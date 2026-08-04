@@ -72,6 +72,9 @@ namespace ZoneEngine.Core.Playfields
         // Capture 20260722-233205: first Rollerrat AOS FollowTarget path ~12–18m to player.
         private const float RollerratAutomaticAggroRadiusMeters = 15f;
 
+        // Mike: follow player ~15m from home, then leash return.
+        internal const double RollerratMaximumNpcDistanceFromHomeMeters = 15.0;
+
         private const double DefaultRespawnSeconds = 30.0;
 
         // Captures 20260722-104809/152454: ordinary Desert Reets and
@@ -295,15 +298,22 @@ namespace ZoneEngine.Core.Playfields
             return allies.ToArray();
         }
 
-        internal static bool IsRegisteredGreedyDesertReet(ICharacter npc)
+        internal static bool IsRegisteredRollerrat(ICharacter npc)
         {
-            if (npc == null
-                || npc.Playfield == null
-                || npc.Playfield.Identity.Instance != AreteLandingPlayfieldId
-                || !string.Equals(npc.Name, "Greedy Desert Reet", StringComparison.OrdinalIgnoreCase)
-                || npc.Stats[StatIds.level].Value != 7
-                || npc.Stats[StatIds.monsterdata].Value != CombatTestMobArchetype.IslandReet.MonsterData
-                || npc.Stats[StatIds.npcfamily].Value != CombatTestMobArchetype.IslandReet.NpcFamily)
+            if (npc == null)
+            {
+                return false;
+            }
+
+            lock (OasisGate)
+            {
+                return OasisRollerratInstances.Contains(npc.Identity.Instance);
+            }
+        }
+
+        internal static bool IsRegisteredOasisDesertReet(ICharacter npc)
+        {
+            if (npc == null)
             {
                 return false;
             }
@@ -312,6 +322,35 @@ namespace ZoneEngine.Core.Playfields
             {
                 return OasisReetInstances.Contains(npc.Identity.Instance);
             }
+        }
+
+        internal static bool IsRegisteredGreedyDesertReet(ICharacter npc)
+        {
+            if (!MatchesGreedyDesertReetIdentity(npc))
+            {
+                return false;
+            }
+
+            lock (OasisGate)
+            {
+                return OasisReetInstances.Contains(npc.Identity.Instance);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260725-shiny-sword-nano: unique name + Island Reet archetype on Arete.
+        /// Used by Shiny Sword trade (must not require OasisReetInstances — live pool ids
+        /// differ from the capture shell and oasis registration can miss respawns).
+        /// </summary>
+        internal static bool MatchesGreedyDesertReetIdentity(ICharacter npc)
+        {
+            return npc != null
+                   && npc.Playfield != null
+                   && npc.Playfield.Identity.Instance == AreteLandingPlayfieldId
+                   && string.Equals(npc.Name, "Greedy Desert Reet", StringComparison.OrdinalIgnoreCase)
+                   && npc.Stats[StatIds.level].Value == 7
+                   && npc.Stats[StatIds.monsterdata].Value == CombatTestMobArchetype.IslandReet.MonsterData
+                   && npc.Stats[StatIds.npcfamily].Value == CombatTestMobArchetype.IslandReet.NpcFamily;
         }
 
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
@@ -615,6 +654,7 @@ namespace ZoneEngine.Core.Playfields
 
             int minDamage = 6;
             int maxDamage = slot.Level >= 7 ? 10 : 8;
+            // Capture / Mike: Desert Reets are not attack-on-sight; retaliate only.
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
                 "lorelei-oasis-20260721-loralei",
                 minDamage,
@@ -628,10 +668,9 @@ namespace ZoneEngine.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0).WithCaptureProvenRetaliationEligibility("desert-reet-passive-until-attacked");
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            // Capture: not attack-on-sight; retaliate + nearby assist only.
             controller.AiProfile = NpcAiProfile.Passive;
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;

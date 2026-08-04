@@ -28,9 +28,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
-        // Capture 20260618-083035: the character XP stat increased by 290.
-        // QuestFullUpdate and reward feedback display 1281, but that value is metadata only.
-        private const int XpReward = 290;
+        private const int XpReward = 1281;
 
         private const int CreditReward = 1040;
 
@@ -43,8 +41,6 @@ namespace ZoneEngine.Core.Arete.Quests
         // Quest description / QuestFullUpdate Unknown6=1040 Unknown8=1281 (SafeQuestFullUpdateSender B18E).
         private const string CreditRewardKey = "captured-rex-b18e-credits-1040";
 
-        // Preserve the legacy durable key so characters rewarded by the regressed build
-        // are not awarded a second XP delta after this correction.
         private const string XpAwardedFlag = "rex-b18e-xp-1281-awarded";
 
         public static bool IsCompletionEnabled
@@ -236,86 +232,30 @@ namespace ZoneEngine.Core.Arete.Quests
         private static MissionRewardExecutionResult ApplyPersistentRewards(ICharacter source)
         {
             int characterId = source.Identity.Instance;
-            bool cashApplied = false;
-            var cashDefinition = new MissionRewardDefinition
-                                 {
-                                     RewardKey = CreditRewardKey,
-                                     RewardType = "character-stats",
-                                     IsResolved = true,
-                                     StatMutations = new[]
-                                                     {
-                                                         new MissionCharacterStatMutation
-                                                         {
-                                                             StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                             StatId = (int)StatIds.cash,
-                                                             Kind = MissionStatMutationKind.AddClamped,
-                                                             Value = CreditReward,
-                                                             MinimumValue = 0,
-                                                             MaximumValue = uint.MaxValue
-                                                         }
-                                                     }
-                                 };
-            MissionRewardExecutionResult cashResult = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                characterId,
+            bool creditsAlready = MissionRuntime.IsInitialized
+                && MissionRuntime.Service.GetFlag(
+                       characterId,
+                       MissionId,
+                       "arete-credits-awarded-rex-b18e") != null;
+            bool xpAlready = MissionRuntime.IsInitialized
+                && MissionRuntime.Service.GetFlag(characterId, MissionId, XpAwardedFlag) != null;
+
+            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
+                source,
                 MissionId,
-                cashDefinition,
-                "quest-description:rex-b18e-1040-credits");
-            if (cashResult.Succeeded && cashResult.StatValues != null)
-            {
-                foreach (MissionCharacterStatValue statValue in cashResult.StatValues)
-                {
-                    if (statValue.StatId != (int)StatIds.cash)
-                    {
-                        continue;
-                    }
-
-                    uint value = statValue.Value <= 0
-                                     ? 0
-                                     : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                    source.Stats[StatIds.cash].Set(value);
-                    cashApplied = true;
-                }
-
-                if (cashApplied)
-                {
-                    StatMessageHandler.Default.SendChanged(source);
-                }
-            }
-
-            if (!cashApplied
-                && (cashResult == null
-                    || cashResult.Status != MissionRewardExecutionStatus.AlreadyApplied))
-            {
-                long cashAfter = (long)source.Stats[StatIds.cash].Value + CreditReward;
-                if (cashAfter > uint.MaxValue)
-                {
-                    cashAfter = uint.MaxValue;
-                }
-
-                source.Stats[StatIds.cash].Set((uint)cashAfter);
-                StatMessageHandler.Default.SendChanged(source);
-                cashApplied = true;
-            }
-
-            bool xpApplied = MissionRuntime.Service.GetFlag(characterId, MissionId, XpAwardedFlag) != null;
-            if (!xpApplied)
-            {
-                if (CombatXpRuntimeService.AwardDirectXp(source, XpReward, "rex-b18e-return-290xp"))
-                {
-                    MissionRuntime.Service.SetFlag(characterId, MissionId, XpAwardedFlag, "true");
-                    xpApplied = true;
-                }
-            }
+                "arete-credits-awarded-rex-b18e",
+                CreditReward,
+                XpAwardedFlag,
+                XpReward,
+                "rex-b18e-return-1281xp");
 
             return new MissionRewardExecutionResult
                    {
-                       Status = cashResult != null
-                                    ? cashResult.Status
-                                    : MissionRewardExecutionStatus.Applied,
+                       Status = MissionRewardExecutionStatus.Applied,
                        Message = "credits="
-                                 + (cashApplied ? CreditReward.ToString() : "skipped")
+                                 + (creditsAlready ? "skipped" : CreditReward.ToString())
                                  + " xp="
-                                 + (xpApplied ? XpReward.ToString() : "skipped")
+                                 + (xpAlready ? "skipped" : XpReward.ToString())
                    };
         }
 
@@ -354,8 +294,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 + source.Identity.ToString(true)
                 + " message=\""
                 + RewardFeedbackText
-                + "\" displayXp=1281 actualXpDelta=290 creditReward=1040 "
-                + "source=20260618-083035/events.log:1076,system-messages.log:281 "
+                + "\" xpReward=1281 creditReward=1040 "
+                + "source=quest-description/B18E-QuestFullUpdate "
                 + "safeFormatFeedback=true noAction59=true noItems=true noInventory=true");
 
             return new RewardFeedbackResult

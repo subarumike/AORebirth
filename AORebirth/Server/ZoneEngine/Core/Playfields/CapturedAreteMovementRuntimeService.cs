@@ -60,6 +60,13 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            // Slot-spawned "Cleaning Robot" (Flint / path homes) must stay put.
+            // Capture spawn/patrol routes were pulling them onto the ramp within seconds.
+            if (IsSlotSpawnedCleaningRobot(character))
+            {
+                return false;
+            }
+
             CapturedAreteMovementPoint position = ToPoint(character.Coordinates().coordinate);
             string generationKey = BuildSpawnGenerationKey(character, position);
             int generation;
@@ -321,6 +328,15 @@ namespace AORebirth.Core.Playfields
                        TargetPosition = target,
                        HomePosition = home
                    };
+        }
+
+        /// <summary>
+        /// Exact "Cleaning Robot" only (not Malfunctioning / Burning). Slot population stays home.
+        /// </summary>
+        private static bool IsSlotSpawnedCleaningRobot(ICharacter character)
+        {
+            return character != null
+                   && string.Equals(character.Name, "Cleaning Robot", StringComparison.Ordinal);
         }
 
         private static string BuildSpawnGenerationKey(

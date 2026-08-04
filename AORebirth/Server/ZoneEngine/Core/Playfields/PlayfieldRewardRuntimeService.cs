@@ -37,6 +37,7 @@ namespace AORebirth.Core.Playfields
             FlintBioComQuestRuntime.TryObserveNpcDeath(attacker, target);
             KneecappingQuestRuntime.TryObserveNpcDeath(attacker, target);
             RemiGalloisQuestRuntime.TryObserveNpcDeath(attacker, target);
+            DesmondCalitriQuestRuntime.TryObserveNpcDeath(attacker, target);
             ThrakGardenKeySilvertailTransform.TryObserveCursedDeath(attacker, target);
         }
     }

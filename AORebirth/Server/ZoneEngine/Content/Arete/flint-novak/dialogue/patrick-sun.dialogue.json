@@ -1,10 +1,11 @@
 {
   "Identity": {
-    "Id": "arete-patrick-sun-dialogue-20260725-patric",
-    "Version": "captured-patrick-dialog-20260725-patric",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260725-patric"
+    "Id": "arete-patrick-sun-dialogue-20260801-patrick-sun",
+    "Version": "captured-patrick-dialog-20260801-Patrick-Sun",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260801-Patrick Sun"
   },
   "SourceCaptures": [
+    "20260801-Patrick Sun",
     "20260725-patric"
   ],
   "Npcs": [

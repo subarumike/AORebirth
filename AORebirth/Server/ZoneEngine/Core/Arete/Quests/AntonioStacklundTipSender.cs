@@ -9,15 +9,18 @@ namespace ZoneEngine.Core.Arete.Quests
 
     /// <summary>
     /// Capture 20260726-Antonio-Stacklund QuestFullUpdate recipe tips.
+    /// Assault Rifle tip refreshed from 20260801-120249 (Mission:5574F05C).
     /// </summary>
     internal static class AntonioStacklundTipSender
     {
-        private const int CapturedPlayerInstance = unchecked((int)0x7996C028);
-        private const int CapturedExpiryValue = unchecked((int)0x5FA0E000);
-        private const long TipClientClockBaseSeconds = 1_201_445_827L;
-        private const int TipMissionDurationSeconds = 48 * 60 * 60;
+        // 20260726-Antonio-Stacklund player + 20260801-120249 Assault tip player.
+        private static readonly int[] CapturedPlayerInstances =
+            {
+                unchecked((int)0x7996C028),
+                unchecked((int)0x795AB05F)
+            };
 
-        public const int AssaultRifleInstance = unchecked((int)0x5569CDBF);
+        public const int AssaultRifleInstance = unchecked((int)0x5574F05C);
         public const int WailingBatInstance = unchecked((int)0x5569CDC4);
         public const int GripBladeInstance = unchecked((int)0x5569CDC5);
         public const int ShaolinBowInstance = unchecked((int)0x5569CDCC);
@@ -37,8 +40,9 @@ namespace ZoneEngine.Core.Arete.Quests
         public const int LeatherVestInstance = unchecked((int)0x5569CDC2);
         public const int RangeMeterInstance = unchecked((int)0x5569CDC3);
 
+        // Capture 20260801-120249 IN #45 QuestFullUpdate (player patched only; leave AbsoluteTime).
         private const string AssaultRifleHex =
-            "D446000A0001052900000DC17996C028465A40610000C3507996C02801000007E20000DAC35569CDBF0000000F000000000000000000000002417373" +
+            "973D000A0001052900000DC1795AB05F465A40610000C350795AB05F01000007E20000DAC35574F05C0000000F000000000000000000000002417373" +
             "656D626C65206120424F2D31382028426C7565204F6666736574290000000394417373656D626C65206120424F2D31382028426C7565204F66667365" +
             "74293C42523E3C42523E416E746F6E696F20537461636B6C756E64206861732070726F766964656420796F7520776974682074686520726563697065" +
             "20666F72206372656174696E672061203C6120687265663D276974656D7265663A2F2F3234383334372F3234383334372F31273E424F2D3138202842" +
@@ -56,10 +60,10 @@ namespace ZoneEngine.Core.Arete.Quests
             "2223464630303030223E4D697373696F6E204F626A6563746976653A20417373656D626C652061203C6120687265663D276974656D7265663A2F2F32" +
             "34383334372F3234383334372F31273E424F2D31382028426C7565204F6666736574293C2F613E2E3C2F666F6E743E000000C35078E0FC7C00000006" +
             "000000000000000000000000000003F1000003F1000003F1433039370000000000000000000000000000000000000000000000000000000000000000" +
-            "0000C3507996C02800002C4C0000000000000000000007E200000012000000014B545654000000000000000000000000000000000000000000000000" +
+            "0000C350795AB05F00002C4C0000000000000000000007E200000012000000014B545654000000000000000000000000000000000000000000000000" +
             "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" +
-            "000000000000D2F14D5FA0E000000000000000000000000000000000000000000000000000000000000007E20000C3507996C02800000001055FA0E0" +
-            "000000000000000000000006000007E20000C3507996C0280000000000019AE9000000000000000000000000000000000000000000000007000003F1" +
+            "000000000000D2F14D67485C00000000000000000000000000000000000000000000000000000000000007E20000C350795AB05F000000010567485C" +
+            "000000000000000000000006000007E20000C350795AB05F0000000000019AE9000000000000000000000000000000000000000000000007000003F1" +
             "01";
 
         private const string WailingBatHex =
@@ -712,9 +716,13 @@ namespace ZoneEngine.Core.Arete.Quests
             try
             {
                 byte[] packet = HexToBytes(tipHex);
-                ReplaceInt32Be(packet, CapturedPlayerInstance, source.Identity.Instance);
-                int liveExpiry = ComputeLiveTipExpiry(client);
-                ReplaceInt32Be(packet, CapturedExpiryValue, liveExpiry);
+                // Leave capture AbsoluteTime. TipClientClockBase patching hid tips when the
+                // client clock is already in the capture AbsoluteTime era (Shiny/Remi/Lorelei).
+                for (int i = 0; i < CapturedPlayerInstances.Length; i++)
+                {
+                    ReplaceInt32Be(packet, CapturedPlayerInstances[i], source.Identity.Instance);
+                }
+
                 client.EnqueueOutboundCompressedBuffer(packet);
                 return true;
             }
@@ -722,18 +730,6 @@ namespace ZoneEngine.Core.Arete.Quests
             {
                 return false;
             }
-        }
-
-        private static int ComputeLiveTipExpiry(ZoneClient client)
-        {
-            double secondsSinceSync = (DateTime.UtcNow - client.LastGameTimeSyncUtc).TotalSeconds;
-            if (secondsSinceSync < 0)
-            {
-                secondsSinceSync = 0;
-            }
-
-            return unchecked(
-                (int)(TipClientClockBaseSeconds + (long)secondsSinceSync + TipMissionDurationSeconds));
         }
 
         private static byte[] HexToBytes(string hex)

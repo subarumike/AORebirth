@@ -145,6 +145,7 @@
     <Compile Include="Core\Arete\Quests\MissionStateService.cs" />
     <Compile Include="Core\Arete\Quests\MissionStateStore.cs" />
     <Compile Include="Core\Arete\Quests\MarcusB18FCompletionHandler.cs" />
+    <Compile Include="Core\Arete\Quests\AreteQuestRewardGrants.cs" />
     <Compile Include="Core\Arete\Quests\MarcusB194GasFireProgressTracker.cs" />
     <Compile Include="Core\Arete\Quests\MarcusB196CompletionHandler.cs" />
     <Compile Include="Core\Arete\Quests\MarcusWoundedWorkersQuestRuntime.cs" />
@@ -172,6 +173,8 @@
     <Compile Include="Core\Arete\Quests\PatrickSunTipSender.cs" />
     <Compile Include="Core\Arete\Quests\RemiGalloisQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\RemiGalloisTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\DesmondCalitriQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\DesmondCalitriTipSender.cs" />
     <Compile Include="Core\Arete\Quests\ShinySwordQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\ShinySwordTipSender.cs" />
     <Compile Include="Core\Arete\Quests\ShippingManifestTerminalQuestRuntime.cs" />
@@ -213,6 +216,7 @@
     <Compile Include="Core\Thrak\Vendors\ThrakGardenVendorInteractionRules.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
+    <Compile Include="Core\WeaponCombatTimingRules.cs" />
     <Compile Include="Core\PlayerSpecialAttackRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
     <Compile Include="Core\CombatXpRuntimeService.cs" />
@@ -510,6 +514,8 @@
     <Compile Include="Core\MessageHandlers\UseItemOnItemInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\UseItemOnItemInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\VendingMachineFullUpdateMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteAlexAreaVendorInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\AreteCellStructureScannerSave.cs" />
     <Compile Include="Core\MessageHandlers\VicinityChatMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\WeatherControlMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ZoneLoginMessageHandler.cs" />
@@ -666,6 +672,7 @@
     <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorStockDefinition.cs" />
     <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaVendorContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaNanoPackageRuntime.cs" />
     <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaVendorRuntimeRegistry.cs" />
@@ -688,6 +695,10 @@
     <Compile Include="Core\Playfields\CapturedAreteSarahGreeneVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedAreteSarahGreeneVendorRuntimeService.cs" />
     <Compile Include="Core\MessageHandlers\CapturedAreteSarahGreeneVendorInteractionHandler.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteBarryFoodVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteBarryFoodVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteBarryFoodVendorRuntimeService.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteBarryFoodVendorInteractionHandler.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />

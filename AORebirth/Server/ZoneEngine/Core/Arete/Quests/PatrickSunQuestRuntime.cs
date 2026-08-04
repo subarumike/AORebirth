@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.Arete.Quests
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Threading;
 
     using AORebirth.Core.Entities;
@@ -23,8 +24,8 @@ namespace ZoneEngine.Core.Arete.Quests
     #endregion
 
     /// <summary>
-    /// Capture 20260725-patric: Patrick Sun insurance / kill / yell side quest on Arete Landing.
-    /// Tips Mission:5565C962 → 5565C963 → 5565C966; finish 2229 XP, 2200 credits,
+    /// Capture 20260801-Patrick Sun: Patrick Sun insurance / kill / yell side quest on Arete Landing.
+    /// Tips Mission:5565C962 → 5565C963 → 5565C966; finish 2596 XP, 2200 credits,
     /// Belt Component Platform 300X (36782/36777 ql30).
     /// </summary>
     public static class PatrickSunQuestRuntime
@@ -45,8 +46,13 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public const string YellQuestId = "Mission:5565C966";
 
-        // Capture 20260725-patric Terminal:574187D0 (ICC Cell Structure Scanner).
-        public const int CellScannerTerminalInstance = unchecked((int)0x574187D0);
+        // Capture 20260801-Patrick Sun live Terminal:574187D0; playfields.dat Terminal:C00D1999 tpl=300813.
+        public const int CellScannerTerminalInstance = AreteCellStructureScannerSave.LiveTerminalInstance;
+
+        public const int CellScannerPlayfieldStatelInstance =
+            AreteCellStructureScannerSave.PlayfieldStatelInstance;
+
+        public const int CellScannerTemplateId = AreteCellStructureScannerSave.TemplateId;
 
         private const int PatrickSunInstance = unchecked((int)0x78E0FC7B);
 
@@ -59,12 +65,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int BeltQuality = 30;
 
-        private const int FinishXpReward = 2229;
+        private const int FinishXpReward = 2596;
 
         private const int FinishCreditReward = 2200;
 
-        // Capture FormatFeedback Message wire for "Received reward: 2229 XP, 2200 credits."
-        private const string FinishRewardFeedback = "~&!!!\":$'O\"ui!!!;4i!!!:l~";
+        // Capture FormatFeedback Message wire for "Received reward: 2596 XP, 2200 credits."
+        private const string FinishRewardFeedback = "~&!!!\":$'O\"ui!!!?Oi!!!:l~";
 
         private const int CapturedTemplateActionUnknown1 = 1;
 
@@ -74,11 +80,31 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string RewardsGrantedFlag = "patrick-sun-rewards-granted";
 
+        private const string InsurancePendingFlag = "patrick-insurance-pending";
+
+        private const string TalkPendingFlag = "patrick-talk-pending";
+
+        private const string YellPendingFlag = "patrick-yell-pending";
+
+        private static readonly object TipSyncRoot = new object();
+
+        private static readonly HashSet<int> InsurancePendingByCharacter = new HashSet<int>();
+
+        private static readonly HashSet<int> TalkPendingByCharacter = new HashSet<int>();
+
+        private static readonly HashSet<int> YellPendingByCharacter = new HashSet<int>();
+
         public static string ResolvePatrickStartNodeId(ICharacter source)
         {
             if (source == null || !IsInAreteLanding(source))
             {
                 return null;
+            }
+
+            if (HasCompletedPatrickQuest(source))
+            {
+                // Capture: quest is one-shot after yell rewards; still allow greeting, no tip restart.
+                return RootNodeId;
             }
 
             if (HasPendingYellTurnIn(source))
@@ -88,13 +114,20 @@ namespace ZoneEngine.Core.Arete.Quests
                     source,
                     PatrickSunTipSender.YellTipInstance);
                 EnsureQuestActive(source, YellQuestId);
+                MarkYellPending(source);
                 PatrickSunTipSender.TrySendYellTipOnly(source);
                 return YellRootNodeId;
             }
 
-            if (IsMissionActive(source, TalkQuestId) && !IsMissionCompleted(source, TalkQuestId))
+            if (HasPendingTalkTip(source))
             {
                 return ScannerRootNodeId;
+            }
+
+            // Heal: insurance tip was offered before pending flags existed (Mike 20260801).
+            if (HasMissionOfferedOrActive(source, InsuranceQuestId))
+            {
+                MarkInsurancePending(source);
             }
 
             return RootNodeId;
@@ -115,9 +148,11 @@ namespace ZoneEngine.Core.Arete.Quests
 
             if (string.Equals(previousNodeId, ScannerRootNodeId, StringComparison.OrdinalIgnoreCase))
             {
-                // Capture 20260725-patric:
+                // Capture 20260801-Patrick Sun:
                 // Answer Cell Scanner → AppendText "Excellent..." → Talk tip delete + Yell QFU
-                // → AnswerList Goodbye → HealthDamage/Death (2954 ms later, before player clicks Goodbye).
+                // → AnswerList Goodbye → HealthDamage/Death (4355 ms later, before player clicks Goodbye).
+                ClearTalkPending(source);
+                MarkYellPending(source);
                 EnsureQuestActive(source, YellQuestId);
                 CompleteAndActivate(source, TalkQuestId, YellQuestId, "mission_5565C963_talk_patrick");
                 EnsureQuestActive(source, YellQuestId);
@@ -128,8 +163,8 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             // Capture: rewards land with Relax/belt AppendText after ICC-guard answer (yell_003→reward).
-            if (string.Equals(previousNodeId, "patrick_yell_003", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(previousNodeId, YellRewardNodeId, StringComparison.OrdinalIgnoreCase))
+            // Only complete on yell_003 — reward-node Goodbye must not grant a second time.
+            if (string.Equals(previousNodeId, "patrick_yell_003", StringComparison.OrdinalIgnoreCase))
             {
                 CompleteYellQuest(source);
                 return true;
@@ -141,44 +176,316 @@ namespace ZoneEngine.Core.Arete.Quests
         public static bool TryHandleInsuranceTerminalUse(ICharacter source, Identity target)
         {
             if (source == null
-                || target == null
-                || target.Type != IdentityType.Terminal
-                || target.Instance != unchecked((int)0x574187D0)
-                || !IsInAreteLanding(source)
-                || !IsMissionActive(source, InsuranceQuestId)
-                || IsMissionCompleted(source, InsuranceQuestId))
+                || !AreteCellStructureScannerSave.IsTarget(target)
+                || !IsInAreteLanding(source))
             {
                 return false;
             }
 
-            // Capture 20260727-193403 proves only Terminal:574187D0 for this transition.
-            CompleteAndActivate(source, InsuranceQuestId, TalkQuestId, "mission_5565C962_use_scanner");
-            PatrickSunTipSender.TrySendInsuranceToTalkHandoff(source);
+            // Log before save — prior builds threw inside TrySave and never ACKed (client Use spam).
             Log(
-                "insurance→talk handoff character="
+                "cell scanner Use begin character="
                 + source.Identity.ToString(true)
-                + " terminal="
+                + " target="
                 + target.ToString(true));
+
+            bool saved = false;
+            try
+            {
+                // Capture 20260801-091856 / 20260801-Patrick Sun: SaveChar first, then tip handoff.
+                saved = AreteCellStructureScannerSave.TrySave(source);
+            }
+            catch (Exception ex)
+            {
+                Log("cell scanner SaveChar exception: " + ex);
+            }
+
+            bool pendingInsurance = HasPendingInsuranceTip(source);
+            if (pendingInsurance && saved)
+            {
+                try
+                {
+                    // Capture replay: Quest Delete insurance tip → QFU "Talk to Patrick Sun".
+                    ClearInsurancePending(source);
+                    MarkTalkPending(source);
+                    CompleteAndActivate(source, InsuranceQuestId, TalkQuestId, "mission_5565C962_use_scanner");
+                    PatrickSunTipSender.TrySendInsuranceToTalkHandoff(source);
+                    Log(
+                        "insurance→talk handoff character="
+                        + source.Identity.ToString(true)
+                        + " terminal="
+                        + target.ToString(true));
+                }
+                catch (Exception ex)
+                {
+                    Log("insurance→talk handoff exception: " + ex);
+                }
+            }
+            else
+            {
+                Log(
+                    "cell scanner use character="
+                    + source.Identity.ToString(true)
+                    + " saved="
+                    + saved
+                    + " pendingInsurance="
+                    + pendingInsurance
+                    + " target="
+                    + target.ToString(true));
+            }
+
+            // Always claim the Use so GenericCmd ACK is sent (stops client retry spam).
             return true;
+        }
+
+        private static bool HasCompletedPatrickQuest(ICharacter source)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            return MissionRuntime.Service.GetFlag(
+                       source.Identity.Instance,
+                       YellQuestId,
+                       RewardsGrantedFlag) != null;
+        }
+
+        private static bool HasPendingInsuranceTip(ICharacter source)
+        {
+            if (source == null || HasCompletedPatrickQuest(source) || HasPendingTalkTip(source))
+            {
+                return false;
+            }
+
+            int characterId = source.Identity.Instance;
+            lock (TipSyncRoot)
+            {
+                if (InsurancePendingByCharacter.Contains(characterId))
+                {
+                    return true;
+                }
+            }
+
+            if (MissionRuntime.IsInitialized
+                && HasTipFlag(source, InsuranceQuestId, InsurancePendingFlag))
+            {
+                return true;
+            }
+
+            // Do not treat Completed insurance as blocking — Offer stays AlreadyApplied and tip
+            // wire can still be live while MissionRuntime never tracked Active (Mike 20260801).
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.IsInitialized
+                    ? MissionRuntime.Service.GetMission(characterId, InsuranceQuestId)
+                    : null;
+            return mission != null
+                   && (mission.State == MissionLifecycleState.Active
+                       || mission.State == MissionLifecycleState.Offered);
+        }
+
+        private static bool HasPendingTalkTip(ICharacter source)
+        {
+            if (source == null || HasCompletedPatrickQuest(source))
+            {
+                return false;
+            }
+
+            int characterId = source.Identity.Instance;
+            lock (TipSyncRoot)
+            {
+                if (TalkPendingByCharacter.Contains(characterId))
+                {
+                    return true;
+                }
+            }
+
+            if (MissionRuntime.IsInitialized
+                && HasTipFlag(source, TalkQuestId, TalkPendingFlag))
+            {
+                return true;
+            }
+
+            return IsMissionActive(source, TalkQuestId) && !IsMissionCompleted(source, TalkQuestId);
         }
 
         private static void StartInsuranceTip(ICharacter source)
         {
-            if (!MissionRuntime.IsInitialized)
+            if (source == null || HasCompletedPatrickQuest(source))
             {
+                Log(
+                    "insurance tip skipped completed character="
+                    + (source == null ? "<null>" : source.Identity.ToString(true)));
                 return;
             }
 
-            int characterId = source.Identity.Instance;
-            MissionRuntime.Service.OfferMission(characterId, InsuranceQuestId);
-            MissionRuntime.Service.AcceptMission(characterId, InsuranceQuestId);
+            if (HasPendingTalkTip(source) || HasPendingYellTurnIn(source))
+            {
+                Log(
+                    "insurance tip skipped already-advanced character="
+                    + source.Identity.ToString(true));
+                return;
+            }
+
+            MarkInsurancePending(source);
+            if (MissionRuntime.IsInitialized)
+            {
+                int characterId = source.Identity.Instance;
+                MissionRuntime.Service.OfferMission(characterId, InsuranceQuestId);
+                MissionRuntime.Service.AcceptMission(characterId, InsuranceQuestId);
+                TrySetTipFlag(source, InsuranceQuestId, InsurancePendingFlag);
+            }
+
             PatrickSunTipSender.TrySendInsuranceTipOnly(source);
             Log("insurance tip started character=" + source.Identity.ToString(true));
         }
 
-        // Capture: Excellent @19:34:57.630 → HealthDamage @19:35:00.584 (2954 ms).
+        private static void MarkInsurancePending(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TipSyncRoot)
+            {
+                InsurancePendingByCharacter.Add(source.Identity.Instance);
+                TalkPendingByCharacter.Remove(source.Identity.Instance);
+                YellPendingByCharacter.Remove(source.Identity.Instance);
+            }
+        }
+
+        private static void ClearInsurancePending(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TipSyncRoot)
+            {
+                InsurancePendingByCharacter.Remove(source.Identity.Instance);
+            }
+
+            TrySetTipFlag(source, InsuranceQuestId, InsurancePendingFlag, "0");
+        }
+
+        private static void MarkTalkPending(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TipSyncRoot)
+            {
+                TalkPendingByCharacter.Add(source.Identity.Instance);
+                InsurancePendingByCharacter.Remove(source.Identity.Instance);
+            }
+
+            TrySetTipFlag(source, TalkQuestId, TalkPendingFlag);
+        }
+
+        private static void ClearTalkPending(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TipSyncRoot)
+            {
+                TalkPendingByCharacter.Remove(source.Identity.Instance);
+            }
+
+            TrySetTipFlag(source, TalkQuestId, TalkPendingFlag, "0");
+        }
+
+        private static void MarkYellPending(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TipSyncRoot)
+            {
+                YellPendingByCharacter.Add(source.Identity.Instance);
+                TalkPendingByCharacter.Remove(source.Identity.Instance);
+                InsurancePendingByCharacter.Remove(source.Identity.Instance);
+            }
+
+            TrySetTipFlag(source, YellQuestId, YellPendingFlag);
+        }
+
+        private static void ClearYellPending(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TipSyncRoot)
+            {
+                YellPendingByCharacter.Remove(source.Identity.Instance);
+            }
+
+            TrySetTipFlag(source, YellQuestId, YellPendingFlag, "0");
+        }
+
+        private static bool HasMissionOfferedOrActive(ICharacter source, string questId)
+        {
+            if (source == null || !MissionRuntime.IsInitialized || string.IsNullOrEmpty(questId))
+            {
+                return false;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(source.Identity.Instance, questId);
+            return mission != null
+                   && (mission.State == MissionLifecycleState.Active
+                       || mission.State == MissionLifecycleState.Offered);
+        }
+
+        private static bool HasTipFlag(ICharacter source, string questId, string flagKey)
+        {
+            if (source == null || !MissionRuntime.IsInitialized || string.IsNullOrEmpty(flagKey))
+            {
+                return false;
+            }
+
+            ZoneEngine.Core.Missions.MissionFlagRecord flag =
+                MissionRuntime.Service.GetFlag(source.Identity.Instance, questId, flagKey);
+            return flag != null && string.Equals(flag.Value, "1", StringComparison.Ordinal);
+        }
+
+        private static void TrySetTipFlag(
+            ICharacter source,
+            string questId,
+            string flagKey,
+            string value = "1")
+        {
+            if (source == null || !MissionRuntime.IsInitialized || string.IsNullOrEmpty(questId))
+            {
+                return;
+            }
+
+            try
+            {
+                int characterId = source.Identity.Instance;
+                MissionRuntime.Service.OfferMission(characterId, questId);
+                MissionRuntime.Service.AcceptMission(characterId, questId);
+                MissionRuntime.Service.SetFlag(characterId, questId, flagKey, value);
+            }
+            catch (Exception ex)
+            {
+                Log("tip flag persist skipped key=" + flagKey + " err=" + ex.Message);
+            }
+        }
+
+        // Capture 20260801-Patrick Sun: Cell Scanner answer @07:02:11.003 → HealthDamage @07:02:15.358 (4355 ms).
         // Tip/Yell lands first; death follows while Goodbye options are on screen.
-        private const int PatrickKillDelayMilliseconds = 2954;
+        private const int PatrickKillDelayMilliseconds = 4355;
 
         private static void SchedulePatrickKill(ICharacter source)
         {
@@ -249,31 +556,48 @@ namespace ZoneEngine.Core.Arete.Quests
                     RewardsGrantedFlag) != null)
             {
                 // Still wipe stuck journal tip if a prior grant left Remain 00:00 on client.
+                ClearYellPending(source);
                 SafeQuestFullUpdateSender.SendTipAction59AndDelete(
                     source,
                     PatrickSunTipSender.YellTipInstance);
                 return;
             }
 
-            // Delete tip first so journal clears even if a later grant step fails.
+            // Claim once-only before grants so double dialogue answers cannot 2x XP/credits/belt.
+            if (MissionRuntime.IsInitialized)
+            {
+                try
+                {
+                    MissionRuntime.Service.SetFlag(
+                        source.Identity.Instance,
+                        YellQuestId,
+                        RewardsGrantedFlag,
+                        "1");
+                }
+                catch (Exception ex)
+                {
+                    Log("yell rewards flag failed: " + ex.Message);
+                }
+            }
+
+            ClearYellPending(source);
+
+            // Capture 20260801-Patrick Sun #748-753:
+            // FormatFeedback → Cash → XP → TemplateAction → ContainerAdd → Feedback → tip delete.
+            TrySendFinishRewardFeedback(source);
+            ApplyFinishXpCredits(source);
+            TryGrantBelt(source);
+            FeedbackMessageHandler.Default.Send(source, 110, 108871108);
+
+            // Delete tip after reward wire so journal clears with the grant burst.
             SafeQuestFullUpdateSender.SendTipAction59AndDelete(
                 source,
                 PatrickSunTipSender.YellTipInstance);
-
-            ApplyFinishXpCredits(source);
-            TryGrantBelt(source);
-            TrySendFinishRewardFeedback(source);
-            FeedbackMessageHandler.Default.Send(source, 110, 108871108);
 
             if (MissionRuntime.IsInitialized)
             {
                 EnsureQuestActive(source, YellQuestId);
                 ForceCompleteTip(source.Identity.Instance, YellQuestId, "mission_5565C966_yell_patrick");
-                MissionRuntime.Service.SetFlag(
-                    source.Identity.Instance,
-                    YellQuestId,
-                    RewardsGrantedFlag,
-                    "1");
             }
 
             Log("yell complete rewards character=" + source.Identity.ToString(true));
@@ -292,14 +616,14 @@ namespace ZoneEngine.Core.Arete.Quests
                 targetHp = 1;
             }
 
-            // Capture 20260725-patric #239: HealthDamage from Patrick before Death.
+            // Capture 20260801-Patrick Sun #407: HealthDamage from Patrick before Death.
             source.Controller.Client.SendCompressed(
                 new HealthDamageMessage
                 {
                     Identity = source.Identity,
                     Unknown = 0,
                     Unknown1 = 0,
-                    Unknown2 = unchecked((int)0xFFFECC9D),
+                    Unknown2 = unchecked((int)0xFFFEE668),
                     Unknown3 = targetHp,
                     Unknown4 = 5,
                     Target = new Identity
@@ -386,99 +710,36 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            // Credits: MissionRuntime ledger or direct cash Set.
-            bool cashApplied = false;
-            if (MissionRuntime.IsInitialized)
-            {
-                MissionRewardDefinition cashDefinition = new MissionRewardDefinition
-                                                        {
-                                                            RewardKey = "captured-patrick-sun-yell-credits",
-                                                            RewardType = "character-stats",
-                                                            IsResolved = true,
-                                                            StatMutations =
-                                                                new[]
-                                                                {
-                                                                    new MissionCharacterStatMutation
-                                                                    {
-                                                                        StatIdentityType =
-                                                                            (int)IdentityType.CanbeAffected,
-                                                                        StatId = (int)StatIds.cash,
-                                                                        Kind = MissionStatMutationKind.AddClamped,
-                                                                        Value = FinishCreditReward,
-                                                                        MinimumValue = 0,
-                                                                        MaximumValue = uint.MaxValue
-                                                                    }
-                                                                }
-                                                        };
-                MissionRewardExecutionResult cashResult = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                    source.Identity.Instance,
-                    YellQuestId,
-                    cashDefinition,
-                    "capture:20260725-patric:patrick-yell-credits");
-                if (cashResult.Succeeded && cashResult.StatValues != null)
-                {
-                    foreach (MissionCharacterStatValue statValue in cashResult.StatValues)
-                    {
-                        if (statValue.StatId != (int)StatIds.cash)
-                        {
-                            continue;
-                        }
-
-                        uint value = statValue.Value <= 0
-                                         ? 0
-                                         : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                        source.Stats[StatIds.cash].Set(value);
-                        cashApplied = true;
-                    }
-
-                    if (cashApplied)
-                    {
-                        StatMessageHandler.Default.SendChanged(source);
-                    }
-                }
-            }
-
-            if (!cashApplied)
-            {
-                long cashAfter = (long)source.Stats[StatIds.cash].Value + FinishCreditReward;
-                if (cashAfter > uint.MaxValue)
-                {
-                    cashAfter = uint.MaxValue;
-                }
-
-                source.Stats[StatIds.cash].Set((uint)cashAfter);
-                StatMessageHandler.Default.SendChanged(source);
-            }
-
-            // XP must use CombatXpRuntimeService — naive Stats[xp].Set does not update the bar/wire
-            // (cash worked; feedback showed 2229 XP but XP did not land).
-            bool xpApplied = CombatXpRuntimeService.AwardDirectXp(
+            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
                 source,
+                YellQuestId,
+                "arete-credits-awarded-patrick-yell",
+                FinishCreditReward,
+                "arete-xp-awarded-patrick-yell",
                 FinishXpReward,
-                "patrick-sun-yell-2229xp");
-            Log(
-                "finish rewards cashApplied="
-                + cashApplied
-                + " xpApplied="
-                + xpApplied
-                + " character="
-                + source.Identity.ToString(true));
+                "patrick-sun-yell-2596xp");
+            Log("finish rewards character=" + source.Identity.ToString(true));
         }
 
         private static bool HasPendingYellTurnIn(ICharacter source)
         {
-            if (source == null)
+            if (source == null || HasCompletedPatrickQuest(source))
             {
                 return false;
             }
 
-            if (MissionRuntime.IsInitialized
-                && MissionRuntime.Service.GetFlag(
-                    source.Identity.Instance,
-                    YellQuestId,
-                    RewardsGrantedFlag) != null)
+            int characterId = source.Identity.Instance;
+            lock (TipSyncRoot)
             {
-                return false;
+                if (YellPendingByCharacter.Contains(characterId))
+                {
+                    return true;
+                }
+            }
+
+            if (HasTipFlag(source, YellQuestId, YellPendingFlag))
+            {
+                return true;
             }
 
             if (IsMissionActive(source, YellQuestId) && !IsMissionCompleted(source, YellQuestId))
@@ -487,7 +748,9 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             // Wire tip can exist on client after death even if Yell Accept was missed.
-            return IsMissionCompleted(source, TalkQuestId) && !IsMissionCompleted(source, YellQuestId);
+            return HasPendingTalkTip(source) == false
+                   && IsMissionCompleted(source, TalkQuestId)
+                   && !IsMissionCompleted(source, YellQuestId);
         }
 
         private static void EnsureQuestActive(ICharacter source, string questId)

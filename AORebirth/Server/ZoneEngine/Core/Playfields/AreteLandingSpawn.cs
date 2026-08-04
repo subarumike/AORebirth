@@ -483,16 +483,16 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260720-goldman 7982B96D (dossier)
-                CaptureInstance = unchecked((int)0x7982B96D),
+                // Capture 20260721-sara 79851D20 (scfu); package capture 20260802-advy-nano-package
+                CaptureInstance = unchecked((int)0x79851D20),
                 Name = "Cedric Harding",
-                Level = 6, Health = 42, MonsterData = 165188, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 23,
-                NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
+                Level = 6, Health = 42, MonsterData = 165188, Scale = 120, VisualFlags = 31, HeadMesh = 40690, RunSpeed = 22,
+                NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1417,
                 Side = 0, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
-                X = 3501.87085f, Y = 5.11000061f, Z = 825.5927f,
-                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
-                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
-                Meshes = null,
+                X = 3501.89f, Y = 5.11000061f, Z = 825.466f,
+                Hx = 0.0f, Hy = 0.709269166f, Hz = 0.0f, Hw = 0.7049378f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40690, 0, 4 }, new[] { 1, 81800, 0, 2 } },
             },
             new AreteNpc
             {
@@ -769,12 +769,13 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260720-goldman 78E0FC74 (scfu)
+                // Capture 20260720-goldman 78E0FC74 (scfu); pathing 20260726-leonora-pathing
                 CaptureInstance = unchecked((int)0x78E0FC74),
                 Name = "Leonora Marty",
                 Level = 10, Health = 227, MonsterData = 26125, Scale = 100, VisualFlags = 31, HeadMesh = 40228, RunSpeed = 34,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1864,
-                Side = 0, Breed = 2, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                // Capture path Animation/MoveMode=24 (Walk). SCFU MovementMode=3 is Run enum and made her sprint.
+                Side = 0, Breed = 2, Gender = 3, Race = 1, Fatness = 1, MovementMode = 2,
                 X = 3440.039f, Y = 9.01f, Z = 858.082642f,
                 Hx = 0.0f, Hy = 0.611119151f, Hz = 0.0f, Hw = 0.7915386f,
                 Textures = new[] { new[] { 0, 85939 }, new[] { 1, 296228 }, new[] { 2, 296231 }, new[] { 3, 296229 }, new[] { 4, 296230 } },
@@ -1270,6 +1271,21 @@ namespace AORebirth.Core.Playfields
             SpawnedPlayfields.Remove(playfieldInstance);
             LivingCaptureSlots.Clear();
             CapturedRespawnDueUtcByPlayfield.Remove(playfieldInstance);
+        }
+
+        /// <summary>
+        /// Capture SCFU instance → current live pool instance for a spawned Arete NPC.
+        /// Used by dialogue routing when client/target ids are pool ids, not capture ids.
+        /// </summary>
+        internal static bool TryGetLivingPoolInstance(int captureInstance, out int poolInstance)
+        {
+            if (captureInstance == 0)
+            {
+                poolInstance = 0;
+                return false;
+            }
+
+            return LivingCaptureSlots.TryGetValue(captureInstance, out poolInstance);
         }
 
         public static void SpawnForPlayfield(

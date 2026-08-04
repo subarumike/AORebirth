@@ -476,12 +476,6 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
-                if (!ApplyAlexTurnInXpCredits(source))
-                {
-                    Log("alex-turnin deferred: durable reward was not completed");
-                    return;
-                }
-
                 TryConsumeBioCom(source, stagedContainer);
                 try
                 {
@@ -492,6 +486,7 @@ namespace ZoneEngine.Core.Arete.Quests
                     Log("alex-rejecteditems failed: " + ex.Message);
                 }
 
+                ApplyAlexTurnInXpCredits(source);
                 TrySendTurnInRewardFeedback(source);
                 TryGrantAlexTurnInItems(source);
                 CompleteDeliverAndOfferUplink(source);
@@ -669,92 +664,16 @@ namespace ZoneEngine.Core.Arete.Quests
                 });
         }
 
-        private static bool ApplyAlexTurnInXpCredits(ICharacter source)
+        private static void ApplyAlexTurnInXpCredits(ICharacter source)
         {
-            if (source == null || !MissionRuntime.IsInitialized || MissionRuntime.Rewards == null)
-            {
-                return false;
-            }
-
-            MissionRewardDefinition definition = new MissionRewardDefinition
-                                                {
-                                                    RewardKey = "captured-alex-bio-com-turnin-xp-credits-20260731-184635",
-                                                    LegacyRewardKeys = new[]
-                                                                       {
-                                                                           "captured-alex-bio-com-turnin-xp-credits"
-                                                                       },
-                                                    RewardType = "character-stats",
-                                                    IsResolved = true,
-                                                    StatMutations =
-                                                        new[]
-                                                        {
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.cash,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = TurnInCreditReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.xp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = TurnInXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.unsavedxp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = TurnInXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.lastxp,
-                                                                Kind = MissionStatMutationKind.Set,
-                                                                Value = TurnInXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            }
-                                                        }
-                                                };
-            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                source.Identity.Instance,
+            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
+                source,
                 "Mission:5514B19C",
-                definition,
-                "capture:20260731-184635:alex-turnin-xp-credits");
-            if (result == null || !result.Succeeded)
-            {
-                Log(
-                    "alex xp/credits reward failed status="
-                    + (result == null ? "null" : result.Status.ToString())
-                    + " msg="
-                    + (result == null ? string.Empty : result.Message));
-                return false;
-            }
-
-            if (result.StatValues != null)
-            {
-                foreach (MissionCharacterStatValue statValue in result.StatValues)
-                {
-                    uint value = statValue.Value <= 0
-                                     ? 0
-                                     : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                    source.Stats[(StatIds)statValue.StatId].Set(value);
-                }
-
-                StatMessageHandler.Default.SendChanged(source);
-            }
-
-            return true;
+                "arete-credits-awarded-flint-biocom-turnin",
+                TurnInCreditReward,
+                "arete-xp-awarded-flint-biocom-turnin",
+                TurnInXpReward,
+                "flint-biocom-alex-turnin-2229xp");
         }
 
         private static void TrySendTurnInRewardFeedback(ICharacter source)
@@ -978,8 +897,27 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
+            int characterId = source.Identity.Instance;
+
+            // Past Bio deliver: Report-to-Alex / Talk-to-Stan / tradeskill must not reopen Flint item dialog.
+            ZoneEngine.Core.Missions.MissionStateRecord report =
+                MissionRuntime.Service.GetMission(characterId, "Mission:555B4365");
+            ZoneEngine.Core.Missions.MissionStateRecord talkStan =
+                MissionRuntime.Service.GetMission(characterId, "Mission:555B4366");
+            ZoneEngine.Core.Missions.MissionStateRecord nanoSensor =
+                MissionRuntime.Service.GetMission(characterId, "Mission:555B4367");
+            if (IsActiveOrOffered(report)
+                || (report != null && report.State == MissionLifecycleState.Completed)
+                || IsActiveOrOffered(talkStan)
+                || (talkStan != null && talkStan.State == MissionLifecycleState.Completed)
+                || IsActiveOrOffered(nanoSensor)
+                || (nanoSensor != null && nanoSensor.State == MissionLifecycleState.Completed))
+            {
+                return false;
+            }
+
             ZoneEngine.Core.Missions.MissionStateRecord deliver =
-                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19C");
+                MissionRuntime.Service.GetMission(characterId, "Mission:5514B19C");
             if (IsActiveOrOffered(deliver))
             {
                 return true;
@@ -992,9 +930,9 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             ZoneEngine.Core.Missions.MissionStateRecord find =
-                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19B");
+                MissionRuntime.Service.GetMission(characterId, "Mission:5514B19B");
             ZoneEngine.Core.Missions.MissionStateRecord uplink =
-                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19D");
+                MissionRuntime.Service.GetMission(characterId, "Mission:5514B19D");
             bool findDone = find != null && find.State == MissionLifecycleState.Completed;
             bool uplinkStarted = IsActiveOrOffered(uplink)
                                  || (uplink != null && uplink.State == MissionLifecycleState.Completed);

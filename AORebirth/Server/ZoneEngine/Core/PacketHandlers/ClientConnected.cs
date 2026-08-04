@@ -162,7 +162,17 @@ Pool.Instance.GetAll<Vendor>(
 client.Controller.Character.Playfield.Identity,
 (int)IdentityType.VendingMachine))
             {
-                VendingMachineFullUpdateMessageHandler.Default.Send(client.Controller.Character, vendor);
+                CapturedAreteAlexAreaVendorRuntimeDefinition alexArea;
+                if (CapturedAreteAlexAreaVendorRuntimeRegistry.TryGet(vendor.Identity.Instance, out alexArea))
+                {
+                    VendingMachineFullUpdateMessageHandler.Default.SendAreteFreestanding(
+                        client.Controller.Character,
+                        vendor);
+                }
+                else
+                {
+                    VendingMachineFullUpdateMessageHandler.Default.Send(client.Controller.Character, vendor);
+                }
             }
 
             // Debug-only combat test mob spawns are disabled on normal login.

@@ -17,8 +17,8 @@
     },
     "patrol": {
       "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/patrol.csv",
-      "runtimeRows": 20933,
-      "sourceObservations": 21305
+      "runtimeRows": 20971,
+      "sourceObservations": 21346
     },
     "spawn": {
       "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/spawn.csv",
@@ -29,11 +29,12 @@
   "captureIds": [
     "20260721-Rox-robots",
     "20260722-104809",
-    "20260722-152454"
+    "20260722-152454",
+    "20260726-leonora-pathing"
   ],
   "capturedPlayfieldId": 1044525,
   "datasetKind": "arete-movement-runtime-aggregate",
-  "deduplicatedRuntimeRows": 22798,
+  "deduplicatedRuntimeRows": 22836,
   "identityScope": [
     "CaptureId",
     "SourceIdentity",
@@ -248,7 +249,7 @@
   "runtimePlayfieldId": 6553,
   "schemaVersion": 4,
   "scriptedRuntimeRows": 0,
-  "sourcePromotableObservations": 23185,
+  "sourcePromotableObservations": 23226,
   "sources": [
     {
       "ambiguousObservations": 0,
@@ -279,6 +280,16 @@
       "rejectedObservations": 353,
       "runtimeManifest": "docs/generated/arete_20260722_152454_movement/runtime/manifest.json",
       "sourcePromotableObservations": 8229
+    },
+    {
+      "ambiguousObservations": 0,
+      "analysisManifest": "",
+      "captureId": "20260726-leonora-pathing",
+      "deduplicatedRuntimeRows": 38,
+      "reconciledObservations": 41,
+      "rejectedObservations": 0,
+      "runtimeManifest": "",
+      "sourcePromotableObservations": 41
     }
   ]
 }

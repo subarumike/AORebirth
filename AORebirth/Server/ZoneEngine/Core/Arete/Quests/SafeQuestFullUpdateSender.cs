@@ -78,6 +78,9 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int CargoLiftingInstance = unchecked((int)0x555BE9FA);
 
+        // Capture 20260721-Vernon-Godfray Cargo Lifting QFU shell before instance patch.
+        private const int CargoLiftingCapturedWireInstance = unchecked((int)0x555CF577);
+
         private const int ReturnToVernonGodfrayInstance = unchecked((int)0x555BE9FB);
 
         private const int TalkToDoctorMasonInstance = unchecked((int)0x555BE9FC);
@@ -309,17 +312,18 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string StrongboxContentsLongInfo =
             "Take the contents of the Strongbox <BR><BR>"
-            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetetected. "
+            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetected. "
             + "Now that you have bought a <a href='itemref://95577/95577/1'>Lock Pick</a>, this should be an easy task."
             + "<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>"
             + "Pick up (Left Click) your <a href='itemref://95577/95577/1'>Lock Pick</a> from your inventory and "
             + "drop it (Left Click) on the <a href='itemref://295604/295604/1'>Merchant's Strongbox</a>.</font>";
 
-        private const string DeliverAntonioFactoryShortInfo = "Deliver Antonio's Adaptatio...";
+        // Capture 20260801-102913 QFU Mission:5574F01A ShortInfo truncation.
+        private const string DeliverAntonioFactoryShortInfo = "Deliver Antonio's Adaptation...";
 
         private const string DeliverAntonioFactoryLongInfo =
             "Deliver Antonio's Adaptation Factory to Stan Goodman.<BR><BR>"
-            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetetected. "
+            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetected. "
             + "Now that you have found <a href='itemref://248306/248306/1'>Antonio's Adaptation Factory</a>, "
             + "bring it back to Stan.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>"
             + "Bring <a href='itemref://248306/248306/1'>Antonio's Adaptation Factory</a> to Stan Goodman.</font>";
@@ -1884,7 +1888,8 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         /// <summary>
-        /// Capture 20260721-lockpick: open sealed Lock Pick → Action59+Delete BuyLockpick + QFU Strongbox.
+        /// Capture 20260721-lockpick packets.hex #542-#544:
+        /// Action59+Quest/Delete BuyLockpick (555BD124) then QFU Strongbox (555BE9C5).
         /// </summary>
         public static RexQuestPreviewEmissionResult TrySendBuyLockpickToStrongboxHandoff(ICharacter source)
         {
@@ -1896,8 +1901,13 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
+                // Capture-exact delete wire first (generic tip delete left Buy Lockpick stuck).
+                SendCapturedBuyLockpickTipDelete(source);
                 SendTipAction59AndDelete(source, BuyLockpickInstance);
                 SendStrongboxContentsTip(source);
+                // Second delete after Strongbox QFU — client tip list sometimes kept the old tip.
+                SendCapturedBuyLockpickTipDelete(source);
+                SendTipAction59AndDelete(source, BuyLockpickInstance);
                 return RexQuestPreviewEmissionResult.Sent(
                     "BuyLockpick→Strongbox tip. mission=Mission:555BE9C5 source=20260721-lockpick");
             }
@@ -1905,6 +1915,31 @@ namespace ZoneEngine.Core.Arete.Quests
             {
                 return RexQuestPreviewEmissionResult.Failed("BuyLockpick→Strongbox handoff failed: " + e.Message);
             }
+        }
+
+        private static void SendCapturedBuyLockpickTipDelete(ICharacter source)
+        {
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client == null || source.Identity.Instance == 0)
+            {
+                return;
+            }
+
+            // Capture 20260721-lockpick #542 CharacterAction Action=59 Target=Mission:555BD124
+            const string action59Hex =
+                "206D000A0001003700000DC1797E30295E4777700000C350797E3029000000003B000000000000DAC3555BD1240000DAC3555BD1240000";
+            // Capture 20260721-lockpick #543 Quest Action=Delete Mission:555BD124
+            const string questDeleteHex =
+                "206E000A0001003500000DC1797E3029212C487A0000C350797E30290000000001000000000000DAC3555BD1240000000000000000";
+            const int capturedPlayerInstance = unchecked((int)0x797E3029);
+
+            byte[] action59 = HexToBytes(action59Hex);
+            ReplaceInt32Be(action59, capturedPlayerInstance, source.Identity.Instance);
+            byte[] questDelete = HexToBytes(questDeleteHex);
+            ReplaceInt32Be(questDelete, capturedPlayerInstance, source.Identity.Instance);
+
+            client.EnqueueOutboundCompressedBuffer(action59);
+            client.EnqueueOutboundCompressedBuffer(questDelete);
         }
 
         private static void SendStrongboxContentsTip(ICharacter source)
@@ -2205,7 +2240,8 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         /// <summary>
-        /// Capture 20260721-Vernon-Godfray: Re-route → Delete Cargo Lifting + QFU Return to Vernon.
+        /// Capture 20260801-105429 / 20260721-Vernon-Godfray: Re-route →
+        /// Action59+Quest Delete Cargo Lifting, then QFU Return to Vernon.
         /// </summary>
         public static RexQuestPreviewEmissionResult TrySendCargoLiftingToReturnVernonHandoff(ICharacter source)
         {
@@ -2217,10 +2253,13 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
+                // Fixed tip id + capture-source id (wire shell Mission:555CF577 before patch).
+                // Deleting only 555BE9FA left Cargo stuck when the client tip used the shell id.
                 SendTipAction59AndDelete(source, CargoLiftingInstance);
+                SendTipAction59AndDelete(source, CargoLiftingCapturedWireInstance);
                 SendReturnToVernonGodfrayTip(source);
                 return RexQuestPreviewEmissionResult.Sent(
-                    "CargoLifting→ReturnVernon tip. mission=Mission:555BE9FB source=20260721-Vernon-Godfray");
+                    "CargoLifting→ReturnVernon tip. mission=Mission:555BE9FB source=20260801-105429");
             }
             catch (Exception e)
             {
@@ -2242,9 +2281,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
+                // Stale Cargo Lifting tips survive if an earlier handoff missed Action59/Delete.
+                SendTipAction59AndDelete(source, CargoLiftingInstance);
+                SendTipAction59AndDelete(source, CargoLiftingCapturedWireInstance);
                 SendReturnToVernonGodfrayTip(source);
                 return RexQuestPreviewEmissionResult.Sent(
-                    "ReturnVernon tip-only. mission=Mission:555BE9FB source=20260721-Vernon-Godfray");
+                    "ReturnVernon tip-only. mission=Mission:555BE9FB source=20260801-105429");
             }
             catch (Exception e)
             {
@@ -2403,6 +2445,7 @@ namespace ZoneEngine.Core.Arete.Quests
         /// <summary>
         /// Capture 20260721-Vernon-Godfray IN #1494 QuestFullUpdate (live Mission:555CF578).
         /// Patches player instance + fixed mission id Mission:555BE9FB.
+        /// Unknown8 patched 0x08B5 (2229) → 0x0A24 (2596) per capture 20260801-105429 turn-in.
         /// </summary>
         private static bool TrySendReturnToVernonGodfrayTipWire(ICharacter source)
         {
@@ -2413,7 +2456,7 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             const string returnVernonQfuHex =
-                "4ACB000A000102C600000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF5780000000F00000000000000000000000252657475726E20746F205665726E6F6E20476F6466726179000000012752657475726E20746F205665726E6F6E20476F64667261793C42523E3C42523E41667465722066696E697368696E6720746865206861636B206A6F622C2072657475726E20746F205665726E6F6E20616E64206865206D696768742068656C7020796F75207769746820796F75722049442070726F626C656D2E3C42523E3C42523E3C666F6E7420636F6C6F723D2223464630303030223E4D697373696F6E204F626A6563746976653A3C42523E54616C6B20746F205665726E6F6E20476F646672617920616E6420676976652068696D20746865203C6120687265663D276974656D7265663A2F2F3239363537322F3239363537322F31273E556E70726F6772616D6D6564204964656E74696669636174696F6E20436869703C2F613E2E3C2F666F6E743E000000C35078E0FC63000000060000055000000000000008B5000003F1000003F1000007E20004867F0004867F0000000100000000595A464900000000000000003132593800000009000000000000000000000000000000000000C350797E306A00026ADD0000000000000000000007E200000006000111D3554E49440000000000000000000111D3565254520000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D578B3600009C5000001999000186A0000186A04556A00000000000444E4000000007E20000C350797E306A0000000105578B36000000000000000000000006000007E20000C350797E306A00000000000199F3000000000000000000000000000000000000000000000007000003F101";
+                "4ACB000A000102C600000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF5780000000F00000000000000000000000252657475726E20746F205665726E6F6E20476F6466726179000000012752657475726E20746F205665726E6F6E20476F64667261793C42523E3C42523E41667465722066696E697368696E6720746865206861636B206A6F622C2072657475726E20746F205665726E6F6E20616E64206865206D696768742068656C7020796F75207769746820796F75722049442070726F626C656D2E3C42523E3C42523E3C666F6E7420636F6C6F723D2223464630303030223E4D697373696F6E204F626A6563746976653A3C42523E54616C6B20746F205665726E6F6E20476F646672617920616E6420676976652068696D20746865203C6120687265663D276974656D7265663A2F2F3239363537322F3239363537322F31273E556E70726F6772616D6D6564204964656E74696669636174696F6E20436869703C2F613E2E3C2F666F6E743E000000C35078E0FC6300000006000005500000000000000A24000003F1000003F1000007E20004867F0004867F0000000100000000595A464900000000000000003132593800000009000000000000000000000000000000000000C350797E306A00026ADD0000000000000000000007E200000006000111D3554E49440000000000000000000111D3565254520000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D578B3600009C5000001999000186A0000186A04556A00000000000444E4000000007E20000C350797E306A0000000105578B36000000000000000000000006000007E20000C350797E306A00000000000199F3000000000000000000000000000000000000000000000007000003F101";
 
             const int capturedPlayerInstance = unchecked((int)0x797E306A);
             const int capturedMissionInstance = unchecked((int)0x555CF578);
@@ -4340,11 +4383,28 @@ namespace ZoneEngine.Core.Arete.Quests
 
         internal static QuestFullUpdateMessage CreateDeliverAntonioFactoryPreviewMessage(Identity characterIdentity)
         {
-            return CreateStanChainTipPreviewMessage(
+            // Capture 20260801-102913 QFU Mission:5574F01A:
+            // icon=158429, Unknown6=1240 credits, Unknown8=2596 XP, MissionItemData=296572@1.
+            return CreateSarahChainTipPreviewMessage(
                 characterIdentity,
                 DeliverAntonioFactoryInstance,
                 DeliverAntonioFactoryShortInfo,
-                DeliverAntonioFactoryLongInfo);
+                DeliverAntonioFactoryLongInfo,
+                158429,
+                unchecked((int)0x78E0FC63),
+                unknown6: 1240,
+                unknown8: 2596,
+                missionItemData:
+                    new[]
+                    {
+                        new MissionItemReward
+                        {
+                            LowId = 296572,
+                            HighId = 296572,
+                            Ql = 1,
+                            Unknown = 0
+                        }
+                    });
         }
 
         internal static QuestFullUpdateMessage CreateTalkToSarahGreenePreviewMessage(Identity characterIdentity)
@@ -4404,8 +4464,8 @@ namespace ZoneEngine.Core.Arete.Quests
         internal static QuestFullUpdateMessage CreateGiveHackedTechnicalLibraryPreviewMessage(
             Identity characterIdentity)
         {
-            // Capture 20260721-Vernon-Godfray #304: icon=158429, tip NPC 78E0FC63,
-            // Unknown6=1320 credits, Unknown8=2229 XP.
+            // Capture 20260801-104528: icon=158429, tip NPC 78E0FC63,
+            // Unknown6=1320 credits, Unknown8=2596 XP.
             return CreateSarahChainTipPreviewMessage(
                 characterIdentity,
                 GiveHackedTechnicalLibraryInstance,
@@ -4414,7 +4474,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 158429,
                 unchecked((int)0x78E0FC63),
                 unknown6: 1320,
-                unknown8: 2229);
+                unknown8: 2596);
         }
 
         internal static QuestFullUpdateMessage CreateCargoLiftingPreviewMessage(Identity characterIdentity)
@@ -4435,6 +4495,8 @@ namespace ZoneEngine.Core.Arete.Quests
         internal static QuestFullUpdateMessage CreateReturnToVernonGodfrayPreviewMessage(
             Identity characterIdentity)
         {
+            // Capture 20260801-105429: tip short=Return to Vernon Godfray, icon=158429.
+            // Completion reward (chip turn-in) is 2596 XP / 1360 credits.
             return CreateSarahChainTipPreviewMessage(
                 characterIdentity,
                 ReturnToVernonGodfrayInstance,
@@ -4445,7 +4507,9 @@ namespace ZoneEngine.Core.Arete.Quests
                 + "Talk to Vernon Godfray and give him the "
                 + "<a href='itemref://296572/296572/1'>Unprogrammed Identification Chip</a>.</font>",
                 158429,
-                unchecked((int)0x78E0FC63));
+                unchecked((int)0x78E0FC63),
+                unknown6: 1360,
+                unknown8: 2596);
         }
 
         internal static QuestFullUpdateMessage CreateTalkToDoctorMasonPreviewMessage(
@@ -4467,8 +4531,9 @@ namespace ZoneEngine.Core.Arete.Quests
 
         internal static QuestFullUpdateMessage CreateBuyNanoProgramsPreviewMessage(Identity characterIdentity)
         {
-            // Capture 20260730-212713 QFU Mission:5572F3B7:
-            // Unknown6=1160 credits, Unknown8=2581 XP, MissionItemData=223373 QL25.
+            // Capture 20260801-102913 QFU Mission:5574F01C tip preview:
+            // Unknown6=1200 credits, Unknown8=2596 XP, MissionItemData=223373 QL25.
+            // Completion grant XP/credits remain capture-backed separately (20260730-212921).
             Identity missionIdentity = IdentityFromRaw(MissionIdentityType, BuyNanoProgramsInstance);
             Identity tipNpcIdentity = new Identity
                                        {
@@ -4495,9 +4560,9 @@ namespace ZoneEngine.Core.Arete.Quests
                                    LongInfo = BuyNanoProgramsLongInfo,
                                    UnknownId1 = tipNpcIdentity,
                                    Unknown5 = 6,
-                                   Unknown6 = 1160,
+                                   Unknown6 = 1200,
                                    Unknown7 = 0,
-                                   Unknown8 = 2581,
+                                   Unknown8 = 2596,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData =
@@ -4590,7 +4655,8 @@ namespace ZoneEngine.Core.Arete.Quests
             int missionIconId,
             int tipNpcInstance,
             int unknown6,
-            int unknown8)
+            int unknown8,
+            MissionItemReward[] missionItemData = null)
         {
             Identity missionIdentity = IdentityFromRaw(MissionIdentityType, missionInstance);
             Identity tipNpcIdentity = new Identity
@@ -4599,6 +4665,7 @@ namespace ZoneEngine.Core.Arete.Quests
                                            Instance = tipNpcInstance
                                        };
             int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+            MissionItemReward[] rewards = missionItemData ?? new MissionItemReward[0];
 
             return new QuestFullUpdateMessage
                    {
@@ -4623,7 +4690,7 @@ namespace ZoneEngine.Core.Arete.Quests
                                    Unknown8 = unknown8,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
-                                   MissionItemData = new MissionItemReward[0],
+                                   MissionItemData = rewards,
                                    Unknown11 = expiry,
                                    Unknown12 = 0,
                                    Unknown13 = 0,

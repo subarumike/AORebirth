@@ -1,0 +1,429 @@
+{
+  "Identity": {
+    "Id": "arete-desmond-calitri-dialogue-20260801",
+    "Version": "captured-desmond-barry-vendor-20260801",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260801-Desmond Calitri; tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260801-burger-vendor"
+  },
+  "SourceCaptures": [
+    "20260801-Desmond Calitri",
+    "20260801-burger-vendor"
+  ],
+  "Npcs": [
+    {
+      "Id": "desmond-calitri",
+      "NpcIdentity": "SimpleChar:78E0FC77",
+      "Name": "Desmond Calitri",
+      "RootNodeId": "desmond_root",
+      "Aliases": [
+        "(SimpleChar:78E0FC77)"
+      ],
+      "Nodes": [
+        {
+          "Id": "desmond_root",
+          "PromptText": "I have a shipyard to run, do you need something?",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=456 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_root_0",
+              "Index": 0,
+              "Text": "Do you have any work around here?",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_burger_accept_goodbye",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_root_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_root_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_burger_accept_goodbye",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Desmond Calitri lets out a loud laugh",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Look 'round you, kid. This is a large-scale industrial operation, freight is coming and going constantly. Sadly, my staff is all full. We have no room for more grunts here.\\n\\nThough, I am hungry. Go grab me a Bronto Burger, and I must emphasize, a normal Bronto Burger. I may be able to think of something for you to do for me by the time you get back.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=545 Unknown2=1 then seq=546 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_burger_accept_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_burger_deliver",
+          "PromptText": "I have a shipyard to run, do you need something?",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=1957 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_burger_deliver_0",
+              "Index": 0,
+              "Text": "I have your Bronto Burger.",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_burger_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_burger_deliver_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_burger_deliver_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_burger_trade_hold",
+          "PromptText": "Yes, I can smell it. Hand it over.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=2016 then KnuBotStartTrade",
+          "Options": [
+            {
+              "Id": "desmond_burger_trade_hold_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic resume after FinishTrade",
+              "NextNodeId": "desmond_help",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_help",
+          "PromptText": "Took you long enough. I was getting ready to call in one of my Bruisers to take care of this little chore, but I think you will be able to handle it.\\n\\nI hope you won't have any qualms with getting your hands dirty, as I have a mess that needs to be cleaned up.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=2258 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_help_0",
+              "Index": 0,
+              "Text": "What do you need help with?",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_help_goodbye",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_help_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_help_goodbye",
+          "PromptText": "Let's get one thing straight: I don't need anyone's help for anything. But, there is a situation on my hands that needs to be dealt with. A new face like yourself will do good here.\\n\\nSome of my workers are outside protesting. Something about unfair payment or my harsh working conditions. They are all lucky to have jobs here with the ICC. I need you to rough up a couple of those Protesters that are forming outside. It's bad for business, and I don't need ICC to start breathing down my neck.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=2357 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_help_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_protester_return",
+          "PromptText": "Why are you here wasting my time? Did you want something?",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=3581 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_protester_return_0",
+              "Index": 0,
+              "Text": "I took care of those protesters.",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_decision",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_protester_return_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_protester_return_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_decision",
+          "PromptText": "Good, serves them right. They are all lucky to have a job with ICC and such a caring boss like myself. If they keep up with these protests, they'll wake up in the desert. In small pieces.\\n\\nNow there's just one last thing I need from you, and then maybe I'll let you join my workforce. The organizer of these Protests, and the person putting ideas of \"unions\" and \"fair\" working conditions...I need you to shut him up.\\n\\nFind that upstart, Cedric Harding. Make an example out of him, and I may count you as one of my own.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=3682 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_decision_0",
+              "Index": 0,
+              "Text": "I'll take care of it.",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_wetwork_goodbye",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_decision_1",
+              "Index": 1,
+              "Text": "Something about this doesn't seem right...",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_reject",
+              "Actions": []
+            },
+            {
+              "Id": "desmond_decision_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_wetwork_goodbye",
+          "PromptText": "Good, then stop wasting time and take care of it already.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=3793 Unknown2=0",
+          "Options": [
+            {
+              "Id": "desmond_wetwork_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_reject",
+          "PromptText": "Just go.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=3892 Unknown2=0",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "desmond_reject_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        },
+        {
+          "Id": "desmond_done",
+          "PromptText": "Why are you here wasting my time? Did you want something?",
+          "PromptTextConfidence": "Reuse captured mid-quest root; post-completion reopen not uniquely captured",
+          "Options": [
+            {
+              "Id": "desmond_done_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "Safe close",
+              "NextNodeId": "desmond_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_close",
+          "PromptText": "",
+          "PromptTextConfidence": "Safe close",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "desmond_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "barry-the-food-vendor",
+      "NpcIdentity": "SimpleChar:78E0FC7D",
+      "Name": "Barry the Food Vendor",
+      "RootNodeId": "barry_root",
+      "Aliases": [
+        "(SimpleChar:78E0FC7D)"
+      ],
+      "Nodes": [
+        {
+          "Id": "barry_root",
+          "PromptText": "Step on up, stranger. I've got the delicous, meaty goodness that you crave.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-burger-vendor seq=457 Unknown2=0 (capture spelling delicous)",
+          "Options": [
+            {
+              "Id": "barry_root_0",
+              "Index": 0,
+              "Text": "What do you have to sell?",
+              "TextEvidence": "20260801-burger-vendor chat-dialogue.log",
+              "NextNodeId": "barry_sell",
+              "Actions": []
+            },
+            {
+              "Id": "barry_root_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-burger-vendor chat-dialogue.log",
+              "NextNodeId": "barry_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "barry_root_quest",
+          "PromptText": "Step on up, stranger. I've got the delicous, meaty goodness that you crave.",
+          "PromptTextConfidence": "KnubotAppendText 20260801-Desmond Calitri seq=1222 / burger-vendor seq=457",
+          "Options": [
+            {
+              "Id": "barry_root_quest_0",
+              "Index": 0,
+              "Text": "Desmond Calitri sent me here for a Bronto Burger.",
+              "TextEvidence": "20260801-Desmond Calitri AnswerList; response AppendText not captured (distance close) — routes to captured sell pitch",
+              "NextNodeId": "barry_sell",
+              "Actions": []
+            },
+            {
+              "Id": "barry_root_quest_1",
+              "Index": 1,
+              "Text": "What do you have to sell?",
+              "TextEvidence": "20260801-Desmond Calitri / 20260801-burger-vendor",
+              "NextNodeId": "barry_sell",
+              "Actions": []
+            },
+            {
+              "Id": "barry_root_quest_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-Desmond Calitri / 20260801-burger-vendor",
+              "NextNodeId": "barry_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "barry_sell",
+          "PromptText": "You must be new around here! I offer a variety of food items, but I specialize in offering delicious Bronto Burger cuisine.\\n\\nIf you want a quick snack for the road, why not order up a Bronto Burger, or a Bronto Cheese, or my favorite: Double Bronto Cheese.\\n\\n<font color=\"#ff0000\">Press the button below marked with the symbol of a Shopping Cart.  It will give you an overview of the current stock",
+          "PromptTextConfidence": "KnubotAppendText 20260801-burger-vendor seq=729 Unknown2=0 exact wire (ends mid-sentence without closing font)",
+          "Options": [
+            {
+              "Id": "barry_sell_0",
+              "Index": 0,
+              "Text": "What is in these Bronto burgers?",
+              "TextEvidence": "20260801-burger-vendor chat-dialogue.log",
+              "NextNodeId": "barry_ingredients",
+              "Actions": []
+            },
+            {
+              "Id": "barry_sell_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-burger-vendor chat-dialogue.log",
+              "NextNodeId": "barry_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "barry_ingredients",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "An excellent question from an excellent customer! Bronto Burgers are made from the highest quality Bronto meat available on the planet, from specially bred livestock. They live enjoyable lives in our compound over in Galway County, where all the magic happens.\\n\\n",
+              "Unknown2": 0
+            },
+            {
+              "Text": "Their meat is subjected to the strictest of quality tests, as our consumers don't deserve any less. What can I get for you today?\\n\\n",
+              "Unknown2": 0
+            },
+            {
+              "Text": "<font color=\"#ff0000\"> Press the button below marked with the symbol of a Shopping Cart.  It will give you an overview of the current stock.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260801-burger-vendor seq=768/778/782 Unknown2=0",
+          "Options": [
+            {
+              "Id": "barry_ingredients_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260801-burger-vendor chat-dialogue.log",
+              "NextNodeId": "barry_close",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "barry_close",
+          "PromptText": "",
+          "PromptTextConfidence": "Safe close",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "barry_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

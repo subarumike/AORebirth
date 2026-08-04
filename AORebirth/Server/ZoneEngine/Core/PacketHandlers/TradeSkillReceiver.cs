@@ -300,6 +300,42 @@ namespace ZoneEngine.Core.PacketHandlers
                     + targetItem.HighID
                     + " QL"
                     + targetItem.Quality);
+
+                // Capture 20260721-Vernon-Godfray: Hacking Omni-Tech Library needs Hacker Tool 87810
+                // (Source) + Omni-Tek Technical Library 248377 (Target) — not Biological Survey Nanobots.
+                bool triedLibrary =
+                    sourceItem.HighID == ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules.OmniTekTechnicalLibraryItemId
+                    || targetItem.HighID == ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules.OmniTekTechnicalLibraryItemId
+                    || sourceItem.LowID == ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules.OmniTekTechnicalLibraryItemId
+                    || targetItem.LowID == ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules.OmniTekTechnicalLibraryItemId;
+                if (triedLibrary)
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        "Vernon Hacking Skills: put Hacker Tool (87810) as Source and Omni-Tek Technical Library (248377) as Target, then Build. Talk to Vernon again if the Hacker Tool is missing.");
+                }
+
+                // Capture 20260721-Mason: Assemble Implant 1 = Agility Cluster Shiny Leg (101781/101782)
+                // Source + Basic Leg Implant (101261/101262) Target — not Hacker Tool 87810.
+                bool triedMasonCluster =
+                    sourceItem.HighID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.AgilityClusterShinyLegHighId
+                    || sourceItem.LowID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.AgilityClusterShinyLegLowId
+                    || targetItem.HighID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.AgilityClusterShinyLegHighId
+                    || targetItem.LowID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.AgilityClusterShinyLegLowId
+                    || sourceItem.HighID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.StaminaClusterBrightLegHighId
+                    || sourceItem.LowID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.StaminaClusterBrightLegLowId
+                    || targetItem.HighID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.StaminaClusterBrightLegHighId
+                    || targetItem.LowID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.StaminaClusterBrightLegLowId
+                    || sourceItem.HighID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.MaxHealthClusterFadedLegHighId
+                    || sourceItem.LowID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.MaxHealthClusterFadedLegLowId
+                    || targetItem.HighID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.MaxHealthClusterFadedLegHighId
+                    || targetItem.LowID == ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.MaxHealthClusterFadedLegLowId;
+                if (triedMasonCluster)
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        "Dr. Mason Assemble Implant: put the quest cluster as Source and the Basic Leg Implant / prior assemble result as Target (101261/101262 for step 1), then Build. Do not use Hacker Tool (87810).");
+                }
             }
         }
 

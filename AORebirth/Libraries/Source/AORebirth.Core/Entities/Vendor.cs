@@ -113,7 +113,10 @@ namespace AORebirth.Core.Entities
             this.ApplyLiveVendorVisualOverrides(templateId);
 
             this.TemplateHash = "";
-            this.Name = ItemNamesDao.Instance.Get(this.Template.ID).Name;
+            DBItemName itemName = ItemNamesDao.Instance.Get(this.Template.ID);
+            this.Name = itemName != null && !string.IsNullOrEmpty(itemName.Name)
+                            ? itemName.Name
+                            : string.Empty;
 
             this.BaseInventory = new VendorInventory(this);
             this.BaseInventory.Read();

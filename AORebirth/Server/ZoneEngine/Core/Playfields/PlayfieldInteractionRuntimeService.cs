@@ -69,15 +69,17 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
-            if (LeonoraMartyQuestRuntime.TryHandleCreditCardPickup(client, message, target))
-            {
-                return true;
-            }
-
-            var source = client?.Controller?.Character;
+            // Arete ICC Cell Structure Scanner — must run before Leonora credit-card Pool lookup.
+            // Leonora GetObject throws on non-pooled Terminals (C00D1999), which aborted Use ACK.
+            var source = client != null && client.Controller != null ? client.Controller.Character : null;
             if (PatrickSunQuestRuntime.TryHandleInsuranceTerminalUse(source, target))
             {
                 GenericCmdMessageHandler.Default.Acknowledge(source, message);
+                return true;
+            }
+
+            if (LeonoraMartyQuestRuntime.TryHandleCreditCardPickup(client, message, target))
+            {
                 return true;
             }
 
@@ -97,12 +99,6 @@ namespace ZoneEngine.Core.Playfields
 
             // Capture 20260721-sara: Use Remains of Shop Thief → DNA-Locked Armor.
             if (SarahGreeneQuestRuntime.TryHandleShopThiefUse(client, message, target))
-            {
-                return true;
-            }
-
-            // Capture 20260730-214622: Use Bank of Rubi-Ka Credit Card floor Terminal → tips + item.
-            if (LeonoraMartyQuestRuntime.TryHandleCreditCardPickup(client, message, target))
             {
                 return true;
             }
@@ -167,6 +163,11 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (CapturedAreteAlexAreaVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             if (CapturedAreteMarcoSpidaVendorInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
@@ -183,6 +184,11 @@ namespace ZoneEngine.Core.Playfields
             }
 
             if (CapturedAreteRemiGalloisVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteBarryFoodVendorInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

@@ -68,6 +68,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (DesmondCalitriQuestRuntime.TryStageDesmondTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
             if (VernonGodfrayQuestRuntime.TryStageVernonTradeItem(client.Controller.Character, message))
             {
                 return;
@@ -116,6 +121,13 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (SarahGreeneQuestRuntime.ShouldSuppressGenericSarahTradeRemove(
+                    client.Controller.Character,
+                    message))
+            {
+                return;
+            }
+
+            if (DesmondCalitriQuestRuntime.ShouldSuppressGenericDesmondTradeRemove(
                     client.Controller.Character,
                     message))
             {
