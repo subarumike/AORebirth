@@ -1402,11 +1402,17 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
     verified_item_database_failure = (
         "verified item-template decode failure:" in detail
     )
+    capture_decoder_internal_failure = (
+        ("TypeError:" in detail or "AttributeError:" in detail)
+        and "extract_capture_backed_npc_combat.py" in detail
+        and ("parse_capture" in detail or "decode_" in detail)
+    )
     return (
         json_decoder_failure
         or governed_json_parse_failure
         or governed_json_internal_failure
         or verified_item_database_failure
+        or capture_decoder_internal_failure
     )
 
 

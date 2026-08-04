@@ -47,10 +47,14 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`6b2d5cc4e45397ba034d05d619ef5bbee6ba1023ae17d40616ae0aca55e0b8ae`.
+`95c1198135a7dafc09d5d26e98b1b9713b3c14fce5a68985e555b29e29e09107`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
+
+Capture-decoder internal type failures caused by the known Windows interpreter
+corruption boundary are retried at the coordinator child boundary; ordinary
+deterministic type/schema failures remain fail-closed and are not retried.
 
 The published input descriptor is schema 2 and hashes only durable capture
 source, plan, identity, and session-state fields. Private shard descriptors stay

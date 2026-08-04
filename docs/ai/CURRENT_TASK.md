@@ -15,6 +15,9 @@ completed Arete runtime or generated cohort.
   repository configuration and engine directory required by the probe.
 - Keep PowerShell boolean continuation syntax parseable in the PID-metadata
   trust check.
+- Treat capture-decoder internal `TypeError`/`AttributeError` tracebacks as the
+  same bounded transient interpreter corruption already retried inside the
+  frozen analyzer; deterministic schema failures remain non-retryable.
 - Preserve exact PID, executable, start-time, and listener ownership; never use
   process-name fallback termination.
 

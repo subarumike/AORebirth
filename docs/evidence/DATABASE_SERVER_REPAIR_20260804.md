@@ -58,6 +58,17 @@ the preceding PowerShell condition lines. Focused contracts now pin both
 requirements. No engine, gameplay, packet, generated, WebEngine, or database
 schema behavior was changed.
 
+The first complete candidate gate passed. The second exposed an existing
+interpreter-corruption classification gap while the formula child decoded a
+`SpecialAttackWeapon`: a provenance mapping was observed as a string and raised
+a `TypeError`. The frozen analyzer already classifies internal capture-decoder
+type failures as transient, but the outer generated-combat coordinator did not.
+The coordinator now applies the same narrow traceback boundary for its bounded
+three-attempt child retry. Deterministic type/schema failures are explicitly
+non-retryable. The focused suite pins both cases. Regeneration changed only the
+generation manifest's coordinator provenance and derived cohort/input
+identities; all five generated runtime/report artifacts remained byte-identical.
+
 ## Database and online-state safety
 
 Database preflight remains read-only and fail-closed. It requires the
@@ -93,8 +104,18 @@ listener release. Neither path terminates by process name.
 - Secret scan: PASS
 - Live read-only database preflight: PASS; 34 required tables verified and
   online-character count zero
-- Full acceptance and exact-commit gate results: recorded after final commit
-  verification below
+- Full acceptance and exact-commit gate results: two unchanged runs PASS, all
+  13 stages, no retries
+- Generated-combat suite: 71/71 PASS
+- Governed generation identity:
+  `95c1198135a7dafc09d5d26e98b1b9713b3c14fce5a68985e555b29e29e09107`
+- Governed input identity:
+  `89059b55910de8d130c3b92ad688982d9bdc3554077842f051ec6539db11fdbe`
+- AOtomation: 1037/1037 PASS
+- Arete acceptance: 60/60 PASS; combat 57/57, active coverage 8/8, loot
+  14/14
+- Subway, Temple, missions, generated artifacts/manifests, PHP/WebCore,
+  Git LFS, secret scan, and Debug build: PASS
 
 ## Engine actions and final state
 
