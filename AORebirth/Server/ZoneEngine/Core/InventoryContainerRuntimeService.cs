@@ -929,6 +929,13 @@ namespace ZoneEngine.Core
                 throw new NullReferenceException("No item found at " + itemPosition);
             }
 
+            // Capture Marco Nanoprogram Container: unpack Overflow nanos BEFORE backpack / skill-lock
+            // fallthrough (crystal templates can look Use-locked or container-like).
+            if (CapturedAreteMarcoSpidaNanoPackageRuntime.TryHandleCrystalUse(character, itemPosition, item))
+            {
+                return true;
+            }
+
             if (this.TryOpenBackpackContainer(character, itemPosition, item))
             {
                 return true;
@@ -973,12 +980,6 @@ namespace ZoneEngine.Core
 
             // Capture 20260726-finish leonora: Use Vacuum Packed Omni-Med Suit → armor pieces.
             if (LeonoraMartyQuestRuntime.TryHandleVacuumPackedOmniMedSuitUse(character, itemPosition, item))
-            {
-                return true;
-            }
-
-            // Capture 20260721-nano-enforcer-arete: Use Marco Enforcer crystal → Overflow nanos + tip.
-            if (CapturedAreteMarcoSpidaNanoPackageRuntime.TryHandleCrystalUse(character, itemPosition, item))
             {
                 return true;
             }
