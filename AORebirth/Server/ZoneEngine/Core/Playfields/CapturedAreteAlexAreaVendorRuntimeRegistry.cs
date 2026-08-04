@@ -28,6 +28,14 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
+        internal static void Remove(int vendorInstance)
+        {
+            lock (Sync)
+            {
+                Entries.Remove(vendorInstance);
+            }
+        }
+
         internal static void RemoveForPlayfield(Identity playfieldIdentity)
         {
             lock (Sync)

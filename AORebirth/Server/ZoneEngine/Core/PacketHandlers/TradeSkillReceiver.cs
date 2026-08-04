@@ -183,14 +183,17 @@ namespace ZoneEngine.Core.PacketHandlers
                 bool antonioCombine =
                     ZoneEngine.Core.Arete.Quests.AntonioStacklundCombineRules
                         .IsCombineResult(newItem.LowID, newItem.HighID);
+                bool robotBrainCombine =
+                    ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainCombineRules
+                        .IsCombineResult(newItem.LowID, newItem.HighID);
 
                 // Capture: Overflow grants do not need a free inventory slot first, but our
                 // server TryAdd does. Consume inputs before add when both are deleted (Mason)
                 // or when Vernon consumes the library.
-                if (vernonLibraryHack || masonAssemble || antonioCombine)
+                if (vernonLibraryHack || masonAssemble || antonioCombine || robotBrainCombine)
                 {
-                    // Captured Mason and Antonio results are always QL1 Overflow.
-                    if ((masonAssemble || antonioCombine) && newItem.Quality != 1)
+                    // Captured Mason/Antonio/Robot-Brain results are QL1 Overflow.
+                    if ((masonAssemble || antonioCombine || robotBrainCombine) && newItem.Quality != 1)
                     {
                         try
                         {
@@ -241,6 +244,17 @@ namespace ZoneEngine.Core.PacketHandlers
                 else if (antonioCombine)
                 {
                     ZoneEngine.Core.Arete.Quests.AntonioStacklundQuestRuntime
+                        .SendCombineResultClientPackets(
+                            client.Controller.Character,
+                            sourceItem,
+                            targetItem,
+                            newItem);
+                }
+                else if (robotBrainCombine)
+                {
+                    // Capture 20260721-001538: FormatFeedback + Overflow TemplateAction —
+                    // never AddTemplate (client crash on Personalized Robot Brain Build).
+                    ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainQuestRuntime
                         .SendCombineResultClientPackets(
                             client.Controller.Character,
                             sourceItem,

@@ -58,12 +58,15 @@ namespace ZoneEngine.Core.Playfields
                         new CapturedAreteAlexAreaVendorStockDefinition(12, 21613, 21613, 1)
                     }),
                 // Capture 20260801-215330 / 20260721-lockpick: VendingMachine:12E77208 ICC Tech Supplies.
+                // Live VMFU StaticInstance=300946 does not render freestanding on this ItemLoader set.
+                // Tip + item name use 297290 (same 297xxx freestanding family as Junk Shop 297281 /
+                // ICC Ammunition 297459) — that mesh renders and is the correct ICC Tech shape.
                 // Slot 3 = sealed Lock Pick package (295999); Use opens to Lock Pick (95577).
                 // Capture VendingMachineFullUpdate Rotation Y=0.7057894 W=-0.7084217 (not identity).
                 new CapturedAreteAlexAreaVendorDefinition(
                     "ICC Tech Supplies",
                     unchecked((int)0x12E77208),
-                    300946,
+                    297290,
                     3442.931f,
                     12.27642f,
                     822.4964f,

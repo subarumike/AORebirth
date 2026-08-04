@@ -58,6 +58,8 @@ namespace ZoneEngine.Core.Playfields
 
             lock (this.syncRoot)
             {
+                this.PurgeNonRenderingIccTechLocked(playfieldIdentity, dynelRegistry);
+
                 foreach (CapturedAreteAlexAreaVendorDefinition definition in
                     CapturedAreteAlexAreaVendorContentProvider.Vendors)
                 {
@@ -94,6 +96,56 @@ namespace ZoneEngine.Core.Playfields
                         + definition.Stock.Count
                         + " evidence=20260801-215330+20260721-lockpick");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Replace wrong-mesh ICC Tech boxes (live 300946 invisible; 99634 generic SHOP).
+        /// Expected runtime mesh is tip itemref 297290.
+        /// </summary>
+        private void PurgeNonRenderingIccTechLocked(
+            Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry)
+        {
+            const int ExpectedIccTechTemplateId = 297290;
+            for (int i = this.capturedVendors.Count - 1; i >= 0; i--)
+            {
+                Vendor vendor = this.capturedVendors[i];
+                if (vendor == null
+                    || !string.Equals(vendor.Name, "ICC Tech Supplies", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                CapturedAreteAlexAreaVendorRuntimeDefinition runtime;
+                if (!CapturedAreteAlexAreaVendorRuntimeRegistry.TryGet(vendor.Identity.Instance, out runtime)
+                    || !CapturedAreteAlexAreaVendorRuntimeRegistry.Same(
+                        runtime.PlayfieldIdentity,
+                        playfieldIdentity))
+                {
+                    continue;
+                }
+
+                int advertised = vendor.Stats[(int)StatIds.staticinstance].Value;
+                if (advertised == ExpectedIccTechTemplateId)
+                {
+                    continue;
+                }
+
+                CapturedAreteAlexAreaVendorRuntimeRegistry.Remove(vendor.Identity.Instance);
+                if (dynelRegistry != null)
+                {
+                    dynelRegistry.Unregister(vendor.Identity);
+                }
+
+                Pool.Instance.RemoveObject(vendor);
+                this.capturedVendors.RemoveAt(i);
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Purged wrong-mesh ICC Tech Supplies template="
+                    + advertised
+                    + " for respawn as "
+                    + ExpectedIccTechTemplateId);
             }
         }
 
@@ -175,8 +227,8 @@ namespace ZoneEngine.Core.Playfields
             {
                 int captureTemplateId = definition.TemplateId;
                 int templateId = captureTemplateId;
-                // Backup behavior: 300946 often has ItemLoader entry but no ItemNamesDao row —
-                // fall back to 99634 so the freestanding ICC Tech box actually renders.
+                // Prefer definition template (297290 for ICC Tech). Only fall back to 99634 when
+                // the preferred template is missing from ItemLoader/ItemNamesDao.
                 if (!ItemLoader.ItemList.ContainsKey(templateId)
                     || ItemNamesDao.Instance.Get(templateId) == null)
                 {
@@ -242,9 +294,8 @@ namespace ZoneEngine.Core.Playfields
                     definition.HeadingZ,
                     definition.HeadingW);
                 vendor.Playfield = playfield;
-                // Capture StaticInstance stays 300946 for ICC Tech even when runtime mesh is 99634.
-                vendor.Stats[(int)StatIds.staticinstance].Value = captureTemplateId;
-                vendor.Stats[0x17].Value = captureTemplateId;
+                vendor.Stats[(int)StatIds.staticinstance].Value = templateId;
+                vendor.Stats[0x17].Value = templateId;
 
                 if (vendor.BaseInventory != null)
                 {

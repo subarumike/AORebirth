@@ -70,7 +70,8 @@ namespace ZoneEngine.Core
 
         public const int BureaucratWorkerMonsterData = 96056;
 
-        public const double AttackPetRechargeSeconds = 2.0;
+        // Mike: MP attack pets should swing every 3–5s (not ~20s weapon-recharge fallthrough).
+        public const double AttackPetRechargeSeconds = 4.0;
 
         public const double HealCastRange = 20.0;
 
@@ -220,9 +221,16 @@ namespace ZoneEngine.Core
 
         public static bool IsPlayerOwnedMeleeCombatPet(ICharacter pet)
         {
-            return IsPlayerOwnedAttackPet(pet)
-                   || IsPlayerOwnedBureaucratCompanionPet(pet)
-                   || UsesBureaucratWorkerBuw1CombatPackets(pet);
+            // Prefer strain registration, but any living player-owned non-heal pet must use
+            // pet melee cadence — otherwise equipped MEW timing can fall through to ~20s.
+            if (IsPlayerOwnedAttackPet(pet)
+                || IsPlayerOwnedBureaucratCompanionPet(pet)
+                || UsesBureaucratWorkerBuw1CombatPackets(pet))
+            {
+                return true;
+            }
+
+            return IsPlayerOwnedPet(pet) && !IsPlayerOwnedHealingPet(pet);
         }
 
         public static bool IsPlayerOwnedHealingPet(ICharacter pet)
