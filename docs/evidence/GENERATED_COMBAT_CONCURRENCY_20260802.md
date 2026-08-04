@@ -46,26 +46,26 @@ The starting hashes were recorded before reconciliation. The final hashes are fr
 
 | File | Starting SHA-256 | Final SHA-256 | Result |
 | --- | --- | --- | --- |
-| `docs/generated/capture_backed_npc_combat_inventory.json` | `e85ff2119427a740e1c629465895bf510e7ab019e857321dcfa5e1a0a0d3015e` | `8fa4476b7d99b139518d5a43ba654c3004807f715e55096b21de1f146fad0771` | Regenerated with the reconciled producer/input identity |
+| `docs/generated/capture_backed_npc_combat_inventory.json` | `e85ff2119427a740e1c629465895bf510e7ab019e857321dcfa5e1a0a0d3015e` | `c8f18b57893a343b284b45274530bf4b79463ca766bdd1097c3fdf072aed1323` | Regenerated with the reconciled producer/input identity |
 | `AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs` | `553549e6296072653356bfa6b701a3ea7f09badd7cf12b17a22f20d63a890712` | `553549e6296072653356bfa6b701a3ea7f09badd7cf12b17a22f20d63a890712` | Byte-identical |
 | `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogFixtures.g.cs` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | Byte-identical |
-| `docs/generated/capture_backed_npc_combat_active_coverage.json` | `89b54335c7407d8cebdf3c4d6e07e2353fe2fcfc870a94e625d304dfcf328254` | `e8088b991e555fe9f46119550db9134f128c06ed27e4790e577fe1016b587078` | Only its inventory-source descriptor changed in the Git diff |
-| `docs/generated/enemy_combat_setup_formula_dataset.json` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | Byte-identical |
-| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `b3a31dc5d0c2c53ce9967d5318e1866c52fbabb6bca4a1bcecc52e7776fd6685` | Sixth-file commit marker after final generator hardening |
+| `docs/generated/capture_backed_npc_combat_active_coverage.json` | `89b54335c7407d8cebdf3c4d6e07e2353fe2fcfc870a94e625d304dfcf328254` | `aa563b1acc489c97b7181605b0bb353612f25b567583880e06ba598297b4cbe1` | Only its inventory-source descriptor changed in the Git diff |
+| `docs/generated/enemy_combat_setup_formula_dataset.json` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | `55b91bc84a958a3b2e131fee6754393730a361510367efa62fc54ea3a6dee6ea` | Only rebuilt analyzer provenance SHA values changed |
+| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `1691e851528eab6c80d83d570dd0b7a7185ceca4205c207fbedb5eb6a7be5099` | Sixth-file commit marker after final generator hardening |
 
-The catalog, fixtures, and formula data stayed byte-identical. The active-coverage Git diff changes only its recorded inventory SHA-256. No supported runtime C# source was changed for this reconciliation, and the generated runtime catalog stayed byte-identical. Those facts are the boundary for the conclusion that runtime semantics did not change.
+The catalog and fixtures stayed byte-identical. The active-coverage Git diff changes only its recorded inventory SHA-256, while formula changes are limited to the rebuilt analyzer provenance SHA. No supported runtime C# source was changed for this reconciliation, and the generated runtime catalog stayed byte-identical. Those facts are the boundary for the conclusion that runtime semantics did not change.
 
 ### Final identities
 
 | Identity | Value |
 | --- | --- |
-| Generation identity | `097e36e031d410e005fa541f3573d93bd37352e3f2d44c5456f83116185eda80` |
-| Combined input identity | `efca377baa80de2d62ab6bffe847363b02e46dc562ef22bc95e741495365be2c` |
-| Rendered manifest SHA-256 | `b3a31dc5d0c2c53ce9967d5318e1866c52fbabb6bca4a1bcecc52e7776fd6685` |
-| Primary capture snapshot identity | `cf8d193c23263a3797db2dbb25838658f40f826d26a2bf99604b4f6d8dea8056` |
-| Primary capture manifest SHA-256 | `0ba2a6a5a1c02ed0468427f8d5bc20adf403c773b478426b02f6253980030b3d` |
+| Generation identity | `6b2d5cc4e45397ba034d05d619ef5bbee6ba1023ae17d40616ae0aca55e0b8ae` |
+| Combined input identity | `ca1c9a76d58eada2a2c7ddf26aeec52583905a1c32da5c23d42a1ccce1d18974` |
+| Rendered manifest SHA-256 | `1691e851528eab6c80d83d570dd0b7a7185ceca4205c207fbedb5eb6a7be5099` |
+| Primary capture snapshot identity | `512d6ba182b9d377b442ccdd4542aad4055ec84a0b517be06784824327ff224f` |
+| Primary capture manifest SHA-256 | `475a66fa74eda550a24b494ea98a86907bccd96825f0026e99e9de02699ceed2` |
 | Primary capture manifest byte length | `402965` |
-| Auxiliary snapshot identity | `91b186648598abb732a0c063a93af1a40db8706d6a991e96e51ad398491caf49` |
+| Auxiliary snapshot identity | `4b6127909e05e82ab83645601d1087174047e70b4ab47840006f929ead57058e` |
 | Active/formula fixed-point rounds | `3` |
 
 The generation identity covers the path-independent manifest identity payload. The separate manifest-file SHA-256 in the artifact table hashes the rendered sixth file and is not expected to equal the generation identity.
@@ -181,11 +181,33 @@ Completed:
   The coordinator now reuses those bytes, still reports three convergence rounds,
   and avoids only the redundant terminal ItemDb traversal. All five
   runtime-facing artifact hashes remain unchanged.
-- Final focused transaction and pipeline suite: **70/70 PASS**.
+- Final hardening derives separate exact private active and formula projections
+  from the validated full inventory. Each child validates its own projection
+  SHA/length over the bytes decoded, and complete `attackInfoPacketIds` arrays
+  remain intact rather than being replaced by samples or counts.
+- The terminal optimization is now narrower in proof and broader in savings:
+  only formula equality after a completed transition proves the next pair is an
+  identity transition, at which point that transition is memoized and both
+  redundant children are skipped. Fixed-point output and the three-round count
+  remain unchanged.
+- Verified JSON retries now cover impossible stdlib `TypeError` and
+  `AttributeError` failures only when traceback frames prove
+  `json.decoder`/`json.scanner` ownership. Deterministic validation failures and
+  unrelated exceptions continue to fail closed. The final manifest records
+  CPython 3.13.14.
+- The clean, bytecode-disabled CPython 3.13.14 reproduction still failed inside
+  the large pure-Python ItemDb decoder, ruling out stale `.pyc` files. Formula
+  generation now obtains its exact 42-template input from the repository's C#
+  `MessagePackZip` reader. A complete projected formula build matched the prior
+  formula SHA before analyzer provenance was refreshed; the published formula
+  diff contains only that analyzer SHA.
+- Final focused transaction and pipeline suite: **71/71 PASS**.
 - Final coordinated `--write` and `--validate-current`: **PASS**, generation
-  `097e36e031d410e005fa541f3573d93bd37352e3f2d44c5456f83116185eda80`, input
-  `efca377baa80de2d62ab6bffe847363b02e46dc562ef22bc95e741495365be2c`, three
-  fixed-point rounds. Final clean-commit reproducibility remains delivery-only.
+  `6b2d5cc4e45397ba034d05d619ef5bbee6ba1023ae17d40616ae0aca55e0b8ae`, input
+  `ca1c9a76d58eada2a2c7ddf26aeec52583905a1c32da5c23d42a1ccce1d18974`, three
+  fixed-point rounds. The runtime catalog and fixtures remained byte-identical;
+  the other generated diffs are provenance/source descriptors only. Final
+  clean-commit reproducibility remains delivery-only.
 
 Final delivery-only results are deliberately not embedded in this tracked evidence file:
 

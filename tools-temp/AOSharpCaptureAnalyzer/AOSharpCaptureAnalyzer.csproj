@@ -39,7 +39,22 @@
     </Compile>
     <Compile Include="Pf127LineOfSightPromotionValidator.cs" />
     <Compile Include="Pf127CaptureSnapshot.cs" />
+    <Compile Include="ItemTemplateProjection.cs" />
     <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\AORebirth.Core.csproj">
+      <Project>{8aef23b2-9e44-40a1-a74e-cf7348b45b62}</Project>
+      <Name>AORebirth.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AORebirth\Libraries\Source\msgpack-cli\src\MsgPack.Mono\MsgPack.Mono.csproj">
+      <Project>{6e8c2296-21e9-4113-89c4-76376516aa14}</Project>
+      <Name>MsgPack.Mono</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AORebirth\Libraries\Source\Utility\Utility.csproj">
+      <Project>{cb56f285-02ae-4816-9e8a-ec69991400e5}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

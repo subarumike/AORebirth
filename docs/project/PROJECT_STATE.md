@@ -47,7 +47,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`097e36e031d410e005fa541f3573d93bd37352e3f2d44c5456f83116185eda80`.
+`6b2d5cc4e45397ba034d05d619ef5bbee6ba1023ae17d40616ae0aca55e0b8ae`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
@@ -56,28 +56,33 @@ The published input descriptor is schema 2 and hashes only durable capture
 source, plan, identity, and session-state fields. Private shard descriptors stay
 strictly validated inside each primary attempt but do not contaminate the
 published identity. Active/formula children receive independent fsynced,
-read-back-verified private inventory copies and verify SHA-256 and byte length
-over the same bytes they decode with a fully Python-initialized JSON scanner.
-The frozen ItemDb is likewise verified against its auxiliary snapshot record,
-retained as trusted bytes, and rematerialized independently for each formula
-round before same-buffer integrity validation and selective template decoding.
-The selective ItemDb reader now skips unrequested nested MessagePack values with
-an explicit work stack, eliminating the recursive native-crash path without
-changing retained templates or the governed formula artifact.
-After round one, a byte-identical active state reuses the prior deterministic
-formula result, preserving the three-round convergence result while eliminating
-the redundant terminal ItemDb traversal. Published runtime-facing bytes remain
-unchanged.
+read-back-verified private projections and verify SHA-256 and byte length over
+the same bytes they decode with a fully Python-initialized JSON scanner. Active
+and formula projections are separate exact consumer inputs, and both preserve
+complete `attackInfoPacketIds` arrays rather than sampled or counted evidence.
+The frozen ItemDb is likewise verified against its auxiliary snapshot record.
+The repository's C# `MessagePackZip` reader extracts exactly the 42 templates
+referenced by governed PF127/PF1931 formula inputs into a canonical private JSON
+projection. Formula children verify that projection's SHA/length and no longer
+parse the full ItemDb in Python. The generated formula values remain unchanged;
+its diff is limited to rebuilt analyzer provenance.
+After a completed transition, formula equality proves that the next active and
+formula pair is identical to the current pair. The coordinator memoizes only
+that proven identity transition, preserving the three-round convergence result
+while skipping both redundant terminal children. The generated runtime catalog
+and fixtures remain byte-identical; other generated changes are provenance and
+source-descriptor reconciliation only.
 Cohort validation now binds each JSON decode to the manifest SHA/length, reuses
 the first parsed object instead of reparsing the 124 MB inventory, and retries
 `JSONDecodeError` against the same verified UTF-8 string up to three times. The
-same bound applies only to exact impossible stdlib scanner `TypeError` signatures
-whose traceback proves `json.decoder`/`json.scanner` ownership.
+same bound applies to impossible stdlib JSON `TypeError` or `AttributeError`
+failures only when their traceback proves `json.decoder`/`json.scanner`
+ownership; deterministic and unrelated failures fail closed.
 Repository-owned acceptance, build, test, and generated-combat wrappers select
-Python 3.14 through `Tools/select_python_runtime.cmd`; the selector can be
+CPython 3.13.14 through `Tools/select_python_runtime.cmd`; the selector can be
 overridden with `AO_REBIRTH_PYTHON`. This avoids the locally installed Python
 3.12 runtime whose repeated `python312.dll` access violations prevented stable
-preflight execution. The manifest records the selected CPython 3.14.4 binary.
+preflight execution. The manifest records the selected CPython 3.13.14 binary.
 Each mandatory gate holds one read lease across all 13 stages, eliminating the
 former full inventory parse before and after every filtered acceptance wrapper.
 
