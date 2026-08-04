@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import sys
 
 
@@ -51,6 +52,10 @@ def main():
     )
     require("--prestart" in start_ps and "--engine-required" in start_ps,
             "startup must use ownership-safe prestart and launched-PID verification")
+    require('$configPath = Join-Path $root "AORebirth\\Config\\Config.xml"' in start_ps,
+            "startup status probes must use the repository configuration")
+    require('$probeArguments = @("--config", $configPath, "--engine-dir", $engineDir) + $Arguments' in start_ps,
+            "startup status probes must receive configuration and engine-directory arguments")
     require("Stop-LaunchedEngineProcess" in start_ps and "$launched" in start_ps,
             "startup must track and clean only processes launched by its invocation")
     require("$rollbackStopped" in start_ps,
@@ -62,6 +67,12 @@ def main():
             "shutdown must not fall back to killing processes by name")
     require("metadataIsTrusted" in stop_ps and "StartedAt" in stop_ps and "--prestart" in stop_ps,
             "shutdown must validate managed PID path/start identity and released ports")
+    require('$configPath = Join-Path $root "AORebirth\\Config\\Config.xml"' in stop_ps,
+            "shutdown status probes must use the repository configuration")
+    require("$statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name" in stop_ps,
+            "shutdown release probes must receive configuration and engine-directory arguments")
+    require(not re.search(r"(?m)^\s*-and\b", stop_ps),
+            "PowerShell continuation operators must remain on the preceding condition line")
 
     forbidden_php_download_tokens = (
         "php-5.5.10",
