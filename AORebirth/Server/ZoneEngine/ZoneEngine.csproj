@@ -889,6 +889,9 @@
     <Content Include="Content\Arete\flint-novak\dialogue\remi-gallois.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\desmond-calitri.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Arete\flint-novak\dialogue\greedy-desert-reet.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

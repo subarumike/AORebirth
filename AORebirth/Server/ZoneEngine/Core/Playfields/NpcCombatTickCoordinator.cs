@@ -988,6 +988,15 @@ namespace AORebirth.Core.Playfields
             ICharacter attacker,
             CombatAttackSource attackSource)
         {
+            // Player-owned attack pets always use pet cadence — never weapon itemdelay/recharge
+            // (MEW templates can resolve to ~20s and stall swings).
+            if (attacker != null
+                && PetCombatRules.IsPlayerOwnedPet(attacker)
+                && !PetCombatRules.IsPlayerOwnedHealingPet(attacker))
+            {
+                return PetCombatRules.AttackPetRechargeSeconds;
+            }
+
             if (attackSource.CapturedLandedIntervalObservationsSeconds != null
                 && attackSource.CapturedLandedIntervalObservationsSeconds.Length > 0)
             {
@@ -1671,7 +1680,11 @@ namespace AORebirth.Core.Playfields
             }
 
             if (PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
-                || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker))
+                || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker)
+                || (PetCombatRules.IsPlayerOwnedPet(attacker)
+                    && !PetCombatRules.IsPlayerOwnedHealingPet(attacker)
+                    && !PetBureaucratGuardianAppearance.IsGuardianPet(attacker)
+                    && !PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker)))
             {
                 int rawMinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0);
                 int rawMaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0);

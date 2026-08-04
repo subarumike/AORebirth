@@ -114,6 +114,19 @@ namespace ZoneEngine.Core.Arete.Quests
                    || highId == PersonalizedBasicRobotBrainHighId;
         }
 
+        /// <summary>
+        /// Nano Sensor / Basic Robot Brain / Personalized Basic Robot Brain combine results.
+        /// Capture path: Overflow TemplateAction — never AddTemplate (client crash).
+        /// </summary>
+        internal static bool IsCombineResult(int lowId, int highId)
+        {
+            return IsNanoSensor(lowId)
+                   || IsNanoSensor(highId)
+                   || IsBasicRobotBrain(lowId)
+                   || IsBasicRobotBrain(highId)
+                   || IsPersonalizedBrain(lowId, highId);
+        }
+
         private static bool IsScrewdriver(int id)
         {
             return id == ScrewdriverId;
