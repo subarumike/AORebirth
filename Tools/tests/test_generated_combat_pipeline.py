@@ -1521,6 +1521,22 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 "item-template slice 5 is invalid: Unexpected end of MessagePack data",
             )
         )
+        capture_decoder_type_error = (
+            "extract_capture_backed_npc_combat.py\n"
+            "in parse_capture\n"
+            "in decode_special_attack_weapon\n"
+            "TypeError: 'str' object does not support item assignment"
+        )
+        self.assertTrue(
+            pipeline._is_transient_interpreter_failure(
+                1, capture_decoder_type_error
+            )
+        )
+        self.assertFalse(
+            pipeline._is_transient_interpreter_failure(
+                1, "TypeError: deterministic capture schema failure"
+            )
+        )
         self.assertEqual(pipeline.PRIMARY_AGGREGATION_MAX_ATTEMPTS, 3)
 
         fatal_head = CompletedChild(
