@@ -116,10 +116,22 @@ namespace AORebirth.Core.Playfields
 
         private readonly object lifetimeSync = new object();
 
+        /// <summary>
+        /// Player auto-attack schedule only. Must not share heartBeatSync — Attack handlers
+        /// waiting on the full PF heartbeat were delayed for many seconds (Mike 20260801).
+        /// </summary>
+        private readonly object playerCombatSync = new object();
+
         private readonly PlayfieldRuntimeSystems runtimeSystems;
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
         private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
+
+        /// <summary>
+        /// Player follow-up auto-attacks. First hit is from AttackMessageHandler; later hits must
+        /// not depend on the PF heartbeat character loop (Mike 20260801: 15–20s between swings).
+        /// </summary>
+        private readonly Dictionary<int, Timer> playerAutoAttackTimers = new Dictionary<int, Timer>();
 
         private readonly CorpseInventoryService corpseInventoryService = new CorpseInventoryService();
 
@@ -1328,7 +1340,26 @@ namespace AORebirth.Core.Playfields
 
         public void StartPlayerAttack(ICharacter character, Identity target)
         {
+            if (character == null || this.disposed)
+            {
+                return;
+            }
+
+            // Arm only (no heartBeatSync). First swing runs after Attack+SAW packets.
             this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);
+        }
+
+        /// <summary>
+        /// First auto-attack swing after combat-start Attack+SAW have been sent to the client.
+        /// </summary>
+        public void TryPlayerFirstCombatTick(ICharacter character)
+        {
+            if (character == null || this.disposed)
+            {
+                return;
+            }
+
+            this.DoCombatTick(character);
         }
 
         public void CancelPlayerAttack(ICharacter character)
@@ -1417,7 +1448,125 @@ namespace AORebirth.Core.Playfields
 
         private void ResetPlayerCombatTick(Identity attacker)
         {
-            this.nextCombatTicks.Remove(attacker.Instance);
+            this.CancelPlayerAutoAttackTimer(attacker.Instance);
+            lock (this.playerCombatSync)
+            {
+                this.nextCombatTicks.Remove(attacker.Instance);
+            }
+        }
+
+        private void CancelPlayerAutoAttackTimer(int attackerInstance)
+        {
+            Timer timer;
+            lock (this.playerCombatSync)
+            {
+                if (!this.playerAutoAttackTimers.TryGetValue(attackerInstance, out timer))
+                {
+                    return;
+                }
+
+                this.playerAutoAttackTimers.Remove(attackerInstance);
+            }
+
+            try
+            {
+                timer.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+        }
+
+        private void SchedulePlayerAutoAttack(ICharacter attacker, double delaySeconds)
+        {
+            if (attacker == null || !(attacker.Controller is PlayerController) || this.disposed)
+            {
+                return;
+            }
+
+            int attackerInstance = attacker.Identity.Instance;
+            if (delaySeconds < 0.25)
+            {
+                delaySeconds = 0.25;
+            }
+
+            int dueMs = (int)Math.Round(delaySeconds * 1000.0);
+            if (dueMs < 250)
+            {
+                dueMs = 250;
+            }
+
+            this.CancelPlayerAutoAttackTimer(attackerInstance);
+
+            Timer timer = null;
+            timer = new Timer(
+                _ => this.OnPlayerAutoAttackTimer(attackerInstance),
+                null,
+                dueMs,
+                Timeout.Infinite);
+
+            lock (this.playerCombatSync)
+            {
+                // Replace if Start/Cancel raced another schedule.
+                Timer existing;
+                if (this.playerAutoAttackTimers.TryGetValue(attackerInstance, out existing))
+                {
+                    try
+                    {
+                        existing.Dispose();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                    }
+                }
+
+                this.playerAutoAttackTimers[attackerInstance] = timer;
+                this.nextCombatTicks[attackerInstance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(delaySeconds);
+            }
+        }
+
+        private void OnPlayerAutoAttackTimer(int attackerInstance)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            lock (this.playerCombatSync)
+            {
+                this.playerAutoAttackTimers.Remove(attackerInstance);
+                // Allow this swing through the nextTick gate.
+                this.nextCombatTicks.Remove(attackerInstance);
+            }
+
+            ICharacter attacker =
+                this.FindByIdentity<ICharacter>(
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = attackerInstance
+                    });
+            if (attacker == null
+                || !(attacker.Controller is PlayerController)
+                || attacker.FightingTarget.Instance == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                this.DoCombatTick(attacker);
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "PlayerAutoAttackTimer failed attacker="
+                    + attackerInstance
+                    + " err="
+                    + exception.Message);
+            }
         }
 
         public void RespawnPlayer(ICharacter character)
@@ -1685,23 +1834,30 @@ namespace AORebirth.Core.Playfields
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
             DateTime nextTick;
             DateTime now = DateTime.UtcNow;
-            if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
-                && nextTick > now)
+            lock (this.playerCombatSync)
             {
-                return;
+                if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
+                    && nextTick > now)
+                {
+                    return;
+                }
             }
 
-            if (!this.IsInCombatRange(attacker, target, attackSource.Range))
-            {
-                this.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
-                this.nextCombatTicks[attacker.Identity.Instance] =
-                    DateTime.UtcNow + TimeSpan.FromSeconds(OutOfRangeRetrySeconds);
-                return;
-            }
-
+            // No per-swing range gate while FightingTarget is set. Target is already validated
+            // on Attack; stale RawCoordinates were skipping every swing after the first for
+            // 10–20s (Mike 20260801 — fists and guns identical).
             int currentHealth = target.Stats[StatIds.health].Value;
-            DamageCalculationResult damageResult = this.CalculateCombatDamageDetailed(attacker, attackSource);
-            int damage = damageResult.FinalTargetDamage;
+            int hellfyreDamage;
+            bool hellfyreRocket = RemiGalloisQuestRuntime.TryGetHellfyreRocketDamage(
+                attacker,
+                target,
+                attackSource.WeaponLowId,
+                attackSource.WeaponHighId,
+                out hellfyreDamage);
+            DamageCalculationResult damageResult = hellfyreRocket
+                                                       ? null
+                                                       : this.CalculateCombatDamageDetailed(attacker, attackSource);
+            int damage = hellfyreRocket ? hellfyreDamage : damageResult.FinalTargetDamage;
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
@@ -1713,24 +1869,47 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
+            if (hellfyreRocket)
+            {
+                RemiGalloisQuestRuntime.AnnounceHellfyreRocketHit(
+                    attacker,
+                    target,
+                    damage,
+                    newHealth,
+                    killingHit);
+            }
+
             target.Stats[StatIds.health].Value = newHealth;
             MissionAcgOperationalRuntime.NotifyHealthChanged(target, newHealth);
             this.runtimeSystems.SendChangedStats(target, SendChangedStats);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
-                    "Combat hit attacker={0} target={1} damage={2} health={3}/{4} weaponBased={5} slot={6}",
+                    CultureInfo.InvariantCulture,
+                    "Combat hit attacker={0} target={1} damage={2} health={3}/{4} weaponBased={5} slot={6} cycleSeconds={7:0.00} range={8:0.00}",
                     attacker.Identity,
                     target.Identity,
                     damage,
                     newHealth,
                     target.Stats[StatIds.life].Value,
                     attackSource.UsesEquippedWeapon ? 1 : 0,
-                    attackSource.AttackInfoWeaponSlot));
-            this.TryWriteWeaponDamageEvidence(attacker, target, attackSource, damageResult, currentHealth, newHealth);
+                    attackSource.AttackInfoWeaponSlot,
+                    attackSource.RechargeSeconds,
+                    attackSource.Range));
+            if (damageResult != null)
+            {
+                this.TryWriteWeaponDamageEvidence(
+                    attacker,
+                    target,
+                    attackSource,
+                    damageResult,
+                    currentHealth,
+                    newHealth);
+            }
 
             if (killingHit)
             {
+                this.CancelPlayerAutoAttackTimer(attacker.Identity.Instance);
                 this.HandleCombatKillingHit(attacker, target);
                 return;
             }
@@ -1741,8 +1920,9 @@ namespace AORebirth.Core.Playfields
                 this.SuspendNpcRegen(target);
             }
 
-            this.nextCombatTicks[attacker.Identity.Instance] =
-                DateTime.UtcNow + TimeSpan.FromSeconds(attackSource.RechargeSeconds);
+            // Drive the next swing from a player timer (AggDef/initiative cycle). Do not wait
+            // for the playfield heartbeat foreach — that path was skipping players for ~15s.
+            this.SchedulePlayerAutoAttack(attacker, attackSource.RechargeSeconds);
         }
 
         private int CalculateCombatDamage(ICharacter attacker, CombatAttackSource attackSource)
@@ -1909,7 +2089,13 @@ namespace AORebirth.Core.Playfields
                            Range = MaxMeleeCombatDistance,
                            RechargeSeconds = IsCapturedCleaningRobot(attacker)
                                                  ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
-                                                 : DefaultCombatTickSeconds,
+                                                 : (attacker.Controller is PlayerController
+                                                        ? WeaponCombatTimingRules.CalculateCycleSeconds(
+                                                              attacker,
+                                                              100,
+                                                              100,
+                                                              null)
+                                                        : DefaultCombatTickSeconds),
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = UnarmedAttackInfoAmmoCount,
                            AttackInfoWeaponSlot = attackInfoWeaponSlot,
@@ -1950,9 +2136,15 @@ namespace AORebirth.Core.Playfields
                        EffectiveAttackRating = GetEffectiveAttackRating(attacker, weapon),
                        AddAllOff = TryGetStatValue(attacker, 276),
                        Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
-                       RechargeSeconds = NormalizeCombatDelaySeconds(
-                           weapon.GetAttribute((int)StatIds.itemdelay),
-                           weapon.GetAttribute((int)StatIds.rechargedelay)),
+                       RechargeSeconds = attacker.Controller is PlayerController
+                                             ? WeaponCombatTimingRules.CalculateCycleSeconds(
+                                                 attacker,
+                                                 weapon.GetAttribute((int)StatIds.itemdelay),
+                                                 weapon.GetAttribute((int)StatIds.rechargedelay),
+                                                 weapon)
+                                             : NormalizeCombatDelaySeconds(
+                                                 weapon.GetAttribute((int)StatIds.itemdelay),
+                                                 weapon.GetAttribute((int)StatIds.rechargedelay)),
                        UsesEquippedWeapon = true,
                        AttackInfoAmmoCount = 40,
                        AttackInfoWeaponSlot = equippedWeapon.Slot,
@@ -2258,6 +2450,18 @@ namespace AORebirth.Core.Playfields
         {
             int normalizedAttackDelay = NormalizeCombatItemStat(attackDelay, 0);
             int normalizedRechargeDelay = NormalizeCombatItemStat(rechargeDelay, 0);
+
+            // Reject absurd per-side values (e.g. 1500cs) that would become a ~15s cycle.
+            if (normalizedAttackDelay > 500)
+            {
+                normalizedAttackDelay = 100;
+            }
+
+            if (normalizedRechargeDelay > 500)
+            {
+                normalizedRechargeDelay = 100;
+            }
+
             int totalCentiseconds = normalizedAttackDelay + normalizedRechargeDelay;
 
             if (totalCentiseconds <= 0)
@@ -3225,7 +3429,12 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearCombatTracking(Identity identity)
         {
-            this.nextCombatTicks.Remove(identity.Instance);
+            this.CancelPlayerAutoAttackTimer(identity.Instance);
+            lock (this.playerCombatSync)
+            {
+                this.nextCombatTicks.Remove(identity.Instance);
+            }
+
             this.lastCombatWeaponSlots.Remove(identity.Instance);
             this.runtimeSystems.ClearNpcCombatTracking(identity);
         }
@@ -4595,7 +4804,25 @@ namespace AORebirth.Core.Playfields
             {
             }
 
-            this.nextCombatTicks.Clear();
+            List<Timer> timersToDispose;
+            lock (this.playerCombatSync)
+            {
+                timersToDispose = new List<Timer>(this.playerAutoAttackTimers.Values);
+                this.playerAutoAttackTimers.Clear();
+                this.nextCombatTicks.Clear();
+            }
+
+            foreach (Timer timer in timersToDispose)
+            {
+                try
+                {
+                    timer.Dispose();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+            }
+
             this.lastCombatWeaponSlots.Clear();
 
             try

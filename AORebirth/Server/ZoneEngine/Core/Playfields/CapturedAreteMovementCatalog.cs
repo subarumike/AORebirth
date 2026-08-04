@@ -633,6 +633,10 @@ namespace ZoneEngine.Core.Playfields
 
     public sealed class CapturedAreteMovementRuntimeCoordinator
     {
+        // Do not attach capture routes whose start is far from the NPC (Flint Cleaning Robots
+        // were matching Marcus/ramp spawn paths and vanishing seconds after spawn).
+        private const double MaxVariantAttachDistanceMeters = 12.0;
+
         public static bool PatrolConditionMatches(
             bool hasNpcController,
             bool hasFightingTarget)
@@ -737,6 +741,11 @@ namespace ZoneEngine.Core.Playfields
                     .ThenBy(x => x.SourceGeneration)
                     .ToArray();
                 double nearestVariantDistance = variants[0].Distance;
+                if (nearestVariantDistance > MaxVariantAttachDistanceMeters)
+                {
+                    return CapturedAreteMovementDecisionKind.Fallback;
+                }
+
                 var nearestVariants = variants
                     .Where(x => Math.Abs(x.Distance - nearestVariantDistance) <= 0.001)
                     .ToArray();
@@ -1140,8 +1149,8 @@ namespace ZoneEngine.Core.Playfields
                         || family <= 0
                         || template <= 0
                         || level <= 0
-                        || starts <= 0
-                        || !eligible
+                        || starts < 0
+                        || (eligible && starts <= 0)
                         || capturedPlayfield != CapturedAreteMovementCatalog.CapturedPlayfieldId
                         || runtimePlayfield != CapturedAreteMovementCatalog.RuntimePlayfieldId
                         || string.IsNullOrWhiteSpace(columns[9])
@@ -1190,11 +1199,23 @@ namespace ZoneEngine.Core.Playfields
 
                         radius = parsedRadius;
                     }
-                    else if (!string.Equals(columns[9], "eligibility-only", StringComparison.Ordinal)
-                             || !string.IsNullOrWhiteSpace(columns[8])
-                             || !string.IsNullOrWhiteSpace(columns[10])
-                             || !string.IsNullOrWhiteSpace(columns[11])
-                             || !string.IsNullOrWhiteSpace(columns[12]))
+                    else if (string.Equals(columns[9], "eligibility-only", StringComparison.Ordinal)
+                             || string.Equals(columns[9], "manual-passive-until-attacked", StringComparison.Ordinal))
+                    {
+                        if (!string.IsNullOrWhiteSpace(columns[8])
+                            || !string.IsNullOrWhiteSpace(columns[10])
+                            || !string.IsNullOrWhiteSpace(columns[11])
+                            || !string.IsNullOrWhiteSpace(columns[12])
+                            || (string.Equals(
+                                    columns[9],
+                                    "manual-passive-until-attacked",
+                                    StringComparison.Ordinal)
+                                && eligible))
+                        {
+                            return Invalid("aggro-radius-evidence-invalid:" + index);
+                        }
+                    }
+                    else
                     {
                         return Invalid("aggro-radius-evidence-invalid:" + index);
                     }
@@ -1254,7 +1275,11 @@ namespace ZoneEngine.Core.Playfields
             }
 
             CapturedAreteAggroObservation match = this.FindMatch(actor);
-            if (match == null || !match.ObservedAutomaticAggroRadiusMeters.HasValue)
+            // Radius alone is not enough: chase after player attack was mis-labeled as
+            // automatic aggro for Desert Reet (Mike 2026-08-02: passive until attacked).
+            if (match == null
+                || !match.AutomaticAggroEligible
+                || !match.ObservedAutomaticAggroRadiusMeters.HasValue)
             {
                 return false;
             }

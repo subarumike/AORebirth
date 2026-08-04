@@ -20,7 +20,8 @@ namespace ZoneEngine.Core.Playfields
     #endregion
 
     /// <summary>
-    /// Capture 20260721-nanoprogramsvendor / 20260721-nano-enforcer-arete:
+    /// Capture 20260721-nanoprogramsvendor / 20260721-nano-enforcer-arete /
+    /// 20260801-191821 (Keeper):
     /// Use Marco nano crystal package → Overflow content grants → Delete crystal → tip reward.
     /// </summary>
     internal static class CapturedAreteMarcoSpidaNanoPackageRuntime

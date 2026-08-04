@@ -89,7 +89,10 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             ICharacter npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, npcIdentity);
-            return LoreleiOasisMobRuntime.IsRegisteredGreedyDesertReet(npc);
+            // Capture 20260725-shiny-sword-nano: match identity, not oasis spawn registry.
+            // StartTrade used dialogue registration (by name) while FinishTrade required
+            // OasisReetInstances — trade opened then turn-in/nano grant never ran.
+            return LoreleiOasisMobRuntime.MatchesGreedyDesertReetIdentity(npc);
         }
 
         /// <summary>
@@ -115,7 +118,30 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            // Capture TemplateAction Unknown2=3 at Inventory placement (item not deleted).
+            // Capture order: QuestFullUpdate tip, then TemplateAction Unknown2=3 (sword kept).
+            if (!HasRewardsGranted(character))
+            {
+                EnsureQuestActive(character, QuestId);
+                RexQuestPreviewEmissionResult tipResult = ShinySwordTipSender.TrySendTip(character);
+                Log(
+                    "shiny-sword use tip character="
+                    + character.Identity.ToString(true)
+                    + " slot="
+                    + itemPosition
+                    + " emitted="
+                    + tipResult.Emitted
+                    + " "
+                    + tipResult.Message);
+            }
+            else
+            {
+                Log(
+                    "shiny-sword use skipped tip (rewards already granted) character="
+                    + character.Identity.ToString(true)
+                    + " slot="
+                    + itemPosition);
+            }
+
             character.Send(
                 new TemplateActionMessage
                 {
@@ -131,17 +157,6 @@ namespace ZoneEngine.Core.Arete.Quests
                     Unknown4 = 0
                 });
 
-            if (!HasRewardsGranted(character))
-            {
-                EnsureQuestActive(character, QuestId);
-                ShinySwordTipSender.TrySendTip(character);
-            }
-
-            Log(
-                "shiny-sword use tip character="
-                + character.Identity.ToString(true)
-                + " slot="
-                + itemPosition);
             return true;
         }
 
@@ -248,11 +263,13 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            MarkRewardsGranted(source);
-            TryGrantNanoReward(source);
+            // Capture 20260725-shiny-sword-nano #26–#33: FormatFeedback → Cash/XP →
+            // TemplateAction nano 223381 QL25 → tip Action59/Delete.
+            SendFinishFeedback(source);
             ApplyCredits(source);
             CombatXpRuntimeService.AwardDirectXp(source, FinishXpReward, "shiny-sword-2507xp");
-            SendFinishFeedback(source);
+            TryGrantNanoReward(source);
+            MarkRewardsGranted(source);
         }
 
         private static void TryGrantNanoReward(ICharacter source)
@@ -329,14 +346,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            long cashAfter = (long)source.Stats[StatIds.cash].Value + FinishCreditReward;
-            if (cashAfter > uint.MaxValue)
-            {
-                cashAfter = uint.MaxValue;
-            }
-
-            source.Stats[StatIds.cash].Set((uint)cashAfter);
-            StatMessageHandler.Default.SendChanged(source);
+            AreteQuestRewardGrants.GrantCredits(source, FinishCreditReward);
         }
 
         private static void SendFinishFeedback(ICharacter source)

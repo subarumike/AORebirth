@@ -493,62 +493,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            MissionRewardDefinition definition = new MissionRewardDefinition
-                                                {
-                                                    RewardKey = "captured-vaughn-talk-xp-credits",
-                                                    RewardType = "character-stats",
-                                                    IsResolved = true,
-                                                    StatMutations =
-                                                        new[]
-                                                        {
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.cash,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = TalkToVaughnCreditReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.xp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = TalkToVaughnXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.unsavedxp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = TalkToVaughnXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            }
-                                                        }
-                                                };
-            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                characterId,
-                TalkToVaughnQuestId,
-                definition,
-                "capture:20260722-233205:vaughn-talk-xp-credits");
-            if (!result.Succeeded || result.StatValues == null)
-            {
-                return;
-            }
-
-            foreach (MissionCharacterStatValue statValue in result.StatValues)
-            {
-                uint value = statValue.Value <= 0
-                                 ? 0
-                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                source.Stats[(StatIds)statValue.StatId].Set(value);
-            }
-
-            StatMessageHandler.Default.SendChanged(source);
+            AreteQuestRewardGrants.GrantCredits(source, TalkToVaughnCreditReward);
+            CombatXpRuntimeService.AwardDirectXp(source, TalkToVaughnXpReward, "vaughn-talk-2581xp");
             MissionRuntime.Service.SetFlag(
                 characterId,
                 TalkToVaughnQuestId,

@@ -23,13 +23,15 @@ namespace ZoneEngine.Core.Playfields
     #endregion
 
     /// <summary>
-    /// Capture 20260727-204902 SANDSTORM Marauders east of Arete market (Remi Hellfyre quest).
+    /// Capture 20260801-SANDSTORM SANDSTORM Marauders + Control Tower on Remi Hellfyre path.
     /// </summary>
     internal static class AreteSandstormMarauderRuntime
     {
         private const int AreteLandingPlayfieldId = 6553;
 
         private const string MarauderName = "SANDSTORM Marauder";
+
+        private const string ControlTowerName = "SANDSTORM Control Tower";
 
         private const int MarauderLevel = 7;
 
@@ -39,67 +41,56 @@ namespace ZoneEngine.Core.Playfields
 
         private const int MarauderNpcFamily = 0;
 
-        private const int MarauderRunSpeed = 24;
+        // Capture SCFU RunSpeedBase=500.
+        private const int MarauderRunSpeed = 500;
 
         private const int MarauderCharacterFlags = 268964353;
 
-        private const int MarauderHeadMesh = 40101;
+        private const int DefaultMarauderHeadMesh = 40101;
 
         // Capture corpse CATMesh (not MonsterData). MD-as-CATMesh crashes the client.
         private const int MarauderCorpseCatMesh = 265819;
 
-        private sealed class ReplacementDefinition
-        {
-            public ReplacementDefinition(
-                int monsterData,
-                double delaySeconds,
-                float x,
-                float y,
-                float z)
-            {
-                this.MonsterData = monsterData;
-                this.DelaySeconds = delaySeconds;
-                this.X = x;
-                this.Y = y;
-                this.Z = z;
-            }
+        private const int ControlTowerMonsterData = 200894;
 
-            public int MonsterData { get; private set; }
+        private const int ControlTowerLevel = 13;
 
-            public double DelaySeconds { get; private set; }
+        private const int ControlTowerHealth = 327;
 
-            public float X { get; private set; }
+        private const int ControlTowerScale = 96;
 
-            public float Y { get; private set; }
+        private const int ControlTowerRunSpeed = 45;
 
-            public float Z { get; private set; }
-        }
+        private const int ControlTowerCharacterFlags = 269095425;
+
+        // Mike: SANDSTORM Marauders respawn 30s after death at their spawn slot.
+        private const double MarauderRespawnSeconds = 30.0;
 
         private sealed class MarauderSlot
         {
             public MarauderSlot(
                 int monsterData,
+                int headMesh,
                 float x,
                 float y,
-                float z,
-                ReplacementDefinition replacement)
+                float z)
             {
                 this.MonsterData = monsterData;
+                this.HeadMesh = headMesh;
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
-                this.Replacement = replacement;
             }
 
             public int MonsterData { get; private set; }
+
+            public int HeadMesh { get; private set; }
 
             public float X { get; private set; }
 
             public float Y { get; private set; }
 
             public float Z { get; private set; }
-
-            public ReplacementDefinition Replacement { get; private set; }
         }
 
         private sealed class SlotRuntimeState
@@ -107,8 +98,6 @@ namespace ZoneEngine.Core.Playfields
             public Identity CurrentIdentity { get; set; }
 
             public DateTime? RespawnDueUtc { get; set; }
-
-            public bool ReplacementConsumed { get; set; }
         }
 
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
@@ -116,26 +105,17 @@ namespace ZoneEngine.Core.Playfields
         private static readonly Dictionary<int, SlotRuntimeState[]> RuntimeStatesByPlayfield =
             new Dictionary<int, SlotRuntimeState[]>();
 
-        // Exact initial actors from 20260727-204902. Only the first two slots
-        // have identity-correlated replacement observations; the other three
-        // remain intentionally non-respawning.
+        private static readonly Dictionary<int, Identity> ControlTowerByPlayfield =
+            new Dictionary<int, Identity>();
+
+        // Capture 20260801-SANDSTORM first-seen path actors; Mike: all slots respawn after 30s.
         private static readonly MarauderSlot[] SpawnSlots =
             {
-                new MarauderSlot(
-                    265822,
-                    4033.099f,
-                    0.010f,
-                    677.2908f,
-                    new ReplacementDefinition(26092, 42.5370285, 4031.978f, 0.6528038f, 677.3542f)),
-                new MarauderSlot(
-                    287217,
-                    4032.111f,
-                    0.010f,
-                    667.5142f,
-                    new ReplacementDefinition(26092, 42.5948143, 4032.878f, 0.010f, 667.3873f)),
-                new MarauderSlot(265822, 4039.592f, 0.6754054f, 696.7009f, null),
-                new MarauderSlot(287217, 4038.502f, 0.010f, 688.2748f, null),
-                new MarauderSlot(287217, 4054.383f, 1.537878f, 651.4177f, null)
+                new MarauderSlot(265822, DefaultMarauderHeadMesh, 4033.377f, 0.010f, 667.7479f),
+                new MarauderSlot(265822, DefaultMarauderHeadMesh, 4033.406f, 0.010f, 676.7122f),
+                new MarauderSlot(287217, 0, 4039.895f, 0.6299585f, 696.3529f),
+                new MarauderSlot(287217, 0, 4058.394f, 0.610f, 678.1385f),
+                new MarauderSlot(265822, DefaultMarauderHeadMesh, 4055.279f, 2.131286f, 650.3979f)
             };
 
         public static void StartForPlayfield(Playfield playfield, Identity playfieldIdentity, Action<ICharacter> activateNpc)
@@ -155,11 +135,12 @@ namespace ZoneEngine.Core.Playfields
             {
                 try
                 {
-                    Character marauder = SpawnSlot(
+                    Character marauder = SpawnMarauder(
                         playfield,
                         playfieldIdentity,
                         activateNpc,
                         SpawnSlots[i].MonsterData,
+                        SpawnSlots[i].HeadMesh,
                         SpawnSlots[i].X,
                         SpawnSlots[i].Y,
                         SpawnSlots[i].Z);
@@ -178,19 +159,37 @@ namespace ZoneEngine.Core.Playfields
                 }
             }
 
+            try
+            {
+                Character tower = SpawnControlTower(playfield, playfieldIdentity, activateNpc);
+                if (tower != null)
+                {
+                    ControlTowerByPlayfield[playfieldIdentity.Instance] = tower.Identity;
+                    spawned++;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteSandstormMarauderRuntime control-tower spawn failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
+            }
+
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 "AreteSandstormMarauderRuntime spawned="
                 + spawned
                 + "/"
-                + SpawnSlots.Length
+                + (SpawnSlots.Length + 1)
                 + " pf="
                 + playfieldIdentity.Instance
-                + " source=20260727-204902");
+                + " source=20260801-SANDSTORM");
             if (spawned == 0)
             {
                 LinkedPlayfields.Remove(playfieldIdentity.Instance);
                 RuntimeStatesByPlayfield.Remove(playfieldIdentity.Instance);
+                ControlTowerByPlayfield.Remove(playfieldIdentity.Instance);
             }
         }
 
@@ -198,6 +197,7 @@ namespace ZoneEngine.Core.Playfields
         {
             LinkedPlayfields.Remove(playfieldInstance);
             RuntimeStatesByPlayfield.Remove(playfieldInstance);
+            ControlTowerByPlayfield.Remove(playfieldInstance);
         }
 
         internal static bool IsRegisteredMarauder(ICharacter target)
@@ -205,9 +205,7 @@ namespace ZoneEngine.Core.Playfields
             if (target == null
                 || target.Playfield == null
                 || target.Playfield.Identity.Instance != AreteLandingPlayfieldId
-                || !string.Equals(target.Name, MarauderName, StringComparison.OrdinalIgnoreCase)
-                || target.Stats[StatIds.level].Value != MarauderLevel
-                || target.Stats[StatIds.npcfamily].Value != MarauderNpcFamily)
+                || !string.Equals(target.Name, MarauderName, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -216,14 +214,15 @@ namespace ZoneEngine.Core.Playfields
             if (!RuntimeStatesByPlayfield.TryGetValue(AreteLandingPlayfieldId, out states)
                 || states == null)
             {
-                return false;
+                // Name match on Arete is enough when slot table was cleared mid-session.
+                return target.Stats[StatIds.level].Value == MarauderLevel
+                       || target.Stats[StatIds.level].Value == 0;
             }
 
             for (int i = 0; i < states.Length; i++)
             {
                 SlotRuntimeState state = states[i];
                 if (state != null
-                    && state.CurrentIdentity != null
                     && state.CurrentIdentity.Type == target.Identity.Type
                     && state.CurrentIdentity.Instance == target.Identity.Instance)
                 {
@@ -231,7 +230,8 @@ namespace ZoneEngine.Core.Playfields
                 }
             }
 
-            return false;
+            return target.Stats[StatIds.level].Value == MarauderLevel
+                   || string.Equals(target.Name, MarauderName, StringComparison.OrdinalIgnoreCase);
         }
 
         public static void TickRespawn(
@@ -246,12 +246,15 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
+            // Survive ClearPlayfield / late join: re-arm like Alex fleas.
+            LinkedPlayfields.Add(playfieldIdentity.Instance);
             SlotRuntimeState[] states;
             if (!RuntimeStatesByPlayfield.TryGetValue(playfieldIdentity.Instance, out states)
                 || states == null
                 || states.Length != SpawnSlots.Length)
             {
-                return;
+                states = new SlotRuntimeState[SpawnSlots.Length];
+                RuntimeStatesByPlayfield[playfieldIdentity.Instance] = states;
             }
 
             DateTime utcNow = DateTime.UtcNow;
@@ -259,25 +262,23 @@ namespace ZoneEngine.Core.Playfields
             {
                 MarauderSlot slot = SpawnSlots[i];
                 SlotRuntimeState state = states[i];
-                if (slot.Replacement == null
-                    || state == null
-                    || state.ReplacementConsumed)
+                if (state == null)
                 {
-                    continue;
+                    state = new SlotRuntimeState();
+                    states[i] = state;
                 }
 
-                ICharacter current = Pool.Instance.GetObject<ICharacter>(state.CurrentIdentity);
-                if (current != null
-                    && current.Playfield == playfield
-                    && current.Stats[StatIds.health].Value > 0)
+                Identity livingId;
+                if (TryResolveLivingMarauder(playfield, state, slot, out livingId))
                 {
+                    state.CurrentIdentity = livingId;
                     state.RespawnDueUtc = null;
                     continue;
                 }
 
                 if (!state.RespawnDueUtc.HasValue)
                 {
-                    state.RespawnDueUtc = utcNow + TimeSpan.FromSeconds(slot.Replacement.DelaySeconds);
+                    state.RespawnDueUtc = utcNow + TimeSpan.FromSeconds(MarauderRespawnSeconds);
                     continue;
                 }
 
@@ -288,33 +289,100 @@ namespace ZoneEngine.Core.Playfields
 
                 try
                 {
-                    ReplacementDefinition replacement = slot.Replacement;
-                    Character marauder = SpawnSlot(
+                    Character marauder = SpawnMarauder(
                         playfield,
                         playfieldIdentity,
                         activateNpc,
-                        replacement.MonsterData,
-                        replacement.X,
-                        replacement.Y,
-                        replacement.Z);
+                        slot.MonsterData,
+                        slot.HeadMesh,
+                        slot.X,
+                        slot.Y,
+                        slot.Z);
                     if (marauder != null)
                     {
                         state.CurrentIdentity = marauder.Identity;
                         state.RespawnDueUtc = null;
-                        state.ReplacementConsumed = true;
+                        LogUtil.Debug(
+                            DebugInfoDetail.Engine,
+                            "AreteSandstormMarauderRuntime respawned slot=" + i
+                            + " id=" + marauder.Identity.ToString(true));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "AreteSandstormMarauderRuntime respawn slot=" + i + " failed: "
+                        + ex.GetType().Name + ": " + ex.Message);
+                }
+            }
+        }
+
+        private static bool TryResolveLivingMarauder(
+            Playfield playfield,
+            SlotRuntimeState state,
+            MarauderSlot slot,
+            out Identity livingId)
+        {
+            livingId = Identity.None;
+            if (playfield == null || state == null || slot == null)
+            {
+                return false;
+            }
+
+            if (state.CurrentIdentity.Type != IdentityType.None
+                && state.CurrentIdentity.Instance != 0)
+            {
+                try
+                {
+                    ICharacter current = Pool.Instance.GetObject<ICharacter>(state.CurrentIdentity);
+                    if (IsLivingMarauderOnPlayfield(current, playfield))
+                    {
+                        livingId = current.Identity;
+                        return true;
                     }
                 }
                 catch (Exception)
                 {
                 }
             }
+
+            const float radiusSq = 64.0f; // 8m
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
+            {
+                if (!IsLivingMarauderOnPlayfield(candidate, playfield))
+                {
+                    continue;
+                }
+
+                float dx = candidate.Coordinates().x - slot.X;
+                float dz = candidate.Coordinates().z - slot.Z;
+                if ((dx * dx) + (dz * dz) <= radiusSq)
+                {
+                    livingId = candidate.Identity;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        private static Character SpawnSlot(
+        private static bool IsLivingMarauderOnPlayfield(ICharacter candidate, Playfield playfield)
+        {
+            return candidate != null
+                   && candidate.Playfield == playfield
+                   && candidate.Controller is NPCController
+                   && candidate.Stats[StatIds.health].Value > 0
+                   && candidate.Stats[StatIds.deadtimer].Value == 0
+                   && string.Equals(candidate.Name, MarauderName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static Character SpawnMarauder(
             Playfield playfield,
             Identity playfieldIdentity,
             Action<ICharacter> activateNpc,
             int monsterData,
+            int headMesh,
             float x,
             float y,
             float z)
@@ -334,10 +402,10 @@ namespace ZoneEngine.Core.Playfields
 
             marauder.Name = MarauderName;
             marauder.Playfield = playfield;
-            ApplyCaptureStats(marauder, monsterData);
+            ApplyMarauderStats(marauder, monsterData, headMesh);
             marauder.Name = MarauderName;
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "arete-sandstorm-20260727-204902",
+                "arete-sandstorm-20260801-SANDSTORM",
                 8,
                 18,
                 2.0,
@@ -352,6 +420,9 @@ namespace ZoneEngine.Core.Playfields
                 0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(marauder, controller, contract, out unused);
+            // Prepare can overwrite identity stats — restore capture marauder profile.
+            ApplyMarauderStats(marauder, monsterData, headMesh);
+            marauder.Name = MarauderName;
             controller.AiProfile = NpcAiProfile.Aggressive;
             marauder.Coordinates(new Coordinate { x = x, y = y, z = z });
             marauder.DoNotDoTimers = false;
@@ -360,7 +431,52 @@ namespace ZoneEngine.Core.Playfields
             return marauder;
         }
 
-        private static void ApplyCaptureStats(Character marauder, int monsterData)
+        private static Character SpawnControlTower(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            NPCController controller = new NPCController { AiProfile = NpcAiProfile.Passive };
+            Character tower = NonPlayerCharacterHandler.SpawnMobFromTemplate(
+                "A004",
+                playfieldIdentity,
+                new Coordinate { x = 4066.855f, y = 0.61f, z = 666.7697f },
+                new Quaternion(0.0, 0.0, 0.0, 1.0),
+                controller,
+                ControlTowerLevel);
+            if (tower == null)
+            {
+                return null;
+            }
+
+            tower.Name = ControlTowerName;
+            tower.Playfield = playfield;
+            SetStat(tower, StatIds.monsterdata, ControlTowerMonsterData);
+            SetStat(tower, StatIds.life, ControlTowerHealth);
+            SetStat(tower, StatIds.health, ControlTowerHealth);
+            SetStat(tower, StatIds.level, ControlTowerLevel);
+            SetStat(tower, StatIds.npcfamily, MarauderNpcFamily);
+            SetStat(tower, StatIds.monsterscale, ControlTowerScale);
+            SetStat(tower, StatIds.runspeed, ControlTowerRunSpeed);
+            SetStat(tower, StatIds.flags, ControlTowerCharacterFlags);
+            SetStat(tower, StatIds.visualflags, 31);
+            SetStat(tower, StatIds.side, 3);
+            SetStat(tower, StatIds.breed, 1);
+            SetStat(tower, StatIds.sex, 2);
+            SetStat(tower, StatIds.race, 1);
+            SetStat(tower, StatIds.fatness, 1);
+            SetStat(tower, StatIds.catmesh, MarauderCorpseCatMesh);
+            SetStat(tower, StatIds.displaycatmesh, MarauderCorpseCatMesh);
+            tower.Name = ControlTowerName;
+            controller.AiProfile = NpcAiProfile.Passive;
+            tower.Coordinates(new Coordinate { x = 4066.855f, y = 0.61f, z = 666.7697f });
+            tower.DoNotDoTimers = false;
+            activateNpc(tower);
+            playfield.AnnounceSpawnedCharacterVisibility(tower, Identity.None);
+            return tower;
+        }
+
+        private static void ApplyMarauderStats(Character marauder, int monsterData, int headMesh)
         {
             SetStat(marauder, StatIds.monsterdata, monsterData);
             SetStat(marauder, StatIds.life, MarauderHealth);
@@ -376,8 +492,11 @@ namespace ZoneEngine.Core.Playfields
             SetStat(marauder, StatIds.sex, 2);
             SetStat(marauder, StatIds.race, 1);
             SetStat(marauder, StatIds.fatness, 1);
-            SetStat(marauder, StatIds.headmesh, MarauderHeadMesh);
-            // Usable corpse CATMesh for CorpseCatMeshFor(); living body still uses MonsterData.
+            if (headMesh > 0)
+            {
+                SetStat(marauder, StatIds.headmesh, headMesh);
+            }
+
             SetStat(marauder, StatIds.catmesh, MarauderCorpseCatMesh);
             SetStat(marauder, StatIds.displaycatmesh, MarauderCorpseCatMesh);
         }
@@ -387,6 +506,5 @@ namespace ZoneEngine.Core.Playfields
             mob.Stats[stat].Value = value;
             mob.Stats[stat].BaseValue = (uint)value;
         }
-
     }
 }

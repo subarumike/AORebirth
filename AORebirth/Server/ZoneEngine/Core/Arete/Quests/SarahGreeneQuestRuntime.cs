@@ -801,71 +801,14 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void ApplySarahTurnInXpCredits(ICharacter source)
         {
-            MissionRewardDefinition definition = new MissionRewardDefinition
-                                                {
-                                                    RewardKey = "captured-sarah-armor-turnin-xp-credits",
-                                                    RewardType = "character-stats",
-                                                    IsResolved = true,
-                                                    StatMutations =
-                                                        new[]
-                                                        {
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.cash,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = SarahTurnInCreditReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.xp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = SarahTurnInXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.unsavedxp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = SarahTurnInXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.lastxp,
-                                                                Kind = MissionStatMutationKind.Set,
-                                                                Value = SarahTurnInXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            }
-                                                        }
-                                                };
-            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                source.Identity.Instance,
+            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
+                source,
                 DeliverDnaLockedArmorQuestId,
-                definition,
-                "capture:20260721-sara:sarah-turnin-xp-credits");
-            if (!result.Succeeded || result.StatValues == null)
-            {
-                return;
-            }
-
-            foreach (MissionCharacterStatValue statValue in result.StatValues)
-            {
-                uint value = statValue.Value <= 0
-                                 ? 0
-                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                source.Stats[(StatIds)statValue.StatId].Set(value);
-            }
-
-            StatMessageHandler.Default.SendChanged(source);
+                "arete-credits-awarded-sarah-armor-turnin",
+                SarahTurnInCreditReward,
+                "arete-xp-awarded-sarah-armor-turnin",
+                SarahTurnInXpReward,
+                "sarah-armor-turnin-2229xp");
         }
 
         private static void TrySendSarahTurnInRewardFeedback(ICharacter source)

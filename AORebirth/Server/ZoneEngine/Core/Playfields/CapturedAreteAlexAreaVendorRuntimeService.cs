@@ -11,11 +11,15 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Core.Vector;
     using AORebirth.Database.Dao;
     using AORebirth.Enums;
+    using AORebirth.Interfaces;
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
+
+    using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.MessageHandlers;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -49,6 +53,12 @@ namespace ZoneEngine.Core.Playfields
 
                 dynelRegistry.Register(vendor);
                 this.capturedVendors.Add(vendor);
+                CapturedAreteAlexAreaVendorRuntimeRegistry.Register(
+                    new CapturedAreteAlexAreaVendorRuntimeDefinition(
+                        playfieldIdentity,
+                        vendor.Identity,
+                        definition.DisplayName));
+                this.AnnounceToPlayfieldPlayers(playfield, vendor);
                 spawned++;
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
@@ -62,7 +72,7 @@ namespace ZoneEngine.Core.Playfields
                     + vendor.Stats[(int)StatIds.staticinstance].Value
                     + " stockRows="
                     + definition.Stock.Count
-                    + " evidence=20260720-074847+20260721-lockpick");
+                    + " evidence=20260801-215330+20260721-lockpick");
             }
 
             if (spawned == 0)
@@ -74,6 +84,7 @@ namespace ZoneEngine.Core.Playfields
         internal void Clear(Identity playfieldIdentity, PlayfieldDynelRegistry dynelRegistry)
         {
             this.spawnedPlayfields.Remove(playfieldIdentity.Instance);
+            CapturedAreteAlexAreaVendorRuntimeRegistry.RemoveForPlayfield(playfieldIdentity);
             foreach (Vendor vendor in this.capturedVendors)
             {
                 dynelRegistry.Unregister(vendor.Identity);
@@ -81,6 +92,24 @@ namespace ZoneEngine.Core.Playfields
             }
 
             this.capturedVendors.Clear();
+        }
+
+        private void AnnounceToPlayfieldPlayers(Playfield playfield, Vendor vendor)
+        {
+            if (playfield == null || vendor == null)
+            {
+                return;
+            }
+
+            foreach (ICharacter character in playfield.EnumerateActiveCharacters())
+            {
+                if (character == null || !(character.Controller is PlayerController))
+                {
+                    continue;
+                }
+
+                VendingMachineFullUpdateMessageHandler.Default.SendAreteFreestanding(character, vendor);
+            }
         }
 
         private Vendor TryCreateVendor(
@@ -93,8 +122,7 @@ namespace ZoneEngine.Core.Playfields
             {
                 int captureTemplateId = definition.TemplateId;
                 int templateId = captureTemplateId;
-                if (!ItemLoader.ItemList.ContainsKey(templateId)
-                    || ItemNamesDao.Instance.Get(templateId) == null)
+                if (!ItemLoader.ItemList.ContainsKey(templateId))
                 {
                     if (!ItemLoader.ItemList.ContainsKey(
                             CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId))
@@ -106,6 +134,14 @@ namespace ZoneEngine.Core.Playfields
                             + CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId);
                     }
 
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        "Arete Alex-area vendor template missing id="
+                        + captureTemplateId
+                        + " using fallback="
+                        + CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId
+                        + " name="
+                        + definition.DisplayName);
                     templateId = CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId;
                 }
 
@@ -130,6 +166,7 @@ namespace ZoneEngine.Core.Playfields
                             new Item(stock.Quality, stock.LowId, stock.HighId)));
                 }
 
+                // Pool free IDs — fixed live IDs throw before VendingMachine type exists on parent.
                 var identity = new Identity
                                {
                                    Type = IdentityType.VendingMachine,

@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 FOLLOW_TARGET = 0x260F3671
 SET_POS = 0x195E496E
 STOP_MOVING_CMD = 0x742E2314
-CHAR_DC_MOVE = 0x54111123
 
 IDENTITY_TYPES = {
     50000: "SimpleChar",
@@ -245,40 +244,6 @@ def decode_stop_moving_cmd(timestamp, direction, sequence, data, counts):
     return row
 
 
-def decode_char_dc_move(timestamp, direction, sequence, data, counts):
-    source = read_identity(data, 20)
-    if source is None or len(data) < 70:
-        counts["decodeErrors"] += 1
-        return None
-
-    row = base_row(timestamp, direction, sequence, "CharDCMove", source)
-    base_unknown = data[28]
-    move_type = data[29]
-    row["FollowKind"] = "CharacterMove"
-    row["CurrentX"] = fmt_float(read_f32(data, 46))
-    row["CurrentY"] = fmt_float(read_f32(data, 50))
-    row["CurrentZ"] = fmt_float(read_f32(data, 54))
-    row["Flags"] = "base_unknown={0};move_type={1}".format(
-        base_unknown, move_type
-    )
-    row["RawParams"] = (
-        "base_unknown={0};move_type={1};heading={2},{3},{4},{5};"
-        "unknown1={6};aux_a={7};aux_b={8}"
-    ).format(
-        base_unknown,
-        move_type,
-        fmt_float(read_f32(data, 30)),
-        fmt_float(read_f32(data, 34)),
-        fmt_float(read_f32(data, 38)),
-        fmt_float(read_f32(data, 42)),
-        read_i32(data, 58),
-        fmt_float(read_f32(data, 62)),
-        fmt_float(read_f32(data, 66)),
-    )
-    counts["charDCMovePackets"] += 1
-    return row
-
-
 def decode_line(line, counts):
     match = LINE_RE.match(line.strip())
     if not match:
@@ -299,8 +264,6 @@ def decode_line(line, counts):
         return decode_set_pos(timestamp, direction, sequence, data, counts)
     if message_type == STOP_MOVING_CMD:
         return decode_stop_moving_cmd(timestamp, direction, sequence, data, counts)
-    if message_type == CHAR_DC_MOVE:
-        return decode_char_dc_move(timestamp, direction, sequence, data, counts)
     return None
 
 
@@ -322,7 +285,6 @@ def main():
         "usableFollowTargetPackets": 0,
         "setPosPackets": 0,
         "stopMovingCmdPackets": 0,
-        "charDCMovePackets": 0,
         "decodeErrors": 0,
     }
 
@@ -353,13 +315,12 @@ def main():
         handle.write("\n")
 
     print(
-        "decoded movement rows={0} followTarget={1} usableFollowTarget={2} setPos={3} stopMovingCmd={4} charDCMove={5} errors={6}".format(
+        "decoded movement rows={0} followTarget={1} usableFollowTarget={2} setPos={3} stopMovingCmd={4} errors={5}".format(
             counts["movementPacketRows"],
             counts["followTargetPackets"],
             counts["usableFollowTargetPackets"],
             counts["setPosPackets"],
             counts["stopMovingCmdPackets"],
-            counts["charDCMovePackets"],
             counts["decodeErrors"],
         )
     )

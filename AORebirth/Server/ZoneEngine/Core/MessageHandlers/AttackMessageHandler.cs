@@ -148,6 +148,8 @@ namespace ZoneEngine.Core.MessageHandlers
             this.EngageNpcTarget(character, target);
             this.SendCombatStartSpecialAttackWeapon(character);
             this.SendAttackState(character, message.Target, message.Action);
+            // First swing only after SAW+Attack so the client plays the attack anim.
+            this.TryPlayerFirstCombatTick(character);
             PetCommandService.OnOwnerEngagedCombat(character, message.Target);
         }
 
@@ -163,6 +165,15 @@ namespace ZoneEngine.Core.MessageHandlers
             character.SetTarget(target);
             character.SetFightingTarget(target);
             this.ResetCombatTick(character);
+        }
+
+        private void TryPlayerFirstCombatTick(ICharacter character)
+        {
+            Playfield playfield = character.Playfield as Playfield;
+            if (playfield != null)
+            {
+                playfield.TryPlayerFirstCombatTick(character);
+            }
         }
 
         private void CancelPlayerAttack(ICharacter character)

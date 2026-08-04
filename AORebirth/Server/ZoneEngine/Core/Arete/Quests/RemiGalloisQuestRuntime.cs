@@ -2,6 +2,7 @@ namespace ZoneEngine.Core.Arete.Quests
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Inventory;
@@ -17,14 +18,14 @@ namespace ZoneEngine.Core.Arete.Quests
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
-    using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 
     /// <summary>
-    /// Capture 20260727-204902: Remi Gallois Hellfyre field test on Arete Landing.
-    /// Accept → Mission:556B5E53 + Experimental Hellfyre Rocket Launcher (295757).
-    /// Kill 3 SANDSTORM Marauders → Mission:556B5E59 Return to Remi.
-    /// Finish → 2080 XP, 1440 credits + TemplateAction 223349/223361/215265/223365 ql25.
+    /// Capture 20260801-SANDSTORM: Remi Gallois Hellfyre field test on Arete Landing.
+    /// Accept → Mission:5576B777 + Experimental Hellfyre Rocket Launcher (295757) to overflow
+    /// (player equips via normal inventory right-click / ClientMove to RH slot 6).
+    /// Kill 3 SANDSTORM Marauders → Mission:5576B780 Return to Remi.
+    /// Finish → 2581 XP, 1160 credits + nano crystals ql25; launcher self-destructs after 30s.
     /// </summary>
     public static class RemiGalloisQuestRuntime
     {
@@ -44,25 +45,32 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public const string FinishNodeId = "remi_finish";
 
-        public const string QuellQuestId = "Mission:556B5E53";
+        public const string QuellQuestId = "Mission:5576B777";
 
-        public const string ReturnQuestId = "Mission:556B5E59";
+        public const string ReturnQuestId = "Mission:5576B780";
+
+        private const string LegacyQuellQuestId = "Mission:556B5E53";
+
+        private const string LegacyReturnQuestId = "Mission:556B5E59";
 
         public const int HellfyreLauncherItemId = 295757;
 
-        /// <summary>Capture 20260727-204902 Hellfyre HealthDamage Amount=-500 FireAC per rocket.</summary>
+        /// <summary>Capture 20260801-SANDSTORM Hellfyre HealthDamage Amount=-500 FireAC per rocket.</summary>
         public const int HellfyreCapturedDamage = 500;
 
-        /// <summary>Capture CastNanoSpell / SpellList nano for EMP Rocket Detonation.</summary>
-        public const int HellfyreCapturedNanoId = 296911;
+        /// <summary>Capture CastNanoSpell nano id for rocket detonation.</summary>
+        public const int HellfyreCapturedNanoId = 295887;
 
         private const int AreteLandingPlayfieldId = 6553;
 
         private const int RequiredKillCount = 3;
 
-        private const int FinishXpReward = 2080;
+        private const int FinishXpReward = 2581;
 
-        private const int FinishCreditReward = 1440;
+        private const int FinishCreditReward = 1160;
+
+        // Mike: Experimental Hellfyre self-destructs 30s after Remi finish rewards.
+        private const int HellfyreSelfDestructDelayMilliseconds = 30 * 1000;
 
         private const int CapturedTemplateActionUnknown1 = 1;
 
@@ -70,10 +78,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int CapturedOverflowNextFreeSlot = 0x6F;
 
-        // Capture FormatFeedback "Received reward: 2080 XP, 1440 credits."
-        private const string FinishRewardFeedback = "~&!!!\":$'O\"ui!!!9Ii!!!1q~";
+        // Capture FormatFeedback "Received reward: 2581 XP, 1160 credits."
+        private const string FinishRewardFeedback = "~&!!!\":$'O\"ui!!!?@i!!!.X~";
 
         private const string RewardsGrantedFlag = "remi-gallois-rewards-granted";
+
+        private const string ReturnArmedFlag = "remi-gallois-return-armed";
 
         private static readonly int[] FinishRewardItemIds =
             {
@@ -94,6 +104,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static readonly HashSet<int> RewardsGrantedByCharacter = new HashSet<int>();
 
+        // Tip wire can succeed while MissionRuntime Offer/Accept fails — still track kills.
+        private static readonly HashSet<int> QuellArmedByCharacter = new HashSet<int>();
+
+        // After 3 kills: prefer remi_return even while Hellfyre is still equipped.
+        private static readonly HashSet<int> ReturnArmedByCharacter = new HashSet<int>();
+
         public static string ResolveRemiStartNodeId(ICharacter source)
         {
             if (source == null || !IsInAreteLanding(source))
@@ -106,14 +122,18 @@ namespace ZoneEngine.Core.Arete.Quests
                 return DoneNodeId;
             }
 
-            if (IsMissionActive(source, ReturnQuestId) && !IsMissionCompleted(source, ReturnQuestId))
+            // Capture 20260801-SANDSTORM: after kill handoff tip Mission:5576B780 → remi_return
+            // ("Your field test is complete!"). Must beat Hellfyre/Quell "doing" branch.
+            if (IsReturnPending(source))
             {
+                ArmReturn(source);
                 RemiGalloisTipSender.TrySendReturnTipOnly(source);
                 return ReturnNodeId;
             }
 
-            if (IsMissionActive(source, QuellQuestId) && !IsMissionCompleted(source, QuellQuestId))
+            if (IsQuellPending(source))
             {
+                ArmQuell(source);
                 RemiGalloisTipSender.TrySendQuellTipOnly(source);
                 return DoingNodeId;
             }
@@ -136,6 +156,11 @@ namespace ZoneEngine.Core.Arete.Quests
             if (string.Equals(previousNodeId, OfferNodeId, StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
+                if (IsReturnPending(source) || HasRewardsGranted(source))
+                {
+                    return true;
+                }
+
                 StartQuellQuest(source);
                 return true;
             }
@@ -144,6 +169,12 @@ namespace ZoneEngine.Core.Arete.Quests
             if (string.Equals(previousNodeId, AcceptNodeId, StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
+                if (IsReturnPending(source))
+                {
+                    RemiGalloisTipSender.TrySendReturnTipOnly(source);
+                    return true;
+                }
+
                 RemiGalloisTipSender.TrySendQuellTipOnly(source);
                 return true;
             }
@@ -151,6 +182,11 @@ namespace ZoneEngine.Core.Arete.Quests
             if (string.Equals(previousNodeId, DoingNodeId, StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
+                if (IsReturnPending(source))
+                {
+                    return true;
+                }
+
                 TryGrantHellfyreLauncher(source);
                 return true;
             }
@@ -159,6 +195,13 @@ namespace ZoneEngine.Core.Arete.Quests
                 && answerIndex == 0)
             {
                 CompleteReturnRewards(source);
+                return true;
+            }
+
+            if (string.Equals(previousNodeId, FinishNodeId, StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                // Capture close after remi_finish AppendText; rewards already granted on remi_return.
                 return true;
             }
 
@@ -171,11 +214,20 @@ namespace ZoneEngine.Core.Arete.Quests
                 || target == null
                 || !IsInAreteLanding(attacker)
                 || !IsSandstormMarauder(target)
-                || !IsMissionActive(attacker, QuellQuestId)
-                || IsMissionCompleted(attacker, QuellQuestId)
-                || HasRewardsGranted(attacker))
+                || IsReturnPending(attacker)
+                || HasRewardsGranted(attacker)
+                || (!IsQuellArmed(attacker)
+                    && !HasHellfyreLauncher(attacker)
+                    && !IsMissionActive(attacker, QuellQuestId)
+                    && !IsMissionActive(attacker, LegacyQuellQuestId))
+                || IsMissionCompleted(attacker, QuellQuestId))
             {
                 return false;
+            }
+
+            if (HasHellfyreLauncher(attacker) && !IsReturnPending(attacker))
+            {
+                ArmQuell(attacker);
             }
 
             string observationKey = target.Identity.ToString(true);
@@ -186,6 +238,15 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
+            Log(
+                "quell kill progress="
+                + progress
+                + "/"
+                + RequiredKillCount
+                + " character="
+                + attacker.Identity.ToString(true)
+                + " target="
+                + observationKey);
             TrySendKillFeedback(attacker, progress);
             if (progress >= RequiredKillCount)
             {
@@ -198,11 +259,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void StartQuellQuest(ICharacter source)
         {
-            if (source == null || HasRewardsGranted(source))
+            if (source == null || HasRewardsGranted(source) || IsReturnPending(source))
             {
                 return;
             }
 
+            ArmQuell(source);
             try
             {
                 EnsureQuestActive(source, QuellQuestId);
@@ -223,11 +285,12 @@ namespace ZoneEngine.Core.Arete.Quests
         /// </summary>
         public static void EmitAcceptTipAndHellfyre(ICharacter source)
         {
-            if (source == null || HasRewardsGranted(source))
+            if (source == null || HasRewardsGranted(source) || IsReturnPending(source))
             {
                 return;
             }
 
+            ArmQuell(source);
             // Capture order: QuestFullUpdate tip → TemplateAction Hellfyre.
             RexQuestPreviewEmissionResult tip = RemiGalloisTipSender.TrySendQuellTipOnly(source);
             Log("quell tip(accept) result=" + tip.Message);
@@ -241,14 +304,91 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
+            DisarmQuell(source);
+            ArmReturn(source);
             if (MissionRuntime.IsInitialized)
             {
-                ForceCompleteTip(source.Identity.Instance, QuellQuestId, "mission_556B5E53_kill_marauders");
+                ForceCompleteTip(source.Identity.Instance, QuellQuestId, "mission_5576B777_kill_marauders");
             }
 
             EnsureQuestActive(source, ReturnQuestId);
             RexQuestPreviewEmissionResult tip = RemiGalloisTipSender.TrySendQuellToReturnHandoff(source);
             Log("quell complete → return tip result=" + tip.Message);
+        }
+
+        /// <summary>
+        /// Capture 20260801-SANDSTORM: Hellfyre RH (295757) vs SANDSTORM Marauder → 500 FireAC.
+        /// </summary>
+        public static bool TryGetHellfyreRocketDamage(
+            ICharacter attacker,
+            ICharacter target,
+            int weaponLowId,
+            int weaponHighId,
+            out int damage)
+        {
+            damage = 0;
+            if (attacker == null
+                || target == null
+                || !IsInAreteLanding(attacker)
+                || !IsSandstormMarauder(target))
+            {
+                return false;
+            }
+
+            if (weaponLowId != HellfyreLauncherItemId && weaponHighId != HellfyreLauncherItemId)
+            {
+                return false;
+            }
+
+            damage = HellfyreCapturedDamage;
+            return true;
+        }
+
+        public static void AnnounceHellfyreRocketHit(
+            ICharacter attacker,
+            ICharacter target,
+            int damage,
+            int targetHpAfter,
+            bool killingHit)
+        {
+            if (attacker?.Playfield == null || target == null || damage <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                // Capture: CastNanoSpell NanoId=295887 Unknown1=1 Caster=player Target=marauder.
+                attacker.Playfield.Announce(
+                    new CastNanoSpellMessage
+                    {
+                        Identity = attacker.Identity,
+                        Unknown = 0,
+                        NanoId = HellfyreCapturedNanoId,
+                        Unknown1 = 1,
+                        Target = target.Identity,
+                        Caster = attacker.Identity
+                    });
+                TryAnnounceHellfyreSpellList(attacker, target);
+
+                // Capture HealthDamage: Identity=marauder Amount=-500 Stat=FireAC TargetHp=... Target=player.
+                attacker.Playfield.Announce(
+                    new HealthDamageMessage
+                    {
+                        Identity = target.Identity,
+                        Unknown = 0,
+                        Unknown1 = -damage,
+                        Unknown2 = (int)StatIds.fireac,
+                        Unknown3 = targetHpAfter,
+                        Unknown4 = killingHit ? 5 : 0,
+                        Target = attacker.Identity,
+                        Unknown5 = 0
+                    });
+            }
+            catch (Exception ex)
+            {
+                Log("hellfyre rocket chrome failed err=" + ex.Message);
+            }
         }
 
         /// <summary>
@@ -320,11 +460,13 @@ namespace ZoneEngine.Core.Arete.Quests
             TrySendFinishRewardFeedback(source);
             FeedbackMessageHandler.Default.Send(source, 110, 108871108);
 
+            DisarmReturn(source);
+            DisarmQuell(source);
             MarkRewardsGranted(source);
             if (MissionRuntime.IsInitialized)
             {
                 EnsureQuestActive(source, ReturnQuestId);
-                ForceCompleteTip(source.Identity.Instance, ReturnQuestId, "mission_556B5E59_return_remi");
+                ForceCompleteTip(source.Identity.Instance, ReturnQuestId, "mission_5576B780_return_remi");
                 MissionRuntime.Service.SetFlag(
                     source.Identity.Instance,
                     ReturnQuestId,
@@ -332,209 +474,33 @@ namespace ZoneEngine.Core.Arete.Quests
                     "1");
             }
 
+            ScheduleHellfyreSelfDestruct(source);
             Log("return complete rewards character=" + source.Identity.ToString(true));
         }
 
+        /// <summary>
+        /// Capture 20260801-SANDSTORM: TemplateAction + ContainerAdd Overflow only.
+        /// Player equips with normal inventory right-click / ClientMove → RH slot 6.
+        /// </summary>
         private static void TryGrantHellfyreLauncher(ICharacter source)
         {
-            TryGrantHellfyreAsRightHandWeapon(source);
-        }
-
-        /// <summary>
-        /// Capture 20260727-204902: grant TemplateAction Overflow + ContainerAdd Overflow,
-        /// then player ClientMove Inventory→Slot 6 (Righthand) + WIFU Unknown2=6.
-        /// Equip RH immediately so the launcher is a hand weapon, not HUD1.
-        /// </summary>
-        private static void TryGrantHellfyreAsRightHandWeapon(ICharacter source)
-        {
-            if (!InventoryContainerRuntimeService.Default.HasCharacterInventory(source)
-                || source.Controller == null
-                || source.Controller.Client == null)
+            if (source == null)
             {
-                Log("hellfyre grant skipped reason=no-inventory-or-client");
                 return;
             }
 
-            if (!ItemLoader.ItemList.ContainsKey(HellfyreLauncherItemId))
+            if (HasHellfyreLauncher(source))
             {
-                Log("hellfyre grant skipped reason=missing-ItemLoader-template id=" + HellfyreLauncherItemId);
+                Log("hellfyre grant skipped reason=already-owned character=" + source.Identity.ToString(true));
                 return;
             }
 
-            IInventoryPage weaponPage;
-            if (!source.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage)
-                || weaponPage == null)
-            {
-                Log("hellfyre grant skipped reason=no-weapon-page");
-                return;
-            }
-
-            int rightHand = (int)WeaponSlots.Righthand;
-            Item item = new Item(1, HellfyreLauncherItemId, HellfyreLauncherItemId);
-            // Capture WIFU Flags=205520897 — Item.Flags is otherwise left 0 on fresh grants.
-            int templateFlags = item.GetAttribute((int)StatIds.flags);
-            if (templateFlags > 0 && templateFlags != 1234567890)
-            {
-                item.Flags = templateFlags;
-            }
-
-            // Hellfyre stores the launcher mesh on attr 209 / mesh(12), not WeaponMeshRight.
-            // Seed WeaponMeshRight so EnsureWeaponVisualMeshes applies rocket mesh 264083.
-            int hellfyreMesh = item.GetAttribute(209);
-            if (hellfyreMesh <= 0 || hellfyreMesh == 1234567890)
-            {
-                hellfyreMesh = item.GetAttribute((int)StatIds.mesh);
-            }
-
-            if (hellfyreMesh > 0 && hellfyreMesh != 1234567890)
-            {
-                item.SetAttribute((int)StatIds.weaponmeshright, hellfyreMesh);
-            }
-
-            // Capture overflow grant chrome first.
-            source.Send(
-                new TemplateActionMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    ItemLowId = HellfyreLauncherItemId,
-                    ItemHighId = HellfyreLauncherItemId,
-                    Quality = 1,
-                    Unknown1 = CapturedTemplateActionUnknown1,
-                    Unknown2 = CapturedTemplateActionUnknown2,
-                    Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Unknown3 = 0,
-                    Unknown4 = 0
-                });
-            source.Send(
-                new ContainerAddItemMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Target = new Identity
-                             {
-                                 Type = IdentityType.OverflowWindow,
-                                 Instance = source.Identity.Instance
-                             },
-                    TargetPlacement = CapturedOverflowNextFreeSlot
-                });
-
-            try
-            {
-                IInventoryPage inventoryPage;
-                if (!source.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventoryPage)
-                    || inventoryPage == null)
-                {
-                    Log("hellfyre grant skipped reason=no-inventory-page");
-                    return;
-                }
-
-                IItem existing = weaponPage[rightHand];
-                if (existing != null)
-                {
-                    int freeForUnequip = inventoryPage.FindFreeSlot();
-                    if (freeForUnequip >= 0)
-                    {
-                        IItemSlotHandler slotHandler = weaponPage as IItemSlotHandler;
-                        if (slotHandler != null)
-                        {
-                            slotHandler.Unequip(rightHand, inventoryPage, freeForUnequip);
-                            UnEquip.Send(source.Controller.Client, weaponPage, rightHand);
-                        }
-                    }
-                }
-
-                // Clear Hud1 if a prior bad grant parked the launcher there.
-                IItem hudItem = weaponPage[(int)WeaponSlots.Hud1];
-                if (hudItem != null
-                    && (hudItem.LowID == HellfyreLauncherItemId || hudItem.HighID == HellfyreLauncherItemId))
-                {
-                    weaponPage.Remove((int)WeaponSlots.Hud1);
-                }
-
-                // Capture equip path is Inventory→RH. Park in a real bag slot first so
-                // ContainerAdd Source=Inventory:<slot> does not steal another item's icon
-                // (hardcoded 0x43 previously produced sunglasses-in-RH chrome).
-                int inventorySlot = inventoryPage.FindFreeSlot();
-                if (inventorySlot < 0)
-                {
-                    Log("hellfyre grant skipped reason=inventory-full");
-                    return;
-                }
-
-                InventoryError bagError = source.BaseInventory.AddToPage(
-                    (int)IdentityType.Inventory,
-                    inventorySlot,
-                    item);
-                if (bagError != InventoryError.OK)
-                {
-                    Log("hellfyre inventory AddToPage failed status=" + bagError);
-                    return;
-                }
-
-                IItemSlotHandler weaponSlots = weaponPage as IItemSlotHandler;
-                if (weaponSlots == null)
-                {
-                    Log("hellfyre grant skipped reason=no-weapon-slot-handler");
-                    return;
-                }
-
-                weaponSlots.Equip(inventoryPage, inventorySlot, rightHand);
-
-                source.BaseInventory.Write();
-
-                // Capture equip result: ContainerAdd Inventory→SimpleChar Slot=6 + WIFU.
-                source.Send(
-                    new ContainerAddItemMessage
-                    {
-                        Identity = source.Identity,
-                        Unknown = 0,
-                        SourceContainer = new Identity
-                                          {
-                                              Type = IdentityType.Inventory,
-                                              Instance = inventorySlot
-                                          },
-                        Target = source.Identity,
-                        TargetPlacement = rightHand
-                    });
-                WeaponItemFullUpdate.SendWeaponDefinition(source, item);
-                Equip.Send(source.Controller.Client, weaponPage, rightHand);
-
-                // Equip.Send skips TemplateAction for RH/LH; redraw icon on WeaponPage slot 6.
-                source.Send(
-                    new TemplateActionMessage
-                    {
-                        Identity = source.Identity,
-                        Unknown = 0,
-                        ItemLowId = HellfyreLauncherItemId,
-                        ItemHighId = HellfyreLauncherItemId,
-                        Quality = 1,
-                        Unknown1 = CapturedTemplateActionUnknown1,
-                        Unknown2 = rightHand,
-                        Placement = new Identity
-                                    {
-                                        Type = IdentityType.WeaponPage,
-                                        Instance = rightHand
-                                    },
-                        Unknown3 = 0,
-                        Unknown4 = 0
-                    });
-
-                source.CalculateSkills();
-                InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(source, true);
-                Log(
-                    "hellfyre equipped RH character="
-                    + source.Identity.ToString(true)
-                    + " fromInventorySlot="
-                    + inventorySlot
-                    + " flags="
-                    + item.Flags);
-            }
-            catch (Exception ex)
-            {
-                Log("hellfyre RH equip failed err=" + ex.Message);
-            }
+            TryGrantOverflowItem(
+                source,
+                HellfyreLauncherItemId,
+                HellfyreLauncherItemId,
+                1,
+                "hellfyre-overflow");
         }
 
         private static void TryGrantFinishRewardItems(ICharacter source)
@@ -612,70 +578,139 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            bool cashApplied = false;
-            if (MissionRuntime.IsInitialized)
+            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
+                source,
+                ReturnQuestId,
+                "arete-credits-awarded-remi-return",
+                FinishCreditReward,
+                "arete-xp-awarded-remi-return",
+                FinishXpReward,
+                "remi-gallois-2581xp");
+        }
+
+        private static void ScheduleHellfyreSelfDestruct(ICharacter source)
+        {
+            if (source == null)
             {
-                MissionRewardDefinition cashDefinition = new MissionRewardDefinition
-                                                        {
-                                                            RewardKey = "captured-remi-gallois-credits",
-                                                            RewardType = "character-stats",
-                                                            IsResolved = true,
-                                                            StatMutations =
-                                                                new[]
-                                                                {
-                                                                    new MissionCharacterStatMutation
-                                                                    {
-                                                                        StatIdentityType =
-                                                                            (int)IdentityType.CanbeAffected,
-                                                                        StatId = (int)StatIds.cash,
-                                                                        Kind = MissionStatMutationKind.AddClamped,
-                                                                        Value = FinishCreditReward,
-                                                                        MinimumValue = 0,
-                                                                        MaximumValue = uint.MaxValue
-                                                                    }
-                                                                }
-                                                        };
-                MissionRewardExecutionResult cashResult = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                    source.Identity.Instance,
-                    ReturnQuestId,
-                    cashDefinition,
-                    "capture:20260727-204902:remi-finish-credits");
-                if (cashResult.Succeeded && cashResult.StatValues != null)
+                return;
+            }
+
+            ICharacter captured = source;
+            ThreadPool.QueueUserWorkItem(
+                _ =>
                 {
-                    foreach (MissionCharacterStatValue statValue in cashResult.StatValues)
+                    try
                     {
-                        if (statValue.StatId != (int)StatIds.cash)
-                        {
-                            continue;
-                        }
-
-                        uint value = statValue.Value <= 0
-                                         ? 0
-                                         : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                        source.Stats[StatIds.cash].Set(value);
-                        cashApplied = true;
+                        Thread.Sleep(HellfyreSelfDestructDelayMilliseconds);
+                        DestroyHellfyreLauncher(captured);
                     }
-
-                    if (cashApplied)
+                    catch (Exception ex)
                     {
-                        StatMessageHandler.Default.SendChanged(source);
+                        Log("hellfyre self-destruct schedule failed err=" + ex.Message);
+                    }
+                });
+            Log(
+                "hellfyre self-destruct armed delayMs="
+                + HellfyreSelfDestructDelayMilliseconds
+                + " character="
+                + source.Identity.ToString(true));
+        }
+
+        private static void DestroyHellfyreLauncher(ICharacter source)
+        {
+            if (source == null
+                || source.Controller?.Client == null
+                || !InventoryContainerRuntimeService.Default.HasCharacterInventory(source))
+            {
+                return;
+            }
+
+            int removed = 0;
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in source.BaseInventory.Pages)
+            {
+                if (pageEntry.Value == null)
+                {
+                    continue;
+                }
+
+                List<int> slots = new List<int>();
+                foreach (KeyValuePair<int, IItem> slot in pageEntry.Value.List())
+                {
+                    IItem item = slot.Value;
+                    if (item != null
+                        && (item.LowID == HellfyreLauncherItemId || item.HighID == HellfyreLauncherItemId))
+                    {
+                        slots.Add(slot.Key);
+                    }
+                }
+
+                for (int i = 0; i < slots.Count; i++)
+                {
+                    int slot = slots[i];
+                    try
+                    {
+                        source.BaseInventory.RemoveItem(pageEntry.Key, slot);
+                        CharacterActionMessageHandler.Default.SendDeleteItem(source, pageEntry.Key, slot);
+                        removed++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("hellfyre remove failed page=" + pageEntry.Key + " slot=" + slot + " err=" + ex.Message);
                     }
                 }
             }
 
-            if (!cashApplied)
+            if (removed > 0)
             {
-                long cashAfter = (long)source.Stats[StatIds.cash].Value + FinishCreditReward;
-                if (cashAfter > uint.MaxValue)
+                try
                 {
-                    cashAfter = uint.MaxValue;
+                    source.BaseInventory.Write();
+                    source.CalculateSkills();
+                    InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(source, true);
+                }
+                catch (Exception ex)
+                {
+                    Log("hellfyre self-destruct finalize failed err=" + ex.Message);
                 }
 
-                source.Stats[StatIds.cash].Set((uint)cashAfter);
-                StatMessageHandler.Default.SendChanged(source);
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "The Experimental Hellfyre Rocket Launcher self-destructs.");
             }
 
-            CombatXpRuntimeService.AwardDirectXp(source, FinishXpReward, "remi-gallois-2080xp");
+            Log(
+                "hellfyre self-destruct removed="
+                + removed
+                + " character="
+                + source.Identity.ToString(true));
+        }
+
+        private static bool HasHellfyreLauncher(ICharacter source)
+        {
+            if (source?.BaseInventory?.Pages == null)
+            {
+                return false;
+            }
+
+            foreach (IInventoryPage page in source.BaseInventory.Pages.Values)
+            {
+                if (page == null)
+                {
+                    continue;
+                }
+
+                foreach (KeyValuePair<int, IItem> slot in page.List())
+                {
+                    IItem item = slot.Value;
+                    if (item != null
+                        && (item.LowID == HellfyreLauncherItemId || item.HighID == HellfyreLauncherItemId))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static void TrySendFinishRewardFeedback(ICharacter source)
@@ -738,7 +773,132 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static bool IsSandstormMarauder(ICharacter target)
         {
-            return AreteSandstormMarauderRuntime.IsRegisteredMarauder(target);
+            if (AreteSandstormMarauderRuntime.IsRegisteredMarauder(target))
+            {
+                return true;
+            }
+
+            // Fallback: capture name (level can be overwritten by Prepare after ApplyMarauderStats).
+            return target != null
+                   && string.Equals(target.Name, "SANDSTORM Marauder", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void ArmQuell(ICharacter source)
+        {
+            if (source != null)
+            {
+                QuellArmedByCharacter.Add(source.Identity.Instance);
+            }
+        }
+
+        private static void DisarmQuell(ICharacter source)
+        {
+            if (source != null)
+            {
+                QuellArmedByCharacter.Remove(source.Identity.Instance);
+            }
+        }
+
+        private static bool IsQuellArmed(ICharacter source)
+        {
+            return source != null && QuellArmedByCharacter.Contains(source.Identity.Instance);
+        }
+
+        private static bool IsQuellPending(ICharacter source)
+        {
+            if (source == null || HasRewardsGranted(source) || IsReturnPending(source))
+            {
+                return false;
+            }
+
+            if (IsMissionCompleted(source, QuellQuestId))
+            {
+                return false;
+            }
+
+            return IsQuellArmed(source)
+                   || HasHellfyreLauncher(source)
+                   || IsMissionActive(source, QuellQuestId)
+                   || IsMissionActive(source, LegacyQuellQuestId);
+        }
+
+        private static void ArmReturn(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            ReturnArmedByCharacter.Add(source.Identity.Instance);
+            if (MissionRuntime.IsInitialized)
+            {
+                try
+                {
+                    MissionRuntime.Service.SetFlag(
+                        source.Identity.Instance,
+                        ReturnQuestId,
+                        ReturnArmedFlag,
+                        "1");
+                }
+                catch (Exception ex)
+                {
+                    Log("ArmReturn SetFlag failed err=" + ex.Message);
+                }
+            }
+        }
+
+        private static void DisarmReturn(ICharacter source)
+        {
+            if (source != null)
+            {
+                ReturnArmedByCharacter.Remove(source.Identity.Instance);
+            }
+        }
+
+        private static bool IsReturnArmed(ICharacter source)
+        {
+            if (source == null)
+            {
+                return false;
+            }
+
+            if (ReturnArmedByCharacter.Contains(source.Identity.Instance))
+            {
+                return true;
+            }
+
+            if (!MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            return MissionRuntime.Service.GetFlag(
+                       source.Identity.Instance,
+                       ReturnQuestId,
+                       ReturnArmedFlag) != null;
+        }
+
+        private static bool IsReturnPending(ICharacter source)
+        {
+            if (source == null || HasRewardsGranted(source))
+            {
+                return false;
+            }
+
+            if (IsReturnArmed(source))
+            {
+                return true;
+            }
+
+            if ((IsMissionActive(source, ReturnQuestId) || IsMissionActive(source, LegacyReturnQuestId))
+                && !IsMissionCompleted(source, ReturnQuestId))
+            {
+                return true;
+            }
+
+            // Quell tip completed / kill objective done → return even if Return MissionRuntime missed.
+            return IsMissionCompleted(source, QuellQuestId)
+                   && !IsMissionCompleted(source, ReturnQuestId);
         }
 
         private static int AdvanceLocalKillProgress(int characterId, string observationKey)

@@ -93,6 +93,13 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (DesmondCalitriQuestRuntime.TryFinishDesmondTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
             if (VernonGodfrayQuestRuntime.TryFinishVernonTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))

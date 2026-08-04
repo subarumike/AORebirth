@@ -36,6 +36,9 @@ namespace ZoneEngine.Core.Playfields
         private readonly CapturedAreteRemiGalloisVendorRuntimeService capturedAreteRemi =
             new CapturedAreteRemiGalloisVendorRuntimeService();
 
+        private readonly CapturedAreteBarryFoodVendorRuntimeService capturedAreteBarry =
+            new CapturedAreteBarryFoodVendorRuntimeService();
+
         private readonly CapturedAreteSarahGreeneVendorRuntimeService capturedAreteSarah =
             new CapturedAreteSarahGreeneVendorRuntimeService();
 
@@ -100,6 +103,7 @@ namespace ZoneEngine.Core.Playfields
             this.AttachCapturedAreteLoreleiVendor(playfield, playfieldIdentity, dynelRegistry);
             this.capturedAreteAntonio.Attach(playfield, playfieldIdentity, dynelRegistry);
             this.capturedAreteRemi.Attach(playfield, playfieldIdentity, dynelRegistry);
+            this.capturedAreteBarry.Attach(playfield, playfieldIdentity, dynelRegistry);
             this.capturedAreteSarah.Attach(playfield, playfieldIdentity, dynelRegistry);
         }
 
@@ -124,6 +128,7 @@ namespace ZoneEngine.Core.Playfields
             PlayfieldDynelRegistry dynelRegistry)
         {
             this.capturedAreteSarah.Clear(playfieldIdentity, dynelRegistry);
+            this.capturedAreteBarry.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteRemi.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteAntonio.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteLorelei.Clear(playfieldIdentity, dynelRegistry);

@@ -75,12 +75,21 @@ namespace ZoneEngine.Core.MessageHandlers
 
             character.DoNotDoTimers = false;
 
-            bool saved = FunctionCollection.Instance.CallFunction(
-                (int)FunctionType.SaveChar,
-                character,
-                character,
-                character,
-                NoArguments);
+            bool saved;
+            if (AreteCellStructureScannerSave.IsTarget(target, templateId))
+            {
+                // Capture 20260801-091856: Arete scanner uses SocialStatus=0 + auto-save tip.
+                saved = AreteCellStructureScannerSave.TrySave(character);
+            }
+            else
+            {
+                saved = FunctionCollection.Instance.CallFunction(
+                    (int)FunctionType.SaveChar,
+                    character,
+                    character,
+                    character,
+                    NoArguments);
+            }
 
             GenericCmdMessageHandler.Default.Acknowledge(character, message);
 
@@ -107,6 +116,13 @@ namespace ZoneEngine.Core.MessageHandlers
             if (SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(target, templateId))
             {
                 return false;
+            }
+
+            // Capture 20260801-Patrick Sun / 20260801-091856:
+            // live Terminal:574187D0 + playfields.dat Terminal:C00D1999 tpl=300813.
+            if (AreteCellStructureScannerSave.IsTarget(target, templateId))
+            {
+                return true;
             }
 
             // Capture 20260721-finish: Exit Arete Landing → ICC HQ (not Insurance SaveChar).

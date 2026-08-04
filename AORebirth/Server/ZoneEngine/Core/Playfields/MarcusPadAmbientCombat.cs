@@ -350,21 +350,23 @@ namespace ZoneEngine.Core.Playfields
             FaceToward(marcus, robot);
             FaceToward(robot, marcus);
 
+            // Ambient pad fight bypasses CapturedEnemyCombatRuntime.Prepare / IsCombatReady
+            // certification — emit from the capture-backed sequence definitions directly.
             AnnounceMarcusFlamethrowerTextureVfx(playfield, marcus);
             playfield.Announce(
                 CapturedEnemyCombatPacketFactory.CreateAttack(
                     marcus.Identity,
                     robot.Identity,
-                    MarcusCombatContract));
+                    MarcusCombatContract.SpecialAttackSequence));
             playfield.Announce(
                 CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
                     robot.Identity,
-                    RobotCombatContract));
+                    RobotCombatContract.SpecialAttackSequence));
             playfield.Announce(
                 CapturedEnemyCombatPacketFactory.CreateAttack(
                     robot.Identity,
                     marcus.Identity,
-                    RobotCombatContract));
+                    RobotCombatContract.SpecialAttackSequence));
 
             DateTime now = DateTime.UtcNow;
             NextMarcusAttackUtc[playfieldIdentity.Instance] =
@@ -520,7 +522,7 @@ namespace ZoneEngine.Core.Playfields
             playfield.Announce(
                 CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
                     marcus.Identity,
-                    MarcusCombatContract));
+                    MarcusCombatContract.SpecialAttackSequence));
         }
 
         private static void EnsureMarcusFlamethrowerWeaponMesh(Character marcus)

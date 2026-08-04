@@ -2940,7 +2940,10 @@ namespace ZoneEngine.Core
 
             if (existing != null)
             {
-                if (existing.Mesh > 0 && existing.Mesh != 1234567890)
+                // Replace when mesh differs — stale mesh must not block weapon visuals.
+                if (existing.Mesh > 0
+                    && existing.Mesh != 1234567890
+                    && existing.Mesh == meshId)
                 {
                     return false;
                 }

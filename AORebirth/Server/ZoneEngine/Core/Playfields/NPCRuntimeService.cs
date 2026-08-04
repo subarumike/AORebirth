@@ -267,6 +267,12 @@ namespace AORebirth.Core.Playfields
                 maximumNpcDistanceFromHome =
                     AreteRoboticGuardDogRuntime.MaximumNpcDistanceFromHomeMeters;
             }
+            else if (LoreleiOasisMobRuntime.IsRegisteredRollerrat(character))
+            {
+                // Mike: Rollerrats chase ~15m then return home (not zone-wide).
+                maximumNpcDistanceFromHome =
+                    LoreleiOasisMobRuntime.RollerratMaximumNpcDistanceFromHomeMeters;
+            }
 
             this.npcHomeStates[character.Identity.Instance] =
                 new NpcHomeState
@@ -1005,6 +1011,10 @@ namespace AORebirth.Core.Playfields
                     this.playfield,
                     this.playfield.Identity,
                     this.ActivateNpc);
+                AreteSandstormMarauderRuntime.TickRespawn(
+                    this.playfield,
+                    this.playfield.Identity,
+                    this.ActivateNpc);
                 // Burn→explode lifecycle for Malfunctioning Cleaning Robots (also via EnsureArete).
                 this.capturedAreteRobotSpawns.TickRespawn(this.playfield, this.playfield.Identity);
             }
@@ -1174,6 +1184,12 @@ namespace AORebirth.Core.Playfields
                 }
 
                 radius = CapturedEligibilityOnlyAggroRadiusMeters;
+            }
+
+            // Oasis Desert Reets are passive-until-attacked (aggro.csv + Mike).
+            if (LoreleiOasisMobRuntime.IsRegisteredOasisDesertReet(npc))
+            {
+                return null;
             }
 
             return this.dynelRegistry

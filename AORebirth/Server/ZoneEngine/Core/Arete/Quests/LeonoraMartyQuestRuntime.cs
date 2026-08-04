@@ -542,12 +542,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            long cashAfter = (long)source.Stats[StatIds.cash].Value + StealCreditReward;
-            if (cashAfter > uint.MaxValue)
-            {
-                cashAfter = uint.MaxValue;
-            }
-
             if (source.Controller?.Client != null)
             {
                 source.Controller.Client.SendCompressed(
@@ -561,8 +555,11 @@ namespace ZoneEngine.Core.Arete.Quests
                     });
             }
 
-            source.Stats[StatIds.cash].Set((uint)cashAfter);
-            StatMessageHandler.Default.SendChanged(source);
+            AreteQuestRewardGrants.GrantCreditsOnce(
+                source,
+                StealQuestId,
+                "arete-credits-awarded-leonora-steal",
+                StealCreditReward);
         }
 
         private static void MarkCreditCardStolen(ICharacter source)
@@ -588,23 +585,27 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
+            // Always claim Use for 297054 so generic consumable fallthrough cannot delete the pack
+            // without granting armor (capture 20260726-finish leonora and open vacuumpack).
             if (!InventoryContainerRuntimeService.Default.HasCharacterInventory(character)
                 || character.Controller == null
                 || character.Controller.Client == null)
             {
-                Log("vacuum-pack use skipped: inventory/client missing");
-                return false;
+                Log("vacuum-pack use claimed but skipped: inventory/client missing");
+                return true;
             }
 
             for (int i = 0; i < VacuumPackContents.Length; i++)
             {
                 if (!ItemLoader.ItemList.ContainsKey(VacuumPackContents[i]))
                 {
-                    Log("vacuum-pack use skipped: ItemLoader missing id=" + VacuumPackContents[i]);
-                    return false;
+                    Log("vacuum-pack use claimed but skipped: ItemLoader missing id=" + VacuumPackContents[i]);
+                    return true;
                 }
             }
 
+            int granted = 0;
+            bool unpackAborted = false;
             for (int i = 0; i < VacuumPackContents.Length; i++)
             {
                 int contentId = VacuumPackContents[i];
@@ -616,50 +617,65 @@ namespace ZoneEngine.Core.Arete.Quests
                 catch (Exception ex)
                 {
                     Log("vacuum-pack content create failed id=" + contentId + " err=" + ex.Message);
-                    return false;
+                    unpackAborted = true;
+                    break;
                 }
 
                 QuestRewardInventoryGrantResult grant =
                     InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(character, grantItem);
                 if (grant.Status == QuestRewardInventoryGrantStatus.Success)
                 {
+                    // Capture: TemplateAction Overflow Unknown2=87 + ContainerAddItem slot 111.
                     SendOverflowGrantPackets(character, contentId);
+                    granted++;
                     continue;
                 }
 
+                // Unique armor pieces already owned must not abort the open.
                 if (grant.Status == QuestRewardInventoryGrantStatus.InventoryAddFailed
                     && grant.InventoryError == InventoryError.HaveUniqueAlready)
                 {
                     continue;
                 }
 
+                // Inventory full / other add fail: still push capture Overflow packets so the client
+                // receives the pieces (same pattern as buy-nano tip overflow-on-fail).
+                SendOverflowGrantPackets(character, contentId);
                 Log(
                     "vacuum-pack content grant failed id="
                     + contentId
                     + " status="
                     + grant.Status
                     + " invErr="
-                    + grant.InventoryError);
-                return false;
+                    + grant.InventoryError
+                    + " (overflow sent)");
+                granted++;
             }
 
-            // Capture: TemplateAction pack Unknown2=3 at Inventory placement, then DeleteItem.
-            TemplateActionMessageHandler.Default.Send(
-                character,
-                item,
-                (int)itemPosition.Type,
-                itemPosition.Instance);
-            character.BaseInventory.RemoveItem((int)itemPosition.Type, itemPosition.Instance);
-            CharacterActionMessageHandler.Default.SendDeleteItem(
-                character,
-                (int)itemPosition.Type,
-                itemPosition.Instance);
+            if (!unpackAborted)
+            {
+                // Capture: TemplateAction pack Unknown2=3 at Inventory placement, then DeleteItem.
+                TemplateActionMessageHandler.Default.Send(
+                    character,
+                    item,
+                    (int)itemPosition.Type,
+                    itemPosition.Instance);
+                character.BaseInventory.RemoveItem((int)itemPosition.Type, itemPosition.Instance);
+                CharacterActionMessageHandler.Default.SendDeleteItem(
+                    character,
+                    (int)itemPosition.Type,
+                    itemPosition.Instance);
+            }
 
             Log(
                 "vacuum-pack opened character="
                 + character.Identity.ToString(true)
                 + " slot="
-                + itemPosition);
+                + itemPosition
+                + " granted="
+                + granted
+                + " aborted="
+                + unpackAborted);
             return true;
         }
 
@@ -807,7 +823,24 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             // Capture 20260730-214622 / 20260726-secon try CC: world prop instance rotates on respawn.
-            StaticDynel dynel = Pool.Instance.GetObject<StaticDynel>(character.Playfield.Identity, target);
+            // Pool.GetObject throws when the Terminal type/instance is not pooled (e.g. Arete
+            // insurance Terminal:C00D1999). That aborted GenericCmd Use before Patrick/Insurance.
+            if (character.Playfield == null
+                || !Pool.Instance.Contains(character.Playfield.Identity, target))
+            {
+                return false;
+            }
+
+            StaticDynel dynel;
+            try
+            {
+                dynel = Pool.Instance.GetObject<StaticDynel>(character.Playfield.Identity, target);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
             if (dynel == null)
             {
                 return false;
