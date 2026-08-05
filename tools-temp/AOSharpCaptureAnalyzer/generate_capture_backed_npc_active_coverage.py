@@ -10,7 +10,7 @@ two safe lookup modes as the generated runtime catalog:
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
-or if the fixed initial population does not reconcile to 1,607 actors.
+or if the fixed initial population does not reconcile to 1,600 actors.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1607
+EXPECTED_INITIAL_ACTORS = 1600
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -41,7 +41,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("temple-reanimated-corpse-adds", 2),
     ("nascence-core-hecklers", 40),
     ("nascence-life", 837),
-    ("arete-family", 103),
+    ("arete-family", 96),
     ("arete-additional-captured-actors", 14),
     ("arete-alien-area", 64),
     ("arete-sandstorm-marauders", 5),
@@ -1302,10 +1302,10 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
             evidence_capture_ids=("20260720-064523",),
         )
     )
-    if sum(actor.actor_count for actor in actors) != 103:
+    if sum(actor.actor_count for actor in actors) != 96:
         raise CoverageError(
             "Arete family parser reconciled "
-            f"{sum(actor.actor_count for actor in actors)} actors instead of 103"
+            f"{sum(actor.actor_count for actor in actors)} actors instead of 96"
         )
     return actors
 
