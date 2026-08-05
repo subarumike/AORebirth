@@ -37,9 +37,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertNpc(result, "SimpleChar:796360BD");
             AssertNpc(result, "SimpleChar:796360BC");
             AssertNpc(result, "SimpleChar:79135F51");
-            AssertNpc(result, "SimpleChar:782DE582");
             AssertNpc(result, "SimpleChar:782DE699");
-            AssertNpc(result, "SimpleChar:782DE57C");
+            AssertNpc(result, "SimpleChar:78E0FC77");
+            AssertNpc(result, "SimpleChar:78E0FC7D");
             AssertQuest(result, "Mission:5514B18C");
             AssertQuest(result, "Mission:5514B18D");
             AssertQuest(result, "Mission:5514B18E");

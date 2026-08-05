@@ -2,28 +2,30 @@
 
 ## Active
 
-No implementation is active after delivery of the PF1931 post-login crash
-repair. The standing gameplay priority remains incremental capture-backed PF127
-Subway work when Mike supplies or requests the next capture task.
+No implementation is active after delivery of the Arete large-capture
+reconciliation. The standing gameplay priority returns to incremental
+capture-backed PF127 Subway work when Mike supplies or requests the next task.
 
-## Latest delivered reconciliation
+## Reconciliation scope
 
-- Removed the PF1931 `PlayfieldAnarchyF` generated-building identity that was
-  emitted without a generator payload and crashed the official client.
-- Added a fail-closed serializer contract preventing generated-playfield
-  identities without exact payloads.
-- Preserved the complete 43-door captured initial replay unchanged.
-- Confirmed Soldier could enter PF1931, remain connected, and exit to PF647 with
-  the full replay enabled.
-- Contained the independent PF6553 Marcus heartbeat exception without inventing
-  missing attack-start context.
+- Regenerate the active-coverage cohort from current runtime/capture authority.
+- Reconcile Arete acceptance assertions with the current 1,600-actor initial
+  population and 1,602 configured maximum.
+- Restore atomic, legacy-aware rewards and retry-safe item/mission handoffs for
+  Marcus Wounded Workers, Flint Bio-Com, Stan Goodman, and the Rex/Marcus chain.
+- Restore the tracked PF1931 world-interaction decoder deleted by the Arete
+  merge.
+- Preserve all supported capture-backed combat, movement, population, dialogue,
+  timing, quest, and loot values.
 
 ## Delivery acceptance
 
-- Focused Temple, packet-shape, and Marcus combat-context tests pass.
-- Complete mandatory integration gate passes twice from the unchanged final
-  commit and leaves the worktree clean.
-- Debug build passes, database preflight passes, Chat/Login/Zone are restarted
-  through approved wrappers with exact port ownership, and optional WebEngine
-  remains inactive.
-- Audit evidence: `docs/evidence/TEMPLE_POST_LOGIN_DOOR_CRASH_20260804.md`.
+- Generated combat cohort validation: PASS, identity
+  `4217fcc90b5adc10847c647d8134dea271c9c2cc73cae94a0ca34b4bd37950cf`.
+- Arete acceptance: 60/60 PASS.
+- Complete AOtomation suite: 1,038/1,038 PASS.
+- Debug build and the complete mandatory integration gate pass twice from the
+  unchanged delivery commit.
+- Database preflight and restarted Chat/Login/Zone exact-port ownership pass;
+  optional WebEngine remains inactive.
+- Audit evidence: `docs/evidence/ARETE_LARGE_CAPTURE_RECONCILIATION_20260805.md`.

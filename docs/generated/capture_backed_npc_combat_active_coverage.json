@@ -37167,11 +37167,11 @@
     },
     {
       "actorCount": 3,
-      "bindingKey": "7aa0128054600baeddb1",
+      "bindingKey": "5c6fc226c453c3741311",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
-        "20260727-204902"
+        "20260801-SANDSTORM"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
@@ -37191,11 +37191,11 @@
     },
     {
       "actorCount": 2,
-      "bindingKey": "de4fcb088774f406e44f",
+      "bindingKey": "fde0647fdf41a3ab6360",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
-        "20260727-204902"
+        "20260801-SANDSTORM"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
@@ -272733,10 +272733,10 @@
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
-        "20260727-204902"
+        "20260801-SANDSTORM"
       ],
       "contentEvidenceCaptureIdsOutsideCombatInventory": [
-        "20260727-204902"
+        "20260801-SANDSTORM"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
@@ -272775,7 +272775,7 @@
       ],
       "matchingEvidenceSessionCount": 1,
       "missingEvidence": [
-        "content provenance not indexed by the canonical combat inventory: 20260727-204902",
+        "content provenance not indexed by the canonical combat inventory: 20260801-SANDSTORM",
         "runtime-ready capture-proven unique semantic fallback for a source-unbound runtime actor"
       ],
       "monsterData": 265822,
@@ -272805,10 +272805,10 @@
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
-        "20260727-204902"
+        "20260801-SANDSTORM"
       ],
       "contentEvidenceCaptureIdsOutsideCombatInventory": [
-        "20260727-204902"
+        "20260801-SANDSTORM"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
@@ -273513,7 +273513,7 @@
         "AttackInfo correlated after this packet inside the same capture and SCFU generation",
         "capture-backed non-equipped attack range",
         "captured same-fight landed AttackInfo interval",
-        "content provenance not indexed by the canonical combat inventory: 20260727-204902",
+        "content provenance not indexed by the canonical combat inventory: 20260801-SANDSTORM",
         "exact specialized runtime sequence for multiple captured AttackInfo streams",
         "runtime-ready capture-proven unique semantic fallback for a source-unbound runtime actor"
       ],

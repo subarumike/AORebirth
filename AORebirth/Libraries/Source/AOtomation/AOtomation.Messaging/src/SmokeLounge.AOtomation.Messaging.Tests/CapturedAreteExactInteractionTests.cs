@@ -62,15 +62,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(result.IsValid, string.Join(Environment.NewLine, result.Validation.Errors));
             DialogueContentPack pack = result.Packs.Single();
-            Assert.AreEqual(3, pack.Npcs.Count);
+            Assert.AreEqual(1, pack.Npcs.Count);
 
-            AssertRoot(
-                pack,
-                "SimpleChar:782DE582",
-                "barry_root",
-                "Desmond Calitri sent me here for a Bronto Burger.",
-                "What do you have to sell?",
-                "Goodbye");
             AssertRoot(
                 pack,
                 "SimpleChar:782DE699",
@@ -78,29 +71,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Who are you?",
                 "I haven't seen any violence...",
                 "Goodbye");
-            AssertRoot(
-                pack,
-                "SimpleChar:782DE57C",
-                "desmond_root",
-                "Do you have any work around here?",
-                "I have some questions...",
-                "Goodbye");
-
-            DialogueNpcEntry barry = pack.Npcs.Single(npc => npc.NpcIdentity == "SimpleChar:782DE582");
-            Assert.IsTrue(
-                barry.Nodes.Any(
-                    node => node.Options.Any(option => option.Text == "What is in these Bronto burgers?")));
             DialogueNpcEntry boris = pack.Npcs.Single(npc => npc.NpcIdentity == "SimpleChar:782DE699");
             Assert.IsTrue(
                 boris.Nodes.Any(
                     node => node.Options.Any(option => option.Text == "Tell me more about the different Suppression Gas values.")));
-            DialogueNpcEntry desmond = pack.Npcs.Single(npc => npc.NpcIdentity == "SimpleChar:782DE57C");
-            Assert.IsTrue(
-                desmond.Nodes.Any(
-                    node => node.Options.Any(option => option.Text == "I have your Bronto Burger.")));
-            Assert.IsTrue(
-                desmond.Nodes.Any(
-                    node => node.Options.Any(option => option.Text == "I took care of those protesters.")));
 
             Assert.IsTrue(pack.Npcs.SelectMany(npc => npc.Nodes).All(node => node.PromptText == string.Empty));
             Assert.IsTrue(

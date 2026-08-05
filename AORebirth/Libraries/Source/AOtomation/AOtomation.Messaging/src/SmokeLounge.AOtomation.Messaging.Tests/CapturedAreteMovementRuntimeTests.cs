@@ -34,9 +34,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedAreteMovementCatalog catalog = CapturedAreteMovementCatalog.LoadDefault();
 
             Assert.IsTrue(catalog.IsValid, catalog.FailureReason);
-            Assert.AreEqual(23185, catalog.SourceObservationCount);
-            Assert.AreEqual(22798, catalog.RuntimeObservationCount);
-            Assert.AreEqual(20933, catalog.Count(CapturedAreteMovementBehavior.Patrol));
+            Assert.AreEqual(23226, catalog.SourceObservationCount);
+            Assert.AreEqual(22836, catalog.RuntimeObservationCount);
+            Assert.AreEqual(20971, catalog.Count(CapturedAreteMovementBehavior.Patrol));
             Assert.AreEqual(1384, catalog.Count(CapturedAreteMovementBehavior.Spawn));
             Assert.AreEqual(164, catalog.Count(CapturedAreteMovementBehavior.Chase));
             Assert.AreEqual(54, catalog.Count(CapturedAreteMovementBehavior.Flee));

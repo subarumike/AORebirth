@@ -112,32 +112,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteSandstormMarauderRuntime.cs");
             AssertContainsAll(
                 sandstorm,
-                "captured SANDSTORM population and combat",
+                "Capture 20260801-SANDSTORM SANDSTORM Marauders + Control Tower",
                 "MarauderName = \"SANDSTORM Marauder\"",
                 "MarauderLevel = 7",
-                "\"arete-sandstorm-20260727-204902\"",
+                "\"arete-sandstorm-20260801-SANDSTORM\"",
                 "CapturedEnemyCombatRuntime.Prepare(");
             Assert.AreEqual(5, CountOccurrences(sandstorm, "new MarauderSlot("));
-            Assert.AreEqual(2, CountOccurrences(sandstorm, "new ReplacementDefinition("));
+            Assert.AreEqual(0, CountOccurrences(sandstorm, "new ReplacementDefinition("));
             AssertContainsAll(
                 sandstorm,
-                "five exact initial SANDSTORM slots and two exact replacements",
-                "265822,",
-                "4033.099f",
-                "677.2908f",
-                "287217,",
-                "4032.111f",
-                "667.5142f",
-                "4039.592f",
-                "0.6754054f",
-                "696.7009f",
-                "4038.502f",
-                "688.2748f",
-                "4054.383f",
-                "1.537878f",
-                "651.4177f",
-                "new ReplacementDefinition(26092, 42.5370285, 4031.978f, 0.6528038f, 677.3542f)",
-                "new ReplacementDefinition(26092, 42.5948143, 4032.878f, 0.010f, 667.3873f)");
+                "Capture 20260801-SANDSTORM first-seen path actors",
+                "new MarauderSlot(265822, DefaultMarauderHeadMesh, 4033.377f, 0.010f, 667.7479f)",
+                "new MarauderSlot(265822, DefaultMarauderHeadMesh, 4033.406f, 0.010f, 676.7122f)",
+                "new MarauderSlot(287217, 0, 4039.895f, 0.6299585f, 696.3529f)",
+                "new MarauderSlot(287217, 0, 4058.394f, 0.610f, 678.1385f)",
+                "new MarauderSlot(265822, DefaultMarauderHeadMesh, 4055.279f, 2.131286f, 650.3979f)",
+                "MarauderRespawnSeconds = 30.0");
             Assert.IsFalse(sandstorm.Contains("RespawnSeconds = 45.0"));
         }
 

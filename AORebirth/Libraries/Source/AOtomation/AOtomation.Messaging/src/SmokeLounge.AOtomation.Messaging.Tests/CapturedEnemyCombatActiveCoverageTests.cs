@@ -19,8 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1607;
-        private const int ExpectedBindingRecordCount = 1583;
+        private const int ExpectedInitialActorCount = 1600;
+        private const int ExpectedBindingRecordCount = 1576;
         private const string Pf127OrdinaryProfileResolutionMode =
             "production-owned-exact-pf127-ordinary-profile-resolver";
         private const string Pf1931ProfileResolutionMode =
@@ -45,7 +45,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1609, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1602, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -856,15 +856,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     value => Convert.ToInt32(ArrayMember(value, "levelCandidates").Single()) == 7));
             Assert.AreEqual(5, sandstorm.Sum(value => IntMember(value, "actorCount")));
             Assert.AreEqual(
-                2,
+                3,
                 IntMember(sandstorm.Single(value => IntMember(value, "monsterData") == 265822), "actorCount"));
             Assert.AreEqual(
-                3,
+                2,
                 IntMember(sandstorm.Single(value => IntMember(value, "monsterData") == 287217), "actorCount"));
             Assert.IsTrue(
                 sandstorm.All(
                     value => StringArrayMember(value, "contentEvidenceCaptureIds")
-                        .SequenceEqual(new[] { "20260727-204902" })));
+                        .SequenceEqual(new[] { "20260801-SANDSTORM" })));
 
             Dictionary<string, object> cleaningRobots = bindings.Single(
                 value => StringMember(value, "name") == "Cleaning Robot"
@@ -1282,7 +1282,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "temple-reanimated-corpse-adds", 2 },
                 { "nascence-core-hecklers", 40 },
                 { "nascence-life", 837 },
-                { "arete-family", 103 },
+                { "arete-family", 96 },
                 { "arete-additional-captured-actors", 14 },
                 { "arete-alien-area", 64 },
                 { "arete-sandstorm-marauders", 5 },
