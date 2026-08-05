@@ -145,6 +145,12 @@ required by the exact calls. Supported stationary mesh and burning-robot visual
 behavior remains. Focused tests preserve the factory calls behind the guard,
 and a clean engine restart produced no repeated Marcus exception.
 
+The Marcus source correction is an auxiliary input to governed active-combat
+coverage. The repository writer regenerated only the affected active-coverage
+payload and generation manifest; all other generated cohort files remained
+byte-identical. Current validation passes at cohort identity
+`f8f3dcd2c3ff218e419e787ef0348770ab5a10074a9a9bb2c7c577afb5ff6efd`.
+
 ## Acceptance evidence
 
 - Debug build: PASS.

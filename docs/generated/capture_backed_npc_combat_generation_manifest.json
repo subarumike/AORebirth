@@ -22,7 +22,7 @@
       "byteLength": 13524035,
       "path": "docs/generated/capture_backed_npc_combat_active_coverage.json",
       "role": "activeCoverage",
-      "sha256": "aa563b1acc489c97b7181605b0bb353612f25b567583880e06ba598297b4cbe1"
+      "sha256": "b1e3c7dcce5afc13b9aa62e283670d1f2b5d188f3492bba9fb17848f357e411b"
     },
     {
       "byteLength": 9000177,
@@ -47,7 +47,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1486
   },
-  "generationIdentity": "95c1198135a7dafc09d5d26e98b1b9713b3c14fce5a68985e555b29e29e09107",
+  "generationIdentity": "f8f3dcd2c3ff218e419e787ef0348770ab5a10074a9a9bb2c7c577afb5ff6efd",
   "generators": {
     "activeCoverage": {
       "byteLength": 149281,
@@ -96,12 +96,12 @@
     }
   },
   "inputSnapshot": {
-    "auxiliarySnapshotIdentity": "d3e7a0326a297b273d1b7dccfc4b3dd7b76b60e810265cdad0f07557b4ef2464",
+    "auxiliarySnapshotIdentity": "8afb9a8bb7c06021cf7524f87f301312e5ffe922ebe079f974a1b496bab61d15",
     "captureManifestByteLength": 402965,
     "captureManifestSha256": "475a66fa74eda550a24b494ea98a86907bccd96825f0026e99e9de02699ceed2",
     "captureSchemaVersion": 1,
     "captureSnapshotIdentity": "512d6ba182b9d377b442ccdd4542aad4055ec84a0b517be06784824327ff224f",
-    "identity": "89059b55910de8d130c3b92ad688982d9bdc3554077842f051ec6539db11fdbe",
+    "identity": "19518ba1466f69be60187face1bb035a7de47df7d8ad06dbd2c75fda5b16b58d",
     "schemaVersion": 2
   },
   "pipeline": "capture-backed-npc-combat",
