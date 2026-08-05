@@ -263,9 +263,10 @@ namespace ZoneEngine.Core.Playfields
                 NextRobotRespawnUtc.Remove(playfieldIdentity.Instance);
                 if (marcus != null && marcus.Stats[StatIds.health].Value > 0)
                 {
-                    if (marcus.FightingTarget.Instance == 0
+                    if (HasCompleteLinkFightContext()
+                        && (marcus.FightingTarget.Instance == 0
                         || marcus.FightingTarget.Instance != robot.Identity.Instance
-                        || !NextMarcusAttackUtc.ContainsKey(playfieldIdentity.Instance))
+                        || !NextMarcusAttackUtc.ContainsKey(playfieldIdentity.Instance)))
                     {
                         LinkFight(playfield, playfieldIdentity, marcus, robot);
                         CapturedSpellListVisualEffects.AnnounceBurningRobotFire(robot);
@@ -334,7 +335,10 @@ namespace ZoneEngine.Core.Playfields
             Character marcus,
             Character robot)
         {
-            if (playfield == null || marcus == null || robot == null)
+            if (playfield == null
+                || marcus == null
+                || robot == null
+                || !HasCompleteLinkFightContext())
             {
                 return;
             }
@@ -523,6 +527,16 @@ namespace ZoneEngine.Core.Playfields
                 CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
                     marcus.Identity,
                     MarcusCombatContract.SpecialAttackSequence));
+        }
+
+        private static bool HasCompleteLinkFightContext()
+        {
+            return MarcusCombatContract.IsCombatReady
+                   && MarcusCombatContract.HasCapturedAttackStartContext
+                   && MarcusCombatContract.HasCapturedSpecialAttackWeaponContext
+                   && RobotCombatContract.IsCombatReady
+                   && RobotCombatContract.HasCapturedAttackStartContext
+                   && RobotCombatContract.HasCapturedSpecialAttackWeaponContext;
         }
 
         private static void EnsureMarcusFlamethrowerWeaponMesh(Character marcus)

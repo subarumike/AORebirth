@@ -3102,6 +3102,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(marcus.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon("));
             Assert.IsTrue(marcus.Contains("CapturedEnemyCombatPacketFactory.CreateAttack("));
             Assert.IsTrue(marcus.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo("));
+            Assert.IsTrue(marcus.Contains("if (HasCompleteLinkFightContext()"));
+            Assert.IsTrue(marcus.Contains("|| !HasCompleteLinkFightContext())"));
+            Assert.IsTrue(marcus.Contains("MarcusCombatContract.HasCapturedAttackStartContext"));
+            Assert.IsTrue(marcus.Contains("MarcusCombatContract.HasCapturedSpecialAttackWeaponContext"));
             Assert.IsFalse(marcus.Contains("new SpecialAttackWeaponMessage"));
             Assert.IsFalse(marcus.Contains("new AttackMessage"));
             Assert.IsFalse(marcus.Contains("new AttackInfoMessage"));
