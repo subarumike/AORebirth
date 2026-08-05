@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-04
+Updated: 2026-08-05
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -9,7 +9,7 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Complete AOtomation suite: 1037/1037 PASS with no skipped, hidden, or
+- Complete AOtomation suite: 1038/1038 PASS with no skipped, hidden, or
   reclassified failures.
 - Arete acceptance: 60/60 PASS.
 - Arete combat catalog: 57/57 PASS.
@@ -40,8 +40,8 @@ sessions, 3,269 complete attack chains, 260 certified profiles, 96 runtime-ready
 profiles, 309 semantic definitions, 101 runtime-ready definitions, and 1,486
 explicitly unresolved observations with zero generator errors.
 
-The active-coverage projection contains 1,607 fixed actors: 504 certified and
-1,103 explicitly unresolved. Unsupported or conflicting observations remain
+The active-coverage projection contains 1,600 fixed initial actors and a 1,602
+configured maximum across 1,576 binding records. Unsupported or conflicting observations remain
 fail-closed. The 2026-08-01 reconciliation promoted only Cedric Harding's exact
 PF6553 source-bound profile; no unsupported runtime behavior was added.
 
@@ -51,7 +51,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`95c1198135a7dafc09d5d26e98b1b9713b3c14fce5a68985e555b29e29e09107`.
+`4217fcc90b5adc10847c647d8134dea271c9c2cc73cae94a0ca34b4bd37950cf`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.

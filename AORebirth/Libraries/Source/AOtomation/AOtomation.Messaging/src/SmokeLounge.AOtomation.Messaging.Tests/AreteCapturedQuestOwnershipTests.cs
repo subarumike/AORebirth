@@ -125,10 +125,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "TemplateActionMessageHandler.Default.Send(");
             AssertInOrder(
                 interactions,
-                "LeonoraMartyQuestRuntime.TryHandleCreditCardPickup",
                 "PatrickSunQuestRuntime.TryHandleInsuranceTerminalUse",
+                "LeonoraMartyQuestRuntime.TryHandleCreditCardPickup",
                 "InsuranceTerminalInteractionHandler.Default.TryHandleUse");
-            AssertContains(patrick, "target.Instance != unchecked((int)0x574187D0)");
+            AssertContains(patrick, "AreteCellStructureScannerSave.IsTarget(target)");
         }
 
         [TestMethod]
@@ -163,8 +163,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(rewards, "RemiGalloisQuestRuntime.TryObserveNpcDeath(attacker, target);");
             AssertContains(remi, "AreteSandstormMarauderRuntime.IsRegisteredMarauder(target)");
             AssertContains(owner, "string.Equals(target.Name, MarauderName, StringComparison.OrdinalIgnoreCase)");
-            AssertContains(owner, "target.Stats[StatIds.level].Value != MarauderLevel");
-            AssertContains(owner, "target.Stats[StatIds.npcfamily].Value != MarauderNpcFamily");
+            AssertContains(owner, "target.Stats[StatIds.level].Value == MarauderLevel");
+            AssertContains(owner, "target.Playfield.Identity.Instance != AreteLandingPlayfieldId");
             AssertContains(owner, "state.CurrentIdentity.Instance == target.Identity.Instance");
         }
 
@@ -179,7 +179,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(tradeSkill, "AntonioStacklundCombineRules.SourceProcessBonus(high)");
             AssertContains(tradeSkill, "AntonioStacklundCombineRules.TargetProcessBonus(high)");
             AssertContains(receiver, "bool antonioCombine =");
-            AssertContains(receiver, "if ((masonAssemble || antonioCombine) && newItem.Quality != 1)");
+            AssertContains(receiver, "if ((masonAssemble || antonioCombine || robotBrainCombine) && newItem.Quality != 1)");
             AssertInOrder(
                 receiver,
                 "else if (antonioCombine)",
@@ -199,11 +199,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string movement = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteMovementRuntimeService.cs");
 
-            AssertContains(patrick, "private const int PatrickKillDelayMilliseconds = 2954;");
+            AssertContains(patrick, "private const int PatrickKillDelayMilliseconds = 4355;");
             Assert.IsFalse(patrick.Contains("PatrickKillDelayMilliseconds = 1200"));
             Assert.IsFalse(remi.Contains("QuellTipResendDelayMilliseconds"));
             Assert.IsFalse(remi.Contains("ReturnTipResendDelayMilliseconds"));
-            Assert.IsFalse(remi.Contains("Thread.Sleep"));
+            AssertContains(remi, "private const int HellfyreSelfDestructDelayMilliseconds = 30 * 1000;");
+            AssertContains(remi, "Thread.Sleep(HellfyreSelfDestructDelayMilliseconds);");
             AssertInOrder(
                 remi,
                 "RemiGalloisTipSender.TrySendQuellTipOnly(source);",
@@ -223,9 +224,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string owner = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\LoreleiOasisMobRuntime.cs");
 
-            AssertContains(quest, "LoreleiOasisMobRuntime.IsRegisteredGreedyDesertReet(npc)");
+            AssertContains(quest, "LoreleiOasisMobRuntime.MatchesGreedyDesertReetIdentity(npc)");
             AssertContains(owner, "string.Equals(npc.Name, \"Greedy Desert Reet\"");
-            AssertContains(owner, "npc.Stats[StatIds.level].Value != 7");
+            AssertContains(owner, "npc.Stats[StatIds.level].Value == 7");
             AssertContains(owner, "return OasisReetInstances.Contains(npc.Identity.Instance);");
             string router = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Arete\Dialogue\ContentDrivenNpcDialogueRouter.cs");
@@ -238,11 +239,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string rex = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\RexB18ECompletionHandler.cs");
-            AssertContains(rex, "private const int XpReward = 290;");
+            AssertContains(rex, "private const int XpReward = 1281;");
             AssertContains(rex, "Received reward: 1281 XP, 1040 credits.");
-            AssertContains(rex, "displayXp=1281 actualXpDelta=290");
-            AssertContains(rex, "rex-b18e-return-290xp");
-            Assert.IsFalse(rex.Contains("private const int XpReward = 1281;"));
+            AssertContains(rex, "AreteQuestRewardGrants.GrantCreditsAndXpOnce(");
+            AssertContains(rex, "rex-b18e-return-1281xp");
 
             string stan = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\StanGoodmanQuestRuntime.cs");
@@ -272,8 +272,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string wounded = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\MarcusWoundedWorkersQuestRuntime.cs");
-            AssertContains(wounded, "private const int StimReturnXpReward = 1281;");
-            AssertContains(wounded, "marcus-wounded-xp-credits-1281-1040");
+            AssertContains(wounded, "private const int StimReturnXpReward = 2076;");
+            AssertContains(wounded, "marcus-wounded-xp-credits-2076-1040");
             AssertContains(wounded, "captured-marcus-stim-return-xp-credits-2076-1040");
             AssertContains(wounded, "LegacyRewardKeys = new[]");
             AssertInOrder(

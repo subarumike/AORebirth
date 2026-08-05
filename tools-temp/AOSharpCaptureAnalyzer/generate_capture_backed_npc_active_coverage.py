@@ -1471,7 +1471,7 @@ def parse_arete_sandstorm(repo_root: Path) -> List[ActorDefinition]:
             parse_csharp_int("MarauderLevel", constants),
             path,
             runtime_profile_selector="arete-sandstorm-captured-contract",
-            evidence_capture_ids=("20260727-204902",),
+            evidence_capture_ids=("20260801-SANDSTORM",),
             notes=("initial slot MonsterData is preserved per captured actor",),
         )
         actor.actor_count = actor_count
