@@ -90,6 +90,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             PropertyMetaData propertyMetaData = null)
         {
             var message = (PlayfieldAnarchyFMessage)value;
+            if (RequiresGeneratorPayload(message.PlayfieldId1.Type)
+                && (message.GeneratorPayload == null || message.GeneratorPayload.Length == 0))
+            {
+                throw new InvalidOperationException(
+                    "Generated playfield identity requires an exact generator payload.");
+            }
+
             streamWriter.WriteInt32((int)message.N3MessageType);
             streamWriter.WriteIdentity(message.Identity);
             streamWriter.WriteByte(message.Unknown);
@@ -155,6 +162,12 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                    firstWord == (int)IdentityType.VendingMachine ||
                    firstWord == unchecked((int)0x0000C77D) ||
                    firstWord == unchecked((int)0x0000C79F);
+        }
+
+        private static bool RequiresGeneratorPayload(IdentityType type)
+        {
+            int value = (int)type;
+            return value == 0x0000C79E || value == 0x0000C79F;
         }
     }
 }

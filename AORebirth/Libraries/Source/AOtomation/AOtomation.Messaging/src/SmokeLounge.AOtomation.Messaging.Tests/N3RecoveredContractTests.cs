@@ -496,6 +496,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void GeneratedPlayfieldIdentityWithoutGeneratorPayloadFailsClosed()
+        {
+            var message = new PlayfieldAnarchyFMessage
+                          {
+                              Identity = new Identity { Type = IdentityType.Playfield2, Instance = 1931 },
+                              PlayfieldId1 = new Identity { Type = (IdentityType)0x0000C79E, Instance = 1931 },
+                              Unknown3 = 1,
+                              PlayfieldId2 = new Identity { Type = IdentityType.Playfield2, Instance = 1931 }
+                          };
+
+            try
+            {
+                Serialize(message);
+                Assert.Fail("Expected a generated playfield without a generator payload to fail closed.");
+            }
+            catch (System.InvalidOperationException exception)
+            {
+                StringAssert.Contains(exception.Message, "requires an exact generator payload");
+            }
+        }
+
+        [TestMethod]
         public void OfficialLivePlayfieldAnarchyFGeneratorPayloadRoundTripsOpaque()
         {
             byte[] body = HexToBytes(

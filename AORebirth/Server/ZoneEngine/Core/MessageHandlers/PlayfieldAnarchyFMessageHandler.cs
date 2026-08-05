@@ -117,24 +117,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.PlayfieldX = Playfields.GetPlayfieldX(character.Playfield.Identity.Instance);
                 x.PlayfieldZ = Playfields.GetPlayfieldZ(character.Playfield.Identity.Instance);
 
-                if (TempleWorldInteractionRules.IsTempleProxyArrival(character))
-                {
-                    // Keep the categorical dungeon resource separate from this server's
-                    // mutable playfield owner and retain the official source portal.
-                    x.PlayfieldId1 = new Identity
-                                     {
-                                         Type = (IdentityType)51102,
-                                         Instance = TempleWorldInteractionRules.TemplePlayfieldId
-                                     };
-                    x.Unknown3 = 1;
-                    x.Unknown4 = TempleWorldInteractionRules.TempleGatewayDoorInstance;
-                    x.PlayfieldId2 = new Identity
-                                     {
-                                         Type = IdentityType.Playfield2,
-                                         Instance = character.Playfield.Identity.Instance
-                                     };
-                }
-
                 if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
                 {
                     // Remapped live PFs are not in Playfields.xml → GetPlayfieldX/Z returns 100000

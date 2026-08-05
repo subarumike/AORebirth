@@ -393,8 +393,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(teleportHandler, "sourceDoor.Instance,");
             StringAssert.Contains(teleportHandler, "x.SgId = sgId");
             StringAssert.Contains(teleportHandler, "Instance = destinationPlayfieldId");
-            StringAssert.Contains(playfieldAnarchy, "IsTempleProxyArrival(character)");
-            StringAssert.Contains(playfieldAnarchy, "TempleGatewayDoorInstance");
+            StringAssert.Contains(playfieldAnarchy, "Type = IdentityType.Playfield1");
+            Assert.IsFalse(playfieldAnarchy.Contains("IsTempleProxyArrival(character)"));
+            Assert.IsFalse(playfieldAnarchy.Contains("Type = (IdentityType)51102"));
         }
 
         [TestMethod]
