@@ -17,6 +17,10 @@ completion matrices and dated evidence retain detailed provenance.
 - Arete loot foundation: 14/14 PASS.
 - PF127 Subway acceptance: PASS.
 - PF1931 Temple acceptance: PASS.
+- PF1931 official-client post-login acceptance: PASS. The static
+  `PlayfieldAnarchyF` resource shape is restored, malformed generated-resource
+  identities fail closed, all 43 captured internal door statuses remain
+  enabled, and Soldier completed entry/residency/exit validation on 2026-08-04.
 - Generated mission graph and mission reproducibility: PASS.
 - Debug server build: PASS.
 - Git LFS and Git object integrity: PASS.
@@ -116,7 +120,9 @@ migrations; details and exact source references are recorded in
   contracts. New behavior still requires capture evidence.
 - PF1931 Temple is complete for its current ordinary/named population, dynamic
   doors, combat, lifecycle, loot, and navigation contracts. Unsupported nano
-  selectors and unseen loot outcomes remain fail-closed.
+  selectors and unseen loot outcomes remain fail-closed. PF6553 Marcus ambient
+  combat also fails closed before attack start while its captured start context
+  is incomplete; supported mesh and burning-robot visuals remain active.
 
 ## Repository health
 

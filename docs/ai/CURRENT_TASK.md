@@ -2,37 +2,28 @@
 
 ## Active
 
-Reconcile the preserved database/server worktree repair without changing the
-completed Arete runtime or generated cohort.
+No implementation is active after delivery of the PF1931 post-login crash
+repair. The standing gameplay priority remains incremental capture-backed PF127
+Subway work when Mike supplies or requests the next capture task.
 
-## Accepted scope
+## Latest delivered reconciliation
 
-- Keep the secure `AO_REBIRTH_MYSQL_CONNECTION` process-environment override;
-  tracked configuration must contain placeholders only.
-- Keep database preflight fail-closed for missing credentials, connection,
-  database identity, schema/read access, and nonzero `characters.Online` state.
-- Repair managed start/stop status-probe calls so every invocation supplies the
-  repository configuration and engine directory required by the probe.
-- Keep PowerShell boolean continuation syntax parseable in the PID-metadata
-  trust check.
-- Treat capture-decoder internal `TypeError`/`AttributeError` tracebacks as the
-  same bounded transient interpreter corruption already retried inside the
-  frozen analyzer; deterministic schema failures remain non-retryable.
-- Preserve exact PID, executable, start-time, and listener ownership; never use
-  process-name fallback termination.
-
-## Rejected preserved changes
-
-The tracked private connection string, configuration fallback, secret-scanner
-exemption, weakened missing-credential tests, and documentation describing that
-model were rejected and restored to the accepted secure baseline.
+- Removed the PF1931 `PlayfieldAnarchyF` generated-building identity that was
+  emitted without a generator payload and crashed the official client.
+- Added a fail-closed serializer contract preventing generated-playfield
+  identities without exact payloads.
+- Preserved the complete 43-door captured initial replay unchanged.
+- Confirmed Soldier could enter PF1931, remain connected, and exit to PF647 with
+  the full replay enabled.
+- Contained the independent PF6553 Marcus heartbeat exception without inventing
+  missing attack-start context.
 
 ## Delivery acceptance
 
-- Focused database-preflight, engine-management, and secret-scan tests pass.
+- Focused Temple, packet-shape, and Marcus combat-context tests pass.
 - Complete mandatory integration gate passes twice from the unchanged final
   commit and leaves the worktree clean.
 - Debug build passes, database preflight passes, Chat/Login/Zone are restarted
   through approved wrappers with exact port ownership, and optional WebEngine
   remains inactive.
-- Audit evidence: `docs/evidence/DATABASE_SERVER_REPAIR_20260804.md`.
+- Audit evidence: `docs/evidence/TEMPLE_POST_LOGIN_DOOR_CRASH_20260804.md`.
