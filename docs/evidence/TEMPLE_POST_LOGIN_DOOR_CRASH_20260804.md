@@ -146,10 +146,15 @@ behavior remains. Focused tests preserve the factory calls behind the guard,
 and a clean engine restart produced no repeated Marcus exception.
 
 The Marcus source correction is an auxiliary input to governed active-combat
-coverage. The repository writer regenerated only the affected active-coverage
-payload and generation manifest; all other generated cohort files remained
-byte-identical. Current validation passes at cohort identity
-`f8f3dcd2c3ff218e419e787ef0348770ab5a10074a9a9bb2c7c577afb5ff6efd`.
+coverage. During final remote integration, authoritative Arete runtime commit
+`3f5404b2` also reduced the captured Arete-family population from 103 to 96 by
+removing seven Garbage Flea slots absent from the newer capture. The generator
+still hard-coded the old 103/1,607 denominator, so its contract was corrected to
+96/1,600 rather than restoring removed runtime actors or editing output by hand.
+The repository writer regenerated the affected active-coverage payload and
+generation manifest; all other generated cohort files remained byte-identical.
+Current validation passes at cohort identity
+`f54efabb32c0033bd665e5a670cab75853dfdfd7aea1e58ff5fa9e44005418b4`.
 
 ## Acceptance evidence
 

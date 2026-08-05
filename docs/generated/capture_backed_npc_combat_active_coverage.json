@@ -1,7 +1,7 @@
 {
   "bindingTotals": {
-    "actorCount": 1607,
-    "bindingRecordCount": 1583
+    "actorCount": 1600,
+    "bindingRecordCount": 1576
   },
   "bindings": [
     {
@@ -34086,30 +34086,6 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "6d79b492a163eab545a9",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "bd4327ccadb48945086e",
-      "level": 1,
-      "levelCandidates": [
-        1
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
       "bindingKey": "c316e0846503113f67dd",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -34123,126 +34099,6 @@
       "level": 2,
       "levelCandidates": [
         2
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
-      "bindingKey": "b29bc25a0797f5b77ea4",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "bd4327ccadb48945086e",
-      "level": 1,
-      "levelCandidates": [
-        1
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
-      "bindingKey": "3c19b2a61b014cc5dfb1",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "bd4327ccadb48945086e",
-      "level": 1,
-      "levelCandidates": [
-        1
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
-      "bindingKey": "4ee3476b0a243b40559c",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "bd4327ccadb48945086e",
-      "level": 1,
-      "levelCandidates": [
-        1
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
-      "bindingKey": "f698248a6d52cc7785fc",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "163c1f48595e0e731aad",
-      "level": 2,
-      "levelCandidates": [
-        2
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
-      "bindingKey": "462da7e9b841d3fc1a8f",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "bd4327ccadb48945086e",
-      "level": 1,
-      "levelCandidates": [
-        1
       ],
       "monsterData": 17657,
       "name": "Garbage Flea",
@@ -34374,30 +34230,6 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "2777b2492b0874414790",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "2779a98f62374846bff2",
-      "level": 6,
-      "levelCandidates": [
-        6
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
       "bindingKey": "2d5929b72618f8c630c8",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -34411,6 +34243,30 @@
       "level": 5,
       "levelCandidates": [
         5
+      ],
+      "monsterData": 17657,
+      "name": "Garbage Flea",
+      "runtimeContractReady": false,
+      "runtimePlayfieldOrResource": 6553,
+      "runtimeProfileSelector": null,
+      "runtimeSourceIdentityHint": null,
+      "surface": "arete-family"
+    },
+    {
+      "actorCount": 1,
+      "bindingKey": "2777b2492b0874414790",
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260720-204431"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
+      ],
+      "coverageKey": "2779a98f62374846bff2",
+      "level": 6,
+      "levelCandidates": [
+        6
       ],
       "monsterData": 17657,
       "name": "Garbage Flea",
@@ -34446,7 +34302,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "4d4243dc9c230524fd53",
+      "bindingKey": "e0009f5ccef5675d56c3",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -34455,34 +34311,10 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "2779a98f62374846bff2",
-      "level": 6,
+      "coverageKey": "a42378ba0942077878bf",
+      "level": 5,
       "levelCandidates": [
-        6
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
-      "bindingKey": "db3be170de825289f414",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "2779a98f62374846bff2",
-      "level": 6,
-      "levelCandidates": [
-        6
+        5
       ],
       "monsterData": 17657,
       "name": "Garbage Flea",
@@ -37334,7 +37166,7 @@
       "surface": "arete-alien-area"
     },
     {
-      "actorCount": 2,
+      "actorCount": 3,
       "bindingKey": "7aa0128054600baeddb1",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -37358,7 +37190,7 @@
       "surface": "arete-sandstorm-marauders"
     },
     {
-      "actorCount": 3,
+      "actorCount": 2,
       "bindingKey": "de4fcb088774f406e44f",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -38316,7 +38148,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-      "sha256": "282260f946a76323dec8e1c6c8685639e663a922f25f1ae3efc1dcbe2d816630"
+      "sha256": "c60871c45de28fc656212f0431dc8010d98d38a857e5a6bd33e9673739a6b4f9"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -38336,7 +38168,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
-      "sha256": "0014175bb3607f4d8edd9b540e5ce4baedbca54cd7ef71450c193146de55659c"
+      "sha256": "9f58a70034be73717af076a88ab4a0a0109a980774cfce00b04b8195b57e6f35"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -38346,7 +38178,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs",
-      "sha256": "442d37daa0d0bfc24111d7fc66768b8a37c9e2d87da3d145dd9dc472d967b8ca"
+      "sha256": "7781665ff025dbe1bbfc06907983d26ac3728ffb4fe35c69eec99712cc1fed79"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -38436,12 +38268,12 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-      "sha256": "a31ea3f29b31e55737fe1f4ecde319013d6ca614cd125f99f6ab08d2daf1f48f"
+      "sha256": "6b2b17d1147d16c499936d6b0bf72b60edd35e3ec0c0701149bce40486716287"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-      "sha256": "e401cb0638230d7833016057194583d9bd4e6b5ee29009eb53eaee97d484b376"
+      "sha256": "a6f964f98cb4dfbba6dc7d9a1cf696fb483c7361cab7af22885c6b66c4c7ac1e"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -38904,7 +38736,7 @@
     "captureCertifiedVariantCountWithMutableWeaponState": 5,
     "exactRawWireObservationCount": 2874,
     "finalCaptureCertifiedActorCount": 504,
-    "finalQuarantinedActorCount": 1103,
+    "finalQuarantinedActorCount": 1096,
     "fixedCertifiedProfileRowCount": 503,
     "fixedProfileRowCount": 805,
     "fixedUnresolvedProfileRowCount": 302,
@@ -59964,11 +59796,11 @@
     "runtimePlayfieldOrResource": 1931
   },
   "populationContract": {
-    "actualInitialActorCount": 1607,
-    "configuredMaximumActorCount": 1609,
+    "actualInitialActorCount": 1600,
+    "configuredMaximumActorCount": 1602,
     "cursedSilvertail": "a dynamic replacement for one of five Dreaming Silvertails and does not increase the Nascence Life count",
     "dynamicMissionMobs": "excluded from the fixed denominator because their count and identity are mission-instance data",
-    "expectedInitialActorCount": 1607,
+    "expectedInitialActorCount": 1600,
     "maximumExplanation": "two Infector slots arm only after Abmouth combat and are not initial actors"
   },
   "profiles": [
@@ -201606,7 +201438,7 @@
       ]
     },
     {
-      "actorCount": 6,
+      "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 381,
       "captureSessions": [
@@ -204111,7 +203943,7 @@
       ]
     },
     {
-      "actorCount": 3,
+      "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 381,
       "captureSessions": [
@@ -207830,7 +207662,7 @@
       ]
     },
     {
-      "actorCount": 2,
+      "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 381,
       "captureSessions": [
@@ -215777,7 +215609,7 @@
       ]
     },
     {
-      "actorCount": 5,
+      "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 381,
       "captureSessions": [
@@ -272892,7 +272724,7 @@
       ]
     },
     {
-      "actorCount": 2,
+      "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 381,
       "captureSessions": [
@@ -272964,7 +272796,7 @@
       ]
     },
     {
-      "actorCount": 3,
+      "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 381,
       "captureSessions": [
@@ -277090,7 +276922,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          622
+          614
         ]
       },
       {
@@ -277134,7 +276966,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          1699
+          1715
         ]
       },
       {
@@ -277156,7 +276988,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          354
+          422
         ]
       },
       {
@@ -277234,8 +277066,8 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
         "prepareCallCount": 2,
         "prepareCallSourceLines": [
-          633,
-          689
+          673,
+          728
         ]
       },
       {
@@ -277356,10 +277188,10 @@
       "unresolved": 837
     },
     {
-      "actorCount": 103,
+      "actorCount": 96,
       "certified": 0,
       "surface": "arete-family",
-      "unresolved": 103
+      "unresolved": 96
     },
     {
       "actorCount": 14,
@@ -277400,7 +277232,7 @@
   ],
   "totals": {
     "certified": 504,
-    "initialActorCount": 1607,
-    "unresolved": 1103
+    "initialActorCount": 1600,
+    "unresolved": 1096
   }
 }
