@@ -25,11 +25,6 @@ namespace ZoneEngine.Core.Playfields
 
     #endregion
 
-    /// <summary>
-    /// Capture-backed Marcus Stone vs Burning Cleaning Robot ambient fight.
-    /// Capture 20260731-174302: standing flamethrower (SAW 121/121/121/83/50 + AttackInfo slot 6).
-    /// Driven here directly — NpcCombatTickCoordinator path-nav gates block this ranged pad fight.
-    /// </summary>
     internal static class MarcusPadAmbientCombat
     {
         private const int AreteLandingPlayfieldId = 6553;
@@ -52,14 +47,13 @@ namespace ZoneEngine.Core.Playfields
 
         private const int RobotScale = 200;
 
-        // Capture 20260731-174302: AttackInfo cadence ~6.25s (15:44:15 → 21 → 27 → 33).
-        private const double FlamethrowerRechargeSeconds = 6.25;
+        private const double FlamethrowerRange = 15.0;
 
-        // Capture 20260731-174302 AttackInfo Amount sequence: 13, 23, 12, 23.
-        private static readonly int[] FlamethrowerDamageObservations = { 13, 23, 12, 23 };
+        private const double FlamethrowerRechargeSeconds = 6.0;
 
-        // Capture 20260731-174302: SAW+Attack at 15:44:12.28, first AttackInfo at 15:44:15.25.
-        private const double FlamethrowerInitialAttackDelaySeconds = 3.0;
+        private const int FlamethrowerMinDamage = 7;
+
+        private const int FlamethrowerMaxDamage = 17;
 
         private const int RobotMinDamage = 1;
 
@@ -67,11 +61,12 @@ namespace ZoneEngine.Core.Playfields
 
         private const double RobotRechargeSeconds = 4.0;
 
-        private const double RobotInitialAttackDelaySeconds = 0.2;
-
         // Mike: soft-respawn ~60s after Burning Cleaning Robot death.
         private const double RobotRespawnSeconds = 60.0;
 
+        private const double FlamethrowerAnimRefreshSeconds = 6.0;
+
+        // Capture 20260721-marcus-animation-texture-dialogtext SpecialAttackWeapon on Marcus.
         private const int MarcusSpecialAttackWeaponUnknown1 = 121;
 
         private const int MarcusSpecialAttackWeaponUnknown2 = 121;
@@ -84,110 +79,20 @@ namespace ZoneEngine.Core.Playfields
 
         private const int MarcusFlamethrowerMeshId = 292936;
 
-        private const int NormalAttackInfoHitType = 3;
-
-        private static readonly CapturedEnemyCombatContract MarcusCombatContract =
-            CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260731-174302: Marcus Stone standing flamethrower packet sequence",
-                new CapturedEnemySpecialAttackSequenceDefinition(
-                    FlamethrowerInitialAttackDelaySeconds,
-                    null,
-                    new CapturedEnemyCombatAttackDefinition(
-                        12,
-                        23,
-                        0,
-                        11.0d,
-                        FlamethrowerRechargeSeconds,
-                        false,
-                        0,
-                        6,
-                        0,
-                        NormalAttackInfoHitType,
-                        0,
-                        0,
-                        true,
-                        FlamethrowerDamageObservations),
-                    new CapturedEnemySpecialAttackDefinition[0],
-                    MarcusSpecialAttackWeaponUnknown1,
-                    MarcusSpecialAttackWeaponUnknown2,
-                    MarcusSpecialAttackWeaponUnknown3,
-                    MarcusSpecialAttackWeaponUnknown4,
-                    MarcusSpecialAttackWeaponUnknown5,
-                    0,
-                    0,
-                    0));
-
-        private static readonly CapturedEnemyCombatContract RobotCombatContract =
-            CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260731-174302: Burning Cleaning Robot ambient return attack packet sequence",
-                new CapturedEnemySpecialAttackSequenceDefinition(
-                    RobotInitialAttackDelaySeconds,
-                    null,
-                    new CapturedEnemyCombatAttackDefinition(
-                        RobotMinDamage,
-                        RobotMaxDamage,
-                        0,
-                        NpcCombatAttackRules.MaxMeleeCombatDistance,
-                        RobotRechargeSeconds,
-                        false,
-                        -1,
-                        0,
-                        0,
-                        NormalAttackInfoHitType,
-                        0,
-                        0,
-                        true),
-                    new[]
-                    {
-                        new CapturedEnemySpecialAttackDefinition(43, 43, 43, string.Empty)
-                    },
-                    43,
-                    43,
-                    43,
-                    3,
-                    0,
-                    0,
-                    0,
-                    0));
-
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
 
         private static readonly Dictionary<int, DateTime> NextRobotRespawnUtc = new Dictionary<int, DateTime>();
 
+        private static readonly Dictionary<int, DateTime> NextFlamethrowerAnimUtc = new Dictionary<int, DateTime>();
+
         private static readonly Dictionary<int, DateTime> NextFireSpellListUtc = new Dictionary<int, DateTime>();
-
-        private static readonly Dictionary<int, DateTime> NextMarcusAttackUtc = new Dictionary<int, DateTime>();
-
-        private static readonly Dictionary<int, DateTime> NextRobotAttackUtc = new Dictionary<int, DateTime>();
-
-        private static readonly Dictionary<int, int> MarcusDamageCursor = new Dictionary<int, int>();
-
-        private static readonly Dictionary<int, long> LastTickHeartbeat = new Dictionary<int, long>();
-
-        /// <summary>
-        /// Capture fight is standing ranged — Marcus stays put and uses weapon slot 6.
-        /// Combat/patrol ticks must not chase either actor toward the other.
-        /// </summary>
-        public static bool IsStandingPadAmbientCombatant(ICharacter character)
-        {
-            if (character == null || string.IsNullOrEmpty(character.Name))
-            {
-                return false;
-            }
-
-            return string.Equals(character.Name, MarcusName, StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(character.Name, BurningRobotName, StringComparison.OrdinalIgnoreCase);
-        }
 
         public static void ClearPlayfield(int playfieldInstance)
         {
             LinkedPlayfields.Remove(playfieldInstance);
             NextRobotRespawnUtc.Remove(playfieldInstance);
+            NextFlamethrowerAnimUtc.Remove(playfieldInstance);
             NextFireSpellListUtc.Remove(playfieldInstance);
-            NextMarcusAttackUtc.Remove(playfieldInstance);
-            NextRobotAttackUtc.Remove(playfieldInstance);
-            MarcusDamageCursor.Remove(playfieldInstance);
-            LastTickHeartbeat.Remove(playfieldInstance);
         }
 
         public static void StartForPlayfield(Playfield playfield, Identity playfieldIdentity, Action<ICharacter> activateNpc)
@@ -195,7 +100,7 @@ namespace ZoneEngine.Core.Playfields
             if (playfield == null
                 || activateNpc == null
                 || playfieldIdentity.Instance != AreteLandingPlayfieldId
-                || LinkedPlayfields.Contains(playfieldIdentity.Instance))
+                || !LinkedPlayfields.Add(playfieldIdentity.Instance))
             {
                 return;
             }
@@ -203,10 +108,9 @@ namespace ZoneEngine.Core.Playfields
             Character marcus = FindNamedNpc(playfield, MarcusName);
             if (marcus == null)
             {
-                // Marcus may spawn slightly after batch start; TickRespawn will link when present.
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
-                    "MarcusPadAmbientCombat: Marcus Stone not found yet pf=" + playfieldIdentity.Instance);
+                    "MarcusPadAmbientCombat: Marcus Stone not found pf=" + playfieldIdentity.Instance);
                 return;
             }
 
@@ -216,8 +120,7 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
-            LinkedPlayfields.Add(playfieldIdentity.Instance);
-            LinkFight(playfield, playfieldIdentity, marcus, robot);
+            LinkFight(playfield, marcus, robot);
             CapturedSpellListVisualEffects.AnnounceBurningRobotFire(robot);
             NextFireSpellListUtc[playfieldIdentity.Instance] =
                 DateTime.UtcNow + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
@@ -227,85 +130,58 @@ namespace ZoneEngine.Core.Playfields
                 + marcus.Identity.ToString(true)
                 + " robot="
                 + robot.Identity.ToString(true)
-                + " source=20260731-174302");
+                + " source=20260720-064523");
         }
 
         public static void TickRespawn(Playfield playfield, Identity playfieldIdentity, Action<ICharacter> activateNpc)
         {
             if (playfield == null
                 || activateNpc == null
-                || playfieldIdentity.Instance != AreteLandingPlayfieldId)
+                || playfieldIdentity.Instance != AreteLandingPlayfieldId
+                || !LinkedPlayfields.Contains(playfieldIdentity.Instance))
             {
                 return;
             }
 
-            // ProcessPatrolTick runs per NPC; only drive this ambient fight once per heartbeat.
-            long heartbeat = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond / 10;
-            long lastHeartbeat;
-            if (LastTickHeartbeat.TryGetValue(playfieldIdentity.Instance, out lastHeartbeat)
-                && lastHeartbeat == heartbeat)
-            {
-                return;
-            }
-
-            LastTickHeartbeat[playfieldIdentity.Instance] = heartbeat;
-
-            Character marcus = FindNamedNpc(playfield, MarcusName);
             Character robot = FindNamedNpc(playfield, BurningRobotName);
-
             if (robot != null && robot.Stats[StatIds.health].Value > 0)
             {
-                if (!LinkedPlayfields.Contains(playfieldIdentity.Instance))
-                {
-                    LinkedPlayfields.Add(playfieldIdentity.Instance);
-                }
-
                 NextRobotRespawnUtc.Remove(playfieldIdentity.Instance);
+                Character marcus = FindNamedNpc(playfield, MarcusName);
                 if (marcus != null && marcus.Stats[StatIds.health].Value > 0)
                 {
-                    if (HasCompleteLinkFightContext()
-                        && (marcus.FightingTarget.Instance == 0
-                        || marcus.FightingTarget.Instance != robot.Identity.Instance
-                        || !NextMarcusAttackUtc.ContainsKey(playfieldIdentity.Instance)))
+                    if (marcus.FightingTarget.Instance == 0
+                        || marcus.FightingTarget.Instance != robot.Identity.Instance)
                     {
-                        LinkFight(playfield, playfieldIdentity, marcus, robot);
+                        LinkFight(playfield, marcus, robot);
                         CapturedSpellListVisualEffects.AnnounceBurningRobotFire(robot);
                         NextFireSpellListUtc[playfieldIdentity.Instance] =
                             DateTime.UtcNow
                             + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
+                        return;
                     }
-
-                    HoldStationary(playfield, marcus);
-                    HoldStationary(playfield, robot);
-                    ProcessMarcusFlamethrowerAttack(playfield, playfieldIdentity, marcus, robot);
-                    ProcessRobotAttack(playfield, playfieldIdentity, marcus, robot);
-                    MaybeEnsureMarcusFlamethrowerMesh(marcus);
-                    MaybeRefreshBurningFireSpellList(playfieldIdentity, robot);
                 }
 
-                return;
-            }
-
-            // No living robot — schedule / perform respawn.
-            NextMarcusAttackUtc.Remove(playfieldIdentity.Instance);
-            NextRobotAttackUtc.Remove(playfieldIdentity.Instance);
-
-            if (marcus == null)
-            {
+                MaybeRefreshFlamethrowerAnim(playfield, playfieldIdentity, marcus, robot);
+                MaybeRefreshBurningFireSpellList(playfieldIdentity, robot);
                 return;
             }
 
             DateTime nextRespawn;
             if (!NextRobotRespawnUtc.TryGetValue(playfieldIdentity.Instance, out nextRespawn))
             {
-                // Never linked yet → spawn immediately; after a kill wait RobotRespawnSeconds.
-                nextRespawn = LinkedPlayfields.Contains(playfieldIdentity.Instance)
-                                  ? DateTime.UtcNow + TimeSpan.FromSeconds(RobotRespawnSeconds)
-                                  : DateTime.UtcNow;
-                NextRobotRespawnUtc[playfieldIdentity.Instance] = nextRespawn;
+                NextRobotRespawnUtc[playfieldIdentity.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(RobotRespawnSeconds);
+                return;
             }
 
             if (nextRespawn > DateTime.UtcNow)
+            {
+                return;
+            }
+
+            Character marcusForRespawn = FindNamedNpc(playfield, MarcusName);
+            if (marcusForRespawn == null)
             {
                 return;
             }
@@ -316,8 +192,7 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
-            LinkedPlayfields.Add(playfieldIdentity.Instance);
-            LinkFight(playfield, playfieldIdentity, marcus, spawned);
+            LinkFight(playfield, marcusForRespawn, spawned);
             NextRobotRespawnUtc.Remove(playfieldIdentity.Instance);
             CapturedSpellListVisualEffects.AnnounceBurningRobotFire(spawned);
             NextFireSpellListUtc[playfieldIdentity.Instance] =
@@ -326,174 +201,45 @@ namespace ZoneEngine.Core.Playfields
                 DebugInfoDetail.Engine,
                 "MarcusPadAmbientCombat respawned robot="
                 + spawned.Identity.ToString(true)
-                + " source=20260731-174302");
+                + " source=20260720-064523");
         }
 
-        private static void LinkFight(
+        private static void MaybeRefreshFlamethrowerAnim(
             Playfield playfield,
             Identity playfieldIdentity,
             Character marcus,
             Character robot)
         {
-            if (playfield == null
-                || marcus == null
-                || robot == null
-                || !HasCompleteLinkFightContext())
+            if (marcus == null || robot == null)
             {
                 return;
             }
 
-            // Do not use CapturedEnemyCombatRuntime / ResetCombatTick here:
-            // PF path-nav gates block standing ranged AttackInfo for this pad fight.
-            // Stay put — capture shows ~11m flamethrower, not melee chase.
-            HoldStationary(playfield, marcus);
-            HoldStationary(playfield, robot);
-            EnsureMarcusFlamethrowerWeaponMesh(marcus);
-            marcus.SetFightingTarget(robot.Identity);
-            robot.SetFightingTarget(marcus.Identity);
-            FaceToward(marcus, robot);
-            FaceToward(robot, marcus);
+            DateTime nextAnim;
+            if (NextFlamethrowerAnimUtc.TryGetValue(playfieldIdentity.Instance, out nextAnim)
+                && nextAnim > DateTime.UtcNow)
+            {
+                return;
+            }
 
-            // Ambient pad fight bypasses CapturedEnemyCombatRuntime.Prepare / IsCombatReady
-            // certification — emit from the capture-backed sequence definitions directly.
+            EnsureMarcusFlamethrowerWeaponMesh(marcus);
+            // Capture: SpecialAttackWeapon (texture VFX) then AttackInfo WeaponSlot=6 (~6s cadence).
             AnnounceMarcusFlamethrowerTextureVfx(playfield, marcus);
             playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateAttack(
-                    marcus.Identity,
-                    robot.Identity,
-                    MarcusCombatContract.SpecialAttackSequence));
-            playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
-                    robot.Identity,
-                    RobotCombatContract.SpecialAttackSequence));
-            playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateAttack(
-                    robot.Identity,
-                    marcus.Identity,
-                    RobotCombatContract.SpecialAttackSequence));
-
-            DateTime now = DateTime.UtcNow;
-            NextMarcusAttackUtc[playfieldIdentity.Instance] =
-                now + TimeSpan.FromSeconds(FlamethrowerInitialAttackDelaySeconds);
-            NextRobotAttackUtc[playfieldIdentity.Instance] =
-                now + TimeSpan.FromSeconds(RobotInitialAttackDelaySeconds);
-            MarcusDamageCursor[playfieldIdentity.Instance] = 0;
-
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                "MarcusPadAmbientCombat LinkFight self-driven Marcus="
-                + marcus.Identity.ToString(true)
-                + " robot="
-                + robot.Identity.ToString(true));
-        }
-
-        private static void ProcessMarcusFlamethrowerAttack(
-            Playfield playfield,
-            Identity playfieldIdentity,
-            Character marcus,
-            Character robot)
-        {
-            DateTime nextAttack;
-            if (!NextMarcusAttackUtc.TryGetValue(playfieldIdentity.Instance, out nextAttack)
-                || nextAttack > DateTime.UtcNow)
-            {
-                return;
-            }
-
-            EnsureMarcusFlamethrowerWeaponMesh(marcus);
-
-            int cursor;
-            if (!MarcusDamageCursor.TryGetValue(playfieldIdentity.Instance, out cursor))
-            {
-                cursor = 0;
-            }
-
-            int damage = FlamethrowerDamageObservations[cursor % FlamethrowerDamageObservations.Length];
-            MarcusDamageCursor[playfieldIdentity.Instance] = cursor + 1;
-
-            // Capture AttackInfo: Amount / AmmoCount=0 / WeaponSlot=6 / Unk1=0 / HitType=Normal(3) / WeaponInstance=0
-            playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
-                    marcus.Identity,
-                    robot.Identity,
-                    damage,
-                    0,
-                    MarcusCombatContract.SpecialAttackSequence.RepeatingAttack));
-
-            int currentHealth = robot.Stats[StatIds.health].Value;
-            int newHealth = Math.Max(0, currentHealth - damage);
-            robot.Stats[StatIds.health].Value = newHealth;
-            robot.SendChangedStats();
-
-            NextMarcusAttackUtc[playfieldIdentity.Instance] =
-                DateTime.UtcNow + TimeSpan.FromSeconds(FlamethrowerRechargeSeconds);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                "MarcusPadAmbientCombat MarcusAttackInfo dmg="
-                + damage
-                + " robotHp="
-                + newHealth
-                + "/"
-                + robot.Stats[StatIds.life].Value);
-
-            if (newHealth > 0)
-            {
-                return;
-            }
-
-            NextMarcusAttackUtc.Remove(playfieldIdentity.Instance);
-            NextRobotAttackUtc.Remove(playfieldIdentity.Instance);
-            playfield.Announce(
-                new StopFightMessage
+                new AttackInfoMessage
                 {
                     Identity = marcus.Identity,
                     Unknown = 0,
-                    Unknown1 = 1
+                    Target = robot.Identity,
+                    Unknown1 = 7,
+                    Unknown2 = 0,
+                    Unknown3 = 6,
+                    Unknown4 = 0,
+                    Unknown5 = 3,
+                    Unknown6 = 0
                 });
-            marcus.SetFightingTarget(Identity.None);
-            playfield.HandleCombatKillingHit(marcus, robot);
-            NextRobotRespawnUtc[playfieldIdentity.Instance] =
-                DateTime.UtcNow + TimeSpan.FromSeconds(RobotRespawnSeconds);
-        }
-
-        private static void ProcessRobotAttack(
-            Playfield playfield,
-            Identity playfieldIdentity,
-            Character marcus,
-            Character robot)
-        {
-            DateTime nextAttack;
-            if (!NextRobotAttackUtc.TryGetValue(playfieldIdentity.Instance, out nextAttack)
-                || nextAttack > DateTime.UtcNow
-                || marcus.Stats[StatIds.health].Value <= 0
-                || robot.Stats[StatIds.health].Value <= 0)
-            {
-                return;
-            }
-
-            int damage = RobotMinDamage
-                         + ((int)(DateTime.UtcNow.Ticks & 0xffff) % (RobotMaxDamage - RobotMinDamage + 1));
-            playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
-                    robot.Identity,
-                    marcus.Identity,
-                    damage,
-                    -1,
-                    RobotCombatContract.SpecialAttackSequence.RepeatingAttack));
-
-            // Marcus is effectively immortal for this ambient demo (117800 HP); still apply tiny chips.
-            int currentHealth = marcus.Stats[StatIds.health].Value;
-            marcus.Stats[StatIds.health].Value = Math.Max(1, currentHealth - damage);
-            marcus.SendChangedStats();
-
-            NextRobotAttackUtc[playfieldIdentity.Instance] =
-                DateTime.UtcNow + TimeSpan.FromSeconds(RobotRechargeSeconds);
-        }
-
-        private static void MaybeEnsureMarcusFlamethrowerMesh(Character marcus)
-        {
-            EnsureMarcusFlamethrowerWeaponMesh(marcus);
+            NextFlamethrowerAnimUtc[playfieldIdentity.Instance] =
+                DateTime.UtcNow + TimeSpan.FromSeconds(FlamethrowerAnimRefreshSeconds);
         }
 
         private static void MaybeRefreshBurningFireSpellList(Identity playfieldIdentity, Character robot)
@@ -516,6 +262,67 @@ namespace ZoneEngine.Core.Playfields
                 + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
         }
 
+        private static void LinkFight(Playfield playfield, Character marcus, Character robot)
+        {
+            string failure;
+            CapturedEnemyCombatRuntime.Prepare(
+                marcus,
+                marcus.Controller as NPCController,
+                CreateMarcusFlamethrowerContract(),
+                out failure);
+            if (!string.IsNullOrEmpty(failure))
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "MarcusPadAmbientCombat Marcus combat prepare: " + failure);
+            }
+
+            CapturedEnemyCombatRuntime.Prepare(
+                robot,
+                robot.Controller as NPCController,
+                CreateBurningRobotContract(),
+                out failure);
+            if (!string.IsNullOrEmpty(failure))
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "MarcusPadAmbientCombat robot combat prepare: " + failure);
+            }
+
+            EnsureMarcusFlamethrowerWeaponMesh(marcus);
+            marcus.SetFightingTarget(robot.Identity);
+            robot.SetFightingTarget(marcus.Identity);
+            playfield.ResetCombatTick(marcus.Identity);
+            playfield.ResetCombatTick(robot.Identity);
+            // Capture 20260721: SpecialAttackWeapon then Attack (Marcus texture VFX 121/121/121/83/50).
+            AnnounceMarcusFlamethrowerTextureVfx(playfield, marcus);
+            playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = marcus.Identity,
+                    Unknown = 0,
+                    Target = robot.Identity,
+                    Action = 0
+                });
+            playfield.Announce(
+                new AttackInfoMessage
+                {
+                    Identity = marcus.Identity,
+                    Unknown = 0,
+                    Target = robot.Identity,
+                    Unknown1 = 7,
+                    Unknown2 = 0,
+                    Unknown3 = 6,
+                    Unknown4 = 0,
+                    Unknown5 = 3,
+                    Unknown6 = 0
+                });
+            playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = robot.Identity,
+                    Unknown = 0,
+                    Target = marcus.Identity,
+                    Action = 0
+                });
+        }
+
         private static void AnnounceMarcusFlamethrowerTextureVfx(Playfield playfield, Character marcus)
         {
             if (playfield == null || marcus == null)
@@ -524,19 +331,17 @@ namespace ZoneEngine.Core.Playfields
             }
 
             playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
-                    marcus.Identity,
-                    MarcusCombatContract.SpecialAttackSequence));
-        }
-
-        private static bool HasCompleteLinkFightContext()
-        {
-            return MarcusCombatContract.IsCombatReady
-                   && MarcusCombatContract.HasCapturedAttackStartContext
-                   && MarcusCombatContract.HasCapturedSpecialAttackWeaponContext
-                   && RobotCombatContract.IsCombatReady
-                   && RobotCombatContract.HasCapturedAttackStartContext
-                   && RobotCombatContract.HasCapturedSpecialAttackWeaponContext;
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = marcus.Identity,
+                    Unknown = 0,
+                    Specials = new SpecialAttack[0],
+                    Unknown1 = MarcusSpecialAttackWeaponUnknown1,
+                    Unknown2 = MarcusSpecialAttackWeaponUnknown2,
+                    Unknown3 = MarcusSpecialAttackWeaponUnknown3,
+                    Unknown4 = MarcusSpecialAttackWeaponUnknown4,
+                    Unknown5 = MarcusSpecialAttackWeaponUnknown5
+                });
         }
 
         private static void EnsureMarcusFlamethrowerWeaponMesh(Character marcus)
@@ -546,6 +351,7 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
+            // AttackInfo WeaponSlot=6 (Righthand) needs WeaponMeshRight for client texture animation.
             if (marcus.Stats[StatIds.weaponmeshright].Value != MarcusFlamethrowerMeshId)
             {
                 marcus.Stats.SetBaseValueWithoutTriggering(
@@ -571,45 +377,73 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
-        private static void HoldStationary(Playfield playfield, Character character)
+        private static CapturedEnemyCombatContract CreateMarcusFlamethrowerContract()
         {
-            if (character == null)
-            {
-                return;
-            }
-
-            NPCController npcController = character.Controller as NPCController;
-            if (npcController != null)
-            {
-                npcController.StopFollow();
-                npcController.SnapshotCurrentMotionPosition();
-                npcController.State = CharacterState.Fighting;
-            }
-
-            if (playfield != null)
-            {
-                playfield.ClearNpcCombatTracking(character.Identity);
-            }
+            CapturedEnemyCombatAttackDefinition repeatingAttack = new CapturedEnemyCombatAttackDefinition(
+                FlamethrowerMinDamage,
+                FlamethrowerMaxDamage,
+                0,
+                FlamethrowerRange,
+                FlamethrowerRechargeSeconds,
+                false,
+                0,
+                6,
+                0,
+                3,
+                0,
+                0,
+                true);
+            // Capture 20260721-marcus-animation-texture-dialogtext:
+            // SpecialAttackWeapon Specials=[] Unknown1/2/3=121 Unknown4=83 Unknown5=50
+            // (texture animation VFX on Marcus while fighting the Burning Cleaning Robot).
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260721-marcus-animation-texture-dialogtext Marcus SpecialAttackWeapon 121/121/121/83/50 + AttackInfo WeaponSlot=6",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    0.5,
+                    null,
+                    repeatingAttack,
+                    new CapturedEnemySpecialAttackDefinition[0],
+                    MarcusSpecialAttackWeaponUnknown1,
+                    MarcusSpecialAttackWeaponUnknown2,
+                    MarcusSpecialAttackWeaponUnknown3,
+                    MarcusSpecialAttackWeaponUnknown4,
+                    MarcusSpecialAttackWeaponUnknown5,
+                    0,
+                    0,
+                    0));
         }
 
-        private static void FaceToward(Character character, Character target)
+        private static CapturedEnemyCombatContract CreateBurningRobotContract()
         {
-            if (character == null || target == null)
-            {
-                return;
-            }
-
-            AORebirth.Core.Vector.Vector3 from = character.RawCoordinates;
-            AORebirth.Core.Vector.Vector3 to = target.RawCoordinates;
-            if (from.Distance2D(to) < 0.001)
-            {
-                return;
-            }
-
-            AORebirth.Core.Vector.Vector3 direction = to - from;
-            direction.y = 0;
-            character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(direction.Normalize());
-            character.RawHeading = character.Heading;
+            CapturedEnemyCombatAttackDefinition repeatingAttack = new CapturedEnemyCombatAttackDefinition(
+                RobotMinDamage,
+                RobotMaxDamage,
+                0,
+                FlamethrowerRange,
+                RobotRechargeSeconds,
+                false,
+                -1,
+                0,
+                0,
+                3,
+                0,
+                0,
+                false);
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260720-064523 Burning Cleaning Robot SpecialAttackWeapon 43/43/43/3/0 + Attack Marcus",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    0.2,
+                    null,
+                    repeatingAttack,
+                    new[] { new CapturedEnemySpecialAttackDefinition(43, 43, 43, string.Empty) },
+                    43,
+                    43,
+                    43,
+                    3,
+                    0,
+                    0,
+                    0,
+                    0));
         }
 
         private static Character SpawnBurningRobot(

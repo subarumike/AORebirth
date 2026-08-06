@@ -52,28 +52,9 @@ namespace AORebirth.CaptureProtocol
             0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00
         };
 
-        private static readonly byte[] AreteFlags2Bd3OpaqueExtension =
-        {
-            0x4E, 0x00, 0x01, 0xD8, 0x4F, 0x4C, 0x45, 0x57,
-            0x31, 0x4C, 0x45, 0x57, 0x31, 0x00, 0x00, 0x00,
-            0x00, 0x00
-        };
-
-        private static readonly byte[] AreteFlags2Bd3MewOpaqueExtension =
-        {
-            0x3D, 0x00, 0x01, 0xD7, 0x3E, 0x4D, 0x45, 0x57,
-            0x31, 0x4D, 0x45, 0x57, 0x31, 0x00, 0x00, 0x00,
-            0x04, 0x79, 0x7E, 0x30, 0x7E, 0x00
-        };
-
         private static readonly byte[] PetFlags27e2OpaqueExtension =
         {
             0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00
-        };
-
-        private static readonly byte[] AreteFlags27e2OpaqueExtension =
-        {
-            0x04, 0x79, 0x7E, 0x30, 0x7E, 0x00
         };
 
         internal static bool TryDecodePacket(
@@ -623,14 +604,11 @@ namespace AORebirth.CaptureProtocol
                 (result.Flags2 == 0x00000FC4
                     && reader.RemainingEquals(PlayerFlags2Fc4OpaqueExtension))
                 || (result.Flags2 == 0x00000BD3
+                    && Has(result.Flags, IsPet)
                     && reader.RemainingEquals(PetFlags2Bd3OpaqueExtension))
-                || (result.Flags2 == 0x00000BD3
-                    && reader.RemainingEquals(AreteFlags2Bd3OpaqueExtension))
-                || (result.Flags2 == 0x00000BD3
-                    && reader.RemainingEquals(AreteFlags2Bd3MewOpaqueExtension))
                 || (result.Flags2 == 0x000007E2
-                    && (reader.RemainingEquals(PetFlags27e2OpaqueExtension)
-                        || reader.RemainingEquals(AreteFlags27e2OpaqueExtension)));
+                    && Has(result.Flags, IsPet)
+                    && reader.RemainingEquals(PetFlags27e2OpaqueExtension));
             return observedFamily ? reader.ReadRemaining() : new byte[0];
         }
 

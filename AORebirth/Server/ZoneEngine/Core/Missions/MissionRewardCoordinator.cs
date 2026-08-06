@@ -28,7 +28,6 @@ namespace ZoneEngine.Core.Missions
     {
         public MissionRewardDefinition()
         {
-            this.LegacyRewardKeys = new string[0];
             this.StatMutations = new MissionCharacterStatMutation[0];
         }
 
@@ -37,8 +36,6 @@ namespace ZoneEngine.Core.Missions
         public string RewardType { get; set; }
 
         public bool IsResolved { get; set; }
-
-        public IList<string> LegacyRewardKeys { get; set; }
 
         public IList<MissionCharacterStatMutation> StatMutations { get; set; }
     }
@@ -178,19 +175,6 @@ namespace ZoneEngine.Core.Missions
                 return invalid;
             }
 
-            MissionRewardStageRecord legacyStage = this.FindAppliedLegacyReward(
-                characterId,
-                key,
-                definition.LegacyRewardKeys);
-            if (legacyStage != null)
-            {
-                return Result(
-                    MissionRewardExecutionStatus.AlreadyApplied,
-                    legacyStage,
-                    null,
-                    "A legacy reward key already completed this reward.");
-            }
-
             if (effect == null)
             {
                 return Result(MissionRewardExecutionStatus.Unresolved, null, null, "Reward effect is unresolved.");
@@ -320,19 +304,6 @@ namespace ZoneEngine.Core.Missions
                 return invalid;
             }
 
-            MissionRewardStageRecord legacyStage = this.FindAppliedLegacyReward(
-                characterId,
-                key,
-                definition.LegacyRewardKeys);
-            if (legacyStage != null)
-            {
-                return Result(
-                    MissionRewardExecutionStatus.AlreadyApplied,
-                    legacyStage,
-                    null,
-                    "A legacy reward key already completed this reward.");
-            }
-
             if (definition.StatMutations == null || definition.StatMutations.Count == 0)
             {
                 return Result(MissionRewardExecutionStatus.Unresolved, null, null, "Character-stat reward has no resolved mutations.");
@@ -359,20 +330,6 @@ namespace ZoneEngine.Core.Missions
             return Result(MissionRewardExecutionStatus.Rejected, result.Stage, result.StatValues, result.Message);
         }
 
-        public bool IsRewardApplied(int characterId, string questId, string rewardKey)
-        {
-            if (characterId <= 0 || string.IsNullOrWhiteSpace(questId) || string.IsNullOrWhiteSpace(rewardKey))
-            {
-                return false;
-            }
-
-            var key = new MissionRewardKey(new MissionKey(characterId, questId), rewardKey);
-            MissionRewardStageRecord stage = this.repository.Execute(
-                characterId,
-                transaction => transaction.GetReward(key));
-            return stage != null && stage.Status == MissionRewardStatus.Applied;
-        }
-
         private long Now()
         {
             long value = this.utcNowTicks();
@@ -382,44 +339,6 @@ namespace ZoneEngine.Core.Missions
             }
 
             return value;
-        }
-
-        private MissionRewardStageRecord FindAppliedLegacyReward(
-            int characterId,
-            MissionRewardKey canonicalKey,
-            IList<string> legacyRewardKeys)
-        {
-            if (legacyRewardKeys == null || legacyRewardKeys.Count == 0)
-            {
-                return null;
-            }
-
-            return this.repository.Execute(
-                characterId,
-                transaction =>
-                {
-                    for (int index = 0; index < legacyRewardKeys.Count; index++)
-                    {
-                        string legacyRewardKey = legacyRewardKeys[index];
-                        if (string.IsNullOrWhiteSpace(legacyRewardKey)
-                            || string.Equals(
-                                canonicalKey.RewardKey,
-                                legacyRewardKey.Trim(),
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-
-                        MissionRewardStageRecord stage = transaction.GetReward(
-                            new MissionRewardKey(canonicalKey.Mission, legacyRewardKey));
-                        if (stage != null && stage.Status == MissionRewardStatus.Applied)
-                        {
-                            return stage;
-                        }
-                    }
-
-                    return null;
-                });
         }
 
         private static MissionRewardExecutionResult ResolveReward(

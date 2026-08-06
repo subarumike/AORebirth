@@ -101,6 +101,9 @@ namespace ZoneEngine.Core.Playfields
 
         public const string MessageAttackInfo = "AttackInfo";
 
+        public const string MessageCapturedAreteRobotPatrolReplayAssigned =
+            "CapturedAreteRobotPatrolReplayAssigned";
+
         public const string MessageCapturedAreteRobotSpawnCreated = "CapturedAreteRobotSpawnCreated";
 
         public const string MessageCapturedAreteRobotSpawnRowsLoaded = "CapturedAreteRobotSpawnRowsLoaded";
@@ -208,6 +211,9 @@ namespace ZoneEngine.Core.Playfields
 
         public const string StageCapturedAreteRobotSpawnCreated = "captured-arete-robot-spawn-created";
 
+        public const string StageCapturedAreteRobotPatrolReplayAssigned =
+            "captured-arete-robot-patrol-replay-assigned";
+
         public const string StageCapturedAreteRobotSimpleCharFullUpdateBroadcast =
             "captured-arete-robot-simple-char-full-update-broadcast";
 
@@ -270,6 +276,7 @@ namespace ZoneEngine.Core.Playfields
         {
             StageCapturedAreteRobotSpawnRowsLoaded,
             StageCapturedAreteRobotSpawnCreated,
+            StageCapturedAreteRobotPatrolReplayAssigned,
             StageCapturedAreteRobotSimpleCharFullUpdateBroadcast
         };
 
@@ -359,11 +366,14 @@ namespace ZoneEngine.Core.Playfields
             int runSpeed,
             float x,
             float y,
-            float z)
+            float z,
+            float patrolX,
+            float patrolY,
+            float patrolZ)
         {
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "sourceInstance={0:X8} monsterData={1} hp={2} level={3} runSpeed={4} pos={5:0.#####},{6:0.#####},{7:0.#####}",
+                "sourceInstance={0:X8} monsterData={1} hp={2} level={3} runSpeed={4} pos={5:0.#####},{6:0.#####},{7:0.#####} patrol={8:0.#####},{9:0.#####},{10:0.#####}",
                 sourceInstance,
                 monsterData,
                 health,
@@ -371,7 +381,21 @@ namespace ZoneEngine.Core.Playfields
                 runSpeed,
                 x,
                 y,
-                z);
+                z,
+                patrolX,
+                patrolY,
+                patrolZ);
+        }
+
+        public static string FormatCapturedAreteRobotPatrolReplayAssignedDetail(
+            int sourceInstance,
+            int segmentCount)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "sourceInstance={0:X8} segments={1}",
+                sourceInstance,
+                segmentCount);
         }
 
         public static string FormatCapturedAreteRobotSimpleCharFullUpdateDetail(int sourceInstance)

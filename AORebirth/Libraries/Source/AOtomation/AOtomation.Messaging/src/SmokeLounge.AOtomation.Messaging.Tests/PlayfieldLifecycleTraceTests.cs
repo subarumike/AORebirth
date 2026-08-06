@@ -1305,9 +1305,106 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void CapturedAreteRobotSpawnTraceKeepsSetupAndScfuOrderAfterSchema4Activation()
+        public void CapturedAreteRobotContentProviderPreservesPatrolReplayPathAndMissingFileFallback()
+        {
+            Assert.AreEqual(
+                @"Content\Captured\Arete\cleaning_robot_patrol_replay.csv",
+                CapturedAreteRobotContentProvider.PatrolReplayRelativePath);
+            Assert.AreEqual(
+                @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260721-Rox-robots\movement-packets.csv",
+                CapturedAreteRobotContentProvider.EvidenceCapturePatrolReplayRelativePath);
+
+            var provider = new CapturedAreteRobotContentProvider(
+                new[] { Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "movement-packets.csv") });
+
+            Assert.AreEqual(string.Empty, provider.FindPatrolReplayPath());
+            Assert.AreEqual(0, provider.GetPatrolReplaySegments(0x79866553).Length);
+        }
+
+        [TestMethod]
+        public void CapturedAreteRobotContentProviderLoadsCommittedPatrolReplayData()
         {
             var provider = new CapturedAreteRobotContentProvider();
+            string replayPath = provider.FindPatrolReplayPath();
+
+            Assert.IsTrue(File.Exists(replayPath));
+            Assert.IsTrue(
+                replayPath.IndexOf("tools-temp", StringComparison.OrdinalIgnoreCase) < 0,
+                "Runtime replay data must load from committed content, not tools-temp captures.");
+
+            Assert.AreEqual(39, provider.GetPatrolReplaySegments(0x79866553).Length);
+
+            CapturedAreteRobotPatrolReplaySegment first =
+                provider.GetPatrolReplaySegments(0x79866553)[0];
+            Assert.AreEqual(3620.47729f, first.StartX);
+            Assert.AreEqual(51.7449989f, first.StartY);
+            Assert.AreEqual(785.077393f, first.StartZ);
+            Assert.AreEqual(3621.25732f, first.EndX);
+            Assert.AreEqual(52.5f, first.EndY);
+            Assert.AreEqual(784.154419f, first.EndZ);
+        }
+
+        [TestMethod]
+        public void NpcPatrolReplayCoordinatorAssignsCapturedReplaySegmentsFromProvider()
+        {
+            string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            File.WriteAllLines(
+                path,
+                new[]
+                {
+                    "CapturedUtc,MessageType,SourceInstance,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ",
+                    "2026-06-29T19:31:21.0000000Z,FollowTarget,79225E7C,NpcPath,1,2,3,4,5,6",
+                    "2026-06-29T19:31:22.5000000Z,FollowTarget,79225E7C,NpcPath,4,5,6,7,8,9"
+                });
+
+            try
+            {
+                var provider = new CapturedAreteRobotContentProvider(new[] { path });
+                var coordinator = new NpcPatrolReplayCoordinator(provider);
+                NpcPatrolReplaySegment[] assigned = null;
+
+                coordinator.AssignCapturedAreteRobotReplay(
+                    0x79225E7C,
+                    segments => assigned = segments);
+
+                Assert.IsNotNull(assigned);
+                Assert.AreEqual(2, assigned.Length);
+                Assert.AreEqual(1.5, assigned[0].DelayAfterSeconds);
+                Assert.AreEqual(1f, assigned[0].StartX);
+                Assert.AreEqual(2f, assigned[0].StartY);
+                Assert.AreEqual(3f, assigned[0].StartZ);
+                Assert.AreEqual(4f, assigned[0].EndX);
+                Assert.AreEqual(5f, assigned[0].EndY);
+                Assert.AreEqual(6f, assigned[0].EndZ);
+                Assert.AreEqual(0.25, assigned[1].DelayAfterSeconds);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [TestMethod]
+        public void NpcPatrolReplayCoordinatorAssignsEmptyReplayForMissingProviderData()
+        {
+            var provider = new CapturedAreteRobotContentProvider(
+                new[] { Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "movement-packets.csv") });
+            var coordinator = new NpcPatrolReplayCoordinator(provider);
+            NpcPatrolReplaySegment[] assigned = null;
+
+            coordinator.AssignCapturedAreteRobotReplay(
+                0x79225E7C,
+                segments => assigned = segments);
+
+            Assert.IsNotNull(assigned);
+            Assert.AreEqual(0, assigned.Length);
+        }
+
+        [TestMethod]
+        public void CapturedAreteRobotSpawnOrchestrationTraceKeepsSetupReplayAndScfuOrder()
+        {
+            var provider = new CapturedAreteRobotContentProvider();
+            var coordinator = new NpcPatrolReplayCoordinator(provider);
             CapturedAreteRobotSpawnDefinition[] spawns = provider.GetSpawnDefinitions();
             CapturedAreteRobotSpawnDefinition spawn = spawns[0];
             Identity playfield = new Identity { Type = IdentityType.Playfield, Instance = 6553 };
@@ -1321,7 +1418,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn.RunSpeed,
                     spawn.X,
                     spawn.Y,
-                    spawn.Z);
+                    spawn.Z,
+                    spawn.PatrolX,
+                    spawn.PatrolY,
+                    spawn.PatrolZ);
 
             using (PlayfieldLifecycleCapture capture = PlayfieldLifecycleTrace.Capture())
             {
@@ -1340,6 +1440,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     robot,
                     spawnCreatedDetail);
 
+                NpcPatrolReplaySegment[] assigned = null;
+                coordinator.AssignCapturedAreteRobotReplay(spawn.SourceInstance, segments => assigned = segments);
+                Assert.IsNotNull(assigned);
+                Assert.AreEqual(39, assigned.Length);
+
+                PlayfieldLifecycleTrace.Record(
+                    PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                    PlayfieldLifecycleTrace.MessageCapturedAreteRobotPatrolReplayAssigned,
+                    robot,
+                    PlayfieldLifecycleTrace.FormatCapturedAreteRobotPatrolReplayAssignedDetail(
+                        spawn.SourceInstance,
+                        assigned.Length));
                 PlayfieldLifecycleTrace.Record(
                     PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
                     PlayfieldLifecycleTrace.StageCapturedAreteRobotSimpleCharFullUpdateBroadcast,
@@ -1358,6 +1471,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 AssertStageBefore(
                     capture.Events,
                     PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned);
+                AssertStageBefore(
+                    capture.Events,
+                    PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
                     PlayfieldLifecycleTrace.StageCapturedAreteRobotSimpleCharFullUpdateBroadcast);
                 Assert.IsTrue(
                     HasDetail(
@@ -1373,95 +1490,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawnCreatedDetail.IndexOf(
                         "sourceInstance=79866553 monsterData=297023 hp=12 level=1 runSpeed=6",
                         StringComparison.Ordinal) >= 0);
+                Assert.IsTrue(
+                    HasDetail(
+                        capture.Events,
+                        PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                        "sourceInstance=79866553 segments=39"));
             }
-        }
-
-        [TestMethod]
-        public void CapturedAreteRobotPatrolUsesSchema4WithoutLegacyReplayFallback()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string providerText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs"));
-            string orchestratorText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs"));
-            string zoneProjectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
-            string testProjectText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\SmokeLounge.AOtomation.Messaging.Tests.csproj"));
-            string aggregateManifestText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\movement-full\manifest.json"));
-            string aggregateSpawnText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\movement-full\spawn.csv"));
-            string loreleiText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\LoreleiOasisMobRuntime.cs"));
-            string karliText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteKarliCappelleriPatrolRuntime.cs"));
-            string npcControllerText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
-
-            Assert.IsFalse(providerText.Contains("GetPatrolReplaySegments"));
-            Assert.IsFalse(providerText.Contains("PatrolX"));
-            Assert.IsFalse(orchestratorText.Contains("AssignCapturedPatrolWaypoints"));
-            Assert.IsFalse(orchestratorText.Contains("AssignCapturedAreteRobotReplay"));
-            Assert.IsFalse(orchestratorText.Contains("SetCapturedPatrolReplaySegments"));
-            Assert.IsTrue(orchestratorText.Contains("this.activateNpc(mobCharacter);"));
-            Assert.IsFalse(coordinatorText.Contains("CapturedAreteRobot"));
-            Assert.IsTrue(coordinatorText.Contains("BuildCapturedSubwaySegments(int sourceInstance)"));
-            Assert.IsTrue(coordinatorText.Contains("AssignCapturedSubwayReplay("));
-            Assert.IsFalse(zoneProjectText.Contains("cleaning_robot_patrol_replay.csv"));
-            Assert.IsFalse(testProjectText.Contains("cleaning_robot_patrol_replay.csv"));
-            StringAssert.Contains(aggregateManifestText, "20260721-Rox-robots");
-            StringAssert.Contains(aggregateSpawnText, "Lolly the Reet");
-            Assert.IsFalse(loreleiText.Contains("SetCapturedPatrolReplaySegments"));
-            Assert.AreEqual(14, CountOccurrences(karliText, "new NpcPatrolReplaySegment("));
-            Assert.IsTrue(karliText.Contains("InitialPatrolDelaySeconds = 2.4464911;"));
-            Assert.IsTrue(karliText.Contains("InitialPatrolDelaySeconds);"));
-            Assert.IsFalse(karliText.Contains("BuildContinuousLoop"));
-            Assert.IsFalse(karliText.Contains("AreteMobDiagnosticSwitches"));
-            string karliApplyMethod =
-                ExtractMethodBlock(karliText, "public static bool TryApplyPatrol(");
-            Assert.AreEqual(3, CountOccurrences(karliApplyMethod, "false,"));
-            AssertTextBefore(karliApplyMethod, "false,", "InitialPatrolDelaySeconds);");
-            string replayMethod =
-                ExtractMethodBlock(npcControllerText, "private bool TrySendCapturedPatrolReplay()");
-            Assert.IsTrue(
-                replayMethod.Contains("if (!this.capturedPatrolReplayLoops)")
-                && replayMethod.Contains("this.capturedPatrolReplayComplete = true;")
-                && replayMethod.Contains("return true;"));
-            AssertTextBefore(
-                replayMethod,
-                "if (!this.capturedPatrolReplayLoops)",
-                "this.capturedPatrolReplayIndex = 0;");
-            Assert.IsFalse(
-                File.Exists(
-                    Path.Combine(
-                        repositoryRoot,
-                        @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteLollyTheReetPatrolRuntime.cs")));
-            Assert.IsFalse(
-                File.Exists(
-                    Path.Combine(
-                        repositoryRoot,
-                        @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteLeonoraMartyPatrolRuntime.cs")));
         }
 
         [TestMethod]
@@ -5122,13 +5156,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ZoneEngine project must compile PlayfieldVendorRuntimeService.");
             Assert.AreEqual(
                 1,
-                CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider()"),
+                CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
                 "NPCRuntimeService must own captured Arete robot content provider construction.");
             Assert.AreEqual(
                 1,
                 CountOccurrences(
                     npcRuntimeText,
-                    "new NpcPatrolReplayCoordinator(this.capturedSubwayContent)"),
+                    "new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent)"),
                 "NPCRuntimeService must own NPC patrol replay coordinator construction.");
             Assert.AreEqual(
                 1,
@@ -8042,7 +8076,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
 
             Assert.IsTrue(
-                npcRuntimeText.Contains("new CapturedAreteRobotContentProvider()"),
+                npcRuntimeText.Contains("new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
                 "Arete captured robot spawns must keep using CapturedAreteRobotContentProvider.");
             Assert.IsTrue(
                 npcRuntimeText.Contains(
@@ -8072,8 +8106,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "CapturedAreteRobotSpawnOrchestrator must load captured spawns from the provider.");
             Assert.IsTrue(
                 orchestratorText.Contains("for (int i = 0; i < spawns.Length; i++)")
-                && orchestratorText.Contains("CapturedAreteRobotSpawnDefinition spawn = spawns[i];"),
-                "CapturedAreteRobotSpawnOrchestrator must process each captured robot definition by stable slot index.");
+                && orchestratorText.Contains("spawns[i]"),
+                "CapturedAreteRobotSpawnOrchestrator must spawn each captured robot definition.");
 
             Assert.IsFalse(
                 playfieldText.Contains("private static bool IsAreteCleaningRobotTestSpawn"),

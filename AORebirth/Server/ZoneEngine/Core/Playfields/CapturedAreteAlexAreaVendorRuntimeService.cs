@@ -11,210 +11,76 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Core.Vector;
     using AORebirth.Database.Dao;
     using AORebirth.Enums;
-    using AORebirth.Interfaces;
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
 
-    using ZoneEngine.Core.Controllers;
-    using ZoneEngine.Core.MessageHandlers;
-
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     #endregion
 
-    /// <summary>
-    /// Freestanding Arete vendors: Junk Shop, ICC Ammunition (Alex), ICC Tech Supplies (Vernon / Lock Pick).
-    /// Capture 20260801-215330 / 20260721-lockpick.
-    /// </summary>
     internal sealed class CapturedAreteAlexAreaVendorRuntimeService
     {
         private readonly List<Vendor> capturedVendors = new List<Vendor>();
 
-        private readonly object syncRoot = new object();
+        private readonly HashSet<int> spawnedPlayfields = new HashSet<int>();
 
         internal void Spawn(Playfield playfield, Identity playfieldIdentity, PlayfieldDynelRegistry dynelRegistry)
         {
-            this.EnsurePresent(playfield, playfieldIdentity, dynelRegistry);
-        }
-
-        /// <summary>
-        /// Heartbeat-safe: spawn any missing Alex/Vernon freestanding shops (esp. ICC Tech Supplies).
-        /// </summary>
-        internal void EnsurePresent(
-            Playfield playfield,
-            Identity playfieldIdentity,
-            PlayfieldDynelRegistry dynelRegistry)
-        {
             if (playfield == null
                 || dynelRegistry == null
-                || playfieldIdentity.Instance != CapturedAreteAlexAreaVendorContentProvider.AreteLandingPlayfieldId)
+                || playfieldIdentity.Instance != CapturedAreteAlexAreaVendorContentProvider.AreteLandingPlayfieldId
+                || !this.spawnedPlayfields.Add(playfieldIdentity.Instance))
             {
                 return;
             }
 
-            lock (this.syncRoot)
+            int spawned = 0;
+            foreach (CapturedAreteAlexAreaVendorDefinition definition in CapturedAreteAlexAreaVendorContentProvider.Vendors)
             {
-                this.PurgeNonRenderingIccTechLocked(playfieldIdentity, dynelRegistry);
-
-                foreach (CapturedAreteAlexAreaVendorDefinition definition in
-                    CapturedAreteAlexAreaVendorContentProvider.Vendors)
-                {
-                    if (this.HasRegisteredVendor(definition.DisplayName, playfieldIdentity))
-                    {
-                        continue;
-                    }
-
-                    Vendor vendor = this.TryCreateVendor(playfield, playfieldIdentity, definition);
-                    if (vendor == null)
-                    {
-                        continue;
-                    }
-
-                    dynelRegistry.Register(vendor);
-                    this.capturedVendors.Add(vendor);
-                    CapturedAreteAlexAreaVendorRuntimeRegistry.Register(
-                        new CapturedAreteAlexAreaVendorRuntimeDefinition(
-                            playfieldIdentity,
-                            vendor.Identity,
-                            definition.DisplayName));
-                    this.AnnounceToPlayfieldPlayers(playfield, vendor);
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        "Captured Arete Alex-area vendor spawned name="
-                        + definition.DisplayName
-                        + " sourceVendor=VendingMachine:"
-                        + definition.SourceVendorInstance.ToString("X8")
-                        + " runtimeVendor="
-                        + vendor.Identity
-                        + " template="
-                        + vendor.Stats[(int)StatIds.staticinstance].Value
-                        + " stockRows="
-                        + definition.Stock.Count
-                        + " evidence=20260801-215330+20260721-lockpick");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Replace wrong-mesh ICC Tech boxes (live 300946 invisible; 99634 generic SHOP).
-        /// Expected runtime mesh is tip itemref 297290.
-        /// </summary>
-        private void PurgeNonRenderingIccTechLocked(
-            Identity playfieldIdentity,
-            PlayfieldDynelRegistry dynelRegistry)
-        {
-            const int ExpectedIccTechTemplateId = 297290;
-            for (int i = this.capturedVendors.Count - 1; i >= 0; i--)
-            {
-                Vendor vendor = this.capturedVendors[i];
-                if (vendor == null
-                    || !string.Equals(vendor.Name, "ICC Tech Supplies", StringComparison.OrdinalIgnoreCase))
+                Vendor vendor = this.TryCreateVendor(playfield, playfieldIdentity, definition);
+                if (vendor == null)
                 {
                     continue;
                 }
 
-                CapturedAreteAlexAreaVendorRuntimeDefinition runtime;
-                if (!CapturedAreteAlexAreaVendorRuntimeRegistry.TryGet(vendor.Identity.Instance, out runtime)
-                    || !CapturedAreteAlexAreaVendorRuntimeRegistry.Same(
-                        runtime.PlayfieldIdentity,
-                        playfieldIdentity))
-                {
-                    continue;
-                }
-
-                int advertised = vendor.Stats[(int)StatIds.staticinstance].Value;
-                if (advertised == ExpectedIccTechTemplateId)
-                {
-                    continue;
-                }
-
-                CapturedAreteAlexAreaVendorRuntimeRegistry.Remove(vendor.Identity.Instance);
-                if (dynelRegistry != null)
-                {
-                    dynelRegistry.Unregister(vendor.Identity);
-                }
-
-                Pool.Instance.RemoveObject(vendor);
-                this.capturedVendors.RemoveAt(i);
+                dynelRegistry.Register(vendor);
+                this.capturedVendors.Add(vendor);
+                spawned++;
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
-                    "Purged wrong-mesh ICC Tech Supplies template="
-                    + advertised
-                    + " for respawn as "
-                    + ExpectedIccTechTemplateId);
+                    "Captured Arete Alex-area vendor spawned name="
+                    + definition.DisplayName
+                    + " sourceVendor=VendingMachine:"
+                    + definition.SourceVendorInstance.ToString("X8")
+                    + " runtimeVendor="
+                    + vendor.Identity
+                    + " template="
+                    + vendor.Stats[(int)StatIds.staticinstance].Value
+                    + " stockRows="
+                    + definition.Stock.Count
+                    + " evidence=20260720-074847+20260721-lockpick");
+            }
+
+            if (spawned == 0)
+            {
+                this.spawnedPlayfields.Remove(playfieldIdentity.Instance);
             }
         }
 
         internal void Clear(Identity playfieldIdentity, PlayfieldDynelRegistry dynelRegistry)
         {
-            lock (this.syncRoot)
+            this.spawnedPlayfields.Remove(playfieldIdentity.Instance);
+            foreach (Vendor vendor in this.capturedVendors)
             {
-                CapturedAreteAlexAreaVendorRuntimeRegistry.RemoveForPlayfield(playfieldIdentity);
-                foreach (Vendor vendor in this.capturedVendors)
-                {
-                    if (dynelRegistry != null)
-                    {
-                        dynelRegistry.Unregister(vendor.Identity);
-                    }
-
-                    Pool.Instance.RemoveObject(vendor);
-                }
-
-                this.capturedVendors.Clear();
-            }
-        }
-
-        private bool HasRegisteredVendor(string displayName, Identity playfieldIdentity)
-        {
-            for (int i = 0; i < this.capturedVendors.Count; i++)
-            {
-                Vendor vendor = this.capturedVendors[i];
-                if (vendor == null
-                    || !string.Equals(vendor.Name, displayName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                CapturedAreteAlexAreaVendorRuntimeDefinition runtime;
-                if (CapturedAreteAlexAreaVendorRuntimeRegistry.TryGet(vendor.Identity.Instance, out runtime)
-                    && CapturedAreteAlexAreaVendorRuntimeRegistry.Same(
-                        runtime.PlayfieldIdentity,
-                        playfieldIdentity))
-                {
-                    // Still alive in pool?
-                    Vendor live = Pool.Instance.GetObject<Vendor>(
-                        playfieldIdentity,
-                        vendor.Identity);
-                    if (live != null)
-                    {
-                        return true;
-                    }
-                }
+                dynelRegistry.Unregister(vendor.Identity);
+                Pool.Instance.RemoveObject(vendor);
             }
 
-            return false;
-        }
-
-        private void AnnounceToPlayfieldPlayers(Playfield playfield, Vendor vendor)
-        {
-            if (playfield == null || vendor == null)
-            {
-                return;
-            }
-
-            foreach (ICharacter character in playfield.EnumerateActiveCharacters())
-            {
-                if (character == null || !(character.Controller is PlayerController))
-                {
-                    continue;
-                }
-
-                VendingMachineFullUpdateMessageHandler.Default.SendAreteFreestanding(character, vendor);
-            }
+            this.capturedVendors.Clear();
         }
 
         private Vendor TryCreateVendor(
@@ -227,8 +93,6 @@ namespace ZoneEngine.Core.Playfields
             {
                 int captureTemplateId = definition.TemplateId;
                 int templateId = captureTemplateId;
-                // Prefer definition template (297290 for ICC Tech). Only fall back to 99634 when
-                // the preferred template is missing from ItemLoader/ItemNamesDao.
                 if (!ItemLoader.ItemList.ContainsKey(templateId)
                     || ItemNamesDao.Instance.Get(templateId) == null)
                 {
@@ -242,14 +106,6 @@ namespace ZoneEngine.Core.Playfields
                             + CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId);
                     }
 
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        "Arete Alex-area vendor template fallback capture="
-                        + captureTemplateId
-                        + " runtime="
-                        + CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId
-                        + " name="
-                        + definition.DisplayName);
                     templateId = CapturedAreteAlexAreaVendorContentProvider.RuntimeVendorTemplateFallbackId;
                 }
 
@@ -264,9 +120,7 @@ namespace ZoneEngine.Core.Playfields
                             "Arete Alex-area vendor skip missing stock low="
                             + stock.LowId
                             + " high="
-                            + stock.HighId
-                            + " name="
-                            + definition.DisplayName);
+                            + stock.HighId);
                         continue;
                     }
 
@@ -294,8 +148,7 @@ namespace ZoneEngine.Core.Playfields
                     definition.HeadingZ,
                     definition.HeadingW);
                 vendor.Playfield = playfield;
-                vendor.Stats[(int)StatIds.staticinstance].Value = templateId;
-                vendor.Stats[0x17].Value = templateId;
+                vendor.Stats[(int)StatIds.staticinstance].Value = captureTemplateId;
 
                 if (vendor.BaseInventory != null)
                 {
@@ -322,7 +175,7 @@ namespace ZoneEngine.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "Captured Arete Alex-area vendor refused name="
-                    + (definition == null ? "?" : definition.DisplayName)
+                    + definition.DisplayName
                     + " reason="
                     + ex.GetType().Name
                     + ": "

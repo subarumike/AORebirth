@@ -9,12 +9,13 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Complete AOtomation suite: 1038/1038 PASS with no skipped, hidden, or
-  reclassified failures.
-- Arete acceptance: 60/60 PASS.
-- Arete combat catalog: 57/57 PASS.
-- Arete active coverage: 8/8 PASS.
-- Arete loot foundation: 14/14 PASS.
+- Complete AOtomation suite: PASS (989/989).
+- Arete is restored to commit
+  `fadc678e2ab991ddff032061d2b3fdd8ec8ba857`, the final commit before the
+  2026-07-23 through 2026-08-06 rollback window.
+- The post-cutoff Arete 60/60 script, expanded combat catalog, expanded active
+  coverage, and expanded loot foundation are retired by this rollback; they are
+  no longer current acceptance gates.
 - PF127 Subway acceptance: PASS.
 - PF1931 Temple acceptance: PASS.
 - PF1931 official-client post-login acceptance: PASS. The static
@@ -40,10 +41,12 @@ sessions, 3,269 complete attack chains, 260 certified profiles, 96 runtime-ready
 profiles, 309 semantic definitions, 101 runtime-ready definitions, and 1,486
 explicitly unresolved observations with zero generator errors.
 
-The active-coverage projection contains 1,600 fixed initial actors and a 1,602
-configured maximum across 1,576 binding records. Unsupported or conflicting observations remain
-fail-closed. The 2026-08-01 reconciliation promoted only Cedric Harding's exact
-PF6553 source-bound profile; no unsupported runtime behavior was added.
+The active-coverage projection is regenerated for the restored pre-cutoff Arete
+population: 1,529 actors, 1,515 binding records, and maximum actor index 1,531.
+The transactional generator and current-cohort validation both pass with
+generation identity
+`2512f9652d8549eac1c7bc767ab4810fbf7f28b7129c0094c947baeecf06fb6c`.
+Unsupported or conflicting observations remain fail-closed.
 
 The generated combat surface is now one six-file cohort: five semantic artifacts
 plus a manifest commit marker. A multi-reader/single-writer lease protects
@@ -51,7 +54,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`4217fcc90b5adc10847c647d8134dea271c9c2cc73cae94a0ca34b4bd37950cf`.
+`2512f9652d8549eac1c7bc767ab4810fbf7f28b7129c0094c947baeecf06fb6c`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
@@ -112,9 +115,9 @@ migrations; details and exact source references are recorded in
 
 ## Supported playfields
 
-- Arete is complete for behavior supported by the complete repository and
-  capture corpus. Unknown probabilities, unseen branches, and unmeasured values
-  remain explicit evidence gaps.
+- Arete is restored to the behavior, content, and evidence boundary present at
+  the 2026-07-22 cutoff. Post-cutoff alien-area, sandstorm, movement, quest,
+  vendor, loot, and 60/60 acceptance promotions are no longer supported.
 - PF127 Subway is complete for its current capture-backed population,
   navigation, combat, lifecycle, loot, vendor, Karrec, zoning, and teardown
   contracts. New behavior still requires capture evidence.

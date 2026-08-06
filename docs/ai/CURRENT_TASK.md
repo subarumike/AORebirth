@@ -2,30 +2,25 @@
 
 ## Active
 
-No implementation is active after delivery of the Arete large-capture
-reconciliation. The standing gameplay priority returns to incremental
-capture-backed PF127 Subway work when Mike supplies or requests the next task.
+Rollback every Arete change made after the 2026-07-22 cutoff while preserving
+later Subway, Temple, mission, pet, and infrastructure work that is not Arete
+specific.
 
-## Reconciliation scope
+## Rollback scope
 
-- Regenerate the active-coverage cohort from current runtime/capture authority.
-- Reconcile Arete acceptance assertions with the current 1,600-actor initial
-  population and 1,602 configured maximum.
-- Restore atomic, legacy-aware rewards and retry-safe item/mission handoffs for
-  Marcus Wounded Workers, Flint Bio-Com, Stan Goodman, and the Rex/Marcus chain.
-- Restore the tracked PF1931 world-interaction decoder deleted by the Arete
-  merge.
-- Preserve all supported capture-backed combat, movement, population, dialogue,
-  timing, quest, and loot values.
+- Restore Arete runtime, content, quests, vendors, loot, movement, tests, and
+  evidence to commit `fadc678e2ab991ddff032061d2b3fdd8ec8ba857`.
+- Remove shared-runtime registrations and packet paths that only served the
+  reverted Arete additions.
+- Reconcile the generated combat cohort from the restored runtime authority;
+  do not hand-edit generated output.
+- Retire the post-cutoff Arete 60/60 acceptance script and assertions while
+  retaining the pre-cutoff Arete coverage in the complete AOtomation suite.
+- Build, validate, restart engines, commit, and push only the rollback.
 
 ## Delivery acceptance
 
-- Generated combat cohort validation: PASS, identity
-  `4217fcc90b5adc10847c647d8134dea271c9c2cc73cae94a0ca34b4bd37950cf`.
-- Arete acceptance: 60/60 PASS.
-- Complete AOtomation suite: 1,038/1,038 PASS.
-- Debug build and the complete mandatory integration gate pass twice from the
-  unchanged delivery commit.
-- Database preflight and restarted Chat/Login/Zone exact-port ownership pass;
-  optional WebEngine remains inactive.
-- Audit evidence: `docs/evidence/ARETE_LARGE_CAPTURE_RECONCILIATION_20260805.md`.
+- Generated combat cohort write and validation: PASS (`2512f9652d8549eac1c7bc767ab4810fbf7f28b7129c0094c947baeecf06fb6c`).
+- Complete AOtomation suite: PASS (989/989).
+- Debug build: PASS against the final generated cohort.
+- Engine restart and exact-port ownership: PASS (Chat 6996/7012, Login 7500, Zone 7501).

@@ -929,13 +929,6 @@ namespace ZoneEngine.Core
                 throw new NullReferenceException("No item found at " + itemPosition);
             }
 
-            // Capture Marco Nanoprogram Container: unpack Overflow nanos BEFORE backpack / skill-lock
-            // fallthrough (crystal templates can look Use-locked or container-like).
-            if (CapturedAreteMarcoSpidaNanoPackageRuntime.TryHandleCrystalUse(character, itemPosition, item))
-            {
-                return true;
-            }
-
             if (this.TryOpenBackpackContainer(character, itemPosition, item))
             {
                 return true;
@@ -972,14 +965,8 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            // Capture 20260730-214622 / 20260726-073341: Use inventory credit card → steal 15000 credits.
-            if (LeonoraMartyQuestRuntime.TryHandleCreditCardStealUse(character, itemPosition, item))
-            {
-                return true;
-            }
-
-            // Capture 20260726-finish leonora: Use Vacuum Packed Omni-Med Suit → armor pieces.
-            if (LeonoraMartyQuestRuntime.TryHandleVacuumPackedOmniMedSuitUse(character, itemPosition, item))
+            // Capture 20260721-nano-enforcer-arete: Use Marco Enforcer crystal → Overflow nanos + tip.
+            if (CapturedAreteMarcoSpidaNanoPackageRuntime.TryHandleCrystalUse(character, itemPosition, item))
             {
                 return true;
             }
@@ -989,20 +976,6 @@ namespace ZoneEngine.Core
 
             // Capture 20260723-123341: every token-board Use → FormatFeedback first, then upgrade funcs.
             if (TokenBoardRuntime.TryHandleUse(character, itemPosition, item))
-            {
-                return true;
-            }
-
-            if (ShinySwordQuestRuntime.TryHandleShinySwordUse(character, itemPosition, item)
-                || LeonoraMartyQuestRuntime.TryHandleCreditCardStealUse(character, itemPosition, item)
-                || LeonoraMartyQuestRuntime.TryHandleVacuumPackedOmniMedSuitUse(
-                    character,
-                    itemPosition,
-                    item)
-                || KarliCappelleriQuestRuntime.TryHandleFriendlyBuffUse(
-                    character,
-                    itemPosition,
-                    item))
             {
                 return true;
             }

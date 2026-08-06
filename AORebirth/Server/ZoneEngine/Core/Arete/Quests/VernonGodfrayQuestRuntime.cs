@@ -74,23 +74,19 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int CapturedTradeSlotCount = 1;
 
-        // Capture 20260801-104528 system-messages #219: Received reward: 2596 XP, 1320 credits.
-        private const int HackTurnInXpReward = 2596;
+        private const int HackTurnInXpReward = 2229;
 
         private const int HackTurnInCreditReward = 1320;
 
-        // Capture 20260801-105429 system-messages #1592: Received reward: 2596 XP, 1360 credits.
-        private const int ReturnTurnInXpReward = 2596;
+        private const int ReturnTurnInXpReward = 2229;
 
         private const int ReturnTurnInCreditReward = 1360;
 
-        // Capture 20260801-104528 system-messages #219 FormattedMessage=
-        // "Received reward: 2596 XP, 1320 credits."
-        private const string HackTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!?Oi!!!0N~";
+        // Capture 20260721-Vernon-Godfray FormatFeedback after Hacked Library Accept.
+        private const string HackTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!;4i!!!0N~";
 
-        // Capture 20260801-105429 system-messages #1592 FormattedMessage=
-        // "Received reward: 2596 XP, 1360 credits."
-        private const string ReturnTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!?Oi!!!1!~";
+        // Capture 20260721-Vernon-Godfray FormatFeedback after return chip Accept (1360 credits).
+        private const string ReturnTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!;4i!!!1!~";
 
         private const string VernonTradePrompt =
             "Drag and drop the item(s) you want to give to Vernon Godfray into one of the slots available and press \"accept\"";
@@ -429,12 +425,10 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            // Capture 20260801-104528: always try grant both tools. Owning only a vendor
-            // Hacker Tool (87810) must not skip Omni-Tek Technical Library (248377).
             if (IsMissionLifecycle(source, HackingSkillsQuestId, true, true)
-                && HasBothStarterTools(source))
+                || HasStarterTools(source))
             {
-                Log("well-what ignored — hacking tip + both tools already present");
+                Log("well-what ignored — vernon tools/tip already progressed");
                 return true;
             }
 
@@ -485,8 +479,6 @@ namespace ZoneEngine.Core.Arete.Quests
 
             if (IsMissionLifecycle(source, HackingSkillsQuestId, true, false))
             {
-                // Heal missing Library when player already owned a Hacker Tool from vendors.
-                TryGrantStarterTools(source);
                 SafeQuestFullUpdateSender.TrySendSpeakVernonToHackingSkillsHandoff(source);
                 return true;
             }
@@ -554,35 +546,26 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void TryGrantStarterTools(ICharacter source)
         {
-            // Capture 20260801-104528 TemplateAction order: Library 248377 then Hacker Tool 87810.
-            bool libraryGranted = TryGrantOverflowItem(source, OmniTekTechnicalLibraryItemId, 1);
-            bool toolGranted = TryGrantOverflowItem(source, HackerToolItemId, 1);
-            Log(
-                "starter-tools character="
-                + (source == null ? "<null>" : source.Identity.ToString(true))
-                + " library="
-                + (libraryGranted ? "granted-or-present" : "failed")
-                + " hackerTool="
-                + (toolGranted ? "granted-or-present" : "failed"));
+            TryGrantOverflowItem(source, OmniTekTechnicalLibraryItemId, 1);
+            TryGrantOverflowItem(source, HackerToolItemId, 1);
         }
 
-        /// <returns>True when item is already carried or grant packets were sent.</returns>
-        private static bool TryGrantOverflowItem(ICharacter source, int itemId, int quality)
+        private static void TryGrantOverflowItem(ICharacter source, int itemId, int quality)
         {
             if (source == null || itemId <= 0)
             {
-                return false;
+                return;
             }
 
             if (!ItemLoader.ItemList.ContainsKey(itemId))
             {
                 Log("grant skipped: ItemLoader missing id=" + itemId);
-                return false;
+                return;
             }
 
             if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(source, itemId))
             {
-                return true;
+                return;
             }
 
             Item item;
@@ -593,7 +576,7 @@ namespace ZoneEngine.Core.Arete.Quests
             catch (Exception ex)
             {
                 Log("item create failed id=" + itemId + " err=" + ex.Message);
-                return false;
+                return;
             }
 
             QuestRewardInventoryGrantResult grant =
@@ -607,11 +590,10 @@ namespace ZoneEngine.Core.Arete.Quests
                     + grant.Status
                     + " invErr="
                     + grant.InventoryError);
-                return false;
+                return;
             }
 
             SendOverflowGrantPackets(source, itemId, quality);
-            return true;
         }
 
         private static void SendOverflowGrantPackets(ICharacter source, int itemId, int quality)
@@ -645,21 +627,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 });
         }
 
-        private static bool HasBothStarterTools(ICharacter source)
-        {
-            return InventoryContainerRuntimeService.Default.HasCharacterInventory(source)
-                   && InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
-                          source,
-                          OmniTekTechnicalLibraryItemId)
-                   && InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
-                          source,
-                          HackerToolItemId);
-        }
-
         private static bool HasStarterTools(ICharacter source)
         {
-            // Legacy name kept for ResolveVernonStartNodeId callers: either tool means
-            // Vernon already started the hack chain. Prefer HasBothStarterTools for grants.
             return InventoryContainerRuntimeService.Default.HasCharacterInventory(source)
                    && (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
                            source,
@@ -833,9 +802,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 // Empty RejectedItems keeps server item, but client trade chrome still hides the
                 // icon — same as PersonalizedRobotBrain: Overflow TemplateAction redraw once.
                 TryForceReturnHackedTechnicalLibrary(source);
-                    // Capture 20260801-104528: FormatFeedback → Cash → XP.
-                    TrySendHackTurnInRewardFeedback(source);
-                    ApplyHackTurnInXpCredits(source);
+                ApplyHackTurnInXpCredits(source);
+                TrySendHackTurnInRewardFeedback(source);
                 CompleteGiveLibraryAndOfferCargoLifting(source);
                 ForgetTradeSession(source);
                 try
@@ -955,20 +923,9 @@ namespace ZoneEngine.Core.Arete.Quests
                     Log("vernon-return-rejecteditems failed: " + ex.Message);
                 }
 
-                // Capture 20260801-105429 #1592–#1605: FormatFeedback → Cash/XP →
-                // TemplateAction 296575 → Feedback 110 → tip handoff.
-                TrySendReturnTurnInRewardFeedback(source);
-                ApplyReturnTurnInXpCredits(source);
                 TryGrantBlankIccIdChip(source);
-                try
-                {
-                    FeedbackMessageHandler.Default.Send(source, 110, 108871108);
-                }
-                catch (Exception ex)
-                {
-                    Log("vernon-return-feedback110 failed: " + ex.Message);
-                }
-
+                ApplyReturnTurnInXpCredits(source);
+                TrySendReturnTurnInRewardFeedback(source);
                 CompleteReturnAndOfferDoctorMason(source);
                 ForgetTradeSession(source);
                 try
@@ -1027,14 +984,62 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void ApplyReturnTurnInXpCredits(ICharacter source)
         {
-            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
-                source,
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-vernon-return-chip-turnin-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = ReturnTurnInCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = ReturnTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = ReturnTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
                 ReturnToVernonGodfrayQuestId,
-                "arete-credits-awarded-vernon-return-turnin",
-                ReturnTurnInCreditReward,
-                "arete-xp-awarded-vernon-return-turnin",
-                ReturnTurnInXpReward,
-                "vernon-return-chip-turnin-2596xp");
+                definition,
+                "capture:20260721-Vernon-Godfray:vernon-return-turnin-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
         }
 
         private static void TrySendReturnTurnInRewardFeedback(ICharacter source)
@@ -1091,14 +1096,62 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void ApplyHackTurnInXpCredits(ICharacter source)
         {
-            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
-                source,
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-vernon-hack-library-turnin-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = HackTurnInCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = HackTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = HackTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
                 GiveHackedTechnicalLibraryQuestId,
-                "arete-credits-awarded-vernon-hack-turnin",
-                HackTurnInCreditReward,
-                "arete-xp-awarded-vernon-hack-turnin",
-                HackTurnInXpReward,
-                "vernon-hack-library-turnin-2596xp");
+                definition,
+                "capture:20260721-Vernon-Godfray:vernon-hack-turnin-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
         }
 
         private static void TrySendHackTurnInRewardFeedback(ICharacter source)

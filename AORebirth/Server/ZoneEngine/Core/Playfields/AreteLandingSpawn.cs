@@ -47,9 +47,6 @@ namespace AORebirth.Core.Playfields
         // pad check and TickEnsure respawns forever (~100 stacked).
         private static readonly Dictionary<int, int> LivingCaptureSlots = new Dictionary<int, int>();
 
-        private static readonly Dictionary<int, Dictionary<int, DateTime>> CapturedRespawnDueUtcByPlayfield =
-            new Dictionary<int, Dictionary<int, DateTime>>();
-
         private const string TemplateHash = "BART";
 
         private sealed class AreteNpc
@@ -85,8 +82,6 @@ namespace AORebirth.Core.Playfields
             public int[][] Meshes;
             /// <summary>Live capture SimpleChar instance; 0 = runtime pool id.</summary>
             public int CaptureInstance;
-            /// <summary>Measured death-to-replacement delay; 0 keeps legacy ensure behavior.</summary>
-            public double RespawnSeconds;
         }
 
         private static readonly AreteNpc[] Npcs =
@@ -225,32 +220,12 @@ namespace AORebirth.Core.Playfields
                 Name = "Kneebreaker Alfonzo Rizzolo",
                 CaptureInstance = unchecked((int)0x7981F40C),
                 Level = 4, Health = 28, MonsterData = 165196, Scale = 110, VisualFlags = 31, HeadMesh = 40117, RunSpeed = 17,
-                // Complete 20260722-152454 SCFU generations 7989147B/79891517/7989151B
-                // and the correlated NPC-first aggro row all identify family 137. That
-                // supersedes the older contradictory landing literal 103.
-                NpcFamily = 137, LosHeight = 0, CharacterFlags = 269226497, AppearanceValue = 1672,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 269226497, AppearanceValue = 1672,
                 Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
                 X = 3580.73462f, Y = 8.055f, Z = 833.1199f,
                 Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = new[] { new[] { 0, 0 }, new[] { 1, 81912 }, new[] { 2, 81914 }, new[] { 3, 81909 }, new[] { 4, 81917 } },
                 Meshes = new[] { new[] { 0, 40117, 0, 4 }, new[] { 1, 7826, 0, 2 } },
-                // Capture 20260722-152454 enemy-respawns.csv: 26.923 seconds death-to-replacement.
-                RespawnSeconds = 26.923,
-            },
-            new AreteNpc
-            {
-                // Capture 20260722-152454 SCFU SimpleChar:79891509.
-                Name = "Violent Protester",
-                CaptureInstance = unchecked((int)0x79891509),
-                Level = 3, Health = 14, MonsterData = 203740, Scale = 92, VisualFlags = 31, HeadMesh = 40127, RunSpeed = 13,
-                NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1416,
-                Side = 0, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
-                X = 3505.53418f, Y = 5.11000061f, Z = 823.417725f,
-                Hx = 0f, Hy = -0.7057521f, Hz = 0f, Hw = 0.7084589f,
-                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
-                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40127, 0, 4 }, new[] { 1, 284183, 0, 2 } },
-                // Median clean replacement interval across captures 104809/152454: 19.958 seconds.
-                RespawnSeconds = 19.958,
             },
             new AreteNpc
             {
@@ -483,16 +458,16 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260721-sara 79851D20 (scfu); package capture 20260802-advy-nano-package
-                CaptureInstance = unchecked((int)0x79851D20),
+                // Capture 20260720-goldman 7982B96D (dossier)
+                CaptureInstance = unchecked((int)0x7982B96D),
                 Name = "Cedric Harding",
-                Level = 6, Health = 42, MonsterData = 165188, Scale = 120, VisualFlags = 31, HeadMesh = 40690, RunSpeed = 22,
-                NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1417,
+                Level = 6, Health = 42, MonsterData = 165188, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 23,
+                NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
-                X = 3501.89f, Y = 5.11000061f, Z = 825.466f,
-                Hx = 0.0f, Hy = 0.709269166f, Hz = 0.0f, Hw = 0.7049378f,
-                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
-                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40690, 0, 4 }, new[] { 1, 81800, 0, 2 } },
+                X = 3501.87085f, Y = 5.11000061f, Z = 825.5927f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
             },
             new AreteNpc
             {
@@ -769,13 +744,12 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260720-goldman 78E0FC74 (scfu); pathing 20260726-leonora-pathing
+                // Capture 20260720-goldman 78E0FC74 (scfu)
                 CaptureInstance = unchecked((int)0x78E0FC74),
                 Name = "Leonora Marty",
                 Level = 10, Health = 227, MonsterData = 26125, Scale = 100, VisualFlags = 31, HeadMesh = 40228, RunSpeed = 34,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1864,
-                // Capture path Animation/MoveMode=24 (Walk). SCFU MovementMode=3 is Run enum and made her sprint.
-                Side = 0, Breed = 2, Gender = 3, Race = 1, Fatness = 1, MovementMode = 2,
+                Side = 0, Breed = 2, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
                 X = 3440.039f, Y = 9.01f, Z = 858.082642f,
                 Hx = 0.0f, Hy = 0.611119151f, Hz = 0.0f, Hw = 0.7915386f,
                 Textures = new[] { new[] { 0, 85939 }, new[] { 1, 296228 }, new[] { 2, 296231 }, new[] { 3, 296229 }, new[] { 4, 296230 } },
@@ -1008,7 +982,7 @@ namespace AORebirth.Core.Playfields
             {
                 // Capture 20260720-goldman 78E0FC65 (scfu)
                 CaptureInstance = unchecked((int)0x78E0FC65),
-                Name = "Stanley Goodman",
+                Name = "Stan Goodman",
                 Level = 20, Health = 559, MonsterData = 26084, Scale = 110, VisualFlags = 31, HeadMesh = 40689, RunSpeed = 69,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
@@ -1270,22 +1244,6 @@ namespace AORebirth.Core.Playfields
         {
             SpawnedPlayfields.Remove(playfieldInstance);
             LivingCaptureSlots.Clear();
-            CapturedRespawnDueUtcByPlayfield.Remove(playfieldInstance);
-        }
-
-        /// <summary>
-        /// Capture SCFU instance → current live pool instance for a spawned Arete NPC.
-        /// Used by dialogue routing when client/target ids are pool ids, not capture ids.
-        /// </summary>
-        internal static bool TryGetLivingPoolInstance(int captureInstance, out int poolInstance)
-        {
-            if (captureInstance == 0)
-            {
-                poolInstance = 0;
-                return false;
-            }
-
-            return LivingCaptureSlots.TryGetValue(captureInstance, out poolInstance);
         }
 
         public static void SpawnForPlayfield(
@@ -1309,9 +1267,6 @@ namespace AORebirth.Core.Playfields
                 TickEnsureMissingNpcs(playfield, playfieldIdentity, activateNpc);
                 return;
             }
-
-            CapturedRespawnDueUtcByPlayfield[playfieldIdentity.Instance] =
-                new Dictionary<int, DateTime>();
 
             int spawned = 0;
             try
@@ -1360,55 +1315,16 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            Dictionary<int, DateTime> respawnDueUtc;
-            if (!CapturedRespawnDueUtcByPlayfield.TryGetValue(
-                    playfieldIdentity.Instance,
-                    out respawnDueUtc))
-            {
-                respawnDueUtc = new Dictionary<int, DateTime>();
-                CapturedRespawnDueUtcByPlayfield[playfieldIdentity.Instance] = respawnDueUtc;
-            }
-
-            DateTime utcNow = DateTime.UtcNow;
             foreach (AreteNpc def in Npcs)
             {
-                bool wasTracked = def.CaptureInstance != 0
-                                  && LivingCaptureSlots.ContainsKey(def.CaptureInstance);
                 if (IsNpcPresent(playfield, def))
                 {
-                    if (def.CaptureInstance != 0)
-                    {
-                        respawnDueUtc.Remove(def.CaptureInstance);
-                    }
-
                     continue;
-                }
-
-                DateTime dueUtc;
-                if (def.RespawnSeconds > 0.0)
-                {
-                    if (!respawnDueUtc.TryGetValue(def.CaptureInstance, out dueUtc))
-                    {
-                        if (wasTracked)
-                        {
-                            respawnDueUtc[def.CaptureInstance] = utcNow
-                                + TimeSpan.FromSeconds(def.RespawnSeconds);
-                            continue;
-                        }
-                    }
-                    else if (dueUtc > utcNow)
-                    {
-                        continue;
-                    }
                 }
 
                 try
                 {
-                    if (SpawnOne(playfield, playfieldIdentity, activateNpc, def)
-                        && def.CaptureInstance != 0)
-                    {
-                        respawnDueUtc.Remove(def.CaptureInstance);
-                    }
+                    SpawnOne(playfield, playfieldIdentity, activateNpc, def);
                 }
                 catch (Exception ex)
                 {
@@ -1481,11 +1397,6 @@ namespace AORebirth.Core.Playfields
 
                 if (string.Equals(npc.Name, def.Name, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (def.CaptureInstance != 0)
-                    {
-                        LivingCaptureSlots[def.CaptureInstance] = npc.Identity.Instance;
-                    }
-
                     return true;
                 }
             }
@@ -1636,7 +1547,6 @@ namespace AORebirth.Core.Playfields
 
             ApplyAppearance(mob, def);
             mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
-            PrepareCapturedLandingCombat(mob, npcController, def);
             if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.DogName, StringComparison.OrdinalIgnoreCase))
             {
                 ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.PrepareSpawnedDog(mob, npcController);
@@ -1645,11 +1555,6 @@ namespace AORebirth.Core.Playfields
             if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PeacekeeperName, StringComparison.OrdinalIgnoreCase))
             {
                 ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PrepareSpawnedPeacekeeper(mob, npcController);
-            }
-
-            if (AreteRexLarssonIdleGestureRuntime.IsRexLarsson(mob))
-            {
-                AreteRexLarssonIdleGestureRuntime.Register(mob);
             }
 
             ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.TryApplyPatrol(def.CaptureInstance, npcController);
@@ -1663,60 +1568,6 @@ namespace AORebirth.Core.Playfields
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
             return true;
-        }
-
-        private static void PrepareCapturedLandingCombat(
-            Character mob,
-            NPCController controller,
-            AreteNpc def)
-        {
-            bool capturedAutomaticCombatEligibility =
-                def != null
-                && ((def.NpcFamily == 103
-                     && def.MonsterData == 203740
-                     && def.Level == 3
-                     && string.Equals(
-                         def.Name,
-                         "Violent Protester",
-                         StringComparison.Ordinal))
-                    || (def.NpcFamily == 137
-                        && def.MonsterData == 165196
-                        && def.Level == 4
-                        && string.Equals(
-                            def.Name,
-                            "Kneebreaker Alfonzo Rizzolo",
-                            StringComparison.Ordinal)));
-            if (!capturedAutomaticCombatEligibility)
-            {
-                return;
-            }
-
-            CapturedEnemyCombatContract contract;
-            string resolutionFailure;
-            if (!CapturedEnemyCombatProfileCatalog
-                    .TryCreateExactCapturedAttackOnSightContract(
-                        AreteLandingPlayfieldId,
-                        def.Name,
-                        def.MonsterData,
-                        def.Level,
-                        out contract,
-                        out resolutionFailure))
-            {
-                // Aggro eligibility and packet emission are independent evidence. Keep
-                // Kneebreaker's proven eligibility, but quarantine combat because the
-                // complete corpus contains no exact captured attack packet contract.
-                contract = CapturedEnemyCombatContract.Unresolved(
-                    "Arete landing automatic-combat eligibility is captured; exact packet contract unavailable: "
-                    + resolutionFailure,
-                    true);
-            }
-
-            string prepareFailure;
-            CapturedEnemyCombatRuntime.Prepare(
-                mob,
-                controller,
-                contract,
-                out prepareFailure);
         }
 
         private static void ApplyAppearance(Character mob, AreteNpc def)

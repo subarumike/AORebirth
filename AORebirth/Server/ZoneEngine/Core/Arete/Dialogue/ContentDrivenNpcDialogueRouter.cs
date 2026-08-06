@@ -41,12 +41,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private const int MarcusStoneInstance = unchecked((int)0x782DE567);
 
-        private const int BarryFoodVendorInstance = unchecked((int)0x78E0FC7D);
-
-        private const int BorisPeacekeeperInstance = unchecked((int)0x782DE699);
-
-        private const int DesmondCalitriInstance = unchecked((int)0x78E0FC77);
-
         private const int FlintNovakInstance = unchecked((int)0x78E0FC64);
 
         private const int AlexGibbsInstance = unchecked((int)0x78E0FC61);
@@ -62,22 +56,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const int ShippingManifestTerminalInstance = unchecked((int)0x78E0FC6A);
         private const int MarcoSpidaInstance = unchecked((int)0x78E0FC81);
         private const int VaughnHammondInstance = unchecked((int)0x78E0FC73);
-        private const int AntonioStacklundInstance = unchecked((int)0x78E0FC7C);
-        private const int KarliCappelleriInstance = unchecked((int)0x799AD394);
-        private const int LeonoraMartyInstance = unchecked((int)0x78E0FC74);
-        private const int PatrickSunInstance = unchecked((int)0x78E0FC7B);
-        private const int RemiGalloisInstance = unchecked((int)0x78E0FC75);
-        private const int GreedyDesertReetInstance = unchecked((int)0x79978BB8);
 
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
 
         private const string MarcusStoneNpcIdentity = "SimpleChar:782DE567";
-
-        private const string BarryFoodVendorNpcIdentity = "SimpleChar:78E0FC7D";
-
-        private const string BorisPeacekeeperNpcIdentity = "SimpleChar:782DE699";
-
-        private const string DesmondCalitriNpcIdentity = "SimpleChar:78E0FC77";
 
         private const string FlintNovakNpcIdentity = "SimpleChar:78E0FC64";
 
@@ -92,12 +74,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const string ShippingManifestTerminalNpcIdentity = "SimpleChar:78E0FC6A";
         private const string MarcoSpidaNpcIdentity = "SimpleChar:78E0FC81";
         private const string VaughnHammondNpcIdentity = "SimpleChar:78E0FC73";
-        private const string AntonioStacklundNpcIdentity = "SimpleChar:78E0FC7C";
-        private const string KarliCappelleriNpcIdentity = "SimpleChar:799AD394";
-        private const string LeonoraMartyNpcIdentity = "SimpleChar:78E0FC74";
-        private const string PatrickSunNpcIdentity = "SimpleChar:78E0FC7B";
-        private const string RemiGalloisNpcIdentity = "SimpleChar:78E0FC75";
-        private const string GreedyDesertReetNpcIdentity = "SimpleChar:79978BB8";
 
         private const string RexB18EReturnNodeId = "rex_194454_006";
 
@@ -135,57 +111,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 PlayfieldId = AreteLandingPlayfieldId,
                 GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
                 LogPrefix = "ARETE_MARCUS_DIALOGUE"
-            };
-
-        private static readonly ContentDrivenNpcDialogueRegistration BarryFoodVendorRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Barry the Food Vendor",
-                ExpectedNpcName = "Barry the Food Vendor",
-                NpcIdentity =
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = BarryFoodVendorInstance
-                    },
-                NpcIdentityText = BarryFoodVendorNpcIdentity,
-                PlayfieldId = AreteLandingPlayfieldId,
-                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
-                LogPrefix = "ARETE_BARRY_DIALOGUE"
-            };
-
-        private static readonly ContentDrivenNpcDialogueRegistration BorisPeacekeeperRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Boris the Peacekeeper",
-                ExpectedNpcName = "Boris the Peacekeeper",
-                NpcIdentity =
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = BorisPeacekeeperInstance
-                    },
-                NpcIdentityText = BorisPeacekeeperNpcIdentity,
-                PlayfieldId = AreteLandingPlayfieldId,
-                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
-                LogPrefix = "ARETE_BORIS_DIALOGUE"
-            };
-
-        private static readonly ContentDrivenNpcDialogueRegistration DesmondCalitriRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Desmond Calitri",
-                ExpectedNpcName = "Desmond Calitri",
-                NpcIdentity =
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = DesmondCalitriInstance
-                    },
-                NpcIdentityText = DesmondCalitriNpcIdentity,
-                PlayfieldId = AreteLandingPlayfieldId,
-                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
-                LogPrefix = "ARETE_DESMOND_DIALOGUE"
             };
 
         private static readonly ContentDrivenNpcDialogueRegistration FlintNovakRegistration =
@@ -242,10 +167,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private static readonly ContentDrivenNpcDialogueRegistration StanGoodmanRegistration =
             new ContentDrivenNpcDialogueRegistration
             {
-                // Live/spawn name is "Stanley Goodman" (AreteLandingSpawn + capture 20260801-101034).
-                // Pool ids ≠ capture id 78E0FC65, so FindRegistration falls back to this name.
                 Name = "Stan Goodman",
-                ExpectedNpcName = "Stanley Goodman",
+                ExpectedNpcName = "Stan Goodman",
                 NpcIdentity =
                     new Identity
                     {
@@ -394,54 +317,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "ARETE_VAUGHN_DIALOGUE"
             };
 
-        private static readonly ContentDrivenNpcDialogueRegistration AntonioStacklundRegistration =
-            CreateAreteRegistration(
-                "Antonio Stacklund",
-                AntonioStacklundInstance,
-                AntonioStacklundNpcIdentity,
-                AreteLandingPlayfieldId,
-                "ARETE_ANTONIO_DIALOGUE");
-
-        private static readonly ContentDrivenNpcDialogueRegistration KarliCappelleriRegistration =
-            CreateAreteRegistration(
-                "Karli Cappelleri",
-                KarliCappelleriInstance,
-                KarliCappelleriNpcIdentity,
-                8009,
-                "ARETE_KARLI_DIALOGUE");
-
-        private static readonly ContentDrivenNpcDialogueRegistration LeonoraMartyRegistration =
-            CreateAreteRegistration(
-                "Leonora Marty",
-                LeonoraMartyInstance,
-                LeonoraMartyNpcIdentity,
-                AreteLandingPlayfieldId,
-                "ARETE_LEONORA_DIALOGUE");
-
-        private static readonly ContentDrivenNpcDialogueRegistration PatrickSunRegistration =
-            CreateAreteRegistration(
-                "Patrick Sun",
-                PatrickSunInstance,
-                PatrickSunNpcIdentity,
-                AreteLandingPlayfieldId,
-                "ARETE_PATRICK_DIALOGUE");
-
-        private static readonly ContentDrivenNpcDialogueRegistration RemiGalloisRegistration =
-            CreateAreteRegistration(
-                "Remi Gallois",
-                RemiGalloisInstance,
-                RemiGalloisNpcIdentity,
-                AreteLandingPlayfieldId,
-                "ARETE_REMI_DIALOGUE");
-
-        private static readonly ContentDrivenNpcDialogueRegistration GreedyDesertReetRegistration =
-            CreateAreteRegistration(
-                "Greedy Desert Reet",
-                GreedyDesertReetInstance,
-                GreedyDesertReetNpcIdentity,
-                AreteLandingPlayfieldId,
-                "ARETE_GREEDY_REET_DIALOGUE");
-
         private static readonly ContentDrivenNpcDialogueRegistration WindcallerKarrecRegistration =
             CreateWindcallerRegistration(WindcallerKarrecNpcContent.Karrec);
 
@@ -536,64 +411,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "THRAK_GARDEN_KEY"
             };
 
-        // Capture 20260723-221330 Nascence Life dialogs (options-only / Say what?).
-        private const int NascenceFrontierPlayfieldId = 4310;
-        private const int GoldmanAretePlayfieldId = 4531;
-        private const int ScientistDrakeRodriguezInstance = unchecked((int)0x7963A853);
-        private const int JoshuaFalkerInstance = unchecked((int)0x787B5401);
-        private const int PrinceCreehanInstance = unchecked((int)0x78CCD541);
-
-        private static readonly ContentDrivenNpcDialogueRegistration ScientistDrakeRodriguezRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Scientist Drake Rodriguez",
-                ExpectedNpcName = "Scientist Drake Rodriguez",
-                NpcIdentity =
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = ScientistDrakeRodriguezInstance
-                    },
-                NpcIdentityText = "SimpleChar:7963A853",
-                PlayfieldId = NascenceFrontierPlayfieldId,
-                GateEnvironmentVariableName = null,
-                LogPrefix = "NASCENCE_LIFE"
-            };
-
-        private static readonly ContentDrivenNpcDialogueRegistration JoshuaFalkerRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Joshua Falker",
-                ExpectedNpcName = "Joshua Falker",
-                NpcIdentity =
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = JoshuaFalkerInstance
-                    },
-                NpcIdentityText = "SimpleChar:787B5401",
-                PlayfieldId = NascenceFrontierPlayfieldId,
-                GateEnvironmentVariableName = null,
-                LogPrefix = "NASCENCE_LIFE"
-            };
-
-        private static readonly ContentDrivenNpcDialogueRegistration PrinceCreehanRegistration =
-            new ContentDrivenNpcDialogueRegistration
-            {
-                Name = "Prince Creehan",
-                ExpectedNpcName = "Prince Creehan",
-                NpcIdentity =
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = PrinceCreehanInstance
-                    },
-                NpcIdentityText = "SimpleChar:78CCD541",
-                PlayfieldId = GoldmanAretePlayfieldId,
-                GateEnvironmentVariableName = null,
-                LogPrefix = "NASCENCE_LIFE"
-            };
-
         private static readonly ContentDrivenNpcDialogueRegistration CraigOrFuriousFistsRegistration =
             CreateThrakGardenVendorRegistration(
                 ThrakGardenVendorInteractionRules.FuriousFistsName,
@@ -634,9 +451,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
         {
             RexLarssonRegistration,
             MarcusStoneRegistration,
-            BarryFoodVendorRegistration,
-            BorisPeacekeeperRegistration,
-            DesmondCalitriRegistration,
             FlintNovakRegistration,
             AlexGibbsRegistration,
             BillRegistration,
@@ -649,12 +463,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ShippingManifestTerminalRegistration,
             MarcoSpidaRegistration,
             VaughnHammondRegistration,
-            AntonioStacklundRegistration,
-            KarliCappelleriRegistration,
-            LeonoraMartyRegistration,
-            PatrickSunRegistration,
-            RemiGalloisRegistration,
-            GreedyDesertReetRegistration,
             WindcallerKarrecRegistration,
             AnnoyingDudeRegistration,
             MaddyCardileRegistration,
@@ -663,9 +471,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ProphetYuttRegistration,
             HypnagogicUrgaLumRegistration,
             DreamingSilvertailRegistration,
-            ScientistDrakeRodriguezRegistration,
-            JoshuaFalkerRegistration,
-            PrinceCreehanRegistration,
             CraigOrFuriousFistsRegistration,
             CraigOrPreservationRegistration,
             CraigOrFlamingBarrelsRegistration,
@@ -700,29 +505,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                        PlayfieldId = definition.PlayfieldId,
                        GateEnvironmentVariableName = null,
                        LogPrefix = "SUBWAY_KARREC_DIALOGUE"
-                   };
-        }
-
-        private static ContentDrivenNpcDialogueRegistration CreateAreteRegistration(
-            string displayName,
-            int sourceNpcInstance,
-            string npcIdentityText,
-            int playfieldId,
-            string logPrefix)
-        {
-            return new ContentDrivenNpcDialogueRegistration
-                   {
-                       Name = displayName,
-                       ExpectedNpcName = displayName,
-                       NpcIdentity = new Identity
-                                     {
-                                         Type = IdentityType.CanbeAffected,
-                                         Instance = sourceNpcInstance
-                                     },
-                       NpcIdentityText = npcIdentityText,
-                       PlayfieldId = playfieldId,
-                       GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
-                       LogPrefix = logPrefix
                    };
         }
 
@@ -799,16 +581,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            ICharacter npc = null;
-            try
-            {
-                npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, targetIdentity);
-            }
-            catch
-            {
-                npc = null;
-            }
-
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, targetIdentity);
             ContentDrivenNpcDialogueRegistration registration = FindRegistration(npc)
                                                                   ?? FindRegistration(targetIdentity);
             if (registration == null)
@@ -852,19 +625,18 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            // Prefer the FinishTrade target's session. Walking Registrations in declaration
-            // order (FindActiveSessionRegistration) can latch onto a stale earlier NPC
-            // session — Shipping Manifest then CloseChat with no Re-route / tip handoff
-            // (ZoneEngineLog 2026-08-02 05:44: smt-hack-inspect done, no post-trade advanced).
-            ContentDrivenNpcDialogueRegistration registration;
-            string sessionKey;
-            DialogueSessionRecord record;
-            if (!TryGetActiveSessionForNpc(source, npcIdentity, out registration, out sessionKey, out record))
+            ContentDrivenNpcDialogueRegistration registration = FindActiveSessionRegistration(source);
+            if (registration == null)
+            {
+                registration = FindRegistration(npcIdentity);
+            }
+
+            if (registration == null || !IsRegistrationEnabled(registration))
             {
                 return false;
             }
 
-            if (!IsRegistrationEnabled(registration) || !IsExpectedPlayfield(source, registration))
+            if (!IsExpectedPlayfield(source, registration))
             {
                 return false;
             }
@@ -875,16 +647,23 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
+            string sessionKey = CreateSessionKey(source.Identity, registration);
+            DialogueSessionRecord record;
+            lock (SyncRoot)
+            {
+                SessionsByCharacter.TryGetValue(sessionKey, out record);
+            }
+
+            if (record == null || record.Session == null || !record.Session.IsActive)
+            {
+                return false;
+            }
+
             // Auto-select the synthetic "(Continue after trade)" / first option on the hold node.
             DialogueSessionResult result = service.SelectOption(record.Session, 0);
             if (!result.IsValid)
             {
                 LogValidation(registration, "post-trade dialogue advance failed", result.Validation);
-                LogDialogue(
-                    registration,
-                    "post-trade advance failed character=" + source.Identity.ToString(true)
-                    + " target=" + npcIdentity.ToString(true)
-                    + " node=" + (record.Session == null ? "<none>" : record.Session.CurrentNodeId));
                 return false;
             }
 
@@ -942,23 +721,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             // Name-bound Arete NPCs (Rex/Marcus) use dynamic spawn ids; resolve via live NPC
             // first so answers keep the bound registration that opened the window.
-            // Capture-id Targets (e.g. Stan 78E0FC65) are not in the playfield pool — GetObject
-            // can throw; never let that abort answer routing.
-            ICharacter targetNpc = null;
-            if (source.Playfield != null)
-            {
-                try
-                {
-                    targetNpc = Pool.Instance.GetObject<ICharacter>(
-                        source.Playfield.Identity,
-                        targetIdentity);
-                }
-                catch
-                {
-                    targetNpc = null;
-                }
-            }
-
+            ICharacter targetNpc = source.Playfield == null
+                                         ? null
+                                         : Pool.Instance.GetObject<ICharacter>(
+                                             source.Playfield.Identity,
+                                             targetIdentity);
             ContentDrivenNpcDialogueRegistration registration = FindRegistration(targetNpc)
                                                                   ?? FindRegistration(targetIdentity);
             if (registration == null)
@@ -1024,21 +791,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
-            if (IsRegistration(registration, KarliCappelleriRegistration))
-            {
-                DialogueSessionResult branchOverride =
-                    KarliCappelleriQuestRuntime.ApplyDoingBranchOverride(
-                        service,
-                        result,
-                        previousNodeId,
-                        answerIndex,
-                        source);
-                if (branchOverride != null)
-                {
-                    result = branchOverride;
-                }
-            }
-
             LogRecordedActions(source, result, registration);
             TryHandleTailorMeasurementGrant(
                 source,
@@ -1092,12 +844,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            previousNodeId,
                            answerIndex,
                            targetIdentity)
-                       || TryHandleDesmondTradeHoldSideEffect(
-                           source,
-                           registration,
-                           previousNodeId,
-                           answerIndex,
-                           targetIdentity)
                        || TryHandleVernonTradeHoldSideEffect(
                            source,
                            registration,
@@ -1127,18 +873,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            previousNodeId,
                            answerIndex,
                            targetIdentity)
-                       || TryHandleLeonoraTradeHoldSideEffect(
-                           source,
-                           registration,
-                           previousNodeId,
-                           answerIndex,
-                           targetIdentity)
-                       || TryHandleShinySwordTradeHoldSideEffect(
-                           source,
-                           registration,
-                           previousNodeId,
-                           answerIndex,
-                           targetIdentity)
                        || TryHandleShippingManifestTradeHoldSideEffect(
                            source,
                            registration,
@@ -1149,13 +883,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             if (result.Session == null || !result.Session.IsActive)
             {
-                DispatchCapturedQuestAnswerSideEffects(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity,
-                    false);
                 LogDialogue(
                     registration,
                     "answer closed session character=" + source.Identity.ToString(true)
@@ -1331,22 +1058,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 }
             }
 
-            // Capture 20260801-Desmond Calitri: burger answer AppendText then StartTrade.
-            if (IsDesmondTradeHoldAnswer(registration, previousNodeId, answerIndex))
-            {
-                SendDialoguePromptOnly(source, result, registration);
-                PaceKnuBotPackets();
-                if (TryHandleDesmondTradeHoldSideEffect(
-                        source,
-                        registration,
-                        previousNodeId,
-                        answerIndex,
-                        targetIdentity))
-                {
-                    return true;
-                }
-            }
-
             // Capture 20260722-214957: AppendText (Very well, leave it here) then StartTrade.
             if (IsVernonTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
@@ -1424,45 +1135,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
-            if (IsLeonoraTradeHoldAnswer(registration, previousNodeId, answerIndex))
-            {
-                SendDialoguePromptOnly(source, result, registration);
-                PaceKnuBotPackets();
-                if (TryHandleLeonoraTradeHoldSideEffect(
-                        source,
-                        registration,
-                        previousNodeId,
-                        answerIndex,
-                        targetIdentity))
-                {
-                    return true;
-                }
-            }
-
-            if (IsShinySwordTradeHoldAnswer(registration, previousNodeId, answerIndex))
-            {
-                SendDialoguePromptOnly(source, result, registration);
-                PaceKnuBotPackets();
-                if (TryHandleShinySwordTradeHoldSideEffect(
-                        source,
-                        registration,
-                        previousNodeId,
-                        answerIndex,
-                        targetIdentity))
-                {
-                    return true;
-                }
-            }
-
             SendDialogueNode(source, result, registration, suppressOptionsForTradeHold);
-
-            DispatchCapturedQuestAnswerSideEffects(
-                source,
-                registration,
-                previousNodeId,
-                answerIndex,
-                targetIdentity,
-                true);
 
             if (IsRegistration(registration, RexLarssonRegistration))
             {
@@ -1537,7 +1210,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             if (hadSession)
             {
-                ResumeCapturedDialoguePatrol(source, registration, targetIdentity);
                 LogDialogue(registration, "session closed by client character=" + source.Identity.ToString(true));
                 return true;
             }
@@ -1550,14 +1222,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter npc,
             ContentDrivenNpcDialogueRegistration registration)
         {
-            if (IsRegistration(registration, RemiGalloisRegistration)
-                && RemiGalloisQuestRuntime.IsCompleted(source))
-            {
-                // No post-completion interaction was captured. Fail closed rather than
-                // promoting the inferred remi_done vendor branch from the draft pack.
-                return CloseRegisteredDialogueSafely(source, npc, registration);
-            }
-
             if (IsRegistration(registration, WindcallerKarrecRegistration))
             {
                 WindcallerKarrecTradeAdapter.TryResumeDurableCompletion(source, registration.NpcIdentity);
@@ -1632,8 +1296,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 SessionsByCharacter[CreateSessionKey(source.Identity, registration)] =
                     new DialogueSessionRecord { Registration = registration, Session = result.Session };
             }
-
-            PauseCapturedDialoguePatrol(npc, registration);
 
             FaceNpcTowardSource(npc, source);
             SendOpenChatWindow(source, registration);
@@ -1893,36 +1555,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return SarahGreeneQuestRuntime.TryBeginSarahTrade(source, tradeTarget);
         }
 
-        private static bool IsDesmondTradeHoldAnswer(
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex)
-        {
-            return IsRegistration(registration, DesmondCalitriRegistration)
-                   && answerIndex == 0
-                   && string.Equals(
-                       previousNodeId,
-                       DesmondCalitriQuestRuntime.BurgerDeliverNodeId,
-                       StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool TryHandleDesmondTradeHoldSideEffect(
-            ICharacter source,
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex,
-            Identity liveDesmondIdentity)
-        {
-            if (!IsDesmondTradeHoldAnswer(registration, previousNodeId, answerIndex))
-            {
-                return false;
-            }
-
-            return DesmondCalitriQuestRuntime.TryBeginDesmondTrade(
-                source,
-                ResolveLiveNpcIdentity(liveDesmondIdentity, registration));
-        }
-
         private static bool IsVernonTradeHoldAnswer(
             ContentDrivenNpcDialogueRegistration registration,
             string previousNodeId,
@@ -2099,198 +1731,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return VaughnHammondQuestRuntime.TryBeginVaughnTrade(source, tradeTarget);
-        }
-
-        private static bool IsLeonoraTradeHoldAnswer(
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex)
-        {
-            return IsRegistration(registration, LeonoraMartyRegistration)
-                   && answerIndex == 0
-                   && string.Equals(
-                       previousNodeId,
-                       LeonoraMartyQuestRuntime.WithCardStartNodeId,
-                       StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool TryHandleLeonoraTradeHoldSideEffect(
-            ICharacter source,
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex,
-            Identity liveLeonoraIdentity)
-        {
-            if (!IsLeonoraTradeHoldAnswer(registration, previousNodeId, answerIndex))
-            {
-                return false;
-            }
-
-            return LeonoraMartyQuestRuntime.TryBeginLeonoraTrade(
-                source,
-                ResolveLiveNpcIdentity(liveLeonoraIdentity, registration));
-        }
-
-        private static bool IsShinySwordTradeHoldAnswer(
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex)
-        {
-            return IsRegistration(registration, GreedyDesertReetRegistration)
-                   && answerIndex == 1
-                   && string.Equals(
-                       previousNodeId,
-                       ShinySwordQuestRuntime.DemandNodeId,
-                       StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool TryHandleShinySwordTradeHoldSideEffect(
-            ICharacter source,
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex,
-            Identity liveReetIdentity)
-        {
-            if (!IsShinySwordTradeHoldAnswer(registration, previousNodeId, answerIndex))
-            {
-                return false;
-            }
-
-            return ShinySwordQuestRuntime.TryBeginSwordTrade(
-                source,
-                ResolveLiveNpcIdentity(liveReetIdentity, registration));
-        }
-
-        private static void DispatchCapturedQuestAnswerSideEffects(
-            ICharacter source,
-            ContentDrivenNpcDialogueRegistration registration,
-            string previousNodeId,
-            int answerIndex,
-            Identity liveNpcIdentity,
-            bool responseNodeSent)
-        {
-            if (IsRegistration(registration, DesmondCalitriRegistration))
-            {
-                if (responseNodeSent)
-                {
-                    DesmondCalitriQuestRuntime.TryHandleDesmondDialogueAnswer(
-                        source,
-                        previousNodeId,
-                        answerIndex);
-                }
-
-                return;
-            }
-
-            if (IsRegistration(registration, BarryFoodVendorRegistration))
-            {
-                if (responseNodeSent)
-                {
-                    DesmondCalitriQuestRuntime.TryHandleBarryDialogueAnswer(
-                        source,
-                        previousNodeId,
-                        answerIndex);
-                }
-
-                return;
-            }
-
-            if (IsRegistration(registration, AntonioStacklundRegistration))
-            {
-                if (responseNodeSent)
-                {
-                    AntonioStacklundQuestRuntime.TryHandleDialogueAnswer(
-                        source,
-                        previousNodeId,
-                        answerIndex);
-                    if (string.Equals(
-                            previousNodeId,
-                            "antonio_001",
-                            StringComparison.OrdinalIgnoreCase)
-                        && answerIndex == 1)
-                    {
-                        CapturedAreteAntonioStacklundVendorInteractionHandler.Default.TryOpenShop(
-                            source,
-                            ResolveLiveNpcIdentity(liveNpcIdentity, registration));
-                    }
-                }
-
-                return;
-            }
-
-            if (IsRegistration(registration, KarliCappelleriRegistration))
-            {
-                if (responseNodeSent)
-                {
-                    KarliCappelleriQuestRuntime.TryHandleDialogueAnswer(
-                        source,
-                        previousNodeId,
-                        answerIndex);
-                }
-
-                return;
-            }
-
-            if (IsRegistration(registration, PatrickSunRegistration))
-            {
-                if (responseNodeSent)
-                {
-                    PatrickSunQuestRuntime.TryHandleDialogueAnswer(
-                        source,
-                        previousNodeId,
-                        answerIndex);
-                }
-
-                return;
-            }
-
-            if (!IsRegistration(registration, RemiGalloisRegistration))
-            {
-                return;
-            }
-
-            bool capturedSellOption =
-                (string.Equals(previousNodeId, RemiGalloisQuestRuntime.RootNodeId, StringComparison.OrdinalIgnoreCase)
-                 || string.Equals(previousNodeId, RemiGalloisQuestRuntime.DoingNodeId, StringComparison.OrdinalIgnoreCase)
-                 || string.Equals(previousNodeId, RemiGalloisQuestRuntime.ReturnNodeId, StringComparison.OrdinalIgnoreCase))
-                && answerIndex == 1;
-            if (capturedSellOption)
-            {
-                CapturedAreteRemiGalloisVendorInteractionHandler.Default.TryOpenShop(
-                    source,
-                    ResolveLiveNpcIdentity(liveNpcIdentity, registration));
-            }
-
-            if (responseNodeSent
-                || string.Equals(
-                    previousNodeId,
-                    RemiGalloisQuestRuntime.AcceptNodeId,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                RemiGalloisQuestRuntime.TryHandleDialogueAnswer(
-                    source,
-                    previousNodeId,
-                    answerIndex);
-            }
-
-            if (responseNodeSent
-                && answerIndex == 0
-                && string.Equals(
-                    previousNodeId,
-                    RemiGalloisQuestRuntime.OfferNodeId,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                RemiGalloisQuestRuntime.EmitAcceptTipAndHellfyre(source);
-            }
-        }
-
-        private static Identity ResolveLiveNpcIdentity(
-            Identity candidate,
-            ContentDrivenNpcDialogueRegistration registration)
-        {
-            return candidate.Type == IdentityType.CanbeAffected && candidate.Instance != 0
-                       ? candidate
-                       : registration.NpcIdentity;
         }
 
         private static bool TryHandleLoreleiVendorSideEffect(
@@ -2600,16 +2040,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return KneecappingQuestRuntime.ResolveAlexStartNodeId(source);
             }
 
-            if (IsRegistration(registration, DesmondCalitriRegistration))
-            {
-                return DesmondCalitriQuestRuntime.ResolveDesmondStartNodeId(source);
-            }
-
-            if (IsRegistration(registration, BarryFoodVendorRegistration))
-            {
-                return DesmondCalitriQuestRuntime.ResolveBarryStartNodeId(source);
-            }
-
             if (IsRegistration(registration, StanGoodmanRegistration))
             {
                 return StanGoodmanQuestRuntime.ResolveStanStartNodeId(source);
@@ -2638,21 +2068,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             if (IsRegistration(registration, LollyTheReetRegistration))
             {
                 return LoreleiQuestRuntime.ResolveLollyStartNodeId(source);
-            }
-
-            if (IsRegistration(registration, LeonoraMartyRegistration))
-            {
-                return LeonoraMartyQuestRuntime.ResolveLeonoraStartNodeId(source);
-            }
-
-            if (IsRegistration(registration, PatrickSunRegistration))
-            {
-                return PatrickSunQuestRuntime.ResolvePatrickStartNodeId(source);
-            }
-
-            if (IsRegistration(registration, RemiGalloisRegistration))
-            {
-                return RemiGalloisQuestRuntime.ResolveRemiStartNodeId(source);
             }
 
             if (IsRegistration(registration, ProphetYuttRegistration))
@@ -2784,112 +2199,26 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private static ContentDrivenNpcDialogueRegistration FindActiveSessionRegistration(ICharacter source)
         {
-            ContentDrivenNpcDialogueRegistration registration;
-            string sessionKey;
-            DialogueSessionRecord record;
-            return TryGetActiveSessionForNpc(source, Identity.None, out registration, out sessionKey, out record)
-                       ? registration
-                       : null;
-        }
-
-        /// <summary>
-        /// Resolves the active content-driven dialogue session for a character, optionally
-        /// constrained to the NPC that just finished a KnuBot trade.
-        /// </summary>
-        private static bool TryGetActiveSessionForNpc(
-            ICharacter source,
-            Identity npcIdentity,
-            out ContentDrivenNpcDialogueRegistration registration,
-            out string sessionKey,
-            out DialogueSessionRecord record)
-        {
-            registration = null;
-            sessionKey = null;
-            record = null;
             if (source == null)
             {
-                return false;
+                return null;
             }
 
-            bool requireNpc = npcIdentity.Type != IdentityType.None && npcIdentity.Instance != 0;
-            if (requireNpc)
+            foreach (ContentDrivenNpcDialogueRegistration registration in Registrations)
             {
-                ContentDrivenNpcDialogueRegistration byTarget = FindRegistration(npcIdentity);
-                if (byTarget != null)
-                {
-                    string key = CreateSessionKey(source.Identity, byTarget);
-                    DialogueSessionRecord found;
-                    lock (SyncRoot)
-                    {
-                        SessionsByCharacter.TryGetValue(key, out found);
-                    }
-
-                    if (found != null && found.Session != null && found.Session.IsActive)
-                    {
-                        registration = found.Registration ?? byTarget;
-                        sessionKey = key;
-                        record = found;
-                        return true;
-                    }
-                }
-            }
-
-            string characterPrefix = source.Identity.Type + ":" + source.Identity.Instance + "|";
-            lock (SyncRoot)
-            {
-                foreach (KeyValuePair<string, DialogueSessionRecord> pair in SessionsByCharacter)
-                {
-                    if (pair.Value == null
-                        || pair.Value.Session == null
-                        || !pair.Value.Session.IsActive
-                        || pair.Key == null
-                        || !pair.Key.StartsWith(characterPrefix, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    ContentDrivenNpcDialogueRegistration candidate = pair.Value.Registration;
-                    if (candidate == null)
-                    {
-                        continue;
-                    }
-
-                    if (requireNpc && !IsRegisteredIdentity(npcIdentity, candidate))
-                    {
-                        continue;
-                    }
-
-                    registration = candidate;
-                    sessionKey = pair.Key;
-                    record = pair.Value;
-                    return true;
-                }
-            }
-
-            if (requireNpc)
-            {
-                return false;
-            }
-
-            foreach (ContentDrivenNpcDialogueRegistration candidate in Registrations)
-            {
-                string key = CreateSessionKey(source.Identity, candidate);
-                DialogueSessionRecord found;
+                DialogueSessionRecord record;
                 lock (SyncRoot)
                 {
-                    SessionsByCharacter.TryGetValue(key, out found);
+                    SessionsByCharacter.TryGetValue(CreateSessionKey(source.Identity, registration), out record);
                 }
 
-                if (found != null && found.Session != null && found.Session.IsActive)
+                if (record != null && record.Session != null && record.Session.IsActive)
                 {
-                    registration = found.Registration ?? candidate;
-                    sessionKey = key;
-                    record = found;
-                    return true;
+                    return record.Registration;
                 }
             }
 
-            return false;
+            return null;
         }
 
         private static bool TryGetSessionService(
@@ -3051,54 +2380,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 SessionsByCharacter.Remove(sessionKey);
             }
 
-            ResumeCapturedDialoguePatrol(source, registration, registration.NpcIdentity);
-
             if (sendClose)
             {
                 KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
             }
 
             LogDialogue(registration, "session ended character=" + source.Identity.ToString(true));
-        }
-
-        private static void PauseCapturedDialoguePatrol(
-            ICharacter npc,
-            ContentDrivenNpcDialogueRegistration registration)
-        {
-            if (IsRegistration(registration, KarliCappelleriRegistration))
-            {
-                KarliCappelleriQuestRuntime.PausePatrolForDialogue(npc);
-            }
-            else if (IsRegistration(registration, LeonoraMartyRegistration))
-            {
-                LeonoraMartyQuestRuntime.PausePatrolForDialogue(npc);
-            }
-        }
-
-        private static void ResumeCapturedDialoguePatrol(
-            ICharacter source,
-            ContentDrivenNpcDialogueRegistration registration,
-            Identity npcIdentity)
-        {
-            if (source?.Playfield == null
-                || (!IsRegistration(registration, KarliCappelleriRegistration)
-                    && !IsRegistration(registration, LeonoraMartyRegistration)))
-            {
-                return;
-            }
-
-            Identity resolvedIdentity = ResolveLiveNpcIdentity(npcIdentity, registration);
-            ICharacter npc = Pool.Instance.GetObject<ICharacter>(
-                source.Playfield.Identity,
-                resolvedIdentity);
-            if (IsRegistration(registration, KarliCappelleriRegistration))
-            {
-                KarliCappelleriQuestRuntime.ResumePatrolAfterDialogue(npc);
-            }
-            else
-            {
-                LeonoraMartyQuestRuntime.ResumePatrolAfterDialogue(npc);
-            }
         }
 
         private static void LogRecordedActions(
@@ -3253,8 +2540,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             ContentDrivenNpcDialogueRegistration runtimeRegistration =
                 FindCapturedSubwayVendorRuntimeRegistration(npc)
-                ?? FindWindcallerRuntimeRegistration(npc)
-                ?? FindGreedyDesertReetRuntimeRegistration(npc);
+                ?? FindWindcallerRuntimeRegistration(npc);
             if (runtimeRegistration != null)
             {
                 return runtimeRegistration;
@@ -3263,11 +2549,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ContentDrivenNpcDialogueRegistration byIdentity = FindRegistration(npc.Identity);
             if (byIdentity != null)
             {
-                // Always bind to the live pool identity. Capture SCFU ids (e.g. Stan
-                // 78E0FC65) are not client-visible; sending them as Knubot Target shows
-                // "NoName" and breaks answer routing (capture 20260801-101034 / ZoneEngineLog
-                // 2026-08-01 10:22 Target=CanbeAffected:2028010597).
-                return BindRegistration(byIdentity, npc.Identity);
+                return byIdentity;
             }
 
             ContentDrivenNpcDialogueRegistration byName = Registrations.FirstOrDefault(
@@ -3299,27 +2581,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             foreach (ContentDrivenNpcDialogueRegistration registration in Registrations)
             {
-                if (!IsRegisteredIdentity(identity, registration))
+                if (IsRegisteredIdentity(identity, registration))
                 {
-                    continue;
+                    return registration;
                 }
-
-                int poolInstance;
-                if (AORebirth.Core.Playfields.AreteLandingSpawn.TryGetLivingPoolInstance(
-                        registration.NpcIdentity.Instance,
-                        out poolInstance)
-                    && poolInstance != 0)
-                {
-                    return BindRegistration(
-                        registration,
-                        new Identity
-                        {
-                            Type = IdentityType.CanbeAffected,
-                            Instance = poolInstance
-                        });
-                }
-
-                return BindRegistration(registration, identity);
             }
 
             return null;
@@ -3386,14 +2651,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return registration == null ? null : BindRegistration(registration, runtime.NpcIdentity);
         }
 
-        private static ContentDrivenNpcDialogueRegistration FindGreedyDesertReetRuntimeRegistration(
-            ICharacter npc)
-        {
-            return npc != null && LoreleiOasisMobRuntime.MatchesGreedyDesertReetIdentity(npc)
-                       ? BindRegistration(GreedyDesertReetRegistration, npc.Identity)
-                       : null;
-        }
-
         private static ContentDrivenNpcDialogueRegistration BindRegistration(
             ContentDrivenNpcDialogueRegistration registration,
             Identity npcIdentity)
@@ -3422,8 +2679,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ContentDrivenNpcDialogueRegistration registration)
         {
             return IsWindcallerQuestRegistration(registration)
-                   || IsRegistration(registration, SubwayTailorRegistration)
-                   || IsRegistration(registration, GreedyDesertReetRegistration);
+                   || IsRegistration(registration, SubwayTailorRegistration);
         }
 
         private static bool IsRegistration(
@@ -3443,23 +2699,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
             Identity identity,
             ContentDrivenNpcDialogueRegistration registration)
         {
-            if (registration == null
-                || identity.Type != registration.NpcIdentity.Type)
-            {
-                return false;
-            }
-
-            if (identity.Instance == registration.NpcIdentity.Instance)
-            {
-                return true;
-            }
-
-            // AreteLandingSpawn maps capture SCFU ids → live pool instances.
-            int poolInstance;
-            return AORebirth.Core.Playfields.AreteLandingSpawn.TryGetLivingPoolInstance(
-                       registration.NpcIdentity.Instance,
-                       out poolInstance)
-                   && identity.Instance == poolInstance;
+            return registration != null
+                   && identity.Type == registration.NpcIdentity.Type
+                   && identity.Instance == registration.NpcIdentity.Instance;
         }
 
         private static bool IsExpectedPlayfield(

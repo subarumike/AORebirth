@@ -20,8 +20,7 @@ namespace ZoneEngine.Core.Playfields
     #endregion
 
     /// <summary>
-    /// Capture 20260721-nanoprogramsvendor / 20260721-nano-enforcer-arete /
-    /// 20260801-191821 (Keeper):
+    /// Capture 20260721-nanoprogramsvendor / 20260721-nano-enforcer-arete:
     /// Use Marco nano crystal package → Overflow content grants → Delete crystal → tip reward.
     /// </summary>
     internal static class CapturedAreteMarcoSpidaNanoPackageRuntime
@@ -60,25 +59,19 @@ namespace ZoneEngine.Core.Playfields
                 if (!ItemLoader.ItemList.ContainsKey(entry.ItemId))
                 {
                     Log(
-                        "package content missing ItemLoader id="
+                        "package-use skipped: ItemLoader missing content id="
                         + entry.ItemId
                         + " crystal="
-                        + package.CrystalItemId
-                        + " — skip entry");
+                        + package.CrystalItemId);
+                    return false;
                 }
             }
 
             // Capture 20260721-nanoprogramsvendor: Overflow nanos first, then delete crystal.
-            // Tip rewards always attempt after unpack (even if a content grant fails mid-way).
             int granted = 0;
             for (int i = 0; i < package.Contents.Length; i++)
             {
                 CapturedAreteMarcoSpidaNanoPackageContentEntry entry = package.Contents[i];
-                if (!ItemLoader.ItemList.ContainsKey(entry.ItemId))
-                {
-                    continue;
-                }
-
                 Item grantItem;
                 try
                 {
@@ -91,7 +84,7 @@ namespace ZoneEngine.Core.Playfields
                         + entry.ItemId
                         + " reason="
                         + ex.Message);
-                    continue;
+                    return false;
                 }
 
                 QuestRewardInventoryGrantResult grant =
@@ -122,11 +115,11 @@ namespace ZoneEngine.Core.Playfields
                     + " status="
                     + grant.Status
                     + " invErr="
-                    + grant.InventoryError
-                    + " — continue");
+                    + grant.InventoryError);
+                return false;
             }
 
-            // Always consume the Nanoprogram Container on Use (capture TemplateAction Unknown2=3 delete).
+            // Capture: TemplateAction crystal Unknown2=3 at Inventory placement, then DeleteItem.
             TemplateActionMessageHandler.Default.Send(
                 character,
                 item,
@@ -139,7 +132,6 @@ namespace ZoneEngine.Core.Playfields
                 itemPosition.Instance);
 
             // Capture order: tip XP/credits + 223373 + Action59/Delete after crystal delete.
-            // Also heal characters whose tip was ForceCompleted without rewards.
             StanGoodmanQuestRuntime.TryCompleteBuyNanoTipOnCrystalUse(character, item);
 
             Log(

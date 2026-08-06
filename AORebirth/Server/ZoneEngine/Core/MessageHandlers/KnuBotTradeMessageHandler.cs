@@ -68,11 +68,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (DesmondCalitriQuestRuntime.TryStageDesmondTradeItem(client.Controller.Character, message))
-            {
-                return;
-            }
-
             if (VernonGodfrayQuestRuntime.TryStageVernonTradeItem(client.Controller.Character, message))
             {
                 return;
@@ -89,12 +84,6 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (VaughnHammondQuestRuntime.TryStageVaughnTradeItem(client.Controller.Character, message))
-            {
-                return;
-            }
-
-            if (LeonoraMartyQuestRuntime.TryStageLeonoraTradeItem(client.Controller.Character, message)
-                || ShinySwordQuestRuntime.TryStageSwordTradeItem(client.Controller.Character, message))
             {
                 return;
             }
@@ -127,13 +116,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (DesmondCalitriQuestRuntime.ShouldSuppressGenericDesmondTradeRemove(
-                    client.Controller.Character,
-                    message))
-            {
-                return;
-            }
-
             if (VernonGodfrayQuestRuntime.ShouldSuppressGenericVernonTradeRemove(
                     client.Controller.Character,
                     message))
@@ -156,16 +138,6 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (VaughnHammondQuestRuntime.ShouldSuppressGenericVaughnTradeRemove(
-                    client.Controller.Character,
-                    message))
-            {
-                return;
-            }
-
-            if (LeonoraMartyQuestRuntime.ShouldSuppressGenericLeonoraTradeRemove(
-                    client.Controller.Character,
-                    message)
-                || ShinySwordQuestRuntime.ShouldSuppressGenericSwordTradeRemove(
                     client.Controller.Character,
                     message))
             {

@@ -62,13 +62,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string AlexTurnInRewardsFlag = "alex-turnin-rewards";
 
-        // Capture 20260731-184635 FormatFeedback: "Received reward: 2229 XP, 1120 credits."
-        private const int TurnInXpReward = 2229;
+        private const int TurnInXpReward = 2076;
 
         private const int TurnInCreditReward = 1120;
 
-        // Capture 20260731-184635 FormatFeedback wire.
-        private const string TurnInRewardFeedback = "~&!!!\":$'O\"ui!!!;4i!!!.0~";
+        // Capture 20260720-074847 FormatFeedback wire.
+        private const string TurnInRewardFeedback = "~&!!!\":$'O\"ui!!!9Ei!!!.0~";
 
         private const int AreteLandingPlayfieldId = 6553;
 
@@ -476,12 +475,6 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
-                if (!ApplyAlexTurnInXpCredits(source))
-                {
-                    Log("alex-turnin deferred: durable reward was not completed");
-                    return;
-                }
-
                 TryConsumeBioCom(source, stagedContainer);
                 try
                 {
@@ -492,6 +485,7 @@ namespace ZoneEngine.Core.Arete.Quests
                     Log("alex-rejecteditems failed: " + ex.Message);
                 }
 
+                ApplyAlexTurnInXpCredits(source);
                 TrySendTurnInRewardFeedback(source);
                 TryGrantAlexTurnInItems(source);
                 CompleteDeliverAndOfferUplink(source);
@@ -578,7 +572,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            // Capture 20260731-184635 @16:47:00: Blank Info Chip 296570 + Rebuilt HC-12 295800.
+            // Capture 20260720-flint @20:49:09: Blank Info Chip 296570 + Rebuilt HC-12 295800.
             if (!hasChip)
             {
                 GrantSingleRewardItem(source, BlankInfoChipItemId);
@@ -669,20 +663,11 @@ namespace ZoneEngine.Core.Arete.Quests
                 });
         }
 
-        private static bool ApplyAlexTurnInXpCredits(ICharacter source)
+        private static void ApplyAlexTurnInXpCredits(ICharacter source)
         {
-            if (source == null || !MissionRuntime.IsInitialized || MissionRuntime.Rewards == null)
-            {
-                return false;
-            }
-
             MissionRewardDefinition definition = new MissionRewardDefinition
                                                 {
-                                                    RewardKey = "captured-alex-bio-com-turnin-xp-credits-20260731-184635",
-                                                    LegacyRewardKeys = new[]
-                                                                       {
-                                                                           "captured-alex-bio-com-turnin-xp-credits"
-                                                                       },
+                                                    RewardKey = "captured-alex-bio-com-turnin-xp-credits",
                                                     RewardType = "character-stats",
                                                     IsResolved = true,
                                                     StatMutations =
@@ -730,31 +715,21 @@ namespace ZoneEngine.Core.Arete.Quests
                 source.Identity.Instance,
                 "Mission:5514B19C",
                 definition,
-                "capture:20260731-184635:alex-turnin-xp-credits");
-            if (result == null || !result.Succeeded)
+                "capture:20260720-074847:alex-turnin-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
             {
-                Log(
-                    "alex xp/credits reward failed status="
-                    + (result == null ? "null" : result.Status.ToString())
-                    + " msg="
-                    + (result == null ? string.Empty : result.Message));
-                return false;
+                return;
             }
 
-            if (result.StatValues != null)
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
             {
-                foreach (MissionCharacterStatValue statValue in result.StatValues)
-                {
-                    uint value = statValue.Value <= 0
-                                     ? 0
-                                     : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                    source.Stats[(StatIds)statValue.StatId].Set(value);
-                }
-
-                StatMessageHandler.Default.SendChanged(source);
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
             }
 
-            return true;
+            StatMessageHandler.Default.SendChanged(source);
         }
 
         private static void TrySendTurnInRewardFeedback(ICharacter source)
@@ -966,11 +941,6 @@ namespace ZoneEngine.Core.Arete.Quests
             }
         }
 
-        public static bool IsDeliverBioDialogueActive(ICharacter source)
-        {
-            return IsDeliverTipActive(source);
-        }
-
         private static bool IsDeliverTipActive(ICharacter source)
         {
             if (source == null || !MissionRuntime.IsInitialized)
@@ -978,47 +948,9 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            int characterId = source.Identity.Instance;
-
-            // Past Bio deliver: Report-to-Alex / Talk-to-Stan / tradeskill must not reopen Flint item dialog.
-            ZoneEngine.Core.Missions.MissionStateRecord report =
-                MissionRuntime.Service.GetMission(characterId, "Mission:555B4365");
-            ZoneEngine.Core.Missions.MissionStateRecord talkStan =
-                MissionRuntime.Service.GetMission(characterId, "Mission:555B4366");
-            ZoneEngine.Core.Missions.MissionStateRecord nanoSensor =
-                MissionRuntime.Service.GetMission(characterId, "Mission:555B4367");
-            if (IsActiveOrOffered(report)
-                || (report != null && report.State == MissionLifecycleState.Completed)
-                || IsActiveOrOffered(talkStan)
-                || (talkStan != null && talkStan.State == MissionLifecycleState.Completed)
-                || IsActiveOrOffered(nanoSensor)
-                || (nanoSensor != null && nanoSensor.State == MissionLifecycleState.Completed))
-            {
-                return false;
-            }
-
-            ZoneEngine.Core.Missions.MissionStateRecord deliver =
-                MissionRuntime.Service.GetMission(characterId, "Mission:5514B19C");
-            if (IsActiveOrOffered(deliver))
-            {
-                return true;
-            }
-
-            // Tip-only / ledger desync: Bio Com in bag after Find complete, Deliver not finished.
-            if (!HasBioCom(source))
-            {
-                return false;
-            }
-
-            ZoneEngine.Core.Missions.MissionStateRecord find =
-                MissionRuntime.Service.GetMission(characterId, "Mission:5514B19B");
-            ZoneEngine.Core.Missions.MissionStateRecord uplink =
-                MissionRuntime.Service.GetMission(characterId, "Mission:5514B19D");
-            bool findDone = find != null && find.State == MissionLifecycleState.Completed;
-            bool uplinkStarted = IsActiveOrOffered(uplink)
-                                 || (uplink != null && uplink.State == MissionLifecycleState.Completed);
-            bool deliverDone = deliver != null && deliver.State == MissionLifecycleState.Completed;
-            return findDone && !deliverDone && !uplinkStarted;
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19C");
+            return IsActiveOrOffered(mission);
         }
 
         private static bool IsAlexGibbsNpc(ICharacter source, Identity target)

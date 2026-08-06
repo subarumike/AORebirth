@@ -1491,15 +1491,6 @@ INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`,
 INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (135856142, 2073, 209, 5.003, 187, 0, 0, 0, 1, '', 297407, 'NILZLFQ');
 
 -- ============================================================
--- Arete Bronto Burgers vending machine
--- Source: AOSharp capture 20260614-214819
--- VendorId: 429457422; Playfield: 6553 Arete Landing; TemplateId: 121036; Statel: 0xC00E1999; Capture identity: (VendingMachine:12D1BF27)
--- MappingType: Captured
--- MappingSource: Captured VendorFull + ShopUpdate; the BF27 -> C00E1999 statel sequence deterministically binds vendor 429457422.
--- MappingConfidence: High
-INSERT INTO `vendors` (`Id`, `Playfield`, `X`, `Y`, `Z`, `HeadingX`, `HeadingY`, `HeadingZ`, `HeadingW`, `Name`, `TemplateId`, `Hash`) VALUES (429457422, 6553, 0, 0, 0, 0, 0, 0, 1, '', 121036, 'ARBRTBG');
-
--- ============================================================
 -- Arete ICC implant/cluster import
 -- Source: AOSharp capture 20260613-172753
 -- Coverage: 147 -> 142 (5 reduction)

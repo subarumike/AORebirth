@@ -26,8 +26,6 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class NpcCombatTickCoordinator
     {
-        private const int AreteLandingPlayfieldId = 6553;
-
         private const int MissingItemStatValue = 1234567890;
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
@@ -119,15 +117,11 @@ namespace AORebirth.Core.Playfields
                 hasCapturedContract ? capturedContract.ParallelAttackSequence : null;
             bool hasCapturedAttackStart = hasCapturedContract
                                           && capturedContract.HasCapturedAttackStartContext;
-            // Capture first-hit ~2s after Attack start; pets use that delay (not robot timing).
             double initialDelaySeconds = specialAttackSequence != null
                                              ? specialAttackSequence.InitialAttackDelaySeconds
-                                             : PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
-                                               || PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker)
-                                                   ? PetCombatRules.AttackPetRechargeSeconds
-                                                   : Playfield.IsCapturedCleaningRobot(attacker)
-                                                         ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
-                                                         : NpcCombatAttackRules.DefaultCombatTickSeconds;
+                                             : Playfield.IsCapturedCleaningRobot(attacker)
+                                                   ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
+                                                   : NpcCombatAttackRules.DefaultCombatTickSeconds;
             DateTime now = DateTime.UtcNow;
             if (parallelAttackSequence != null)
             {
@@ -171,11 +165,7 @@ namespace AORebirth.Core.Playfields
                                                this.nextCapturedFirstHitDelayObservationIndexes,
                                                attacker.Identity.Instance,
                                                capturedContract.CapturedFirstHitDelayObservationsSeconds)
-                                           : capturedContract.FirstHitDelaySeconds > 0
-                                                 ? capturedContract.FirstHitDelaySeconds
-                                                 : specialAttackSequence != null
-                                                       ? specialAttackSequence.InitialAttackDelaySeconds
-                                                       : 0.0d;
+                                           : capturedContract.FirstHitDelaySeconds;
                 bool usesSplitFixedAttackStartPackets = capturedContract.AttackModel
                                                         == CapturedEnemyAttackModel.FixedAttackInfo;
                 DateTime attackSequenceStartedAt = now;
@@ -344,13 +334,6 @@ namespace AORebirth.Core.Playfields
                 out missionSpatialFailure))
             {
                 this.playfield.ClearInvalidNpcCombatTarget(attacker);
-                return;
-            }
-
-            if (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
-                || PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker))
-            {
-                this.ProcessPlayerOwnedPetCombatTick(attacker, target);
                 return;
             }
 
@@ -582,20 +565,14 @@ namespace AORebirth.Core.Playfields
 
             if (killingHit)
             {
-                if (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
-                    || PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker))
+                if (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker))
                 {
-                    // Capture: StopFight only when the mob dies, then pet returns to owner.
                     this.playfield.Announce(
                         new StopFightMessage
                         {
                             Identity = attacker.Identity,
                             Unknown1 = 1
                         });
-                    this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
-                    this.playfield.HandleCombatKillingHit(attacker, target);
-                    PetCommandService.ReturnPetToOwner(attacker);
-                    return;
                 }
 
                 this.playfield.HandleCombatKillingHit(attacker, target);
@@ -605,124 +582,6 @@ namespace AORebirth.Core.Playfields
             this.nextCombatTicks[attacker.Identity.Instance] =
                 DateTime.UtcNow + TimeSpan.FromSeconds(
                     this.ResolveLandedRechargeSeconds(attacker, attackSource));
-        }
-
-        /// <summary>
-        /// Capture 20260730-151431: Worker chase via FollowTarget, then AttackInfo hits until
-        /// kill/StopFight. Bypass PF127 nav/LOS gates that leave pets frozen on the target
-        /// with only SpecialAttackWeapon/Attack animation and no damage.
-        /// </summary>
-        private void ProcessPlayerOwnedPetCombatTick(ICharacter attacker, ICharacter target)
-        {
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
-            if (attackSource == null)
-            {
-                this.playfield.ClearNpcCombatTracking(attacker.Identity);
-                return;
-            }
-
-            double meleeRange = Math.Max(
-                attackSource.Range,
-                NpcCombatAttackRules.MaxMeleeCombatDistance);
-            double distance = Playfield.GetCombatDistance(attacker, target);
-            DateTime now = DateTime.UtcNow;
-            DateTime nextTick;
-            bool waitingForNextSwing = this.nextCombatTicks.TryGetValue(
-                                          attacker.Identity.Instance,
-                                          out nextTick)
-                                      && nextTick > now;
-
-            if (waitingForNextSwing)
-            {
-                if (distance > meleeRange)
-                {
-                    this.EnsurePetChasesFightTarget(attacker, target);
-                }
-
-                // Capture 20260730-162433: one Attack at command; do not re-send Attack mid-fight.
-                return;
-            }
-
-            if (distance > meleeRange)
-            {
-                this.EnsurePetChasesFightTarget(attacker, target);
-                this.nextCombatTicks[attacker.Identity.Instance] =
-                    now + TimeSpan.FromSeconds(0.5);
-                return;
-            }
-
-            var petController = attacker.Controller as NPCController;
-            if (petController != null && petController.IsFollowing())
-            {
-                // Clear follow state only — do not emit StopFight / stop-move that kills anim.
-                petController.StopFollow();
-            }
-
-            int currentHealth = target.Stats[StatIds.health].Value;
-            int damage = this.CalculateCombatDamage(attacker, attackSource);
-            if (damage < 1)
-            {
-                damage = 1;
-            }
-
-            int newHealth = Math.Max(0, currentHealth - damage);
-            bool killingHit = newHealth == 0;
-
-            // Capture 20260730-162433: after command SAW+Attack, hits are AttackInfo only.
-            this.AnnounceCombatDamage(
-                attacker,
-                target,
-                damage,
-                attackSource,
-                attackSource.UsesEquippedWeapon
-                    ? CombatDamageSource.WeaponAutoAttack
-                    : CombatDamageSource.UnarmedAutoAttack);
-            target.Stats[StatIds.health].Value = newHealth;
-            target.SendChangedStats();
-            this.playfield.NotifyNpcCombatDamage(target);
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "CombatPetHit attacker={0} target={1} dmg={2} health={3}/{4} dist={5:0.00}",
-                    attacker.Identity,
-                    target.Identity,
-                    damage,
-                    newHealth,
-                    target.Stats[StatIds.life].Value,
-                    distance));
-
-            if (killingHit)
-            {
-                this.playfield.Announce(
-                    new StopFightMessage
-                    {
-                        Identity = attacker.Identity,
-                        Unknown1 = 1
-                    });
-                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
-                this.playfield.HandleCombatKillingHit(attacker, target);
-                PetCommandService.ReturnPetToOwner(attacker);
-                return;
-            }
-
-            this.nextCombatTicks[attacker.Identity.Instance] =
-                now + TimeSpan.FromSeconds(
-                    this.ResolveLandedRechargeSeconds(attacker, attackSource));
-        }
-
-        private void EnsurePetChasesFightTarget(ICharacter attacker, ICharacter target)
-        {
-            var petController = attacker.Controller as NPCController;
-            if (petController == null || target == null)
-            {
-                return;
-            }
-
-            if (!petController.IsFollowing(target.Identity))
-            {
-                petController.Follow(target.Identity, 2.0);
-            }
         }
 
         private bool TryApplyCapturedWeaponAmmo(
@@ -836,16 +695,6 @@ namespace AORebirth.Core.Playfields
             CapturedEnemyCombatContract capturedContract,
             DateTime utcNow)
         {
-            // Player pets on Arete must land hits once in melee range; strict PF127
-            // LOS/nav gates leave them frozen on the target with no AttackInfo.
-            if (this.playfield.Identity.Instance == AreteLandingPlayfieldId
-                && (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
-                    || PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker)))
-            {
-                this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);
-                return true;
-            }
-
             bool requiresDamageLineOfSight =
                 NpcDamageLineOfSightRuntimeService.IsDamageLineOfSightRequired(
                     NpcDamageLineOfSightRuntimeService.Pf127DamageLineOfSightActivated,
@@ -1085,8 +934,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker)
-                || PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
+            if (PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
                 || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker))
             {
                 this.AnnouncePlayerOwnedAttackPetAttackStartContext(attacker, target);
@@ -1135,51 +983,32 @@ namespace AORebirth.Core.Playfields
 
         private void AnnouncePlayerOwnedAttackPetAttackStartContext(ICharacter attacker, ICharacter target)
         {
-            bool usesBuw1 = PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker);
-            if (usesBuw1)
-            {
-                // Capture 20260730-151431: factory path matches live SpecialAttackWeapon wire.
-                this.playfield.Announce(
-                    CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
-                        attacker.Identity,
-                        CreateBureaucratWorkerSpecialAttacks(),
-                        0,
-                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
-                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
-                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
-                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
-                        0));
-            }
-            else
-            {
-                this.playfield.Announce(
-                    new SpecialAttackWeaponMessage
-                    {
-                        Identity = attacker.Identity,
-                        Specials = CreatePlayerOwnedAttackPetSpecialAttacks(),
-                        Unknown1 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        Unknown2 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        Unknown3 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        Unknown4 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        Unknown5 = 0
-                    });
-            }
-
             this.playfield.Announce(
-                CapturedEnemyCombatPacketFactory.CreateAttack(
-                    attacker.Identity,
-                    target.Identity,
-                    0,
-                    0));
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = attacker.Identity,
+                    Specials = CreatePlayerOwnedAttackPetSpecialAttacks(),
+                    Unknown1 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown2 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown3 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown4 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    Unknown5 = 0
+                });
+            this.playfield.Announce(
+                new AttackMessage
+                {
+                    Identity = attacker.Identity,
+                    Target = target.Identity,
+                    Action = 0
+                });
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "CombatPetAttackStartContextSend attacker={0} target={1} buw1={2}",
+                    "CombatPetAttackStartContextSend attacker={0} target={1}",
                     attacker.Identity,
-                    target.Identity,
-                    usesBuw1));
+                    target.Identity));
         }
 
         private void AnnounceCapturedSpecialAttackSequenceContext(
@@ -1475,19 +1304,6 @@ namespace AORebirth.Core.Playfields
                    };
         }
 
-        private static CapturedEnemySpecialAttackDefinition[] CreateBureaucratWorkerSpecialAttacks()
-        {
-            // Capture 20260730-151431: one SpecialAttack, BUW1/BUW1.
-            return new[]
-                   {
-                       new CapturedEnemySpecialAttackDefinition(
-                           PetCombatRules.BureaucratWorkerWeaponLowTemplate,
-                           PetCombatRules.BureaucratWorkerWeaponHighTemplate,
-                           PetCombatRules.BureaucratWorkerWeaponTag,
-                           PetCombatRules.BureaucratWorkerWeaponName)
-                   };
-        }
-
         private static CapturedEnemySpecialAttackDefinition[] CreateCapturedCleaningRobotSpecialAttacks()
         {
             return new[]
@@ -1647,38 +1463,6 @@ namespace AORebirth.Core.Playfields
                        };
             }
 
-            if (PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker))
-            {
-                int rawMinDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.mindamage].Value, 0);
-                int rawMaxDamage = NormalizeCombatItemStat(attacker.Stats[StatIds.maxdamage].Value, 0);
-                int fallbackMinDamage = PetCombatRules.ResolveLevelEquivalentAttackPetMinDamage(
-                    attacker.Stats[StatIds.level].Value);
-                int fallbackMaxDamage = PetCombatRules.ResolveLevelEquivalentAttackPetMaxDamage(
-                    attacker.Stats[StatIds.level].Value);
-                int petMinDamage = rawMinDamage > 0
-                                       ? rawMinDamage
-                                       : (rawMaxDamage > 0 ? rawMaxDamage : fallbackMinDamage);
-                int petMaxDamage = rawMaxDamage > 0
-                                       ? rawMaxDamage
-                                       : (rawMinDamage > 0 ? rawMinDamage : fallbackMaxDamage);
-
-                return new CombatAttackSource
-                       {
-                           MinDamage = petMinDamage,
-                           MaxDamage = petMaxDamage,
-                           DamageBonus = NormalizeCombatItemStat(attacker.Stats[StatIds.damagebonus].Value, 0),
-                           Range = NpcCombatAttackRules.MaxMeleeCombatDistance,
-                           RechargeSeconds = PetCombatRules.AttackPetRechargeSeconds,
-                           UsesEquippedWeapon = true,
-                           AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = PetCombatRules.BureaucratWorkerAttackInfoWeaponSlot,
-                           AttackInfoUnk1 = PetCombatRules.BureaucratWorkerAttackInfoUnk1,
-                           AttackInfoHitType = PetCombatRules.BureaucratWorkerAttackInfoHitType,
-                           AttackInfoWeaponInstance = PetCombatRules.BureaucratWorkerWeaponTag,
-                           SendAttackInfo = true
-                       };
-            }
-
             if (PetCombatRules.IsPlayerOwnedMewAttackPet(attacker)
                 || PetCombatRules.IsPlayerOwnedBureaucratCompanionPet(attacker)
                 || (PetCombatRules.IsPlayerOwnedPet(attacker)
@@ -1784,30 +1568,16 @@ namespace AORebirth.Core.Playfields
             if (hasCapturedContract
                 && capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
             {
-                // FixedAttackOnSight (Alex fleas etc.) is unarmed: CapturedUsesEquippedWeapon=false
-                // and CapturedAttackRange often unset. Old logic treated !equipped as hard-fail and
-                // returned null → ResetCombatTick aborted after AcquireAggro (no visible aggro).
                 double attackRange;
                 if (capturedContract.CapturedAttackRange.HasValue)
                 {
                     attackRange = capturedContract.CapturedAttackRange.Value;
                 }
-                else if (capturedContract.CapturedUsesEquippedWeapon)
-                {
-                    if (!this.TryResolveCapturedWeaponAttackRange(
-                            attacker,
-                            capturedContract,
-                            out attackRange))
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    attackRange = NpcCombatAttackRules.MaxMeleeCombatDistance;
-                }
-
-                if (!IsResolvedAttackRange(attackRange))
+                else if (!capturedContract.CapturedUsesEquippedWeapon
+                         || !this.TryResolveCapturedWeaponAttackRange(
+                             attacker,
+                             capturedContract,
+                             out attackRange))
                 {
                     return null;
                 }

@@ -325,16 +325,6 @@ namespace AORebirth.Core.Playfields
                        && this.RechargeSeconds > 0;
             }
         }
-
-        internal bool IsValidOneShot
-        {
-            get
-            {
-                return this.MinDamage > 0
-                       && this.MaxDamage >= this.MinDamage
-                       && this.RechargeSeconds == 0.0d;
-            }
-        }
     }
 
     internal sealed class CapturedEnemySpecialAttackDefinition
@@ -434,26 +424,15 @@ namespace AORebirth.Core.Playfields
     {
         internal CapturedEnemyParallelAttackStreamDefinition(
             double initialDelaySeconds,
-            CapturedEnemyCombatAttackDefinition attack,
-            bool repeats = true)
+            CapturedEnemyCombatAttackDefinition attack)
         {
             this.InitialDelaySeconds = initialDelaySeconds;
             this.Attack = attack;
-            this.Repeats = repeats;
         }
 
         internal double InitialDelaySeconds { get; private set; }
 
         internal CapturedEnemyCombatAttackDefinition Attack { get; private set; }
-
-        internal bool Repeats { get; private set; }
-
-        internal DateTime ResolveNextTickAfterHit(DateTime now)
-        {
-            return this.Repeats
-                       ? now + TimeSpan.FromSeconds(this.Attack.RechargeSeconds)
-                       : DateTime.MaxValue;
-        }
 
         internal bool IsValid
         {
@@ -461,9 +440,7 @@ namespace AORebirth.Core.Playfields
             {
                 return this.InitialDelaySeconds >= 0
                        && this.Attack != null
-                       && (this.Repeats
-                               ? this.Attack.IsValid
-                               : this.Attack.IsValidOneShot);
+                       && this.Attack.IsValid;
             }
         }
     }
@@ -480,8 +457,7 @@ namespace AORebirth.Core.Playfields
             int specialAttackWeaponUnknown5,
             byte specialAttackWeaponN3Unknown,
             byte attackN3Unknown,
-            byte attackAction,
-            double attackStartDelaySeconds = 0.0d)
+            byte attackAction)
         {
             this.Streams = streams;
             this.SpecialAttacks = specialAttacks;
@@ -493,7 +469,6 @@ namespace AORebirth.Core.Playfields
             this.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
             this.AttackN3Unknown = attackN3Unknown;
             this.AttackAction = attackAction;
-            this.AttackStartDelaySeconds = attackStartDelaySeconds;
         }
 
         internal CapturedEnemyParallelAttackStreamDefinition[] Streams { get; private set; }
@@ -516,17 +491,12 @@ namespace AORebirth.Core.Playfields
 
         internal byte AttackAction { get; private set; }
 
-        internal double AttackStartDelaySeconds { get; private set; }
-
         internal bool IsValid
         {
             get
             {
                 return this.Streams != null
                        && this.Streams.Length > 0
-                       && !double.IsNaN(this.AttackStartDelaySeconds)
-                       && !double.IsInfinity(this.AttackStartDelaySeconds)
-                       && this.AttackStartDelaySeconds >= 0.0d
                        && this.Streams.All(
                            stream => stream != null && stream.IsValid);
             }
@@ -1277,8 +1247,7 @@ namespace AORebirth.Core.Playfields
                     stream.InitialDelaySeconds,
                     stream.Attack.WithCapturedDamageObservations(
                         capturedDamageObservationsByAttack[index],
-                        lethalAttackInfoUnknownByAttack[index]),
-                    stream.Repeats);
+                        lethalAttackInfoUnknownByAttack[index]));
             }
 
             clone.ParallelAttackSequence = new CapturedEnemyParallelAttackSequenceDefinition(
@@ -1291,8 +1260,7 @@ namespace AORebirth.Core.Playfields
                 parallelSequence.SpecialAttackWeaponUnknown5,
                 parallelSequence.SpecialAttackWeaponN3Unknown,
                 parallelSequence.AttackN3Unknown,
-                parallelSequence.AttackAction,
-                parallelSequence.AttackStartDelaySeconds);
+                parallelSequence.AttackAction);
             return clone;
         }
 

@@ -555,16 +555,6 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.ActivateNpc(character);
         }
 
-        public void SuspendCapturedAretePatrol(ICharacter character)
-        {
-            this.runtimeSystems.SuspendCapturedAretePatrol(character);
-        }
-
-        public void ResumeCapturedAretePatrol(ICharacter character)
-        {
-            this.runtimeSystems.ResumeCapturedAretePatrol(character);
-        }
-
         public void RegisterDynel(IEntity entity)
         {
             this.runtimeSystems.RegisterDynel(entity);
@@ -1847,17 +1837,8 @@ namespace AORebirth.Core.Playfields
             // on Attack; stale RawCoordinates were skipping every swing after the first for
             // 10–20s (Mike 20260801 — fists and guns identical).
             int currentHealth = target.Stats[StatIds.health].Value;
-            int hellfyreDamage;
-            bool hellfyreRocket = RemiGalloisQuestRuntime.TryGetHellfyreRocketDamage(
-                attacker,
-                target,
-                attackSource.WeaponLowId,
-                attackSource.WeaponHighId,
-                out hellfyreDamage);
-            DamageCalculationResult damageResult = hellfyreRocket
-                                                       ? null
-                                                       : this.CalculateCombatDamageDetailed(attacker, attackSource);
-            int damage = hellfyreRocket ? hellfyreDamage : damageResult.FinalTargetDamage;
+            DamageCalculationResult damageResult = this.CalculateCombatDamageDetailed(attacker, attackSource);
+            int damage = damageResult.FinalTargetDamage;
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
 
@@ -1869,16 +1850,6 @@ namespace AORebirth.Core.Playfields
                 attackSource.UsesEquippedWeapon
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
-            if (hellfyreRocket)
-            {
-                RemiGalloisQuestRuntime.AnnounceHellfyreRocketHit(
-                    attacker,
-                    target,
-                    damage,
-                    newHealth,
-                    killingHit);
-            }
-
             target.Stats[StatIds.health].Value = newHealth;
             MissionAcgOperationalRuntime.NotifyHealthChanged(target, newHealth);
             this.runtimeSystems.SendChangedStats(target, SendChangedStats);
@@ -2089,13 +2060,7 @@ namespace AORebirth.Core.Playfields
                            Range = MaxMeleeCombatDistance,
                            RechargeSeconds = IsCapturedCleaningRobot(attacker)
                                                  ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
-                                                 : (attacker.Controller is PlayerController
-                                                        ? WeaponCombatTimingRules.CalculateCycleSeconds(
-                                                              attacker,
-                                                              100,
-                                                              100,
-                                                              null)
-                                                        : DefaultCombatTickSeconds),
+                                                 : DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = UnarmedAttackInfoAmmoCount,
                            AttackInfoWeaponSlot = attackInfoWeaponSlot,
@@ -2136,15 +2101,9 @@ namespace AORebirth.Core.Playfields
                        EffectiveAttackRating = GetEffectiveAttackRating(attacker, weapon),
                        AddAllOff = TryGetStatValue(attacker, 276),
                        Range = NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
-                       RechargeSeconds = attacker.Controller is PlayerController
-                                             ? WeaponCombatTimingRules.CalculateCycleSeconds(
-                                                 attacker,
-                                                 weapon.GetAttribute((int)StatIds.itemdelay),
-                                                 weapon.GetAttribute((int)StatIds.rechargedelay),
-                                                 weapon)
-                                             : NormalizeCombatDelaySeconds(
-                                                 weapon.GetAttribute((int)StatIds.itemdelay),
-                                                 weapon.GetAttribute((int)StatIds.rechargedelay)),
+                       RechargeSeconds = NormalizeCombatDelaySeconds(
+                           weapon.GetAttribute((int)StatIds.itemdelay),
+                           weapon.GetAttribute((int)StatIds.rechargedelay)),
                        UsesEquippedWeapon = true,
                        AttackInfoAmmoCount = 40,
                        AttackInfoWeaponSlot = equippedWeapon.Slot,
@@ -3454,9 +3413,6 @@ namespace AORebirth.Core.Playfields
 
         private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
         {
-            // Capture 20260730-220951: flea corpse must keep living scale/mesh (125 / 15231).
-            AlexAreaMobRuntime.EnsureFleaCorpseVisuals(target);
-
             int corpseCatMesh = CorpseCatMeshFor(target);
             int corpseMonsterData = CorpseMonsterDataFor(target);
             int recipientCount = 0;
