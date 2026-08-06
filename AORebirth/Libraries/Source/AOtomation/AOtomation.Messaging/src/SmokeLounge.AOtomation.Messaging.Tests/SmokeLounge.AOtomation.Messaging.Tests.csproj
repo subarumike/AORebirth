@@ -263,7 +263,6 @@
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
     <Compile Include="OfficialDungeonNavigationTests.cs" />
-    <Compile Include="CapturedAreteMovementRuntimeTests.cs" />
     <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
@@ -285,11 +284,7 @@
     <Compile Include="PersistentMissionFoundationTests.cs" />
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
-    <Compile Include="CapturedAreteExactInteractionTests.cs" />
-    <Compile Include="AreteAcceptanceMatrixTests.cs" />
     <Compile Include="SubwayAcceptanceMatrixTests.cs" />
-    <Compile Include="AreteCapturedVendorOwnershipTests.cs" />
-    <Compile Include="AreteCapturedQuestOwnershipTests.cs" />
     <Compile Include="WindcallerKarrecNpcContentTests.cs" />
     <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
     <Compile Include="DailyMissionRewardRulesTests.cs" />
@@ -359,9 +354,6 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs">
       <Link>CapturedAreteRobotContentProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteMovementCatalog.cs">
-      <Link>CapturedAreteMovementCatalog.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs">
       <Link>CapturedSubwayContentProvider.cs</Link>
@@ -433,7 +425,6 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentPackValidator.cs"><Link>DialogueContentPackValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueModels.cs"><Link>DialogueModels.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\CapturedAreteExactInteractionCatalog.cs"><Link>CapturedAreteExactInteractionCatalog.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>
@@ -525,16 +516,8 @@
       <Link>Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\aggro.csv">
-      <Link>Content\Captured\Arete\aggro.csv</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement-full\*.csv">
-      <Link>Content\Captured\Arete\movement-full\%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement-full\manifest.json">
-      <Link>Content\Captured\Arete\movement-full\manifest.json</Link>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
+      <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json">
@@ -555,10 +538,6 @@
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
       <Link>Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\flint-novak\dialogue\captured-june-interactions.dialogue.json">
-      <Link>Content\Arete\flint-novak\dialogue\captured-june-interactions.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\manifest.json">

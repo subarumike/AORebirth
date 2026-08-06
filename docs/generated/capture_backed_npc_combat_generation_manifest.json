@@ -19,10 +19,10 @@
       "sha256": "26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793"
     },
     {
-      "byteLength": 13519171,
+      "byteLength": 12735652,
       "path": "docs/generated/capture_backed_npc_combat_active_coverage.json",
       "role": "activeCoverage",
-      "sha256": "61b9aa9be51c4b4586e85b82a6b46b525eea113e037bb4cf7e6aa5477497eac3"
+      "sha256": "7f9e61a558c5f91f25ce16268aa30824a64b332ace4ab869223322fbc3e3dfb1"
     },
     {
       "byteLength": 9000177,
@@ -32,7 +32,7 @@
     }
   ],
   "counts": {
-    "accepted": 504,
+    "accepted": 503,
     "canonicalSessions": 365,
     "captureSessions": 381,
     "certifiedProfiles": 260,
@@ -40,19 +40,19 @@
     "formulaBindings": 67,
     "formulaProfiles": 422,
     "generatorErrors": 0,
-    "initialActors": 1600,
-    "quarantined": 1096,
+    "initialActors": 1529,
+    "quarantined": 1026,
     "runtimeReadyDefinitions": 101,
     "runtimeReadyProfiles": 96,
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1486
   },
-  "generationIdentity": "4217fcc90b5adc10847c647d8134dea271c9c2cc73cae94a0ca34b4bd37950cf",
+  "generationIdentity": "2512f9652d8549eac1c7bc767ab4810fbf7f28b7129c0094c947baeecf06fb6c",
   "generators": {
     "activeCoverage": {
-      "byteLength": 149275,
+      "byteLength": 140394,
       "path": "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py",
-      "sha256": "cea1efaa6458088bc71ae867a303e833c4ea83d2073e9f81f8304e4171708e84"
+      "sha256": "115e1ab649b13da45ef938ee83b9609a0419fd73be75ff93889a553734ab0ac1"
     },
     "captureDecoder": {
       "byteLength": 106886,
@@ -96,12 +96,12 @@
     }
   },
   "inputSnapshot": {
-    "auxiliarySnapshotIdentity": "285adf8c01c9bf651871995f4e0c5da43ff248b2152dbb0d051d0913113852f1",
+    "auxiliarySnapshotIdentity": "91bf2d8e0a88f6cc55c3098a40ddcdf7574317ccb744cb9e5731836244e97c57",
     "captureManifestByteLength": 402965,
     "captureManifestSha256": "475a66fa74eda550a24b494ea98a86907bccd96825f0026e99e9de02699ceed2",
     "captureSchemaVersion": 1,
     "captureSnapshotIdentity": "512d6ba182b9d377b442ccdd4542aad4055ec84a0b517be06784824327ff224f",
-    "identity": "41170c02111107dd1f227c36464baacf8b9d5ba19b6f63b2a93b3f794799f385",
+    "identity": "c9abbe7789b7dca14c5c4f1927ff2e2bff84ceb40699b0fda8a29e1c711e0220",
     "schemaVersion": 2
   },
   "pipeline": "capture-backed-npc-combat",

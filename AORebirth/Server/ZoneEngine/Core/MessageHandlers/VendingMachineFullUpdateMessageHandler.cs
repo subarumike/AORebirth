@@ -62,16 +62,6 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.BucketheadFiller(vendor));
         }
 
-        /// <summary>
-        /// Capture 20260721-lockpick freestanding ICC Tech Supplies VMFU:
-        /// NpcIdentity none + Position/Rotation, Unknown4=111, Unknown6=0,
-        /// 8 compact stats (Flags/StaticInstance/ACG*), name, Unk8=2, Unk9=50, Unk11=3.
-        /// </summary>
-        public void SendAreteFreestanding(ICharacter character, Vendor vendor)
-        {
-            this.Send(character, this.AreteFreestandingFiller(vendor));
-        }
-
         private MessageDataFiller BucketheadFiller(Vendor vendor)
         {
             return x =>
@@ -98,51 +88,6 @@ namespace ZoneEngine.Core.MessageHandlers
                               Tuple((CharacterStat)500, 0),
                           };
                 x.Unknown7 = string.Empty;
-                x.Unknown8 = 2;
-                x.Unknown9 = 50;
-                x.Unknown10 = new Identity[0];
-                x.Unknown11 = 3;
-            };
-        }
-
-        private MessageDataFiller AreteFreestandingFiller(Vendor vendor)
-        {
-            uint templateId = (uint)vendor.Stats[0x17].Value;
-            return x =>
-            {
-                x.Identity = vendor.Identity;
-                x.Unknown = 0;
-                x.NpcIdentity = Identity.None;
-                x.Coordinates = new Vector3()
-                                {
-                                    X = vendor.Coordinates().x,
-                                    Y = vendor.Coordinates().y,
-                                    Z = vendor.Coordinates().z
-                                };
-                x.Heading = new Quaternion()
-                            {
-                                X = vendor.Heading.xf,
-                                Y = vendor.Heading.yf,
-                                Z = vendor.Heading.zf,
-                                W = vendor.Heading.wf
-                            };
-                x.TypeIdentifier = 0x0b;
-                x.PlayfieldId = vendor.Playfield.Identity.Instance;
-                x.Unknown4 = 111;
-                x.Unknown5 = 0;
-                x.Unknown6 = 0;
-                x.Stats = new[]
-                          {
-                              Tuple(CharacterStat.Flags, unchecked((uint)-2147338751)),
-                              Tuple(CharacterStat.StaticInstance, templateId),
-                              Tuple(CharacterStat.ACGItemLevel, 1),
-                              Tuple(CharacterStat.ACGItemTemplateID, templateId),
-                              Tuple(CharacterStat.ACGItemTemplateID2, templateId),
-                              Tuple(CharacterStat.MultipleCount, 1),
-                              Tuple((CharacterStat)501, 2),
-                              Tuple((CharacterStat)500, 0),
-                          };
-                x.Unknown7 = string.IsNullOrEmpty(vendor.Name) ? string.Empty : vendor.Name + "\0";
                 x.Unknown8 = 2;
                 x.Unknown9 = 50;
                 x.Unknown10 = new Identity[0];

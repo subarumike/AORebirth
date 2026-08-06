@@ -93,12 +93,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 return AlexTradeskillOfferNodeId;
             }
 
-            // Capture 20260731-184635: Deliver Bio tip → Hello / bring device / Goodbye.
-            if (FlintBioComQuestRuntime.IsDeliverBioDialogueActive(source))
-            {
-                return FlintBioComQuestRuntime.AlexTradeOfferNodeId;
-            }
-
             // Capture 20260722-Alex-dialog: "How is that...favor..." while Alex favor chain
             // is active (Surveillance Uplink → Plant → Deliver Bill → Kneecapping).
             if (IsMissionActive(source, "Mission:5514B19D")
@@ -223,14 +217,71 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void ApplyReportTurnInXpCredits(ICharacter source)
         {
-            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
-                source,
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-alex-report-calitri-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = ReportTurnInCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = ReportTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = ReportTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.lastxp,
+                                                                Kind = MissionStatMutationKind.Set,
+                                                                Value = ReportTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
                 "Mission:555B4365",
-                "arete-credits-awarded-alex-report-turnin",
-                ReportTurnInCreditReward,
-                "arete-xp-awarded-alex-report-turnin",
-                ReportTurnInXpReward,
-                "alex-report-calitri-2596xp");
+                definition,
+                "capture:20260720-171317:alex-report-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
         }
 
         private static void TrySendReportRewardFeedback(ICharacter source)

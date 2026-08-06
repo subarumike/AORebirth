@@ -14,7 +14,6 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using Utility;
 
-    using ZoneEngine.Core;
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
@@ -38,13 +37,6 @@ namespace ZoneEngine.Core.Arete.Quests
         private const int HackerToolItemId = VernonGodfrayCombineRules.HackerToolItemId;
 
         private const int CapturedTradeSlotCount = 1;
-
-        // Vernon / brain inspect redraw (TemplateAction Unknown1/2 + Overflow slot).
-        private const int CapturedTemplateActionUnknown1 = 1;
-
-        private const int CapturedTemplateActionUnknown2 = 87;
-
-        private const int CapturedOverflowNextFreeSlot = 0x6F;
 
         private const string TerminalTradePrompt =
             "Drag and drop the item(s) you want to give to Shipping Manifest Terminal into one of the slots available and press \"accept\"";
@@ -175,10 +167,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
             if (IsMissionLifecycle(source, VernonGodfrayQuestRuntime.ReturnToVernonGodfrayQuestId, true, true))
             {
-                // Capture 20260801-105429: Cargo tip must still be deleted even if Return
-                // was already offered (otherwise journal keeps both tips).
-                SafeQuestFullUpdateSender.TrySendCargoLiftingToReturnVernonHandoff(source);
-                Log("smt-reroute — Return already progressed; force Cargo tip delete");
+                Log("smt-reroute ignored — Return to Vernon already progressed");
                 return true;
             }
 
@@ -199,7 +188,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
-                // Capture 20260802-cargo-lift: RejectedItems [] Unknown2=1 — Hacker Tool kept.
+                // Capture: RejectedItems [] Unknown2=1 — Hacker Tool kept (inspect).
                 try
                 {
                     KnuBotRejectedItemsMessageHandler.Default.Send(source, terminalTarget, new Item[0], 1);
@@ -209,19 +198,11 @@ namespace ZoneEngine.Core.Arete.Quests
                     Log("smt-rejecteditems failed: " + ex.Message);
                 }
 
-                // Empty RejectedItems matches capture but client trade chrome still hides the
-                // icon — Vernon/brain Overflow TemplateAction redraw restores Hacker Tool.
-                TryForceReturnHackerTool(source);
-
                 ForgetTradeSession(source);
                 try
                 {
                     if (!ContentDrivenNpcDialogueRouter.TryResumeAfterNpcTrade(source, terminalTarget))
                     {
-                        Log("smt-resume failed — CloseChat (no Re-route); character="
-                            + source.Identity.ToString(true)
-                            + " target="
-                            + terminalTarget.ToString(true));
                         KnuBotCloseChatWindowMessageHandler.Default.Send(source, terminalTarget);
                     }
                 }
@@ -264,11 +245,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 if (result.Status != MissionOperationStatus.Applied
                     && result.Status != MissionOperationStatus.AlreadyApplied)
                 {
-                    // Ensure Cargo is completed even when activate-next fails, so login sync
-                    // does not re-emit the Cargo Lifting tip beside Return to Vernon.
-                    MissionRuntime.Service.CompleteMission(
-                        instance,
-                        VernonGodfrayQuestRuntime.CargoLiftingQuestId);
                     MissionRuntime.Service.OfferMission(
                         instance,
                         VernonGodfrayQuestRuntime.ReturnToVernonGodfrayQuestId);
@@ -278,7 +254,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 }
             }
 
-            // Capture 20260801-105429: Quest Delete Mission Cargo, then QFU Return to Vernon.
             SafeQuestFullUpdateSender.TrySendCargoLiftingToReturnVernonHandoff(source);
             Log("smt-cargo-complete→return-vernon character=" + source.Identity.ToString(true));
         }
@@ -332,96 +307,10 @@ namespace ZoneEngine.Core.Arete.Quests
             return IsMissionLifecycle(source, VernonGodfrayQuestRuntime.CargoLiftingQuestId, true, false);
         }
 
-        private static void TryForceReturnHackerTool(ICharacter source)
-        {
-            if (source?.Controller?.Client == null)
-            {
-                return;
-            }
-
-            bool hasTool = InventoryContainerRuntimeService.Default.HasCharacterInventory(source)
-                           && InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
-                               source,
-                               HackerToolItemId);
-            if (!hasTool)
-            {
-                try
-                {
-                    Item item = new Item(1, HackerToolItemId, HackerToolItemId);
-                    QuestRewardInventoryGrantResult grant =
-                        InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(source, item);
-                    if (grant.Status != QuestRewardInventoryGrantStatus.Success)
-                    {
-                        Log(
-                            "smt-force-return-hacker grant failed status="
-                            + grant.Status
-                            + " invErr="
-                            + grant.InventoryError);
-                        return;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log("smt-force-return-hacker grant failed: " + ex.Message);
-                    return;
-                }
-
-                Log("smt-force-return-hacker grant character=" + source.Identity.ToString(true));
-            }
-
-            SendOverflowGrantPackets(source, HackerToolItemId, 1);
-            Log("smt-force-return-hacker refresh character=" + source.Identity.ToString(true));
-        }
-
-        private static void SendOverflowGrantPackets(ICharacter source, int itemId, int quality)
-        {
-            source.Send(
-                new TemplateActionMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    ItemLowId = itemId,
-                    ItemHighId = itemId,
-                    Quality = quality,
-                    Unknown1 = CapturedTemplateActionUnknown1,
-                    Unknown2 = CapturedTemplateActionUnknown2,
-                    Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Unknown3 = 0,
-                    Unknown4 = 0
-                });
-            source.Send(
-                new ContainerAddItemMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Target = new Identity
-                             {
-                                 Type = IdentityType.OverflowWindow,
-                                 Instance = source.Identity.Instance
-                             },
-                    TargetPlacement = CapturedOverflowNextFreeSlot
-                });
-        }
-
         private static bool IsShippingManifestTerminal(ICharacter source, Identity target)
         {
-            if (target.Type != IdentityType.CanbeAffected || target.Instance == 0)
-            {
-                return false;
-            }
-
-            if (target.Instance == ShippingManifestTerminalInstance)
-            {
-                return true;
-            }
-
-            int poolInstance;
-            if (AORebirth.Core.Playfields.AreteLandingSpawn.TryGetLivingPoolInstance(
-                    ShippingManifestTerminalInstance,
-                    out poolInstance)
-                && poolInstance != 0
-                && target.Instance == poolInstance)
+            if (target.Type == IdentityType.CanbeAffected
+                && target.Instance == ShippingManifestTerminalInstance)
             {
                 return true;
             }
@@ -431,16 +320,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            ICharacter npc = null;
-            try
-            {
-                npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, target);
-            }
-            catch
-            {
-                npc = null;
-            }
-
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, target);
             return npc != null
                    && string.Equals(npc.Name, "Shipping Manifest Terminal", StringComparison.OrdinalIgnoreCase);
         }

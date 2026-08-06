@@ -40,6 +40,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedAreteRobotContentProvider capturedRobotContent;
 
+        private readonly NpcPatrolReplayCoordinator patrolReplay;
+
         private readonly Action<ICharacter> activateNpc;
 
         private readonly Dictionary<int, DateTime[]> nextRespawnUtcByPlayfield =
@@ -63,9 +65,11 @@ namespace AORebirth.Core.Playfields
 
         internal CapturedAreteRobotSpawnOrchestrator(
             CapturedAreteRobotContentProvider capturedRobotContent,
+            NpcPatrolReplayCoordinator patrolReplay,
             Action<ICharacter> activateNpc)
         {
             this.capturedRobotContent = capturedRobotContent;
+            this.patrolReplay = patrolReplay;
             this.activateNpc = activateNpc;
         }
 
@@ -226,15 +230,13 @@ namespace AORebirth.Core.Playfields
 
                 if (now >= state.BurnStartedUtc + TimeSpan.FromSeconds(BurnBeforeExplodeSeconds))
                 {
-                    // Capture 20260731-172247: CharacterAction Death Parameter2=503 then corpse.
+                    // Health=0 → ProcessDeadNpcDespawn → BeginNpcDeath → explode Parameter2=503.
                     candidate.Stats[StatIds.health].Value = 0;
                     this.robotLifeByInstance.Remove(instance);
                     LogUtil.Debug(
                         DebugInfoDetail.Engine,
                         "Captured Arete robot explode identity="
                         + candidate.Identity.ToString(true));
-                    // Force death pipeline now (explode anim) — don't wait for heartbeat race.
-                    playfield.HandleCombatKillingHit(null, candidate);
                     continue;
                 }
 
@@ -298,6 +300,7 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.level, spawn.Level);
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
+            AssignCapturedPatrolWaypoints(mobCharacter, spawn);
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
                 "arete-malfunctioning-cleaning-robot-20260721-Rox-robots",
                 NpcCombatAttackRules.CapturedCleaningRobotLeftHandDamage,
@@ -328,7 +331,27 @@ namespace AORebirth.Core.Playfields
                     spawn.RunSpeed,
                     spawn.X,
                     spawn.Y,
-                    spawn.Z));
+                    spawn.Z,
+                    spawn.PatrolX,
+                    spawn.PatrolY,
+                    spawn.PatrolZ));
+
+            int replaySegmentCount = 0;
+            this.patrolReplay.AssignCapturedAreteRobotReplay(
+                spawn.SourceInstance,
+                segments =>
+                {
+                    replaySegmentCount = segments == null ? 0 : segments.Length;
+                    npcController.SetCapturedPatrolReplaySegments(segments);
+                });
+            PlayfieldLifecycleTrace.Record(
+                PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
+                PlayfieldLifecycleTrace.StageCapturedAreteRobotPatrolReplayAssigned,
+                PlayfieldLifecycleTrace.MessageCapturedAreteRobotPatrolReplayAssigned,
+                mobCharacter.Identity,
+                PlayfieldLifecycleTrace.FormatCapturedAreteRobotPatrolReplayAssignedDetail(
+                    spawn.SourceInstance,
+                    replaySegmentCount));
 
             mobCharacter.DoNotDoTimers = false;
             this.activateNpc(mobCharacter);
@@ -362,6 +385,20 @@ namespace AORebirth.Core.Playfields
                     spawn.Level,
                     spawn.RunSpeed));
             return mobCharacter;
+        }
+
+        private static void AssignCapturedPatrolWaypoints(
+            ICharacter mobCharacter,
+            CapturedAreteRobotSpawnDefinition spawn)
+        {
+            mobCharacter.Waypoints.Clear();
+            mobCharacter.AddWaypoint(
+                new AORebirth.Core.Vector.Vector3(spawn.X, spawn.Y, spawn.Z),
+                false);
+            mobCharacter.AddWaypoint(
+                new AORebirth.Core.Vector.Vector3(spawn.PatrolX, spawn.PatrolY, spawn.PatrolZ),
+                false);
+            mobCharacter.Controller.State = CharacterState.Patrolling;
         }
 
         private static void SetCapturedMobStat(ICharacter mobCharacter, StatIds stat, int value)

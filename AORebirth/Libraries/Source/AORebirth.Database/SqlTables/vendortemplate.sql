@@ -1022,12 +1022,6 @@ INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHas
 INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('NILZLFQ', 1, 'NeutralRefinedICCShinyClusters', 297407, 'N5PM', 300, 300);
 
 -- ============================================================
--- Arete Bronto Burgers vending machine
--- Source: AOSharp capture 20260614-214819
--- NormalizedName: AreteBrontoBurgers; TemplateId: 121036; ShopHash: BRBG; Inventory rows: 10; Capture identity: (VendingMachine:12D1BF27)
-INSERT INTO `vendortemplate` (`HASH`, `lvl`, `Name`, `itemtemplate`, `ShopInvHash`, `minQL`, `maxQL`) VALUES ('ARBRTBG', 1, 'AreteBrontoBurgers', 121036, 'BRBG', 1, 1);
-
--- ============================================================
 -- Arete ICC implant/cluster import
 -- Source: AOSharp capture 20260613-172753
 -- Coverage: 147 -> 142 (5 reduction)

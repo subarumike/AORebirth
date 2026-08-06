@@ -26,12 +26,6 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class NPCRuntimeService
     {
-        // NPC-first attack starts prove automatic aggression even when the
-        // player coordinate needed for an exact trigger distance is absent.
-        // Use a contact-only floor for that proven eligibility; measured
-        // radii continue to take precedence and the exact radius stays unresolved.
-        private const double CapturedEligibilityOnlyAggroRadiusMeters = 1.0d;
-
         private readonly Playfield playfield;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
@@ -53,10 +47,6 @@ namespace AORebirth.Core.Playfields
         private readonly OrdinaryEnemyCatalog ordinaryEnemyCatalog;
 
         private readonly NpcPatrolReplayCoordinator patrolReplay;
-
-        private readonly CapturedAreteMovementRuntimeService capturedAreteMovement;
-
-        private readonly CapturedAreteAggroCatalog capturedAreteAggro;
 
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
@@ -87,7 +77,7 @@ namespace AORebirth.Core.Playfields
                                    ?? throw new ArgumentNullException("chaseNavigation");
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
-            this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider();
+            this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
             this.capturedSubwayContent = new CapturedSubwayContentProvider();
             this.capturedSubwayOrdinaryContent = new CapturedSubwayOrdinaryContentProvider();
             this.ordinaryEnemyCatalog =
@@ -95,24 +85,12 @@ namespace AORebirth.Core.Playfields
                     this.capturedSubwayContent,
                     this.capturedSubwayOrdinaryContent,
                     new CapturedTempleOfThreeWindsContentProvider());
-            this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedSubwayContent);
-            this.capturedAreteMovement = new CapturedAreteMovementRuntimeService();
-            if (!this.capturedAreteMovement.IsAvailable)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "Captured Arete movement disabled reason=" + this.capturedAreteMovement.FailureReason);
-            }
-            this.capturedAreteAggro = CapturedAreteAggroCatalog.LoadDefault();
-            if (!this.capturedAreteAggro.IsValid)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "Captured Arete aggro disabled reason=" + this.capturedAreteAggro.FailureReason);
-            }
+            this.patrolReplay =
+                new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
                     this.capturedAreteRobotContent,
+                    this.patrolReplay,
                     this.ActivateNpc);
             this.ordinaryEnemies =
                 new OrdinaryEnemyRuntimeService(
@@ -165,17 +143,6 @@ namespace AORebirth.Core.Playfields
 
             this.dynelRegistry.Register(character);
             this.RegisterNpcHome(character);
-            this.capturedAreteMovement.Activate(character);
-        }
-
-        internal void SuspendCapturedAretePatrol(ICharacter character)
-        {
-            this.capturedAreteMovement.SuspendPatrol(character);
-        }
-
-        internal void ResumeCapturedAretePatrol(ICharacter character)
-        {
-            this.capturedAreteMovement.ResumePatrol(character);
         }
 
         internal void EnsureAreteCapturePopulation()
@@ -185,14 +152,6 @@ namespace AORebirth.Core.Playfields
                 this.playfield.Identity,
                 this.ActivateNpc);
             this.capturedAreteRobotSpawns.TickRespawn(this.playfield, this.playfield.Identity);
-            AreteAlienAreaMobRuntime.TickRespawn(
-                this.playfield,
-                this.playfield.Identity,
-                this.ActivateNpc);
-            AreteSandstormMarauderRuntime.TickRespawn(
-                this.playfield,
-                this.playfield.Identity,
-                this.ActivateNpc);
         }
 
         internal void ClearRuntimeState()
@@ -214,7 +173,6 @@ namespace AORebirth.Core.Playfields
             }
 
             this.combatTick.ClearRuntimeState();
-            this.capturedAreteMovement.Clear();
             this.corpseLifecycle.ClearRuntimeState();
             this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance);
             this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
@@ -224,19 +182,14 @@ namespace AORebirth.Core.Playfields
             this.npcHomeStates.Clear();
             this.corpseDespawnTicks.Clear();
             AndromedaIccHqIdleGestureRuntime.Clear();
-            AreteRexLarssonIdleGestureRuntime.Clear();
             AndromedaIccHqSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteLandingSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteIccPeacekeeperPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             MarcusPadAmbientCombat.ClearPlayfield(this.playfield.Identity.Instance);
-            AreteGasFireRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             this.capturedAreteRobotSpawns.ClearPlayfield(this.playfield.Identity.Instance);
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             LoreleiOasisMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
-            AreteAlienAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
-            AreteSandstormMarauderRuntime.ClearPlayfield(this.playfield.Identity.Instance);
-            AreteKarliCappelleriPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             NascenceLifeSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteFinishCaptureMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             SurveillanceDroidRuntime.ClearPlayfield(this.playfield.Identity.Instance);
@@ -267,13 +220,6 @@ namespace AORebirth.Core.Playfields
                 maximumNpcDistanceFromHome =
                     AreteRoboticGuardDogRuntime.MaximumNpcDistanceFromHomeMeters;
             }
-            else if (LoreleiOasisMobRuntime.IsRegisteredRollerrat(character))
-            {
-                // Mike: Rollerrats chase ~15m then return home (not zone-wide).
-                maximumNpcDistanceFromHome =
-                    LoreleiOasisMobRuntime.RollerratMaximumNpcDistanceFromHomeMeters;
-            }
-
             this.npcHomeStates[character.Identity.Instance] =
                 new NpcHomeState
                 {
@@ -338,7 +284,7 @@ namespace AORebirth.Core.Playfields
 
             try
             {
-                // Capture 20260731-180854: Flint/Alex Cleaning Robot population (no stacked extras).
+                // Capture 20260720-212302: Arete Cleaning Robot population (mesh/attack/loot).
                 JunkyardCleaningRobotRuntime.StartForPlayfield(
                     this.playfield,
                     playfieldIdentity,
@@ -373,51 +319,6 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "LoreleiOasisMobRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
-            }
-
-            try
-            {
-                AreteAlienAreaMobRuntime.StartForPlayfield(
-                    this.playfield,
-                    playfieldIdentity,
-                    this.ActivateNpc);
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "AreteAlienAreaMobRuntime start failed: "
-                    + ex.GetType().Name + ": " + ex.Message);
-            }
-
-            try
-            {
-                AreteSandstormMarauderRuntime.StartForPlayfield(
-                    this.playfield,
-                    playfieldIdentity,
-                    this.ActivateNpc);
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "AreteSandstormMarauderRuntime start failed: "
-                    + ex.GetType().Name + ": " + ex.Message);
-            }
-
-            try
-            {
-                AreteKarliCappelleriPatrolRuntime.StartForPlayfield(
-                    this.playfield,
-                    playfieldIdentity,
-                    this.ActivateNpc);
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "AreteKarliCappelleriPatrolRuntime start failed: "
-                    + ex.GetType().Name + ": " + ex.Message);
             }
 
             try
@@ -526,7 +427,6 @@ namespace AORebirth.Core.Playfields
                 playfieldIdentity,
                 this.ActivateNpc);
             AndromedaIccHqIdleGestureRuntime.ProcessDue(utcNow);
-            AreteRexLarssonIdleGestureRuntime.ProcessDue(utcNow);
             this.capturedTempleEncounters.ProcessDue(utcNow, this.AcquireAggro);
         }
 
@@ -687,7 +587,6 @@ namespace AORebirth.Core.Playfields
             this.capturedSubwayEncounters.NotifyNpcDespawn(target, utcNow);
             this.nascenceCoreHecklers.NotifyNpcDespawn(target);
             this.capturedTempleEncounters.NotifyNpcDespawn(target, utcNow);
-            this.capturedAreteMovement.Remove(target);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             OrdinaryEnemyRuntimeRegistry.Remove(target.Identity.Instance);
@@ -719,12 +618,6 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            // Marcus pad: standing flamethrower — never chase into melee range.
-            if (MarcusPadAmbientCombat.IsStandingPadAmbientCombatant(attacker))
-            {
-                return;
-            }
-
             this.combatTick.ProcessCombatTick(attacker);
         }
 
@@ -736,7 +629,6 @@ namespace AORebirth.Core.Playfields
         internal void ClearFightingTarget(ICharacter character)
         {
             character.SetFightingTarget(Identity.None);
-            this.capturedAreteMovement.Interrupt(character);
             this.ClearCombatTracking(
                 character.Identity,
                 NpcChaseInvalidationReason.TargetLost);
@@ -758,7 +650,6 @@ namespace AORebirth.Core.Playfields
         {
             target.SetTarget(Identity.None);
             target.SetFightingTarget(Identity.None);
-            this.capturedAreteMovement.Interrupt(target);
             this.ClearCombatTracking(
                 target.Identity,
                 NpcChaseInvalidationReason.Death);
@@ -830,18 +721,14 @@ namespace AORebirth.Core.Playfields
             if (CapturedEnemyCombatRuntimeRegistry.TryGet(target.Identity.Instance, out capturedContract)
                 && !capturedContract.IsCombatReady)
             {
-                // Alex Garbage Flea AOS: never block on quarantine — proximity aggro is capture-proven.
-                if (!AlexAreaMobRuntime.IsRegisteredForAggro(target.Identity.Instance))
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        string.Format(
-                            "Captured enemy combat refused npc={0} attacker={1} reason=contract-incomplete evidence={2}",
-                            target.Identity,
-                            attacker.Identity,
-                            capturedContract.Evidence));
-                    return;
-                }
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Captured enemy combat refused npc={0} attacker={1} reason=contract-incomplete evidence={2}",
+                        target.Identity,
+                        attacker.Identity,
+                        capturedContract.Evidence));
+                return;
             }
 
             OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
@@ -982,19 +869,19 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.playfield != null && this.playfield.Identity.Instance == 6553)
+            if (this.playfield != null
+                && this.playfield.Identity.Instance == 6553
+                && string.Equals(character.Name, "Marcus Stone", StringComparison.OrdinalIgnoreCase))
             {
-                // Drive Marcus pad fight every Arete heartbeat (not only when Marcus is the dynel).
                 MarcusPadAmbientCombat.TickRespawn(
                     this.playfield,
                     this.playfield.Identity,
                     this.ActivateNpc);
-                if (string.Equals(character.Name, "Marcus Stone", StringComparison.OrdinalIgnoreCase))
-                {
-                    MarcusWoundedWorkersQuestRuntime.TickHealRecoveries(this.playfield);
-                    AreteGasFireRuntime.TickRespawn(this.playfield);
-                }
+                MarcusWoundedWorkersQuestRuntime.TickHealRecoveries(this.playfield);
+            }
 
+            if (this.playfield != null && this.playfield.Identity.Instance == 6553)
+            {
                 SurveillanceDroidRuntime.TickEnsurePresent(
                     this.playfield,
                     this.playfield.Identity,
@@ -1008,10 +895,6 @@ namespace AORebirth.Core.Playfields
                     this.playfield.Identity,
                     this.ActivateNpc);
                 LoreleiOasisMobRuntime.TickRespawn(
-                    this.playfield,
-                    this.playfield.Identity,
-                    this.ActivateNpc);
-                AreteSandstormMarauderRuntime.TickRespawn(
                     this.playfield,
                     this.playfield.Identity,
                     this.ActivateNpc);
@@ -1062,8 +945,7 @@ namespace AORebirth.Core.Playfields
                 this.AcquireAggro(defenseHostile, character, false);
             }
 
-            ICharacter automaticTarget = this.FindCapturedAreteAggroTarget(character)
-                                         ?? this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
+            ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.capturedTempleEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
@@ -1078,31 +960,6 @@ namespace AORebirth.Core.Playfields
 
             if (character.FightingTarget.Instance != 0)
             {
-                // Marcus Stone / Burning Cleaning Robot: stay put and shoot (no DoFollow chase).
-                if (MarcusPadAmbientCombat.IsStandingPadAmbientCombatant(character))
-                {
-                    NPCController padController = character.Controller as NPCController;
-                    if (padController != null)
-                    {
-                        padController.StopFollow();
-                        padController.SnapshotCurrentMotionPosition();
-                        padController.State = CharacterState.Fighting;
-                    }
-
-                    return;
-                }
-
-                ICharacter capturedMovementTarget =
-                    this.dynelRegistry.FindByIdentity<ICharacter>(character.FightingTarget);
-                if (!missionStationary
-                    && this.capturedAreteMovement.TryProcessCombat(
-                        character,
-                        capturedMovementTarget,
-                        utcNow))
-                {
-                    return;
-                }
-
                 if (!missionStationary && character.Controller.IsFollowing())
                 {
                     var fightingPetController = character.Controller as NPCController;
@@ -1126,18 +983,6 @@ namespace AORebirth.Core.Playfields
 
             this.ordinaryEnemies.TryReturnToSpawn(character);
 
-            if (!missionStationary
-                && this.capturedAreteMovement.TryProcessSpawn(character, utcNow))
-            {
-                return;
-            }
-
-            if (!missionStationary
-                && this.capturedAreteMovement.TryProcessPatrol(character, utcNow))
-            {
-                return;
-            }
-
             if (character.Controller.IsFollowing())
             {
                 character.Controller.DoFollow();
@@ -1148,63 +993,6 @@ namespace AORebirth.Core.Playfields
             {
                 character.Controller.StartPatrolling();
             }
-        }
-
-        private ICharacter FindCapturedAreteAggroTarget(ICharacter npc)
-        {
-            if (npc == null
-                || npc.Playfield == null
-                || npc.Playfield.Identity.Instance != 6553
-                || npc.FightingTarget.Instance != 0
-                || npc.Stats[StatIds.health].Value <= 0)
-            {
-                return null;
-            }
-
-            var evidence = new CapturedAreteMovementActorEvidence
-                           {
-                               RuntimeIdentity = npc.Identity.Instance,
-                               SpawnGeneration = 1,
-                               NpcFamily = npc.Stats[StatIds.npcfamily].Value,
-                               MonsterData = npc.Stats[StatIds.monsterdata].Value,
-                               Level = npc.Stats[StatIds.level].Value,
-                               PlayfieldId = npc.Playfield.Identity.Instance,
-                               Name = npc.Name,
-                               Position = new CapturedAreteMovementPoint(0.0d, 0.0d, 0.0d)
-                           };
-            double radius;
-            if (!this.capturedAreteAggro.TryGetRadius(evidence, out radius))
-            {
-                int npcFirstAttackStarts;
-                if (!this.capturedAreteAggro.TryGetEligibility(
-                        evidence,
-                        out npcFirstAttackStarts))
-                {
-                    return null;
-                }
-
-                radius = CapturedEligibilityOnlyAggroRadiusMeters;
-            }
-
-            // Oasis Desert Reets are passive-until-attacked (aggro.csv + Mike).
-            if (LoreleiOasisMobRuntime.IsRegisteredOasisDesertReet(npc))
-            {
-                return null;
-            }
-
-            return this.dynelRegistry
-                .FindCharactersInRange(npc, (float)radius)
-                .Where(
-                    candidate => candidate != null
-                                 && candidate.Identity != npc.Identity
-                                 && candidate.Controller is PlayerController
-                                 && candidate.Stats[StatIds.health].Value > 0)
-                .OrderBy(
-                    candidate =>
-                        candidate.Coordinates().coordinate.Distance2D(
-                            npc.Coordinates().coordinate))
-                .ThenBy(candidate => candidate.Identity.Instance)
-                .FirstOrDefault();
         }
 
         internal void ClearCombatTracking(Identity identity)
@@ -1228,7 +1016,6 @@ namespace AORebirth.Core.Playfields
             this.chaseNavigation.Clear(
                 target.Identity.Instance,
                 NpcChaseInvalidationReason.TargetReplaced);
-            this.capturedAreteMovement.Interrupt(target);
             target.SetTarget(attacker.Identity);
             target.SetFightingTarget(attacker.Identity);
 
@@ -1292,8 +1079,7 @@ namespace AORebirth.Core.Playfields
                     ToNavigationPoint(home.Coordinates.coordinate),
                     ToNavigationPoint(npc.Coordinates().coordinate),
                     ToNavigationPoint(target.Coordinates().coordinate),
-                    home.MaximumNpcDistanceFromHome,
-                    this.capturedAreteMovement.HasLeashEvidence(npc)))
+                    home.MaximumNpcDistanceFromHome))
             {
                 return false;
             }
@@ -1308,7 +1094,6 @@ namespace AORebirth.Core.Playfields
             home.ReturningHome = true;
             npc.SetTarget(Identity.None);
             npc.SetFightingTarget(Identity.None);
-            this.capturedAreteMovement.Interrupt(npc);
             this.ClearCombatTracking(
                 npc.Identity,
                 NpcChaseInvalidationReason.LeashReset);
@@ -1363,14 +1148,6 @@ namespace AORebirth.Core.Playfields
 
             NPCController controller = npc.Controller as NPCController;
             if (controller == null)
-            {
-                return true;
-            }
-
-            if (this.capturedAreteMovement.TryProcessLeash(
-                npc,
-                home.Coordinates.coordinate,
-                utcNow))
             {
                 return true;
             }
@@ -1455,6 +1232,11 @@ namespace AORebirth.Core.Playfields
         private void ScheduleDeadNpcDespawn(ICharacter target)
         {
             this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
+        }
+
+        private static void LogCapturedAreteRobotContent(bool isError, string message)
+        {
+            LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);
         }
 
         private class NpcHomeState

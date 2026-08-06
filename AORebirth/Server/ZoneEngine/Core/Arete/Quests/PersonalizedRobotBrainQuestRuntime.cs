@@ -62,76 +62,6 @@ namespace ZoneEngine.Core.Arete.Quests
             public Identity StagedContainer;
         }
 
-        /// <summary>
-        /// Capture 20260721-001538 / Vernon-Mason pattern: FormatFeedback + TemplateAction
-        /// Overflow + ContainerAddItem — never AddTemplate (client crash on Build).
-        /// </summary>
-        public static void SendCombineResultClientPackets(
-            ICharacter source,
-            Item sourceItem,
-            Item targetItem,
-            Item resultItem)
-        {
-            if (source?.Controller?.Client == null || resultItem == null)
-            {
-                return;
-            }
-
-            string feedback = string.Format(
-                "You combined \"{0}\" with \"{1}\" and the result is a quality level {2} \"{3}\".",
-                ResolveCombineItemName(sourceItem),
-                ResolveCombineItemName(targetItem),
-                resultItem.Quality,
-                ResolveCombineItemName(resultItem));
-
-            source.Controller.Client.SendCompressed(
-                new FormatFeedbackMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 1,
-                    Unknown1 = 0,
-                    FormattedMessage = feedback,
-                    Unknown2 = 0
-                });
-
-            // Capture 20260721-001538: Personalized brain TemplateAction 156026/156026 ql1.
-            int lowId = resultItem.LowID > 0 ? resultItem.LowID : resultItem.HighID;
-            int highId = resultItem.HighID > 0 ? resultItem.HighID : lowId;
-            if (PersonalizedRobotBrainCombineRules.IsPersonalizedBrain(lowId, highId))
-            {
-                highId = lowId;
-            }
-
-            int quality = resultItem.Quality > 0 ? resultItem.Quality : 1;
-            source.Controller.Client.SendCompressed(
-                new TemplateActionMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    ItemLowId = lowId,
-                    ItemHighId = highId,
-                    Quality = quality,
-                    Unknown1 = 1,
-                    Unknown2 = 87,
-                    Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Unknown3 = 0,
-                    Unknown4 = 0
-                });
-            source.Controller.Client.SendCompressed(
-                new ContainerAddItemMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Target = new Identity
-                             {
-                                 Type = IdentityType.OverflowWindow,
-                                 Instance = source.Identity.Instance
-                             },
-                    TargetPlacement = 0x6F
-                });
-        }
-
         public static void OnCombineSucceeded(ICharacter source, int resultLowId, int resultHighId)
         {
             if (source == null || !MissionRuntime.IsInitialized)
@@ -698,17 +628,6 @@ namespace ZoneEngine.Core.Arete.Quests
                     TargetPlacement = 0x6F
                 });
             Log("brain returned character=" + source.Identity.ToString(true));
-        }
-
-        private static string ResolveCombineItemName(Item item)
-        {
-            if (item == null)
-            {
-                return "item";
-            }
-
-            string name = TradeSkill.Instance.GetItemName(item.LowID, item.HighID, item.Quality);
-            return string.IsNullOrEmpty(name) ? "item" : name;
         }
 
         private static bool IsTipActive(ICharacter source, string questId)

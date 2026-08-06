@@ -698,14 +698,62 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void ApplyDeliverTurnInXpCredits(ICharacter source)
         {
-            AreteQuestRewardGrants.GrantCreditsAndXpOnce(
-                source,
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-lorelei-deliver-turnin-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = DeliverTurnInCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = DeliverTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = DeliverTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
                 DeliverQuestId,
-                "arete-credits-awarded-lorelei-deliver-turnin",
-                DeliverTurnInCreditReward,
-                "arete-xp-awarded-lorelei-deliver-turnin",
-                DeliverTurnInXpReward,
-                "lorelei-deliver-turnin-2581xp");
+                definition,
+                "capture:20260721-loralei:lorelei-deliver-turnin-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
         }
 
         private static void TrySendDeliverRewardFeedback(ICharacter source)

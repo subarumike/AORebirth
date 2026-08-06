@@ -198,14 +198,6 @@ namespace ZoneEngine.Core
                 return new TradeSkillMatch { Entry = entry, Swapped = false };
             }
 
-            entry = ZoneEngine.Core.Arete.Quests.AntonioStacklundCombineRules.TryMatch(
-                sourceHighId,
-                targetHighId);
-            if (entry != null)
-            {
-                return new TradeSkillMatch { Entry = entry, Swapped = false };
-            }
-
             TradeSkillMatch dbMatch = this.TryResolveDbPair(
                 sourceLowId,
                 sourceHighId,
@@ -255,8 +247,7 @@ namespace ZoneEngine.Core
                    + ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainCombineRules.SourceProcessBonus(high)
                    + ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules.SourceProcessBonus(high)
                    + ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.SourceProcessBonus(high)
-                   + ZoneEngine.Core.Arete.Quests.LoreleiCombineRules.SourceProcessBonus(high)
-                   + ZoneEngine.Core.Arete.Quests.AntonioStacklundCombineRules.SourceProcessBonus(high);
+                   + ZoneEngine.Core.Arete.Quests.LoreleiCombineRules.SourceProcessBonus(high);
         }
 
         /// <summary>
@@ -288,8 +279,7 @@ namespace ZoneEngine.Core
                    + ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainCombineRules.TargetProcessBonus(high)
                    + ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules.TargetProcessBonus(high)
                    + ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules.TargetProcessBonus(high)
-                   + ZoneEngine.Core.Arete.Quests.LoreleiCombineRules.TargetProcessBonus(high)
-                   + ZoneEngine.Core.Arete.Quests.AntonioStacklundCombineRules.TargetProcessBonus(high);
+                   + ZoneEngine.Core.Arete.Quests.LoreleiCombineRules.TargetProcessBonus(high);
         }
 
         #endregion

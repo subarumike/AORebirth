@@ -3064,6 +3064,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(coreDirectory, "Playfields", "NascenceCoreHecklerSpawnOrchestrator.cs"),
                 Path.Combine(coreDirectory, "Playfields", "NascenceLifeSpawn.cs"),
                 Path.Combine(coreDirectory, "Playfields", "LoreleiOasisMobRuntime.cs"),
+                Path.Combine(coreDirectory, "Playfields", "MarcusPadAmbientCombat.cs"),
                 Path.Combine(coreDirectory, "Playfields", "RomeBlueCitySpawn.cs"),
                 Path.Combine(coreDirectory, "Playfields", "ThrakOmniGardenSpawn.cs"),
                 Path.Combine(coreDirectory, "Thrak", "Quests", "ThrakGardenKeySilvertailTransform.cs")
@@ -3099,16 +3100,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(templeCatalog.Contains("new AttackMessage"));
             Assert.IsFalse(templeCatalog.Contains("new SpecialAttackWeaponMessage"));
             Assert.IsTrue(marcus.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence("));
-            Assert.IsTrue(marcus.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon("));
-            Assert.IsTrue(marcus.Contains("CapturedEnemyCombatPacketFactory.CreateAttack("));
-            Assert.IsTrue(marcus.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo("));
-            Assert.IsTrue(marcus.Contains("if (HasCompleteLinkFightContext()"));
-            Assert.IsTrue(marcus.Contains("|| !HasCompleteLinkFightContext())"));
-            Assert.IsTrue(marcus.Contains("MarcusCombatContract.HasCapturedAttackStartContext"));
-            Assert.IsTrue(marcus.Contains("MarcusCombatContract.HasCapturedSpecialAttackWeaponContext"));
-            Assert.IsFalse(marcus.Contains("new SpecialAttackWeaponMessage"));
-            Assert.IsFalse(marcus.Contains("new AttackMessage"));
-            Assert.IsFalse(marcus.Contains("new AttackInfoMessage"));
             Assert.IsTrue(contractRuntime.Contains("case CapturedEnemyAttackModel.FixedAttackInfo:"));
             Assert.IsTrue(contractRuntime.Contains("controller.AiProfile = NpcAiProfile.Passive;"));
             Assert.IsTrue(contractRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Register(character.Identity.Instance, contract);"));

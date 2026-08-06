@@ -110,8 +110,7 @@ namespace AORebirth.Core.Playfields
             double attackStartDelaySeconds,
             double firstHitDelaySeconds,
             double[] landedIntervalObservationsSeconds,
-            CapturedEnemyWeaponDefinition weaponDefinition,
-            bool repeats = true)
+            CapturedEnemyWeaponDefinition weaponDefinition)
         {
             if (attack == null
                 || !this.HasCompleteFixedRuntimeEvidence)
@@ -121,18 +120,15 @@ namespace AORebirth.Core.Playfields
 
             landedIntervalObservationsSeconds = landedIntervalObservationsSeconds
                                                    ?? new double[0];
-            if (landedIntervalObservationsSeconds.Any(value => !IsValidInterval(value)))
+            if (landedIntervalObservationsSeconds.Length == 0
+                || !landedIntervalObservationsSeconds.All(IsValidInterval))
             {
                 return false;
             }
 
             bool fixedRechargeMatchesCapturedObservation =
-                repeats
-                    ? landedIntervalObservationsSeconds.Length > 0
-                      && landedIntervalObservationsSeconds.Any(
-                          value => NearlyEqual(value, attack.RechargeSeconds))
-                    : landedIntervalObservationsSeconds.Length == 0
-                      && NearlyEqual(attack.RechargeSeconds, 0.0d);
+                landedIntervalObservationsSeconds.Any(
+                    value => NearlyEqual(value, attack.RechargeSeconds));
             bool fixedAttackStartDelayMatchesCapturedObservation =
                 this.CapturedAttackStartDelayObservationsSeconds.Any(
                     value => NearlyEqual(value, attackStartDelaySeconds));
@@ -590,38 +586,6 @@ namespace AORebirth.Core.Playfields
                 this.GetReusableNaturalAttackStreams()[0];
             CapturedEnemyCombatProfileStreamDefinition right =
                 other.GetReusableNaturalAttackStreams()[0];
-            return this.MatchesCaptureProvenNaturalAttackPacketSemantics(
-                other,
-                left,
-                right);
-        }
-
-        internal bool MatchesCaptureProvenNaturalAttackPacketSemantics(
-            CapturedEnemyCombatProfileDefinition other,
-            CapturedEnemyCombatProfileStreamDefinition left,
-            CapturedEnemyCombatProfileStreamDefinition right)
-        {
-            if (!this.CaptureEvidenceSafe
-                || this.WeaponDefinition != null
-                || other == null
-                || !other.CaptureEvidenceSafe
-                || other.WeaponDefinition != null
-                || left == null
-                || right == null
-                || left.CapturedUsesEquippedWeapon != false
-                || right.CapturedUsesEquippedWeapon != false
-                || left.CapturedSendAttackInfo != true
-                || right.CapturedSendAttackInfo != true
-                || left.CapturedTerminalHitOnly
-                || right.CapturedTerminalHitOnly
-                || this.SpecialAttackWeaponN3Unknown != other.SpecialAttackWeaponN3Unknown
-                || this.AttackN3Unknown != other.AttackN3Unknown
-                || this.AttackAction != other.AttackAction
-                || !SpecialsMatch(this.SpecialAttacks, other.SpecialAttacks))
-            {
-                return false;
-            }
-
             return left.WeaponSlot == right.WeaponSlot
                    && left.DamageTypeWire == right.DamageTypeWire
                    && left.HitTypeWire == right.HitTypeWire
@@ -703,7 +667,6 @@ namespace AORebirth.Core.Playfields
             byte attackAction;
             var attacks = new List<CapturedEnemyCombatAttackDefinition>();
             var firstHitDelays = new List<double>();
-            var repeats = new List<bool>();
             if (contract.SpecialAttackSequence != null)
             {
                 CapturedEnemySpecialAttackSequenceDefinition sequence = contract.SpecialAttackSequence;
@@ -720,7 +683,6 @@ namespace AORebirth.Core.Playfields
                 {
                     attacks.Add(sequence.OpeningAttack);
                     firstHitDelays.Add(sequence.InitialAttackDelaySeconds);
-                    repeats.Add(true);
                 }
 
                 if (sequence.RepeatingAttack != null)
@@ -731,7 +693,6 @@ namespace AORebirth.Core.Playfields
                         + (sequence.OpeningAttack == null
                                ? 0.0d
                                : sequence.OpeningAttack.RechargeSeconds));
-                    repeats.Add(true);
                 }
             }
             else if (contract.ParallelAttackSequence != null)
@@ -750,7 +711,6 @@ namespace AORebirth.Core.Playfields
                 {
                     attacks.Add(stream.Attack);
                     firstHitDelays.Add(stream.InitialDelaySeconds);
-                    repeats.Add(stream.Repeats);
                 }
             }
             else
@@ -796,8 +756,7 @@ namespace AORebirth.Core.Playfields
                                 0.0d,
                                 firstHitDelays[phaseIndex],
                                 this.ResolveLandedIntervalObservations(stream),
-                                this.WeaponDefinition,
-                                repeats[phaseIndex]);
+                                this.WeaponDefinition);
                 }
             }
 
@@ -1089,120 +1048,11 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedEnemyCombatProfileCatalog
     {
-        private const int AretePlayfieldResourceId = 6553;
-
         private const string FilthFleaSemanticProfileId =
             "218eb3509f2be66b-12f99a4c2f732061";
 
         private static readonly CapturedEnemyCombatProfileDefinition[] Profiles =
             CapturedEnemyCombatGeneratedProfiles.Create();
-
-        internal static bool TryCreateExactCapturedAttackOnSightContract(
-            int resourceId,
-            string name,
-            int monsterData,
-            int level,
-            out CapturedEnemyCombatContract resolved,
-            out string failure)
-        {
-            resolved = null;
-            failure = string.Empty;
-            CapturedEnemyCombatProfileDefinition[] exactProfiles = Profiles.Where(
-                value => value.MatchesKey(resourceId, name, monsterData, level)
-                         && value.CaptureRuntimeEvidenceSafe)
-                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
-                .ToArray();
-            if (exactProfiles.Length != 1)
-            {
-                failure = exactProfiles.Length == 0
-                    ? "no exact capture-safe combat profile"
-                    : "multiple exact capture-safe combat profiles require an explicit selection";
-                return false;
-            }
-
-            CapturedEnemyCombatProfileDefinition profile = exactProfiles[0];
-            CapturedEnemyCombatProfileStreamDefinition stream;
-            bool equipped = profile.WeaponDefinition != null;
-            if (equipped)
-            {
-                if (!profile.SupportsCaptureProvenEquippedWeaponPacketSemantics)
-                {
-                    failure = "exact equipped profile lacks reusable packet semantics";
-                    return false;
-                }
-
-                stream = profile.Streams[0];
-            }
-            else
-            {
-                CapturedEnemyCombatProfileStreamDefinition[] reusable =
-                    profile.GetReusableNaturalAttackStreams();
-                if (reusable.Length != 1)
-                {
-                    failure = reusable.Length == 0
-                        ? "exact natural profile lacks a reusable attack stream"
-                        : "exact natural profile requires an explicit captured stream selection";
-                    return false;
-                }
-
-                stream = reusable[0];
-            }
-
-            if (stream.MinimumObservedDamage <= 0
-                || stream.MaximumObservedDamage < stream.MinimumObservedDamage
-                || stream.ObservedRechargeSeconds <= 0.0d)
-            {
-                failure = "exact profile lacks deterministic damage or recharge evidence";
-                return false;
-            }
-
-            CapturedEnemyCombatContract baseline =
-                CapturedEnemyCombatContract.CapturedFixedPacketSequence(
-                    profile.Evidence,
-                    profile.RepresentativeEvidenceSourceIdentity,
-                    NpcAiProfile.Aggressive,
-                    stream.MinimumObservedDamage,
-                    stream.MaximumObservedDamage,
-                    stream.ObservedRechargeSeconds,
-                    profile.SpecialAttacks,
-                    profile.SpecialAttackWeaponN3Unknown,
-                    profile.SpecialAttackWeaponUnknown1,
-                    profile.SpecialAttackWeaponUnknown2,
-                    profile.SpecialAttackWeaponUnknown3,
-                    profile.SpecialAttackWeaponUnknown4,
-                    profile.SpecialAttackWeaponUnknown5,
-                    profile.AttackN3Unknown,
-                    profile.AttackAction,
-                    stream.InitialAmmoCount,
-                    stream.WeaponSlot,
-                    stream.DamageTypeWire,
-                    stream.HitTypeWire,
-                    stream.WeaponInstance,
-                    stream.N3Unknown,
-                    false,
-                    stream.CapturedDamageObservations,
-                    stream.CapturedAttackStartDelayObservationsSeconds,
-                    stream.CapturedFirstHitDelayObservationsSeconds,
-                    stream.CapturedLandedIntervalObservationsSeconds,
-                    stream.CapturedDamageBonus,
-                    stream.CapturedUsesEquippedWeapon,
-                    stream.CapturedAttackRange,
-                    stream.CapturedSendAttackInfo);
-            if (equipped)
-            {
-                baseline = baseline.WithProductionEquippedWeaponValues();
-            }
-
-            return TryResolve(
-                resourceId,
-                name,
-                monsterData,
-                level,
-                profile.RepresentativeEvidenceSourceIdentity,
-                baseline,
-                out resolved,
-                out failure);
-        }
 
         internal static bool TryResolve(
             Character character,
@@ -1292,25 +1142,11 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
-            CapturedEnemyCombatContract capturedAreteParallelNaturalAttackContract;
-            if (TryResolveCapturedAreteParallelNaturalAttackProfile(
-                    resourceId,
-                    name,
-                    monsterData,
-                    level,
-                    current,
-                    out capturedAreteParallelNaturalAttackContract))
-            {
-                resolved = capturedAreteParallelNaturalAttackContract;
-                return true;
-            }
-
             CapturedEnemyCombatContract naturalAttackContract;
             if (TryResolveProductionOwnedNaturalAttackProfile(
                     resourceId,
                     name,
                     monsterData,
-                    level,
                     current,
                     out naturalAttackContract))
             {
@@ -1883,198 +1719,16 @@ namespace AORebirth.Core.Playfields
             return resolved.IsCombatReady;
         }
 
-        private static bool TryResolveCapturedAreteParallelNaturalAttackProfile(
-            int resourceId,
-            string name,
-            int monsterData,
-            int level,
-            CapturedEnemyCombatContract current,
-            out CapturedEnemyCombatContract resolved)
-        {
-            resolved = null;
-            bool capturedAlienAreaNaturalAttack =
-                resourceId == AretePlayfieldResourceId
-                && ((string.Equals(name, "Rollerrat", StringComparison.Ordinal)
-                     && monsterData == 17687)
-                    || (string.Equals(name, "Angry Minibull", StringComparison.Ordinal)
-                        && monsterData == 30360));
-            if (!capturedAlienAreaNaturalAttack
-                || current == null
-                || current.AttackModel != CapturedEnemyAttackModel.Unresolved
-                || !current.Retaliates)
-            {
-                return false;
-            }
-
-            CapturedEnemyCombatProfileDefinition[] exactProfiles = Profiles.Where(
-                value => value.MatchesKey(resourceId, name, monsterData, level)
-                         && value.CaptureEvidenceSafe
-                         && value.WeaponDefinition == null)
-                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
-                .ToArray();
-            if (exactProfiles.Length != 1)
-            {
-                return false;
-            }
-
-            CapturedEnemyCombatProfileDefinition profile = exactProfiles[0];
-            CapturedEnemyCombatProfileStreamDefinition[] cadenceStreams =
-                profile.GetReusableNaturalAttackStreams();
-            if (profile.RepresentativeEvidenceSourceIdentity == 0
-                || cadenceStreams.Length == 0
-                || profile.SpecialAttacks.Length == 0
-                || cadenceStreams.Any(
-                    stream => profile.SpecialAttacks.Count(
-                        special => special != null
-                                   && special.Tag == stream.WeaponInstance) != 1))
-            {
-                return false;
-            }
-
-            var parallelStreams = new List<CapturedEnemyParallelAttackStreamDefinition>();
-            double[] attackStartDelays = cadenceStreams.SelectMany(
-                stream => stream.CapturedAttackStartDelayObservationsSeconds).ToArray();
-            if (attackStartDelays.Length == 0
-                || attackStartDelays.Any(
-                    value => double.IsNaN(value)
-                             || double.IsInfinity(value)
-                             || value < 0.0d)
-                || attackStartDelays.Any(
-                    value => Math.Abs(value - attackStartDelays[0]) >= 0.000001d))
-            {
-                return false;
-            }
-
-            foreach (CapturedEnemyCombatProfileStreamDefinition stream in cadenceStreams)
-            {
-                double[] landedIntervals = profile.ResolveLandedIntervalObservations(stream);
-                if (!stream.HasCompleteFixedRuntimeEvidence
-                    || stream.CapturedUsesEquippedWeapon != false
-                    || stream.CapturedSendAttackInfo != true
-                    || stream.CapturedFirstHitDelayObservationsSeconds.Length == 0
-                    || stream.CapturedFirstHitDelayObservationsSeconds.Any(
-                        value => double.IsNaN(value)
-                                 || double.IsInfinity(value)
-                                 || value < 0.0d)
-                    || landedIntervals.Any(
-                        value => double.IsNaN(value)
-                                 || double.IsInfinity(value)
-                                 || value <= 0.0d))
-                {
-                    return false;
-                }
-
-                bool repeats = landedIntervals.Length > 0;
-                parallelStreams.Add(
-                    new CapturedEnemyParallelAttackStreamDefinition(
-                        stream.CapturedFirstHitDelayObservationsSeconds[0],
-                        new CapturedEnemyCombatAttackDefinition(
-                            stream.CapturedDamageObservations.Min(),
-                            stream.CapturedDamageObservations.Max(),
-                            stream.CapturedDamageBonus.Value,
-                            stream.CapturedAttackRange
-                            ?? ZoneEngine.Core.Playfields.NpcCombatAttackRules
-                                .MaxMeleeCombatDistance,
-                            repeats ? landedIntervals[0] : 0.0d,
-                            false,
-                            stream.InitialAmmoCount,
-                            stream.WeaponSlot,
-                            stream.DamageTypeWire,
-                            stream.HitTypeWire,
-                            stream.WeaponInstance,
-                            stream.N3Unknown,
-                            true,
-                            stream.CapturedDamageObservations),
-                        repeats));
-            }
-
-            CapturedEnemyCombatProfileStreamDefinition[] terminalStreams =
-                profile.Streams.Where(stream => stream.CapturedTerminalHitOnly).ToArray();
-            foreach (CapturedEnemyCombatProfileStreamDefinition terminalStream in terminalStreams)
-            {
-                int[] compatible = Enumerable.Range(0, parallelStreams.Count).Where(
-                    index => terminalStream.MatchesCapturedTerminalOutcome(
-                        parallelStreams[index].Attack)).ToArray();
-                if (compatible.Length != 1)
-                {
-                    return false;
-                }
-
-                int streamIndex = compatible[0];
-                CapturedEnemyParallelAttackStreamDefinition existing =
-                    parallelStreams[streamIndex];
-                if (existing.Attack.LethalAttackInfoUnknown.HasValue
-                    && existing.Attack.LethalAttackInfoUnknown.Value
-                       != terminalStream.DamageTypeWire)
-                {
-                    return false;
-                }
-
-                parallelStreams[streamIndex] =
-                    new CapturedEnemyParallelAttackStreamDefinition(
-                        existing.InitialDelaySeconds,
-                        existing.Attack.WithCapturedDamageObservations(
-                            existing.Attack.CapturedDamageObservations,
-                            terminalStream.DamageTypeWire),
-                        existing.Repeats);
-            }
-
-            CapturedEnemyCombatContract captured =
-                CapturedEnemyCombatContract.CapturedParallelAttackSequence(
-                    profile.Evidence,
-                    new CapturedEnemyParallelAttackSequenceDefinition(
-                        parallelStreams.ToArray(),
-                        profile.SpecialAttacks,
-                        profile.SpecialAttackWeaponUnknown1,
-                        profile.SpecialAttackWeaponUnknown2,
-                        profile.SpecialAttackWeaponUnknown3,
-                        profile.SpecialAttackWeaponUnknown4,
-                        profile.SpecialAttackWeaponUnknown5,
-                        profile.SpecialAttackWeaponN3Unknown,
-                        profile.AttackN3Unknown,
-                        profile.AttackAction,
-                        attackStartDelays[0]),
-                    current.RequiresDamageLineOfSight);
-            resolved = captured
-                .WithCaptureCertification(
-                    profile.Evidence,
-                    profile.RepresentativeEvidenceSourceIdentity,
-                    null)
-                .WithCapturedSpecialAttackWeaponUnknown5Observations(
-                    profile.SpecialAttackWeaponUnknown5Observations)
-                .WithCaptureProvenArchetype(
-                    string.Format(
-                        "resource={0}|name={1}|MonsterData={2}|level={3}|profile={4}|captured-parallel-streams={5}",
-                        resourceId,
-                        name,
-                        monsterData,
-                        level,
-                        profile.ProfileId,
-                        cadenceStreams.Length));
-            return resolved.IsCombatReady;
-        }
-
         private static bool TryResolveProductionOwnedNaturalAttackProfile(
             int resourceId,
             string name,
             int monsterData,
-            int level,
             CapturedEnemyCombatContract current,
             out CapturedEnemyCombatContract resolved)
         {
             resolved = null;
-            bool capturedAreteFixedNaturalAttack =
-                resourceId == AretePlayfieldResourceId
-                && current != null
-                && current.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo
-                && current.HasCapturedAttackStartContext
-                && current.HasCapturedSpecialAttackWeaponContext
-                && current.HasEmptySpecialAttackWeaponContext
-                && current.CapturedSpecialAttacks != null
-                && current.CapturedSpecialAttacks.Length == 0;
             if (current == null
-                || (!current.UsesProductionSpecializedValues
-                    && !capturedAreteFixedNaturalAttack)
+                || !current.UsesProductionSpecializedValues
                 || current.AttackModel == CapturedEnemyAttackModel.Specialized
                 || current.MinDamage <= 0
                 || current.MaxDamage < current.MinDamage
@@ -2083,50 +1737,28 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            CapturedEnemyCombatProfileDefinition[] family;
-            CapturedEnemyCombatProfileDefinition profile;
-            CapturedEnemyCombatProfileStreamDefinition stream;
-            if (capturedAreteFixedNaturalAttack
-                && !current.UsesProductionSpecializedValues)
+            CapturedEnemyCombatProfileDefinition[] family = Profiles.Where(
+                value => value.MatchesArchetypeKey(resourceId, name, monsterData)
+                         && value
+                             .SupportsCaptureProvenNaturalAttackPacketSemantics)
+                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
+                .ToArray();
+            if (family.Length == 0)
             {
-                if (!TrySelectCapturedAreteNaturalAttackStream(
-                        resourceId,
-                        name,
-                        monsterData,
-                        level,
-                        current,
-                        out family,
-                        out profile,
-                        out stream))
-                {
-                    return false;
-                }
+                return false;
             }
-            else
+
+            CapturedEnemyCombatProfileDefinition profile = family[0];
+            if (family.Any(
+                value => !profile
+                    .MatchesCaptureProvenNaturalAttackPacketSemantics(value)))
             {
-                family = Profiles.Where(
-                    value => value.MatchesArchetypeKey(resourceId, name, monsterData)
-                             && value
-                                 .SupportsCaptureProvenNaturalAttackPacketSemantics)
-                    .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
-                    .ToArray();
-                if (family.Length == 0)
-                {
-                    return false;
-                }
-
-                profile = family[0];
-                if (family.Any(
-                    value => !profile
-                        .MatchesCaptureProvenNaturalAttackPacketSemantics(value)))
-                {
-                    return false;
-                }
-
-                stream = profile.GetReusableNaturalAttackStreams()[0];
+                return false;
             }
 
             int evidenceSourceIdentity = profile.RepresentativeEvidenceSourceIdentity;
+            CapturedEnemyCombatProfileStreamDefinition stream =
+                profile.GetReusableNaturalAttackStreams()[0];
             string evidence = string.Join(
                 "; ",
                 family.Select(value => value.Evidence).Distinct().ToArray());
@@ -2137,14 +1769,7 @@ namespace AORebirth.Core.Playfields
                 monsterData,
                 string.Join(
                     ",",
-                    family.Select(value => value.ProfileId).ToArray()))
-                + (capturedAreteFixedNaturalAttack
-                       ? string.Format(
-                           "|streamSlot={0}|streamDamageType={1}|streamInstance={2}",
-                           stream.WeaponSlot,
-                           stream.DamageTypeWire,
-                           stream.WeaponInstance)
-                       : string.Empty);
+                    family.Select(value => value.ProfileId).ToArray()));
             resolved = CapturedEnemyCombatContract
                 .CapturedSpecialSequence(
                     evidence,
@@ -2183,111 +1808,6 @@ namespace AORebirth.Core.Playfields
                     null)
                 .WithCaptureProvenArchetype(archetypeId);
             return resolved.IsCombatReady;
-        }
-
-        private static bool TrySelectCapturedAreteNaturalAttackStream(
-            int resourceId,
-            string name,
-            int monsterData,
-            int level,
-            CapturedEnemyCombatContract current,
-            out CapturedEnemyCombatProfileDefinition[] family,
-            out CapturedEnemyCombatProfileDefinition profile,
-            out CapturedEnemyCombatProfileStreamDefinition stream)
-        {
-            family = new CapturedEnemyCombatProfileDefinition[0];
-            profile = null;
-            stream = null;
-
-            CapturedEnemyCombatProfileDefinition[] matchingProfiles = Profiles.Where(
-                value => value.MatchesArchetypeKey(resourceId, name, monsterData)
-                         && value.CaptureEvidenceSafe
-                         && value.WeaponDefinition == null)
-                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
-                .ToArray();
-            CapturedEnemyCombatProfileDefinition[] exactLevelProfiles =
-                matchingProfiles.Where(value => value.Level == level).ToArray();
-            CapturedEnemyCombatProfileDefinition[] candidateProfiles =
-                exactLevelProfiles.Any(
-                    value => value.GetReusableNaturalAttackStreams().Any(
-                        candidate => candidate.WeaponSlot
-                                     == current.AttackInfoWeaponSlot
-                                     && candidate.DamageTypeWire
-                                     == current.AttackInfoUnknown))
-                    ? exactLevelProfiles
-                    : matchingProfiles;
-            var candidates = candidateProfiles.SelectMany(
-                value => value.GetReusableNaturalAttackStreams()
-                    .Where(
-                        candidate => candidate.WeaponSlot
-                                     == current.AttackInfoWeaponSlot
-                                     && candidate.DamageTypeWire
-                                     == current.AttackInfoUnknown)
-                    .Select(
-                        candidate => Tuple.Create(value, candidate)))
-                .ToArray();
-            if (candidates.Length == 0)
-            {
-                return false;
-            }
-
-            var representatives = new List<Tuple<
-                CapturedEnemyCombatProfileDefinition,
-                CapturedEnemyCombatProfileStreamDefinition>>();
-            foreach (Tuple<
-                CapturedEnemyCombatProfileDefinition,
-                CapturedEnemyCombatProfileStreamDefinition> candidate in candidates)
-            {
-                if (!representatives.Any(
-                    value => value.Item1
-                        .MatchesCaptureProvenNaturalAttackPacketSemantics(
-                            candidate.Item1,
-                            value.Item2,
-                            candidate.Item2)))
-                {
-                    representatives.Add(candidate);
-                }
-            }
-
-            Tuple<
-                CapturedEnemyCombatProfileDefinition,
-                CapturedEnemyCombatProfileStreamDefinition>[] exactInstance =
-                    representatives.Where(
-                        value => value.Item2.WeaponInstance
-                                 == current.AttackInfoWeaponInstance)
-                        .ToArray();
-            Tuple<
-                CapturedEnemyCombatProfileDefinition,
-                CapturedEnemyCombatProfileStreamDefinition> selected =
-                    exactInstance.Length == 1
-                        ? exactInstance[0]
-                        : representatives.Count == 1
-                            ? representatives[0]
-                            : null;
-            if (selected == null)
-            {
-                return false;
-            }
-
-            Tuple<
-                CapturedEnemyCombatProfileDefinition,
-                CapturedEnemyCombatProfileStreamDefinition>[] selectedCandidates =
-                    candidates.Where(
-                        value => selected.Item1
-                            .MatchesCaptureProvenNaturalAttackPacketSemantics(
-                                value.Item1,
-                                selected.Item2,
-                                value.Item2))
-                        .ToArray();
-            family = selectedCandidates.Select(value => value.Item1)
-                .Distinct()
-                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
-                .ToArray();
-            CapturedEnemyCombatProfileDefinition selectedProfile = family[0];
-            profile = selectedProfile;
-            stream = selectedCandidates.First(
-                value => value.Item1 == selectedProfile).Item2;
-            return true;
         }
 
         private static bool TryResolveCaptureProvenEquippedWeaponArchetype(

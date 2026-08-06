@@ -93,13 +93,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (DesmondCalitriQuestRuntime.TryFinishDesmondTrade(
-                messageWrapper.Client.Controller.Character,
-                messageWrapper.MessageBody))
-            {
-                return;
-            }
-
             if (VernonGodfrayQuestRuntime.TryFinishVernonTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
@@ -124,16 +117,6 @@ namespace ZoneEngine.Core.MessageHandlers
             if (VaughnHammondQuestRuntime.TryFinishVaughnTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
-            {
-                return;
-            }
-
-            if (LeonoraMartyQuestRuntime.TryFinishLeonoraTrade(
-                    messageWrapper.Client.Controller.Character,
-                    messageWrapper.MessageBody)
-                || ShinySwordQuestRuntime.TryFinishSwordTrade(
-                    messageWrapper.Client.Controller.Character,
-                    messageWrapper.MessageBody))
             {
                 return;
             }

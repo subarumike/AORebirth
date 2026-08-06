@@ -124,49 +124,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void AtomicRewardLegacyKeyPreventsRenamedRewardFromApplyingAgain()
-        {
-            var repository = new InMemoryMissionRepository();
-            PersistentMissionService service = Service(repository);
-            ActivateThroughB18E(service, 1302);
-            Observe(service, 1302, B18E, B18EObjective, "rex-return:legacy-reward-test");
-            Assert.AreEqual(MissionOperationStatus.Applied, service.CompleteMission(1302, B18E).Status);
-            repository.SeedCharacterStat(1302, 50000, 61, 100);
-            var coordinator = new MissionRewardCoordinator(repository);
-            MissionRewardDefinition legacy = new MissionRewardDefinition
-                                             {
-                                                 RewardKey = "captured-reward-v1",
-                                                 RewardType = "character-stats",
-                                                 IsResolved = true,
-                                                 StatMutations = new[] { AddStat(61, 25) }
-                                             };
-            Assert.AreEqual(
-                MissionRewardExecutionStatus.Applied,
-                coordinator.ExecuteAtomicCharacterStats(1302, B18E, legacy, "capture:v1").Status);
-
-            MissionRewardDefinition renamed = new MissionRewardDefinition
-                                              {
-                                                  RewardKey = "captured-reward-v2",
-                                                  LegacyRewardKeys = new[] { "captured-reward-v1" },
-                                                  RewardType = "character-stats",
-                                                  IsResolved = true,
-                                                  StatMutations = new[] { AddStat(61, 25) }
-                                              };
-            MissionRewardExecutionResult retry = coordinator.ExecuteAtomicCharacterStats(
-                1302,
-                B18E,
-                renamed,
-                "capture:v2");
-
-            Assert.AreEqual(MissionRewardExecutionStatus.AlreadyApplied, retry.Status);
-            Assert.AreEqual("captured-reward-v1", retry.Stage.RewardKey);
-            Assert.IsTrue(coordinator.IsRewardApplied(1302, B18E, "captured-reward-v1"));
-            Assert.IsFalse(coordinator.IsRewardApplied(1302, B18E, "captured-reward-v2"));
-            Assert.AreEqual(125, repository.GetCharacterStat(1302, 50000, 61));
-            Assert.AreEqual(1, repository.ReadCharacter(1302).Rewards.Count);
-        }
-
-        [TestMethod]
         public void MarcusB18FInventoryFailureRetriesThenGrantsItemAndB194Once()
         {
             var repository = new InMemoryMissionRepository();

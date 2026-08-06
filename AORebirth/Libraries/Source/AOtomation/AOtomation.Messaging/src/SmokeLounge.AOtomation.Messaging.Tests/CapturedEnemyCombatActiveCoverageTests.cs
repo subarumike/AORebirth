@@ -19,8 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1600;
-        private const int ExpectedBindingRecordCount = 1576;
+        private const int ExpectedInitialActorCount = 1529;
+        private const int ExpectedBindingRecordCount = 1515;
         private const string Pf127OrdinaryProfileResolutionMode =
             "production-owned-exact-pf127-ordinary-profile-resolver";
         private const string Pf1931ProfileResolutionMode =
@@ -45,7 +45,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1602, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1531, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -660,10 +660,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, recordsByFamily["scripted-hostiles"].Length);
             Assert.AreEqual(171, records.Length);
             Assert.AreEqual(
-                34,
+                27,
                 recordsByFamily["cleaning-robots"].Sum(
                     value => IntMember(value, "fixedDenominatorActorCount")),
-                "Cleaning-robot supplemental rows must reconcile to their 34 fixed Arete actors.");
+                "Cleaning-robot supplemental rows must reconcile to their 27 fixed Arete actors.");
 
             var auditKeys = new HashSet<string>(StringComparer.Ordinal);
             foreach (Dictionary<string, object> record in recordsByFamily.Values.SelectMany(value => value))
@@ -798,85 +798,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void AretePrepareSurfacesRetainEveryExactCapturedActorDefinition()
-        {
-            Dictionary<string, object> document = ReadCoverageDocument();
-            Dictionary<string, object>[] bindings = ArrayMember(document, "bindings")
-                .Select(value => JsonObject(value, "active coverage binding"))
-                .ToArray();
-
-            Dictionary<string, object>[] landing = bindings
-                .Where(
-                    value => value["runtimeProfileSelector"] as string
-                        == "arete-landing-exact-captured-automatic-combat")
-                .ToArray();
-            Assert.AreEqual(2, landing.Length);
-            CollectionAssert.AreEquivalent(
-                new[] { "Kneebreaker Alfonzo Rizzolo", "Violent Protester" },
-                landing.Select(value => StringMember(value, "name")).ToArray());
-            Assert.IsTrue(
-                landing.All(
-                    value => StringArrayMember(value, "contentSources").Single()
-                        == "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs"));
-
-            Dictionary<string, object>[] alienArea = bindings
-                .Where(value => StringMember(value, "surface") == "arete-alien-area")
-                .ToArray();
-            Assert.AreEqual(64, alienArea.Length);
-            Assert.AreEqual(64, alienArea.Sum(value => IntMember(value, "actorCount")));
-            CollectionAssert.AreEquivalent(
-                new[]
-                {
-                    "Alien Spider - Zix",
-                    "Scout - Jaax'Sinuh",
-                    "Specialist - Cha'Heru",
-                    "Saltworm",
-                    "Rollerrat",
-                    "Angry Minibull",
-                    "Harvey the Bully"
-                },
-                alienArea.Select(value => StringMember(value, "name")).Distinct().ToArray());
-            Assert.IsTrue(
-                alienArea.All(
-                    value => StringArrayMember(value, "contentEvidenceCaptureIds")
-                        .Contains("20260726-spawn-mob-tll-alien")));
-
-            Dictionary<string, object>[] sandstorm = bindings
-                .Where(
-                    value => StringMember(value, "surface")
-                        == "arete-sandstorm-marauders")
-                .ToArray();
-            Assert.AreEqual(2, sandstorm.Length);
-            Assert.IsTrue(sandstorm.All(value => StringMember(value, "name") == "SANDSTORM Marauder"));
-            CollectionAssert.AreEquivalent(
-                new[] { 265822, 287217 },
-                sandstorm.Select(value => IntMember(value, "monsterData")).ToArray());
-            Assert.IsTrue(
-                sandstorm.All(
-                    value => Convert.ToInt32(ArrayMember(value, "levelCandidates").Single()) == 7));
-            Assert.AreEqual(5, sandstorm.Sum(value => IntMember(value, "actorCount")));
-            Assert.AreEqual(
-                3,
-                IntMember(sandstorm.Single(value => IntMember(value, "monsterData") == 265822), "actorCount"));
-            Assert.AreEqual(
-                2,
-                IntMember(sandstorm.Single(value => IntMember(value, "monsterData") == 287217), "actorCount"));
-            Assert.IsTrue(
-                sandstorm.All(
-                    value => StringArrayMember(value, "contentEvidenceCaptureIds")
-                        .SequenceEqual(new[] { "20260801-SANDSTORM" })));
-
-            Dictionary<string, object> cleaningRobots = bindings.Single(
-                value => StringMember(value, "name") == "Cleaning Robot"
-                         && StringArrayMember(value, "contentSources").Single()
-                            == "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs");
-            Assert.AreEqual(21, IntMember(cleaningRobots, "actorCount"));
-            CollectionAssert.AreEqual(
-                new[] { "20260731-180854" },
-                StringArrayMember(cleaningRobots, "contentEvidenceCaptureIds"));
-        }
-
-        [TestMethod]
         public void EveryProductionCapturedEnemyCombatPrepareCallSiteHasAnExplicitCoverageAudit()
         {
             Dictionary<string, object> document = ReadCoverageDocument();
@@ -920,8 +841,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
             Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
             Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(21, discovered.Count);
-            Assert.AreEqual(22, discovered.Values.Sum());
+            Assert.AreEqual(19, discovered.Count);
+            Assert.AreEqual(21, discovered.Values.Sum());
             foreach (KeyValuePair<string, int> entryPoint in discovered)
             {
                 Dictionary<string, object> record = recorded[entryPoint.Key];
@@ -1283,9 +1204,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "nascence-core-hecklers", 40 },
                 { "nascence-life", 837 },
                 { "arete-family", 96 },
-                { "arete-additional-captured-actors", 14 },
-                { "arete-alien-area", 64 },
-                { "arete-sandstorm-marauders", 5 },
+                { "arete-additional-captured-actors", 12 },
                 { "subway-merchants", 6 },
                 { "rome-blue-city", 22 },
                 { "thrak-omni-garden", 10 }

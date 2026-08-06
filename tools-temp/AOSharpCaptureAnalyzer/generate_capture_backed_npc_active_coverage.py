@@ -10,7 +10,7 @@ two safe lookup modes as the generated runtime catalog:
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
-or if the fixed initial population does not reconcile to 1,600 actors.
+or if the fixed initial population does not reconcile to 1,529 actors.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1600
+EXPECTED_INITIAL_ACTORS = 1529
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -42,9 +42,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("nascence-core-hecklers", 40),
     ("nascence-life", 837),
     ("arete-family", 96),
-    ("arete-additional-captured-actors", 14),
-    ("arete-alien-area", 64),
-    ("arete-sandstorm-marauders", 5),
+    ("arete-additional-captured-actors", 12),
     ("subway-merchants", 6),
     ("rome-blue-city", 22),
     ("thrak-omni-garden", 10),
@@ -160,21 +158,6 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
         "fixed-denominator-surfaces",
         ("arete-additional-captured-actors",),
     ),
-    "AORebirth/Server/ZoneEngine/Core/Playfields/AreteAlienAreaMobRuntime.cs": (
-        1,
-        "fixed-denominator-surfaces",
-        ("arete-alien-area",),
-    ),
-    "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs": (
-        1,
-        "fixed-denominator-surfaces",
-        ("arete-additional-captured-actors",),
-    ),
-    "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs": (
-        1,
-        "fixed-denominator-surfaces",
-        ("arete-sandstorm-marauders",),
-    ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs": (
         1,
         "fixed-denominator-surfaces",
@@ -216,6 +199,11 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
         ("cleaning-robots",),
     ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs": (
+        2,
+        "fixed-denominator-surfaces",
+        ("arete-family",),
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs": (
         2,
         "fixed-denominator-surfaces",
         ("arete-family",),
@@ -1214,7 +1202,7 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
     # three-float rows after validating the whole initializer shape.
     if junkyard_slots == 0:
         junkyard_slots = len(re.findall(r"\bnew\s*\[\]\s*\{", junkyard_body))
-    if junkyard_slots != 21:
+    if junkyard_slots != 14:
         raise CoverageError(f"Junkyard Cleaning Robot parser found {junkyard_slots} slots")
     robot = make_actor(
         "arete-family",
@@ -1223,7 +1211,7 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
         parse_csharp_int("RobotMonsterData", junkyard_constants),
         parse_csharp_int("RobotLevel", junkyard_constants),
         junkyard_path,
-        evidence_capture_ids=("20260731-180854",),
+        evidence_capture_ids=("20260720-212302",),
     )
     robot.actor_count = junkyard_slots
     actors.append(robot)
@@ -1356,126 +1344,6 @@ def parse_arete_additional(repo_root: Path) -> List[ActorDefinition]:
         )
     )
 
-    landing_path = "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs"
-    landing = read_source(repo_root, landing_path)
-    landing_body = extract_array_initializer(landing, "AreteNpc[] Npcs")
-    landing_capture_ids = {
-        "Kneebreaker Alfonzo Rizzolo": (
-            "20260720-171317",
-            "20260722-152454",
-        ),
-        "Violent Protester": ("20260722-152454",),
-    }
-    found_landing_hostiles: set[str] = set()
-    for fields in parse_object_initializers(landing_body, "AreteNpc"):
-        name = parse_csharp_string(fields.get("Name", '""'))
-        if name not in landing_capture_ids:
-            continue
-        found_landing_hostiles.add(name)
-        actors.append(
-            make_actor(
-                "arete-additional-captured-actors",
-                6553,
-                name,
-                parse_csharp_int(fields["MonsterData"]),
-                parse_csharp_int(fields["Level"]),
-                landing_path,
-                configured_source_identity=parse_csharp_int(
-                    fields["CaptureInstance"]
-                ),
-                runtime_source_identity_hint=None,
-                runtime_profile_selector=(
-                    "arete-landing-exact-captured-automatic-combat"
-                ),
-                evidence_capture_ids=landing_capture_ids[name],
-                notes=(
-                    "runtime identity is regenerated; exact name, MonsterData, level, family, and playfield gate combat eligibility",
-                ),
-            )
-        )
-    if found_landing_hostiles != set(landing_capture_ids):
-        raise CoverageError(
-            "Arete landing hostile parser found "
-            f"{sorted(found_landing_hostiles)} instead of "
-            f"{sorted(landing_capture_ids)}"
-        )
-    return actors
-
-
-def parse_arete_alien_area(repo_root: Path) -> List[ActorDefinition]:
-    path = "AORebirth/Server/ZoneEngine/Core/Playfields/AreteAlienAreaMobRuntime.cs"
-    text = read_source(repo_root, path)
-    body = extract_array_initializer(text, "MobSlot[] Slots")
-    combat_capture_ids = {
-        "Alien Spider - Zix": ("20260726-230559",),
-        "Scout - Jaax'Sinuh": ("20260726-230559",),
-        "Specialist - Cha'Heru": ("20260726-230559",),
-        "Saltworm": ("20260727-054719",),
-        "Rollerrat": ("20260726-124832",),
-        "Angry Minibull": ("20260726-220219", "20260726-230559"),
-        "Harvey the Bully": ("20260726-220219", "20260726-230559"),
-    }
-    actors: List[ActorDefinition] = []
-    for call in extract_calls(body, "MobSlot", True):
-        args = split_top_level(call)
-        if len(args) != 13:
-            raise CoverageError(f"short Arete alien-area MobSlot call: {call}")
-        name = parse_csharp_string(args[0])
-        if name not in combat_capture_ids:
-            raise CoverageError(f"unmapped Arete alien-area actor: {name}")
-        actors.append(
-            make_actor(
-                "arete-alien-area",
-                6553,
-                name,
-                parse_csharp_int(args[2]),
-                parse_csharp_int(args[3]),
-                path,
-                runtime_profile_selector="arete-alien-area-captured-contract",
-                evidence_capture_ids=(
-                    "20260726-spawn-mob-tll-alien",
-                    *combat_capture_ids[name],
-                ),
-                notes=(
-                    "spawn metadata and the behavior-specific direct runtime contract retain separate capture provenance",
-                ),
-            )
-        )
-    if len(actors) != 64:
-        raise CoverageError(f"Arete alien-area parser found {len(actors)} actors")
-    return actors
-
-
-def parse_arete_sandstorm(repo_root: Path) -> List[ActorDefinition]:
-    path = "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
-    text = read_source(repo_root, path)
-    constants = extract_constants(text)
-    body = extract_array_initializer(text, "MarauderSlot[] SpawnSlots")
-    calls = extract_calls(body, "MarauderSlot", True)
-    if len(calls) != 5:
-        raise CoverageError(f"Arete SANDSTORM parser found {len(calls)} initial slots")
-
-    counts_by_monster_data: Dict[int, int] = {}
-    for call in calls:
-        args = split_top_level(call)
-        monster_data = parse_csharp_int(args[0], constants)
-        counts_by_monster_data[monster_data] = counts_by_monster_data.get(monster_data, 0) + 1
-
-    actors: List[ActorDefinition] = []
-    for monster_data, actor_count in sorted(counts_by_monster_data.items()):
-        actor = make_actor(
-            "arete-sandstorm-marauders",
-            6553,
-            parse_csharp_string("MarauderName", constants),
-            monster_data,
-            parse_csharp_int("MarauderLevel", constants),
-            path,
-            runtime_profile_selector="arete-sandstorm-captured-contract",
-            evidence_capture_ids=("20260801-SANDSTORM",),
-            notes=("initial slot MonsterData is preserved per captured actor",),
-        )
-        actor.actor_count = actor_count
-        actors.append(actor)
     return actors
 
 
@@ -1552,8 +1420,6 @@ def parse_all_actors(repo_root: Path) -> List[ActorDefinition]:
     actors.extend(parse_nascence_life(repo_root))
     actors.extend(parse_arete_family(repo_root))
     actors.extend(parse_arete_additional(repo_root))
-    actors.extend(parse_arete_alien_area(repo_root))
-    actors.extend(parse_arete_sandstorm(repo_root))
     actors.extend(parse_subway_merchants(repo_root))
     actors.extend(parse_city_and_garden(repo_root))
 

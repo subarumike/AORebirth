@@ -663,18 +663,111 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            AreteQuestRewardGrants.GrantCredits(source, BillTurnInCreditReward);
-            CombatXpRuntimeService.AwardDirectXp(
-                source,
-                BillTurnInXpReward,
-                "bill-hc12-turnin-2076xp");
-            Log(
-                "bill-turnin rewards xp="
-                + BillTurnInXpReward
-                + " credits="
-                + BillTurnInCreditReward
-                + " cashNow="
-                + source.Stats[StatIds.cash].Value);
+            bool appliedLive = false;
+            try
+            {
+                MissionRewardDefinition definition = new MissionRewardDefinition
+                                                    {
+                                                        RewardKey = "captured-bill-hc12-turnin-xp-credits",
+                                                        RewardType = "character-stats",
+                                                        IsResolved = true,
+                                                        StatMutations =
+                                                            new[]
+                                                            {
+                                                                new MissionCharacterStatMutation
+                                                                {
+                                                                    StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                    StatId = (int)StatIds.cash,
+                                                                    Kind = MissionStatMutationKind.AddClamped,
+                                                                    Value = BillTurnInCreditReward,
+                                                                    MinimumValue = 0,
+                                                                    MaximumValue = uint.MaxValue
+                                                                },
+                                                                new MissionCharacterStatMutation
+                                                                {
+                                                                    StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                    StatId = (int)StatIds.xp,
+                                                                    Kind = MissionStatMutationKind.AddClamped,
+                                                                    Value = BillTurnInXpReward,
+                                                                    MinimumValue = 0,
+                                                                    MaximumValue = uint.MaxValue
+                                                                },
+                                                                new MissionCharacterStatMutation
+                                                                {
+                                                                    StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                    StatId = (int)StatIds.unsavedxp,
+                                                                    Kind = MissionStatMutationKind.AddClamped,
+                                                                    Value = BillTurnInXpReward,
+                                                                    MinimumValue = 0,
+                                                                    MaximumValue = uint.MaxValue
+                                                                },
+                                                                new MissionCharacterStatMutation
+                                                                {
+                                                                    StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                    StatId = (int)StatIds.lastxp,
+                                                                    Kind = MissionStatMutationKind.Set,
+                                                                    Value = BillTurnInXpReward,
+                                                                    MinimumValue = 0,
+                                                                    MaximumValue = uint.MaxValue
+                                                                }
+                                                            }
+                                                    };
+                MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                    characterId,
+                    "Mission:5514B19F",
+                    definition,
+                    "capture:20260722-bill-dialog:bill-turnin-xp-credits");
+                if (result.Succeeded && result.StatValues != null)
+                {
+                    foreach (MissionCharacterStatValue statValue in result.StatValues)
+                    {
+                        uint value = statValue.Value <= 0
+                                         ? 0
+                                         : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                        source.Stats[(StatIds)statValue.StatId].Set(value);
+                    }
+
+                    StatMessageHandler.Default.SendChanged(source);
+                    appliedLive = true;
+                }
+                else
+                {
+                    Log(
+                        "bill-turnin rewards ledger status="
+                        + (result == null ? "null" : result.Status.ToString())
+                        + " msg="
+                        + (result == null ? string.Empty : result.Message));
+                }
+            }
+            catch (Exception e)
+            {
+                Log("bill-turnin rewards ledger failed: " + e.Message);
+            }
+
+            if (!appliedLive)
+            {
+                // Live session fallback so the player always receives capture amounts.
+                long cashBefore = source.Stats[StatIds.cash].Value;
+                long cashAfter = cashBefore + BillTurnInCreditReward;
+                if (cashAfter > uint.MaxValue)
+                {
+                    cashAfter = uint.MaxValue;
+                }
+
+                source.Stats[StatIds.cash].Set((uint)cashAfter);
+                CombatXpRuntimeService.AwardDirectXp(
+                    source,
+                    BillTurnInXpReward,
+                    "bill-hc12-turnin-2076xp");
+                StatMessageHandler.Default.SendChanged(source);
+                Log(
+                    "bill-turnin rewards live-fallback xp="
+                    + BillTurnInXpReward
+                    + " credits="
+                    + BillTurnInCreditReward
+                    + " cashNow="
+                    + source.Stats[StatIds.cash].Value);
+            }
 
             try
             {

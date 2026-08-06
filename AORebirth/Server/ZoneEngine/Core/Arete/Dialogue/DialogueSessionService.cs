@@ -153,29 +153,6 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return this.CreateResult(session, null, null, Enumerable.Empty<AreteRecordedAction>(), validation);
         }
 
-        public DialogueSessionResult RebuildResultForCurrentNode(DialogueSession session)
-        {
-            var validation = new AreteValidationResult();
-            DialogueNpcEntry npc;
-            DialogueNode currentNode;
-            if (!this.TryResolveSessionNode(session, validation, out npc, out currentNode))
-            {
-                return this.CreateResult(
-                    session,
-                    npc,
-                    currentNode,
-                    Enumerable.Empty<AreteRecordedAction>(),
-                    validation);
-            }
-
-            return this.CreateResult(
-                session,
-                npc,
-                currentNode,
-                Enumerable.Empty<AreteRecordedAction>(),
-                validation);
-        }
-
         private DialogueNpcEntry ResolveNpc(string npcIdentity, AreteValidationResult validation)
         {
             if (this.registry == null)

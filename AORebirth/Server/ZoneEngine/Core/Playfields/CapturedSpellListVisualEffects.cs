@@ -18,10 +18,9 @@ namespace ZoneEngine.Core.Playfields
     #endregion
 
     /// <summary>
-    /// Capture-backed SpellList visual effects (20260722-keeper-exect-nano + 20260731-172247).
+    /// Capture-backed SpellList visual effects (20260722-keeper-exect-nano).
     /// Ambient Restoration: named SpellList after CastNanoSpell pair (Effect 0xCF4A / nano 302365).
-    /// Robot fire: paired GfxEffect SpellLists (0xCF26) with GfxValue 0xA8E3 then 0xA871
-    /// (capture 20260731-172247 Malfunctioning Cleaning Robot), unique Effect.Instance each.
+    /// Robot fire: GfxEffect SpellList (0xCF26, GfxValue=0xA871) ~5s with unique Effect.Instance.
     /// </summary>
     internal static class CapturedSpellListVisualEffects
     {
@@ -31,12 +30,9 @@ namespace ZoneEngine.Core.Playfields
 
         private const int AmbientSpellEffectIdentityType = 0x0000CF4A;
 
-        private const int BurningRobotFireGfxEffectBase = unchecked((int)0x43DD5590);
+        private const int BurningRobotFireGfxEffectBase = unchecked((int)0x43BD71C7);
 
-        // Capture 20260731-172247: live sends A8E3 then A871 as a pair (same timestamp).
-        private const int BurningRobotFireGfxValuePrimary = 0xA8E3;
-
-        private const int BurningRobotFireGfxValueSecondary = 0xA871;
+        private const int BurningRobotFireGfxValue = 0xA871;
 
         private const double BurningRobotFireSpellListSeconds = 5.0;
 
@@ -112,9 +108,40 @@ namespace ZoneEngine.Core.Playfields
 
             try
             {
-                // Live 20260731-172247: two SpellLists back-to-back (A8E3 then A871).
-                AnnounceBurningRobotFireGfx(robot, BurningRobotFireGfxValuePrimary);
-                AnnounceBurningRobotFireGfx(robot, BurningRobotFireGfxValueSecondary);
+                int gfxInstance = Interlocked.Increment(ref nextBurningFireGfxInstance);
+                robot.Playfield.Announce(
+                    new SpellListMessage
+                    {
+                        Identity = robot.Identity,
+                        Unknown = 0,
+                        Character = robot.Identity,
+                        NanoEffects =
+                            new[]
+                            {
+                                new NanoEffect
+                                {
+                                    Effect =
+                                        new Identity
+                                        {
+                                            Type = IdentityType.GfxEffect,
+                                            Instance = gfxInstance
+                                        },
+                                    Unknown1 = 4,
+                                    CriterionCount = 0,
+                                    Hits = 1,
+                                    Delay = 0,
+                                    Unknown2 = 0,
+                                    Unknown3 = 0,
+                                    GfxValue = BurningRobotFireGfxValue,
+                                    GfxLife = 0,
+                                    GfxSize = 0,
+                                    GfxRed = 0,
+                                    GfxGreen = 0,
+                                    GfxBlue = 0,
+                                    GfxFade = 0
+                                }
+                            }
+                    });
             }
             catch (Exception ex)
             {
@@ -125,44 +152,6 @@ namespace ZoneEngine.Core.Playfields
                     + ": "
                     + ex.Message);
             }
-        }
-
-        private static void AnnounceBurningRobotFireGfx(ICharacter robot, int gfxValue)
-        {
-            int gfxInstance = Interlocked.Increment(ref nextBurningFireGfxInstance);
-            robot.Playfield.Announce(
-                new SpellListMessage
-                {
-                    Identity = robot.Identity,
-                    Unknown = 0,
-                    Character = robot.Identity,
-                    NanoEffects =
-                        new[]
-                        {
-                            new NanoEffect
-                            {
-                                Effect =
-                                    new Identity
-                                    {
-                                        Type = IdentityType.GfxEffect,
-                                        Instance = gfxInstance
-                                    },
-                                Unknown1 = 4,
-                                CriterionCount = 0,
-                                Hits = 1,
-                                Delay = 0,
-                                Unknown2 = 0,
-                                Unknown3 = 0,
-                                GfxValue = gfxValue,
-                                GfxLife = 0,
-                                GfxSize = 0,
-                                GfxRed = 0,
-                                GfxGreen = 0,
-                                GfxBlue = 0,
-                                GfxFade = 0
-                            }
-                        }
-                });
         }
 
         internal static bool IsAmbientRestorationNano(int nanoId)

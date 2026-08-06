@@ -30,34 +30,10 @@ namespace AORebirth.Core.Playfields
         private const string AlexFleaProfileKey = "captured.arete.alex-garbage-flea";
         private const int AlexFleaMonsterData = 17657;
         private const int AlexFleaCredits = 11;
-        private const string AreteCleanmeisterProfileKey =
-            "captured.arete.cleanmeister-intelligence-robot";
-        private const string AreteSupremeCollectorProfileKey =
-            "captured.arete.supreme-collector-of-waste";
-        private const string AreteMalfunctioningRobotProfileKey =
-            "captured.arete.malfunctioning-cleaning-robot";
-        private const string AreteRollerratProfileKey = "captured.arete.rollerrat";
-        private const string AreteDesertReetProfileKey = "captured.arete.desert-reet";
-        private const string AreteAngryMinibullProfileKey = "captured.arete.angry-minibull";
-        private const string AreteGnarlProfileKey = "captured.arete.gnarl-the-roller";
-        private const string AreteKneebreakerProfileKey =
-            "captured.arete.kneebreaker-alfonzo-rizzolo";
-        // Captures report the static Arete resource id (1044525), while the
-        // running zone and loot context use the Arete instance id (6553).
-        private const int AretePlayfieldId = 6553;
-        private const int AreteRollerratMonsterData = 17687;
-        private const int AreteDesertReetMonsterData = 30365;
-        private const int AreteAngryMinibullMonsterData = 30360;
-        private const string AreteOrdinaryLootEvidence =
-            "AOSharpLiveCapture 20260722-104809 and 20260722-152454 identity-linked corpse-loot-observations.csv";
-        private const string AretePartOneLootEvidence =
-            "AOSharpLiveCapture 20260722-104809 corpse-loot-observations.csv; "
-            + "identity-linked atomic snapshots for ordinary Docker, Waste Collector, "
-            + "Garbage Flea, Cleaning Robot, Cleanmeister Intelligence Robot, "
-            + "Supreme Collector of Waste, and Malfunctioning Cleaning Robot";
-        private const string AretePartTwoLootEvidence =
-            "AOSharpLiveCapture 20260722-152454 corpse-loot-observations.csv; "
-            + "identity-linked atomic snapshots; snapshot probabilities and wider pools unresolved";
+        private const string AlexPadLootEvidence =
+            "AOSharpLiveCapture 20260722-cap-mob-drop-cred corpse-loot-observations; Docker credits=4; Waste credits=11; Flea credits=5|11; Cleaning Robot credits=5";
+        private const string CleaningRobotLootEvidence =
+            "AOSharpLiveCapture 20260722-cap-mob-drop-cred; Cleaning Robot credits=5; Robot Junk 42620 / empty / misc";
         // Capture 20260723-221330 Nascence Life corpses.
         private const string NascenceChimeraProfileKey = "captured.nascence.barking-chimera";
         private const string NascenceYuttosProfileKey = "captured.nascence.yuttos";
@@ -116,7 +92,7 @@ namespace AORebirth.Core.Playfields
             lock (this.productionRandomSync) seed = this.productionRandom.Next();
             context.Seed = seed;
             LootGenerationResult result = this.generator.Generate(context, new SeededLootRandomSource(seed));
-            this.EnsureAlexPadCreditsEvenWhenEmpty(context, result, target.Name);
+            this.EnsureAlexPadCreditsEvenWhenEmpty(context, result);
             if (DiagnosticsEnabled())
             {
                 LogUtil.Debug(DebugInfoDetail.Engine, string.Format(
@@ -129,10 +105,7 @@ namespace AORebirth.Core.Playfields
             return result;
         }
 
-        private void EnsureAlexPadCreditsEvenWhenEmpty(
-            LootGenerationContext context,
-            LootGenerationResult result,
-            string enemyName)
+        private void EnsureAlexPadCreditsEvenWhenEmpty(LootGenerationContext context, LootGenerationResult result)
         {
             if (context == null || result == null || result.Credits > 0)
             {
@@ -140,15 +113,6 @@ namespace AORebirth.Core.Playfields
             }
 
             int credits;
-            if (CapturedAreteLandingLootDefinitions.TryGetTypicalCredits(enemyName, out credits)
-                && credits > 0)
-            {
-                result.Credits = credits;
-                result.CreditsUnresolved = true;
-                result.LootUnresolved = true;
-                return;
-            }
-
             if (!TryGetAlexPadEmptyCredits(context.MonsterData, out credits))
             {
                 return;
@@ -253,133 +217,28 @@ namespace AORebirth.Core.Playfields
                     return;
                 }
 
-                if (string.Equals(
-                    target.Name,
-                    "Cleanmeister Intelligence Robot",
-                    StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteCleanmeister();
-                    context.EnemyProfileKey = AreteCleanmeisterProfileKey;
-                    return;
-                }
-
-                if (string.Equals(
-                    target.Name,
-                    "Supreme Collector of Waste",
-                    StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteSupremeCollector();
-                    context.EnemyProfileKey = AreteSupremeCollectorProfileKey;
-                    return;
-                }
-
-                if (string.Equals(
-                    target.Name,
-                    "Malfunctioning Cleaning Robot",
-                    StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteMalfunctioningRobot();
-                    context.EnemyProfileKey = AreteMalfunctioningRobotProfileKey;
-                    return;
-                }
-
-                if (context.PlayfieldId == AretePlayfieldId
-                    && string.Equals(
-                        target.Name,
-                        "Gnarl the Roller",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteGnarl();
-                    context.EnemyProfileKey = AreteGnarlProfileKey;
-                    return;
-                }
-
-                if (context.PlayfieldId == AretePlayfieldId
-                    && string.Equals(
-                        target.Name,
-                        "Kneebreaker Alfonzo Rizzolo",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteKneebreaker();
-                    context.EnemyProfileKey = AreteKneebreakerProfileKey;
-                    return;
-                }
-
-                if (context.PlayfieldId == AretePlayfieldId
-                    && context.MonsterData == AreteRollerratMonsterData
-                    && string.Equals(target.Name, "Rollerrat", StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteRollerrat();
-                    context.EnemyProfileKey = AreteRollerratProfileKey;
-                    return;
-                }
-
-                if (context.PlayfieldId == AretePlayfieldId
-                    && context.MonsterData == AreteDesertReetMonsterData
-                    && string.Equals(target.Name, "Desert Reet", StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteDesertReet();
-                    context.EnemyProfileKey = AreteDesertReetProfileKey;
-                    return;
-                }
-
-                if (context.PlayfieldId == AretePlayfieldId
-                    && context.MonsterData == AreteAngryMinibullMonsterData
-                    && string.Equals(target.Name, "Angry Minibull", StringComparison.OrdinalIgnoreCase))
-                {
-                    this.EnsureAreteAngryMinibull();
-                    context.EnemyProfileKey = AreteAngryMinibullProfileKey;
-                    return;
-                }
-
-                // Arete Landing: Shiny Sword 297289 QL1 @ 6.2% on all PF6553 enemies.
-                // This independent global roll intentionally stacks with exact corpse tables.
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId)
-                {
-                    this.EnsureAreteShinySwordIndependent();
-                }
-
-                // Arete Landing part 1/2: exact-name observed corpse snapshots (items + credits).
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId)
-                {
-                    string areteProfileKey;
-                    if (CapturedAreteLandingLootDefinitions.TryRegister(
-                        this.registry,
-                        target.Name,
-                        out areteProfileKey))
-                    {
-                        context.EnemyProfileKey = areteProfileKey;
-                        return;
-                    }
-                }
-
-                // Legacy Alex-pad MonsterData tables — Arete PF only (shared MD must not clobber Subway).
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId
-                    && context.MonsterData == AlexDockerMonsterData)
+                if (context.MonsterData == AlexDockerMonsterData)
                 {
                     this.EnsureAlexDocker();
                     context.EnemyProfileKey = AlexDockerProfileKey;
                     return;
                 }
 
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId
-                    && context.MonsterData == AlexWasteMonsterData)
+                if (context.MonsterData == AlexWasteMonsterData)
                 {
                     this.EnsureAlexWasteCollector();
                     context.EnemyProfileKey = AlexWasteProfileKey;
                     return;
                 }
 
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId
-                    && context.MonsterData == AlexFleaMonsterData)
+                if (context.MonsterData == AlexFleaMonsterData)
                 {
                     this.EnsureAlexGarbageFlea();
                     context.EnemyProfileKey = AlexFleaProfileKey;
                     return;
                 }
 
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId
-                    && context.MonsterData == CleaningRobotMonsterData)
+                if (context.MonsterData == CleaningRobotMonsterData)
                 {
                     this.EnsureCleaningRobot();
                     context.EnemyProfileKey = CleaningRobotProfileKey;
@@ -807,15 +666,6 @@ namespace AORebirth.Core.Playfields
             this.registry.RegisterTableAndAssignment(adapted.Table, adapted.Assignment);
         }
 
-        internal static ObservedCorpseSnapshotDefinition[] BuildArete104809DockerSnapshots()
-        {
-            const string key = "capture.20260722-104809.docker.7988284D";
-            return new[]
-                {
-                    ObservedCorpseSnapshot(AretePartOneLootEvidence, key, 4)
-                };
-        }
-
         private void EnsureAlexDocker()
         {
             const string tableKey = "captured.arete.alex-32v-docker";
@@ -824,110 +674,30 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            var snapshots = new List<ObservedCorpseSnapshotDefinition>(BuildArete104809DockerSnapshots())
+            // Capture 20260722-cap-mob-drop-cred: credits always 4; empty or 248307.
+            ObservedCorpseSnapshotDefinition[] snapshots =
                 {
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-a", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-b", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-c", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-d", AlexDockerCredits),
                     ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        "capture.20260722-152454.docker.798914DC",
+                        AlexPadLootEvidence,
+                        "capture.20260722.docker.a",
                         AlexDockerCredits,
-                        ObservedCorpseSnapshotEntry(
-                            AretePartTwoLootEvidence,
-                            "capture.20260722-152454.docker.798914DC",
-                            248318,
-                            248318,
-                            1,
-                            1))
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.docker.a", 248307, 248307, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.docker.b",
+                        AlexDockerCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.docker.b", 248307, 248307, 1, 1))
                 };
 
             this.RegisterAlexPadTable(
                 tableKey,
                 "32-V Docker captured corpse",
                 AlexDockerProfileKey,
-                snapshots.ToArray());
-        }
-
-        internal static ObservedCorpseSnapshotDefinition[] BuildArete104809WasteCollectorSnapshots()
-        {
-            const string e = AretePartOneLootEvidence;
-            const string first = "capture.20260722-104809.waste.7988C8C9";
-            const string second = "capture.20260722-104809.waste.7988C8CE";
-            const string third = "capture.20260722-104809.waste.7988CA21";
-            const string fourth = "capture.20260722-104809.waste.7988C807";
-            const string fifth = "capture.20260722-104809.waste.7987C729";
-            const string sixth = "capture.20260722-104809.waste.7987C724";
-            const string seventh = "capture.20260722-104809.waste.7988CAD1";
-            const string eighth = "capture.20260722-104809.waste.7988C801";
-            const string ninth = "capture.20260722-104809.waste.7988CB14";
-            const string tenth = "capture.20260722-104809.waste.7988CAE5";
-            const string eleventh = "capture.20260722-104809.waste.7988CADF";
-            const string twelfth = "capture.20260722-104809.waste.7988CAEE";
-            const string thirteenth = "capture.20260722-104809.waste.7988CAF8";
-            const string fourteenth = "capture.20260722-104809.waste.7988CAF4";
-            return new[]
-                {
-                    ObservedCorpseSnapshot(
-                        e,
-                        first,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, first, 248319, 248319, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, first, 42620, 42619, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        second,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, second, 248315, 248315, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, second, 42620, 42619, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        third,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, third, 248315, 248315, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, third, 70562, 85597, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        fourth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, fourth, 297289, 297289, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, fourth, 42620, 42619, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        fifth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, fifth, 42620, 42619, 2, 1)),
-                    ObservedCorpseSnapshot(e, sixth, 11),
-                    ObservedCorpseSnapshot(e, seventh, 11),
-                    ObservedCorpseSnapshot(
-                        e,
-                        eighth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, eighth, 42620, 42619, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        ninth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, ninth, 248319, 248319, 1, 1)),
-                    ObservedCorpseSnapshot(e, tenth, 11),
-                    ObservedCorpseSnapshot(
-                        e,
-                        eleventh,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, eleventh, 248315, 248315, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, eleventh, 248319, 248319, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, eleventh, 42620, 42619, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        twelfth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, twelfth, 70561, 85744, 2, 1)),
-                    ObservedCorpseSnapshot(e, thirteenth, 11),
-                    ObservedCorpseSnapshot(
-                        e,
-                        fourteenth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, fourteenth, 248334, 248334, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, fourteenth, 70558, 85640, 2, 1),
-                        ObservedCorpseSnapshotEntry(e, fourteenth, 42620, 42619, 2, 1))
-                };
+                snapshots);
         }
 
         private void EnsureAlexWasteCollector()
@@ -938,186 +708,45 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            var snapshots = new List<ObservedCorpseSnapshotDefinition>(BuildArete104809WasteCollectorSnapshots())
+            // Capture 20260722-cap-mob-drop-cred: credits=11; items 248315/248319/248334/42620/70564…
+            ObservedCorpseSnapshotDefinition[] snapshots =
                 {
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.waste.empty", AlexWasteCredits),
                     ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        "capture.20260722-152454.waste.798913CD",
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.a",
                         AlexWasteCredits,
-                        ObservedCorpseSnapshotEntry(
-                            AretePartTwoLootEvidence,
-                            "capture.20260722-152454.waste.798913CD",
-                            248315,
-                            248315,
-                            1,
-                            1),
-                        ObservedCorpseSnapshotEntry(
-                            AretePartTwoLootEvidence,
-                            "capture.20260722-152454.waste.798913CD",
-                            70558,
-                            85640,
-                            2,
-                            1)),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.a", 248334, 248334, 1, 1)),
                     ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        "capture.20260722-152454.waste.79891536",
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.b",
                         AlexWasteCredits,
-                        ObservedCorpseSnapshotEntry(
-                            AretePartTwoLootEvidence,
-                            "capture.20260722-152454.waste.79891536",
-                            248334,
-                            248334,
-                            1,
-                            1),
-                        ObservedCorpseSnapshotEntry(
-                            AretePartTwoLootEvidence,
-                            "capture.20260722-152454.waste.79891536",
-                            248319,
-                            248319,
-                            1,
-                            1),
-                        ObservedCorpseSnapshotEntry(
-                            AretePartTwoLootEvidence,
-                            "capture.20260722-152454.waste.79891536",
-                            42620,
-                            42619,
-                            2,
-                            1))
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.b", 248315, 248315, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.b", 42620, 42619, 2, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.c",
+                        AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.c", 248319, 248319, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.d",
+                        AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.d", 42620, 42619, 2, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.e",
+                        AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.e", 248315, 248315, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.e", 70564, 85515, 2, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.e", 42620, 42619, 2, 1))
                 };
 
             this.RegisterAlexPadTable(
                 tableKey,
                 "Waste Collector captured corpse",
                 AlexWasteProfileKey,
-                snapshots.ToArray());
-        }
-
-        internal static ObservedCorpseSnapshotDefinition[] BuildArete104809GarbageFleaSnapshots()
-        {
-            const string e = AretePartOneLootEvidence;
-            const string first = "capture.20260722-104809.garbage-flea.7988C8C4";
-            const string second = "capture.20260722-104809.garbage-flea.7988C91C";
-            const string third = "capture.20260722-104809.garbage-flea.7987C2DD";
-            const string fourth = "capture.20260722-104809.garbage-flea.7988C812";
-            const string fifth = "capture.20260722-104809.garbage-flea.7988C932";
-            const string sixth = "capture.20260722-104809.garbage-flea.7988CB23";
-            const string seventh = "capture.20260722-104809.garbage-flea.7988CAED";
-            const string eighth = "capture.20260722-104809.garbage-flea.7988CB32";
-            const string ninth = "capture.20260722-104809.garbage-flea.7988CB5D";
-            const string tenth = "capture.20260722-104809.garbage-flea.7988CB5C";
-            const string eleventh = "capture.20260722-104809.garbage-flea.7988CB08";
-            return new[]
-                {
-                    ObservedCorpseSnapshot(
-                        e,
-                        first,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, first, 248322, 248322, 1, 1)),
-                    ObservedCorpseSnapshot(e, second, 11),
-                    ObservedCorpseSnapshot(e, third, 5),
-                    ObservedCorpseSnapshot(e, fourth, 5),
-                    ObservedCorpseSnapshot(e, fifth, 11),
-                    ObservedCorpseSnapshot(
-                        e,
-                        sixth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, sixth, 248322, 248322, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        seventh,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, seventh, 70560, 85688, 2, 1),
-                        ObservedCorpseSnapshotEntry(e, seventh, 248322, 248322, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        eighth,
-                        11,
-                        ObservedCorpseSnapshotEntry(e, eighth, 248322, 248322, 1, 1)),
-                    ObservedCorpseSnapshot(e, ninth, 5),
-                    ObservedCorpseSnapshot(
-                        e,
-                        tenth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, tenth, 248322, 248322, 1, 1)),
-                    ObservedCorpseSnapshot(e, eleventh, 5)
-                };
-        }
-
-        private void EnsureAreteShinySwordIndependent()
-        {
-            const string tableKey = "arete.landing.shiny-sword.independent";
-            if (this.registry.ContainsTable(tableKey))
-            {
-                return;
-            }
-
-            const string evidence =
-                "Mike Arete loot table; Shiny Sword 297289 QL1 6.2%; also observed Waste Collector corpse in arete-part-1";
-            this.registry.RegisterTable(
-                new LootTableDefinition
-                {
-                    LootTableKey = tableKey,
-                    DisplayName = "Arete Landing Shiny Sword independent",
-                    TableType = LootTableType.GlobalDefault,
-                    RollGroups =
-                        new[]
-                        {
-                            new LootGroupDefinition
-                            {
-                                LootGroupKey = "shiny-sword",
-                                RollMode = LootRollMode.Independent,
-                                RollCount = 1,
-                                EmptyWeight = 0,
-                                DropChanceBasisPoints = 10000,
-                                Entries =
-                                    new[]
-                                    {
-                                        new LootEntryDefinition
-                                        {
-                                            SelectionKey = "shiny-sword-297289",
-                                            ItemTemplateId = 297289,
-                                            HighItemTemplateId = 297289,
-                                            FixedQuality = 1,
-                                            MinimumQuality = 1,
-                                            MaximumQuality = 1,
-                                            MinimumQuantity = 1,
-                                            MaximumQuantity = 1,
-                                            Weight = 1,
-                                            DropChanceBasisPoints = 620,
-                                            Semantics = LootSemantics.WeightedDocumented,
-                                            Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                                            EvidenceReference = evidence
-                                        }
-                                    },
-                                Conditions = new string[0]
-                            }
-                        },
-                    ObservedCorpseSnapshots = new ObservedCorpseSnapshotDefinition[0],
-                    CreditsPolicy = new CreditsPolicyDefinition
-                    {
-                        Mode = CreditsPolicyMode.None,
-                        Evidence = LootEvidenceConfidence.ProvenCapture
-                    },
-                    QualityPolicy = "fixed-ql1",
-                    Evidence = evidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    ItemPoolUnresolved = false,
-                    Enabled = true
-                });
-            this.registry.RegisterAssignment(
-                new LootAssignmentDefinition
-                {
-                    AssignmentKey = tableKey,
-                    TargetType = LootAssignmentTargetType.Global,
-                    TargetKey = null,
-                    LootTableKey = tableKey,
-                    PlayfieldId = CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId,
-                    Priority = 0,
-                    Conditions = new string[0],
-                    Evidence = evidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    Enabled = true
-                });
+                snapshots);
         }
 
         private void EnsureAlexGarbageFlea()
@@ -1128,429 +757,30 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            ObservedCorpseSnapshotDefinition[] snapshots = BuildArete104809GarbageFleaSnapshots();
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-5a", 5),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-5b", 5),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-5c", 5),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-11", 11),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.flea.a",
+                        5,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.flea.a", 248322, 248322, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.flea.b",
+                        5,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.flea.b", 70560, 70560, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.flea.b", 248322, 248322, 1, 1))
+                };
 
             this.RegisterAlexPadTable(
                 tableKey,
                 "Garbage Flea captured corpse",
                 AlexFleaProfileKey,
                 snapshots);
-        }
-
-        private void EnsureAreteCleanmeister()
-        {
-            if (this.registry.ContainsTable(AreteCleanmeisterProfileKey))
-            {
-                return;
-            }
-
-            const string first = "capture.20260722-104809.cleanmeister.7988C930";
-            const string second = "capture.20260722-104809.cleanmeister.7988CAD3";
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(
-                        AretePartOneLootEvidence,
-                        first,
-                        17,
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 42620, 42619, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 85517, 27360, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 85740, 85739, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 123514, 123515, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 154069, 150213, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 161609, 161610, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 162736, 162736, 7, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 206656, 206657, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        AretePartOneLootEvidence,
-                        second,
-                        17,
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 85693, 27389, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 135719, 135719, 1, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 123789, 123790, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 129064, 129065, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 160338, 160339, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 162736, 162736, 7, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 201045, 201046, 2, 1)),
-                    ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        "capture.20260722-152454.cleanmeister.798915E0",
-                        17,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 85691, 22004, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 70562, 85597, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 122981, 122982, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 130042, 130043, 2, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 160604, 160604, 20, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 162736, 162736, 7, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.cleanmeister.798915E0", 201072, 201073, 2, 1))
-                };
-
-            this.RegisterObservedAreteVariantTable(
-                AreteCleanmeisterProfileKey,
-                "Cleanmeister Intelligence Robot captured corpses",
-                snapshots);
-        }
-
-        internal static ObservedCorpseSnapshotDefinition BuildArete152454ResolvedSupremeCollectorSnapshot()
-        {
-            const string key = "capture.20260722-152454.supreme-collector.798911CF";
-            return ObservedCorpseSnapshot(
-                AretePartTwoLootEvidence,
-                key,
-                35,
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 70558, 85640, 5, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 70559, 85689, 5, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 122886, 122887, 5, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 123057, 123058, 5, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 163318, 163319, 5, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 162497, 162497, 14, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 201076, 201077, 5, 1));
-        }
-
-        private void EnsureAreteSupremeCollector()
-        {
-            if (this.registry.ContainsTable(AreteSupremeCollectorProfileKey))
-            {
-                return;
-            }
-
-            const string first = "capture.20260722-104809.supreme-collector.79882C8F";
-            const string second = "capture.20260722-104809.supreme-collector.7988CB09";
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(
-                        AretePartOneLootEvidence,
-                        first,
-                        35,
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 42620, 42619, 4, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 123038, 123039, 5, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 160216, 160217, 5, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 160603, 160603, 20, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 160704, 160704, 24, 1)),
-                    ObservedCorpseSnapshot(
-                        AretePartOneLootEvidence,
-                        second,
-                        35,
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 85761, 85760, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 85533, 85532, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 124383, 124384, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 121629, 121630, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 160603, 160603, 20, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 162736, 162736, 7, 1),
-                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 201068, 201069, 3, 1)),
-                    ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        "capture.20260722-152454.supreme-collector.7989146B",
-                        35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 70565, 85514, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 135719, 135719, 1, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 124391, 124392, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 153083, 153084, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 160736, 160737, 3, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 162736, 162736, 7, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.supreme-collector.7989146B", 201076, 201077, 3, 1)),
-                    BuildArete152454ResolvedSupremeCollectorSnapshot()
-                };
-
-            this.RegisterObservedAreteVariantTable(
-                AreteSupremeCollectorProfileKey,
-                "Supreme Collector of Waste captured corpses",
-                snapshots);
-        }
-
-        private void EnsureAreteMalfunctioningRobot()
-        {
-            if (this.registry.ContainsTable(AreteMalfunctioningRobotProfileKey))
-            {
-                return;
-            }
-
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(
-                        AretePartOneLootEvidence,
-                        "capture.20260722-104809.malfunctioning-robot.7988C9B9",
-                        5),
-                    ObservedCorpseSnapshot(
-                        AretePartOneLootEvidence,
-                        "capture.20260722-104809.malfunctioning-robot.7988C9BF",
-                        5)
-                };
-
-            this.RegisterObservedAreteVariantTable(
-                AreteMalfunctioningRobotProfileKey,
-                "Malfunctioning Cleaning Robot captured corpses",
-                snapshots);
-        }
-
-        private void EnsureAreteRollerrat()
-        {
-            if (this.registry.ContainsTable(AreteRollerratProfileKey))
-            {
-                return;
-            }
-
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798915D0", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798915D0", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891513", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891513", 70560, 85688, 7, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFD2", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFD2", 70561, 85744, 7, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFD0", 29,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFD0", 84150, 84149, 4, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFCF", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79882AEC", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7989160C", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891606", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798915FF", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFD3", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFD3", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891150", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891150", 70559, 85689, 7, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B7", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B7", 84158, 84157, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B7", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B5", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B8", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B8", 70559, 85689, 5, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.798912B8", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CFE0", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CD22", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7989164E", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891665", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891665", 70558, 85640, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891665", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891663", 29,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891663", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891636", 29,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891636", 248333, 248333, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7989163B", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891714", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7989162F", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.79891611", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7988CA3F", 35),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7989165A", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.rollerrat.7989165A", 70559, 85689, 7, 1))
-                };
-
-            this.RegisterObservedAretePartTwoTable(
-                AreteRollerratProfileKey,
-                "Arete Rollerrat captured corpses",
-                snapshots);
-        }
-
-        private void EnsureAreteDesertReet()
-        {
-            if (this.registry.ContainsTable(AreteDesertReetProfileKey))
-            {
-                return;
-            }
-
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828FB", 29,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828FB", 42640, 42641, 5, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828EE", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828E7", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828E7", 70561, 85744, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828E7", 42640, 42641, 7, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828F0", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828F0", 42640, 42641, 5, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828E4", 29,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798828E4", 42640, 42641, 6, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.798767DE", 29),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989160F", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989160F", 42640, 42641, 6, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989161C", 35,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989161C", 248328, 248328, 1, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989161C", 70558, 85640, 5, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989161C", 42640, 42641, 5, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989162B", 29,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.desert-reet.7989162B", 248328, 248328, 1, 1))
-                };
-
-            this.RegisterObservedAretePartTwoTable(
-                AreteDesertReetProfileKey,
-                "Arete Desert Reet captured corpses",
-                snapshots);
-        }
-
-        private void EnsureAreteAngryMinibull()
-        {
-            if (this.registry.ContainsTable(AreteAngryMinibullProfileKey))
-            {
-                return;
-            }
-
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891740", 79),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891749", 59,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891749", 248310, 248310, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.7989174A", 72,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.7989174A", 248325, 248325, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.7989175A", 53,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.7989175A", 84156, 84155, 7, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891770", 47),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891779", 47,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891779", 248330, 248330, 1, 2)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.798915D5", 47,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.798915D5", 248310, 248310, 1, 1)),
-                    ObservedCorpseSnapshot(AretePartTwoLootEvidence, "capture.20260722-152454.angry-minibull.79891763", 79)
-                };
-
-            this.RegisterObservedAretePartTwoTable(
-                AreteAngryMinibullProfileKey,
-                "Arete Angry Minibull captured corpses",
-                snapshots);
-        }
-
-        internal static ObservedCorpseSnapshotDefinition BuildArete152454ResolvedGnarlSnapshot()
-        {
-            const string key = "capture.20260722-152454.gnarl.79891585";
-            return ObservedCorpseSnapshot(
-                AretePartTwoLootEvidence,
-                key,
-                0,
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 85548, 22258, 7, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 85596, 85595, 7, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 160264, 160265, 7, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 125343, 125344, 7, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 161487, 161488, 7, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 162715, 162715, 7, 1),
-                ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 201139, 201140, 7, 1));
-        }
-
-        private void EnsureAreteGnarl()
-        {
-            if (this.registry.ContainsTable(AreteGnarlProfileKey))
-            {
-                return;
-            }
-
-            const string key = "capture.20260722-152454.gnarl.79891671";
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        key,
-                        62,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 85750, 85749, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 85512, 85511, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 124106, 124107, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 122064, 122065, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 160103, 160104, 6, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 162736, 162736, 7, 1),
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 201087, 201088, 6, 1)),
-                    BuildArete152454ResolvedGnarlSnapshot()
-                };
-
-            this.RegisterObservedAretePartTwoTable(
-                AreteGnarlProfileKey,
-                "Gnarl the Roller captured corpse",
-                snapshots);
-        }
-
-        private void EnsureAreteKneebreaker()
-        {
-            if (this.registry.ContainsTable(AreteKneebreakerProfileKey))
-            {
-                return;
-            }
-
-            const string key = "capture.20260722-152454.kneebreaker.7989147B";
-            ObservedCorpseSnapshotDefinition[] snapshots =
-                {
-                    ObservedCorpseSnapshot(
-                        AretePartTwoLootEvidence,
-                        key,
-                        23,
-                        ObservedCorpseSnapshotEntry(AretePartTwoLootEvidence, key, 70561, 85744, 4, 1))
-                };
-
-            this.RegisterObservedAretePartTwoTable(
-                AreteKneebreakerProfileKey,
-                "Kneebreaker Alfonzo Rizzolo captured corpse",
-                snapshots);
-        }
-
-        private void RegisterObservedAretePartTwoTable(
-            string tableKey,
-            string displayName,
-            ObservedCorpseSnapshotDefinition[] snapshots)
-        {
-            this.registry.RegisterTable(
-                new LootTableDefinition
-                {
-                    LootTableKey = tableKey,
-                    DisplayName = displayName,
-                    TableType = LootTableType.EnemyType,
-                    RollGroups = new LootGroupDefinition[0],
-                    ObservedCorpseSnapshots = snapshots,
-                    CreditsPolicy = new CreditsPolicyDefinition
-                    {
-                        Mode = CreditsPolicyMode.Unresolved,
-                        Evidence = LootEvidenceConfidence.Unresolved
-                    },
-                    QualityPolicy = "captured-observed-corpse-snapshots",
-                    Evidence = AretePartTwoLootEvidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    ItemPoolUnresolved = true,
-                    Enabled = true
-                });
-            this.registry.RegisterAssignment(
-                new LootAssignmentDefinition
-                {
-                    AssignmentKey = tableKey,
-                    TargetType = LootAssignmentTargetType.EnemyType,
-                    TargetKey = tableKey,
-                    LootTableKey = tableKey,
-                    Priority = 0,
-                    Conditions = new string[0],
-                    Evidence = AretePartTwoLootEvidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    Enabled = true
-                });
-        }
-
-        private void RegisterObservedAreteVariantTable(
-            string tableKey,
-            string displayName,
-            ObservedCorpseSnapshotDefinition[] snapshots)
-        {
-            this.registry.RegisterTable(
-                new LootTableDefinition
-                {
-                    LootTableKey = tableKey,
-                    DisplayName = displayName,
-                    TableType = LootTableType.EnemyType,
-                    RollGroups = new LootGroupDefinition[0],
-                    ObservedCorpseSnapshots = snapshots,
-                    CreditsPolicy = new CreditsPolicyDefinition
-                    {
-                        Mode = CreditsPolicyMode.Unresolved,
-                        Evidence = LootEvidenceConfidence.Unresolved
-                    },
-                    QualityPolicy = "captured-observed-corpse-snapshots",
-                    Evidence = AretePartOneLootEvidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    ItemPoolUnresolved = true,
-                    Enabled = true
-                });
-            this.registry.RegisterAssignment(
-                new LootAssignmentDefinition
-                {
-                    AssignmentKey = tableKey,
-                    TargetType = LootAssignmentTargetType.EnemyType,
-                    TargetKey = tableKey,
-                    LootTableKey = tableKey,
-                    Priority = 0,
-                    Conditions = new string[0],
-                    Evidence = AretePartOneLootEvidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    Enabled = true
-                });
         }
 
         private void RegisterAlexPadTable(
@@ -1573,7 +803,7 @@ namespace AORebirth.Core.Playfields
                         Evidence = LootEvidenceConfidence.Unresolved
                     },
                     QualityPolicy = "captured-observed-corpse-snapshots",
-                    Evidence = AreteOrdinaryLootEvidence,
+                    Evidence = AlexPadLootEvidence,
                     Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
                     ItemPoolUnresolved = true,
                     Enabled = true
@@ -1587,87 +817,10 @@ namespace AORebirth.Core.Playfields
                     LootTableKey = tableKey,
                     Priority = 0,
                     Conditions = new string[0],
-                    Evidence = AreteOrdinaryLootEvidence,
+                    Evidence = AlexPadLootEvidence,
                     Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
                     Enabled = true
                 });
-        }
-
-        internal static ObservedCorpseSnapshotDefinition[] BuildArete104809CleaningRobotSnapshots()
-        {
-            const string e = AretePartOneLootEvidence;
-            const string first = "capture.20260722-104809.cleaning-robot.79882F7E";
-            const string second = "capture.20260722-104809.cleaning-robot.79882F9A";
-            const string third = "capture.20260722-104809.cleaning-robot.79882F8C";
-            const string fourth = "capture.20260722-104809.cleaning-robot.7988C9E3";
-            const string fifth = "capture.20260722-104809.cleaning-robot.7988C9EE";
-            const string sixth = "capture.20260722-104809.cleaning-robot.7988C9FC";
-            const string seventh = "capture.20260722-104809.cleaning-robot.7988C9FF";
-            const string eighth = "capture.20260722-104809.cleaning-robot.7988C84C";
-            const string ninth = "capture.20260722-104809.cleaning-robot.7988C8C6";
-            const string tenth = "capture.20260722-104809.cleaning-robot.7988C8C1";
-            const string eleventh = "capture.20260722-104809.cleaning-robot.7988C8C3";
-            const string twelfth = "capture.20260722-104809.cleaning-robot.7988CA62";
-            const string thirteenth = "capture.20260722-104809.cleaning-robot.7988CACD";
-            const string fourteenth = "capture.20260722-104809.cleaning-robot.7988CAD8";
-            const string fifteenth = "capture.20260722-104809.cleaning-robot.7988CAC6";
-            return new[]
-                {
-                    ObservedCorpseSnapshot(
-                        e,
-                        first,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, first, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        second,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, second, 70563, 70563, 1, 1)),
-                    ObservedCorpseSnapshot(e, third, 5),
-                    ObservedCorpseSnapshot(
-                        e,
-                        fourth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, fourth, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        fifth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, fifth, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        sixth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, sixth, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(e, seventh, 5),
-                    ObservedCorpseSnapshot(
-                        e,
-                        eighth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, eighth, 155685, 155685, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, eighth, 84144, 84144, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, eighth, 70559, 70559, 1, 1)),
-                    ObservedCorpseSnapshot(e, ninth, 5),
-                    ObservedCorpseSnapshot(e, tenth, 5),
-                    ObservedCorpseSnapshot(
-                        e,
-                        eleventh,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, eleventh, 70560, 70560, 1, 1),
-                        ObservedCorpseSnapshotEntry(e, eleventh, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        twelfth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, twelfth, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        e,
-                        thirteenth,
-                        5,
-                        ObservedCorpseSnapshotEntry(e, thirteenth, 42620, 42620, 1, 1)),
-                    ObservedCorpseSnapshot(e, fourteenth, 5),
-                    ObservedCorpseSnapshot(e, fifteenth, 5)
-                };
         }
 
         private void EnsureCleaningRobot()
@@ -1678,11 +831,71 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.RegisterAlexPadTable(
-                tableKey,
-                "Cleaning Robot captured corpses",
-                CleaningRobotProfileKey,
-                BuildArete104809CleaningRobotSnapshots());
+            // Capture 20260722-cap-mob-drop-cred: credits=5; empty / 42620 / misc.
+            int[][] outcomes =
+                {
+                    new[] { 42620 }, new int[0], new[] { 42620 }, new int[0],
+                    new[] { 155666, 70560, 42620 }, new[] { 84148 }, new[] { 36783 },
+                    new int[0], new[] { 42620 }, new int[0]
+                };
+            var entries = new List<LootEntryDefinition>();
+            int emptyWeight = 0;
+            for (int index = 0; index < outcomes.Length; index++)
+            {
+                if (outcomes[index].Length == 0)
+                {
+                    emptyWeight++;
+                    continue;
+                }
+
+                foreach (int itemId in outcomes[index])
+                {
+                    entries.Add(FixedEntry(itemId, 1, "outcome." + index, 1));
+                }
+            }
+
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = "Cleaning Robot captured outcomes",
+                    TableType = LootTableType.EnemyType,
+                    RollGroups =
+                        new[]
+                        {
+                            new LootGroupDefinition
+                            {
+                                LootGroupKey = "captured-outcome",
+                                RollMode = LootRollMode.WeightedOne,
+                                RollCount = 1,
+                                EmptyWeight = emptyWeight,
+                                DropChanceBasisPoints = 10000,
+                                Entries = entries.ToArray(),
+                                Conditions = new string[0]
+                            }
+                        },
+                    CreditsPolicy = CreditsRange(
+                        CleaningRobotCredits,
+                        CleaningRobotCredits,
+                        LootEvidenceConfidence.ProvenCapture),
+                    QualityPolicy = "captured-fixed",
+                    Evidence = "live-capture-20260629-142800; 20260720-212302 empty/junk",
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = CleaningRobotProfileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Evidence = "live-capture-20260629-142800; 20260720-212302 empty/junk",
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true,
+                    Conditions = new string[0]
+                });
         }
 
         private void EnsureNascenceBarkingChimera()

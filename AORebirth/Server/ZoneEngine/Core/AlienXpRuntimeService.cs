@@ -35,9 +35,9 @@ namespace ZoneEngine.Core
         private const uint UnsetStatSentinel = 1234567890u;
 
         /// <summary>
-        /// Capture 20260726-230559: four Alien Spider - Zix kills each add 150 AIXP.
+        /// Temporary test reward for /command spawn alienspider (still respects bar/RK caps).
         /// </summary>
-        private const int AreteAlienSpiderAixpReward = 150;
+        private const int AlienSpiderTestAixpReward = 5000;
 
         /// <summary>
         /// Rubi-Ka level required for each Alien Level (AI 1..30). Index 0 unused.
@@ -273,15 +273,7 @@ namespace ZoneEngine.Core
         {
             if (IsAlienSpiderTestMob(target))
             {
-                return AreteAlienSpiderAixpReward;
-            }
-
-            // The Arete corpus does not prove an AIXP value for the other alien
-            // families. Keep those rewards closed instead of applying the
-            // generic level-derived fallback.
-            if (target.Playfield != null && target.Playfield.Identity.Instance == 6553)
-            {
-                return 0;
+                return AlienSpiderTestAixpReward;
             }
 
             int targetLevel = Math.Max(1, (int)target.Stats[StatIds.level].BaseValue);

@@ -37,9 +37,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertNpc(result, "SimpleChar:796360BD");
             AssertNpc(result, "SimpleChar:796360BC");
             AssertNpc(result, "SimpleChar:79135F51");
-            AssertNpc(result, "SimpleChar:782DE699");
-            AssertNpc(result, "SimpleChar:78E0FC77");
-            AssertNpc(result, "SimpleChar:78E0FC7D");
             AssertQuest(result, "Mission:5514B18C");
             AssertQuest(result, "Mission:5514B18D");
             AssertQuest(result, "Mission:5514B18E");
@@ -198,111 +195,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.IsTrue(exception.Message.Contains("windcaller-karrec"));
                 Assert.IsTrue(exception.Message.Contains("content manifest file was not found"));
             }
-        }
-
-        [TestMethod]
-        public void BrontoBurgersVendorPreservesCapturedStatelTemplateAndInventoryOrder()
-        {
-            string root = FindRepositoryRoot();
-            string vendors = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\vendors.sql"));
-            string templates = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\vendortemplate.sql"));
-            string inventory = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\shopinventorytemplates.sql"));
-
-            Assert.IsTrue(vendors.Contains("Statel: 0xC00E1999"));
-            Assert.IsTrue(vendors.Contains(
-                "VALUES (429457422, 6553, 0, 0, 0, 0, 0, 0, 1, '', 121036, 'ARBRTBG');"));
-            Assert.IsTrue(templates.Contains(
-                "VALUES ('ARBRTBG', 1, 'AreteBrontoBurgers', 121036, 'BRBG', 1, 1);"));
-
-            int[] capturedOrder =
-                {
-                    130621, 130593, 130623, 130624, 130581,
-                    130612, 130625, 130606, 130602, 130603
-                };
-            int cursor = 0;
-            foreach (int itemId in capturedOrder)
-            {
-                string rowPrefix = "VALUES ('BRBG', " + itemId + ", " + itemId + ", 1, 1, 1,";
-                int position = inventory.IndexOf(rowPrefix, cursor, StringComparison.Ordinal);
-                Assert.IsTrue(position >= cursor, "Missing or out-of-order captured item " + itemId + ".");
-                cursor = position + rowPrefix.Length;
-            }
-
-            Assert.AreEqual(
-                10,
-                inventory.Split(new[] { "VALUES ('BRBG'," }, StringSplitOptions.None).Length - 1);
-        }
-
-        [TestMethod]
-        public void CapturedAreteRespawnIntervalsRemainScopedToProvenNpcKinds()
-        {
-            string root = FindRepositoryRoot();
-            string alex = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AlexAreaMobRuntime.cs"));
-            string oasis = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\LoreleiOasisMobRuntime.cs"));
-            string alien = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteAlienAreaMobRuntime.cs"));
-
-            Assert.IsTrue(alex.Contains("CapturedDockerRespawnSeconds = 40.0"));
-            Assert.IsTrue(alex.Contains("slot.Kind == MobKind.Docker"));
-            Assert.IsTrue(alex.Contains("string.Equals(slot.Name, \"32-V Docker\", StringComparison.Ordinal)"));
-            Assert.IsTrue(alex.Contains("DefaultRespawnSeconds = 30.0"));
-
-            Assert.IsTrue(oasis.Contains("CapturedDesertReetRespawnSeconds = 40.0"));
-            Assert.IsTrue(oasis.Contains("CapturedRollerratRespawnSeconds = 40.0"));
-            Assert.IsTrue(oasis.Contains("string.Equals(slot.Name, \"Desert Reet\", StringComparison.Ordinal)"));
-            Assert.IsTrue(oasis.Contains("string.Equals(slot.Name, \"Rollerrat\", StringComparison.Ordinal)"));
-            Assert.IsTrue(oasis.Contains("DefaultRespawnSeconds = 30.0"));
-
-            Assert.IsTrue(alien.Contains("CapturedWildlifeRespawnSeconds = 40.0"));
-            Assert.IsTrue(alien.Contains("slot.Kind == MobKind.Rollerrat"));
-            Assert.IsTrue(alien.Contains("string.Equals(slot.Name, \"Angry Minibull\", StringComparison.Ordinal)"));
-            Assert.IsTrue(alien.Contains("TryResolveRespawnSeconds"));
-            Assert.IsFalse(alien.Contains("DefaultRespawnSeconds"));
-        }
-
-        [TestMethod]
-        public void CapturedNamedEnemyLifecycleUsesMeasuredReplacementDelays()
-        {
-            string root = FindRepositoryRoot();
-            string landing = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteLandingSpawn.cs"));
-
-            Assert.IsTrue(landing.Contains("Name = \"Violent Protester\""));
-            Assert.IsTrue(landing.Contains("MonsterData = 203740"));
-            Assert.IsTrue(landing.Contains("X = 3505.53418f"));
-            Assert.IsTrue(landing.Contains("RespawnSeconds = 19.958"));
-            Assert.IsTrue(landing.Contains("RespawnSeconds = 26.923"));
-            Assert.IsTrue(landing.Contains("CapturedRespawnDueUtcByPlayfield"));
-            Assert.IsTrue(landing.Contains("TimeSpan.FromSeconds(def.RespawnSeconds)"));
-        }
-
-        [TestMethod]
-        public void EligibilityOnlyAggroUsesContactFloorWithoutClaimingExactRadius()
-        {
-            string source = File.ReadAllText(Path.Combine(
-                FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-
-            Assert.IsTrue(source.Contains(
-                "CapturedEligibilityOnlyAggroRadiusMeters = 1.0d"));
-            Assert.IsTrue(source.Contains(
-                "capturedAreteAggro.TryGetRadius(evidence, out radius)"));
-            Assert.IsTrue(source.Contains(
-                "capturedAreteAggro.TryGetEligibility("));
-            Assert.IsTrue(source.Contains(
-                "radius = CapturedEligibilityOnlyAggroRadiusMeters;"));
         }
 
         private static string CheckedInPath(string area, string contentName, string fileName)
