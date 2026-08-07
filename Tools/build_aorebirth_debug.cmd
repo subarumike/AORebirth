@@ -66,6 +66,21 @@ if not "%CORE_EXIT%"=="0" (
     exit /b %CORE_EXIT%
 )
 
+echo [AORebirth Build] Cleaning stale build processes before LoginEngine...
+taskkill /F /T /IM MSBuild.exe >nul 2>&1
+taskkill /F /T /IM dotnet.exe >nul 2>&1
+taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
+taskkill /F /T /IM NuGet.exe >nul 2>&1
+
+echo [AORebirth Build] Building LoginEngine...
+"%MSBUILD%" "AORebirth\Server\LoginEngine\LoginEngine.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
+set LOGIN_EXIT=%ERRORLEVEL%
+if not "%LOGIN_EXIT%"=="0" (
+    echo [AORebirth Build] LoginEngine failed with exit code %LOGIN_EXIT%.
+    popd
+    exit /b %LOGIN_EXIT%
+)
+
 echo [AORebirth Build] Cleaning stale build processes before ZoneEngine...
 taskkill /F /T /IM MSBuild.exe >nul 2>&1
 taskkill /F /T /IM dotnet.exe >nul 2>&1
