@@ -37,6 +37,8 @@ namespace ZoneEngine.Core
 
         internal const string IccShuttleportOption = "ICC Shuttleport";
 
+        internal const string PromptSpeakerName = "ICC Shuttleport Commander";
+
         private const int PromptDelayMilliseconds = 750;
 
         private const int KnuBotPacketPacingMilliseconds = 20;
@@ -160,14 +162,14 @@ namespace ZoneEngine.Core
                 return character.Identity;
             }
 
-            ICharacter marcus = playfield.EnumerateActiveCharacters()
+            ICharacter commander = playfield.EnumerateActiveCharacters()
                 .FirstOrDefault(
                     candidate => candidate != null
                                  && string.Equals(
                                      candidate.Name,
-                                     "Marcus Stone",
+                                     PromptSpeakerName,
                                      StringComparison.OrdinalIgnoreCase));
-            return marcus == null ? character.Identity : marcus.Identity;
+            return commander == null ? character.Identity : commander.Identity;
         }
 
         private static void SendChoices(ICharacter character, Identity target, string prompt)

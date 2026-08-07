@@ -45,9 +45,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string runtime = Read(
                 root,
                 @"AORebirth\Server\ZoneEngine\Core\NewCharacterStartAreaSelectionRuntime.cs");
+            string areteSpawn = Read(
+                root,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteLandingSpawn.cs");
 
             StringAssert.Contains(runtime, "AreteOption = \"Arete\"");
             StringAssert.Contains(runtime, "IccShuttleportOption = \"ICC Shuttleport\"");
+            StringAssert.Contains(runtime, "PromptSpeakerName = \"ICC Shuttleport Commander\"");
+            StringAssert.Contains(areteSpawn, "Name = \"ICC Shuttleport Commander\"");
             StringAssert.Contains(runtime, "IccShuttleportPlayfieldId = 4582");
             StringAssert.Contains(runtime, "IccShuttleportX = 939.0f");
             StringAssert.Contains(runtime, "IccShuttleportY = 20.3f");

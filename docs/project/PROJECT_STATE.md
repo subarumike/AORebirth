@@ -141,9 +141,10 @@ migrations; details and exact source references are recorded in
 - The approved Debug build includes LoginEngine, preventing creation-path
   changes from restarting against a stale executable.
 - Newly created Rubi-Ka characters begin at the supplied Arete arrival point and
-  receive a durable, one-time KnuBot choice between Arete and ICC Shuttleport.
-  Existing characters and the official Shadowlands selector are unaffected; no
-  database schema change is required.
+  receive a durable, one-time KnuBot choice from the dedicated ICC Shuttleport
+  Commander between Arete and ICC Shuttleport. Existing characters and the
+  official Shadowlands selector are unaffected; no database schema change is
+  required.
 - Managed start/stop status probes receive the repository configuration and
   engine directory on every invocation. Shutdown validates PID metadata against
   engine identity, executable path, start time, and released listener ports.
