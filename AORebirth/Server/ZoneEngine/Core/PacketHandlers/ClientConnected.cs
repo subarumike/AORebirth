@@ -419,6 +419,7 @@ client.Controller.Character.Playfield.Identity,
             client.PacketSequencing.CompleteSessionInitialization(
                 client.SessionLifecycle.CompleteInPlayForSessionInit);
             client.Controller.Character.DoNotDoTimers = false;
+            NewCharacterStartAreaSelectionRuntime.Schedule(client);
 
             // Do NOT ExchangeOnlinePresence / SCFU-seed remotes here — that spawned
             // visible doubles of the same players in both zones.

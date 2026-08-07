@@ -225,6 +225,11 @@ namespace LoginEngine.Packets
                     new { Id = charid, Playfield = playfield, X = x, Y = y, Z = z });
 
                 CharacterDao.Instance.SetPlayfield(charid, (int)IdentityType.Playfield, playfield);
+
+                if (!startInSL)
+                {
+                    NewCharacterStartAreaSelectionDao.MarkPending(charid);
+                }
             }
         }
 

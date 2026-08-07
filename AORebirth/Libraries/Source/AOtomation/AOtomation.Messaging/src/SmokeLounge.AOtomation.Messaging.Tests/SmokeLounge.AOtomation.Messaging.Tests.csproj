@@ -82,6 +82,7 @@
       <Link>CapturedIntObservationCursor.cs</Link>
     </Compile>
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
+    <Compile Include="NewCharacterStartAreaSelectionContractTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="InspectMessageContractTests.cs" />

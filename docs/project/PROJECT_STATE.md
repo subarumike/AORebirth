@@ -9,7 +9,7 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Complete AOtomation suite: PASS (989/989).
+- Complete AOtomation suite: PASS (993/993).
 - Arete is restored to commit
   `fadc678e2ab991ddff032061d2b3fdd8ec8ba857`, the final commit before the
   2026-07-23 through 2026-08-06 rollback window.
@@ -140,6 +140,10 @@ migrations; details and exact source references are recorded in
   executables. Managed startup and shutdown never kill by process name alone.
 - The approved Debug build includes LoginEngine, preventing creation-path
   changes from restarting against a stale executable.
+- Newly created Rubi-Ka characters begin at the supplied Arete arrival point and
+  receive a durable, one-time KnuBot choice between Arete and ICC Shuttleport.
+  Existing characters and the official Shadowlands selector are unaffected; no
+  database schema change is required.
 - Managed start/stop status probes receive the repository configuration and
   engine directory on every invocation. Shutdown validates PID metadata against
   engine identity, executable path, start time, and released listener ports.

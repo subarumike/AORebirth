@@ -2,20 +2,25 @@
 
 ## Active
 
-Set the Rubi-Ka new-character start location to the supplied Arete position:
-PF 6553, X 3607.6, Y 52.4, Z 785.7.
+Offer each newly created Rubi-Ka character a durable, one-time starting-area
+choice between Arete and ICC Shuttleport after first login.
 
 ## Scope
 
-- Preserve the supplied fractional coordinates in the persisted new-character
-  record instead of rounding them to integers.
-- Do not change database schemas or existing characters.
-- Build, validate, restart engines, commit, and push only this spawn correction.
-- Ensure the approved Debug build actually rebuilds LoginEngine so the corrected
-  creation path reaches the active server binary.
+- Keep the official character-creation `Shadowlands` selector unchanged for
+  future Shadowlands work.
+- Seed the choice only for new Rubi-Ka characters; existing and Shadowlands
+  characters remain unaffected.
+- Present the choice through the standard AO KnuBot dialogue window.
+- Persist the selection in the existing `missionflags` table before applying it.
+- Arete keeps the character in PF 6553. ICC Shuttleport transfers to PF 4582 at
+  X 939.0, Y 20.3, Z 732.0.
+- Closing the window without choosing leaves the selection pending and offers it
+  again on the next login.
+- Do not change database schemas.
 
 ## Delivery acceptance
 
-- Complete AOtomation suite: PASS (989/989).
+- Complete AOtomation suite: PASS (993/993).
 - Debug build including LoginEngine: PASS.
 - Engine restart and exact-port ownership: PASS (Chat 6996/7012, Login 7500, Zone 7501).
