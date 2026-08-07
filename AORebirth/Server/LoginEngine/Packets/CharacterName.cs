@@ -192,7 +192,8 @@ namespace LoginEngine.Packets
         /// </param>
         public void SendNameToStartPlayfield(bool startInSL, int charid)
         {
-            int playfield, x, y, z;
+            int playfield;
+            float x, y, z;
 
             if (startInSL)
             {
@@ -204,9 +205,9 @@ namespace LoginEngine.Packets
             else
             {
                 playfield = 6553;
-                x = 3607;
-                y = 52;
-                z = 786;
+                x = 3607.6f;
+                y = 52.4f;
+                z = 785.7f;
             }
            // {
            //     playfield = 4582;
