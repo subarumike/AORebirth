@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-05
+Updated: 2026-08-07
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -118,6 +118,8 @@ migrations; details and exact source references are recorded in
 - Arete is restored to the behavior, content, and evidence boundary present at
   the 2026-07-22 cutoff. Post-cutoff alien-area, sandstorm, movement, quest,
   vendor, loot, and 60/60 acceptance promotions are no longer supported.
+- Rubi-Ka character creation persists its initial Arete location as PF 6553,
+  X 3607.6, Y 52.4, Z 785.7 without integer rounding.
 - PF127 Subway is complete for its current capture-backed population,
   navigation, combat, lifecycle, loot, vendor, Karrec, zoning, and teardown
   contracts. New behavior still requires capture evidence.
