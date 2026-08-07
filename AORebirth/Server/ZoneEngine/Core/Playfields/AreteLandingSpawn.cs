@@ -112,6 +112,19 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                // Custom non-quest speaker for the server-owned starting-area selector.
+                // Appearance reuses the capture-backed ICC officer presentation; this NPC is not official capture content.
+                Name = "ICC Shuttleport Commander",
+                Level = 25, Health = 724, MonsterData = 26088, Scale = 100, VisualFlags = 31, HeadMesh = 40687, RunSpeed = 86,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 6054,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3618.5f, Y = 51.745f, Z = 789.5f,
+                Hx = 0f, Hy = -0.2588223f, Hz = 0f, Hw = -0.965926f,
+                Textures = new[] { new[] { 0, 286229 }, new[] { 1, 286227 }, new[] { 2, 286228 }, new[] { 3, 286226 }, new[] { 4, 286225 } },
+                Meshes = new[] { new[] { 0, 40687, 0, 4 }, new[] { 1, 99154, 0, 2 }, new[] { 3, 286446, 0, 0 } },
+            },
+            new AreteNpc
+            {
                 // Capture 20260719-Rex-Markus-stone 78E0FC64
                 Name = "Flint Novak",
                 Level = 20, Health = 559, MonsterData = 26133, Scale = 90, VisualFlags = 31, HeadMesh = 40251, RunSpeed = 69,

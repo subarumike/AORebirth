@@ -11,7 +11,8 @@ choice between Arete and ICC Shuttleport after first login.
   future Shadowlands work.
 - Seed the choice only for new Rubi-Ka characters; existing and Shadowlands
   characters remain unaffected.
-- Present the choice through the standard AO KnuBot dialogue window.
+- Present the choice through the standard AO KnuBot dialogue window using the
+  dedicated ICC Shuttleport Commander speaker instead of Marcus Stone.
 - Persist the selection in the existing `missionflags` table before applying it.
 - Arete keeps the character in PF 6553. ICC Shuttleport transfers to PF 4582 at
   X 939.0, Y 20.3, Z 732.0.
