@@ -62,6 +62,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 messageWrapper.MessageBody.Answer,
                 messageWrapper.MessageBody.Unknown1);
 
+            if (NewCharacterStartAreaSelectionRuntime.TryHandleAnswer(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody.Target,
+                messageWrapper.MessageBody.Answer))
+            {
+                return;
+            }
+
             if (ContentDrivenNpcDialogueRouter.TryHandleAnswer(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody.Target,

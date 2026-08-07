@@ -507,6 +507,7 @@
     <Compile Include="Core\Navigation\OfficialDungeonChaseNavigationProvider.cs" />
     <Compile Include="Core\Navigation\OfficialDungeonGeometry.cs" />
     <Compile Include="Core\Navigation\Pf127ChaseNavigationProvider.cs" />
+    <Compile Include="Core\NewCharacterStartAreaSelectionRuntime.cs" />
     <Compile Include="Core\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Core\PacketHandlers\OrgClient.cs" />
     <Compile Include="Core\PacketHandlers\TradeSkillReceiver.cs" />

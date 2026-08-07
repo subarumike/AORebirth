@@ -66,6 +66,13 @@ namespace ZoneEngine.Core.MessageHandlers
                 messageWrapper.MessageBody.Seconds,
                 messageWrapper.MessageBody.Unknown3);
 
+            if (NewCharacterStartAreaSelectionRuntime.TryHandleClose(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody.Target))
+            {
+                return;
+            }
+
             if (ContentDrivenNpcDialogueRouter.TryHandleClose(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody.Target))
