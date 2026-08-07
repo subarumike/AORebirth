@@ -138,6 +138,8 @@ migrations; details and exact source references are recorded in
   when any character is still marked online.
 - Engine health is PID-owned: listener PIDs must resolve to the exact expected
   executables. Managed startup and shutdown never kill by process name alone.
+- The approved Debug build includes LoginEngine, preventing creation-path
+  changes from restarting against a stale executable.
 - Managed start/stop status probes receive the repository configuration and
   engine directory on every invocation. Shutdown validates PID metadata against
   engine identity, executable path, start time, and released listener ports.
