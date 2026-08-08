@@ -9,11 +9,16 @@ using System.Reflection;
 using System.Resources;
 using System.Security.Cryptography;
 
+using AORebirth.Core.Exceptions;
+using AORebirth.Enums;
+using AORebirth.Interfaces;
+using AORebirth.ObjectManager;
 using Cell.Core;
 using Cell.Util.Collections;
 using MsgPack;
 using MsgPack.Serialization;
 using NLog;
+using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Serialization;
 using Utility;
 using Utility.Config;
@@ -52,6 +57,16 @@ namespace AORebirth.LinuxBuild.CompatibilitySmokeTests
                 VerifyAssembly(typeof(BufferManager).Assembly, "Cell.Core", "0.5.0.0", string.Empty);
                 VerifyAssembly(typeof(Ionic.Zlib.ZlibStream).Assembly, "Ionic.Zlib", "1.9.1.5", string.Empty);
                 VerifyAssembly(typeof(MessagePackZip).Assembly, "Utility", "1.0.0.0", string.Empty);
+                VerifyAssembly(typeof(ActionType).Assembly, "AORebirth.Enums", "1.0.0.0", string.Empty);
+                VerifyAssembly(
+                    typeof(TypeInstanceMismatchException).Assembly,
+                    "AORebirth.Core.Exceptions",
+                    "1.0.0.0",
+                    string.Empty);
+                VerifyAssembly(typeof(IEntity).Assembly, "AORebirth.Interfaces", "1.0.0.0", string.Empty);
+                VerifyAssembly(typeof(Pool).Assembly, "AORebirth.ObjectManager", "1.0.0.0", string.Empty);
+                VerifyStage2PublicContract();
+                VerifyStage2Contracts();
                 VerifyMsgPackRuntime();
                 VerifyTranslationResources();
                 VerifyCellCoreResources();
@@ -108,6 +123,156 @@ namespace AORebirth.LinuxBuild.CompatibilitySmokeTests
                 int[] unpacked = serializer.Unpack(stream);
                 Require(unpacked.SequenceEqual(new[] { 1, 2 }), "MsgPack round trip failed");
             }
+        }
+
+        private static void VerifyStage2Contracts()
+        {
+            Require((int)ActionType.Attack == 11, "AORebirth ActionType contract changed");
+            Require((int)ActionType.FullAuto == 23, "AORebirth FullAuto action contract changed");
+            Require((int)StatIds.level == 54, "AORebirth level stat contract changed");
+            Require(
+                Enum.GetUnderlyingType(typeof(CanFlags)) == typeof(uint)
+                && typeof(CanFlags).IsDefined(typeof(FlagsAttribute), false)
+                && (uint)CanFlags.ApplyOnFightingTarget == 0x80000000U,
+                "AORebirth CanFlags high-bit contract changed");
+            Require(
+                (int)ItemFlags.DisableStatelCollision == int.MinValue,
+                "AORebirth ItemFlags high-bit contract changed");
+
+            PropertyInfo identityProperty = typeof(IEntity).GetProperty("Identity");
+            PropertyInfo parentProperty = typeof(IEntity).GetProperty("Parent");
+            Require(
+                identityProperty != null && identityProperty.PropertyType == typeof(Identity),
+                "IEntity identity contract changed");
+            Require(
+                parentProperty != null && parentProperty.PropertyType == typeof(Identity),
+                "IEntity parent contract changed");
+            Require(
+                typeof(IFunctionArguments).GetProperty("Values").PropertyType
+                    == typeof(List<MessagePackObject>),
+                "IFunctionArguments MsgPack contract changed");
+
+            var contractException = new TypeInstanceMismatchException("stage2-contract");
+            Require(contractException.Message == "stage2-contract", "Exception message contract changed");
+            Type[] exceptionTypes =
+            {
+                typeof(CharacterDoesNotExistException),
+                typeof(ConnectionStringErrorException),
+                typeof(DatabaseCouldNotBeDeterminedException),
+                typeof(DataBaseException),
+                typeof(ParentNotInPoolException),
+                typeof(StatDoesNotExistException),
+                typeof(TypeInstanceMismatchException),
+                typeof(WrongPacketTypeException)
+            };
+            Require(
+                exceptionTypes.All(type => type.IsDefined(typeof(SerializableAttribute), false)),
+                "AORebirth exception serialization markers changed");
+            Require(
+                exceptionTypes.Where(type => type != typeof(ParentNotInPoolException))
+                    .All(type => type.BaseType == typeof(ApplicationException))
+                && typeof(ParentNotInPoolException).BaseType == typeof(Exception),
+                "AORebirth exception inheritance changed");
+
+            var parent = new Identity { Type = IdentityType.Playfield, Instance = 1931 };
+            var identity = new Identity { Type = IdentityType.Container, Instance = 1879048193 };
+            var pooledObject = new PooledObject(parent, identity);
+            try
+            {
+                Require(Pool.Instance.Contains(parent, identity), "ObjectManager did not register pooled object");
+                Require(
+                    ReferenceEquals(Pool.Instance.GetObject<PooledObject>(parent, identity), pooledObject),
+                    "ObjectManager returned a different pooled object");
+                Require(
+                    Pool.Instance.GetAll<PooledObject>(parent, (int)IdentityType.Container).Contains(pooledObject),
+                    "ObjectManager typed enumeration changed");
+                Require(
+                    Pool.Instance.GetAll<PooledObject>((int)IdentityType.Container).Contains(pooledObject),
+                    "ObjectManager global typed enumeration changed");
+                Require(
+                    Pool.Instance.GetFreeInstance<PooledObject>(identity.Instance, IdentityType.Container)
+                        == identity.Instance + 1,
+                    "ObjectManager free-instance allocation changed");
+
+                var childIdentity = new Identity { Type = IdentityType.Container, Instance = 1879048194 };
+                Pool.Instance.AddObject(identity, new Stage2Entity(identity, childIdentity));
+                Require(Pool.Instance.HasResidualChildren(identity), "ObjectManager child bucket was not created");
+            }
+            finally
+            {
+                pooledObject.Dispose();
+                pooledObject.Dispose();
+            }
+
+            Require(!Pool.Instance.Contains(parent, identity), "ObjectManager did not remove pooled object");
+            Require(!Pool.Instance.HasResidualChildren(identity), "ObjectManager did not purge residual children");
+
+            var duplicateIdentity = new Identity { Type = IdentityType.Container, Instance = 1879048195 };
+            var firstEntity = new Stage2Entity(parent, duplicateIdentity);
+            var duplicateEntity = new Stage2Entity(parent, duplicateIdentity);
+            Pool.Instance.AddObject(parent, firstEntity);
+            try
+            {
+                Pool.Instance.AddObject(parent, duplicateEntity);
+                Require(
+                    ReferenceEquals(Pool.Instance.GetObject<Stage2Entity>(parent, duplicateIdentity), firstEntity),
+                    "ObjectManager duplicate registration replaced the first object");
+
+                bool mismatchThrown = false;
+                try
+                {
+                    Pool.Instance.GetObject<PooledObject>(parent, duplicateIdentity);
+                }
+                catch (TypeInstanceMismatchException)
+                {
+                    mismatchThrown = true;
+                }
+
+                Require(mismatchThrown, "ObjectManager type mismatch no longer throws the contract exception");
+            }
+            finally
+            {
+                Pool.Instance.RemoveObject(firstEntity);
+            }
+
+            var missingParent = new Identity { Type = IdentityType.Playfield, Instance = 1879048196 };
+            bool missingParentThrown = false;
+            try
+            {
+                Pool.Instance.GetObject<Stage2Entity>(missingParent, duplicateIdentity);
+            }
+            catch (ParentNotInPoolException)
+            {
+                missingParentThrown = true;
+            }
+
+            Require(missingParentThrown, "ObjectManager missing-parent contract changed");
+            Require(ReferenceEquals(Pool.Instance, Pool.Instance), "ObjectManager singleton contract changed");
+        }
+
+        private static void VerifyStage2PublicContract()
+        {
+            string manifestPath = Path.Combine(
+                AppContext.BaseDirectory,
+                "Fixtures",
+                "LegacyStage2PublicContracts.manifest");
+            Assembly[] assemblies =
+            {
+                typeof(ActionType).Assembly,
+                typeof(TypeInstanceMismatchException).Assembly,
+                typeof(IEntity).Assembly,
+                typeof(Pool).Assembly
+            };
+            Stage2ContractFingerprint.Verify(manifestPath, assemblies);
+
+            Require(
+                !typeof(TypeInstanceMismatchException).Assembly.GetReferencedAssemblies()
+                    .Any(identity => identity.Name == "NLog"),
+                "Linux Exceptions retained the unused legacy NLog dependency");
+            Require(
+                !typeof(IEntity).Assembly.GetReferencedAssemblies()
+                    .Any(identity => identity.Name == "MemBus"),
+                "Linux Interfaces retained the unused legacy MemBus dependency");
         }
 
         private static void VerifyTranslationResources()
@@ -437,6 +602,23 @@ namespace AORebirth.LinuxBuild.CompatibilitySmokeTests
             if (!condition)
             {
                 throw new InvalidOperationException(message);
+            }
+        }
+
+        private sealed class Stage2Entity : IEntity, IDisposable
+        {
+            public Stage2Entity(Identity parent, Identity identity)
+            {
+                this.Parent = parent;
+                this.Identity = identity;
+            }
+
+            public Identity Identity { get; private set; }
+
+            public Identity Parent { get; private set; }
+
+            public void Dispose()
+            {
             }
         }
     }

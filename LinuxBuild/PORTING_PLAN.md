@@ -22,9 +22,10 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 | 5 | PlayfieldLoader and ChatEngine | Remove NBug WinForms startup, deploy `Config.xml`, package `playfields.dat`, fix Linux paths, add service shutdown | Chat startup/login/chat/channel packet parity and clean shutdown on Ubuntu |
 | 6 | Ubuntu service package | `linux-x64` publish, unprivileged service account, systemd unit, logs, backups and firewall | Restart/reboot recovery and sustained multi-player soak test |
 
-Current status: Stage 0 is complete. Stage 1 passes its Windows-hosted build and
-compatibility gates; native Ubuntu execution is still required before the full
-Stage 1 exit gate is complete.
+Current status: Stages 0 through 2 pass their Windows-hosted build and
+compatibility gates. Stage 2 has exact legacy/Linux public-contract parity and
+ObjectManager runtime smoke coverage. Native Ubuntu execution is still required
+before the full cross-platform exit gates are complete.
 
 ## Rules for each stage
 

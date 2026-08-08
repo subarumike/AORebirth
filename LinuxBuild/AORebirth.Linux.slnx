@@ -1,5 +1,9 @@
 <Solution>
   <Folder Name="/Libraries/">
+    <Project Path="Projects/AORebirth.Enums.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Exceptions.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Interfaces.Linux.csproj" />
+    <Project Path="Projects/AORebirth.ObjectManager.Linux.csproj" />
     <Project Path="Projects/Cell.Core.Linux.csproj" />
     <Project Path="Projects/Cell.Util.Linux.csproj" />
     <Project Path="Projects/Ionic.Zlib.Linux.csproj" />

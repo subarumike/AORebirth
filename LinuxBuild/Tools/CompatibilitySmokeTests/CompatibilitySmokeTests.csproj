@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="../Stage2ContractFingerprint.cs" Link="Stage2ContractFingerprint.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Projects/AORebirth.Enums.Linux.csproj" />
+    <ProjectReference Include="../../Projects/AORebirth.Exceptions.Linux.csproj" />
+    <ProjectReference Include="../../Projects/AORebirth.Interfaces.Linux.csproj" />
+    <ProjectReference Include="../../Projects/AORebirth.ObjectManager.Linux.csproj" />
     <ProjectReference Include="../../Projects/Cell.Core.Linux.csproj" />
     <ProjectReference Include="../../Projects/Cell.Util.Linux.csproj" />
     <ProjectReference Include="../../Projects/Ionic.Zlib.Linux.csproj" />
@@ -21,5 +29,6 @@
   <ItemGroup>
     <None Update="Fixtures/*.dat" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Fixtures/LegacyUtilityFixtures.manifest" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures/LegacyStage2PublicContracts.manifest" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

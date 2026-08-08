@@ -23,6 +23,22 @@
     {
       "legacyProject": "AORebirth/Libraries/Source/Utility/Utility.csproj",
       "output": "LinuxBuild/source-inventory/Utility.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Enums/AORebirth.Enums.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Enums.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Exceptions/AORebirth.Exceptions.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Exceptions.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.ObjectManager/AORebirth.ObjectManager.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.ObjectManager.CompileItems.props"
     }
   ]
 }

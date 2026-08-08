@@ -25,7 +25,9 @@ Both wrappers verify every checked-in source inventory before building, then
 run assembly-identity, MsgPack byte-vector/round-trip, resource, portable
 metrics, and compression smoke checks. The current foundation compiles
 `SmokeLounge.AOtomation.Messaging`, `Cell.Util`, `MsgPack.Mono`, `Translations`,
-`Cell.Core`, and `Utility` from guarded legacy source/resource inventories.
+`Cell.Core`, `Utility`, `AORebirth.Enums`, `AORebirth.Core.Exceptions`,
+`AORebirth.Interfaces`, and `AORebirth.ObjectManager` from guarded legacy
+source/resource inventories.
 Utility uses a Linux-only source for portable CPU/RAM metrics and references a
 separate `Ionic.Zlib` compatibility assembly, preserving the original external
 type boundary while using modern .NET compression. It does not yet produce a
@@ -52,6 +54,24 @@ LinuxBuild\verify-legacy-compression.cmd
 writer/list verifier; it is intentionally excluded from the Linux solution.
 The legacy dictionary reader calls an unsupported zlib seek operation and
 cannot read its own fixture; no current runtime source calls that overload.
+
+Stage 2 public API parity is pinned in
+`Tools/CompatibilitySmokeTests/Fixtures/LegacyStage2PublicContracts.manifest`.
+It exhaustively fingerprints the four legacy assemblies' metadata, enums,
+interfaces, exceptions, and ObjectManager public surface. After the approved
+Windows Debug build, verify both the legacy and Linux assemblies with:
+
+```bat
+LinuxBuild\verify-stage2-contracts.cmd
+```
+
+`Tools/LegacyStage2ContractTool` reproducibly generates/verifies that baseline
+from the .NET Framework binaries and is intentionally excluded from the Linux
+solution.
+
+The Linux Interfaces and Exceptions overlays deliberately omit the source-unused
+legacy MemBus and NLog references; the contract smoke fails if either dependency
+reappears.
 
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:
