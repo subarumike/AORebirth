@@ -1,0 +1,20 @@
+{
+  "projects": [
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/SmokeLounge.AOtomation.Messaging.csproj",
+      "output": "LinuxBuild/source-inventory/SmokeLounge.AOtomation.Messaging.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Cell.Util/Cell.Util.csproj",
+      "output": "LinuxBuild/source-inventory/Cell.Util.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono/MsgPack.Mono.csproj",
+      "output": "LinuxBuild/source-inventory/MsgPack.Mono.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Translations/Translations.csproj",
+      "output": "LinuxBuild/source-inventory/Translations.CompileItems.props"
+    }
+  ]
+}

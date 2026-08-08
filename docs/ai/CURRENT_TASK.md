@@ -2,38 +2,32 @@
 
 ## Active
 
-Restore capture-backed regular-mob combat in Arete without reverting the
-current runtime or weakening fail-closed behavior.
+Build a parallel Linux deployment lane for AORebirth in
+`D:\AO_Rebirth_Linux_Build` while preserving the existing Windows/.NET
+Framework solution as the reference build.
 
-## Supported exact combat profiles
+## Current checkpoint
 
-- Alex area: 15 level-2 Waste Collectors, three level-2 Garbage Fleas, and one
-  level-2 Cleanmeister.
-- Junkyard: 14 level-1 Cleaning Robots.
-- Lorelei Oasis: ten level-6 Desert Reets and nine level-5/6 Rollerrats.
-- Landing: four ICC Peacekeepers.
-- Runtime actors retain their runtime identities. Explicit capture source and
-  combat-profile selectors are resolver and loot-routing evidence only.
+- Branch: `codex/linux-parallel-build`.
+- Linux SDK lane: .NET 10, intended for Ubuntu 24.04.
+- Messaging, Cell.Util, MsgPack.Mono, and Translations compile from guarded
+  linked source/resource inventories.
+- Assembly identity, MsgPack byte-vector/round-trip, translation-resource, and
+  unchanged Windows debug-build validation pass.
+- This is compile feasibility only; no engine is Linux-deployable yet.
 
-## Expected exclusions
+## Next slice
 
-- Engineer Automaton I remains intentionally quarantined because the corpus has
-  no exact certified combat profile; it cannot inherit Docker combat or loot.
-- Robotic Guard Dog and the incomplete cleaning-robot variants remain passive
-  where exact range, cadence, damage, or complete combat-state evidence is
-  absent.
-- Patrol and chase movement are outside this combat-identity repair.
+Port Cell.Core and Utility. Resolve modern NLog/resource handling and replace or
+isolate the Windows performance-counter path without changing Windows behavior.
+Then advance through the dependency closure documented in
+`LinuxBuild/PORTING_PLAN.md` toward ChatEngine as the first server milestone.
 
-## Delivery acceptance
+## Constraints
 
-- Generated combat cohort: 1,534 actors, 1,520 bindings, maximum actor index
-  1,536; 559 certified and 975 unresolved; Arete family 52/96 and additional
-  Arete bindings 4/17.
-- Arete behavioral combat gate: PASS (5/5).
-- Active-coverage acceptance: PASS (7/7).
-- Combat-profile catalog acceptance: PASS (51/51).
-- Complete AOtomation suite: PASS (998/998).
-- Debug server build: PASS.
-- Chat/Login/Zone restart: PASS (Chat 6996/7012, Login 7500, Zone 7501).
-- Original-client smoke testing remains a focused manual follow-up; the agent
-  did not launch the AO client.
+- Do not convert or replace legacy project files.
+- Do not change packet behavior or database schemas.
+- Preserve assembly boundaries, names, versions, and strong-name identities.
+- Require Windows regression and cross-runtime parity checks for shared-source
+  compatibility changes.
+- Ubuntu runtime and service validation require the VPS SSH connection details.

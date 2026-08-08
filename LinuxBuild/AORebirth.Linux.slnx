@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="Projects/Cell.Util.Linux.csproj" />
+    <Project Path="Projects/MsgPack.Mono.Linux.csproj" />
+    <Project Path="Projects/SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <Project Path="Projects/Translations.Linux.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/CompatibilitySmokeTests/CompatibilitySmokeTests.csproj" />
+    <Project Path="Tools/SourceInventoryGuard/SourceInventoryGuard.csproj" />
+  </Folder>
+</Solution>

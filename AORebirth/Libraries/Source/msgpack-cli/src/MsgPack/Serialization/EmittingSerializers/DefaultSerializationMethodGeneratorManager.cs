@@ -131,6 +131,12 @@ namespace MsgPack.Serialization.EmittingSerializers
 			{
 				assemblyName = typeof( DefaultSerializationMethodGeneratorManager ).Namespace + ".GeneratedSerealizers" + Interlocked.Increment( ref _assemblySequence );
 				var dedicatedAssemblyBuilder =
+#if AOREBIRTH_LINUX
+					AssemblyBuilder.DefineDynamicAssembly(
+						new AssemblyName( assemblyName ),
+						isCollectable ? AssemblyBuilderAccess.RunAndCollect : AssemblyBuilderAccess.Run
+					);
+#else
 					AppDomain.CurrentDomain.DefineDynamicAssembly(
 						new AssemblyName( assemblyName ),
 #if !SILVERLIGHT
@@ -145,6 +151,7 @@ namespace MsgPack.Serialization.EmittingSerializers
 						AssemblyBuilderAccess.Run 
 #endif
 					);
+#endif
 
 				SetUpAssemblyBuilderAttributes( dedicatedAssemblyBuilder, isDebuggable );
 				this._assembly = dedicatedAssemblyBuilder;
@@ -155,6 +162,9 @@ namespace MsgPack.Serialization.EmittingSerializers
 #if SILVERLIGHT
 			this._module = this._assembly.DefineDynamicModule( assemblyName, true );
 #else
+#if AOREBIRTH_LINUX
+			this._module = this._assembly.DefineDynamicModule( assemblyName );
+#else
 			if ( isDebuggable )
 			{
 				this._module = this._assembly.DefineDynamicModule( assemblyName, this._moduleFileName, true );
@@ -163,6 +173,7 @@ namespace MsgPack.Serialization.EmittingSerializers
 			{
 				this._module = this._assembly.DefineDynamicModule( assemblyName, true );
 			}
+#endif
 #endif // else SILVERLIGHT
 		}
 #endif // !WINDOWS_PHONE
@@ -219,7 +230,11 @@ namespace MsgPack.Serialization.EmittingSerializers
 
 		private void DumpToCore()
 		{
+#if AOREBIRTH_LINUX
+			throw new PlatformNotSupportedException( "Saving generated serializer assemblies is not supported by modern .NET." );
+#else
 			this._assembly.Save( this._moduleFileName );
+#endif
 		}
 #endif
 

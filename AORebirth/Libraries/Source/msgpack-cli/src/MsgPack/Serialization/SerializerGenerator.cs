@@ -163,8 +163,12 @@ namespace MsgPack.Serialization
 		/// <exception cref="IOException">Some I/O error is occurred on saving assembly file.</exception>
 		public void GenerateAssemblyFile()
 		{
+#if AOREBIRTH_LINUX
+			throw new PlatformNotSupportedException( "Saving generated serializer assemblies is not supported by modern .NET." );
+#else
 			this.GenerateAssemblyFile(
 				AppDomain.CurrentDomain.DefineDynamicAssembly( this._assemblyName, AssemblyBuilderAccess.RunAndSave ) );
+#endif
 		}
 
 		/// <summary>
@@ -179,6 +183,9 @@ namespace MsgPack.Serialization
 		/// <exception cref="IOException">Some I/O error is occurred on creating directory or saving assembly file.</exception>
 		public void GenerateAssemblyFile( string directory )
 		{
+#if AOREBIRTH_LINUX
+			throw new PlatformNotSupportedException( "Saving generated serializer assemblies is not supported by modern .NET." );
+#else
 			if ( !Directory.Exists( directory ) )
 			{
 				Directory.CreateDirectory( directory );
@@ -186,10 +193,14 @@ namespace MsgPack.Serialization
 
 			this.GenerateAssemblyFile(
 				AppDomain.CurrentDomain.DefineDynamicAssembly( this._assemblyName, AssemblyBuilderAccess.RunAndSave, directory ) );
+#endif
 		}
 
 		private void GenerateAssemblyFile( AssemblyBuilder assemblyBuilder )
 		{
+#if AOREBIRTH_LINUX
+			throw new PlatformNotSupportedException( "Saving generated serializer assemblies is not supported by modern .NET." );
+#else
 			var context = new SerializationContext();
 			context.EmitterFlavor = EmitterFlavor.FieldBased;
 			context.GeneratorOption = SerializationMethodGeneratorOption.CanDump;
@@ -206,6 +217,7 @@ namespace MsgPack.Serialization
 			}
 
 			assemblyBuilder.Save( this._assemblyName.Name + ".dll" );
+#endif
 		}
 
 		// TODO: Generate CodeDOM
