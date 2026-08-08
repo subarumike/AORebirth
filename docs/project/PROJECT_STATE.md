@@ -30,10 +30,16 @@ completion matrices and dated evidence retain detailed provenance.
   Stages 0-4 Windows-hosted compatibility checks,
   exhaustive public/mapping/table contracts, Database/Stats offline behavior,
   exact SQL publish assets, Communication wire/framing/FIFO loopback behavior,
-  and the unchanged Windows debug build pass. Core/PlayfieldLoader are audited
-  as unused by the first ChatEngine milestone and deferred to Login/Zone. Native
-  Ubuntu validation, live disposable-MySQL parity, ChatEngine, and deployment
-  are not yet complete.
+  and the unchanged Windows debug build pass. The first .NET 10 ChatEngine
+  executable now builds and publishes with strict configuration, a private
+  ISCom bind, headless logging, fail-closed MySQL secret handling, systemd
+  readiness notification, and coordinated shutdown. Its Windows/Linux contract,
+  listener-free startup/lifecycle, authentication fixture, and both
+  framework-dependent and self-contained publish-structure gates pass.
+  PlayfieldLoader/full Core are deferred; the three required legacy
+  authentication sources are isolated in `AORebirth.Chat.Authentication`.
+  Native Ubuntu/systemd/SIGTERM validation and live disposable-MySQL parity are
+  not yet complete.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete

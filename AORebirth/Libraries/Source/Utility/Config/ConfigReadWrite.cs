@@ -101,17 +101,7 @@ namespace Utility.Config
                 {
                     if (this._config == null)
                     {
-                        this._config =
-                            (Config)
-                                new XmlSerializer(typeof(Config)).Deserialize(
-                                    new MemoryStream(File.ReadAllBytes("Config.xml")));
-
-                        string mysqlConnection =
-                            Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
-                        if (!string.IsNullOrWhiteSpace(mysqlConnection))
-                        {
-                            this._config.MysqlConnection = mysqlConnection;
-                        }
+                        this._config = LoadConfig();
                     }
                 }
                 catch (Exception ex)
@@ -152,6 +142,28 @@ namespace Utility.Config
             }
 
             return true;
+        }
+
+        private static string GetConfigPath()
+        {
+
+            return "Config.xml";
+        }
+
+        private static Config LoadConfig()
+        {
+            Config config =
+                (Config)
+                    new XmlSerializer(typeof(Config)).Deserialize(
+                        new MemoryStream(File.ReadAllBytes(GetConfigPath())));
+
+            string mysqlConnection = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
+            if (!string.IsNullOrWhiteSpace(mysqlConnection))
+            {
+                config.MysqlConnection = mysqlConnection;
+            }
+
+            return config;
         }
 
         #endregion

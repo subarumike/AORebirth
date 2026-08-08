@@ -34,11 +34,14 @@ namespace ChatEngine
     #region Usings ...
 
     using System;
+    using System.Data;
     using System.IO;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
+
+    using AORebirth.Database;
     using AORebirth.Communication.ISComV2Server;
     using AORebirth.Communication.Messages;
 
@@ -76,7 +79,7 @@ namespace ChatEngine
 
         /// <summary>
         /// </summary>
-        private static ConsoleText ct = new ConsoleText();
+        private static ConsoleText ct;
 
         /// <summary>
         /// </summary>
@@ -86,11 +89,20 @@ namespace ChatEngine
 
         private const bool UdpEnable = false;
 
-        private static bool exited = false;
+        private static volatile bool exited = false;
+
+        private static int cleanupStarted;
+
+        private static int shutdownRequested;
 
         private static StreamWriter headlessErrorWriter;
 
         private static StreamWriter headlessOutputWriter;
+
+        private static TextWriter originalErrorWriter;
+
+        private static TextWriter originalOutputWriter;
+
 
         #endregion
 
@@ -185,22 +197,45 @@ namespace ChatEngine
             return false;
         }
 
+        private static bool HasEitherArgument(string[] args, string first, string second)
+        {
+            return HasArgument(args, first) || HasArgument(args, second);
+        }
+
+        private static string GetEitherArgumentValue(string[] args, string first, string second)
+        {
+            string value = GetArgumentValue(args, first);
+            return value ?? GetArgumentValue(args, second);
+        }
+
+        private static void CreateParentDirectory(string fileName)
+        {
+            string directory = Path.GetDirectoryName(Path.GetFullPath(fileName));
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
         private static void ConfigureHeadlessConsoleLogging(string[] args)
         {
-            string stdoutLog = GetArgumentValue(args, "/stdout-log");
+            originalOutputWriter = Console.Out;
+            originalErrorWriter = Console.Error;
+
+            string stdoutLog = GetEitherArgumentValue(args, "/stdout-log", "--stdout-log");
             if (!string.IsNullOrWhiteSpace(stdoutLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stdoutLog));
+                CreateParentDirectory(stdoutLog);
                 headlessOutputWriter = new StreamWriter(
                     new FileStream(stdoutLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessOutputWriter.AutoFlush = true;
                 Console.SetOut(headlessOutputWriter);
             }
 
-            string stderrLog = GetArgumentValue(args, "/stderr-log");
+            string stderrLog = GetEitherArgumentValue(args, "/stderr-log", "--stderr-log");
             if (!string.IsNullOrWhiteSpace(stderrLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stderrLog));
+                CreateParentDirectory(stderrLog);
                 headlessErrorWriter = new StreamWriter(
                     new FileStream(stderrLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessErrorWriter.AutoFlush = true;
@@ -221,9 +256,36 @@ namespace ChatEngine
             }
         }
 
+        private static void CloseHeadlessConsoleLogging()
+        {
+            FlushHeadlessConsoleLogging();
+
+            if (headlessOutputWriter != null)
+            {
+                if (originalOutputWriter != null)
+                {
+                    Console.SetOut(originalOutputWriter);
+                }
+
+                headlessOutputWriter.Dispose();
+                headlessOutputWriter = null;
+            }
+
+            if (headlessErrorWriter != null)
+            {
+                if (originalErrorWriter != null)
+                {
+                    Console.SetError(originalErrorWriter);
+                }
+
+                headlessErrorWriter.Dispose();
+                headlessErrorWriter = null;
+            }
+        }
+
         private static void StartShutdownFileWatcher(string[] args)
         {
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             if (string.IsNullOrWhiteSpace(shutdownFile))
             {
                 return;
@@ -236,6 +298,7 @@ namespace ChatEngine
                         {
                             if (File.Exists(shutdownFile))
                             {
+                                ConsumeShutdownFile(shutdownFile);
                                 Console.WriteLine("Shutdown file requested.");
                                 ShutDownServer(null);
                                 FlushHeadlessConsoleLogging();
@@ -250,25 +313,93 @@ namespace ChatEngine
             shutdownThread.Start();
         }
 
-        private static void RunHeadless(string[] args)
+        private static bool RunHeadless(string[] args)
         {
+            if (exited)
+            {
+                return true;
+            }
+
             Console.WriteLine("Starting ChatEngine in headless mode.");
             StartServer(null);
 
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            if (chatServer == null || !chatServer.IsRunning || !chatServer.TCPEnabled)
+            {
+                Console.Error.WriteLine("ChatEngine failed to start its TCP listener.");
+                RequestShutdown("chat listener startup failure");
+                return false;
+            }
+
+            if (ISCom == null || !ISCom.IsRunning || !ISCom.TCPEnabled)
+            {
+                Console.Error.WriteLine("ChatEngine failed to start its ISCom TCP listener.");
+                RequestShutdown("ISCom listener startup failure");
+                return false;
+            }
+
+
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             while (!exited)
             {
                 if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
                 {
-                    Console.WriteLine("Headless shutdown requested.");
-                    ShutDownServer(null);
-                    FlushHeadlessConsoleLogging();
-                    Environment.Exit(0);
+                    ConsumeShutdownFile(shutdownFile);
+                    RequestShutdown("shutdown file");
                 }
 
                 Thread.Sleep(1000);
             }
+
+            return true;
         }
+
+        private static void ConsumeShutdownFile(string shutdownFile)
+        {
+            try
+            {
+                File.Delete(shutdownFile);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Unable to remove shutdown file: " + e.Message);
+            }
+        }
+
+        private static void RequestShutdown(string reason)
+        {
+            if (Interlocked.Exchange(ref shutdownRequested, 1) != 0)
+            {
+                return;
+            }
+
+            exited = true;
+            try
+            {
+                Console.WriteLine("Shutdown requested: " + reason + ".");
+            }
+            catch
+            {
+            }
+        }
+
+        private static void RegisterShutdownSignals()
+        {
+            Console.CancelKeyPress += ConsoleCancelKeyPress;
+
+        }
+
+        private static void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            e.Cancel = true;
+            RequestShutdown("console cancel");
+        }
+
+        private static void UnregisterShutdownSignals()
+        {
+            Console.CancelKeyPress -= ConsoleCancelKeyPress;
+
+        }
+
 
         /// <summary>
         /// </summary>
@@ -307,8 +438,92 @@ namespace ChatEngine
 
         private static void ShutDownServer(string[] obj)
         {
-            StopServer(null);
             exited = true;
+
+            if (chatServer != null)
+            {
+                try
+                {
+                    if (chatServer.IsRunning && chatServer.TCPEnabled)
+                    {
+                        chatServer.TCPEnabled = false;
+                    }
+
+                    chatServer.Stop();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Chat server shutdown failed: " + e.Message);
+                }
+            }
+
+            if (ISCom != null)
+            {
+                try
+                {
+                    ISCom.Stop();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("ISCom shutdown failed: " + e.Message);
+                }
+            }
+        }
+
+        private static void CompleteShutdown()
+        {
+            if (Interlocked.Exchange(ref cleanupStarted, 1) != 0)
+            {
+                return;
+            }
+
+            ShutDownServer(null);
+            try
+            {
+                UnregisterShutdownSignals();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Signal cleanup failed: " + e.Message);
+            }
+
+            if (ISCom != null)
+            {
+                try
+                {
+                    ISCom.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("ISCom disposal failed: " + e.Message);
+                }
+
+                ISCom = null;
+            }
+
+            if (chatServer != null)
+            {
+                try
+                {
+                    chatServer.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Chat server disposal failed: " + e.Message);
+                }
+
+                chatServer = null;
+            }
+
+
+            try
+            {
+                LogManager.Shutdown();
+            }
+            finally
+            {
+                CloseHeadlessConsoleLogging();
+            }
         }
 
         private static void StopServer(string[] obj)
@@ -372,7 +587,6 @@ namespace ChatEngine
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.ReadLine();
                 return false;
             }
 
@@ -389,16 +603,9 @@ namespace ChatEngine
             {
                 ISCom = new ISComV2Server();
                 ISCom.DataReceived += chatServer.ISComDataReceived;
-                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    ISCom.TcpEndPoint = new IPEndPoint(IPAddress.Any, Config.Instance.CurrentConfig.CommPort);
-                }
-                else
-                {
-                    ISCom.TcpEndPoint = new IPEndPoint(
-                        IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP),
-                        Config.Instance.CurrentConfig.CommPort);
-                }
+                ISCom.TcpEndPoint = new IPEndPoint(
+                    GetISComListenAddress(Config.Instance.CurrentConfig),
+                    Config.Instance.CurrentConfig.CommPort);
 
                 // Prove DynamicMessage can resolve Zone→Chat owner pet SystemChatMessage.
                 Type systemChatType = typeof(SystemChatMessage);
@@ -410,9 +617,14 @@ namespace ChatEngine
                     + systemChatType.Assembly.GetName().Name);
 
                 ISCom.Start(true, false);
+                if (!ISCom.IsRunning || !ISCom.TCPEnabled)
+                {
+                    throw new InvalidOperationException("ISCom TCP listener did not start.");
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.Error.WriteLine("ISCom initialization failed: " + e.Message);
                 return false;
             }
 
@@ -427,7 +639,7 @@ namespace ChatEngine
         {
             try
             {
-                // Setup and enable NLog logging to file
+                // Setup and enable NLog logging.
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
                 LogUtil.SetupFileLogging("${basedir}/ChatEngineLog.txt", LogLevel.Trace);
 
@@ -449,6 +661,7 @@ namespace ChatEngine
             return true;
         }
 
+
         /// <summary>
         /// </summary>
         /// <returns>
@@ -458,16 +671,9 @@ namespace ChatEngine
             int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ChatPort);
             try
             {
-                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    chatServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
-                }
-                else
-                {
-                    chatServer.TcpEndPoint = new IPEndPoint(
-                        IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP),
-                        Port);
-                }
+                chatServer.TcpEndPoint = new IPEndPoint(
+                    GetChatListenAddress(Config.Instance.CurrentConfig),
+                    Port);
 
                 chatServer.MaximumPendingConnections = 100;
             }
@@ -475,11 +681,289 @@ namespace ChatEngine
             {
                 Console.WriteLine(locales.ErrorIPAddressParseFailed);
                 Console.Write(e.Message);
-                Console.ReadKey();
                 return false;
             }
 
             return true;
+        }
+
+        private static string GetConfiguredConfigPath()
+        {
+
+            return "Config.xml";
+        }
+
+        private static Utility.Config.Config LoadStrictConfiguration()
+        {
+            string configuredPath = GetConfiguredConfigPath();
+            string fullPath = Path.GetFullPath(configuredPath);
+            string directory = Path.GetDirectoryName(fullPath);
+            string fileName = Path.GetFileName(fullPath);
+
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+            {
+                throw new DirectoryNotFoundException("Configuration directory does not exist.");
+            }
+
+            bool exactCaseMatch = false;
+            foreach (string candidate in Directory.EnumerateFiles(directory))
+            {
+                if (string.Equals(Path.GetFileName(candidate), fileName, StringComparison.Ordinal))
+                {
+                    exactCaseMatch = true;
+                    break;
+                }
+            }
+
+            if (!exactCaseMatch)
+            {
+                throw new FileNotFoundException("Exact-case configuration file was not found: " + fileName);
+            }
+
+            Utility.Config.Config configuration = Config.Instance.CurrentConfig;
+
+            if (configuration == null)
+            {
+                throw new InvalidDataException("Config.xml did not contain a Config document.");
+            }
+
+            ValidateConfigurationValues(configuration);
+            return configuration;
+        }
+
+        private static void ValidateConfigurationValues(Utility.Config.Config configuration)
+        {
+            IPAddress configuredAddress;
+            if (string.IsNullOrWhiteSpace(configuration.ListenIP)
+                || !IPAddress.TryParse(configuration.ListenIP, out configuredAddress))
+            {
+                throw new InvalidDataException("ListenIP must be a valid IP address.");
+            }
+
+            GetChatListenAddress(configuration);
+
+            if (configuration.ChatPort < 1 || configuration.ChatPort > 65535)
+            {
+                throw new InvalidDataException("ChatPort must be between 1 and 65535.");
+            }
+
+            if (configuration.CommPort < 1 || configuration.CommPort > 65535)
+            {
+                throw new InvalidDataException("CommPort must be between 1 and 65535.");
+            }
+
+            if (configuration.ChatPort == configuration.CommPort)
+            {
+                throw new InvalidDataException("ChatPort and CommPort must be distinct.");
+            }
+
+            if (string.IsNullOrWhiteSpace(configuration.Locale))
+            {
+                throw new InvalidDataException("Locale must be configured.");
+            }
+
+            string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
+
+
+            string connectionString;
+            if (configuration.SQLType == "MySql")
+            {
+                string environmentConnection = Environment.GetEnvironmentVariable(
+                    "AO_REBIRTH_MYSQL_CONNECTION");
+
+                connectionString = string.IsNullOrWhiteSpace(environmentConnection)
+                    ? configuration.MysqlConnection
+                    : environmentConnection;
+                configuration.MysqlConnection = connectionString;
+            }
+            else if (configuration.SQLType == "MsSql")
+            {
+                connectionString = configuration.MsSqlConnection;
+            }
+            else if (configuration.SQLType == "PostgreSQL")
+            {
+                connectionString = configuration.PostgreConnection;
+            }
+            else
+            {
+                throw new InvalidDataException("SQLType must be MySql, MsSql, or PostgreSQL.");
+            }
+
+            if (string.IsNullOrWhiteSpace(connectionString)
+                || connectionString.IndexOf("REPLACE_WITH_", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                throw new InvalidDataException("The selected database connection string is not configured.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(requiredSqlType)
+                && !string.Equals(configuration.SQLType, requiredSqlType, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException("SQLType does not match the required deployment provider.");
+            }
+
+            ValidateProviderConnection(configuration.SQLType, connectionString);
+        }
+
+        private static void ValidateProviderConnection(string sqlType, string connectionString)
+        {
+            try
+            {
+                IDbConnection connection;
+                if (sqlType == "MySql")
+                {
+                    connection = new MySQLConnector(connectionString).GetConnection();
+                }
+                else if (sqlType == "MsSql")
+                {
+                    connection = new MSSqlConnector(connectionString).GetConnection();
+                }
+                else
+                {
+                    connection = new NpgsqlConnector(connectionString).GetConnection();
+                }
+
+                using (connection)
+                {
+                    if (connection.State != ConnectionState.Closed)
+                    {
+                        throw new InvalidOperationException(
+                            "Startup validation must not open a database connection.");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDataException("The selected database connection string syntax is invalid.", e);
+            }
+        }
+
+        private static IPAddress GetISComListenAddress(Utility.Config.Config configuration)
+        {
+            string listenIP = configuration.ListenIP;
+
+            IPAddress address;
+            if (!IPAddress.TryParse(listenIP, out address))
+            {
+                throw new InvalidDataException("The ISCom listen address is invalid.");
+            }
+
+
+            return address;
+        }
+
+        private static IPAddress GetChatListenAddress(Utility.Config.Config configuration)
+        {
+            string listenIP = configuration.ListenIP;
+
+            IPAddress address;
+            if (!IPAddress.TryParse(listenIP, out address))
+            {
+                throw new InvalidDataException("The Chat listen address is invalid.");
+            }
+
+            return address;
+        }
+
+        private static int ValidateStartup()
+        {
+            ChatServer validationChatServer = null;
+            ISComV2Server validationISCom = null;
+
+            try
+            {
+                Utility.Config.Config configuration = LoadStrictConfiguration();
+                validationChatServer = new ChatServer();
+                validationChatServer.TcpEndPoint = new IPEndPoint(
+                    GetChatListenAddress(configuration),
+                    configuration.ChatPort);
+                validationChatServer.MaximumPendingConnections = 100;
+
+                validationISCom = new ISComV2Server();
+                validationISCom.TcpEndPoint = new IPEndPoint(
+                    GetISComListenAddress(configuration),
+                    configuration.CommPort);
+                validationISCom.DataReceived += validationChatServer.ISComDataReceived;
+
+                if (validationChatServer.Channels.Count != 8
+                    || validationChatServer.ConnectedClients.Count != 0
+                    || validationChatServer.IsRunning
+                    || validationChatServer.TCPEnabled
+                    || validationISCom.IsRunning
+                    || validationISCom.TCPEnabled)
+                {
+                    throw new InvalidOperationException("Offline ChatEngine topology validation failed.");
+                }
+
+                LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogManager.GetCurrentClassLogger().Debug("ChatEngine startup logging validation.");
+                LogManager.Flush();
+
+                Console.WriteLine(
+                    "CHATENGINE_VALIDATION_OK mode=startup channels=8 provider="
+                    + configuration.SQLType
+                    + " nbug=disabled listeners=0");
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("CHATENGINE_VALIDATION_FAILED mode=startup error=" + e.Message);
+                return 1;
+            }
+            finally
+            {
+                if (validationISCom != null)
+                {
+                    validationISCom.Dispose();
+                }
+
+                if (validationChatServer != null)
+                {
+                    validationChatServer.Dispose();
+                }
+
+                LogManager.Shutdown();
+            }
+        }
+
+        private static int ValidateLifecycle(string[] args)
+        {
+            bool headlessLoggingConfigured = false;
+            try
+            {
+                ConfigureHeadlessConsoleLogging(args);
+                headlessLoggingConfigured = true;
+                LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                RegisterShutdownSignals();
+                Console.WriteLine("CHATENGINE_LIFECYCLE_READY listeners=0 database=closed");
+
+                string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
+                while (!exited)
+                {
+                    if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
+                    {
+                        ConsumeShutdownFile(shutdownFile);
+                        RequestShutdown("shutdown file");
+                    }
+
+                    Thread.Sleep(100);
+                }
+
+                Console.WriteLine("CHATENGINE_LIFECYCLE_STOPPED status=clean");
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("CHATENGINE_LIFECYCLE_FAILED error=" + e.Message);
+                return 1;
+            }
+            finally
+            {
+                CompleteShutdown();
+                if (headlessLoggingConfigured)
+                {
+                    CloseHeadlessConsoleLogging();
+                }
+            }
         }
 
         /// <summary>
@@ -488,39 +972,71 @@ namespace ChatEngine
         /// <param name="args">
         /// Command line parameters
         /// </param>
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
-            bool headless = HasArgument(args, "/headless");
-            if (headless)
+            if (HasEitherArgument(args, "/validate-startup", "--validate-startup"))
             {
-                ConfigureHeadlessConsoleLogging(args);
+                return ValidateStartup();
             }
 
-            ct = new ConsoleText();
-
-            OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Yellow);
-
-            Console.WriteLine();
-
-            Console.WriteLine(locales.ServerConsoleMainText, DateTime.Now.Year);
-
-            if (!Initialize())
+            if (HasEitherArgument(args, "/validate-lifecycle", "--validate-lifecycle"))
             {
-                Console.WriteLine("Error occured while initilizing. Please check in log.");
-                return;
+                return ValidateLifecycle(args);
             }
 
-            if (headless)
-            {
-                RunHeadless(args);
-                LogManager.Configuration = null;
-                FlushHeadlessConsoleLogging();
-                return;
-            }
+            bool headless = HasEitherArgument(args, "/headless", "--headless");
 
-            StartShutdownFileWatcher(args);
-            CommandLoop(args);
-            LogManager.Configuration = null;
+            try
+            {
+                if (headless)
+                {
+                    ConfigureHeadlessConsoleLogging(args);
+                    RegisterShutdownSignals();
+                }
+
+
+                ct = new ConsoleText();
+
+                OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Yellow);
+
+                Console.WriteLine();
+
+                Console.WriteLine(locales.ServerConsoleMainText, DateTime.Now.Year);
+
+                if (exited)
+                {
+                    return 0;
+                }
+
+                if (!Initialize())
+                {
+                    Console.WriteLine("Error occured while initilizing. Please check in log.");
+                    return 1;
+                }
+
+                if (exited)
+                {
+                    return 0;
+                }
+
+                if (headless)
+                {
+                    return RunHeadless(args) ? 0 : 1;
+                }
+
+                StartShutdownFileWatcher(args);
+                CommandLoop(args);
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("ChatEngine startup failed: " + e.Message);
+                return 1;
+            }
+            finally
+            {
+                CompleteShutdown();
+            }
         }
 
         #endregion
