@@ -33,9 +33,10 @@ headless exception logging, env-only deployment secrets, systemd readiness,
 and coordinated shutdown. PlayfieldLoader and full Core are deferred, while the
 exact three Core authentication sources are kept in a contained Linux assembly.
 Strict Stage 5 contract and offline artifact gates now pass locally; native
-Ubuntu execution and
-authorized disposable-MySQL CRUD parity are still required before the full
-cross-platform exit gates are complete.
+Ubuntu 24.04.4 x86_64 apphost, listener-free lifecycle, systemd readiness, both
+loopback listeners, and SIGTERM shutdown also pass. Authorized disposable-MySQL
+CRUD parity is still required before the full cross-platform exit gates are
+complete.
 
 ## Rules for each stage
 
@@ -51,10 +52,11 @@ cross-platform exit gates are complete.
 
 ## Remaining ChatEngine acceptance work
 
-- Verify the published apphost, exact-case assets, systemd unit, and real
-  `sd_notify` readiness/SIGTERM shutdown on Ubuntu 24.04.
-- Re-run the passing cross-runtime authentication/packet/channel fixtures and
-  bounded listener-free startup/lifecycle gates on the matching Linux runtime.
+- Provision or authorize an isolated disposable MySQL target and verify
+  connection/schema readiness before any player authentication test.
+- Native listener-free startup/lifecycle and systemd readiness/SIGTERM now pass;
+  the full contract tools remain reproducibly covered by the Windows-hosted
+  .NET 10 lane.
 - Live Database read/write/query parity still requires an authorized disposable
   MySQL schema; offline gates intentionally never open a connection.
 - Legacy per-channel chat logging remains disabled because its writer is not

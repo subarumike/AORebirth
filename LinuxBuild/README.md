@@ -153,8 +153,9 @@ dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.
 
 This checkpoint includes a publishable ChatEngine build plus passing
 Windows/Linux contract, authentication, negative configuration, lifecycle, and
-publish-structure gates. Native Ubuntu execution, real POSIX signal delivery,
-systemd readiness verification, live database parity, and player traffic remain
-pending.
+publish-structure gates. Native Ubuntu 24.04.4 x86_64 apphost execution,
+listener-free validation, systemd readiness with both loopback listeners, and
+real SIGTERM delivery also pass. Live database parity, boot persistence, and
+player traffic remain pending.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).
