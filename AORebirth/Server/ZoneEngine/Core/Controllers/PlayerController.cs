@@ -373,7 +373,8 @@ namespace ZoneEngine.Core.Controllers
                     true);
             }
 
-            if (!ActiveNanoRuntimeService.Default.CanActivateNano(this.Character, nanoId))
+            if (!TeamWarpRuntime.IsBeaconWarpNano(nanoId)
+                && !ActiveNanoRuntimeService.Default.CanActivateNano(this.Character, nanoId))
             {
                 ChatTextMessageHandler.Default.Send(this.Character, "Not enough NCU to activate this nano.");
                 return false;

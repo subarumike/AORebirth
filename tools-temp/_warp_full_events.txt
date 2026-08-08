@@ -1,0 +1,330 @@
+2026-08-08T11:33:59.7960730Z [PLUGIN] Mission flow log: C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260808-133359\mission-flow.log
+2026-08-08T11:33:59.8000714Z [COMMAND] capture started
+2026-08-08T11:34:00.2378013Z [IN-N3] #1 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:00.2378013Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2743,CurrentNano=2663] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:00.8104491Z [CHAR-SEEN] identity=(SimpleChar:502C2E0F) name=Engnera player=True npc=False pet=False inPlay=True alive=True hp=2743/3748 pct=73.2 level=187 computerLiteracy=913 pos=(211.4183, 5.01, 128.1889) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=0 currentState=0 actionCategory=1234567890 deadTimer=75 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-08-08T11:34:00.8104491Z [CHAR-SEEN] identity=(SimpleChar:79CF9F73) name=OT Bartender player=False npc=True pet=False inPlay=True alive=True hp=19928/19928 pct=100.0 level=194 computerLiteracy=6 pos=(159.7771, 5.807031, 115.7935) attacking=False fightingTarget=null monsterData=26139 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-08-08T11:34:01.2701663Z [IN-N3] #2 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:01.2701663Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2743,CurrentNano=2663] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:02.2825430Z [IN-N3] #3 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:02.2825430Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2743,CurrentNano=2663] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:02.9101567Z [OUT-N3] #1 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:02.9101567Z [ENEMY-FIGHT-AUTO] focused identity=(SimpleChar:35FE2868) reason=local-player-target direction=OUT-N3 sequence=1
+2026-08-08T11:34:03.2969188Z [IN-N3] #4 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:03.2969188Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2743,CurrentNano=2663] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:04.3172898Z [IN-N3] #5 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:04.3172898Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=2673] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:05.3296659Z [IN-N3] #6 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:05.3296659Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=2673] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:06.3340481Z [IN-N3] #7 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:06.3350499Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=2673] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:06.6928270Z [OUT-N3] #2 type=CharacterAction identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:06.6928270Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=154914 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:06.8857090Z [IN-N3] #8 type=CastNanoSpell identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:06.8877149Z [IN-N3] #9 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:06.8877149Z [IN-N3-DETAIL] StatMessage { Stats=count=1[CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:07.3764066Z [IN-N3] #10 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:07.3764066Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:08.4157675Z [IN-N3] #11 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:08.4157675Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:09.4271452Z [IN-N3] #12 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:09.4271452Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:10.4784972Z [IN-N3] #13 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:10.4784972Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:11.4369076Z [IN-N3] #14 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:11.4369076Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:12.4422879Z [IN-N3] #15 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:12.4422879Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:13.4566642Z [IN-N3] #16 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:13.4566642Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1792] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:14.5070169Z [IN-N3] #17 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:14.5070169Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:15.4864137Z [IN-N3] #18 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:15.4864137Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:16.5767448Z [IN-N3] #19 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:16.5767448Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:17.6031111Z [IN-N3] #20 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:17.6031111Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2752,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:18.5855064Z [IN-N3] #21 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:18.5855064Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:19.6148724Z [IN-N3] #22 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:19.6158721Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:20.6532337Z [IN-N3] #23 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:20.6532337Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:21.4017718Z [CHAT] ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-08-08T11:34:21.6716058Z [IN-N3] #24 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:21.6726061Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:22.6829836Z [IN-N3] #25 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:22.6829836Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3815535Z [DYNEL-SPAWNED] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=False alive=True hp=2778/2778 pct=100.0 level=200 computerLiteracy=154 pos=(211.4384, 5.01, 130.1888) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-08-08T11:34:23.3835520Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=154914 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-08-08T11:34:23.3835520Z [IN-N3] #26 type=CharacterAction identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.3835520Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=154914 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3835520Z [IN-N3] #27 type=Feedback identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.3835520Z [IN-N3-DETAIL] FeedbackMessage { Unknown1=1107296280 CategoryId=110 MessageId=124550313 N3MessageType=Feedback Identity=(SimpleChar:502C2E0F) Unknown=1 PacketType=N3Message }
+2026-08-08T11:34:23.3835520Z [IN-N3] #28 type=SimpleCharFullUpdate identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:23.3835520Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage PlayfieldId=1751076 FightingTarget=null Position=(211.4384, 5.010001, 130.1888) Heading=X: 0 | Y: 0.005009942 | Z: 0 | W: 0.9999874 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Madamp" CharacterFlags=Unknown, Unknown2, PetTower, Unknown5, CollideWithStatels, Unknown7 AccountFlags=1 Expansions=1 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+PlayerInfo Level=200 Health=2778 HealthDamage=0 MonsterData=0 MonsterScale=100 VisualFlags=127 VisibleTitle=0 ScfuUnk1=byte[42]:0000000000000000000000000301000100010001000100000003000000000000 HeadMesh=223918 RunSpeedBase=963 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture] Meshes=count=6[SmokeLounge.AOtomation.Messaging.GameData.Mesh,SmokeLounge.AOtomation.Messaging.GameData.Mesh,SmokeLounge.AOtomation.Messaging.GameData.Mesh,SmokeLounge.AOtomation.Messaging.GameData.Mesh,SmokeLounge.AOtomation.Messaging.GameData.Mesh,SmokeLounge.AOtomation.Messaging.GameData.Mesh] Flags2=Unknown1 SpecialAttacks=null ScfuUnk2=0 ScfuUnk3=0 ScfuUnk4=0 TextureOverrides=null Waypoints=null Owner=null N3MessageType=SimpleCharFullUpdate Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3845516Z [IN-N3] #29 type=WeaponItemFullUpdate identity=(WeaponInstance:19E8513C)
+2026-08-08T11:34:23.3845516Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:35FE2868) PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=262 Stats=count=7[Flags=67109921,StaticInstance=303060,ACGItemLevel=100,ACGItemTemplateID=303060,ACGItemTemplateID2=303060,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:19E8513C) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3845516Z [IN-N3] #30 type=WeaponItemFullUpdate identity=(WeaponInstance:19E8513E)
+2026-08-08T11:34:23.3845516Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:35FE2868) PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=264 Stats=count=7[Flags=67109921,StaticInstance=303060,ACGItemLevel=100,ACGItemTemplateID=303060,ACGItemTemplateID2=303060,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:19E8513E) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3865506Z [IN-N3] #31 type=SimpleItemFullUpdate identity=(51056:458038)
+2026-08-08T11:34:23.3865506Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=905848936 Position=null Rotation=null PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=342 Stats=count=13[Flags=201326593,StaticInstance=281129,ACGItemLevel=1,ACGItemTemplateID=281129,ACGItemTemplateID2=281129,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(51056:458038) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3875494Z [IN-N3] #32 type=ChestFullUpdate identity=(Container:A5D6706)
+2026-08-08T11:34:23.3885492Z [IN-N3] #33 type=AppearanceUpdate identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:23.3885492Z [OUT-N3] #3 type=CharacterAction identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.3885492Z [OUT-N3-DETAIL] CharacterActionMessage { Action=128 Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3985441Z [OUT-N3] #4 type=CharacterAction identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.3985441Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.3985441Z [OUT-N3] #5 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.5434537Z [IN-N3] #34 type=TeamMemberInfo identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.6953603Z [IN-N3] #35 type=InfoPacket identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:23.6953603Z [IN-N3] #36 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:23.6953603Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1802] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:23.7153478Z [OUT-N3] #6 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.1161001Z [CHAR-SEEN] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=False alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=154 pos=(211.4384, 5.01, 130.1888) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-08-08T11:34:24.4958672Z [IN-N3] #37 type=OrgInfoPacket identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:24.4968669Z [IN-N3] #38 type=Stat identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:24.4968669Z [IN-N3-DETAIL] StatMessage { Stats=count=1[Clan=2304001] N3MessageType=Stat Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:24.4968669Z [IN-N3] #39 type=Stat identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:24.4968669Z [IN-N3-DETAIL] StatMessage { Stats=count=1[ClanLevel=6] N3MessageType=Stat Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:24.5078594Z [OUT-N3] #7 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5078594Z [OUT-N3] #8 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5078594Z [OUT-N3] #9 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5168542Z [OUT-N3] #10 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5168542Z [OUT-N3] #11 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5278470Z [OUT-N3] #12 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5278470Z [OUT-N3] #13 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5398401Z [OUT-N3] #14 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5398401Z [OUT-N3] #15 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5488346Z [OUT-N3] #16 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5488346Z [OUT-N3] #17 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5598272Z [OUT-N3] #18 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5598272Z [OUT-N3] #19 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5688216Z [OUT-N3] #20 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5688216Z [OUT-N3] #21 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5788163Z [OUT-N3] #22 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5788163Z [OUT-N3] #23 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5898090Z [OUT-N3] #24 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5898090Z [OUT-N3] #25 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5988035Z [OUT-N3] #26 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.5988035Z [OUT-N3] #27 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6087972Z [OUT-N3] #28 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6097970Z [OUT-N3] #29 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6187913Z [OUT-N3] #30 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6187913Z [OUT-N3] #31 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6287846Z [OUT-N3] #32 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6287846Z [OUT-N3] #33 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6397783Z [OUT-N3] #34 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6397783Z [OUT-N3] #35 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6487724Z [OUT-N3] #36 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6487724Z [OUT-N3] #37 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6597655Z [OUT-N3] #38 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6597655Z [OUT-N3] #39 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6687604Z [OUT-N3] #40 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6687604Z [OUT-N3] #41 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6787543Z [OUT-N3] #42 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6787543Z [OUT-N3] #43 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6897479Z [OUT-N3] #44 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6897479Z [OUT-N3] #45 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6997412Z [OUT-N3] #46 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.6997412Z [OUT-N3] #47 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7097349Z [OUT-N3] #48 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7097349Z [OUT-N3] #49 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7227281Z [IN-N3] #40 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7227281Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:24.7237269Z [OUT-N3] #50 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7237269Z [OUT-N3] #51 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7317215Z [OUT-N3] #52 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7317215Z [OUT-N3] #53 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7407163Z [OUT-N3] #54 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7407163Z [OUT-N3] #55 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7507096Z [OUT-N3] #56 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7507096Z [OUT-N3] #57 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7617035Z [OUT-N3] #58 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7617035Z [OUT-N3] #59 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7726970Z [OUT-N3] #60 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7726970Z [OUT-N3] #61 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7806914Z [OUT-N3] #62 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7806914Z [OUT-N3] #63 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7906855Z [OUT-N3] #64 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.7906855Z [OUT-N3] #65 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8016782Z [OUT-N3] #66 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8016782Z [OUT-N3] #67 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8106732Z [OUT-N3] #68 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8106732Z [OUT-N3] #69 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8226666Z [OUT-N3] #70 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8226666Z [OUT-N3] #71 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8306613Z [OUT-N3] #72 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8306613Z [OUT-N3] #73 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8416543Z [OUT-N3] #74 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8416543Z [OUT-N3] #75 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8506481Z [OUT-N3] #76 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8516476Z [OUT-N3] #77 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8616415Z [OUT-N3] #78 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8616415Z [OUT-N3] #79 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8726354Z [OUT-N3] #80 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8726354Z [OUT-N3] #81 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8806297Z [OUT-N3] #82 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8816292Z [OUT-N3] #83 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8906234Z [OUT-N3] #84 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.8906234Z [OUT-N3] #85 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9006169Z [OUT-N3] #86 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9006169Z [OUT-N3] #87 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9116105Z [OUT-N3] #88 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9116105Z [OUT-N3] #89 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9226047Z [OUT-N3] #90 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9226047Z [OUT-N3] #91 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9305989Z [OUT-N3] #92 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9305989Z [OUT-N3] #93 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9415931Z [OUT-N3] #94 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9415931Z [OUT-N3] #95 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9515858Z [OUT-N3] #96 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9515858Z [OUT-N3] #97 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9615810Z [OUT-N3] #98 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9615810Z [OUT-N3] #99 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9725738Z [OUT-N3] #100 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9725738Z [OUT-N3] #101 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9905633Z [OUT-N3] #102 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9905633Z [OUT-N3] #103 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9995567Z [OUT-N3] #104 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:24.9995567Z [OUT-N3] #105 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0105498Z [OUT-N3] #106 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0105498Z [OUT-N3] #107 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0205448Z [OUT-N3] #108 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0205448Z [OUT-N3] #109 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0305373Z [OUT-N3] #110 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0305373Z [OUT-N3] #111 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0405313Z [OUT-N3] #112 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0405313Z [OUT-N3] #113 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0505247Z [OUT-N3] #114 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0505247Z [OUT-N3] #115 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0605193Z [OUT-N3] #116 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0605193Z [OUT-N3] #117 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0705126Z [OUT-N3] #118 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0705126Z [OUT-N3] #119 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0805062Z [OUT-N3] #120 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0805062Z [OUT-N3] #121 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0905006Z [OUT-N3] #122 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.0905006Z [OUT-N3] #123 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1004941Z [OUT-N3] #124 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1004941Z [OUT-N3] #125 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1104879Z [OUT-N3] #126 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1104879Z [OUT-N3] #127 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1204819Z [OUT-N3] #128 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1204819Z [OUT-N3] #129 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1304754Z [OUT-N3] #130 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1304754Z [OUT-N3] #131 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1404705Z [OUT-N3] #132 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1404705Z [OUT-N3] #133 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1504633Z [OUT-N3] #134 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1504633Z [OUT-N3] #135 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1604573Z [OUT-N3] #136 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1604573Z [OUT-N3] #137 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1704506Z [OUT-N3] #138 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1704506Z [OUT-N3] #139 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1804452Z [OUT-N3] #140 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1804452Z [OUT-N3] #141 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1904392Z [OUT-N3] #142 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.1904392Z [OUT-N3] #143 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2004336Z [OUT-N3] #144 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2004336Z [OUT-N3] #145 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2104274Z [OUT-N3] #146 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2104274Z [OUT-N3] #147 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2204212Z [OUT-N3] #148 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2204212Z [OUT-N3] #149 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2304152Z [CHAR-IN-PLAY] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=True alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=154 pos=(211.4384, 5.01, 130.1888) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-08-08T11:34:25.2314145Z [IN-N3] #41 type=CharInPlay identity=(SimpleChar:35FE2868)
+2026-08-08T11:34:25.2314145Z [IN-N3-DETAIL] CharInPlayMessage { N3MessageType=CharInPlay Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:25.2314145Z [OUT-N3] #150 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.2314145Z [OUT-N3] #151 type=LookAt identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.7600890Z [IN-N3] #42 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:25.7600890Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:26.8134398Z [IN-N3] #43 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:26.8134398Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:27.8318125Z [IN-N3] #44 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:27.8318125Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:28.8661761Z [IN-N3] #45 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:28.8661761Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:29.8835503Z [IN-N3] #46 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:29.8835503Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:30.8989246Z [IN-N3] #47 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:30.8989246Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:31.9422839Z [IN-N3] #48 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:31.9422839Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2761,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:32.9376700Z [IN-N3] #49 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:32.9376700Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:33.9320575Z [IN-N3] #50 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:33.9320575Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1812] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:34.9404365Z [IN-N3] #51 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:34.9404365Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:35.9298269Z [IN-N3] #52 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:35.9298269Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:36.9501989Z [IN-N3] #53 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:36.9501989Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:38.0505223Z [IN-N3] #54 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:38.0505223Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:39.0099312Z [IN-N3] #55 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:39.0099312Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:40.0432951Z [IN-N3] #56 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:40.0432951Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:41.0456784Z [IN-N3] #57 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:41.0456784Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:42.0770433Z [IN-N3] #58 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:42.0770433Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:43.0984133Z [IN-N3] #59 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:43.0994131Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:44.1437723Z [IN-N3] #60 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:44.1437723Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1822] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:45.1741366Z [IN-N3] #61 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:45.1741366Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:46.2045012Z [IN-N3] #62 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:46.2045012Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2770,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:47.2538555Z [IN-N3] #63 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:47.2538555Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:48.3741657Z [IN-N3] #64 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:48.3741657Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:49.3155870Z [IN-N3] #65 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:49.3155870Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:50.3499490Z [IN-N3] #66 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:50.3499490Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:51.3523329Z [IN-N3] #67 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:51.3523329Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:52.3547162Z [IN-N3] #68 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:52.3547162Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:53.3640944Z [IN-N3] #69 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:53.3640944Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:54.3844654Z [IN-N3] #70 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:54.3844654Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1832] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:55.4258246Z [IN-N3] #71 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:55.4258246Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:56.4282078Z [IN-N3] #72 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:56.4282078Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:57.4795605Z [IN-N3] #73 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:57.4795605Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:58.5239175Z [IN-N3] #74 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:58.5239175Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:34:59.5123092Z [IN-N3] #75 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:34:59.5123092Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:00.5566662Z [IN-N3] #76 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:00.5566662Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2779,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:01.5840333Z [IN-N3] #77 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:01.5840333Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:02.6144000Z [IN-N3] #78 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:02.6144000Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:03.6267762Z [IN-N3] #79 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:03.6267762Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:04.6511460Z [IN-N3] #80 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:04.6511460Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1842] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:05.1578333Z [COMMAND] capture stop requested; draining raw packets until quiet
+2026-08-08T11:35:05.6875076Z [IN-N3] #81 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:05.6875076Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1852] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:06.7218705Z [IN-N3] #82 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:06.7218705Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1852] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:07.7442408Z [IN-N3] #83 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:07.7442408Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1852] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:08.7945947Z [IN-N3] #84 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:08.7945947Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1852] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:09.7869833Z [IN-N3] #85 type=Stat identity=(SimpleChar:502C2E0F)
+2026-08-08T11:35:09.7869833Z [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=2788,CurrentNano=1852] N3MessageType=Stat Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+2026-08-08T11:35:10.1777425Z [CAPTURE-VALIDATION] status=complete processingAllowed=True recaptureRequired=False offlineDecodeRequired=False issues=0 quietPeriodPassed=False

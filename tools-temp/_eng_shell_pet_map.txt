@@ -1,0 +1,131 @@
+Capture 20260808-131854 Engineer shell/pet map (Engnera)
+SCFU pets: 40 | correlated cycles: 40
+
+=== NANO -> SHELL (from FinishNanoCasting + Overflow TemplateAction) ===
+nano 43325 -> shell low=96196 high=96196 ql=1 (templateUnknown2=87) @ 2026-08-08T11:25:03.2987512Z
+nano 45664 -> shell low=150783 high=150782 ql=67 (templateUnknown2=87) @ 2026-08-08T11:20:37.5406489Z
+nano 45665 -> shell low=150778 high=150778 ql=100 (templateUnknown2=87) @ 2026-08-08T11:19:13.6940055Z
+nano 45671 -> shell low=96218 high=96218 ql=200 (templateUnknown2=87) @ 2026-08-08T11:30:26.5356119Z
+nano 45672 -> shell low=150776 high=150775 ql=193 (templateUnknown2=87) @ 2026-08-08T11:29:26.7046721Z
+nano 45672 -> shell low=259270 high=259270 ql=100 (templateUnknown2=87) @ 2026-08-08T11:30:12.8099429Z
+nano 45675 -> shell low=150793 high=150792 ql=34 (templateUnknown2=87) @ 2026-08-08T11:24:35.5204466Z
+nano 45676 -> shell low=150788 high=150787 ql=9 (templateUnknown2=87) @ 2026-08-08T11:24:49.8256744Z
+nano 45680 -> shell low=150791 high=96228 ql=43 (templateUnknown2=87) @ 2026-08-08T11:24:05.2448153Z
+nano 45681 -> shell low=150786 high=150786 ql=15 (templateUnknown2=87) @ 2026-08-08T11:23:50.6842152Z
+nano 45682 -> shell low=150782 high=96215 ql=76 (templateUnknown2=87) @ 2026-08-08T11:20:52.5307405Z
+nano 45686 -> shell low=150780 high=150779 ql=85 (templateUnknown2=87) @ 2026-08-08T11:19:45.6500523Z
+nano 45691 -> shell low=150797 high=150796 ql=19 (templateUnknown2=87) @ 2026-08-08T11:26:51.2544856Z
+nano 45692 -> shell low=96196 high=150790 ql=2 (templateUnknown2=87) @ 2026-08-08T11:25:19.3976438Z
+nano 45693 -> shell low=150785 high=150784 ql=49 (templateUnknown2=87) @ 2026-08-08T11:23:35.2408558Z
+nano 45694 -> shell low=150780 high=150779 ql=82 (templateUnknown2=87) @ 2026-08-08T11:21:22.5431847Z
+nano 45697 -> shell low=150791 high=150791 ql=40 (templateUnknown2=87) @ 2026-08-08T11:27:48.8478387Z
+nano 45698 -> shell low=150787 high=150786 ql=13 (templateUnknown2=87) @ 2026-08-08T11:24:20.4346756Z
+nano 45699 -> shell low=150783 high=150782 ql=73 (templateUnknown2=87) @ 2026-08-08T11:21:07.7717570Z
+nano 45700 -> shell low=150778 high=150777 ql=106 (templateUnknown2=87) @ 2026-08-08T11:19:29.7134617Z
+nano 45701 -> shell low=150784 high=150783 ql=64 (templateUnknown2=87) @ 2026-08-08T11:22:12.6898139Z
+nano 45702 -> shell low=150779 high=150778 ql=97 (templateUnknown2=87) @ 2026-08-08T11:28:17.4835057Z
+nano 45703 -> shell low=150796 high=150795 ql=23 (templateUnknown2=87) @ 2026-08-08T11:27:05.3018978Z
+nano 45705 -> shell low=150784 high=150784 ql=55 (templateUnknown2=87) @ 2026-08-08T11:21:43.1486256Z
+nano 45706 -> shell low=150780 high=150779 ql=88 (templateUnknown2=87) @ 2026-08-08T11:21:57.6120679Z
+nano 45712 -> shell low=150797 high=150796 ql=17 (templateUnknown2=87) @ 2026-08-08T11:26:19.2424450Z
+nano 45713 -> shell low=150785 high=150784 ql=46 (templateUnknown2=87) @ 2026-08-08T11:26:34.7251618Z
+nano 45714 -> shell low=150781 high=150780 ql=79 (templateUnknown2=87) @ 2026-08-08T11:23:19.9733620Z
+nano 45717 -> shell low=150795 high=150795 ql=25 (templateUnknown2=87) @ 2026-08-08T11:25:35.6925930Z
+nano 45718 -> shell low=150790 high=150790 ql=5 (templateUnknown2=87) @ 2026-08-08T11:25:50.9906649Z
+nano 45719 -> shell low=150784 high=150783 ql=58 (templateUnknown2=87) @ 2026-08-08T11:22:47.6545491Z
+nano 45720 -> shell low=150779 high=150778 ql=91 (templateUnknown2=87) @ 2026-08-08T11:22:29.4658158Z
+nano 45723 -> shell low=150795 high=150794 ql=28 (templateUnknown2=87) @ 2026-08-08T11:27:19.8082511Z
+nano 45725 -> shell low=150784 high=150783 ql=61 (templateUnknown2=87) @ 2026-08-08T11:23:02.6207624Z
+nano 45726 -> shell low=150779 high=150778 ql=94 (templateUnknown2=87) @ 2026-08-08T11:20:02.2052714Z
+nano 45730 -> shell low=150792 high=150791 ql=37 (templateUnknown2=87) @ 2026-08-08T11:28:45.8930874Z
+nano 45731 -> shell low=150787 high=150786 ql=11 (templateUnknown2=87) @ 2026-08-08T11:26:05.5987323Z
+nano 45732 -> shell low=150783 high=150782 ql=70 (templateUnknown2=87) @ 2026-08-08T11:28:03.7247778Z
+nano 45733 -> shell low=150778 high=150777 ql=103 (templateUnknown2=87) @ 2026-08-08T11:20:21.9130818Z
+nano 45736 -> shell low=150793 high=150792 ql=31 (templateUnknown2=87) @ 2026-08-08T11:27:35.3943817Z
+nano 45737 -> shell low=150788 high=150787 ql=7 (templateUnknown2=87) @ 2026-08-08T11:28:32.5714620Z
+
+=== SHELL USE -> PET SPAWN ===
+flow: CastNano -> FinishNanoCasting -> TemplateAction(Overflow shell) -> ContainerAddItem -> GenericCmd Use(Inventory) -> SCFU IsPet -> TemplateAction+DeleteItem(consume shell)
+
+nano=45665 | shell=150778/150778 QL100 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=100 hp=8195 md=45873 scale=112 run=508 family=95 | SimpleChar:79CF9F7D
+nano=45700 | shell=150778/150777 QL106 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=106 hp=9049 md=45873 scale=112 run=531 family=95 | SimpleChar:79CF9F7F
+nano=45686 | shell=150780/150779 QL85 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=85 hp=6266 md=45873 scale=110 run=442 family=95 | SimpleChar:79CF9F80
+nano=45726 | shell=150779/150778 QL94 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=94 hp=7342 md=45873 scale=111 run=485 family=95 | SimpleChar:79CF9F82
+nano=45733 | shell=150778/150777 QL103 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=103 hp=8622 md=45873 scale=112 run=521 family=95 | SimpleChar:79CF9F83
+nano=45664 | shell=150783/150782 QL67 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=67 hp=4442 md=45873 scale=108 run=345 family=95 | SimpleChar:79CF9F86
+nano=45682 | shell=150782/96215 QL76 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=76 hp=5354 md=45873 scale=109 run=394 family=95 | SimpleChar:79CF9F87
+nano=45699 | shell=150783/150782 QL73 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=73 hp=5050 md=45873 scale=108 run=377 family=95 | SimpleChar:79CF9F88
+nano=45694 | shell=150780/150779 QL82 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=82 hp=5962 md=45873 scale=109 run=425 family=95 | SimpleChar:79CF9F8A
+nano=45705 | shell=150784/150784 QL55 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=55 hp=3226 md=45873 scale=106 run=279 family=95 | SimpleChar:79CF9F8C
+nano=45706 | shell=150780/150779 QL88 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=88 hp=6570 md=45873 scale=110 run=457 family=95 | SimpleChar:79CF9F8E
+nano=45701 | shell=150784/150783 QL64 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=64 hp=4138 md=45873 scale=107 run=328 family=95 | SimpleChar:79CF9F8F
+nano=45720 | shell=150779/150778 QL91 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=91 hp=6915 md=45873 scale=111 run=472 family=95 | SimpleChar:79CF9F90
+nano=45719 | shell=150784/150783 QL58 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=58 hp=3530 md=45873 scale=106 run=296 family=95 | SimpleChar:79CF9F92
+nano=45725 | shell=150784/150783 QL61 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=61 hp=3834 md=45873 scale=107 run=311 family=95 | SimpleChar:79CF9F94
+nano=45714 | shell=150781/150780 QL79 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=79 hp=5658 md=45873 scale=109 run=408 family=95 | SimpleChar:79CF9F95
+nano=45693 | shell=150785/150784 QL49 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=49 hp=2645 md=45873 scale=105 run=248 family=95 | SimpleChar:79CF9F96
+nano=45681 | shell=150786/150786 QL15 | pet=Engineer Automaton II player=False npc=True pet=False inPlay=True lvl=15 hp=471 md=17649 scale=97 run=77 family=95 | SimpleChar:79CF9F98
+nano=45680 | shell=150791/96228 QL43 | pet=Engineer Android II player=False npc=True pet=False inPlay=True lvl=43 hp=2201 md=17649 scale=104 run=219 family=95 | SimpleChar:79CF9F9A
+nano=45698 | shell=150787/150786 QL13 | pet=Engineer Automaton II player=False npc=True pet=False inPlay=True lvl=13 hp=392 md=17649 scale=96 run=67 family=95 | SimpleChar:79CF9F9B
+nano=45675 | shell=150793/150792 QL34 | pet=Engineer Android II player=False npc=True pet=False inPlay=True lvl=34 hp=1535 md=17649 scale=102 run=174 family=95 | SimpleChar:79CF9F9E
+nano=45676 | shell=150788/150787 QL9 | pet=Engineer Automaton II player=False npc=True pet=False inPlay=True lvl=9 hp=246 md=17649 scale=95 run=47 family=95 | SimpleChar:79CF9F9F
+nano=43325 | shell=96196/96196 QL1 | pet=Engineer Automaton I player=False npc=True pet=False inPlay=True lvl=1 hp=30 md=17649 scale=90 run=8 family=95 | SimpleChar:79CF9FA1
+nano=45692 | shell=96196/150790 QL2 | pet=Engineer Automaton I player=False npc=True pet=False inPlay=True lvl=2 hp=57 md=17649 scale=91 run=15 family=95 | SimpleChar:79CF9FA2
+nano=45717 | shell=150795/150795 QL25 | pet=Engineer Android I player=False npc=True pet=False inPlay=True lvl=25 hp=869 md=17649 scale=100 run=128 family=95 | SimpleChar:79CF9FA4
+nano=45718 | shell=150790/150790 QL5 | pet=Engineer Automaton I player=False npc=True pet=False inPlay=True lvl=5 hp=138 md=17649 scale=93 run=29 family=95 | SimpleChar:79CF9FA5
+nano=45731 | shell=150787/150786 QL11 | pet=Engineer Automaton II player=False npc=True pet=False inPlay=True lvl=11 hp=312 md=17649 scale=96 run=57 family=95 | SimpleChar:79CF9FA6
+nano=45712 | shell=150797/150796 QL17 | pet=Engineer Android I player=False npc=True pet=False inPlay=True lvl=17 hp=551 md=17649 scale=98 run=87 family=95 | SimpleChar:79CF9FA8
+nano=45713 | shell=150785/150784 QL46 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=46 hp=2423 md=45873 scale=105 run=233 family=95 | SimpleChar:79CF9FA9
+nano=45691 | shell=150797/150796 QL19 | pet=Engineer Android I player=False npc=True pet=False inPlay=True lvl=19 hp=631 md=17649 scale=98 run=97 family=95 | SimpleChar:79CF9FAC
+nano=45703 | shell=150796/150795 QL23 | pet=Engineer Android I lvl=23 hp=790 md=17649 scale=100 run=119 family=95 | SimpleChar:79CF9FAE
+nano=45723 | shell=150795/150794 QL28 | pet=Engineer Android I player=False npc=True pet=False inPlay=True lvl=28 hp=1091 md=17649 scale=101 run=143 family=95 | SimpleChar:79CF9FB1
+nano=45736 | shell=150793/150792 QL31 | pet=Engineer Android II player=False npc=True pet=False inPlay=True lvl=31 hp=1313 md=17649 scale=102 run=158 family=95 | SimpleChar:79CF9FB2
+nano=45697 | shell=150791/150791 QL40 | pet=Engineer Android II player=False npc=True pet=False inPlay=True lvl=40 hp=1979 md=17649 scale=103 run=203 family=95 | SimpleChar:79CF9FB5
+nano=45732 | shell=150783/150782 QL70 | pet=Engineer Gladiatorbot player=False npc=True pet=False inPlay=True lvl=70 hp=4746 md=45873 scale=108 run=359 family=95 | SimpleChar:79CF9FB7
+nano=45702 | shell=150779/150778 QL97 | pet=Engineer Guardbot player=False npc=True pet=False inPlay=True lvl=97 hp=7769 md=45873 scale=111 run=496 family=95 | SimpleChar:79CF9FB8
+nano=45737 | shell=150788/150787 QL7 | pet=Engineer Automaton II lvl=7 hp=192 md=17649 scale=94 run=38 family=95 | SimpleChar:79CF9FBD
+nano=45730 | shell=150792/150791 QL37 | pet=Engineer Android II player=False npc=True pet=False inPlay=True lvl=37 hp=1757 md=17649 scale=103 run=187 family=95 | SimpleChar:79CF9FBE
+nano=45672 | shell=150776/150775 QL193 | pet=Engineer Slayerdroid I player=False npc=True pet=False inPlay=True lvl=193 hp=23735 md=22821 scale=120 run=739 family=95 | SimpleChar:79CF9FC5
+nano=45671 | shell=96218/96218 QL200 | pet=Engineer Slayerdroid II player=False npc=True pet=False inPlay=True lvl=200 hp=43720 md=22821 scale=121 run=821 family=95 | SimpleChar:79CF9FC9
+
+=== UNIQUE NANO PROFILES (first shell + pet range) ===
+nano 43325 shells=[(96196, 96196, 1)] pets=[('Engineer Automaton I player=False npc=True pet=False inPlay=True', 1, 17649, 90)] count=1
+nano 45664 shells=[(150783, 150782, 67)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 67, 45873, 108)] count=1
+nano 45665 shells=[(150778, 150778, 100)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 100, 45873, 112)] count=1
+nano 45671 shells=[(96218, 96218, 200)] pets=[('Engineer Slayerdroid II player=False npc=True pet=False inPlay=True', 200, 22821, 121)] count=1
+nano 45672 shells=[(150776, 150775, 193)] pets=[('Engineer Slayerdroid I player=False npc=True pet=False inPlay=True', 193, 22821, 120)] count=1
+nano 45675 shells=[(150793, 150792, 34)] pets=[('Engineer Android II player=False npc=True pet=False inPlay=True', 34, 17649, 102)] count=1
+nano 45676 shells=[(150788, 150787, 9)] pets=[('Engineer Automaton II player=False npc=True pet=False inPlay=True', 9, 17649, 95)] count=1
+nano 45680 shells=[(150791, 96228, 43)] pets=[('Engineer Android II player=False npc=True pet=False inPlay=True', 43, 17649, 104)] count=1
+nano 45681 shells=[(150786, 150786, 15)] pets=[('Engineer Automaton II player=False npc=True pet=False inPlay=True', 15, 17649, 97)] count=1
+nano 45682 shells=[(150782, 96215, 76)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 76, 45873, 109)] count=1
+nano 45686 shells=[(150780, 150779, 85)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 85, 45873, 110)] count=1
+nano 45691 shells=[(150797, 150796, 19)] pets=[('Engineer Android I player=False npc=True pet=False inPlay=True', 19, 17649, 98)] count=1
+nano 45692 shells=[(96196, 150790, 2)] pets=[('Engineer Automaton I player=False npc=True pet=False inPlay=True', 2, 17649, 91)] count=1
+nano 45693 shells=[(150785, 150784, 49)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 49, 45873, 105)] count=1
+nano 45694 shells=[(150780, 150779, 82)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 82, 45873, 109)] count=1
+nano 45697 shells=[(150791, 150791, 40)] pets=[('Engineer Android II player=False npc=True pet=False inPlay=True', 40, 17649, 103)] count=1
+nano 45698 shells=[(150787, 150786, 13)] pets=[('Engineer Automaton II player=False npc=True pet=False inPlay=True', 13, 17649, 96)] count=1
+nano 45699 shells=[(150783, 150782, 73)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 73, 45873, 108)] count=1
+nano 45700 shells=[(150778, 150777, 106)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 106, 45873, 112)] count=1
+nano 45701 shells=[(150784, 150783, 64)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 64, 45873, 107)] count=1
+nano 45702 shells=[(150779, 150778, 97)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 97, 45873, 111)] count=1
+nano 45703 shells=[(150796, 150795, 23)] pets=[('Engineer Android I', 23, 17649, 100)] count=1
+nano 45705 shells=[(150784, 150784, 55)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 55, 45873, 106)] count=1
+nano 45706 shells=[(150780, 150779, 88)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 88, 45873, 110)] count=1
+nano 45712 shells=[(150797, 150796, 17)] pets=[('Engineer Android I player=False npc=True pet=False inPlay=True', 17, 17649, 98)] count=1
+nano 45713 shells=[(150785, 150784, 46)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 46, 45873, 105)] count=1
+nano 45714 shells=[(150781, 150780, 79)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 79, 45873, 109)] count=1
+nano 45717 shells=[(150795, 150795, 25)] pets=[('Engineer Android I player=False npc=True pet=False inPlay=True', 25, 17649, 100)] count=1
+nano 45718 shells=[(150790, 150790, 5)] pets=[('Engineer Automaton I player=False npc=True pet=False inPlay=True', 5, 17649, 93)] count=1
+nano 45719 shells=[(150784, 150783, 58)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 58, 45873, 106)] count=1
+nano 45720 shells=[(150779, 150778, 91)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 91, 45873, 111)] count=1
+nano 45723 shells=[(150795, 150794, 28)] pets=[('Engineer Android I player=False npc=True pet=False inPlay=True', 28, 17649, 101)] count=1
+nano 45725 shells=[(150784, 150783, 61)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 61, 45873, 107)] count=1
+nano 45726 shells=[(150779, 150778, 94)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 94, 45873, 111)] count=1
+nano 45730 shells=[(150792, 150791, 37)] pets=[('Engineer Android II player=False npc=True pet=False inPlay=True', 37, 17649, 103)] count=1
+nano 45731 shells=[(150787, 150786, 11)] pets=[('Engineer Automaton II player=False npc=True pet=False inPlay=True', 11, 17649, 96)] count=1
+nano 45732 shells=[(150783, 150782, 70)] pets=[('Engineer Gladiatorbot player=False npc=True pet=False inPlay=True', 70, 45873, 108)] count=1
+nano 45733 shells=[(150778, 150777, 103)] pets=[('Engineer Guardbot player=False npc=True pet=False inPlay=True', 103, 45873, 112)] count=1
+nano 45736 shells=[(150793, 150792, 31)] pets=[('Engineer Android II player=False npc=True pet=False inPlay=True', 31, 17649, 102)] count=1
+nano 45737 shells=[(150788, 150787, 7)] pets=[('Engineer Automaton II', 7, 17649, 94)] count=1

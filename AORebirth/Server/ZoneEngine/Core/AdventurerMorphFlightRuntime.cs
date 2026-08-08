@@ -408,21 +408,12 @@ namespace ZoneEngine.Core
 
             if (!changed)
             {
-                // SpellList remove still went out for client mesh clear.
+                // SpellList remove still went out; still push Stat wire for client mesh.
+                PushDemorphAppearanceWire(ch);
                 return true;
             }
 
-            ch.ChangedAppearance = true;
-            if (ch.Playfield != null)
-            {
-                ch.Playfield.AnnounceAppearanceUpdate(ch);
-            }
-
-            ZoneClient client = ch.Controller != null ? ch.Controller.Client as ZoneClient : null;
-            if (client != null)
-            {
-                SimpleCharFullUpdate.SendToPlayfield(client);
-            }
+            PushDemorphAppearanceWire(ch);
 
             try
             {
@@ -485,17 +476,6 @@ namespace ZoneEngine.Core
                 ch.Stats[StatIds.monsterdata].Value = state.PreviousMonsterData;
                 ch.Stats[StatIds.catmesh].Value = state.PreviousCatMesh;
                 ch.Stats[StatIds.displaycatmesh].Value = state.PreviousDisplayCatMesh;
-                ch.ChangedAppearance = true;
-                if (ch.Playfield != null)
-                {
-                    ch.Playfield.AnnounceAppearanceUpdate(ch);
-                }
-
-                ZoneClient client = ch.Controller != null ? ch.Controller.Client as ZoneClient : null;
-                if (client != null)
-                {
-                    SimpleCharFullUpdate.SendToPlayfield(client);
-                }
             }
 
             if (state.FlightEnabled)
@@ -510,6 +490,8 @@ namespace ZoneEngine.Core
 
             state.ActionRestrictionFlags = 0;
             state.FromEquipmentVehicle = false;
+
+            PushDemorphAppearanceWire(ch);
 
             try
             {
@@ -567,13 +549,28 @@ namespace ZoneEngine.Core
 
         /// <summary>
         /// Capture 20260806-085523: NCU cancel sends Buff (and SpellList for Phasefront).
-        /// Reverse server morph for the cancelled nano only — do not ForceClear afterward
-        /// (that used to blast unrelated Phasefront SpellList removes and stuck Adventurer
-        /// metamorph exit / Sparrow demorph).
+        /// Reverse server morph for the cancelled nano, push Stat wire clears (SCFU alone
+        /// left client mesh stuck), then ForceClear only if appearance is still morphed.
         /// </summary>
         public static void CancelVehicleMorphNano(ICharacter character, int nanoId)
         {
             OnMorphNanoRemoved(character, nanoId);
+
+            Character ch = character as Character;
+            if (ch == null)
+            {
+                return;
+            }
+
+            // Buff + restore often leave the client mesh; Stat singles are required.
+            PushDemorphAppearanceWire(ch);
+
+            if (LooksMorphed(ch)
+                && !VehicleHudWearRuntime.HasEquippedVehicle(ch)
+                && !HasActiveMorphNano(ch))
+            {
+                ForceClearStuckVehicleOrMorph(ch);
+            }
         }
 
         private static void SendCancelSpellListForNano(Character ch, int nanoId)
@@ -599,13 +596,63 @@ namespace ZoneEngine.Core
             {
                 // Capture 20260806-085523: hoverboard cancel is Buff only — no SpellList.
             }
-            else if (nanoId == 0)
+            else if (nanoId == 0 || IsMorphFlightNano(nanoId))
             {
-                // /dismount / orphan force-clear only: reverse every capture SpellList morph
-                // that can stick without ActiveNanos. Never use this path on normal NCU cancel.
+                // Orphan force-clear, or other MonsterShape/CanFly nanos (shop Phasefront
+                // variants): reverse every capture SpellList morph that can stick.
                 SendSpellListWire(ch, SparrowRemoveWire, CapturedCharacterInstance, true);
                 SendSpellListWire(ch, PhasefrontCamoRemoveWire, CapturedPhasefrontCharacterInstance, true);
                 SendSpellListWire(ch, PhasefrontExecutiveRemoveWire, CapturedPhasefrontCharacterInstance, true);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260806-085523 cancel: Stat monsterdata/isvehicle/mesh must go on the
+        /// wire. SCFU + AppearanceUpdate alone left Phasefront/hoverboard mesh stuck.
+        /// </summary>
+        private static void PushDemorphAppearanceWire(Character ch)
+        {
+            if (ch == null)
+            {
+                return;
+            }
+
+            try
+            {
+                int monsterData = Math.Max(0, ch.Stats[StatIds.monsterdata].Value);
+                int isVehicle = Math.Max(0, ch.Stats[StatIds.isvehicle].Value);
+                // Capture 20260806-085523 cancel also emits mesh=0 with demorph.
+                int mesh = monsterData == 0 && isVehicle == 0
+                               ? 0
+                               : Math.Max(0, ch.Stats[StatIds.mesh].Value);
+
+                ZoneEngine.Core.MessageHandlers.StatMessageHandler.Default.AnnounceSingle(
+                    ch,
+                    (int)StatIds.monsterdata,
+                    (uint)monsterData);
+                ZoneEngine.Core.MessageHandlers.StatMessageHandler.Default.AnnounceSingle(
+                    ch,
+                    (int)StatIds.isvehicle,
+                    (uint)isVehicle);
+                ZoneEngine.Core.MessageHandlers.StatMessageHandler.Default.AnnounceSingle(
+                    ch,
+                    (int)StatIds.mesh,
+                    (uint)mesh);
+            }
+            catch
+            {
+            }
+
+            ch.ChangedAppearance = true;
+            if (ch.Playfield != null)
+            {
+                ch.Playfield.AnnounceAppearanceUpdate(ch);
+            }
+
+            ZoneClient client = ch.Controller != null ? ch.Controller.Client as ZoneClient : null;
+            if (client != null)
+            {
+                SimpleCharFullUpdate.SendToPlayfield(client);
             }
         }
 
@@ -627,7 +674,9 @@ namespace ZoneEngine.Core
                     return;
                 }
 
-                if (state.ActiveNanoId != 0 && state.ActiveNanoId != nanoId && !IsVehicleMorphNano(nanoId))
+                if (state.ActiveNanoId != 0
+                    && state.ActiveNanoId != nanoId
+                    && !IsMorphFlightNano(nanoId))
                 {
                     return;
                 }
@@ -658,19 +707,8 @@ namespace ZoneEngine.Core
                 ch.Stats[StatIds.monsterscale].Value = state.PreviousMonsterScale;
             }
 
-            ch.ChangedAppearance = true;
-            if (ch.Playfield != null)
-            {
-                ch.Playfield.AnnounceAppearanceUpdate(ch);
-            }
-
-            ZoneClient client = ch.Controller != null ? ch.Controller.Client as ZoneClient : null;
-            if (client != null)
-            {
-                SimpleCharFullUpdate.SendToPlayfield(client);
-            }
-
             SendCancelSpellListForNano(ch, nanoId != 0 ? nanoId : state.ActiveNanoId);
+            PushDemorphAppearanceWire(ch);
 
             try
             {
@@ -702,33 +740,7 @@ namespace ZoneEngine.Core
                 ch.Stats[StatIds.displaycatmesh].Value = missing;
             }
 
-            // Push cleared appearance stats on the wire (SCFU alone left client morph stuck).
-            try
-            {
-                ZoneEngine.Core.MessageHandlers.StatMessageHandler.Default.SendSingle(
-                    ch,
-                    (int)StatIds.monsterdata,
-                    0);
-                ZoneEngine.Core.MessageHandlers.StatMessageHandler.Default.SendSingle(
-                    ch,
-                    (int)StatIds.isvehicle,
-                    0);
-            }
-            catch
-            {
-            }
-
-            ch.ChangedAppearance = true;
-            if (ch.Playfield != null)
-            {
-                ch.Playfield.AnnounceAppearanceUpdate(ch);
-            }
-
-            ZoneClient client = ch.Controller != null ? ch.Controller.Client as ZoneClient : null;
-            if (client != null)
-            {
-                SimpleCharFullUpdate.SendToPlayfield(client);
-            }
+            PushDemorphAppearanceWire(ch);
 
             try
             {
@@ -773,14 +785,47 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            // Zone/login: ActiveNanos are cleared before restore — do not wipe a live morph.
-            if (ActiveNanoRuntimeService.Default.HasZoneTransferStash(ch.Identity.Instance)
+            // Zone/login: ActiveNanos are cleared before restore — do not wipe a live morph
+            // that still has a nano stash or DB row. HP/nano combat stat stash alone must NOT
+            // block orphan clear (every zone leave stashes those stats).
+            if (ActiveNanoRuntimeService.Default.HasZoneTransferNanoStash(ch.Identity.Instance)
                 || HasPersistedMorphFlightNano(ch.Identity.Instance))
             {
                 return;
             }
 
             ForceClearStuckVehicleOrMorph(ch);
+        }
+
+        /// <summary>
+        /// After cancel/restore: if mesh/isvehicle remain but no morph NCU and no HUD vehicle,
+        /// force-clear so the player is not stuck without an NCU cancel target.
+        /// </summary>
+        public static bool TryClearOrphanVehicleMorph(ICharacter character)
+        {
+            Character ch = character as Character;
+            if (ch == null || !LooksMorphed(ch))
+            {
+                return false;
+            }
+
+            if (VehicleHudWearRuntime.HasEquippedVehicle(ch))
+            {
+                return false;
+            }
+
+            if (HasActiveMorphNano(ch))
+            {
+                return false;
+            }
+
+            if (ActiveNanoRuntimeService.Default.HasZoneTransferNanoStash(ch.Identity.Instance)
+                || HasPersistedMorphFlightNano(ch.Identity.Instance))
+            {
+                return false;
+            }
+
+            return ForceClearStuckVehicleOrMorph(ch);
         }
 
         /// <summary>

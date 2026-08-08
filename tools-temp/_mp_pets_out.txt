@@ -1,0 +1,123 @@
+wrote tools-temp\_mp_pets_extract.txt events 135 scfu 10 casts 36
+char=Madamp pf=(Playfield2:175803) duration=892.645
+scfu raw=10 decoded=10
+
+=== SCFU 10 ===
+(SimpleChar:79D12C8A) | Fury Externalization | lvl=32 hp=925 md=96195 scale=102 family=97 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(229.464859,5.01,124.108)
+(SimpleChar:79D12C8B) | Salvinous | lvl=33 hp=609 md=96193 scale=102 family=96 flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(228.464859,5.01,124.108)
+(SimpleChar:79D12C8C) | Tumulten | lvl=199 hp=6135 md=96194 scale=121 family=98 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(222.2574,5.01,124.656593)
+(SimpleChar:79D12C8D) | Wrath Incarnation | lvl=95 hp=4989 md=96195 scale=111 family=97 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(229.2574,5.01,124.656593)
+(SimpleChar:79D12C8E) | Restite | lvl=99 hp=3356 md=96193 scale=112 family=96 flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(228.2574,5.01,124.656593)
+(SimpleChar:79D12C8F) | Distracting Sphere | lvl=5 hp=22 md=96194 scale=93 family=98 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(222.2574,5.01,124.656593)
+(SimpleChar:79D12CA7) | Rage Materialization | lvl=62 hp=2624 md=96195 scale=107 family=97 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(229.2574,5.01,124.656593)
+(SimpleChar:79D12CA8) | Sanoo | lvl=77 hp=2274 md=96193 scale=109 family=96 flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(228.2574,5.01,124.656593)
+(SimpleChar:79D12CA9) | Frenzy Embodiment | lvl=137 hp=9145 md=96195 scale=116 family=97 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(229.2574,5.01,124.656593)
+(SimpleChar:79D12CCA) | Wrath Incarnation | lvl=95 hp=4989 md=96195 scale=111 family=97 flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet owner= textures=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 meshes= pos=(229.2574,5.01,124.656593)
+
+=== KEY EVENTS ===
+3: 2026-08-08T11:43:07.5432269Z [PLUGIN] Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status
+27: 2026-08-08T11:43:07.5492233Z [SNAPSHOT] reason=initial server=3506 clientInst=905848936 playfield=(Playfield2:175803) chars=2 npcs=1 corpses=0 dynels=77 identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=True alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=1007 pos=(225.4649, 5.01, 124.108) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=0 currentState=0 actionCategory=1234567890 deadTimer=75 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+30: 2026-08-08T11:43:08.5436578Z [CHAR-SEEN] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=True alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=1007 pos=(225.4649, 5.01, 124.108) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=0 currentState=0 actionCategory=1234567890 deadTimer=75 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+31: 2026-08-08T11:43:08.5456570Z [CHAR-SEEN] identity=(SimpleChar:79D12C89) name=OT Bartender player=False npc=True pet=False inPlay=True alive=True hp=19481/19481 pct=100.0 level=191 computerLiteracy=6 pos=(167.8497, 5.807212, 107.8292) attacking=False fightingTarget=null monsterData=26139 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+138: 2026-08-08T11:43:20.7724994Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(None:0000) Parameter1=53019 Parameter2=43733 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+139: 2026-08-08T11:43:20.9562703Z [RAW-PACKET-PROJECTION-ERROR] stage=scfu direction=IN sequence=37 ordinal=58 error=MissingMethodException: Method not found: 'Void SmokeLounge.AOtomation.Messaging.Messages.N3Messages.SimpleCharFullUpdateMessage.set_ScfuTowerUnk(Byte)'.
+140: 2026-08-08T11:43:20.9562703Z [IN-N3] #34 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+143: 2026-08-08T11:43:20.9587457Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=43733 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+145: 2026-08-08T11:43:20.9587457Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=43733 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+146: 2026-08-08T11:43:20.9587457Z [IN-N3] #37 type=SimpleCharFullUpdate identity=(SimpleChar:79D12C8A)
+147: 2026-08-08T11:43:20.9607443Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1529859 FightingTarget=null Position=(229.4649, 5.01, 124.108) Heading=X: 0 | Y: 0 | Z: 0 | W: 1 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Fury Externalization" CharacterFlags=268964353 AccountFlags=0 Expansions=0 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Level=32 Health=925 HealthDamage=0 MonsterData=96195 MonsterScale=102 VisualFlags=31 VisibleTitle=0 ScfuUnk1=byte[28]:00000000000000000000000003010001000100010001000000020000 HeadMesh=null RunSpeedBase=162 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtom...
+164: 2026-08-08T11:43:20.9637425Z [IN-N3] #46 type=SpellList identity=(SimpleChar:35FE2868)
+167: 2026-08-08T11:43:20.9747346Z [DYNEL-SPAWNED] identity=(SimpleChar:79D12C8A) name=Fury Externalization player=False npc=True pet=False inPlay=True alive=True hp=925/925 pct=100.0 level=32 computerLiteracy=6 pos=(229.4649, 5.01, 124.108) attacking=False fightingTarget=null monsterData=96195 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+183: 2026-08-08T11:43:21.3445071Z [IN-N3] #55 type=SpellList identity=(SimpleChar:79D12C8A)
+188: 2026-08-08T11:43:21.6323651Z [CHAR-SEEN] identity=(SimpleChar:79D12C8A) name=Fury Externalization player=False npc=False pet=True inPlay=True alive=True hp=925/925 pct=100.0 level=32 computerLiteracy=6 pos=(228.6788, 5.01, 123.7102) attacking=False fightingTarget=null monsterData=96195 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+199: 2026-08-08T11:43:27.0988125Z [OUT-N3] #22 type=PetCommand identity=(SimpleChar:35FE2868)
+221: 2026-08-08T11:43:32.2698730Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(None:0000) Parameter1=53019 Parameter2=125745 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+223: 2026-08-08T11:43:32.8215328Z [DYNEL-SPAWNED] identity=(SimpleChar:79D12C8B) name=Salvinous player=False npc=True pet=False inPlay=True alive=True hp=609/609 pct=100.0 level=33 computerLiteracy=6 pos=(228.4649, 5.01, 124.108) attacking=False fightingTarget=null monsterData=96193 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+224: 2026-08-08T11:43:32.8225320Z [RAW-PACKET-PROJECTION-ERROR] stage=scfu direction=IN sequence=78 ordinal=101 error=MissingMethodException: Method not found: 'Void SmokeLounge.AOtomation.Messaging.Messages.N3Messages.SimpleCharFullUpdateMessage.set_ScfuTowerUnk(Byte)'.
+225: 2026-08-08T11:43:32.8235314Z [IN-N3] #71 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+230: 2026-08-08T11:43:32.8235314Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=125745 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+232: 2026-08-08T11:43:32.8235314Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=125745 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+233: 2026-08-08T11:43:32.8235314Z [IN-N3] #75 type=SimpleCharFullUpdate identity=(SimpleChar:79D12C8B)
+234: 2026-08-08T11:43:32.8245308Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1529859 FightingTarget=null Position=(228.4649, 5.01, 124.108) Heading=X: 0 | Y: 0 | Z: 0 | W: 1 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Salvinous" CharacterFlags=268964353 AccountFlags=0 Expansions=0 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Level=33 Health=609 HealthDamage=0 MonsterData=96193 MonsterScale=102 VisualFlags=31 VisibleTitle=0 ScfuUnk1=byte[28]:00000000000000000000000003010001000100010001000000020000 HeadMesh=null RunSpeedBase=168 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLo...
+239: 2026-08-08T11:43:32.8245308Z [IN-N3] #78 type=SpellList identity=(SimpleChar:35FE2868)
+256: 2026-08-08T11:43:33.4501458Z [IN-N3] #87 type=SpellList identity=(SimpleChar:79D12C8B)
+257: 2026-08-08T11:43:33.4501458Z [IN-N3] #88 type=SpellList identity=(SimpleChar:79D12C8B)
+260: 2026-08-08T11:43:33.6889990Z [CHAR-SEEN] identity=(SimpleChar:79D12C8B) name=Salvinous player=False npc=False pet=True inPlay=True alive=True hp=609/609 pct=100.0 level=33 computerLiteracy=6 pos=(228.4649, 5.01, 124.108) attacking=False fightingTarget=null monsterData=96193 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+282: 2026-08-08T11:43:44.4834062Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+319: 2026-08-08T11:43:56.5620107Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=29301 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+320: 2026-08-08T11:43:56.7139171Z [IN-N3] #115 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+329: 2026-08-08T11:43:59.4522332Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=29301 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+331: 2026-08-08T11:43:59.4522332Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=29301 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+332: 2026-08-08T11:43:59.4532327Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:7275) Parameter1=905848936 Parameter2=1440000 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+334: 2026-08-08T11:43:59.4532327Z [IN-N3-DETAIL] CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:7275) Parameter1=905848936 Parameter2=1440000 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+340: 2026-08-08T11:44:00.6015233Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=29302 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+341: 2026-08-08T11:44:00.7434384Z [IN-N3] #124 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+350: 2026-08-08T11:44:03.5217263Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=29302 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+352: 2026-08-08T11:44:03.5217263Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=29302 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+353: 2026-08-08T11:44:03.5217263Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:7276) Parameter1=905848936 Parameter2=1440000 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+355: 2026-08-08T11:44:03.5217263Z [IN-N3-DETAIL] CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:7276) Parameter1=905848936 Parameter2=1440000 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+365: 2026-08-08T11:44:06.5598571Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=150309 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+366: 2026-08-08T11:44:06.7007711Z [DYNEL-SPAWNED] identity=(SimpleChar:79D12C8C) name=Tumulten player=False npc=True pet=False inPlay=True alive=True hp=6135/6135 pct=100.0 level=199 computerLiteracy=6 pos=(222.2574, 5.01, 124.6566) attacking=False fightingTarget=null monsterData=96194 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+367: 2026-08-08T11:44:06.7017694Z [RAW-PACKET-PROJECTION-ERROR] stage=scfu direction=IN sequence=143 ordinal=174 error=MissingMethodException: Method not found: 'Void SmokeLounge.AOtomation.Messaging.Messages.N3Messages.SimpleCharFullUpdateMessage.set_ScfuTowerUnk(Byte)'.
+368: 2026-08-08T11:44:06.7017694Z [IN-N3] #135 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+371: 2026-08-08T11:44:06.7017694Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=150309 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+373: 2026-08-08T11:44:06.7017694Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=150309 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+374: 2026-08-08T11:44:06.7017694Z [IN-N3] #138 type=SimpleCharFullUpdate identity=(SimpleChar:79D12C8C)
+375: 2026-08-08T11:44:06.7027681Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1529859 FightingTarget=null Position=(222.2574, 5.01, 124.6566) Heading=X: 0 | Y: 0 | Z: 0 | W: 1 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Tumulten" CharacterFlags=268964353 AccountFlags=0 Expansions=0 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Level=199 Health=6135 HealthDamage=0 MonsterData=96194 MonsterScale=121 VisualFlags=31 VisibleTitle=0 ScfuUnk1=byte[28]:00000000000000000000000003010001000100010001000000020000 HeadMesh=null RunSpeedBase=806 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Texture,Smoke...
+382: 2026-08-08T11:44:06.8446800Z [CHAR-SEEN] identity=(SimpleChar:79D12C8C) name=Tumulten player=False npc=False pet=True inPlay=True alive=True hp=6135/6135 pct=100.0 level=199 computerLiteracy=6 pos=(222.2574, 5.01, 124.6566) attacking=False fightingTarget=null monsterData=96194 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+397: 2026-08-08T11:44:06.9056425Z [IN-N3] #149 type=SpellList identity=(SimpleChar:79D12C8C)
+477: 2026-08-08T11:44:46.7255118Z [OUT-N3] #32 type=PetCommand identity=(SimpleChar:35FE2868)
+599: 2026-08-08T11:45:37.5845970Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=43735 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+600: 2026-08-08T11:45:37.7356145Z [DYNEL-SPAWNED] identity=(SimpleChar:79D12C8D) name=Wrath Incarnation player=False npc=True pet=False inPlay=True alive=True hp=4989/4989 pct=100.0 level=95 computerLiteracy=6 pos=(229.2574, 5.01, 124.6566) attacking=False fightingTarget=null monsterData=96195 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+601: 2026-08-08T11:45:37.7366136Z [RAW-PACKET-PROJECTION-ERROR] stage=scfu direction=IN sequence=259 ordinal=293 error=MissingMethodException: Method not found: 'Void SmokeLounge.AOtomation.Messaging.Messages.N3Messages.SimpleCharFullUpdateMessage.set_ScfuTowerUnk(Byte)'.
+602: 2026-08-08T11:45:37.7376127Z [IN-N3] #245 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+605: 2026-08-08T11:45:37.7376127Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=43735 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+607: 2026-08-08T11:45:37.7376127Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=43735 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+608: 2026-08-08T11:45:37.7376127Z [IN-N3] #248 type=SimpleCharFullUpdate identity=(SimpleChar:79D12C8D)
+609: 2026-08-08T11:45:37.7386124Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1529859 FightingTarget=null Position=(229.2574, 5.01, 124.6566) Heading=X: 0 | Y: 0 | Z: 0 | W: 1 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Wrath Incarnation" CharacterFlags=268964353 AccountFlags=0 Expansions=0 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Level=95 Health=4989 HealthDamage=0 MonsterData=96195 MonsterScale=111 VisualFlags=31 VisibleTitle=0 ScfuUnk1=byte[28]:00000000000000000000000003010001000100010001000000020000 HeadMesh=null RunSpeedBase=488 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Textu...
+626: 2026-08-08T11:45:37.7396116Z [IN-N3] #257 type=SpellList identity=(SimpleChar:35FE2868)
+643: 2026-08-08T11:45:37.9411379Z [IN-N3] #266 type=SpellList identity=(SimpleChar:79D12C8D)
+649: 2026-08-08T11:45:38.1610026Z [CHAR-SEEN] identity=(SimpleChar:79D12C8D) name=Wrath Incarnation player=False npc=False pet=True inPlay=True alive=True hp=4989/4989 pct=100.0 level=95 computerLiteracy=6 pos=(229.4015, 5.01, 124.0918) attacking=False fightingTarget=null monsterData=96195 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+655: 2026-08-08T11:45:40.7339718Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=125742 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+656: 2026-08-08T11:45:40.8858786Z [DYNEL-SPAWNED] identity=(SimpleChar:79D12C8E) name=Restite player=False npc=True pet=False inPlay=True alive=True hp=3356/3356 pct=100.0 level=99 computerLiteracy=6 pos=(228.2574, 5.01, 124.6566) attacking=False fightingTarget=null monsterData=96193 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+657: 2026-08-08T11:45:40.8868794Z [RAW-PACKET-PROJECTION-ERROR] stage=scfu direction=IN sequence=287 ordinal=322 error=MissingMethodException: Method not found: 'Void SmokeLounge.AOtomation.Messaging.Messages.N3Messages.SimpleCharFullUpdateMessage.set_ScfuTowerUnk(Byte)'.
+...
+char=Madamp pf=(Playfield2:175803) duration=892.645
+
+=== SCFU 10 ===
+cast nano=43733 target=None:0000 line=138
+finish nano=43733 target= line=143
+finish nano=43733 target= line=145
+cast nano=125745 target=None:0000 line=221
+finish nano=125745 target= line=230
+finish nano=125745 target= line=232
+cast nano=29301 target=SimpleChar:35FE2868 line=319
+finish nano=29301 target= line=329
+finish nano=29301 target= line=331
+cast nano=29302 target=SimpleChar:35FE2868 line=340
+finish nano=29302 target= line=350
+finish nano=29302 target= line=352
+cast nano=150309 target=SimpleChar:35FE2868 line=365
+finish nano=150309 target= line=371
+finish nano=150309 target= line=373
+cast nano=43735 target=SimpleChar:35FE2868 line=599
+finish nano=43735 target= line=605
+finish nano=43735 target= line=607
+cast nano=125742 target=SimpleChar:35FE2868 line=655
+finish nano=125742 target= line=661
+finish nano=125742 target= line=663
+cast nano=156128 target=SimpleChar:35FE2868 line=704
+finish nano=156128 target= line=712
+finish nano=156128 target= line=714
+cast nano=43734 target=SimpleChar:35FE2868 line=1019
+finish nano=43734 target= line=1025
+finish nano=43734 target= line=1027
+cast nano=125743 target=SimpleChar:35FE2868 line=1097
+finish nano=125743 target= line=1103
+finish nano=125743 target= line=1105
+cast nano=43732 target=SimpleChar:35FE2868 line=1540
+finish nano=43732 target= line=1547
+finish nano=43732 target= line=1549
+cast nano=43756 target=SimpleChar:35FE2868 line=2331
+finish nano=43756 target= line=2337
+finish nano=43756 target= line=2339

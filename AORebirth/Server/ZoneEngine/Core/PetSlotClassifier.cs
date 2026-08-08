@@ -22,6 +22,10 @@ namespace ZoneEngine.Core
 
         public const int BureaucratCompanionStrain = 1017;
 
+        // Capture 20260808-mp-pets: MP support/mezz pets (family 98, UMUL/DISP) coexist with
+        // attack (1015) and heal (1016) as a third independent slot.
+        public const int SupportPetStrain = 1018;
+
         public const int HealingSpellListSlot = 2;
 
         public const int RegularSpellListSlot = 5;
@@ -50,6 +54,9 @@ namespace ZoneEngine.Core
                 case "A142":
                 case "CRLT":
                     return BureaucratCompanionStrain;
+                case "UMUL":
+                case "DISP":
+                    return SupportPetStrain;
             }
 
             return HealingPetStrain;
@@ -65,6 +72,11 @@ namespace ZoneEngine.Core
         public static bool IsBureaucratCompanionStrain(int petSlotStrain)
         {
             return petSlotStrain == BureaucratCompanionStrain;
+        }
+
+        public static bool IsSupportPetStrain(int petSlotStrain)
+        {
+            return petSlotStrain == SupportPetStrain;
         }
 
     }

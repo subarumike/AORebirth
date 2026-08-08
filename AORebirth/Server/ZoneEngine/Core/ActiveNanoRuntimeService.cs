@@ -275,12 +275,23 @@ namespace ZoneEngine.Core
                 }
 
                 this.SyncPersistedStore(character);
+                AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
                 return;
             }
 
             foreach (ActiveNanoRemovalTarget removalTarget in removalTargets)
             {
-                this.RemoveActiveNanoByNanoId(character, removalTarget.NanoId, false);
+                bool removed = this.RemoveActiveNanoByNanoId(character, removalTarget.NanoId, false);
+                // Client NCU can show SetNanoDuration even when ApplyActiveNano failed (NCU gate).
+                // Still reverse vehicle/morph appearance for those cancels.
+                if (!removed
+                    && (AdventurerMorphFlightRuntime.IsMorphFlightNano(removalTarget.NanoId)
+                        || AdventurerMorphFlightRuntime.IsVehicleMorphNano(removalTarget.NanoId)))
+                {
+                    AdventurerMorphFlightRuntime.CancelVehicleMorphNano(
+                        character,
+                        removalTarget.NanoId);
+                }
             }
 
             this.SyncCurrentNcuStat(character);
@@ -292,8 +303,7 @@ namespace ZoneEngine.Core
                 string.Join(",", removalTargets.Select(x => x.NanoId.ToString())));
 
             // Buff remove first. Morph reverse already ran inside RemoveActiveNanoByNanoId
-            // → OnMorphNanoRemoved. Do not CancelVehicleMorphNano / ForceClear again — that
-            // re-sent Phasefront SpellList removes and broke Adventurer demorph.
+            // → OnMorphNanoRemoved (or CancelVehicleMorphNano above when ActiveNanos missed it).
             CharacterActionMessageHandler.Default.CompleteFriendlyNanoRemoval(
                 character,
                 message,
@@ -306,6 +316,8 @@ namespace ZoneEngine.Core
             {
                 AdventurerMorphFlightRuntime.CancelVehicleMorphNano(character, requestedNanoId);
             }
+
+            AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
 
             this.SyncPersistedStore(character);
         }
@@ -538,6 +550,7 @@ namespace ZoneEngine.Core
 
             if (persistedNanos == null || persistedNanos.Count == 0)
             {
+                AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
                 return;
             }
 
@@ -607,6 +620,7 @@ namespace ZoneEngine.Core
             this.SyncCurrentNcuStat(character);
 
             AdventurerMorphFlightRuntime.EnsureMorphStateMatchesActiveNanos(character);
+            AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
         }
 
         public void CleanupOrphanSummonPetNanosAfterPetRestore(ICharacter character)
@@ -698,6 +712,22 @@ namespace ZoneEngine.Core
                         "Cleared stale pet pending restore on login char=" + characterId);
                 }
 
+                // No NCU restore — still clear orphan hoverboard/Phasefront mesh after
+                // FullCharacter (HealOrphaned may have run before client applied SCFU).
+                ThreadPool.QueueUserWorkItem(
+                    _ =>
+                    {
+                        Thread.Sleep(250);
+                        ICharacter character = client.Controller != null
+                                                   ? client.Controller.Character
+                                                   : null;
+                        if (character == null)
+                        {
+                            return;
+                        }
+
+                        AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
+                    });
                 return;
             }
 

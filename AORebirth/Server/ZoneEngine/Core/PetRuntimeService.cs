@@ -81,6 +81,12 @@ namespace ZoneEngine.Core
             return companionPet != null && companionPet.Stats[StatIds.health].Value > 0;
         }
 
+        public bool HasLivingSupportPet(ICharacter owner)
+        {
+            ICharacter supportPet = this.GetActivePetInStrain(owner, PetSlotClassifier.SupportPetStrain);
+            return supportPet != null && supportPet.Stats[StatIds.health].Value > 0;
+        }
+
         public bool SummonPet(
             ICharacter owner,
             string petHash,
@@ -143,6 +149,12 @@ namespace ZoneEngine.Core
                 return false;
             }
 
+            if (PetSlotClassifier.IsSupportPetStrain(petSlotStrain) && this.HasLivingSupportPet(owner))
+            {
+                ChatTextMessageHandler.Default.Send(owner, "You can have just 1 Support Pet.");
+                return false;
+            }
+
             if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain)
                 && this.HasLivingBureaucratCompanionPet(owner))
             {
@@ -170,7 +182,10 @@ namespace ZoneEngine.Core
                     resolvedPetTypeId);
                 resolvedPetTypeId = spawnLevel;
             }
-            else if (petSlotStrain == PetSlotClassifier.RegularPetStrain && resolvedPetTypeId > 0)
+            else if ((petSlotStrain == PetSlotClassifier.RegularPetStrain
+                      || petSlotStrain == PetSlotClassifier.HealingPetStrain
+                      || PetSlotClassifier.IsSupportPetStrain(petSlotStrain))
+                     && resolvedPetTypeId > 0)
             {
                 spawnLevel = resolvedPetTypeId;
             }
@@ -199,6 +214,10 @@ namespace ZoneEngine.Core
                 petCharacter,
                 summonNanoId,
                 owner,
+                resolvedPetTypeId);
+            this.ApplyCapturedEngineerPetProfile(
+                petCharacter,
+                summonNanoId,
                 resolvedPetTypeId);
             if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain))
             {
@@ -893,7 +912,7 @@ namespace ZoneEngine.Core
 
         private void SyncOwnerPetCounter(ICharacter owner)
         {
-            // MP heal (1016) and attack (1015) pets are independent slots on the client.
+            // MP heal (1016), attack (1015), and support (1018) pets are independent slots on the client.
             // Live AO never aggregates active pet count onto the owner's petcounter stat;
             // pushing that value makes the client reject a second pet category.
         }
@@ -1005,6 +1024,41 @@ namespace ZoneEngine.Core
                 resolvedHealth = (int)((long)profile.Health * resolvedLevel / profile.Level);
             }
 
+            this.ApplyCapturedPetProfileStats(petCharacter, profile, resolvedLevel, resolvedHealth);
+        }
+
+        private void ApplyCapturedEngineerPetProfile(
+            Character petCharacter,
+            int summonNanoId,
+            int petTypeId)
+        {
+            if (petCharacter == null || summonNanoId <= 0)
+            {
+                return;
+            }
+
+            CapturedBureaucratPetProfile profile;
+            if (!PetEngineerSummonCatalog.TryGetProfile(summonNanoId, out profile))
+            {
+                return;
+            }
+
+            int resolvedLevel = petTypeId > 0 ? petTypeId : profile.Level;
+            int resolvedHealth = profile.Health;
+            if (profile.Level > 0 && resolvedLevel != profile.Level)
+            {
+                resolvedHealth = (int)((long)profile.Health * resolvedLevel / profile.Level);
+            }
+
+            this.ApplyCapturedPetProfileStats(petCharacter, profile, resolvedLevel, resolvedHealth);
+        }
+
+        private void ApplyCapturedPetProfileStats(
+            Character petCharacter,
+            CapturedBureaucratPetProfile profile,
+            int resolvedLevel,
+            int resolvedHealth)
+        {
             petCharacter.Name = profile.Name;
             petCharacter.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.level,

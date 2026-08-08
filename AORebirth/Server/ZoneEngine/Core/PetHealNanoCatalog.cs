@@ -36,6 +36,8 @@ namespace ZoneEngine.Core
 
         public const int MedinosWhisperNanoId = 125728;
 
+        public const int RestiteBloodAnvilNanoId = 125724;
+
         public const int PetNanoExecutedWithinOwnerNcuAction = 0x00000081;
 
         private static readonly int HitFunctionId = (int)FunctionType.Hit;
@@ -46,6 +48,7 @@ namespace ZoneEngine.Core
             new Dictionary<int, int>
             {
                 { 125738, MedinosWhisperNanoId },
+                { 125742, RestiteBloodAnvilNanoId },
                 { 125743, SanooPulseNanoId },
                 { 125744, ValentyiaHeatNanoId },
                 { 125745, SalvinousTouchNanoId },
@@ -59,7 +62,14 @@ namespace ZoneEngine.Core
                 { "MT02", SalvinousTouchNanoId },
                 { "MT03", ValentyiaHeatNanoId },
                 { "MT04", SanooPulseNanoId },
+                { "MT05", RestiteBloodAnvilNanoId },
                 { "BSLX", BelamorteBlessingNanoId },
+                { "TRXY", RestiteBloodAnvilNanoId },
+                { "KCIO", RestiteBloodAnvilNanoId },
+                { "MBYQ", RestiteBloodAnvilNanoId },
+                { "GWAD", RestiteBloodAnvilNanoId },
+                { "DSEJ", RestiteBloodAnvilNanoId },
+                { "SAFE", RestiteBloodAnvilNanoId },
             };
 
         private static readonly Dictionary<int, string> HealNanoDisplayName =
@@ -70,6 +80,7 @@ namespace ZoneEngine.Core
                 { SalvinousTouchNanoId, "Touch of Salvinous" },
                 { SanooPulseNanoId, "Pulse of Sanoo" },
                 { MedinosWhisperNanoId, "Whisper of Medinos" },
+                { RestiteBloodAnvilNanoId, "Blood Anvil of Restite" },
             };
 
         private static readonly Dictionary<string, int> HealingPetNanoPoolByHash =
@@ -79,6 +90,8 @@ namespace ZoneEngine.Core
                 { "MT02", 1207 },
                 { "MT03", 2370 },
                 { "MT04", 3767 },
+                // Capture 20260808-mp-pets: Restite L99; interpolate between Sanoo and Belamorte.
+                { "MT05", 5500 },
                 { "BSLX", 13184 },
             };
 
@@ -89,6 +102,7 @@ namespace ZoneEngine.Core
                 { SalvinousTouchNanoId, 8.9 },
                 { ValentyiaHeatNanoId, 12.0 },
                 { SanooPulseNanoId, 8.7 },
+                { RestiteBloodAnvilNanoId, 9.0 },
                 { BelamorteBlessingNanoId, 6.0 },
             };
 

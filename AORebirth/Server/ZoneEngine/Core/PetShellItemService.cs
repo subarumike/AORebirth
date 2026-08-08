@@ -76,7 +76,8 @@ namespace ZoneEngine.Core
             int shellHighId = shellTemplate.DisplayItemHighId;
             int shellQuality = shellTemplate.DisplayQuality;
             CapturedBureaucratShellDisplay shellDisplay;
-            if (PetSummonNanoCatalog.TryGetBureaucratShellDisplay(nanoId, out shellDisplay))
+            if (PetEngineerSummonCatalog.TryGetShellDisplay(nanoId, out shellDisplay)
+                || PetSummonNanoCatalog.TryGetBureaucratShellDisplay(nanoId, out shellDisplay))
             {
                 shellLowId = shellDisplay.DisplayItemLowId;
                 shellHighId = shellDisplay.DisplayItemHighId;
@@ -85,7 +86,8 @@ namespace ZoneEngine.Core
             else
             {
                 CapturedBureaucratPetProfile profile;
-                if (PetSummonNanoCatalog.TryGetBureaucratProfile(nanoId, out profile))
+                if (PetSummonNanoCatalog.TryGetBureaucratProfile(nanoId, out profile)
+                    || PetEngineerSummonCatalog.TryGetProfile(nanoId, out profile))
                 {
                     shellQuality = profile.Level;
                 }
@@ -139,6 +141,13 @@ namespace ZoneEngine.Core
                 && PetRuntimeService.Default.HasLivingHealingPet(character))
             {
                 ChatTextMessageHandler.Default.Send(character, "You can have just 1 Heal Pet.");
+                return true;
+            }
+
+            if (PetSlotClassifier.IsSupportPetStrain(shellPetStrain)
+                && PetRuntimeService.Default.HasLivingSupportPet(character))
+            {
+                ChatTextMessageHandler.Default.Send(character, "You can have just 1 Support Pet.");
                 return true;
             }
 
@@ -446,10 +455,15 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            if (!PetShellCatalog.TryGetByDisplayLowId(item.LowID, out shellTemplate)
-                && !PetShellCatalog.TryGetBureaucratFallback(out shellTemplate))
+            if (!PetShellCatalog.TryGetByDisplayLowId(item.LowID, out shellTemplate))
             {
-                return false;
+                PetShellKind kind = PetShellCatalog.ResolveKind(
+                    character.Stats[StatIds.profession].Value);
+                if (!PetShellCatalog.TryGet(kind, out shellTemplate)
+                    && !PetShellCatalog.TryGetBureaucratFallback(out shellTemplate))
+                {
+                    return false;
+                }
             }
 
             definition = new PetShellDefinition(
@@ -472,7 +486,8 @@ namespace ZoneEngine.Core
 
         public static bool IsDisplayShellItem(int lowId)
         {
-            if (PetSummonNanoCatalog.IsBureaucratShellItemLowId(lowId))
+            if (PetSummonNanoCatalog.IsBureaucratShellItemLowId(lowId)
+                || PetEngineerSummonCatalog.IsShellItemLowId(lowId))
             {
                 return true;
             }
@@ -607,11 +622,12 @@ namespace ZoneEngine.Core
     {
         private static readonly PetShellDefinition EngineerShell = new PetShellDefinition(
             PetShellKind.Engineer,
-            displayItemLowId: 43328,
+            displayItemLowId: 96196,
             displayQuality: 1,
-            nanoId: 43324,
-            petHash: "PT50",
-            petTypeId: 1);
+            nanoId: 43325,
+            petHash: "PT10",
+            petTypeId: 1,
+            displayItemHighId: 96196);
 
         private static readonly PetShellDefinition BureaucratShell = new PetShellDefinition(
             PetShellKind.Bureaucrat,
@@ -705,7 +721,8 @@ namespace ZoneEngine.Core
 
         public static bool TryGetByDisplayLowId(int lowId, out PetShellDefinition definition)
         {
-            if (lowId == EngineerShell.DisplayItemLowId)
+            if (lowId == EngineerShell.DisplayItemLowId
+                || PetEngineerSummonCatalog.IsShellItemLowId(lowId))
             {
                 definition = EngineerShell;
                 return true;
@@ -745,9 +762,20 @@ namespace ZoneEngine.Core
                 EnsureItem(highId);
             }
 
-            string shellName = nanoId > 0
-                ? PetSummonNanoCatalog.GetBureaucratShellItemName(nanoId)
-                : null;
+            string shellName = null;
+            if (nanoId > 0)
+            {
+                shellName = PetSummonNanoCatalog.GetBureaucratShellItemName(nanoId);
+                if (string.IsNullOrWhiteSpace(shellName))
+                {
+                    CapturedBureaucratPetProfile engProfile;
+                    if (PetEngineerSummonCatalog.TryGetProfile(nanoId, out engProfile))
+                    {
+                        shellName = engProfile.Name + " Shell";
+                    }
+                }
+            }
+
             if (string.IsNullOrWhiteSpace(shellName))
             {
                 return;

@@ -42,6 +42,13 @@ namespace ZoneEngine.Core
                 "QRMT",
                 "MNKW",
                 "RHEF",
+                // Capture 20260808-mp-pets: Calling of Restite (MT05) Soothing Spirits ladder.
+                "TRXY",
+                "KCIO",
+                "MBYQ",
+                "GWAD",
+                "DSEJ",
+                "SAFE",
             };
 
         private static readonly Dictionary<string, int> TextureTierBySpawnHash =
@@ -51,6 +58,7 @@ namespace ZoneEngine.Core
                 { "MT02", 0 },
                 { "MT03", 0 },
                 { "MT04", 0 },
+                { "MT05", 0 },
                 { "BSLX", 0 },
                 { "LYNX", 1 },
                 { "JBOB", 2 },
@@ -58,6 +66,12 @@ namespace ZoneEngine.Core
                 { "QRMT", 4 },
                 { "MNKW", 5 },
                 { "RHEF", 6 },
+                { "TRXY", 1 },
+                { "KCIO", 2 },
+                { "MBYQ", 3 },
+                { "GWAD", 4 },
+                { "DSEJ", 5 },
+                { "SAFE", 6 },
             };
 
         public static bool IsSoothingSpiritsUpgradeHash(string petHash)
@@ -187,6 +201,7 @@ namespace ZoneEngine.Core
                 || string.Equals(petHash, "MT02", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(petHash, "MT03", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(petHash, "MT04", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "MT05", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(petHash, "BSLX", StringComparison.OrdinalIgnoreCase);
         }
 
