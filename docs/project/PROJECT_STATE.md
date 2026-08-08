@@ -24,11 +24,14 @@ completion matrices and dated evidence retain detailed provenance.
 - Debug server build: PASS.
 - Parallel Linux compile-feasibility lane: Messaging, Cell.Util, MsgPack.Mono,
   Translations, Cell.Core, Utility, Enums, Exceptions, Interfaces,
-  ObjectManager, Database, and Stats build on .NET 10 from guarded linked
+  ObjectManager, Database, Stats, and Communication build on .NET 10 from guarded linked
   source/resource/content inventories, with a separate Linux-only `Ionic.Zlib`
-  compatibility assembly. Stages 0-3 Windows-hosted compatibility checks,
+  compatibility assembly plus an inert identity-compatible `MemBus` adapter.
+  Stages 0-4 Windows-hosted compatibility checks,
   exhaustive public/mapping/table contracts, Database/Stats offline behavior,
-  exact SQL publish assets, and the unchanged Windows debug build pass. Native
+  exact SQL publish assets, Communication wire/framing/FIFO loopback behavior,
+  and the unchanged Windows debug build pass. Core/PlayfieldLoader are audited
+  as unused by the first ChatEngine milestone and deferred to Login/Zone. Native
   Ubuntu validation, live disposable-MySQL parity, ChatEngine, and deployment
   are not yet complete.
 - Git LFS and Git object integrity: PASS.

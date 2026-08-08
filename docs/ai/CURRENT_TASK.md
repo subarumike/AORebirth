@@ -11,9 +11,9 @@ Framework solution as the reference build.
 - Branch: `codex/linux-parallel-build`.
 - Linux SDK lane: .NET 10, intended for Ubuntu 24.04.
 - Messaging, Cell.Util, MsgPack.Mono, Translations, Cell.Core, Utility, Enums,
-  Exceptions, Interfaces, ObjectManager, Database, and Stats compile from
-  guarded linked source/resource inventories. Database's 34 SQL Content assets
-  are guarded and copied to build/publish output.
+  Exceptions, Interfaces, ObjectManager, Database, Stats, and Communication
+  compile from guarded linked source/resource inventories. Database's 34 SQL
+  Content assets are guarded and copied to build/publish output.
 - A separate Linux-only `Ionic.Zlib` compatibility assembly preserves the
   external compression type boundary.
 - Stage 1 Windows-hosted validation passes for assembly identity, resources,
@@ -26,15 +26,22 @@ Framework solution as the reference build.
   mapping/table fixtures, exact modern provider pins, 143 database-free runtime
   checks, and 156 SQL/package artifact checks. Windows Debug remains passing;
   no database connection or schema operation was performed.
+- Stage 4 Windows-hosted validation passes Communication public/protected and
+  wire contracts plus bounded source/published IPv4-loopback framing/FIFO and
+  keepalive checks. The net40-only, source-dead Communication MemBus boundary is
+  replaced by an inert identity-compatible Linux assembly.
+- Core/PlayfieldLoader are proven unused by ChatEngine beyond an ignored cache
+  initialization and are deferred to LoginEngine/ZoneEngine; Windows behavior
+  remains unchanged.
 - This is compile feasibility only; no engine is Linux-deployable yet.
 - Native Ubuntu execution remains pending VPS connection details.
 
 ## Next slice
 
-Port Communication and Core. Replace or adapt the net40-only MemBus boundary
-without changing ISCom ordering/concurrency, retain dynamic-message/MEF
-discovery, and keep socket behavior cross-platform. Then advance to
-PlayfieldLoader and ChatEngine.
+Port ChatEngine as the first deployable engine. Exclude the audited-unused
+Core/PlayfieldLoader path in the Linux lane, replace NBug/WinForms startup,
+canonicalize runtime paths and configuration packaging, and add bounded
+headless shutdown before Ubuntu validation.
 
 ## Constraints
 
