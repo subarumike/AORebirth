@@ -32,6 +32,11 @@ namespace ZoneEngine.Core.Playfields
 
         private const int AutomatonMonsterData = 17649;
 
+        private const int AutomatonCombatEvidenceSourceIdentity = unchecked((int)0x7985CD86);
+
+        private const string AutomatonCombatProfileSelector =
+            "resource=6553|md=17649|level=5|name=Engineer Automaton I";
+
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
 
         public static void StartForPlayfield(
@@ -146,13 +151,24 @@ namespace ZoneEngine.Core.Playfields
 
             mob.Coordinates(new Coordinate { x = x, y = y, z = z });
             string combatFailure;
-            CapturedEnemyCombatRuntime.Prepare(
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
                 mob,
                 controller,
-                CapturedEnemyCombatContract.Unresolved(
-                    "20260721-finish Engineer Automaton I 0x7985CD86 has no source-local WIFU/attack-start/AttackInfo contract mapped",
-                    true),
+                AreteRegularMobCombatProfileSelector.Create(
+                    "20260721-finish Engineer Automaton I 0x7985CD86 has no exact source-local combat profile",
+                    AutomatonCombatProfileSelector,
+                    AutomatonCombatEvidenceSourceIdentity,
+                    0,
+                    0,
+                    NpcAiProfile.Passive),
                 out combatFailure);
+            if (!combatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Engineer Automaton I intentionally quarantined reason=" + combatFailure);
+            }
+
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);

@@ -47,7 +47,26 @@ namespace ZoneEngine.Core.Playfields
 
             public float Z { get; private set; }
 
-            public MobSlot(string name, int level, int health, int scale, float x, float y, float z)
+            public string CombatProfileSelector { get; private set; }
+
+            public int CombatEvidenceSourceIdentity { get; private set; }
+
+            public int CombatAttackRangeMicrometers { get; private set; }
+
+            public int CombatSpecialAttackWeaponUnknown5 { get; private set; }
+
+            public MobSlot(
+                string name,
+                int level,
+                int health,
+                int scale,
+                float x,
+                float y,
+                float z,
+                string combatProfileSelector = "",
+                int combatEvidenceSourceIdentity = 0,
+                int combatAttackRangeMicrometers = 0,
+                int combatSpecialAttackWeaponUnknown5 = 0)
             {
                 this.Name = name;
                 this.Level = level;
@@ -56,6 +75,10 @@ namespace ZoneEngine.Core.Playfields
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
+                this.CombatProfileSelector = combatProfileSelector;
+                this.CombatEvidenceSourceIdentity = combatEvidenceSourceIdentity;
+                this.CombatAttackRangeMicrometers = combatAttackRangeMicrometers;
+                this.CombatSpecialAttackWeaponUnknown5 = combatSpecialAttackWeaponUnknown5;
             }
         }
 
@@ -70,7 +93,30 @@ namespace ZoneEngine.Core.Playfields
         private const float SocialAggroRadiusMeters = 12f;
 
         // Capture 20260722-233205: first Rollerrat AOS FollowTarget path ~12–18m to player.
-        private const float RollerratAutomaticAggroRadiusMeters = 15f;
+        private const float RollerratLevel5AutomaticAggroRadiusMeters = 11.018516f;
+
+        private const float RollerratLevel6AutomaticAggroRadiusMeters = 18.747485f;
+
+        private const string DesertReetLevel6CombatProfile =
+            "45c6e511d794c6bf-8c8a88032be6ca97";
+
+        private const int DesertReetLevel6CombatSource = unchecked((int)0x798828F0);
+
+        private const int DesertReetLevel6CombatRangeMicrometers = 23167874;
+
+        private const string RollerratLevel5CombatProfile =
+            "f05cd862c6056037-c2f9cf4727f71a13";
+
+        private const int RollerratLevel5CombatSource = unchecked((int)0x79882AEC);
+
+        private const int RollerratLevel5CombatRangeMicrometers = 11018516;
+
+        private const string RollerratLevel6CombatProfile =
+            "3d2df0c70c1adc8a-42554a1c70a69759";
+
+        private const int RollerratLevel6CombatSource = unchecked((int)0x798912B8);
+
+        private const int RollerratLevel6CombatRangeMicrometers = 18747485;
 
         private const double RespawnSeconds = 30.0;
 
@@ -146,26 +192,26 @@ namespace ZoneEngine.Core.Playfields
         private static readonly MobSlot[] DesertReetSlots =
             {
                 new MobSlot("Desert Reet", 5, 58, 93, 3285.676760f, 4.930795f, 689.824500f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3365.803220f, 2.110000f, 594.795500f),
+                new MobSlot("Desert Reet", 6, 69, 93, 3365.803220f, 2.110000f, 594.795500f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
                 new MobSlot("Desert Reet", 5, 58, 93, 3356.303470f, 2.955723f, 604.348633f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3351.431400f, 3.442523f, 599.837200f),
+                new MobSlot("Desert Reet", 6, 69, 93, 3351.431400f, 3.442523f, 599.837200f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
                 new MobSlot("Desert Reet", 5, 58, 93, 3344.144780f, 3.937722f, 644.245500f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3321.169680f, 0.010000f, 650.742400f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3321.499760f, 0.010000f, 676.924561f),
+                new MobSlot("Desert Reet", 6, 69, 93, 3321.169680f, 0.010000f, 650.742400f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Desert Reet", 6, 69, 93, 3321.499760f, 0.010000f, 676.924561f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
                 new MobSlot("Desert Reet", 5, 58, 93, 3301.305660f, 0.290518f, 694.266663f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3313.068850f, 0.010000f, 665.691400f),
+                new MobSlot("Desert Reet", 6, 69, 93, 3313.068850f, 0.010000f, 665.691400f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
                 new MobSlot("Desert Reet", 5, 58, 93, 3314.008540f, 0.010000f, 708.599854f),
                 new MobSlot("Desert Reet", 5, 58, 93, 3362.621000f, 5.934419f, 565.113400f),
                 new MobSlot("Desert Reet", 5, 58, 93, 3375.664310f, 2.110000f, 585.995000f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3364.041750f, 2.110000f, 610.830900f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3350.786870f, 4.210948f, 626.358800f),
+                new MobSlot("Desert Reet", 6, 69, 93, 3364.041750f, 2.110000f, 610.830900f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Desert Reet", 6, 69, 93, 3350.786870f, 4.210948f, 626.358800f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
                 new MobSlot("Desert Reet", 5, 58, 93, 3399.074220f, 2.110000f, 560.702300f),
                 new MobSlot("Desert Reet", 5, 58, 93, 3397.174000f, 2.110000f, 575.071800f),
                 new MobSlot("Desert Reet", 5, 58, 93, 3369.473140f, 2.407519f, 672.061340f),
                 new MobSlot("Desert Reet", 5, 58, 93, 3360.018310f, 3.011502f, 699.918640f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3348.060790f, 2.251925f, 694.462769f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3351.919680f, 4.242593f, 658.161200f),
-                new MobSlot("Desert Reet", 6, 69, 93, 3341.605000f, 3.798910f, 664.030640f),
+                new MobSlot("Desert Reet", 6, 69, 93, 3348.060790f, 2.251925f, 694.462769f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Desert Reet", 6, 69, 93, 3351.919680f, 4.242593f, 658.161200f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Desert Reet", 6, 69, 93, 3341.605000f, 3.798910f, 664.030640f, DesertReetLevel6CombatProfile, DesertReetLevel6CombatSource, DesertReetLevel6CombatRangeMicrometers, 0),
                 new MobSlot("Desert Reet", 5, 58, 93, 3389.780760f, 2.110000f, 593.955933f),
                 new MobSlot("Greedy Desert Reet", 7, 80, 130, 3377.233150f, 2.110000f, 570.398600f),
             };
@@ -173,15 +219,15 @@ namespace ZoneEngine.Core.Playfields
         // Capture 20260721-loralei enemy-dossier: Rollerrats on the path past the oasis Reets.
         private static readonly MobSlot[] RollerratSlots =
             {
-                new MobSlot("Rollerrat", 5, 58, 125, 3423.55225f, 2.110000f, 691.272949f),
-                new MobSlot("Rollerrat", 5, 58, 125, 3392.27124f, 3.010000f, 755.309631f),
-                new MobSlot("Rollerrat", 6, 69, 125, 3392.08887f, 2.110000f, 680.059800f),
-                new MobSlot("Rollerrat", 5, 58, 125, 3417.22949f, 2.110000f, 718.296631f),
-                new MobSlot("Rollerrat", 6, 69, 125, 3379.18262f, 2.173428f, 662.932200f),
-                new MobSlot("Rollerrat", 6, 69, 125, 3431.68200f, 2.110000f, 664.818054f),
-                new MobSlot("Rollerrat", 6, 69, 125, 3384.95166f, 1.795237f, 639.372200f),
-                new MobSlot("Rollerrat", 6, 69, 125, 3457.39575f, 4.289871f, 746.963300f),
-                new MobSlot("Rollerrat", 5, 58, 125, 3387.48000f, 3.010000f, 744.358000f),
+                new MobSlot("Rollerrat", 5, 58, 125, 3423.55225f, 2.110000f, 691.272949f, RollerratLevel5CombatProfile, RollerratLevel5CombatSource, RollerratLevel5CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 5, 58, 125, 3392.27124f, 3.010000f, 755.309631f, RollerratLevel5CombatProfile, RollerratLevel5CombatSource, RollerratLevel5CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 6, 69, 125, 3392.08887f, 2.110000f, 680.059800f, RollerratLevel6CombatProfile, RollerratLevel6CombatSource, RollerratLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 5, 58, 125, 3417.22949f, 2.110000f, 718.296631f, RollerratLevel5CombatProfile, RollerratLevel5CombatSource, RollerratLevel5CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 6, 69, 125, 3379.18262f, 2.173428f, 662.932200f, RollerratLevel6CombatProfile, RollerratLevel6CombatSource, RollerratLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 6, 69, 125, 3431.68200f, 2.110000f, 664.818054f, RollerratLevel6CombatProfile, RollerratLevel6CombatSource, RollerratLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 6, 69, 125, 3384.95166f, 1.795237f, 639.372200f, RollerratLevel6CombatProfile, RollerratLevel6CombatSource, RollerratLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 6, 69, 125, 3457.39575f, 4.289871f, 746.963300f, RollerratLevel6CombatProfile, RollerratLevel6CombatSource, RollerratLevel6CombatRangeMicrometers, 0),
+                new MobSlot("Rollerrat", 5, 58, 125, 3387.48000f, 3.010000f, 744.358000f, RollerratLevel5CombatProfile, RollerratLevel5CombatSource, RollerratLevel5CombatRangeMicrometers, 0),
                 new MobSlot("Gnarl the Roller", 7, 674, 200, 3396.06787f, 2.460354f, 721.528900f),
             };
 
@@ -214,8 +260,11 @@ namespace ZoneEngine.Core.Playfields
 
             Coordinate npcCoord = npc.Coordinates();
             ICharacter best = null;
-            double bestDistance = RollerratAutomaticAggroRadiusMeters;
-            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, RollerratAutomaticAggroRadiusMeters);
+            float automaticAggroRadius = npc.Stats[StatIds.level].Value <= 5
+                                             ? RollerratLevel5AutomaticAggroRadiusMeters
+                                             : RollerratLevel6AutomaticAggroRadiusMeters;
+            double bestDistance = automaticAggroRadius;
+            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, automaticAggroRadius);
             for (int i = 0; i < inRange.Count; i++)
             {
                 ICharacter candidate = inRange[i];
@@ -568,30 +617,27 @@ namespace ZoneEngine.Core.Playfields
             ApplyReetStats(mob, slot);
             controller.AiProfile = NpcAiProfile.Passive;
 
-            int minDamage = 6;
-            int maxDamage = slot.Level >= 7 ? 10 : 8;
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
+            CapturedEnemyCombatContract contract = AreteRegularMobCombatProfileSelector.Create(
                 "lorelei-oasis-20260721-loralei",
-                minDamage,
-                maxDamage,
-                2.0,
-                0,
-                0,
-                1279612721,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0);
-            string unused;
-            CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            // Capture: not attack-on-sight; retaliate + nearby assist only.
-            controller.AiProfile = NpcAiProfile.Passive;
+                slot.CombatProfileSelector,
+                slot.CombatEvidenceSourceIdentity,
+                slot.CombatAttackRangeMicrometers,
+                slot.CombatSpecialAttackWeaponUnknown5,
+                NpcAiProfile.Passive);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                mob,
+                controller,
+                contract,
+                out combatFailure);
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;
             activateNpc(mob);
-            RegisterOasisReet(mob.Identity.Instance);
+            if (combatReady)
+            {
+                RegisterOasisReet(mob.Identity.Instance);
+            }
+
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
             return mob;
         }
@@ -624,29 +670,27 @@ namespace ZoneEngine.Core.Playfields
             ApplyRollerratStats(mob, slot);
             controller.AiProfile = NpcAiProfile.Aggressive;
 
-            int minDamage = 5;
-            int maxDamage = slot.Level >= 7 ? 9 : 7;
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
+            CapturedEnemyCombatContract contract = AreteRegularMobCombatProfileSelector.Create(
                 "lorelei-rollerrat-20260722-233205",
-                minDamage,
-                maxDamage,
-                2.0,
-                0,
-                0,
-                1279612721,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0);
-            string unused;
-            CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            controller.AiProfile = NpcAiProfile.Aggressive;
+                slot.CombatProfileSelector,
+                slot.CombatEvidenceSourceIdentity,
+                slot.CombatAttackRangeMicrometers,
+                slot.CombatSpecialAttackWeaponUnknown5,
+                NpcAiProfile.Aggressive);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                mob,
+                controller,
+                contract,
+                out combatFailure);
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;
             activateNpc(mob);
-            RegisterOasisRollerrat(mob.Identity.Instance);
+            if (combatReady)
+            {
+                RegisterOasisRollerrat(mob.Identity.Instance);
+            }
+
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
             return mob;
         }

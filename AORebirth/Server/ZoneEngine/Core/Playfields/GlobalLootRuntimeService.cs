@@ -107,7 +107,10 @@ namespace AORebirth.Core.Playfields
 
         private void EnsureAlexPadCreditsEvenWhenEmpty(LootGenerationContext context, LootGenerationResult result)
         {
-            if (context == null || result == null || result.Credits > 0)
+            if (context == null
+                || result == null
+                || result.Credits > 0
+                || context.SuppressMonsterDataFallbackLoot)
             {
                 return;
             }
@@ -171,7 +174,7 @@ namespace AORebirth.Core.Playfields
             bool owned = PetCombatRules.IsPlayerOwnedPet(target);
             int monsterData = target.Stats[StatIds.monsterdata].Value;
             bool isCapturedVergil = !owned && monsterData == CapturedVergilMonsterData;
-            return new LootGenerationContext
+            var context = new LootGenerationContext
             {
                 EnemyProfileKey = isCapturedVergil
                     ? CapturedVergilProfileKey
@@ -192,11 +195,22 @@ namespace AORebirth.Core.Playfields
                 IsBoss = isCapturedVergil || (hasEncounter && encounter.IsBoss),
                 IsOwnedSummon = owned && !hasEncounter
             };
+            CapturedEnemyCombatContract combatContract;
+            CapturedEnemyCombatRuntimeRegistry.TryGet(
+                target.Identity.Instance,
+                out combatContract);
+            AreteCombatLootIdentityPolicy.Apply(
+                context,
+                combatContract,
+                playfieldId,
+                target.Name);
+
+            return context;
         }
 
         private void EnsureDefinitions(ICharacter target, LootGenerationContext context)
         {
-            if (context.IsOwnedSummon) return;
+            if (context.IsOwnedSummon || context.SuppressMonsterDataFallbackLoot) return;
             lock (this.sync)
             {
                 if (string.Equals(

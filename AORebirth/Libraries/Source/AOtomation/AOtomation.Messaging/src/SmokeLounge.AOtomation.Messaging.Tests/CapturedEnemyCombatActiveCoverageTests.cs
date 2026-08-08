@@ -19,8 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1529;
-        private const int ExpectedBindingRecordCount = 1515;
+        private const int ExpectedInitialActorCount = 1534;
+        private const int ExpectedBindingRecordCount = 1520;
         private const string Pf127OrdinaryProfileResolutionMode =
             "production-owned-exact-pf127-ordinary-profile-resolver";
         private const string Pf1931ProfileResolutionMode =
@@ -45,7 +45,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1531, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1536, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -811,7 +811,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             var discovered = new Dictionary<string, int>(StringComparer.Ordinal);
             var preparePattern = new Regex(
-                @"\bCapturedEnemyCombatRuntime\s*\.\s*Prepare\s*\(",
+                @"\bCapturedEnemyCombatRuntime\s*\.\s*Prepare(?:AndRequireCombatReady)?\s*\(",
                 RegexOptions.CultureInvariant);
             foreach (string path in Directory.GetFiles(
                 productionRoot,
@@ -1002,6 +1002,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
                         runtimeBaselines.Add(runtimeBaseline);
                     }
+                }
+                else if (resolutionMode == "exact-arete-content-range-profile-selector")
+                {
+                    runtimeBaselines.Add(
+                        AreteRegularMobCombatProfileSelector.Create(
+                            "generated active-coverage exact Arete selector",
+                            runtimeProfileSelector,
+                            sourceIdentity,
+                            IntMember(binding, "runtimeAttackRangeMicrometers"),
+                            IntMember(binding, "runtimeSpecialAttackWeaponUnknown5"),
+                            ZoneEngine.Core.NpcAiProfile.Passive));
+                }
+                else if (resolutionMode == "exact-runtime-source-and-profile-selector")
+                {
+                    runtimeBaselines.Add(
+                        CapturedEnemyCombatContract.CapturedProfileSelector(
+                            "generated active-coverage exact source selector",
+                            sourceIdentity,
+                            runtimeProfileSelector,
+                            ZoneEngine.Core.NpcAiProfile.Passive,
+                            null,
+                            null,
+                            null));
                 }
                 else if (resolutionMode == Pf1931ProfileResolutionMode)
                 {
@@ -1204,7 +1227,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "nascence-core-hecklers", 40 },
                 { "nascence-life", 837 },
                 { "arete-family", 96 },
-                { "arete-additional-captured-actors", 12 },
+                { "arete-additional-captured-actors", 17 },
                 { "subway-merchants", 6 },
                 { "rome-blue-city", 22 },
                 { "thrak-omni-garden", 10 }

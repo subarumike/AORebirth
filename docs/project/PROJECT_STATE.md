@@ -9,13 +9,11 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Complete AOtomation suite: PASS (993/993).
-- Arete is restored to commit
-  `fadc678e2ab991ddff032061d2b3fdd8ec8ba857`, the final commit before the
-  2026-07-23 through 2026-08-06 rollback window.
-- The post-cutoff Arete 60/60 script, expanded combat catalog, expanded active
-  coverage, and expanded loot foundation are retired by this rollback; they are
-  no longer current acceptance gates.
+- Complete AOtomation suite: PASS (998/998).
+- Arete regular-mob combat uses a scoped forward reconciliation against the
+  current capture corpus. The retired post-cutoff 60/60 script is not restored;
+  the current focused gameplay gate validates supported combat behavior and
+  expected fail-closed exclusions.
 - PF127 Subway acceptance: PASS.
 - PF1931 Temple acceptance: PASS.
 - PF1931 official-client post-login acceptance: PASS. The static
@@ -41,12 +39,13 @@ sessions, 3,269 complete attack chains, 260 certified profiles, 96 runtime-ready
 profiles, 309 semantic definitions, 101 runtime-ready definitions, and 1,486
 explicitly unresolved observations with zero generator errors.
 
-The active-coverage projection is regenerated for the restored pre-cutoff Arete
-population: 1,529 actors, 1,515 binding records, and maximum actor index 1,531.
-The transactional generator and current-cohort validation both pass with
-generation identity
-`2512f9652d8549eac1c7bc767ab4810fbf7f28b7129c0094c947baeecf06fb6c`.
-Unsupported or conflicting observations remain fail-closed.
+The active-coverage projection contains 1,534 actors, 1,520 binding records,
+and maximum actor index 1,536. It reconciles 559 certified actors and 975
+explicitly unresolved actors. The Arete family cohort is 52/96 certified and
+the additional Arete binding cohort is 4/17 certified. The transactional
+generator and current-cohort validation pass against the generation identity
+recorded in the checked-in manifest. Unsupported or conflicting observations
+remain fail-closed.
 
 The generated combat surface is now one six-file cohort: five semantic artifacts
 plus a manifest commit marker. A multi-reader/single-writer lease protects
@@ -54,7 +53,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`2512f9652d8549eac1c7bc767ab4810fbf7f28b7129c0094c947baeecf06fb6c`.
+recorded in `docs/generated/capture_backed_npc_combat_generation_manifest.json`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
@@ -115,9 +114,12 @@ migrations; details and exact source references are recorded in
 
 ## Supported playfields
 
-- Arete is restored to the behavior, content, and evidence boundary present at
-  the 2026-07-22 cutoff. Post-cutoff alien-area, sandstorm, movement, quest,
-  vendor, loot, and 60/60 acceptance promotions are no longer supported.
+- Arete regular-mob combat has explicit captured source/profile selectors while
+  preserving runtime identity. Exact profiles are active for the supported Alex
+  Waste Collector, Garbage Flea, and Cleanmeister cohort; level-1 Cleaning
+  Robots; level-6 Desert Reets; level-5/6 Rollerrats; and ICC Peacekeepers.
+  Engineer Automaton I, Robotic Guard Dog, and incomplete robot variants remain
+  intentionally passive where exact combat evidence is insufficient.
 - Rubi-Ka character creation persists its initial Arete location as PF 6553,
   X 3607.6, Y 52.4, Z 785.7 without integer rounding.
 - PF127 Subway is complete for its current capture-backed population,

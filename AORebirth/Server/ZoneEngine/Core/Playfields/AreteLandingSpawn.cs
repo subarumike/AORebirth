@@ -17,6 +17,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields;
 
     using Coordinate = AORebirth.Core.Vector.Coordinate;
     using Quaternion = AORebirth.Core.Vector.Quaternion;
@@ -61,6 +62,8 @@ namespace AORebirth.Core.Playfields
             public int VisualFlags;
             public int HeadMesh;
             public int RunSpeed;
+            public string CombatProfileSelector;
+            public int CombatEvidenceSourceIdentity;
             public int NpcFamily;
             public int LosHeight;
             public int CharacterFlags;
@@ -630,6 +633,8 @@ namespace AORebirth.Core.Playfields
                 // Capture 20260722-235242 797D337E FollowTarget loop (elevator approach)
                 CaptureInstance = unchecked((int)0x797D337E),
                 Name = "ICC Peacekeeper",
+                CombatProfileSelector = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatProfileSelector,
+                CombatEvidenceSourceIdentity = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatEvidenceSourceIdentity,
                 Level = 40, Health = 1650, MonsterData = 26092, Scale = 103, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 137,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
@@ -643,6 +648,8 @@ namespace AORebirth.Core.Playfields
                 // Capture 20260720-goldman 7962A325 (scfu)
                 CaptureInstance = unchecked((int)0x7962A325),
                 Name = "ICC Peacekeeper",
+                CombatProfileSelector = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatProfileSelector,
+                CombatEvidenceSourceIdentity = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatEvidenceSourceIdentity,
                 Level = 40, Health = 1650, MonsterData = 26092, Scale = 103, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 137,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
@@ -656,6 +663,8 @@ namespace AORebirth.Core.Playfields
                 // Capture 20260720-goldman 7962A3F9 (scfu); pathing 20260722-235242
                 CaptureInstance = unchecked((int)0x7962A3F9),
                 Name = "ICC Peacekeeper",
+                CombatProfileSelector = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatProfileSelector,
+                CombatEvidenceSourceIdentity = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatEvidenceSourceIdentity,
                 Level = 40, Health = 1650, MonsterData = 26092, Scale = 103, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 137,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
@@ -669,6 +678,8 @@ namespace AORebirth.Core.Playfields
                 // Capture 20260720-goldman 797FD043 (scfu)
                 CaptureInstance = unchecked((int)0x797FD043),
                 Name = "ICC Peacekeeper",
+                CombatProfileSelector = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatProfileSelector,
+                CombatEvidenceSourceIdentity = AreteIccPeacekeeperPatrolRuntime.PeacekeeperCombatEvidenceSourceIdentity,
                 Level = 40, Health = 1650, MonsterData = 26092, Scale = 103, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 137,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
@@ -890,6 +901,8 @@ namespace AORebirth.Core.Playfields
                 // Capture 20260720-goldman 78E0FCE9 (scfu)
                 CaptureInstance = unchecked((int)0x78E0FCE9),
                 Name = "Robotic Guard Dog",
+                CombatProfileSelector = AreteRoboticGuardDogRuntime.DogCombatProfileSelector,
+                CombatEvidenceSourceIdentity = AreteRoboticGuardDogRuntime.DogCombatEvidenceSourceIdentity,
                 Level = 13, Health = 1306, MonsterData = 17720, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 36,
                 NpcFamily = 1019, LosHeight = 0, CharacterFlags = 268980737, AppearanceValue = 1483,
                 Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
@@ -1562,12 +1575,20 @@ namespace AORebirth.Core.Playfields
             mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
             if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.DogName, StringComparison.OrdinalIgnoreCase))
             {
-                ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.PrepareSpawnedDog(mob, npcController);
+                ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.PrepareSpawnedDog(
+                    mob,
+                    npcController,
+                    def.CombatProfileSelector,
+                    def.CombatEvidenceSourceIdentity);
             }
 
             if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PeacekeeperName, StringComparison.OrdinalIgnoreCase))
             {
-                ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PrepareSpawnedPeacekeeper(mob, npcController);
+                ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PrepareSpawnedPeacekeeper(
+                    mob,
+                    npcController,
+                    def.CombatProfileSelector,
+                    def.CombatEvidenceSourceIdentity);
             }
 
             ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.TryApplyPatrol(def.CaptureInstance, npcController);

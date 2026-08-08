@@ -65,6 +65,14 @@ namespace ZoneEngine.Core.Playfields
 
             public float Z { get; private set; }
 
+            public string CombatProfileSelector { get; private set; }
+
+            public int CombatEvidenceSourceIdentity { get; private set; }
+
+            public int CombatAttackRangeMicrometers { get; private set; }
+
+            public int CombatSpecialAttackWeaponUnknown5 { get; private set; }
+
             public MobSlot(
                 string name,
                 MobKind kind,
@@ -78,7 +86,11 @@ namespace ZoneEngine.Core.Playfields
                 float aggroRadiusMeters,
                 float x,
                 float y,
-                float z)
+                float z,
+                string combatProfileSelector = "",
+                int combatEvidenceSourceIdentity = 0,
+                int combatAttackRangeMicrometers = 0,
+                int combatSpecialAttackWeaponUnknown5 = 0)
             {
                 this.Name = name;
                 this.Kind = kind;
@@ -93,12 +105,37 @@ namespace ZoneEngine.Core.Playfields
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
+                this.CombatProfileSelector = combatProfileSelector;
+                this.CombatEvidenceSourceIdentity = combatEvidenceSourceIdentity;
+                this.CombatAttackRangeMicrometers = combatAttackRangeMicrometers;
+                this.CombatSpecialAttackWeaponUnknown5 = combatSpecialAttackWeaponUnknown5;
             }
         }
 
         private const int AreteLandingPlayfieldId = 6553;
 
         private const int MissingVisualId = 1234567890;
+
+        private const string WasteCollectorCombatProfile =
+            "fa6fc8256e910451-c850f3966b62b38e";
+
+        private const int WasteCollectorCombatSource = unchecked((int)0x7988CAFF);
+
+        private const int WasteCollectorCombatRangeMicrometers = 1332759;
+
+        private const string GarbageFleaLevel2CombatProfile =
+            "46a87c17eefbd77b-c850f3966b62b38e";
+
+        private const int GarbageFleaLevel2CombatSource = unchecked((int)0x7988C914);
+
+        private const int GarbageFleaLevel2CombatRangeMicrometers = 15576482;
+
+        private const string CleanmeisterCombatProfile =
+            "028210688643a4d8-6ff86979de5c6526";
+
+        private const int CleanmeisterCombatSource = unchecked((int)0x798915E0);
+
+        private const int CleanmeisterCombatRangeMicrometers = 2771750;
 
         private const double RespawnSeconds = 30.0;
 
@@ -195,31 +232,31 @@ namespace ZoneEngine.Core.Playfields
                 new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3516.197f, 5.110f, 914.061f),
                 new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3523.440f, 5.110f, 898.358f),
                 new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3524.225f, 5.110f, 879.666f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3492.532f, 5.110f, 866.601f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3497.703f, 9.380f, 918.384f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3506.614f, 5.110f, 891.661f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3507.345f, 8.185f, 930.825f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3510.761f, 5.110f, 864.661f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3510.884f, 7.982f, 923.173f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3519.717f, 9.080f, 940.067f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3526.509f, 9.501f, 951.883f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3539.143f, 9.087f, 942.056f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3542.399f, 8.045f, 890.165f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3549.620f, 7.396f, 906.258f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3555.855f, 8.336f, 915.219f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3558.766f, 8.575f, 927.072f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3567.060f, 8.218f, 918.754f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3585.885f, 6.998f, 921.242f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3492.532f, 5.110f, 866.601f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3497.703f, 9.380f, 918.384f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3506.614f, 5.110f, 891.661f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3507.345f, 8.185f, 930.825f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3510.761f, 5.110f, 864.661f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3510.884f, 7.982f, 923.173f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3519.717f, 9.080f, 940.067f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3526.509f, 9.501f, 951.883f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3539.143f, 9.087f, 942.056f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3542.399f, 8.045f, 890.165f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3549.620f, 7.396f, 906.258f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3555.855f, 8.336f, 915.219f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3558.766f, 8.575f, 927.072f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3567.060f, 8.218f, 918.754f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Aggressive, 1.332759f, 3585.885f, 6.998f, 921.242f, WasteCollectorCombatProfile, WasteCollectorCombatSource, WasteCollectorCombatRangeMicrometers, 0),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.315f, 5.110f, 902.829f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.761f, 5.110f, 891.211f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 15.576482f, 3502.761f, 5.110f, 891.211f, GarbageFleaLevel2CombatProfile, GarbageFleaLevel2CombatSource, GarbageFleaLevel2CombatRangeMicrometers, 117),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3509.731f, 7.394f, 926.952f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3529.015f, 5.110f, 891.201f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 15.576482f, 3529.015f, 5.110f, 891.201f, GarbageFleaLevel2CombatProfile, GarbageFleaLevel2CombatSource, GarbageFleaLevel2CombatRangeMicrometers, 117),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3541.526f, 8.190f, 892.471f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3549.231f, 9.371f, 938.996f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3554.468f, 8.074f, 919.910f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3562.391f, 5.110f, 864.537f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 15.576482f, 3562.391f, 5.110f, 864.537f, GarbageFleaLevel2CombatProfile, GarbageFleaLevel2CombatSource, GarbageFleaLevel2CombatRangeMicrometers, 117),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3565.514f, 8.356f, 913.615f),
-                new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 100, 13, NpcAiProfile.Passive, 0.0f, 3549.280f, 5.110f, 864.321f),
+                new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 100, 13, NpcAiProfile.Aggressive, 2.771750f, 3549.280f, 5.110f, 864.321f, CleanmeisterCombatProfile, CleanmeisterCombatSource, CleanmeisterCombatRangeMicrometers, 82),
                 new MobSlot("IIV-X Advanced Docker", MobKind.Docker, 17649, 4, 323, 1019, 110, 15, NpcAiProfile.Passive, 0.0f, 3515.109f, 5.305f, 904.289f),
                 new MobSlot("Supreme Collector of Waste", MobKind.WasteCollector, 17714, 4, 370, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3506.573f, 11.074f, 943.099f),
                 // Prior oasis fleas (outside this capture cluster).
@@ -470,31 +507,24 @@ namespace ZoneEngine.Core.Playfields
             // Capture 20260722-cap-mob-drop-cred AttackInfo vs player:
             // Amount=6.. AmmoCount=-1 WeaponSlot=1 HitType=Normal WeaponInstance=1279612721/22
             // → client red "You got hit … damage" text.
-            int minDamage;
-            int maxDamage;
-            ResolveCaptureDamage(slot, out minDamage, out maxDamage);
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "alex-area-20260722-cap-mob-drop-cred",
-                minDamage,
-                maxDamage,
-                2.0,
-                1,
-                0,
-                1279612721,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0);
-            string unused;
-            CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            // FixedAttackOnSight sets Aggressive; restore capture AI (Passive except fleas).
-            controller.AiProfile = slot.AiProfile;
+            CapturedEnemyCombatContract contract =
+                AreteRegularMobCombatProfileSelector.Create(
+                    "arete-alex-regular-mob-selector",
+                    slot.CombatProfileSelector,
+                    slot.CombatEvidenceSourceIdentity,
+                    slot.CombatAttackRangeMicrometers,
+                    slot.CombatSpecialAttackWeaponUnknown5,
+                    slot.AiProfile);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                mob,
+                controller,
+                contract,
+                out combatFailure);
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;
             activateNpc(mob);
-            if (slot.Kind == MobKind.GarbageFlea && slot.AggroRadiusMeters > 0f)
+            if (combatReady && slot.AggroRadiusMeters > 0f)
             {
                 RegisterAggro(mob.Identity.Instance, slot.AggroRadiusMeters);
                 MissionInstanceMobCombat.RegisterAggressive(mob.Identity);
@@ -502,30 +532,6 @@ namespace ZoneEngine.Core.Playfields
 
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
             return mob;
-        }
-
-        private static void ResolveCaptureDamage(MobSlot slot, out int minDamage, out int maxDamage)
-        {
-            switch (slot.Kind)
-            {
-                case MobKind.Docker:
-                    minDamage = 4;
-                    maxDamage = 14;
-                    return;
-                case MobKind.WasteCollector:
-                    minDamage = 8;
-                    maxDamage = 8;
-                    return;
-                case MobKind.CleaningRobot:
-                    minDamage = 6;
-                    maxDamage = 6;
-                    return;
-                case MobKind.GarbageFlea:
-                default:
-                    minDamage = 6;
-                    maxDamage = 8;
-                    return;
-            }
         }
 
         private static void ApplyCaptureStats(Character mob, MobSlot slot)
@@ -546,11 +552,8 @@ namespace ZoneEngine.Core.Playfields
             SetStat(mob, StatIds.fatness, 1);
             // Capture 20260720-204431: Docker +400 XP, Waste ~347/316, Flea +316.
             SetStat(mob, StatIds.xp, ResolveCaptureXp(slot));
-            int minDamage;
-            int maxDamage;
-            ResolveCaptureDamage(slot, out minDamage, out maxDamage);
-            SetStat(mob, StatIds.mindamage, minDamage);
-            SetStat(mob, StatIds.maxdamage, maxDamage);
+            SetStat(mob, StatIds.mindamage, 0);
+            SetStat(mob, StatIds.maxdamage, 0);
             // Capture AttackInfo HitType=Normal → client red hit line uses damagetype.
             SetStat(mob, StatIds.damagetype, 1);
             SetStat(mob, StatIds.defaultattacktype, 1);

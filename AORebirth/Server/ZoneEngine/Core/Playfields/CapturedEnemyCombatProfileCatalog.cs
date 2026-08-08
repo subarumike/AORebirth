@@ -1195,6 +1195,54 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (!string.IsNullOrWhiteSpace(current.EvidenceProfileSelectorHint))
+            {
+                keyMatches = keyMatches.Where(
+                    value => string.Equals(
+                        value.ProfileId,
+                        current.EvidenceProfileSelectorHint,
+                        StringComparison.Ordinal)).ToArray();
+                if (keyMatches.Length != 1)
+                {
+                    failure = string.Format(
+                        "captured profile selector {0} does not identify one exact profile for resource={1} name={2} MonsterData={3} level={4}",
+                        current.EvidenceProfileSelectorHint,
+                        resourceId,
+                        name,
+                        monsterData,
+                        level);
+                    return false;
+                }
+
+                if (sourceIdentityHint == 0 || !keyMatches[0].ContainsSource(sourceIdentityHint))
+                {
+                    failure = string.Format(
+                        "captured source {0:X8} is not evidence for selected profile {1}",
+                        sourceIdentityHint,
+                        current.EvidenceProfileSelectorHint);
+                    return false;
+                }
+
+                CapturedEnemyCombatProfileDefinition selectedProfile = keyMatches[0];
+                if (selectedProfile.WeaponDefinition == null
+                    && selectedProfile.GetReusableNaturalAttackStreams().Length > 0)
+                {
+                    CapturedEnemyCombatContract parallelContract;
+                    if (!TryResolveCapturedProfileSelectorParallelSequence(
+                            selectedProfile,
+                            sourceIdentityHint,
+                            current,
+                            out parallelContract,
+                            out failure))
+                    {
+                        return false;
+                    }
+
+                    resolved = parallelContract;
+                    return true;
+                }
+            }
+
             CapturedEnemyCombatProfileDefinition[] compatibleMatches = keyMatches.Where(
                 value => value.CaptureRuntimeEvidenceSafe
                          || (current.AttackModel == CapturedEnemyAttackModel.Specialized
@@ -1374,7 +1422,7 @@ namespace AORebirth.Core.Playfields
                 landedIntervalObservations,
                 stream.CapturedDamageBonus.Value,
                 stream.CapturedUsesEquippedWeapon.Value,
-                stream.CapturedAttackRange,
+                stream.CapturedAttackRange ?? current.CapturedAttackRange,
                 stream.CapturedSendAttackInfo.Value);
             if (weapon != null)
             {
@@ -1392,6 +1440,174 @@ namespace AORebirth.Core.Playfields
             if (!resolved.IsCombatReady)
             {
                 failure = "selected raw profile failed shared contract readiness: "
+                          + resolved.QuarantineReason;
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool TryResolveCapturedProfileSelectorParallelSequence(
+            CapturedEnemyCombatProfileDefinition profile,
+            int sourceIdentityHint,
+            CapturedEnemyCombatContract current,
+            out CapturedEnemyCombatContract resolved,
+            out string failure)
+        {
+            resolved = current;
+            failure = string.Empty;
+            if (profile == null
+                || current == null
+                || !profile.CaptureEvidenceSafe
+                || profile.WeaponDefinition != null)
+            {
+                failure = "selected profile is not a capture-safe natural-attack profile";
+                return false;
+            }
+
+            if (!current.CapturedAttackRange.HasValue
+                || current.CapturedAttackRange.Value <= 0.0d
+                || double.IsNaN(current.CapturedAttackRange.Value)
+                || double.IsInfinity(current.CapturedAttackRange.Value))
+            {
+                failure = "selected natural-attack profile has no capture-backed attack range";
+                return false;
+            }
+
+            // The generated profile constructor retains one representative Unknown5 value,
+            // while the active-coverage generator certifies the selector hint against this
+            // exact source identity. Do not collapse a source-local value back to the profile
+            // representative (Cleanmeister is 82 while another source in its profile is 0).
+            if (!current.EvidenceSpecialAttackWeaponUnknown5Hint.HasValue)
+            {
+                failure = "selected profile has no exact source-local SpecialAttackWeapon Unknown5 state";
+                return false;
+            }
+
+            CapturedEnemyCombatProfileStreamDefinition[] cadenceStreams =
+                profile.GetReusableNaturalAttackStreams();
+            if (cadenceStreams.Length == 0
+                || cadenceStreams.Any(
+                    stream => !stream.HasCompleteFixedRuntimeEvidence
+                              || stream.CapturedUsesEquippedWeapon != false
+                              || stream.CapturedSendAttackInfo != true
+                              || stream.CapturedFirstHitDelayObservationsSeconds.Length == 0))
+            {
+                failure = "selected profile lacks a complete captured attack stream";
+                return false;
+            }
+
+            double[] attackStartDelays = cadenceStreams.SelectMany(
+                stream => stream.CapturedAttackStartDelayObservationsSeconds).ToArray();
+            if (!current.EvidenceAttackStartDelaySecondsHint.HasValue
+                || double.IsNaN(current.EvidenceAttackStartDelaySecondsHint.Value)
+                || double.IsInfinity(current.EvidenceAttackStartDelaySecondsHint.Value)
+                || current.EvidenceAttackStartDelaySecondsHint.Value < 0.0d
+                || attackStartDelays.Length == 0
+                || attackStartDelays.Any(
+                    value => double.IsNaN(value)
+                             || double.IsInfinity(value)
+                             || value < 0.0d)
+                || !attackStartDelays.Any(
+                    value => Math.Abs(
+                        value - current.EvidenceAttackStartDelaySecondsHint.Value)
+                             < 0.000001d))
+            {
+                failure = "selected profile has no exact source-local captured attack-start delay";
+                return false;
+            }
+
+            var parallelStreams = new List<CapturedEnemyParallelAttackStreamDefinition>();
+            foreach (CapturedEnemyCombatProfileStreamDefinition stream in cadenceStreams)
+            {
+                double[] landedIntervals = profile.ResolveLandedIntervalObservations(stream);
+                if (landedIntervals.Any(
+                    value => double.IsNaN(value)
+                             || double.IsInfinity(value)
+                             || value <= 0.0d))
+                {
+                    failure = "selected profile contains an invalid captured landed interval";
+                    return false;
+                }
+
+                bool repeats = landedIntervals.Length > 0;
+                parallelStreams.Add(
+                    new CapturedEnemyParallelAttackStreamDefinition(
+                        stream.CapturedFirstHitDelayObservationsSeconds[0],
+                        new CapturedEnemyCombatAttackDefinition(
+                            stream.CapturedDamageObservations.Min(),
+                            stream.CapturedDamageObservations.Max(),
+                            stream.CapturedDamageBonus.Value,
+                            current.CapturedAttackRange.Value,
+                            repeats ? landedIntervals[0] : 0.0d,
+                            false,
+                            stream.InitialAmmoCount,
+                            stream.WeaponSlot,
+                            stream.DamageTypeWire,
+                            stream.HitTypeWire,
+                            stream.WeaponInstance,
+                            stream.N3Unknown,
+                            true,
+                            stream.CapturedDamageObservations),
+                        repeats));
+            }
+
+            if (!parallelStreams.Any(stream => stream.Repeats))
+            {
+                failure = "selected profile has no capture-backed repeating attack cadence";
+                return false;
+            }
+
+            CapturedEnemyCombatProfileStreamDefinition[] terminalStreams =
+                profile.Streams.Where(stream => stream.CapturedTerminalHitOnly).ToArray();
+            foreach (CapturedEnemyCombatProfileStreamDefinition terminalStream in terminalStreams)
+            {
+                int[] compatible = Enumerable.Range(0, parallelStreams.Count).Where(
+                    index => terminalStream.MatchesCapturedTerminalOutcome(
+                        parallelStreams[index].Attack)).ToArray();
+                if (compatible.Length != 1)
+                {
+                    failure = "captured terminal attack outcome does not map to one selected stream";
+                    return false;
+                }
+
+                int streamIndex = compatible[0];
+                CapturedEnemyParallelAttackStreamDefinition existing =
+                    parallelStreams[streamIndex];
+                parallelStreams[streamIndex] =
+                    new CapturedEnemyParallelAttackStreamDefinition(
+                        existing.InitialDelaySeconds,
+                        existing.Attack.WithCapturedDamageObservations(
+                            existing.Attack.CapturedDamageObservations,
+                            terminalStream.DamageTypeWire),
+                        existing.Repeats);
+            }
+
+            CapturedEnemyCombatContract captured =
+                CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                    profile.Evidence + "; selector=" + current.Evidence,
+                    new CapturedEnemyParallelAttackSequenceDefinition(
+                        parallelStreams.ToArray(),
+                        profile.SpecialAttacks,
+                        profile.SpecialAttackWeaponUnknown1,
+                        profile.SpecialAttackWeaponUnknown2,
+                        profile.SpecialAttackWeaponUnknown3,
+                        profile.SpecialAttackWeaponUnknown4,
+                        current.EvidenceSpecialAttackWeaponUnknown5Hint.Value,
+                        profile.SpecialAttackWeaponN3Unknown,
+                        profile.AttackN3Unknown,
+                        profile.AttackAction,
+                        current.EvidenceAttackStartDelaySecondsHint.Value),
+                    current.RequiresDamageLineOfSight,
+                    current.AiProfile);
+            resolved = captured
+                .WithCaptureCertification(profile.Evidence, sourceIdentityHint, null)
+                .WithCapturedSpecialAttackWeaponUnknown5Observations(
+                    new[] { current.EvidenceSpecialAttackWeaponUnknown5Hint.Value })
+                .WithCaptureProvenArchetype(profile.ProfileId);
+            if (!resolved.IsCombatReady)
+            {
+                failure = "selected parallel profile failed shared readiness: "
                           + resolved.QuarantineReason;
                 return false;
             }

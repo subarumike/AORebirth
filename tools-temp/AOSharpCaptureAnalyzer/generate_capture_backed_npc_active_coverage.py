@@ -6,11 +6,12 @@ than copied into a second hand-maintained list.  Combat classification is then
 resolved against ``capture_backed_npc_combat_inventory.json`` using the same
 two safe lookup modes as the generated runtime catalog:
 
-* an exact runtime source-identity hint; or
+* an exact runtime source-identity/profile-selector hint, including an exact
+  capture-backed non-equipped attack range supplied by content; or
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
-or if the fixed initial population does not reconcile to 1,529 actors.
+or if the fixed initial population does not reconcile to 1,534 actors.
 """
 
 from __future__ import annotations
@@ -31,7 +32,7 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1529
+EXPECTED_INITIAL_ACTORS = 1534
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -42,7 +43,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("nascence-core-hecklers", 40),
     ("nascence-life", 837),
     ("arete-family", 96),
-    ("arete-additional-captured-actors", 12),
+    ("arete-additional-captured-actors", 17),
     ("subway-merchants", 6),
     ("rome-blue-city", 22),
     ("thrak-omni-garden", 10),
@@ -50,7 +51,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
 
 RUNTIME_PREPARE_ROOT = "AORebirth/Server/ZoneEngine/Core"
 RUNTIME_PREPARE_PATTERN = re.compile(
-    r"\bCapturedEnemyCombatRuntime\s*\.\s*Prepare\s*\("
+    r"\bCapturedEnemyCombatRuntime\s*\.\s*Prepare(?:AndRequireCombatReady)?\s*\("
 )
 SCRIPTED_HOSTILE_SOURCE = (
     "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/"
@@ -251,6 +252,8 @@ class ActorDefinition:
     configured_source_identity: Optional[int] = None
     runtime_source_identity_hint: Optional[int] = None
     runtime_profile_selector: str = ""
+    runtime_attack_range_micrometers: int = 0
+    runtime_special_attack_weapon_unknown5: Optional[int] = None
     content_sources: Tuple[str, ...] = field(default_factory=tuple)
     content_evidence_capture_ids: Tuple[str, ...] = field(default_factory=tuple)
     notes: Tuple[str, ...] = field(default_factory=tuple)
@@ -265,6 +268,8 @@ class ActorDefinition:
             self.configured_source_identity,
             self.runtime_source_identity_hint,
             self.runtime_profile_selector,
+            self.runtime_attack_range_micrometers,
+            self.runtime_special_attack_weapon_unknown5,
             self.notes,
         )
 
@@ -607,6 +612,9 @@ def parse_csharp_int(expression: str, constants: Mapping[str, Any] = {}) -> int:
     value = expression.strip()
     if value in constants and isinstance(constants[value], int):
         return int(constants[value])
+    symbol = value.rsplit(".", 1)[-1]
+    if symbol in constants and isinstance(constants[symbol], int):
+        return int(constants[symbol])
     hex_match = re.search(r"0x([0-9A-Fa-f]+)", value)
     if hex_match:
         return int(hex_match.group(1), 16)
@@ -696,6 +704,8 @@ def make_actor(
     configured_source_identity: Optional[int] = None,
     runtime_source_identity_hint: Optional[int] = None,
     runtime_profile_selector: str = "",
+    runtime_attack_range_micrometers: int = 0,
+    runtime_special_attack_weapon_unknown5: Optional[int] = None,
     evidence_capture_ids: Iterable[str] = (),
     notes: Iterable[str] = (),
 ) -> ActorDefinition:
@@ -711,6 +721,8 @@ def make_actor(
         configured_source_identity=configured_source_identity,
         runtime_source_identity_hint=runtime_source_identity_hint,
         runtime_profile_selector=runtime_profile_selector,
+        runtime_attack_range_micrometers=runtime_attack_range_micrometers,
+        runtime_special_attack_weapon_unknown5=runtime_special_attack_weapon_unknown5,
         content_sources=(source,),
         content_evidence_capture_ids=tuple(sorted(set(evidence_capture_ids))),
         notes=tuple(notes),
@@ -1178,6 +1190,7 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
 
     alex_path = "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
     alex = read_source(repo_root, alex_path)
+    alex_constants = extract_constants(alex)
     alex_body = extract_array_initializer(alex, "MobSlot[] Slots")
     for call in extract_calls(alex_body, "MobSlot", True):
         args = split_top_level(call)
@@ -1189,6 +1202,26 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
                 parse_csharp_int(args[2]),
                 parse_csharp_int(args[3]),
                 alex_path,
+                runtime_source_identity_hint=(
+                    parse_csharp_int(args[14], alex_constants)
+                    if len(args) >= 17
+                    else None
+                ),
+                runtime_profile_selector=(
+                    parse_csharp_string(args[13], alex_constants)
+                    if len(args) >= 17
+                    else ""
+                ),
+                runtime_attack_range_micrometers=(
+                    parse_csharp_int(args[15], alex_constants)
+                    if len(args) >= 17
+                    else 0
+                ),
+                runtime_special_attack_weapon_unknown5=(
+                    parse_csharp_int(args[16], alex_constants)
+                    if len(args) >= 17
+                    else None
+                ),
                 evidence_capture_ids=("20260720-204431",),
             )
         )
@@ -1211,6 +1244,16 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
         parse_csharp_int("RobotMonsterData", junkyard_constants),
         parse_csharp_int("RobotLevel", junkyard_constants),
         junkyard_path,
+        runtime_source_identity_hint=parse_csharp_int(
+            "CombatEvidenceSourceIdentity", junkyard_constants
+        ),
+        runtime_profile_selector=parse_csharp_string(
+            "CombatProfileSelector", junkyard_constants
+        ),
+        runtime_attack_range_micrometers=parse_csharp_int(
+            "CombatAttackRangeMicrometers", junkyard_constants
+        ),
+        runtime_special_attack_weapon_unknown5=0,
         evidence_capture_ids=("20260720-212302",),
     )
     robot.actor_count = junkyard_slots
@@ -1241,6 +1284,26 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
                     parse_csharp_int(monster_constant, lorelei_constants),
                     parse_csharp_int(args[1]),
                     lorelei_path,
+                    runtime_source_identity_hint=(
+                        parse_csharp_int(args[8], lorelei_constants)
+                        if len(args) >= 11
+                        else None
+                    ),
+                    runtime_profile_selector=(
+                        parse_csharp_string(args[7], lorelei_constants)
+                        if len(args) >= 11
+                        else ""
+                    ),
+                    runtime_attack_range_micrometers=(
+                        parse_csharp_int(args[9], lorelei_constants)
+                        if len(args) >= 11
+                        else 0
+                    ),
+                    runtime_special_attack_weapon_unknown5=(
+                        parse_csharp_int(args[10], lorelei_constants)
+                        if len(args) >= 11
+                        else None
+                    ),
                     evidence_capture_ids=("20260721-loralei",),
                 )
             )
@@ -1318,9 +1381,18 @@ def parse_arete_additional(repo_root: Path) -> List[ActorDefinition]:
                 parse_csharp_int(args[5]),
                 robot_path,
                 configured_source_identity=source_identity,
-                runtime_source_identity_hint=None,
+                runtime_source_identity_hint=parse_csharp_int(
+                    args[11], robot_constants
+                ),
+                runtime_profile_selector=parse_csharp_string(
+                    args[10], robot_constants
+                ),
+                runtime_attack_range_micrometers=0,
+                runtime_special_attack_weapon_unknown5=0,
                 evidence_capture_ids=("20260629-193121", "20260719-Rex-Markus-stone"),
-                notes=("runtime spawner does not retain the official capture source identity as a resolver hint",),
+                notes=(
+                    "spawn/patrol capture identity is distinct from the exact combat-evidence source identity",
+                ),
             )
         )
     if len(actors) != 11:
@@ -1338,11 +1410,75 @@ def parse_arete_additional(repo_root: Path) -> List[ActorDefinition]:
             5,
             automaton_path,
             configured_source_identity=0x7985CD86,
-            runtime_source_identity_hint=None,
+            runtime_source_identity_hint=parse_csharp_int(
+                "AutomatonCombatEvidenceSourceIdentity", constants
+            ),
+            runtime_profile_selector=parse_csharp_string(
+                "AutomatonCombatProfileSelector", constants
+            ),
             evidence_capture_ids=("20260721-finish",),
-            notes=("capture identity is documented by the spawn source but is not retained as a runtime resolver hint",),
+            notes=(
+                "expected exclusion: the exact captured actor has no capture-certified combat profile",
+            ),
         )
     )
+
+    landing_path = "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs"
+    landing = read_source(repo_root, landing_path)
+    landing_body = extract_array_initializer(landing, "AreteNpc[] Npcs")
+    landing_rows = [
+        fields
+        for fields in parse_object_initializers(landing_body, "AreteNpc")
+        if parse_csharp_string(fields.get("Name", '""'))
+        in ("ICC Peacekeeper", "Robotic Guard Dog")
+    ]
+    peacekeeper_path = (
+        "AORebirth/Server/ZoneEngine/Core/Playfields/"
+        "AreteIccPeacekeeperPatrolRuntime.cs"
+    )
+    guard_dog_path = (
+        "AORebirth/Server/ZoneEngine/Core/Playfields/"
+        "AreteRoboticGuardDogRuntime.cs"
+    )
+    combat_constants = extract_constants(read_source(repo_root, peacekeeper_path))
+    combat_constants = extract_constants(
+        read_source(repo_root, guard_dog_path), combat_constants
+    )
+    for fields in landing_rows:
+        name = parse_csharp_string(fields["Name"])
+        actors.append(
+            make_actor(
+                "arete-additional-captured-actors",
+                6553,
+                name,
+                parse_csharp_int(fields["MonsterData"]),
+                parse_csharp_int(fields["Level"]),
+                landing_path,
+                configured_source_identity=parse_csharp_int(
+                    fields["CaptureInstance"]
+                ),
+                runtime_source_identity_hint=parse_csharp_int(
+                    fields["CombatEvidenceSourceIdentity"], combat_constants
+                ),
+                runtime_profile_selector=parse_csharp_string(
+                    fields["CombatProfileSelector"], combat_constants
+                ),
+                evidence_capture_ids=(
+                    "20260722-235510"
+                    if name == "ICC Peacekeeper"
+                    else "20260722-212421",
+                ),
+                notes=(
+                    "spawn capture identity is retained separately from the combat-evidence selector",
+                ),
+            )
+        )
+
+    if len(landing_rows) != 5 or len(actors) != 17:
+        raise CoverageError(
+            "Arete additional parser expected 11 cleaning robots, one Engineer, "
+            "four ICC Peacekeepers, and one Robotic Guard Dog"
+        )
 
     return actors
 
@@ -1919,6 +2055,119 @@ def classify_pf1931_owned_profile_level(
     }
 
 
+def classify_arete_content_selector_level(
+    actor: ActorDefinition,
+    level: int,
+    profile: Optional[Mapping[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    if (
+        actor.resource != 6553
+        or profile is None
+        or actor.runtime_source_identity_hint is None
+        or not actor.runtime_profile_selector
+        or actor.runtime_attack_range_micrometers <= 0
+        or actor.runtime_special_attack_weapon_unknown5 is None
+    ):
+        return None
+
+    source_hint = format_identity(actor.runtime_source_identity_hint)
+    selected = [
+        variant
+        for variant in profile.get("variants", [])
+        if variant.get("captureCertified") is True
+        and variant.get("captureEvidenceSafe") is True
+        and variant.get("semanticProfileId") == actor.runtime_profile_selector
+        and source_hint in variant.get("sourceIdentities", [])
+        and variant.get("baseSignature", {}).get("weaponContextKind")
+        in ("natural", "natural-or-special")
+    ]
+    if len(selected) != 1:
+        return None
+
+    variant = selected[0]
+    source_saw_states = {
+        row.get("unknown5")
+        for row in variant.get("mutableSawStateObservations", [])
+        if row.get("sourceIdentity") == source_hint
+    }
+    if source_saw_states != {actor.runtime_special_attack_weapon_unknown5}:
+        return None
+
+    streams = [
+        stream
+        for stream in variant.get("streams", [])
+        if stream.get("capturedTerminalHitOnly") is not True
+    ]
+    if not streams:
+        return None
+    if any(
+        not stream.get("damageObservations")
+        or not stream.get("attackStartDelayObservationsSeconds")
+        or not stream.get("firstHitDelayObservationsSeconds")
+        or len(stream.get("attackStartDelayObservationsSeconds", []))
+        != len(stream.get("firstHitDelayObservationsSeconds", []))
+        or len(stream.get("initialAmmoCandidates", [])) != 1
+        for stream in streams
+    ):
+        return None
+    attack_start_delays = [
+        delay
+        for stream in streams
+        for delay in stream.get("attackStartDelayObservationsSeconds", [])
+    ]
+    source_attack_start_delays = {
+        timing.get("attackStartDelaySeconds")
+        for stream in streams
+        for timing in stream.get("pairedFightTimingObservations", [])
+        if timing.get("sourceIdentity") == source_hint
+    }
+    if (
+        not attack_start_delays
+        or any(delay < 0 for delay in attack_start_delays)
+        or source_attack_start_delays != {0.0}
+        or not any(
+            stream.get("landedIntervalObservationsSeconds") for stream in streams
+        )
+    ):
+        return None
+
+    packet_fields = (
+        "representativeWifuPacketId",
+        "representativeSawPacketId",
+        "representativeAttackPacketId",
+    )
+    packet_ids: List[str] = [variant.get(field) for field in packet_fields]
+    for stream in variant.get("streams", []):
+        packet_ids.extend(stream.get("attackInfoPacketIds", [])[:1])
+    return {
+        "level": level,
+        "combatProfileKey": (
+            f"resource={actor.resource}|md={actor.monster_data}|level={level}|name={actor.name}"
+        ),
+        "classification": "certified",
+        "resolutionMode": "exact-arete-content-range-profile-selector",
+        "captureSessions": sorted_unique(variant.get("captureSessions", [])),
+        "evidencePacketIds": sorted_unique(packet_ids),
+        "evidenceSourceIdentities": [source_hint],
+        "evidenceFound": [
+            {
+                "observationType": "exact-captured-combat-profile-with-content-range",
+                "semanticProfileId": variant.get("semanticProfileId"),
+                "sourceIdentity": source_hint,
+                "capturedAttackRangeMicrometers": actor.runtime_attack_range_micrometers,
+                "specialAttackWeaponUnknown5": actor.runtime_special_attack_weapon_unknown5,
+                "capturedAttackStartDelaySeconds": 0.0,
+                "capturedAttackStreamCount": len(streams),
+            }
+        ],
+        "missingEvidence": [],
+        "runtimeContractReady": True,
+        "runtimeMissingEvidence": [],
+        "disabledGameplayCapability": None,
+        "semanticProfileId": variant.get("semanticProfileId"),
+    }
+
+
 def classify_level(
     actor: ActorDefinition,
     level: int,
@@ -2075,17 +2324,33 @@ def classify_level(
         for variant in capture_certified_variants
         if variant.get("captureEvidenceSafe") is True
     ]
+    arete_content_selector = classify_arete_content_selector_level(
+        actor, level, profile
+    )
+    if arete_content_selector is not None:
+        return arete_content_selector
+
     selected: List[Mapping[str, Any]] = []
     if source_hint is not None:
         exact_source_matches = [
             variant
             for variant in runtime_ready_variants
             if source_hint in variant.get("sourceIdentities", [])
+            and (
+                actor.resource != 6553
+                or not actor.runtime_profile_selector
+                or variant.get("semanticProfileId")
+                == actor.runtime_profile_selector
+            )
         ]
         if len(exact_source_matches) == 1:
             selected = exact_source_matches
             result["classification"] = "certified"
-            result["resolutionMode"] = "exact-runtime-source-identity"
+            result["resolutionMode"] = (
+                "exact-runtime-source-and-profile-selector"
+                if actor.resource == 6553 and actor.runtime_profile_selector
+                else "exact-runtime-source-identity"
+            )
     if not selected and profile.get("semanticFallbackCaptureProven"):
         if len(runtime_ready_variants) == 1:
             selected = runtime_ready_variants
@@ -2802,6 +3067,12 @@ def build_inventory(
                 format_identity(actor.configured_source_identity) or "",
                 format_identity(actor.runtime_source_identity_hint) or "",
                 actor.runtime_profile_selector,
+                str(actor.runtime_attack_range_micrometers),
+                (
+                    str(actor.runtime_special_attack_weapon_unknown5)
+                    if actor.runtime_special_attack_weapon_unknown5 is not None
+                    else ""
+                ),
             )
         )
         row = {
@@ -2815,6 +3086,8 @@ def build_inventory(
             "configuredSourceIdentity": format_identity(actor.configured_source_identity),
             "runtimeSourceIdentityHint": format_identity(actor.runtime_source_identity_hint),
             "runtimeProfileSelector": actor.runtime_profile_selector or None,
+            "runtimeAttackRangeMicrometers": actor.runtime_attack_range_micrometers or None,
+            "runtimeSpecialAttackWeaponUnknown5": actor.runtime_special_attack_weapon_unknown5,
             "actorCount": actor.actor_count,
             "classification": classification,
             "runtimeContractReady": (
@@ -2945,6 +3218,8 @@ def build_inventory(
                     actor.runtime_source_identity_hint
                 ),
                 "runtimeProfileSelector": actor.runtime_profile_selector or None,
+                "runtimeAttackRangeMicrometers": actor.runtime_attack_range_micrometers or None,
+                "runtimeSpecialAttackWeaponUnknown5": actor.runtime_special_attack_weapon_unknown5,
                 "actorCount": actor.actor_count,
                 "classification": profile_row["classification"],
                 "runtimeContractReady": profile_row["runtimeContractReady"],
