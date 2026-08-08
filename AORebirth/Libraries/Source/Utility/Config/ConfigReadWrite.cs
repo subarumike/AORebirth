@@ -97,21 +97,17 @@ namespace Utility.Config
         {
             get
             {
+#if AOREBIRTH_LINUX
+                if (this._config == null)
+                {
+                    this._config = LoadConfig();
+                }
+#else
                 try
                 {
                     if (this._config == null)
                     {
-                        this._config =
-                            (Config)
-                                new XmlSerializer(typeof(Config)).Deserialize(
-                                    new MemoryStream(File.ReadAllBytes("Config.xml")));
-
-                        string mysqlConnection =
-                            Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
-                        if (!string.IsNullOrWhiteSpace(mysqlConnection))
-                        {
-                            this._config.MysqlConnection = mysqlConnection;
-                        }
+                        this._config = LoadConfig();
                     }
                 }
                 catch (Exception ex)
@@ -119,6 +115,7 @@ namespace Utility.Config
                     Console.WriteLine("Error parsing configuration: {0}", ex.Message);
                     this._config = new Config();
                 }
+#endif
 
                 return this._config;
             }
@@ -143,7 +140,7 @@ namespace Utility.Config
             {
                 XmlSerializer ser = new XmlSerializer(typeof(Config));
 #if AOREBIRTH_LINUX
-                using (FileStream stream = File.Create("Config.xml"))
+                using (FileStream stream = File.Create(GetConfigPath()))
                 {
                     ser.Serialize(stream, this._config);
                 }
@@ -159,6 +156,47 @@ namespace Utility.Config
             }
 
             return true;
+        }
+
+        private static string GetConfigPath()
+        {
+#if AOREBIRTH_LINUX
+            string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
+            if (!string.IsNullOrWhiteSpace(configuredPath))
+            {
+                return configuredPath;
+            }
+#endif
+
+            return "Config.xml";
+        }
+
+        private static Config LoadConfig()
+        {
+            Config config =
+                (Config)
+                    new XmlSerializer(typeof(Config)).Deserialize(
+                        new MemoryStream(File.ReadAllBytes(GetConfigPath())));
+
+            string mysqlConnection = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
+#if AOREBIRTH_LINUX
+            string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
+            if (string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal)
+                && !string.IsNullOrWhiteSpace(config.MysqlConnection)
+                && config.MysqlConnection.IndexOf(
+                    "REPLACE_WITH_",
+                    StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                throw new InvalidDataException(
+                    "Config.xml must contain only a placeholder MySQL connection for the Linux deployment profile.");
+            }
+#endif
+            if (!string.IsNullOrWhiteSpace(mysqlConnection))
+            {
+                config.MysqlConnection = mysqlConnection;
+            }
+
+            return config;
         }
 
         #endregion

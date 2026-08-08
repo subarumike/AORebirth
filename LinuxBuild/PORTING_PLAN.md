@@ -18,8 +18,8 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 | 1 | Cell.Core, Utility, and Ionic.Zlib adapter | Modern NLog, portable CPU/RAM metrics, modern resource handling, unsafe parser build | Two-way list compression parity, legacy dictionary ingestion, and runtime tests pass on Windows and Ubuntu |
 | 2 | Enums, Exceptions, Interfaces, ObjectManager | Preserve assembly boundaries and shared assembly metadata | Full contract closure builds with no framework fallback packages |
 | 3 | Database and Stats | Modern Dapper/MySqlConnector, replace `System.Data.Linq.Binary`, keep schemas unchanged | Read/write/query parity against a disposable test database |
-| 4 | Communication and Core dependency audit | Adapt Communication's inert MemBus boundary without changing ISCom ordering; prove Core can be deferred for Chat | ISCom framing/FIFO and dynamic-message resolution parity; guarded Core exclusion |
-| 5 | ChatEngine | Remove NBug WinForms startup, omit the unused PlayfieldLoader/Core cache path, deploy `Config.xml`, fix Linux paths, add service shutdown | Chat startup/login/chat/channel packet parity and clean shutdown on Ubuntu |
+| 4 | Communication and Core dependency audit | Adapt Communication's inert MemBus boundary without changing ISCom ordering; identify the smallest Core slice needed by Chat | ISCom framing/FIFO and dynamic-message resolution parity; guarded full-Core exclusion |
+| 5 | ChatEngine | Remove NBug WinForms startup, extract the three required authentication sources, omit the unused PlayfieldLoader cache, deploy `Config.xml`, fix Linux paths, add service shutdown | Chat contracts/offline startup/publish parity and clean shutdown on Ubuntu |
 | 6 | Ubuntu service package | `linux-x64` publish, unprivileged service account, systemd unit, logs, backups and firewall | Restart/reboot recovery and sustained multi-player soak test |
 
 Current status: Stages 0 through 4 pass their Windows-hosted compile, contract,
@@ -27,10 +27,15 @@ offline runtime, publish-artifact, and compatibility gates. Stage 3 preserves
 Database/Stats API and mapping contracts, proves Dapper binary conversion and
 safe Stats behavior without a live database, and carries all 34 SQL assets
 exactly. Stage 4 preserves Communication API/wire/framing behavior with bounded
-loopback coverage and an inert identity-compatible MemBus adapter. Core and
-PlayfieldLoader are proven unused by Chat and deferred to the later Login/Zone
-milestones. Native Ubuntu execution and authorized disposable-MySQL CRUD parity
-are still required before the full cross-platform exit gates are complete.
+loopback coverage and an inert identity-compatible MemBus adapter. Stage 5 now
+builds and publishes ChatEngine with strict configuration, private ISCom bind,
+headless exception logging, env-only deployment secrets, systemd readiness,
+and coordinated shutdown. PlayfieldLoader and full Core are deferred, while the
+exact three Core authentication sources are kept in a contained Linux assembly.
+Strict Stage 5 contract and offline artifact gates now pass locally; native
+Ubuntu execution and
+authorized disposable-MySQL CRUD parity are still required before the full
+cross-platform exit gates are complete.
 
 ## Rules for each stage
 
@@ -44,15 +49,18 @@ are still required before the full cross-platform exit gates are complete.
 5. Do not remove a dependency or startup action until its behavioral parity
    test passes.
 
-## Remaining known ChatEngine blockers
+## Remaining ChatEngine acceptance work
 
-- NBug 1.2.2 selects WinForms and must be replaced with headless exception
-  logging in the Linux lane.
+- Verify the published apphost, exact-case assets, systemd unit, and real
+  `sd_notify` readiness/SIGTERM shutdown on Ubuntu 24.04.
+- Re-run the passing cross-runtime authentication/packet/channel fixtures and
+  bounded listener-free startup/lifecycle gates on the matching Linux runtime.
 - Live Database read/write/query parity still requires an authorized disposable
   MySQL schema; offline gates intentionally never open a connection.
-- Chat log and datafile paths assume Windows separators/current directory.
-- systemd shutdown needs a reliable stop path; the existing shutdown-file
-  mechanism can be used for the first smoke deployment.
+- Legacy per-channel chat logging remains disabled because its writer is not
+  concurrency-safe; journald server logging is the supported first deployment path.
+- Player disconnect persists offline state synchronously, so shutdown can still
+  exceed the 45-second systemd limit under heavy load or a slow database.
 - Full Core/PlayfieldLoader work remains required for LoginEngine and ZoneEngine,
   including active MemBus, MEF discovery, MathNet replacement, and data assets.
 

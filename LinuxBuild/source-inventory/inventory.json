@@ -52,6 +52,10 @@
     {
       "legacyProject": "AORebirth/Libraries/Source/AORebirth.Communication/AORebirth.Communication.csproj",
       "output": "LinuxBuild/source-inventory/AORebirth.Communication.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Server/ChatEngine/ChatEngine.csproj",
+      "output": "LinuxBuild/source-inventory/ChatEngine.CompileItems.props"
     }
   ]
 }

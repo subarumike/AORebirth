@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/SolutionAssemblyInfo.cs">
+      <Link>Properties/SolutionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelBase.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelFlags.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelMessageEventArgs.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelType.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ClientJoinEventArgs.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/RestrictedChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/GlobalChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/IChannelBase.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/LevelRestrictedChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/OrganizationChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/RaidChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/TeamChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/ChatLogger.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreClient/Character.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreClient/CharacterBase.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreClient/Client.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreServer/ChatServer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/BuddyList.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/BuddyListEntry.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/LftRegistry.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/LftPlayfieldRegistry.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/TeamLevelRanges.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/Authenticate.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/AuthenticateBot.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/BuddyAdd.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/BuddyRemove.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/ChannelDataSet.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/ChannelMessage.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/ChannelMode.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/ChatCommand.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LftRegister.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LftSearch.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LoginCharacter.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/OnlineStatus.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PlayerNameLookup.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PrivateGroupInvitePlayer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PrivateGroupJoin.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PrivateGroupKickEveryone.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PrivateGroupKickPlayer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PrivateGroupLeave.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PrivateGroupMessage.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/Tell.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketIO.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/AccountCharacterList.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/AuthenticationSeed.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/BuddyOnlineStatus.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/BuddyRemoved.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/ChannelJoin.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/ChannelLeave.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/ChannelMessage.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/ClientModeGet.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/ClientModeSet.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/LftQueryReply.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/LoginError.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/LoginOK.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MessageType.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MsgAnonymousVicinity.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MsgPredefined.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MsgPrivate.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MsgPrivateGroup.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MsgSystem.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/MsgVicinity.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/NameLookupResult.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PlayerIDUnknown.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PlayerName.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PrivateGroupInvitation.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PrivateGroupKicked.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PrivateGroupMessage.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PrivateGroupPlayerJoined.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Packets/PrivateGroupPlayerLeft.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreClient/Parser.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Program.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

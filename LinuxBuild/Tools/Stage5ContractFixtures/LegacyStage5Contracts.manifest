@@ -1,0 +1,1071 @@
+manifest|AORebirth.Stage5ChatEngineContract|1
+api|manifest\|AORebirth.Stage2Contract\|1
+api|assembly.begin\|ChatEngine
+api|assembly.name\|ChatEngine
+api|assembly.version\|1.0.0.0
+api|assembly.public-key-token\|null
+api|assembly.file-version\|1.0.0.0
+api|assembly.title\|ChatEngine
+api|assembly.description\|
+api|assembly.configuration\|
+api|assembly.company\|
+api|assembly.product\|ChatEngine
+api|assembly.copyright\|Copyright © 2014 CellAO Team
+api|assembly.trademark\|
+api|assembly.culture\|
+api|assembly.guid\|eebb0b9d-09e7-4950-a0eb-37956e3af8cd
+api|assembly.com-visible\|false
+api|assembly.utility-revision-name\|AO Rebirth
+api|type.begin\|ChatEngine.Channels.ChannelBase
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor(ChatEngine.Channels.ChannelFlags flags,ChatEngine.Channels.ChannelType type,System.UInt32 id,System.String name optional=true;default=string:"")
+api|type.property\|public instance ChatEngine.Channels.ChannelType channelType {get:public;set:private}
+api|type.property\|public instance System.UInt32 ChannelId {get:public;set:private}
+api|type.field\|ChatEngine.Channels.ChannelFlags\|channelFlags\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|ChannelName\|static=false\|initonly=false\|literal=false\|constant=
+api|type.event\|public instance ChatEngine.Channels.ChannelBase.ChannelMessageEvent OnChannelMessage {add:public;remove:public;raise:none}
+api|type.event\|public instance ChatEngine.Channels.ChannelBase.ClientJoinEvent OnClientJoinChannel {add:public;remove:public;raise:none}
+api|type.event\|public instance ChatEngine.Channels.ChannelBase.ClientJoinEvent OnClientLeaveChannel {add:public;remove:public;raise:none}
+api|type.method\|public instance System.Boolean RemoveClient(Cell.Core.IClient client)
+api|type.method\|public instance System.Void ChannelMessage(ChatEngine.CoreClient.Client sourceClient,System.String text,System.String blob optional=true;default=string:"")
+api|type.method\|public instance System.Void CloseChannel()
+api|type.method\|public instance special-name System.Void add_OnChannelMessage(ChatEngine.Channels.ChannelBase.ChannelMessageEvent value)
+api|type.method\|public instance special-name System.Void add_OnClientJoinChannel(ChatEngine.Channels.ChannelBase.ClientJoinEvent value)
+api|type.method\|public instance special-name System.Void add_OnClientLeaveChannel(ChatEngine.Channels.ChannelBase.ClientJoinEvent value)
+api|type.method\|public instance special-name System.Void remove_OnChannelMessage(ChatEngine.Channels.ChannelBase.ChannelMessageEvent value)
+api|type.method\|public instance special-name System.Void remove_OnClientJoinChannel(ChatEngine.Channels.ChannelBase.ClientJoinEvent value)
+api|type.method\|public instance special-name System.Void remove_OnClientLeaveChannel(ChatEngine.Channels.ChannelBase.ClientJoinEvent value)
+api|type.method\|public instance virtual System.Boolean AddClient(Cell.Core.IClient client)
+api|type.method\|public instance virtual special-name ChatEngine.Channels.ChannelType get_channelType()
+api|type.method\|public instance virtual special-name System.UInt32 get_ChannelId()
+api|type.end\|ChatEngine.Channels.ChannelBase
+api|type.begin\|ChatEngine.Channels.ChannelBase.ChannelMessageEvent
+api|type.kind\|delegate
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|true
+api|type.base\|System.MulticastDelegate
+api|type.constructor\|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method\|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,ChatEngine.Channels.ChannelMessageEventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method\|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method\|public instance virtual System.Void Invoke(System.Object sender,ChatEngine.Channels.ChannelMessageEventArgs e)
+api|type.end\|ChatEngine.Channels.ChannelBase.ChannelMessageEvent
+api|type.begin\|ChatEngine.Channels.ChannelBase.ClientJoinEvent
+api|type.kind\|delegate
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|true
+api|type.base\|System.MulticastDelegate
+api|type.constructor\|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method\|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,ChatEngine.Channels.ClientJoinEventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method\|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method\|public instance virtual System.Void Invoke(System.Object sender,ChatEngine.Channels.ClientJoinEventArgs e)
+api|type.end\|ChatEngine.Channels.ChannelBase.ClientJoinEvent
+api|type.begin\|ChatEngine.Channels.ChannelFlags
+api|type.kind\|enum
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|not-applicable
+api|type.enum-underlying\|System.UInt32
+api|type.enum-flags-attribute\|true
+api|type.enum-value\|CantIgnore\|System.UInt32:1
+api|type.enum-value\|CantSend\|System.UInt32:2
+api|type.enum-value\|GroupOnName\|System.UInt32:128
+api|type.enum-value\|Muted\|System.UInt32:16777216
+api|type.enum-value\|NoInternational\|System.UInt32:16
+api|type.enum-value\|NoVoice\|System.UInt32:32
+api|type.enum-value\|None\|System.UInt32:0
+api|type.enum-value\|SendCriteria\|System.UInt32:64
+api|type.end\|ChatEngine.Channels.ChannelFlags
+api|type.begin\|ChatEngine.Channels.ChannelMessageEventArgs
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.EventArgs
+api|type.constructor\|public instance .ctor()
+api|type.property\|public instance System.String PlayerName {get:public;set:public}
+api|type.property\|public instance System.String Text {get:public;set:public}
+api|type.method\|public instance special-name System.String get_PlayerName()
+api|type.method\|public instance special-name System.String get_Text()
+api|type.method\|public instance special-name System.Void set_PlayerName(System.String value)
+api|type.method\|public instance special-name System.Void set_Text(System.String value)
+api|type.end\|ChatEngine.Channels.ChannelMessageEventArgs
+api|type.begin\|ChatEngine.Channels.ChannelType
+api|type.kind\|enum
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|not-applicable
+api|type.enum-underlying\|System.Byte
+api|type.enum-flags-attribute\|false
+api|type.enum-value\|Admin\|System.Byte:1
+api|type.enum-value\|Announcements\|System.Byte:12
+api|type.enum-value\|Battlestation\|System.Byte:144
+api|type.enum-value\|GM\|System.Byte:5
+api|type.enum-value\|General\|System.Byte:135
+api|type.enum-value\|Leaders\|System.Byte:4
+api|type.enum-value\|Organization\|System.Byte:3
+api|type.enum-value\|Raid\|System.Byte:143
+api|type.enum-value\|Shopping\|System.Byte:134
+api|type.enum-value\|Team\|System.Byte:130
+api|type.enum-value\|Towers\|System.Byte:10
+api|type.enum-value\|Unknown\|System.Byte:0
+api|type.end\|ChatEngine.Channels.ChannelType
+api|type.begin\|ChatEngine.Channels.ClientJoinEventArgs
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.EventArgs
+api|type.constructor\|public instance .ctor()
+api|type.property\|public instance System.String PlayerName {get:public;set:public}
+api|type.method\|public instance special-name System.String get_PlayerName()
+api|type.method\|public instance special-name System.Void set_PlayerName(System.String value)
+api|type.end\|ChatEngine.Channels.ClientJoinEventArgs
+api|type.begin\|ChatEngine.Channels.GlobalChannel
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.Channels.ChannelBase
+api|type.constructor\|public instance .ctor(ChatEngine.Channels.ChannelFlags flags,ChatEngine.Channels.ChannelType type,System.UInt32 id,System.String name optional=true;default=string:"")
+api|type.end\|ChatEngine.Channels.GlobalChannel
+api|type.begin\|ChatEngine.Channels.IChannelBase
+api|type.kind\|interface
+api|type.modifiers\|abstract
+api|type.serializable-attribute\|not-applicable
+api|type.base\|
+api|type.property\|public instance ChatEngine.Channels.ChannelType channelType {get:public;set:none}
+api|type.property\|public instance System.UInt32 ChannelId {get:public;set:none}
+api|type.method\|public instance abstract virtual System.Boolean AddClient(Cell.Core.IClient client)
+api|type.method\|public instance abstract virtual System.Boolean RemoveClient(Cell.Core.IClient client)
+api|type.method\|public instance abstract virtual System.Void ChannelMessage(ChatEngine.CoreClient.Client sourceClient,System.String text,System.String blob optional=true;default=string:"")
+api|type.method\|public instance abstract virtual System.Void CloseChannel()
+api|type.method\|public instance abstract virtual special-name ChatEngine.Channels.ChannelType get_channelType()
+api|type.method\|public instance abstract virtual special-name System.UInt32 get_ChannelId()
+api|type.end\|ChatEngine.Channels.IChannelBase
+api|type.begin\|ChatEngine.Channels.LevelRestrictedChannel
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.Channels.ChannelBase
+api|type.constructor\|public instance .ctor(System.UInt32 channelId,System.Int32 minLevel,System.Int32 maxLevel)
+api|type.field\|System.Int32\|MaxLevel\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.Int32\|MinLevel\|static=false\|initonly=false\|literal=false\|constant=
+api|type.method\|public instance virtual System.Boolean AddClient(Cell.Core.IClient client)
+api|type.end\|ChatEngine.Channels.LevelRestrictedChannel
+api|type.begin\|ChatEngine.Channels.OrganizationChannel
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.Channels.ChannelBase
+api|type.constructor\|public instance .ctor(ChatEngine.Channels.ChannelFlags flags,ChatEngine.Channels.ChannelType type,System.UInt32 id,System.String name optional=true;default=string:"")
+api|type.constructor\|public instance .ctor(System.Int32 orgId)
+api|type.end\|ChatEngine.Channels.OrganizationChannel
+api|type.begin\|ChatEngine.Channels.RaidChannel
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.Channels.ChannelBase
+api|type.constructor\|public instance .ctor(ChatEngine.Channels.ChannelFlags flags,ChatEngine.Channels.ChannelType type,System.UInt32 id,System.String name optional=true;default=string:"")
+api|type.constructor\|public instance .ctor(System.UInt32 RaidId)
+api|type.end\|ChatEngine.Channels.RaidChannel
+api|type.begin\|ChatEngine.Channels.RestrictedChannel
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.Channels.ChannelBase
+api|type.constructor\|public instance .ctor(SmokeLounge.AOtomation.Messaging.GameData.Side side,ChatEngine.Channels.ChannelFlags flags,ChatEngine.Channels.ChannelType type)
+api|type.field\|SmokeLounge.AOtomation.Messaging.GameData.Side\|characterSide\|static=false\|initonly=false\|literal=false\|constant=
+api|type.method\|public instance virtual System.Boolean AddClient(Cell.Core.IClient client)
+api|type.end\|ChatEngine.Channels.RestrictedChannel
+api|type.begin\|ChatEngine.Channels.TeamChannel
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.Channels.ChannelBase
+api|type.constructor\|public instance .ctor(ChatEngine.Channels.ChannelFlags flags,ChatEngine.Channels.ChannelType type,System.UInt32 id,System.String name optional=true;default=string:"")
+api|type.constructor\|public instance .ctor(System.UInt32 TeamId)
+api|type.end\|ChatEngine.Channels.TeamChannel
+api|type.begin\|ChatEngine.ChatLogger
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void WriteString(System.String channel,System.String data,System.String sender)
+api|type.end\|ChatEngine.ChatLogger
+api|type.begin\|ChatEngine.CoreClient.Character
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|ChatEngine.CoreClient.CharacterBase
+api|type.constructor\|public instance .ctor(System.UInt32 characterId,ChatEngine.CoreClient.Client client)
+api|type.property\|public instance ChatEngine.CoreClient.Client Client {get:public;set:public}
+api|type.property\|public instance System.Int32 CharacterGMLevel {get:public;set:none}
+api|type.property\|public instance System.Int32 CharacterSide {get:public;set:none}
+api|type.property\|public instance System.Int32 orgId {get:public;set:none}
+api|type.method\|public instance special-name ChatEngine.CoreClient.Client get_Client()
+api|type.method\|public instance special-name System.Int32 get_CharacterGMLevel()
+api|type.method\|public instance special-name System.Int32 get_CharacterSide()
+api|type.method\|public instance special-name System.Int32 get_orgId()
+api|type.method\|public instance special-name System.Void set_Client(ChatEngine.CoreClient.Client value)
+api|type.end\|ChatEngine.CoreClient.Character
+api|type.begin\|ChatEngine.CoreClient.CharacterBase
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor(System.UInt32 characterId)
+api|type.field\|System.String\|characterFirstName\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|characterLastName\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|characterName\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|orgName\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.UInt32\|CharacterId\|static=false\|initonly=false\|literal=false\|constant=
+api|type.method\|public instance System.Boolean ReadNames()
+api|type.end\|ChatEngine.CoreClient.CharacterBase
+api|type.begin\|ChatEngine.CoreClient.Client
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|Cell.Core.ClientBase
+api|type.constructor\|public instance .ctor()
+api|type.constructor\|public instance .ctor(ChatEngine.CoreServer.ChatServer srvr)
+api|type.property\|public instance ChatEngine.CoreClient.Character Character {get:public;set:public}
+api|type.property\|public instance System.Collections.Generic.List<System.UInt32> KnownClients {get:public;set:none}
+api|type.property\|public instance System.String ServerSalt {get:public;set:public}
+api|type.field\|System.Boolean\|IsBot\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.Collections.Generic.HashSet<ChatEngine.Channels.ChannelBase>\|Channels\|static=false\|initonly=false\|literal=false\|constant=
+api|type.method\|public instance ChatEngine.CoreServer.ChatServer ChatServer()
+api|type.method\|public instance System.Void Send(System.Int32 receiver,System.Byte[] packetBytes)
+api|type.method\|public instance special-name ChatEngine.CoreClient.Character get_Character()
+api|type.method\|public instance special-name System.Collections.Generic.List<System.UInt32> get_KnownClients()
+api|type.method\|public instance special-name System.String get_ServerSalt()
+api|type.method\|public instance special-name System.Void set_Character(ChatEngine.CoreClient.Character value)
+api|type.method\|public instance special-name System.Void set_ServerSalt(System.String value)
+api|type.end\|ChatEngine.CoreClient.Client
+api|type.begin\|ChatEngine.CoreServer.ChatServer
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|Cell.Core.ServerBase
+api|type.constructor\|public instance .ctor()
+api|type.field\|System.Collections.Generic.Dictionary<System.UInt32,ChatEngine.CoreClient.Client>\|ConnectedClients\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.Collections.Generic.HashSet<ChatEngine.Channels.ChannelBase>\|Channels\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|MessageOfTheDay\|static=false\|initonly=false\|literal=false\|constant=
+api|type.method\|public instance System.Collections.Generic.List<ChatEngine.Channels.ChannelBase> ChannelsByType<!!0:T>() where !!0:T[modifiers=;constraints=]
+api|type.method\|public instance System.Void OnClientDisconnect(Cell.Core.IClient client,System.Boolean forced)
+api|type.end\|ChatEngine.CoreServer.ChatServer
+api|type.begin\|ChatEngine.Lists.BuddyList
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Collections.Generic.IEnumerable<AORebirth.Database.Entities.DBReceivedMessages> LoadRecentMsgsList(System.UInt32 charId)
+api|type.method\|public static System.Collections.Generic.List<System.Int32> LoadBuddyList(System.Int32 charId)
+api|type.end\|ChatEngine.Lists.BuddyList
+api|type.begin\|ChatEngine.Lists.LftPlayfieldRegistry
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.field\|System.String\|PlayfieldCommandPrefix\|static=true\|initonly=false\|literal=true\|constant=string:"#aorebirth-pf"
+api|type.method\|public static System.Boolean TryGet(System.UInt32 characterId,out System.Int32 playfieldId)
+api|type.method\|public static System.Void Remove(System.UInt32 characterId)
+api|type.method\|public static System.Void Set(System.UInt32 characterId,System.Int32 playfieldId)
+api|type.end\|ChatEngine.Lists.LftPlayfieldRegistry
+api|type.begin\|ChatEngine.Lists.LftRegistry
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Boolean TryGetComment(System.UInt32 characterId,out System.String comment)
+api|type.method\|public static System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<System.UInt32,System.String>> Snapshot()
+api|type.method\|public static System.Void Remove(System.UInt32 characterId)
+api|type.method\|public static System.Void Upsert(System.UInt32 characterId,System.String comment)
+api|type.end\|ChatEngine.Lists.LftRegistry
+api|type.begin\|ChatEngine.Lists.RecentMsgsEntry
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.property\|public instance System.UInt32 PlayerId {get:public;set:public}
+api|type.property\|public instance System.UInt32 ReceivedId {get:public;set:public}
+api|type.method\|public instance special-name System.UInt32 get_PlayerId()
+api|type.method\|public instance special-name System.UInt32 get_ReceivedId()
+api|type.method\|public instance special-name System.Void set_PlayerId(System.UInt32 value)
+api|type.method\|public instance special-name System.Void set_ReceivedId(System.UInt32 value)
+api|type.end\|ChatEngine.Lists.RecentMsgsEntry
+api|type.begin\|ChatEngine.Lists.TeamLevelRanges
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Boolean IsCompatible(System.Int32 searcherLevel,System.Int32 candidateLevel)
+api|type.method\|public static System.Boolean TryGetRange(System.Int32 level,out System.Int32 minLevel,out System.Int32 maxLevel)
+api|type.end\|ChatEngine.Lists.TeamLevelRanges
+api|type.begin\|ChatEngine.PacketHandlers.AuthenticateBot
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.AuthenticateBot
+api|type.begin\|ChatEngine.PacketHandlers.BuddyAdd
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.BuddyAdd
+api|type.begin\|ChatEngine.PacketHandlers.BuddyRemove
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.BuddyRemove
+api|type.begin\|ChatEngine.PacketHandlers.ChannelDataSet
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.ChannelDataSet
+api|type.begin\|ChatEngine.PacketHandlers.ChannelMode
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.ChannelMode
+api|type.begin\|ChatEngine.PacketHandlers.ChatCommand
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.ChatCommand
+api|type.begin\|ChatEngine.PacketHandlers.LftRegister
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.LftRegister
+api|type.begin\|ChatEngine.PacketHandlers.LftSearch
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.LftSearch
+api|type.begin\|ChatEngine.PacketHandlers.LoginCharacter
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.LoginCharacter
+api|type.begin\|ChatEngine.PacketHandlers.OnlineStatus
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.OnlineStatus
+api|type.begin\|ChatEngine.PacketHandlers.PlayerNameLookup
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.PlayerNameLookup
+api|type.begin\|ChatEngine.PacketHandlers.PrivateGroupInvitePlayer
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.PrivateGroupInvitePlayer
+api|type.begin\|ChatEngine.PacketHandlers.PrivateGroupJoin
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.PrivateGroupJoin
+api|type.begin\|ChatEngine.PacketHandlers.PrivateGroupKickPlayer
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.PrivateGroupKickPlayer
+api|type.begin\|ChatEngine.PacketHandlers.PrivateGroupLeave
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.PrivateGroupLeave
+api|type.begin\|ChatEngine.PacketHandlers.PrivateGroupMessage
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.PrivateGroupMessage
+api|type.begin\|ChatEngine.PacketHandlers.Tell
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.Tell
+api|type.begin\|ChatEngine.PacketReader
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.interface\|System.IDisposable
+api|type.constructor\|public instance .ctor(ref System.Byte[] packet)
+api|type.method\|public instance System.Byte ReadByte()
+api|type.method\|public instance System.Byte[] ReadBytes(System.Int32 count)
+api|type.method\|public instance System.String ReadString()
+api|type.method\|public instance System.UInt16 ReadUInt16()
+api|type.method\|public instance System.UInt32 ReadUInt32()
+api|type.method\|public instance System.Void Finish()
+api|type.method\|public instance virtual final System.Void Dispose()
+api|type.end\|ChatEngine.PacketReader
+api|type.begin\|ChatEngine.PacketWriter
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor(System.UInt16 type)
+api|type.method\|public instance System.Byte[] Finish()
+api|type.method\|public instance System.Void Write5of8(System.UInt64 input)
+api|type.method\|public instance System.Void WriteByte(System.Byte input)
+api|type.method\|public instance System.Void WriteBytes(System.Byte[] input)
+api|type.method\|public instance System.Void WriteString(System.String input)
+api|type.method\|public instance System.Void WriteUInt16(System.UInt16 input)
+api|type.method\|public instance System.Void WriteUInt32(System.UInt32 input)
+api|type.end\|ChatEngine.PacketWriter
+api|type.begin\|ChatEngine.Packets.AccountCharacterList
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.String username)
+api|type.end\|ChatEngine.Packets.AccountCharacterList
+api|type.begin\|ChatEngine.Packets.AuthenticationSeed
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.String seed)
+api|type.end\|ChatEngine.Packets.AuthenticationSeed
+api|type.begin\|ChatEngine.Packets.BuddyOnlineStatus
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid,System.UInt32 online,System.Byte[] status)
+api|type.end\|ChatEngine.Packets.BuddyOnlineStatus
+api|type.begin\|ChatEngine.Packets.BuddyRemoved
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid)
+api|type.end\|ChatEngine.Packets.BuddyRemoved
+api|type.begin\|ChatEngine.Packets.ChannelJoin
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(ChatEngine.Channels.ChannelBase channel,System.Byte[] otherData)
+api|type.method\|public static System.Byte[] Create(ChatEngine.Channels.ChannelType channelType,System.UInt32 channelId,System.String channelName,ChatEngine.Channels.ChannelFlags flags,System.Byte[] otherData)
+api|type.method\|public static System.Byte[] Create(System.UInt64 channelid,System.String channelname,System.UInt32 flags,System.Byte[] otherdata)
+api|type.end\|ChatEngine.Packets.ChannelJoin
+api|type.begin\|ChatEngine.Packets.ChannelLeave
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.Byte[] channelid)
+api|type.end\|ChatEngine.Packets.ChannelLeave
+api|type.begin\|ChatEngine.Packets.ChannelMessage
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(ChatEngine.Channels.ChannelBase channel,System.UInt32 playerid,System.String message,System.String blob)
+api|type.end\|ChatEngine.Packets.ChannelMessage
+api|type.begin\|ChatEngine.Packets.LftQueryReply
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.field\|System.Byte\|ModeAdd\|static=true\|initonly=false\|literal=true\|constant=System.Byte:0
+api|type.field\|System.Byte\|ModeClear\|static=true\|initonly=false\|literal=true\|constant=System.Byte:2
+api|type.method\|public static System.Byte[] CreateClear()
+api|type.method\|public static System.Byte[] CreateEntry(ChatEngine.Packets.LftQueryReply.Entry entry)
+api|type.end\|ChatEngine.Packets.LftQueryReply
+api|type.begin\|ChatEngine.Packets.LftQueryReply.Entry
+api|type.kind\|class
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.field\|System.Byte\|Profession\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.Byte\|Side\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|Comment\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.String\|Name\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.UInt32\|CharacterId\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.UInt32\|Level\|static=false\|initonly=false\|literal=false\|constant=
+api|type.field\|System.UInt32\|Playfield\|static=false\|initonly=false\|literal=false\|constant=
+api|type.end\|ChatEngine.Packets.LftQueryReply.Entry
+api|type.begin\|ChatEngine.Packets.LoginError
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create()
+api|type.end\|ChatEngine.Packets.LoginError
+api|type.begin\|ChatEngine.Packets.LoginOk
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create()
+api|type.end\|ChatEngine.Packets.LoginOk
+api|type.begin\|ChatEngine.Packets.MessageType
+api|type.kind\|enum
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|not-applicable
+api|type.enum-underlying\|System.Int16
+api|type.enum-flags-attribute\|false
+api|type.enum-value\|AmdMuxInfo\|System.Int16:1100
+api|type.enum-value\|AnonymousMessage\|System.Int16:35
+api|type.enum-value\|ChannelCliMode\|System.Int16:66
+api|type.enum-value\|ChannelMessage\|System.Int16:65
+api|type.enum-value\|ChannelPart\|System.Int16:61
+api|type.enum-value\|ChannelStatus\|System.Int16:60
+api|type.enum-value\|ChannelUpdate\|System.Int16:64
+api|type.enum-value\|CharacterName\|System.Int16:20
+api|type.enum-value\|CharacterUnknown\|System.Int16:10
+api|type.enum-value\|ChatCommand\|System.Int16:120
+api|type.enum-value\|ClientModeGet\|System.Int16:70
+api|type.enum-value\|ClientModeSet\|System.Int16:71
+api|type.enum-value\|Forward\|System.Int16:110
+api|type.enum-value\|FriendAdd\|System.Int16:40
+api|type.enum-value\|FriendRemove\|System.Int16:41
+api|type.enum-value\|FriendRemoved\|System.Int16:41
+api|type.enum-value\|FriendStatus\|System.Int16:40
+api|type.enum-value\|LftQuery\|System.Int16:1502
+api|type.enum-value\|LftQueryReply\|System.Int16:1501
+api|type.enum-value\|LftRegister\|System.Int16:1500
+api|type.enum-value\|LoginCharacterList\|System.Int16:7
+api|type.enum-value\|LoginError\|System.Int16:6
+api|type.enum-value\|LoginOk\|System.Int16:5
+api|type.enum-value\|LoginResponse\|System.Int16:2
+api|type.enum-value\|LoginSeed\|System.Int16:0
+api|type.enum-value\|LoginSelectChar\|System.Int16:3
+api|type.enum-value\|MessageSystem\|System.Int16:37
+api|type.enum-value\|NameLookup\|System.Int16:21
+api|type.enum-value\|Ping\|System.Int16:100
+api|type.enum-value\|Pong\|System.Int16:100
+api|type.enum-value\|PrivateChannelClientJoin\|System.Int16:55
+api|type.enum-value\|PrivateChannelClientPart\|System.Int16:56
+api|type.enum-value\|PrivateChannelInvite\|System.Int16:50
+api|type.enum-value\|PrivateChannelJoin\|System.Int16:52
+api|type.enum-value\|PrivateChannelKick\|System.Int16:51
+api|type.enum-value\|PrivateChannelKickAll\|System.Int16:54
+api|type.enum-value\|PrivateChannelPart\|System.Int16:53
+api|type.enum-value\|PrivateGroupMessage\|System.Int16:57
+api|type.enum-value\|PrivateMessage\|System.Int16:30
+api|type.enum-value\|SystemMessage\|System.Int16:36
+api|type.enum-value\|VicinityMessage\|System.Int16:34
+api|type.end\|ChatEngine.Packets.MessageType
+api|type.begin\|ChatEngine.Packets.MsgAnonymousVicinity
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.String arg1,System.String msg,System.String blob)
+api|type.end\|ChatEngine.Packets.MsgAnonymousVicinity
+api|type.begin\|ChatEngine.Packets.MsgPredefined
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid,System.UInt32 windowid,System.UInt32 messageid,System.String msgargs)
+api|type.end\|ChatEngine.Packets.MsgPredefined
+api|type.begin\|ChatEngine.Packets.MsgPrivate
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 senderId,System.String message,System.Int32 unk1,System.Int32 unk2)
+api|type.end\|ChatEngine.Packets.MsgPrivate
+api|type.begin\|ChatEngine.Packets.MsgPrivateGroup
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid,System.String message,System.String blob)
+api|type.end\|ChatEngine.Packets.MsgPrivateGroup
+api|type.begin\|ChatEngine.Packets.MsgSystem
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.String message)
+api|type.method\|public static System.Byte[] Create(System.String source,System.String message)
+api|type.method\|public static System.Byte[] CreatePet(System.String message,System.Int32 unk1,System.Int32 unk2)
+api|type.end\|ChatEngine.Packets.MsgSystem
+api|type.begin\|ChatEngine.Packets.MsgVicinity
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid,System.String message,System.Byte chatType)
+api|type.end\|ChatEngine.Packets.MsgVicinity
+api|type.begin\|ChatEngine.Packets.NameLookupResult
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid,System.String playername)
+api|type.end\|ChatEngine.Packets.NameLookupResult
+api|type.begin\|ChatEngine.Packets.PlayerIdUnknown
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerId)
+api|type.end\|ChatEngine.Packets.PlayerIdUnknown
+api|type.begin\|ChatEngine.Packets.PrivateGroupInvitation
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid)
+api|type.end\|ChatEngine.Packets.PrivateGroupInvitation
+api|type.begin\|ChatEngine.Packets.PrivateGroupKicked
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 playerid)
+api|type.end\|ChatEngine.Packets.PrivateGroupKicked
+api|type.begin\|ChatEngine.Packets.PrivateGroupMessage
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 privategroupid,System.UInt32 playerid,System.String message,System.String blob)
+api|type.end\|ChatEngine.Packets.PrivateGroupMessage
+api|type.begin\|ChatEngine.Packets.PrivateGroupPlayerJoined
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 privategroupid,System.UInt32 playerid)
+api|type.end\|ChatEngine.Packets.PrivateGroupPlayerJoined
+api|type.begin\|ChatEngine.Packets.PrivateGroupPlayerLeft
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Byte[] Create(System.UInt32 privategroupid,System.UInt32 playerid)
+api|type.end\|ChatEngine.Packets.PrivateGroupPlayerLeft
+api|type.begin\|ChatEngine.Parser
+api|type.kind\|class
+api|type.modifiers\|
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.constructor\|public instance .ctor()
+api|type.method\|public instance System.Boolean Parse(ChatEngine.CoreClient.Client client,System.Byte[] packet,System.UInt16 messageNumber)
+api|type.end\|ChatEngine.Parser
+api|assembly.end\|ChatEngine
+protected|ChatEngine.CoreClient.Client|method protected instance System.Boolean OnReceive(Cell.Core.BufferSegment buffer) virtual=true abstract=false final=false
+protected|ChatEngine.CoreClient.Client|method protected instance System.UInt16 GetMessageNumber(System.Byte[] packet) virtual=false abstract=false final=false
+protected|ChatEngine.CoreServer.ChatServer|method protected instance Cell.Core.IClient CreateClient(System.Net.IPAddress address) virtual=true abstract=false final=false
+protected|ChatEngine.CoreServer.ChatServer|method protected instance System.Void ClientConnectedToChat(Cell.Core.IClient client) virtual=false abstract=false final=false
+protected|ChatEngine.CoreServer.ChatServer|method protected instance System.Void OnReceiveUDP(System.Int32 num_bytes,System.Byte[] buf,System.Net.IPEndPoint ip) virtual=true abstract=false final=false
+protected|ChatEngine.CoreServer.ChatServer|method protected instance System.Void OnSendTo(System.Net.IPEndPoint clientIP,System.Int32 num_bytes) virtual=true abstract=false final=false
+protected|ChatEngine.PacketReader|method protected instance System.Void Dispose(System.Boolean disposing) virtual=true abstract=false final=false
+auth.type-set|AO.Core.Encryption.BigInteger,AO.Core.Encryption.LoginEncryption,AORebirth.Core.Encryption.PasswordHash
+auth.type|AO.Core.Encryption.BigInteger|class|false|false|System.Object
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance()
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(AO.Core.Encryption.BigInteger bi)
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(System.Byte[] inData)
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(System.Byte[] inData,System.Int32 inLen)
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(System.Int64 value)
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(System.String value,System.Int32 radix)
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(System.UInt32[] inData)
+auth.member|AO.Core.Encryption.BigInteger|ctor public instance(System.UInt64 value)
+auth.member|AO.Core.Encryption.BigInteger|field public instance System.Int32 dataLength initonly=false literal=false constant=
+auth.member|AO.Core.Encryption.BigInteger|field public static System.Int32[] primesBelow2000 initonly=true literal=false constant=
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger abs() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger gcd(AO.Core.Encryption.BigInteger bi) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger genCoPrime(System.Int32 bits,System.Random rand) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger max(AO.Core.Encryption.BigInteger bi) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger min(AO.Core.Encryption.BigInteger bi) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger modInverse(AO.Core.Encryption.BigInteger modulus) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger modPow(AO.Core.Encryption.BigInteger exp,AO.Core.Encryption.BigInteger n) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance AO.Core.Encryption.BigInteger sqrt() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean Equals(System.Object o) virtual=true abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean FermatLittleTest(System.Int32 confidence) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean LucasStrongTest() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean RabinMillerTest(System.Int32 confidence) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean SolovayStrassenTest(System.Int32 confidence) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean isProbablePrime() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Boolean isProbablePrime(System.Int32 confidence) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Byte[] getBytes() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Int32 GetHashCode() virtual=true abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Int32 IntValue() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Int32 bitCount() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Int64 LongValue() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.String ToHexString() virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.String ToString() virtual=true abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.String ToString(System.Int32 radix) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Void genRandomBits(System.Int32 bits,System.Random rand) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Void setBit(System.UInt32 bitNum) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public instance System.Void unsetBit(System.UInt32 bitNum) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger genPseudoPrime(System.Int32 bits,System.Int32 confidence,System.Random rand) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Addition(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_BitwiseAnd(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_BitwiseOr(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Decrement(AO.Core.Encryption.BigInteger bi1) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Division(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_ExclusiveOr(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Implicit(System.Int32 value) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Implicit(System.Int64 value) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Implicit(System.UInt32 value) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Implicit(System.UInt64 value) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Increment(AO.Core.Encryption.BigInteger bi1) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_LeftShift(AO.Core.Encryption.BigInteger bi1,System.Int32 shiftVal) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Modulus(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Multiply(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_OnesComplement(AO.Core.Encryption.BigInteger bi1) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_RightShift(AO.Core.Encryption.BigInteger bi1,System.Int32 shiftVal) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_Subtraction(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger op_UnaryNegation(AO.Core.Encryption.BigInteger bi1) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static AO.Core.Encryption.BigInteger[] LucasSequence(AO.Core.Encryption.BigInteger P,AO.Core.Encryption.BigInteger Q,AO.Core.Encryption.BigInteger k,AO.Core.Encryption.BigInteger n) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Boolean op_Equality(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Boolean op_GreaterThan(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Boolean op_GreaterThanOrEqual(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Boolean op_Inequality(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Boolean op_LessThan(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Boolean op_LessThanOrEqual(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Int32 Jacobi(AO.Core.Encryption.BigInteger a,AO.Core.Encryption.BigInteger b) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Void MulDivTest(System.Int32 rounds) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Void RSATest(System.Int32 rounds) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Void RSATest2(System.Int32 rounds) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.BigInteger|method public static System.Void SqrtTest(System.Int32 rounds) virtual=false abstract=false final=false
+auth.type|AO.Core.Encryption.LoginEncryption|class|false|false|System.Object
+auth.member|AO.Core.Encryption.LoginEncryption|ctor public instance()
+auth.member|AO.Core.Encryption.LoginEncryption|field public instance System.Boolean i_Enable initonly=false literal=false constant=
+auth.member|AO.Core.Encryption.LoginEncryption|method public instance System.Boolean IsCharacterOnAccount(System.String UserName,System.UInt32 CharacterID) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.LoginEncryption|method public instance System.Boolean IsValidLogin(System.String LoginKey,System.String ServerSalt,System.String UserName) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.LoginEncryption|method public instance System.Boolean IsValidLogin(System.String LoginKey,System.String ServerSalt,System.String UserName,System.String passwordHash) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.LoginEncryption|method public instance System.String GeneratePasswordHash(System.String clearPassword) virtual=false abstract=false final=false
+auth.member|AO.Core.Encryption.LoginEncryption|method public instance System.Void DecryptLoginKey(System.String LoginKey,out System.String& UserName,out System.String& ServerSalt,out System.String& Password) virtual=false abstract=false final=false
+auth.type|AORebirth.Core.Encryption.PasswordHash|class|false|false|System.Object
+auth.member|AORebirth.Core.Encryption.PasswordHash|ctor public instance()
+auth.member|AORebirth.Core.Encryption.PasswordHash|field public static System.Int32 HashSize initonly=false literal=true constant=30
+auth.member|AORebirth.Core.Encryption.PasswordHash|field public static System.Int32 MinPBKDF2Iterations initonly=false literal=true constant=1111
+auth.member|AORebirth.Core.Encryption.PasswordHash|field public static System.Int32 SaltSize initonly=false literal=true constant=30
+auth.member|AORebirth.Core.Encryption.PasswordHash|method public static System.Boolean ValidatePassword(System.String password,System.String correctHash) virtual=false abstract=false final=false
+auth.member|AORebirth.Core.Encryption.PasswordHash|method public static System.String CreateHash(System.String password) virtual=false abstract=false final=false
+reference|AORebirth.Communication|1.0.0.0|
+reference|AORebirth.Core|1.0.0.0|
+reference|AORebirth.Database|1.0.0.0|
+reference|AORebirth.Stats|1.0.0.0|
+reference|Cell.Core|0.5.0.0|
+reference|NBug|1.2.0.0|a4292a325f69b123
+reference|NLog|2.1.0.0|5120e14c03d0593c
+reference|PlayfieldLoader|1.0.0.0|
+reference|SmokeLounge.AOtomation.Messaging|0.62.1.0|366f6caa557bb5ed
+reference|System|4.0.0.0|b77a5c561934e089
+reference|System.Core|4.0.0.0|b77a5c561934e089
+reference|System.Data|4.0.0.0|b77a5c561934e089
+reference|Utility|1.0.0.0|
+reference|locales|1.0.0.0|
+reference|mscorlib|4.0.0.0|b77a5c561934e089
+team-range|-1|false|1|4|true|true
+team-range|0|false|1|5|true|true
+team-range|1|true|1|7|true|true
+team-range|2|true|1|8|true|true
+team-range|3|true|1|9|true|true
+team-range|4|true|1|10|true|true
+team-range|5|true|1|11|true|true
+team-range|6|true|1|12|true|true
+team-range|7|true|1|13|true|true
+team-range|8|true|2|14|true|true
+team-range|9|true|3|15|true|true
+team-range|10|true|4|17|true|true
+team-range|11|true|5|18|true|true
+team-range|12|true|6|19|true|true
+team-range|13|true|7|20|true|true
+team-range|14|true|8|21|true|true
+team-range|15|true|9|24|true|true
+team-range|16|true|10|25|true|true
+team-range|17|true|10|26|true|true
+team-range|18|true|11|27|true|true
+team-range|19|true|12|28|true|true
+team-range|20|true|13|29|true|true
+team-range|21|true|14|30|true|true
+team-range|22|true|15|32|true|true
+team-range|23|true|15|33|true|true
+team-range|24|true|15|34|true|true
+team-range|25|true|16|35|true|true
+team-range|26|true|17|38|true|true
+team-range|27|true|18|39|true|true
+team-range|28|true|19|40|true|true
+team-range|29|true|20|41|true|true
+team-range|30|true|21|43|true|true
+team-range|31|true|22|44|true|true
+team-range|32|true|22|45|true|true
+team-range|33|true|23|46|true|true
+team-range|34|true|24|49|true|true
+team-range|35|true|25|50|true|true
+team-range|36|true|26|51|true|true
+team-range|37|true|26|52|true|true
+team-range|38|true|26|54|true|true
+team-range|39|true|27|55|true|true
+team-range|40|true|28|56|true|true
+team-range|41|true|29|57|true|true
+team-range|42|true|30|60|true|true
+team-range|43|true|30|61|true|true
+team-range|44|true|31|62|true|true
+team-range|45|true|32|63|true|true
+team-range|46|true|33|65|true|true
+team-range|47|true|34|66|true|true
+team-range|48|true|34|67|true|true
+team-range|49|true|34|68|true|true
+team-range|50|true|35|71|true|true
+team-range|51|true|36|72|true|true
+team-range|52|true|37|73|true|true
+team-range|53|true|38|74|true|true
+team-range|54|true|38|76|true|true
+team-range|55|true|39|77|true|true
+team-range|56|true|40|78|true|true
+team-range|57|true|41|79|true|true
+team-range|58|true|42|82|true|true
+team-range|59|true|42|83|true|true
+team-range|60|true|42|84|true|true
+team-range|61|true|43|85|true|true
+team-range|62|true|44|87|true|true
+team-range|63|true|45|88|true|true
+team-range|64|true|46|89|true|true
+team-range|65|true|46|90|true|true
+team-range|66|true|47|93|true|true
+team-range|67|true|48|94|true|true
+team-range|68|true|49|95|true|true
+team-range|69|true|50|96|true|true
+team-range|70|true|50|98|true|true
+team-range|71|true|50|99|true|true
+team-range|72|true|51|100|true|true
+team-range|73|true|52|101|true|true
+team-range|74|true|53|104|true|true
+team-range|75|true|54|105|true|true
+team-range|76|true|54|106|true|true
+team-range|77|true|55|107|true|true
+team-range|78|true|56|109|true|true
+team-range|79|true|57|110|true|true
+team-range|80|true|58|111|true|true
+team-range|81|true|58|112|true|true
+team-range|82|true|58|115|true|true
+team-range|83|true|59|116|true|true
+team-range|84|true|60|117|true|true
+team-range|85|true|61|118|true|true
+team-range|86|true|62|120|true|true
+team-range|87|true|62|121|true|true
+team-range|88|true|63|122|true|true
+team-range|89|true|64|123|true|true
+team-range|90|true|65|126|true|true
+team-range|91|true|66|127|true|true
+team-range|92|true|66|128|true|true
+team-range|93|true|66|129|true|true
+team-range|94|true|67|131|true|true
+team-range|95|true|68|132|true|true
+team-range|96|true|69|133|true|true
+team-range|97|true|70|134|true|true
+team-range|98|true|70|137|true|true
+team-range|99|true|71|138|true|true
+team-range|100|true|72|139|true|true
+team-range|101|true|73|140|true|true
+team-range|102|true|74|142|true|true
+team-range|103|true|74|143|true|true
+team-range|104|true|74|144|true|true
+team-range|105|true|75|145|true|true
+team-range|106|true|76|148|true|true
+team-range|107|true|77|149|true|true
+team-range|108|true|78|150|true|true
+team-range|109|true|78|151|true|true
+team-range|110|true|79|153|true|true
+team-range|111|true|80|154|true|true
+team-range|112|true|81|155|true|true
+team-range|113|true|82|156|true|true
+team-range|114|true|82|159|true|true
+team-range|115|true|82|160|true|true
+team-range|116|true|83|161|true|true
+team-range|117|true|84|162|true|true
+team-range|118|true|85|164|true|true
+team-range|119|true|86|165|true|true
+team-range|120|true|86|166|true|true
+team-range|121|true|87|167|true|true
+team-range|122|true|88|170|true|true
+team-range|123|true|89|171|true|true
+team-range|124|true|90|172|true|true
+team-range|125|true|90|173|true|true
+team-range|126|true|90|175|true|true
+team-range|127|true|91|176|true|true
+team-range|128|true|92|177|true|true
+team-range|129|true|93|178|true|true
+team-range|130|true|94|181|true|true
+team-range|131|true|94|182|true|true
+team-range|132|true|95|183|true|true
+team-range|133|true|96|184|true|true
+team-range|134|true|97|186|true|true
+team-range|135|true|98|187|true|true
+team-range|136|true|98|188|true|true
+team-range|137|true|98|189|true|true
+team-range|138|true|99|192|true|true
+team-range|139|true|100|193|true|true
+team-range|140|true|101|194|true|true
+team-range|141|true|102|195|true|true
+team-range|142|true|102|197|true|true
+team-range|143|true|103|198|true|true
+team-range|144|true|104|199|true|true
+team-range|145|true|105|200|true|true
+team-range|146|true|106|203|true|true
+team-range|147|true|106|204|true|true
+team-range|148|true|106|205|true|true
+team-range|149|true|107|206|true|true
+team-range|150|true|108|208|true|true
+team-range|151|true|109|209|true|true
+team-range|152|true|110|210|true|true
+team-range|153|true|110|211|true|true
+team-range|154|true|111|214|true|true
+team-range|155|true|112|215|true|true
+team-range|156|true|113|216|true|true
+team-range|157|true|114|217|true|true
+team-range|158|true|114|219|true|true
+team-range|159|true|114|220|true|true
+team-range|160|true|115|220|true|true
+team-range|161|true|116|220|true|true
+team-range|162|true|117|220|true|true
+team-range|163|true|118|220|true|true
+team-range|164|true|118|220|true|true
+team-range|165|true|119|220|true|true
+team-range|166|true|120|220|true|true
+team-range|167|true|121|220|true|true
+team-range|168|true|122|220|true|true
+team-range|169|true|122|220|true|true
+team-range|170|true|122|220|true|true
+team-range|171|true|123|220|true|true
+team-range|172|true|124|220|true|true
+team-range|173|true|125|220|true|true
+team-range|174|true|126|220|true|true
+team-range|175|true|126|220|true|true
+team-range|176|true|127|220|true|true
+team-range|177|true|128|220|true|true
+team-range|178|true|129|220|true|true
+team-range|179|true|130|220|true|true
+team-range|180|true|130|220|true|true
+team-range|181|true|130|220|true|true
+team-range|182|true|131|220|true|true
+team-range|183|true|132|220|true|true
+team-range|184|true|133|220|true|true
+team-range|185|true|134|220|true|true
+team-range|186|true|134|220|true|true
+team-range|187|true|135|220|true|true
+team-range|188|true|136|220|true|true
+team-range|189|true|137|220|true|true
+team-range|190|true|138|220|true|true
+team-range|191|true|138|220|true|true
+team-range|192|true|138|220|true|true
+team-range|193|true|139|220|true|true
+team-range|194|true|140|220|true|true
+team-range|195|true|141|220|true|true
+team-range|196|true|142|220|true|true
+team-range|197|true|142|220|true|true
+team-range|198|true|143|220|true|true
+team-range|199|true|144|220|true|true
+team-range|200|true|145|220|true|true
+team-range|201|true|146|220|true|true
+team-range|202|true|146|220|true|true
+team-range|203|true|146|220|true|true
+team-range|204|true|147|220|true|true
+team-range|205|true|148|220|true|true
+team-range|206|true|149|220|true|true
+team-range|207|true|150|220|true|true
+team-range|208|true|150|220|true|true
+team-range|209|true|151|220|true|true
+team-range|210|true|152|220|true|true
+team-range|211|true|153|220|true|true
+team-range|212|true|154|220|true|true
+team-range|213|true|154|220|true|true
+team-range|214|true|154|220|true|true
+team-range|215|true|155|220|true|true
+team-range|216|true|156|220|true|true
+team-range|217|true|157|220|true|true
+team-range|218|true|158|220|true|true
+team-range|219|true|158|220|true|true
+team-range|220|true|159|220|true|true
+team-range|221|false|216|226|true|true
+team-range|1000|false|995|1005|true|true
+static.registry|LftRegistry|verified
+static.registry|LftPlayfieldRegistry|verified
+topology.channel|ChatEngine.Channels.GlobalChannel;id=1;name=Global;type=General;flags=CantIgnore, NoInternational
+topology.channel|ChatEngine.Channels.LevelRestrictedChannel;id=1;name=Shopping 1-50;type=Shopping;flags=None;MinLevel=1;MaxLevel=50
+topology.channel|ChatEngine.Channels.LevelRestrictedChannel;id=2;name=Shopping 51-150;type=Shopping;flags=None;MinLevel=51;MaxLevel=150
+topology.channel|ChatEngine.Channels.LevelRestrictedChannel;id=3;name=Shopping 151-220;type=Shopping;flags=None;MinLevel=151;MaxLevel=220
+topology.channel|ChatEngine.Channels.RestrictedChannel;id=0;name=Neutral;type=General;flags=None;characterSide=Neutral
+topology.channel|ChatEngine.Channels.RestrictedChannel;id=1;name=Clan;type=General;flags=None;characterSide=Neutral
+topology.channel|ChatEngine.Channels.RestrictedChannel;id=2;name=Omni-Tek;type=General;flags=None;characterSide=Neutral
+topology.channel|ChatEngine.Channels.RestrictedChannel;id=6;name=Suiv's Playground;type=GM;flags=None;characterSide=Neutral
+topology.server|running=false|clients=0|tcp=null|udp=null|motd=stage5-fixture-motd
+wire|authentication-seed\|14\|605addbfe2ffb5a66632579c4ce01f80b11923b550bbf361ac33f77563703e55\|AAAACgAIc2VlZHzOvAo=
+wire|buddy-online\|15\|14ba777d003ac6511102d23a1dad6b86ef3425745b89aa588114bd67f35949cb\|ACgACwECAwQAAAABCQgH
+wire|buddy-removed\|8\|76a9842d66fc4ecd093f07776df60a7e314f1c8249a2d6afbc4e4521066d9cd4\|ACkABBAgMEA=
+wire|channel-join\|28\|96914f2fdafb943479f1d7ac0c5f2c4e2f366c06c8d08c6cb3311e9b00556c1d\|ADwAGAgHBgUEAAlTdGFnZTV8zrwRIjNEAQMFBw==
+wire|channel-leave\|9\|f9e4395ad4a598845f945c8052e55270ffad5abdb3c97950df2d9135eb5ed7ba\|AD0ABQECAwQF
+wire|lft-clear\|23\|ce87bfe85dd5424a027d5dd5dbdd1a6e03276769b0d625f358c0d641af240523\|Bd0AEwIAAAAAAAAAAAAAAAAAAAAAAAA=
+wire|lft-entry\|45\|5feecd89da711d44e2dc02ad7d6ca31797b4967bf0302f73f4ed13736cdaaf6f\|Bd0AKQABAgMEAAtGaXh0dXJlTmFtZQAAANwAAAB/AgwAC0xGVApmaXh0dXJl
+wire|login-error\|4\|294cbca3d5f36949ec78e874650c67cb993b15c243a93d3eda5822957ab746ab\|AAYAAA==
+wire|login-ok\|4\|05db705de1d67525a820002dc8c4c6c5b8ab3617b0fb391177f8a44b16d2db40\|AAUAAA==
+wire|msg-anonymous-vicinity\|28\|875bae36a2e04df7d78886d711aa682e859c0deed38d123e426bdb6e5148f2ce\|ACMAGAADYXJnAAptZXNzYWdlfM68AAVibG9iCg==
+wire|msg-predefined\|25\|2a0d90d3ee558e7d264dcdb48ebca50254c91e3a335e3b4fdaf20e581c7ee3eb\|ACUAFQAAAAsAAAAWAAAAIQAHYXJnc3zOvA==
+wire|msg-private\|24\|29290ad8b9582ea3ae546612a6a251988448500a3e66757de8b8d5515bd8cbcf\|AB4AFAAAACwACnByaXZhdGV8zrz/+QAJ
+wire|msg-private-group\|25\|2a58322d63c900efa2b1dd0c04fd9bd871898bdb8a27a8423610b0f894758c7b\|AB4AFQAAADcACGdyb3VwfM68AAVibG9iCg==
+wire|msg-system\|16\|cb2d785cf225f2d4f505ef9617d0affa06a19887002edbb3185e827676489037\|ACQADAAKc3lzdGVtfM68Cg==
+wire|msg-system-pet\|16\|7021064371696915cae9e7fb26a196ff0d1a3f113171d7fb6992890a2e7745a5\|ACMADAARAAZwZXR8zrz/7Q==
+wire|msg-vicinity\|24\|abd145fcdfc60cce1b5e442986edccc9a633db225878ffa021e4a2536aa4ae44\|ACIAFAAAAEIAC3ZpY2luaXR5fM68AAEH
+wire|name-lookup\|19\|4d1dbc3d0c165f543527a5994831ff716ce191a6f609ff018c8dd03bda9fcc4c\|ABUADwAAAE0ACVN0YWdlRml2ZQ==
+wire|packet-io\|25\|c8745945e0543ca97b8195b310857675c189114edaa469c34b98f96e899c83b6\|EjQAFaW+7xAgMEAACXBhY2tldHzOvAcICQ==
+wire|player-id-unknown\|8\|ad2c5a099db8208d157e8ed40221e7cb6b92d4df01a364b165d7eebe35907de0\|AAoABAAAAFg=
+wire|player-name-internal\|22\|2e939c62a5b8ffe4745ae91e35fb488c1f75e04731ee842301ac0ce2394ed63d\|ABQAEgAAAGMADEludGVybmFsTmFtZQ==
+wire|private-group-invitation\|8\|92cac8e96b3488c1e4e1bfb5544d3bc78065c1b7a4be389ffa2df81add50169a\|ADIABAAAAGU=
+wire|private-group-kicked\|8\|41dbab8c5198215bdc993ac1aef55d8edeb5d052cecb86facf7e736101383425\|ADMABAAAAGY=
+wire|private-group-message\|31\|51e6204112b71c5cde4f8e2e041025f274be61e4ab389b3e5e85785b1c4f0891\|ADkAGwAAAGcAAABoAAptZXNzYWdlfM68AAVibG9iCg==
+wire|private-group-player-joined\|12\|2a25aac66e3c1bfd098f2d422589762834b5c21b7144c282c55a575e6c5bd5b0\|ADcACAAAAGkAAABq
+wire|private-group-player-left\|12\|6083c04e4b5c28e5d9bad311f0ebad6c6f225eb6a1af4034d8d746f2c404c9df\|ADgACAAAAGsAAABs
+parser.mode|source-mapped-only|handlers-not-invoked
+unsafe.excluded|AccountCharacterList.Create
+unsafe.excluded|Authenticate/AuthenticateBot handlers
+unsafe.excluded|ChatServer.Start/Parser.Parse/DAO/Connector.Open
+auth.password-fixture|Stage5-Password-μ|1232:PHKY9NF3XsgM7tRXXo0RratPXMTqLxNY3SCP3Cb2:BBtKq/V25/4OGWICqnL8cQrBLzboj3mtVyzT334b

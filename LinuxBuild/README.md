@@ -106,11 +106,40 @@ LinuxBuild\verify-stage4-contracts.cmd
 LinuxBuild\verify-stage4-offline.cmd
 ```
 
-The first ChatEngine milestone does not require `AORebirth.Core` or
-`PlayfieldLoader`: the only Chat startup call populates a cache that Chat never
-reads. The Linux Chat overlay will condition out that import/call and guard the
-published dependency set; Windows behavior remains unchanged. Full Core stays
-in scope for later LoginEngine/ZoneEngine work.
+Stage 5 builds ChatEngine as a .NET 10 executable. `PlayfieldLoader` and its
+unused startup cache remain excluded. Chat authentication did contain a hidden
+Core dependency through the legacy `AO.Core.Encryption` namespace, so the Linux
+lane links the exact `BigInteger`, `PasswordHash`, and `LoginEncryption` sources
+into a contained `AORebirth.Chat.Authentication` assembly instead of publishing
+a misleading partial `AORebirth.Core` assembly. Full Core remains in scope for
+later LoginEngine/ZoneEngine work.
+
+The Linux entrypoint excludes NBug/WinForms, logs to the console for journald,
+strictly validates exact-case configuration, keeps ISCom loopback-only by
+default, requires the MySQL secret from the environment, detects listener bind
+failures, reports readiness to systemd only after both listeners pass, and shuts
+down both listeners through SIGTERM/SIGINT without `Environment.Exit`. Offline
+startup validation constructs only closed provider objects and listener-free
+topology:
+
+```bat
+set AO_REBIRTH_CONFIG_PATH=%CD%\LinuxBuild\Projects\bin\ChatEngine.Linux\Release\net10.0\Config.xml
+set AO_REBIRTH_MYSQL_CONNECTION=Server=127.0.0.1;Database=offline;Uid=offline;Pwd=offline
+set AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1
+set AO_REBIRTH_ISCOM_LISTEN_IP=127.0.0.1
+set AO_REBIRTH_REQUIRED_SQL_TYPE=MySql
+dotnet LinuxBuild\Projects\bin\ChatEngine.Linux\Release\net10.0\ChatEngine.dll --validate-startup
+```
+
+Publish the first Ubuntu package with:
+
+```bat
+LinuxBuild\publish-chatengine.cmd linux-x64 false
+```
+
+Pass `true` as the second argument for a self-contained package. Deployment
+layout, secret handling, systemd, and firewall boundaries are documented in
+[`deployment/README.md`](deployment/README.md).
 
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:
@@ -122,8 +151,10 @@ dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.
   --check
 ```
 
-This checkpoint proves modern-.NET compile and offline parity feasibility only.
-It is not yet a ChatEngine build, native Linux runtime validation, live database
-parity proof, packet-parity proof, or deployment.
+This checkpoint includes a publishable ChatEngine build plus passing
+Windows/Linux contract, authentication, negative configuration, lifecycle, and
+publish-structure gates. Native Ubuntu execution, real POSIX signal delivery,
+systemd readiness verification, live database parity, and player traffic remain
+pending.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).

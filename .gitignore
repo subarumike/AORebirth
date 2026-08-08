@@ -121,6 +121,7 @@ tools-temp/external/easyhook/
 
 # Local/generated investigation artifacts that can contain credentials, captures, or copied binaries.
 build-verify/
+/LinuxBuild/artifacts/
 tools-temp/live-pcaps/
 tools-temp/fusion-logs/
 tools-temp/ao-dir-quarantine/

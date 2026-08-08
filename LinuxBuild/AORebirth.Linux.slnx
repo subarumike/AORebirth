@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Libraries/">
+    <Project Path="Projects/AORebirth.Chat.Authentication.Linux.csproj" />
     <Project Path="Projects/AORebirth.Communication.Linux.csproj" />
     <Project Path="Projects/AORebirth.Database.Linux.csproj" />
     <Project Path="Projects/AORebirth.Enums.Linux.csproj" />
@@ -16,8 +17,12 @@
     <Project Path="Projects/Translations.Linux.csproj" />
     <Project Path="Projects/Utility.Linux.csproj" />
   </Folder>
+  <Folder Name="/Servers/">
+    <Project Path="Projects/ChatEngine.Linux.csproj" />
+  </Folder>
   <Folder Name="/Tools/">
     <Project Path="Tools/CompatibilitySmokeTests/CompatibilitySmokeTests.csproj" />
+    <Project Path="Tools/PublishDirectoryGuard/PublishDirectoryGuard.csproj" />
     <Project Path="Tools/SourceInventoryGuard/SourceInventoryGuard.csproj" />
   </Folder>
 </Solution>

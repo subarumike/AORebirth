@@ -30,18 +30,26 @@ Framework solution as the reference build.
   wire contracts plus bounded source/published IPv4-loopback framing/FIFO and
   keepalive checks. The net40-only, source-dead Communication MemBus boundary is
   replaced by an inert identity-compatible Linux assembly.
-- Core/PlayfieldLoader are proven unused by ChatEngine beyond an ignored cache
-  initialization and are deferred to LoginEngine/ZoneEngine; Windows behavior
-  remains unchanged.
-- This is compile feasibility only; no engine is Linux-deployable yet.
+- PlayfieldLoader's ignored cache initialization and full Core are excluded from
+  the first ChatEngine publish. A hidden `AO.Core.Encryption.LoginEncryption`
+  dependency is preserved through a contained three-source Linux authentication
+  assembly.
+- Stage 5 builds and publishes ChatEngine for `linux-x64`. Linux startup uses
+  strict exact-case configuration, a private ISCom bind, console/journald
+  logging, fail-closed env-only MySQL credentials, bind-readiness checks,
+  `Type=notify` readiness, and coordinated SIGTERM/SIGINT shutdown.
+- Offline startup validation constructs closed provider objects and a
+  listener-free eight-channel topology; it does not open a database or socket.
+- Stage 5 Windows/Linux contract, authentication, lifecycle, negative secret,
+  and framework-dependent/self-contained publish-structure gates pass locally.
 - Native Ubuntu execution remains pending VPS connection details.
 
 ## Next slice
 
-Port ChatEngine as the first deployable engine. Exclude the audited-unused
-Core/PlayfieldLoader path in the Linux lane, replace NBug/WinForms startup,
-canonicalize runtime paths and configuration packaging, and add bounded
-headless shutdown before Ubuntu validation.
+Validate the published ChatEngine apphost, systemd unit, `sd_notify` readiness,
+exact-case assets, and real SIGTERM shutdown on the Ubuntu 24.04 VPS. Do not
+open a live database or public listener until the VPS topology and
+disposable-database authorization are supplied.
 
 ## Constraints
 
