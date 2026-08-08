@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,6 +36,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AOSharp.Common">
+      <HintPath>..\..\..\aosharp\AOSharp\bin\Debug\AOSharp.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="AOSharp.Core">
+      <HintPath>..\..\..\aosharp\AOSharp\bin\Debug\AOSharp.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -62,15 +68,5 @@
     </ProjectReference>
   </ItemGroup>
   <!-- Fallback when the vendored AOSharp tree is not present: reuse last-built plugin dependency DLLs. -->
-  <ItemGroup Condition="!Exists('..\external\aosharp-github\AOSharp.Core\AOSharp.Core.csproj')">
-    <Reference Include="AOSharp.Common">
-      <HintPath>bin\Debug\AOSharp.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AOSharp.Core">
-      <HintPath>bin\Debug\AOSharp.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

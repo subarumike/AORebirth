@@ -27,6 +27,7 @@ namespace AORebirth.Core.Playfields
     /// <summary>
     /// Capture-backed ICC HQ Andromeda population (PF 655 / 0x028F).
     /// Capture 20260719-ICC-Capture: 52 city NPCs (players excluded; Karrec trio owned separately).
+    /// Capture 20260806-naleb-transport: + Zyvania Bagh Neleb transport NPC.
     /// </summary>
     internal static class AndromedaIccHqSpawn
     {
@@ -739,6 +740,23 @@ namespace AORebirth.Core.Playfields
                 Hx = 0.0f, Hy = -0.92655f, Hz = 0.0f, Hw = 0.37618f,
                 Textures = new[] { new[] { 0, 0 }, new[] { 1, 296303 }, new[] { 2, 155955 }, new[] { 3, 245697 }, new[] { 4, 296305 } },
                 Meshes = new[] { new[] { 0, 40637, 0, 4 }, new[] { 1, 258990, 0, 2 } },
+                Waypoints = null,
+            },
+            // Capture 20260806-naleb-transport / 20260806-141648: Zyvania Bagh Neleb transport NPC.
+            // Position/level/health/monsterData from CHAR-SEEN; Gender=Female from dialogue
+            // ("nano mage female") + Gender enum Female=3. Breed=Nanomage.
+            // BLOCKED: no SimpleCharFullUpdate in either capture (already in range at start) —
+            // HeadMesh/Textures/Meshes/AppearanceValue/CharacterFlags need a leave-range SCFU.
+            new CityNpc
+            {
+                Name = "Zyvania Bagh",
+                Level = 75, Health = 5328, MonsterData = 274625, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 250,
+                NpcFamily = 3, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1640,
+                Side = 0, Breed = 3, Gender = 3, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 3158.138f, Y = 35.11f, Z = 899.1043f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
                 Waypoints = null,
             },
         };

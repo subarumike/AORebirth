@@ -35,6 +35,7 @@ namespace ZoneEngine.Core.Playfields
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.MessageHandlers;
 
     #endregion
 
@@ -70,7 +71,19 @@ namespace ZoneEngine.Core.Playfields
 
         public void SendPlayfieldReadyBlock(ZoneClient client, ICharacter character)
         {
-            if (client == null || character == null || !this.isPrivateCityPlayfieldCandidate(this.playfieldIdentity))
+            if (client == null || character == null)
+            {
+                return;
+            }
+
+            if (LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(this.playfieldIdentity.Instance))
+            {
+                // Capture 20260806-202421: empty PlayfieldAllTowers + PlayfieldAllCities after FullCharacter.
+                this.SendEmptyPlayfieldTowersAndCities(client);
+                return;
+            }
+
+            if (!this.isPrivateCityPlayfieldCandidate(this.playfieldIdentity))
             {
                 return;
             }

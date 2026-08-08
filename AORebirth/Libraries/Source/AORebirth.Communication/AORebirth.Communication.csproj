@@ -57,6 +57,7 @@
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\OnlineCharacters.cs" />
     <Compile Include="Messages\Ping.cs" />
+    <Compile Include="Messages\PrivateSystemMessage.cs" />
     <Compile Include="Messages\RequestPlayfieldList.cs" />
     <Compile Include="Messages\SystemChatMessage.cs" />
     <Compile Include="Messages\VicinityChatMessage.cs" />

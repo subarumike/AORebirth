@@ -1,0 +1,3464 @@
+{
+  "professions": {
+    "Engineer": [
+      {
+        "itemId": 26166,
+        "quality": 76,
+        "name": "Nano Crystal (Eagle Eye)"
+      },
+      {
+        "itemId": 26245,
+        "quality": 43,
+        "name": "Nano Crystal (Free Movement)"
+      },
+      {
+        "itemId": 28744,
+        "quality": 33,
+        "name": "Nano Crystal (Survival Aid)"
+      },
+      {
+        "itemId": 28745,
+        "quality": 113,
+        "name": "Nano Crystal (Precision of the Hunter)"
+      },
+      {
+        "itemId": 28749,
+        "quality": 66,
+        "name": "Nano Crystal (Team Free Movement)"
+      },
+      {
+        "itemId": 28751,
+        "quality": 4,
+        "name": "Nano Crystal (Team Quick Heal)"
+      },
+      {
+        "itemId": 28752,
+        "quality": 10,
+        "name": "Nano Crystal (Terrain Knowledge)"
+      },
+      {
+        "itemId": 38531,
+        "quality": 24,
+        "name": "Nano Crystal (Team Terrain Knowledge)"
+      },
+      {
+        "itemId": 55838,
+        "quality": 7,
+        "name": "Nano Crystal (Frost With Snow)"
+      },
+      {
+        "itemId": 55840,
+        "quality": 17,
+        "name": "Nano Crystal (Jacket of Blades)"
+      },
+      {
+        "itemId": 55841,
+        "quality": 30,
+        "name": "Nano Crystal (Firefly's Fury)"
+      },
+      {
+        "itemId": 55842,
+        "quality": 24,
+        "name": "Nano Crystal (Enshroud with Barbs)"
+      },
+      {
+        "itemId": 55843,
+        "quality": 37,
+        "name": "Nano Crystal (Cloak of Fire)"
+      },
+      {
+        "itemId": 55844,
+        "quality": 47,
+        "name": "Nano Crystal (Sparking Touch)"
+      },
+      {
+        "itemId": 55845,
+        "quality": 53,
+        "name": "Nano Crystal (Porcupine Barrier)"
+      },
+      {
+        "itemId": 55846,
+        "quality": 63,
+        "name": "Nano Crystal (Fiery Wrap)"
+      },
+      {
+        "itemId": 55847,
+        "quality": 73,
+        "name": "Nano Crystal (Skin of the Toad)"
+      },
+      {
+        "itemId": 55848,
+        "quality": 90,
+        "name": "Nano Crystal (Guard of the Grizzly)"
+      },
+      {
+        "itemId": 55849,
+        "quality": 83,
+        "name": "Nano Crystal (Arctic Gale)"
+      },
+      {
+        "itemId": 55850,
+        "quality": 109,
+        "name": "Nano Crystal (Magma Coating)"
+      },
+      {
+        "itemId": 55851,
+        "quality": 99,
+        "name": "Nano Crystal (Nest of Vipers)"
+      },
+      {
+        "itemId": 55852,
+        "quality": 116,
+        "name": "Nano Crystal (Protection of the Storm)"
+      },
+      {
+        "itemId": 55863,
+        "quality": 1,
+        "name": "Nano Crystal (Coat of Barbs)"
+      },
+      {
+        "itemId": 75369,
+        "quality": 20,
+        "name": "Nano Crystal (Lesser Wilderness Protection)"
+      },
+      {
+        "itemId": 75370,
+        "quality": 43,
+        "name": "Nano Crystal (Wilderness Protection)"
+      },
+      {
+        "itemId": 75371,
+        "quality": 70,
+        "name": "Nano Crystal (Major Wilderness Protection)"
+      },
+      {
+        "itemId": 75372,
+        "quality": 96,
+        "name": "Nano Crystal (Greater Wilderness Protection)"
+      },
+      {
+        "itemId": 82077,
+        "quality": 33,
+        "name": "Nano Crystal (Team Survival Technique)"
+      },
+      {
+        "itemId": 82078,
+        "quality": 17,
+        "name": "Nano Crystal (Team Rough Stitching)"
+      },
+      {
+        "itemId": 82079,
+        "quality": 116,
+        "name": "Nano Crystal (Team Practiced Stitching)"
+      },
+      {
+        "itemId": 82080,
+        "quality": 27,
+        "name": "Nano Crystal (Survival Technique)"
+      },
+      {
+        "itemId": 82083,
+        "quality": 93,
+        "name": "Nano Crystal (Practiced Stitching)"
+      },
+      {
+        "itemId": 82086,
+        "quality": 57,
+        "name": "Nano Crystal (Greater Team Quick Heal)"
+      },
+      {
+        "itemId": 82087,
+        "quality": 43,
+        "name": "Nano Crystal (Greater Quick Heal)"
+      },
+      {
+        "itemId": 82089,
+        "quality": 86,
+        "name": "Nano Crystal (Encourage Regrowth)"
+      },
+      {
+        "itemId": 82838,
+        "quality": 20,
+        "name": "Nano Crystal (Pronouncement of Greatness)"
+      },
+      {
+        "itemId": 82839,
+        "quality": 24,
+        "name": "Nano Crystal (Sparrow Flight)"
+      },
+      {
+        "itemId": 85142,
+        "quality": 83,
+        "name": "Nano Crystal (Grinning Hunter)"
+      },
+      {
+        "itemId": 85145,
+        "quality": 47,
+        "name": "Nano Crystal (Playful Cub)"
+      },
+      {
+        "itemId": 136690,
+        "quality": 14,
+        "name": "Nano Crystal (Slipshod Bandaging)"
+      },
+      {
+        "itemId": 136691,
+        "quality": 116,
+        "name": "Nano Crystal (Survival of the Fittest)"
+      },
+      {
+        "itemId": 136692,
+        "quality": 41,
+        "name": "Nano Crystal (Patch Wounds)"
+      },
+      {
+        "itemId": 136693,
+        "quality": 64,
+        "name": "Nano Crystal (Restore to Health)"
+      },
+      {
+        "itemId": 136694,
+        "quality": 107,
+        "name": "Nano Crystal (Restore Vitality)"
+      },
+      {
+        "itemId": 136695,
+        "quality": 90,
+        "name": "Nano Crystal (Natural Remedy)"
+      },
+      {
+        "itemId": 136697,
+        "quality": 74,
+        "name": "Nano Crystal (Makeshift Bandaging)"
+      },
+      {
+        "itemId": 136699,
+        "quality": 34,
+        "name": "Nano Crystal (Natural Cure)"
+      },
+      {
+        "itemId": 136701,
+        "quality": 21,
+        "name": "Nano Crystal (Lesser Restore to Health)"
+      },
+      {
+        "itemId": 136705,
+        "quality": 83,
+        "name": "Nano Crystal (Cellular Reformation)"
+      },
+      {
+        "itemId": 136707,
+        "quality": 50,
+        "name": "Nano Crystal (Alleviate Pain)"
+      },
+      {
+        "itemId": 161095,
+        "quality": 57,
+        "name": "NanoCrystal (Lure of the Pincushion)"
+      },
+      {
+        "itemId": 161146,
+        "quality": 47,
+        "name": "NanoCrystal (Wind Slicer)"
+      },
+      {
+        "itemId": 161154,
+        "quality": 47,
+        "name": "NanoCrystal (Ballad of Smoke)"
+      },
+      {
+        "itemId": 161162,
+        "quality": 40,
+        "name": "NanoCrystal (Strength of the Hummingbird)"
+      },
+      {
+        "itemId": 161504,
+        "quality": 1,
+        "name": "NanoCrystal (Cyclic Coat of Barbs)"
+      },
+      {
+        "itemId": 161675,
+        "quality": 30,
+        "name": "NanoCrystal (Leet Friend)"
+      },
+      {
+        "itemId": 162118,
+        "quality": 66,
+        "name": "Nano Crystal (Maek Ouch!)"
+      },
+      {
+        "itemId": 162255,
+        "quality": 53,
+        "name": "Nano Crystal (Hide of the Puppy)"
+      },
+      {
+        "itemId": 162314,
+        "quality": 80,
+        "name": "Nano Crystal (Sharpen Claws)"
+      },
+      {
+        "itemId": 163389,
+        "quality": 24,
+        "name": "Nano Crystal (Pr0n0unc3m3nt 0f L4z1n3ss)"
+      },
+      {
+        "itemId": 204309,
+        "quality": 58,
+        "name": "NanoCrystal (Freedom of the Forester)"
+      },
+      {
+        "itemId": 204315,
+        "quality": 80,
+        "name": "NanoCrystal (Boon of the Forester)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      },
+      {
+        "itemId": 302215,
+        "quality": 125,
+        "name": "Nano Crystal (Dragon Scales)"
+      },
+      {
+        "itemId": 302221,
+        "quality": 125,
+        "name": "Nano Crystal (Gift of the Twig)"
+      },
+      {
+        "itemId": 302233,
+        "quality": 125,
+        "name": "Nano Crystal (Lupine Agility)"
+      },
+      {
+        "itemId": 302241,
+        "quality": 125,
+        "name": "Nano Crystal (Feline Ferocity)"
+      },
+      {
+        "itemId": 302415,
+        "quality": 125,
+        "name": "Nano Crystal (Furry Precision)"
+      }
+    ],
+    "Bureaucrat": [
+      {
+        "itemId": 29202,
+        "quality": 37,
+        "name": "Nano Crystal (Nano Growth)"
+      },
+      {
+        "itemId": 29358,
+        "quality": 24,
+        "name": "Nano Crystal (Pistol Mastery)"
+      },
+      {
+        "itemId": 30101,
+        "quality": 27,
+        "name": "Nano Crystal (Anger Addlement)"
+      },
+      {
+        "itemId": 30102,
+        "quality": 43,
+        "name": "Nano Crystal (Authority Figure)"
+      },
+      {
+        "itemId": 30110,
+        "quality": 10,
+        "name": "Nano Crystal (Distracted Gaze)"
+      },
+      {
+        "itemId": 30113,
+        "quality": 37,
+        "name": "Nano Crystal (Drill Missile)"
+      },
+      {
+        "itemId": 30117,
+        "quality": 70,
+        "name": "Nano Crystal (Droid Repair)"
+      },
+      {
+        "itemId": 30119,
+        "quality": 57,
+        "name": "Nano Crystal (Face in the Crowd)"
+      },
+      {
+        "itemId": 30122,
+        "quality": 14,
+        "name": "Nano Crystal (Gunslinger)"
+      },
+      {
+        "itemId": 30128,
+        "quality": 50,
+        "name": "Nano Crystal (Monofilament Whip)"
+      },
+      {
+        "itemId": 30131,
+        "quality": 76,
+        "name": "Nano Crystal (Pheromone Control)"
+      },
+      {
+        "itemId": 30135,
+        "quality": 116,
+        "name": "Nano Crystal (Red Tape)"
+      },
+      {
+        "itemId": 30136,
+        "quality": 109,
+        "name": "Nano Crystal (Remembered Pain)"
+      },
+      {
+        "itemId": 30138,
+        "quality": 43,
+        "name": "Nano Crystal (Sleep)"
+      },
+      {
+        "itemId": 30140,
+        "quality": 90,
+        "name": "Nano Crystal (Nano Restoration Escalation)"
+      },
+      {
+        "itemId": 30143,
+        "quality": 90,
+        "name": "Nano Crystal (Terror Blast)"
+      },
+      {
+        "itemId": 46415,
+        "quality": 83,
+        "name": "Nano Crystal (Supervisor-Grade Aide-Droid)"
+      },
+      {
+        "itemId": 46416,
+        "quality": 60,
+        "name": "Nano Crystal (Supervisor-Grade Assistant-Droid)"
+      },
+      {
+        "itemId": 46417,
+        "quality": 37,
+        "name": "Nano Crystal (Supervisor-Grade Attendant-Droid)"
+      },
+      {
+        "itemId": 46419,
+        "quality": 20,
+        "name": "Nano Crystal (Supervisor-Grade Helper-Droid)"
+      },
+      {
+        "itemId": 46421,
+        "quality": 113,
+        "name": "Nano Crystal (Supervisor-Grade Secretary-Droid)"
+      },
+      {
+        "itemId": 46423,
+        "quality": 73,
+        "name": "Nano Crystal (Limited Aide-Droid)"
+      },
+      {
+        "itemId": 46424,
+        "quality": 50,
+        "name": "Nano Crystal (Limited Assistant-Droid)"
+      },
+      {
+        "itemId": 46425,
+        "quality": 30,
+        "name": "Nano Crystal (Limited Attendant-Droid)"
+      },
+      {
+        "itemId": 46427,
+        "quality": 17,
+        "name": "Nano Crystal (Limited Helper-bot)"
+      },
+      {
+        "itemId": 46429,
+        "quality": 99,
+        "name": "Nano Crystal (Limited Secretary-Droid)"
+      },
+      {
+        "itemId": 46431,
+        "quality": 76,
+        "name": "Nano Crystal (Faithful Aide-Droid)"
+      },
+      {
+        "itemId": 46432,
+        "quality": 53,
+        "name": "Nano Crystal (Faithful Assistant-Droid)"
+      },
+      {
+        "itemId": 46433,
+        "quality": 33,
+        "name": "Nano Crystal (Faithful Attendant-Droid)"
+      },
+      {
+        "itemId": 46435,
+        "quality": 17,
+        "name": "Nano Crystal (Faithful Helper-Droid)"
+      },
+      {
+        "itemId": 46437,
+        "quality": 106,
+        "name": "Nano Crystal (Faithful Secretary-Droid)"
+      },
+      {
+        "itemId": 46440,
+        "quality": 86,
+        "name": "Nano Crystal (Executive-Grade Aide-Droid)"
+      },
+      {
+        "itemId": 46441,
+        "quality": 63,
+        "name": "Nano Crystal (Executive-Grade Assistant-Droid)"
+      },
+      {
+        "itemId": 46442,
+        "quality": 40,
+        "name": "Nano Crystal (Executive-Grade Attendant-Droid)"
+      },
+      {
+        "itemId": 46444,
+        "quality": 24,
+        "name": "Nano Crystal (Executive-Grade Helper-Droid)"
+      },
+      {
+        "itemId": 46446,
+        "quality": 119,
+        "name": "Nano Crystal (Executive-Grade Secretary-Droid)"
+      },
+      {
+        "itemId": 46449,
+        "quality": 43,
+        "name": "Nano Crystal (Director-Grade Attendant-Droid)"
+      },
+      {
+        "itemId": 46451,
+        "quality": 27,
+        "name": "Nano Crystal (Director-Grade Helper-Droid)"
+      },
+      {
+        "itemId": 46454,
+        "quality": 14,
+        "name": "Nano Crystal (Director-Grade Worker-Droid)"
+      },
+      {
+        "itemId": 46455,
+        "quality": 96,
+        "name": "Nano Crystal (Basic Secretary-Droid)"
+      },
+      {
+        "itemId": 46456,
+        "quality": 1,
+        "name": "Nano Crystal (Basic Worker-Droid)"
+      },
+      {
+        "itemId": 46458,
+        "quality": 90,
+        "name": "Nano Crystal (Director-Grade Aide-Droid)"
+      },
+      {
+        "itemId": 46459,
+        "quality": 66,
+        "name": "Nano Crystal (Director-Grade Assistant-Droid)"
+      },
+      {
+        "itemId": 46461,
+        "quality": 109,
+        "name": "Nano Crystal (Advanced Secretary-Droid)"
+      },
+      {
+        "itemId": 46462,
+        "quality": 7,
+        "name": "Nano Crystal (Advanced Worker)"
+      },
+      {
+        "itemId": 46464,
+        "quality": 70,
+        "name": "Nano Crystal (Basic Aide-Droid)"
+      },
+      {
+        "itemId": 46465,
+        "quality": 47,
+        "name": "Nano Crystal (Basic Assistant-Droid)"
+      },
+      {
+        "itemId": 46466,
+        "quality": 27,
+        "name": "Nano Crystal (Basic Attendant-Droid)"
+      },
+      {
+        "itemId": 46468,
+        "quality": 14,
+        "name": "Nano Crystal (Basic Helper-Droid)"
+      },
+      {
+        "itemId": 46471,
+        "quality": 80,
+        "name": "Nano Crystal (Advanced Aide-Droid)"
+      },
+      {
+        "itemId": 46472,
+        "quality": 57,
+        "name": "Nano Crystal (Advanced Assistant-Droid)"
+      },
+      {
+        "itemId": 46473,
+        "quality": 37,
+        "name": "Nano Crystal (Advanced Attendant-Droid)"
+      },
+      {
+        "itemId": 46475,
+        "quality": 20,
+        "name": "Nano Crystal (Advanced Helper)"
+      },
+      {
+        "itemId": 56003,
+        "quality": 4,
+        "name": "Nano Crystal (Lesser Illusory Paralysis)"
+      },
+      {
+        "itemId": 56004,
+        "quality": 33,
+        "name": "Nano Crystal (Lesser Musculature Command)"
+      },
+      {
+        "itemId": 56005,
+        "quality": 24,
+        "name": "Nano Crystal (Restrict Movement)"
+      },
+      {
+        "itemId": 56006,
+        "quality": 47,
+        "name": "Nano Crystal (Revoke Movement License)"
+      },
+      {
+        "itemId": 56007,
+        "quality": 80,
+        "name": "Nano Crystal (Illusory Paralysis)"
+      },
+      {
+        "itemId": 56008,
+        "quality": 63,
+        "name": "Nano Crystal (Enforce Rest Break)"
+      },
+      {
+        "itemId": 56009,
+        "quality": 99,
+        "name": "Nano Crystal (Greater Restrict Movement)"
+      },
+      {
+        "itemId": 56010,
+        "quality": 116,
+        "name": "Nano Crystal (Musculature Command)"
+      },
+      {
+        "itemId": 78445,
+        "quality": 93,
+        "name": "Nano Crystal (Searing Bolt)"
+      },
+      {
+        "itemId": 78446,
+        "quality": 10,
+        "name": "Nano Crystal (Punishing Blade)"
+      },
+      {
+        "itemId": 82003,
+        "quality": 20,
+        "name": "Nano Crystal (Subsonic Blast)"
+      },
+      {
+        "itemId": 82004,
+        "quality": 63,
+        "name": "Nano Crystal (Stinging Reminder)"
+      },
+      {
+        "itemId": 82005,
+        "quality": 43,
+        "name": "Nano Crystal (Performance Review)"
+      },
+      {
+        "itemId": 82186,
+        "quality": 93,
+        "name": "Nano Crystal (Rigid Stance)"
+      },
+      {
+        "itemId": 82187,
+        "quality": 27,
+        "name": "Nano Crystal (Mass Illusory Paralysis)"
+      },
+      {
+        "itemId": 82188,
+        "quality": 10,
+        "name": "Nano Crystal (Mass Daze)"
+      },
+      {
+        "itemId": 82193,
+        "quality": 40,
+        "name": "Nano Crystal (Capture Attention)"
+      },
+      {
+        "itemId": 82194,
+        "quality": 66,
+        "name": "Nano Crystal (Captivate Crowd)"
+      },
+      {
+        "itemId": 82811,
+        "quality": 17,
+        "name": "Nano Crystal (Weight of the Guilty)"
+      },
+      {
+        "itemId": 82812,
+        "quality": 30,
+        "name": "Nano Crystal (Stumbling Steps)"
+      },
+      {
+        "itemId": 82816,
+        "quality": 4,
+        "name": "Nano Crystal (Lesser Stumbling Steps)"
+      },
+      {
+        "itemId": 82818,
+        "quality": 106,
+        "name": "Nano Crystal (Greater Stumbling Steps)"
+      },
+      {
+        "itemId": 82819,
+        "quality": 80,
+        "name": "Nano Crystal (Great Weight of the Guilty)"
+      },
+      {
+        "itemId": 82820,
+        "quality": 50,
+        "name": "Nano Crystal (Blizzard of Red Tape)"
+      },
+      {
+        "itemId": 85319,
+        "quality": 37,
+        "name": "Nano Crystal (Lesser Weighty Announcement)"
+      },
+      {
+        "itemId": 85320,
+        "quality": 14,
+        "name": "Nano Crystal (Lesser Enforced Sloth)"
+      },
+      {
+        "itemId": 85321,
+        "quality": 60,
+        "name": "Nano Crystal (Enforced Sloth)"
+      },
+      {
+        "itemId": 90451,
+        "quality": 99,
+        "name": "Nano Crystal (Baton of Leadership (Team))"
+      },
+      {
+        "itemId": 90453,
+        "quality": 17,
+        "name": "Nano Crystal (Baton of Authority (Team))"
+      },
+      {
+        "itemId": 95386,
+        "quality": 83,
+        "name": "Nano Crystal (Weighty Announcement)"
+      },
+      {
+        "itemId": 99212,
+        "quality": 20,
+        "name": "Nano Crystal (Temporary Glamor)"
+      },
+      {
+        "itemId": 99213,
+        "quality": 63,
+        "name": "Nano Crystal (Solicit Support)"
+      },
+      {
+        "itemId": 99214,
+        "quality": 40,
+        "name": "Nano Crystal (Soft Siren Call)"
+      },
+      {
+        "itemId": 99215,
+        "quality": 53,
+        "name": "Nano Crystal (Personal Magnetism)"
+      },
+      {
+        "itemId": 99216,
+        "quality": 96,
+        "name": "Nano Crystal (Lesser Charismatic Rapture)"
+      },
+      {
+        "itemId": 99217,
+        "quality": 27,
+        "name": "Nano Crystal (Lesser Pheromone Control)"
+      },
+      {
+        "itemId": 99220,
+        "quality": 86,
+        "name": "Nano Crystal (Impose Will)"
+      },
+      {
+        "itemId": 99221,
+        "quality": 47,
+        "name": "Nano Crystal (Dominate Psyche)"
+      },
+      {
+        "itemId": 99225,
+        "quality": 109,
+        "name": "Nano Crystal (Captivated Thoughts)"
+      },
+      {
+        "itemId": 99226,
+        "quality": 33,
+        "name": "Nano Crystal (Bend Will)"
+      },
+      {
+        "itemId": 100444,
+        "quality": 103,
+        "name": "Nano Crystal (Cubicle Dweller)"
+      },
+      {
+        "itemId": 100461,
+        "quality": 80,
+        "name": "Nano Crystal (Demotivate)"
+      },
+      {
+        "itemId": 121143,
+        "quality": 37,
+        "name": "Nano Crystal (Sudden Scare)"
+      },
+      {
+        "itemId": 121145,
+        "quality": 57,
+        "name": "Nano Crystal (Prey On Fear)"
+      },
+      {
+        "itemId": 121148,
+        "quality": 110,
+        "name": "Nano Crystal (Crush Bravery)"
+      },
+      {
+        "itemId": 203658,
+        "quality": 22,
+        "name": "NanoCrystal (Sidestep the Blame)"
+      },
+      {
+        "itemId": 203833,
+        "quality": 24,
+        "name": "NanoCrystal (Beg for Freedom)"
+      },
+      {
+        "itemId": 203836,
+        "quality": 49,
+        "name": "NanoCrystal (Pursuade for Freedom)"
+      },
+      {
+        "itemId": 203851,
+        "quality": 36,
+        "name": "NanoCrystal (Minor Exoskeleton Pulse)"
+      },
+      {
+        "itemId": 203949,
+        "quality": 36,
+        "name": "NanoCrystal (Request Freedom)"
+      },
+      {
+        "itemId": 203959,
+        "quality": 42,
+        "name": "NanoCrystal (The Claim to Freedom)"
+      },
+      {
+        "itemId": 205288,
+        "quality": 30,
+        "name": "Nano Crystal (Gallant Hero: The Enraged Drone)"
+      },
+      {
+        "itemId": 205290,
+        "quality": 52,
+        "name": "Nano Crystal (Gallant Hero: The Infuriated Minion)"
+      },
+      {
+        "itemId": 205292,
+        "quality": 71,
+        "name": "Nano Crystal (Gallant Hero: The Aggravated Servant)"
+      },
+      {
+        "itemId": 205294,
+        "quality": 92,
+        "name": "Nano Crystal (Gallant Hero: The Indignant Flunky)"
+      },
+      {
+        "itemId": 205296,
+        "quality": 110,
+        "name": "Nano Crystal (Gallant Hero: The Angry Servitor)"
+      },
+      {
+        "itemId": 205434,
+        "quality": 70,
+        "name": "Nano Crystal (Corporate Leadership: Dispensation)"
+      },
+      {
+        "itemId": 205436,
+        "quality": 119,
+        "name": "Nano Crystal (Corporate Leadership: Clemency)"
+      },
+      {
+        "itemId": 229962,
+        "quality": 142,
+        "name": "Nano Crystal (Team Empowered Allure of Servitude)"
+      },
+      {
+        "itemId": 229965,
+        "quality": 100,
+        "name": "Nano Crystal (Team Empowered Captivated Thoughts)"
+      },
+      {
+        "itemId": 230373,
+        "quality": 30,
+        "name": "Nano Crystal (Gallant Slave: The Enraged Slave)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      }
+    ],
+    "Doctor": [
+      {
+        "itemId": 27805,
+        "quality": 24,
+        "name": "Nano Crystal (Blood Circle)"
+      },
+      {
+        "itemId": 28753,
+        "quality": 24,
+        "name": "Nano Crystal (Bind Wounds)"
+      },
+      {
+        "itemId": 28754,
+        "quality": 27,
+        "name": "Nano Crystal (Biotoxin MK I)"
+      },
+      {
+        "itemId": 28755,
+        "quality": 43,
+        "name": "Nano Crystal (Biotoxin MK II)"
+      },
+      {
+        "itemId": 28756,
+        "quality": 73,
+        "name": "Nano Crystal (Biotoxin MK III)"
+      },
+      {
+        "itemId": 28757,
+        "quality": 93,
+        "name": "Nano Crystal (Biotoxin MK IV)"
+      },
+      {
+        "itemId": 28761,
+        "quality": 90,
+        "name": "Nano Crystal (Close Wounds)"
+      },
+      {
+        "itemId": 28762,
+        "quality": 116,
+        "name": "Nano Crystal (Colossal Health)"
+      },
+      {
+        "itemId": 28767,
+        "quality": 7,
+        "name": "Nano Crystal (Doctor's Grace)"
+      },
+      {
+        "itemId": 28770,
+        "quality": 14,
+        "name": "Nano Crystal (Enhanced First Aid)"
+      },
+      {
+        "itemId": 28771,
+        "quality": 37,
+        "name": "Nano Crystal (Enlarge)"
+      },
+      {
+        "itemId": 28773,
+        "quality": 80,
+        "name": "Nano Crystal (Exaggerated Health)"
+      },
+      {
+        "itemId": 28776,
+        "quality": 76,
+        "name": "Nano Crystal (Natural Healing)"
+      },
+      {
+        "itemId": 28780,
+        "quality": 7,
+        "name": "Nano Crystal (Inflict Harm)"
+      },
+      {
+        "itemId": 28782,
+        "quality": 90,
+        "name": "Nano Crystal (Instinctive Control)"
+      },
+      {
+        "itemId": 28785,
+        "quality": 37,
+        "name": "Nano Crystal (Premium Cover)"
+      },
+      {
+        "itemId": 28787,
+        "quality": 33,
+        "name": "Nano Crystal (Specialist Treatment)"
+      },
+      {
+        "itemId": 28788,
+        "quality": 119,
+        "name": "Nano Crystal (Superior First Aid)"
+      },
+      {
+        "itemId": 28789,
+        "quality": 30,
+        "name": "Nano Crystal (Superior Healing)"
+      },
+      {
+        "itemId": 28790,
+        "quality": 53,
+        "name": "Nano Crystal (Surgeon's Touch)"
+      },
+      {
+        "itemId": 29358,
+        "quality": 24,
+        "name": "Nano Crystal (Pistol Mastery)"
+      },
+      {
+        "itemId": 42410,
+        "quality": 96,
+        "name": "Nano Crystal (Cleanse Wounds)"
+      },
+      {
+        "itemId": 42412,
+        "quality": 1,
+        "name": "Nano Crystal (Enhance Team Health)"
+      },
+      {
+        "itemId": 42413,
+        "quality": 76,
+        "name": "Nano Crystal (Greater Team Healing)"
+      },
+      {
+        "itemId": 42414,
+        "quality": 60,
+        "name": "Nano Crystal (Health Pump)"
+      },
+      {
+        "itemId": 42415,
+        "quality": 83,
+        "name": "Nano Crystal (Iron Circle)"
+      },
+      {
+        "itemId": 42416,
+        "quality": 14,
+        "name": "Nano Crystal (Lasting Heal)"
+      },
+      {
+        "itemId": 42417,
+        "quality": 57,
+        "name": "Nano Crystal (Medic's Call)"
+      },
+      {
+        "itemId": 42420,
+        "quality": 40,
+        "name": "Nano Crystal (Team Healing)"
+      },
+      {
+        "itemId": 42423,
+        "quality": 4,
+        "name": "Nano Crystal (Weak Team Heal)"
+      },
+      {
+        "itemId": 43924,
+        "quality": 80,
+        "name": "Nano Crystal (Superior Wound Bindings)"
+      },
+      {
+        "itemId": 43925,
+        "quality": 86,
+        "name": "Nano Crystal (Syndicated Healing)"
+      },
+      {
+        "itemId": 43926,
+        "quality": 57,
+        "name": "Nano Crystal (Tailored Cure)"
+      },
+      {
+        "itemId": 43927,
+        "quality": 60,
+        "name": "Nano Crystal (Team Cellular Rebuild)"
+      },
+      {
+        "itemId": 43928,
+        "quality": 70,
+        "name": "Nano Crystal (Team Checkup)"
+      },
+      {
+        "itemId": 43930,
+        "quality": 20,
+        "name": "Nano Crystal (Team Field Dressings)"
+      },
+      {
+        "itemId": 43931,
+        "quality": 113,
+        "name": "Nano Crystal (Team Nano Bandage)"
+      },
+      {
+        "itemId": 43934,
+        "quality": 83,
+        "name": "Nano Crystal (Thorough Examination)"
+      },
+      {
+        "itemId": 43935,
+        "quality": 113,
+        "name": "Nano Crystal (Tissue Repair)"
+      },
+      {
+        "itemId": 43936,
+        "quality": 93,
+        "name": "Nano Crystal (Professional Care)"
+      },
+      {
+        "itemId": 43938,
+        "quality": 40,
+        "name": "Nano Crystal (Recurrent Remedy)"
+      },
+      {
+        "itemId": 43939,
+        "quality": 20,
+        "name": "Nano Crystal (Relief From Pain)"
+      },
+      {
+        "itemId": 43941,
+        "quality": 40,
+        "name": "Nano Crystal (Restorative Boost)"
+      },
+      {
+        "itemId": 43942,
+        "quality": 27,
+        "name": "Nano Crystal (Spreading Health)"
+      },
+      {
+        "itemId": 43943,
+        "quality": 96,
+        "name": "Nano Crystal (Superior Dress Wounds)"
+      },
+      {
+        "itemId": 43948,
+        "quality": 70,
+        "name": "Nano Crystal (Medical Sequencer)"
+      },
+      {
+        "itemId": 43949,
+        "quality": 40,
+        "name": "Nano Crystal (Minor Balm)"
+      },
+      {
+        "itemId": 43950,
+        "quality": 33,
+        "name": "Nano Crystal (Minor Team Purification)"
+      },
+      {
+        "itemId": 43952,
+        "quality": 73,
+        "name": "Nano Crystal (Nano Bandage)"
+      },
+      {
+        "itemId": 43953,
+        "quality": 93,
+        "name": "Nano Crystal (Nano Surgery)"
+      },
+      {
+        "itemId": 43954,
+        "quality": 27,
+        "name": "Nano Crystal (Periodic Checkup)"
+      },
+      {
+        "itemId": 43955,
+        "quality": 33,
+        "name": "Nano Crystal (Physician's Skill)"
+      },
+      {
+        "itemId": 43959,
+        "quality": 63,
+        "name": "Nano Crystal (Lesser Bloom of Health)"
+      },
+      {
+        "itemId": 43961,
+        "quality": 47,
+        "name": "Nano Crystal (Lesser Circle of Renewal)"
+      },
+      {
+        "itemId": 43962,
+        "quality": 17,
+        "name": "Nano Crystal (Lesser Nano Bandage)"
+      },
+      {
+        "itemId": 43963,
+        "quality": 24,
+        "name": "Nano Crystal (Lesser Nano Surgery)"
+      },
+      {
+        "itemId": 43964,
+        "quality": 109,
+        "name": "Nano Crystal (Lesser Policy Payout)"
+      },
+      {
+        "itemId": 43967,
+        "quality": 93,
+        "name": "Nano Crystal (Greater Lasting heal)"
+      },
+      {
+        "itemId": 43973,
+        "quality": 116,
+        "name": "Nano Crystal (Healing Light)"
+      },
+      {
+        "itemId": 43975,
+        "quality": 14,
+        "name": "Nano Crystal (Inferior Cleanse Wounds)"
+      },
+      {
+        "itemId": 43976,
+        "quality": 50,
+        "name": "Nano Crystal (Easing Touch)"
+      },
+      {
+        "itemId": 43978,
+        "quality": 4,
+        "name": "Nano Crystal (Emergency Stitching)"
+      },
+      {
+        "itemId": 43979,
+        "quality": 103,
+        "name": "Nano Crystal (Experimental Panacea)"
+      },
+      {
+        "itemId": 43980,
+        "quality": 80,
+        "name": "Nano Crystal (Fast Team Tissue Repair)"
+      },
+      {
+        "itemId": 43983,
+        "quality": 109,
+        "name": "Nano Crystal (Greater Cellular Grafting)"
+      },
+      {
+        "itemId": 43985,
+        "quality": 50,
+        "name": "Nano Crystal (Counteract Damage)"
+      },
+      {
+        "itemId": 43986,
+        "quality": 86,
+        "name": "Nano Crystal (Course of Treatment)"
+      },
+      {
+        "itemId": 43987,
+        "quality": 30,
+        "name": "Nano Crystal (Cursory Examination)"
+      },
+      {
+        "itemId": 43993,
+        "quality": 10,
+        "name": "Nano Crystal (Dress Wounds)"
+      },
+      {
+        "itemId": 43995,
+        "quality": 47,
+        "name": "Nano Crystal (Cellular Grafting)"
+      },
+      {
+        "itemId": 43996,
+        "quality": 86,
+        "name": "Nano Crystal (Cellular Rebuild)"
+      },
+      {
+        "itemId": 43999,
+        "quality": 37,
+        "name": "Nano Crystal (Company Policy)"
+      },
+      {
+        "itemId": 44002,
+        "quality": 106,
+        "name": "Nano Crystal (Consummate Carer)"
+      },
+      {
+        "itemId": 44004,
+        "quality": 33,
+        "name": "Nano Crystal (Active Remedy)"
+      },
+      {
+        "itemId": 44178,
+        "quality": 53,
+        "name": "Nano Crystal (Active Viral Agent)"
+      },
+      {
+        "itemId": 44179,
+        "quality": 93,
+        "name": "Nano Crystal (Advanced Nano Gorger)"
+      },
+      {
+        "itemId": 44183,
+        "quality": 106,
+        "name": "Nano Crystal (Consuming Toxin)"
+      },
+      {
+        "itemId": 44185,
+        "quality": 14,
+        "name": "Nano Crystal (Elementary Nano Contagion)"
+      },
+      {
+        "itemId": 44186,
+        "quality": 10,
+        "name": "Nano Crystal (Dissolve Molecular Bonding)"
+      },
+      {
+        "itemId": 44188,
+        "quality": 30,
+        "name": "Nano Crystal (Infected Wounds)"
+      },
+      {
+        "itemId": 44189,
+        "quality": 7,
+        "name": "Nano Crystal (Limited Nano Reaper)"
+      },
+      {
+        "itemId": 44190,
+        "quality": 119,
+        "name": "Nano Crystal (Metabolic Disassembly)"
+      },
+      {
+        "itemId": 44192,
+        "quality": 99,
+        "name": "Nano Crystal (Nano Reaper)"
+      },
+      {
+        "itemId": 44193,
+        "quality": 40,
+        "name": "Nano Crystal (Parasitic Affliction)"
+      },
+      {
+        "itemId": 44195,
+        "quality": 17,
+        "name": "Nano Crystal (Protein Breakdown)"
+      },
+      {
+        "itemId": 44197,
+        "quality": 60,
+        "name": "Nano Crystal (Seethe With Germs)"
+      },
+      {
+        "itemId": 44198,
+        "quality": 33,
+        "name": "Nano Crystal (Cancerous Burrower)"
+      },
+      {
+        "itemId": 44201,
+        "quality": 47,
+        "name": "Nano Crystal (Dark Venom)"
+      },
+      {
+        "itemId": 44203,
+        "quality": 37,
+        "name": "Nano Crystal (Minor Consuming Toxin)"
+      },
+      {
+        "itemId": 44204,
+        "quality": 20,
+        "name": "Nano Crystal (Primitive Nano Gorger)"
+      },
+      {
+        "itemId": 44207,
+        "quality": 66,
+        "name": "Nano Crystal (Refined Nano Contagion)"
+      },
+      {
+        "itemId": 44208,
+        "quality": 86,
+        "name": "Nano Crystal (Scythe A Virus)"
+      },
+      {
+        "itemId": 44210,
+        "quality": 80,
+        "name": "Nano Crystal (Abscess Explosion)"
+      },
+      {
+        "itemId": 82010,
+        "quality": 116,
+        "name": "Nano Crystal (First-Degree Burns)"
+      },
+      {
+        "itemId": 82011,
+        "quality": 37,
+        "name": "Nano Crystal (Shatter Bone)"
+      },
+      {
+        "itemId": 82012,
+        "quality": 70,
+        "name": "Nano Crystal (Gouge Flesh)"
+      },
+      {
+        "itemId": 95739,
+        "quality": 57,
+        "name": "Nano Crystal (Superior Bodily Reinforcement)"
+      },
+      {
+        "itemId": 95742,
+        "quality": 33,
+        "name": "Nano Crystal (Metabolism Booster)"
+      },
+      {
+        "itemId": 95745,
+        "quality": 93,
+        "name": "Nano Crystal (Major Health Graft)"
+      },
+      {
+        "itemId": 95746,
+        "quality": 47,
+        "name": "Nano Crystal (Medic's Respite)"
+      },
+      {
+        "itemId": 95748,
+        "quality": 27,
+        "name": "Nano Crystal (Enhance Constitution)"
+      },
+      {
+        "itemId": 95749,
+        "quality": 17,
+        "name": "Nano Crystal (Health Graft)"
+      },
+      {
+        "itemId": 97447,
+        "quality": 90,
+        "name": "Nano Crystal (Temporary Cellular Enhancement)"
+      },
+      {
+        "itemId": 97449,
+        "quality": 14,
+        "name": "Nano Crystal (Survivability Booster)"
+      },
+      {
+        "itemId": 97452,
+        "quality": 83,
+        "name": "Nano Crystal (Superior Health Augmentation)"
+      },
+      {
+        "itemId": 97453,
+        "quality": 66,
+        "name": "Nano Crystal (Strengthen Resolve)"
+      },
+      {
+        "itemId": 97455,
+        "quality": 50,
+        "name": "Nano Crystal (Life Reinforcement)"
+      },
+      {
+        "itemId": 97458,
+        "quality": 30,
+        "name": "Nano Crystal (Health Surge)"
+      },
+      {
+        "itemId": 97459,
+        "quality": 4,
+        "name": "Nano Crystal (Health Augmentation)"
+      },
+      {
+        "itemId": 97464,
+        "quality": 43,
+        "name": "Nano Crystal (Bodily Amplification)"
+      },
+      {
+        "itemId": 99589,
+        "quality": 7,
+        "name": "Nano Crystal (Tired Limbs)"
+      },
+      {
+        "itemId": 99594,
+        "quality": 17,
+        "name": "Nano Crystal (Muscle Atrophy)"
+      },
+      {
+        "itemId": 142745,
+        "quality": 80,
+        "name": "Nano Crystal (Encode DNA Sequence)"
+      },
+      {
+        "itemId": 204426,
+        "quality": 77,
+        "name": "NanoCrystal (Vaccine of Ransacking)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      }
+    ],
+    "Fixer": [
+      {
+        "itemId": 31415,
+        "quality": 116,
+        "name": "Nano Crystal (Blood Makes Noise)"
+      },
+      {
+        "itemId": 31420,
+        "quality": 14,
+        "name": "Nano Crystal (Cracker's Luck)"
+      },
+      {
+        "itemId": 31422,
+        "quality": 27,
+        "name": "Nano Crystal (Embrace of Shadows)"
+      },
+      {
+        "itemId": 31423,
+        "quality": 20,
+        "name": "Nano Crystal (Grid Phreak)"
+      },
+      {
+        "itemId": 31427,
+        "quality": 83,
+        "name": "Nano Crystal (Luck's Fickle Fate)"
+      },
+      {
+        "itemId": 31436,
+        "quality": 1,
+        "name": "Nano Crystal (Poison Modification)"
+      },
+      {
+        "itemId": 31441,
+        "quality": 70,
+        "name": "Nano Crystal (Stack the Odds)"
+      },
+      {
+        "itemId": 31443,
+        "quality": 57,
+        "name": "Nano Crystal (Backpain)"
+      },
+      {
+        "itemId": 31446,
+        "quality": 60,
+        "name": "Nano Crystal (Venom Modification)"
+      },
+      {
+        "itemId": 31449,
+        "quality": 90,
+        "name": "Nano Crystal (Lifebane Modification)"
+      },
+      {
+        "itemId": 56250,
+        "quality": 4,
+        "name": "Nano Crystal (Halt Flight)"
+      },
+      {
+        "itemId": 56251,
+        "quality": 27,
+        "name": "Nano Crystal (Lesser Prolong Encounter)"
+      },
+      {
+        "itemId": 56252,
+        "quality": 14,
+        "name": "Nano Crystal (No Escape Possible)"
+      },
+      {
+        "itemId": 56253,
+        "quality": 90,
+        "name": "Nano Crystal (Greater Halt Flight)"
+      },
+      {
+        "itemId": 56254,
+        "quality": 60,
+        "name": "Nano Crystal (Delay Retreat)"
+      },
+      {
+        "itemId": 81891,
+        "quality": 80,
+        "name": "Nano Crystal (Nano Boost)"
+      },
+      {
+        "itemId": 81892,
+        "quality": 10,
+        "name": "Nano Crystal (Lesser Nano Boost)"
+      },
+      {
+        "itemId": 81893,
+        "quality": 43,
+        "name": "Nano Crystal (Hasty Augmentation Cloud)"
+      },
+      {
+        "itemId": 81895,
+        "quality": 106,
+        "name": "Nano Crystal (Augmentation Cloud)"
+      },
+      {
+        "itemId": 82800,
+        "quality": 4,
+        "name": "Nano Crystal (Passive Micro Entanglement)"
+      },
+      {
+        "itemId": 82801,
+        "quality": 37,
+        "name": "Nano Crystal (Nano Net)"
+      },
+      {
+        "itemId": 82802,
+        "quality": 10,
+        "name": "Nano Crystal (Lesser Nano Net)"
+      },
+      {
+        "itemId": 82803,
+        "quality": 73,
+        "name": "Nano Crystal (Invasive Micro Entanglement)"
+      },
+      {
+        "itemId": 82804,
+        "quality": 103,
+        "name": "Nano Crystal (Greater Nano Net)"
+      },
+      {
+        "itemId": 82806,
+        "quality": 20,
+        "name": "Nano Crystal (Active Micro Entanglement)"
+      },
+      {
+        "itemId": 85263,
+        "quality": 63,
+        "name": "Nano Crystal (Invasive Distributed Entanglement)"
+      },
+      {
+        "itemId": 85264,
+        "quality": 20,
+        "name": "Nano Crystal (Lesser Net Cast Wide)"
+      },
+      {
+        "itemId": 85266,
+        "quality": 119,
+        "name": "Nano Crystal (Greater Net Cast Wide)"
+      },
+      {
+        "itemId": 85267,
+        "quality": 47,
+        "name": "Nano Crystal (Insurance Hack)"
+      },
+      {
+        "itemId": 85268,
+        "quality": 66,
+        "name": "Nano Crystal (Basic Policy Skim)"
+      },
+      {
+        "itemId": 85269,
+        "quality": 73,
+        "name": "Nano Crystal (Detailed Medical Claim)"
+      },
+      {
+        "itemId": 85270,
+        "quality": 30,
+        "name": "Nano Crystal (Falsify Medical Records)"
+      },
+      {
+        "itemId": 85271,
+        "quality": 103,
+        "name": "Nano Crystal (Advanced Insurance Hack)"
+      },
+      {
+        "itemId": 85273,
+        "quality": 4,
+        "name": "Nano Crystal (Basic Insurance Hack)"
+      },
+      {
+        "itemId": 85274,
+        "quality": 33,
+        "name": "Nano Crystal (Active Distributed Entanglement)"
+      },
+      {
+        "itemId": 85276,
+        "quality": 96,
+        "name": "Nano Crystal (Spin Weak Nanoweb)"
+      },
+      {
+        "itemId": 85277,
+        "quality": 43,
+        "name": "Nano Crystal (Net Cast Wide)"
+      },
+      {
+        "itemId": 85279,
+        "quality": 7,
+        "name": "Nano Crystal (Passive Distributed Entanglement)"
+      },
+      {
+        "itemId": 85280,
+        "quality": 119,
+        "name": "Nano Crystal (Policy Skim)"
+      },
+      {
+        "itemId": 85282,
+        "quality": 17,
+        "name": "Nano Crystal (Medical Claim)"
+      },
+      {
+        "itemId": 93134,
+        "quality": 113,
+        "name": "Nano Crystal (Partial Grid Jump)"
+      },
+      {
+        "itemId": 93136,
+        "quality": 30,
+        "name": "Nano Crystal (Hack Grid Vector)"
+      },
+      {
+        "itemId": 93137,
+        "quality": 63,
+        "name": "Nano Crystal (Leech Grid Vector)"
+      },
+      {
+        "itemId": 93138,
+        "quality": 43,
+        "name": "Nano Crystal (Grid Runner)"
+      },
+      {
+        "itemId": 93139,
+        "quality": 83,
+        "name": "Nano Crystal (Grid Surfer)"
+      },
+      {
+        "itemId": 93140,
+        "quality": 17,
+        "name": "Nano Crystal (Limited Grid Jump)"
+      },
+      {
+        "itemId": 142716,
+        "quality": 57,
+        "name": "Nano Crystal (Team Grid Phreak)"
+      },
+      {
+        "itemId": 142719,
+        "quality": 74,
+        "name": "Nano Crystal (Instantaneous Encoding)"
+      },
+      {
+        "itemId": 142721,
+        "quality": 47,
+        "name": "Nano Crystal (Reckless Digitization)"
+      },
+      {
+        "itemId": 162485,
+        "quality": 33,
+        "name": "NanoCrystal (Suppressor)"
+      },
+      {
+        "itemId": 162497,
+        "quality": 14,
+        "name": "NanoCrystal (Lesser Suppressor)"
+      },
+      {
+        "itemId": 162598,
+        "quality": 27,
+        "name": "NanoCrystal (Hack Grid Vector (Team))"
+      },
+      {
+        "itemId": 162602,
+        "quality": 14,
+        "name": "NanoCrystal (Limited Grid Jump (Team))"
+      },
+      {
+        "itemId": 162715,
+        "quality": 7,
+        "name": "NanoCrystal (Relieving Salve)"
+      },
+      {
+        "itemId": 162717,
+        "quality": 24,
+        "name": "NanoCrystal (Rebinding Sutures)"
+      },
+      {
+        "itemId": 162719,
+        "quality": 37,
+        "name": "NanoCrystal (Hacked Diagnosis)"
+      },
+      {
+        "itemId": 162996,
+        "quality": 20,
+        "name": "NanoCrystal (NCU Compressor)"
+      },
+      {
+        "itemId": 163080,
+        "quality": 40,
+        "name": "NanoCrystal (Retool NCU)"
+      },
+      {
+        "itemId": 203594,
+        "quality": 10,
+        "name": "NanoCrystal (Scatter Bonds)"
+      },
+      {
+        "itemId": 203598,
+        "quality": 53,
+        "name": "NanoCrystal (Burst Bonds)"
+      },
+      {
+        "itemId": 203812,
+        "quality": 73,
+        "name": "NanoCrystal (Escape Captivation)"
+      },
+      {
+        "itemId": 203977,
+        "quality": 21,
+        "name": "NanoCrystal (Scatter Bonds (Other))"
+      },
+      {
+        "itemId": 224404,
+        "quality": 25,
+        "name": "Nano Crystal (Summon Shadowweb Spinner MK I)"
+      },
+      {
+        "itemId": 234081,
+        "quality": 25,
+        "name": "Nano Crystal (Tap Notum Vein: Nascence)"
+      },
+      {
+        "itemId": 234083,
+        "quality": 80,
+        "name": "Nano Crystal (Tap Notum Vein: Elysium)"
+      },
+      {
+        "itemId": 239358,
+        "quality": 120,
+        "name": "Nano Crystal (Shadow Trail)"
+      },
+      {
+        "itemId": 297633,
+        "quality": 10,
+        "name": "Nano Crystal (Restock Special Ammo)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      }
+    ],
+    "Soldier": [
+      {
+        "itemId": 29330,
+        "quality": 90,
+        "name": "Nano Crystal (Aggressive Captivation)"
+      },
+      {
+        "itemId": 29332,
+        "quality": 50,
+        "name": "Nano Crystal (Assault Rifle Mastery)"
+      },
+      {
+        "itemId": 29333,
+        "quality": 27,
+        "name": "Nano Crystal (Attack Booster)"
+      },
+      {
+        "itemId": 29334,
+        "quality": 106,
+        "name": "Nano Crystal (Automatic Targeting)"
+      },
+      {
+        "itemId": 29337,
+        "quality": 40,
+        "name": "Nano Crystal (Damage Amplifier)"
+      },
+      {
+        "itemId": 29342,
+        "quality": 63,
+        "name": "Nano Crystal (LR Energy Weapon Mastery)"
+      },
+      {
+        "itemId": 29353,
+        "quality": 76,
+        "name": "Nano Crystal (Don't Fear the Reaper)"
+      },
+      {
+        "itemId": 29355,
+        "quality": 57,
+        "name": "Nano Crystal (Persistent Damage Amplifier)"
+      },
+      {
+        "itemId": 29356,
+        "quality": 17,
+        "name": "Nano Crystal (Persistent Damage Multiplier)"
+      },
+      {
+        "itemId": 29358,
+        "quality": 24,
+        "name": "Nano Crystal (Pistol Mastery)"
+      },
+      {
+        "itemId": 29359,
+        "quality": 43,
+        "name": "Nano Crystal (Precognition)"
+      },
+      {
+        "itemId": 29360,
+        "quality": 17,
+        "name": "Nano Crystal (Quickshot)"
+      },
+      {
+        "itemId": 29362,
+        "quality": 37,
+        "name": "Nano Crystal (Rifle Mastery)"
+      },
+      {
+        "itemId": 29366,
+        "quality": 113,
+        "name": "Nano Crystal (Titan Physique)"
+      },
+      {
+        "itemId": 70383,
+        "quality": 33,
+        "name": "Nano Crystal (Deflection Shield)"
+      },
+      {
+        "itemId": 70384,
+        "quality": 37,
+        "name": "Nano Crystal (Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70385,
+        "quality": 50,
+        "name": "Nano Crystal (Greater Deflection Shield)"
+      },
+      {
+        "itemId": 70386,
+        "quality": 57,
+        "name": "Nano Crystal (Greater Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70389,
+        "quality": 30,
+        "name": "Nano Crystal (Lesser Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70390,
+        "quality": 24,
+        "name": "Nano Crystal (Lesser Deflection Shield)"
+      },
+      {
+        "itemId": 70393,
+        "quality": 63,
+        "name": "Nano Crystal (Major Deflection Shield)"
+      },
+      {
+        "itemId": 70394,
+        "quality": 70,
+        "name": "Nano Crystal (Major Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70397,
+        "quality": 14,
+        "name": "Nano Crystal (Minor Deflection Shield)"
+      },
+      {
+        "itemId": 70398,
+        "quality": 17,
+        "name": "Nano Crystal (Minor Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70399,
+        "quality": 113,
+        "name": "Nano Crystal (Minor Reflective Field)"
+      },
+      {
+        "itemId": 70400,
+        "quality": 119,
+        "name": "Nano Crystal (Minor Reflective Field (Extended))"
+      },
+      {
+        "itemId": 70401,
+        "quality": 1,
+        "name": "Nano Crystal (Partial Deflection Shield)"
+      },
+      {
+        "itemId": 70402,
+        "quality": 96,
+        "name": "Nano Crystal (Partial Reflective Field)"
+      },
+      {
+        "itemId": 70403,
+        "quality": 7,
+        "name": "Nano Crystal (Partial Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70404,
+        "quality": 76,
+        "name": "Nano Crystal (Reactive Deflection Shield)"
+      },
+      {
+        "itemId": 70405,
+        "quality": 99,
+        "name": "Nano Crystal (Partial Reflective Field (Extended))"
+      },
+      {
+        "itemId": 70406,
+        "quality": 83,
+        "name": "Nano Crystal (Reactive Deflection Shield (Extended))"
+      },
+      {
+        "itemId": 70411,
+        "quality": 10,
+        "name": "Nano Crystal (Total Mirror Shield Mk I)"
+      },
+      {
+        "itemId": 70412,
+        "quality": 27,
+        "name": "Nano Crystal (Total Mirror Shield Mk II)"
+      },
+      {
+        "itemId": 70413,
+        "quality": 47,
+        "name": "Nano Crystal (Total Mirror Shield Mk III)"
+      },
+      {
+        "itemId": 70414,
+        "quality": 60,
+        "name": "Nano Crystal (Total Mirror Shield Mk IV)"
+      },
+      {
+        "itemId": 70416,
+        "quality": 86,
+        "name": "Nano Crystal (Total Mirror Shield Mk V)"
+      },
+      {
+        "itemId": 70417,
+        "quality": 106,
+        "name": "Nano Crystal (Total Mirror Shield Mk VI)"
+      },
+      {
+        "itemId": 75415,
+        "quality": 4,
+        "name": "Nano Crystal (Minor Combat Barrier)"
+      },
+      {
+        "itemId": 75416,
+        "quality": 14,
+        "name": "Nano Crystal (Minor Absorption Shield)"
+      },
+      {
+        "itemId": 75417,
+        "quality": 20,
+        "name": "Nano Crystal (Lesser Combat Barrier)"
+      },
+      {
+        "itemId": 75418,
+        "quality": 50,
+        "name": "Nano Crystal (Combat Barrier)"
+      },
+      {
+        "itemId": 75419,
+        "quality": 37,
+        "name": "Nano Crystal (Lesser Absorption Shield)"
+      },
+      {
+        "itemId": 75420,
+        "quality": 83,
+        "name": "Nano Crystal (Superior Combat Barrier)"
+      },
+      {
+        "itemId": 75421,
+        "quality": 119,
+        "name": "Nano Crystal (Advanced Combat Barrier)"
+      },
+      {
+        "itemId": 75422,
+        "quality": 99,
+        "name": "Nano Crystal (Superior Absorption Shield)"
+      },
+      {
+        "itemId": 95723,
+        "quality": 33,
+        "name": "Nano Crystal (Combat Hardening)"
+      },
+      {
+        "itemId": 95725,
+        "quality": 63,
+        "name": "Nano Crystal (Tough as Nails)"
+      },
+      {
+        "itemId": 95727,
+        "quality": 17,
+        "name": "Nano Crystal (Boot Camp Toughness)"
+      },
+      {
+        "itemId": 100228,
+        "quality": 14,
+        "name": "Nano Crystal (Draw Attention)"
+      },
+      {
+        "itemId": 100229,
+        "quality": 30,
+        "name": "Nano Crystal (Enraged Mind)"
+      },
+      {
+        "itemId": 100230,
+        "quality": 70,
+        "name": "Nano Crystal (Annoying Presence)"
+      },
+      {
+        "itemId": 203122,
+        "quality": 30,
+        "name": "NanoCrystal (A Sergeant's Knowledge)"
+      },
+      {
+        "itemId": 203124,
+        "quality": 36,
+        "name": "NanoCrystal (Alleysweeper)"
+      },
+      {
+        "itemId": 203134,
+        "quality": 38,
+        "name": "NanoCrystal (Power Volley)"
+      },
+      {
+        "itemId": 203136,
+        "quality": 33,
+        "name": "NanoCrystal (Laser Surgery)"
+      },
+      {
+        "itemId": 203148,
+        "quality": 56,
+        "name": "NanoCrystal (Metal Rain)"
+      },
+      {
+        "itemId": 203150,
+        "quality": 31,
+        "name": "NanoCrystal (Metal Stream)"
+      },
+      {
+        "itemId": 233013,
+        "quality": 18,
+        "name": "Nano Crystal (Empowered Minor Deflection Shield)"
+      },
+      {
+        "itemId": 233015,
+        "quality": 32,
+        "name": "Nano Crystal (Empowered Lesser Deflection Shield)"
+      },
+      {
+        "itemId": 233017,
+        "quality": 45,
+        "name": "Nano Crystal (Empowered Deflection Shield)"
+      },
+      {
+        "itemId": 233036,
+        "quality": 5,
+        "name": "Nano Crystal (Empowered Partial Deflection Shield)"
+      },
+      {
+        "itemId": 233038,
+        "quality": 63,
+        "name": "Nano Crystal (Empowered Greater Deflection Shield)"
+      },
+      {
+        "itemId": 233040,
+        "quality": 77,
+        "name": "Nano Crystal (Empowered Major Deflection Shield)"
+      },
+      {
+        "itemId": 233042,
+        "quality": 91,
+        "name": "Nano Crystal (Empowered Reactive Deflection Shield)"
+      },
+      {
+        "itemId": 233044,
+        "quality": 106,
+        "name": "Nano Crystal (Empowered Partial Reflective Field)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      }
+    ],
+    "Shade": [
+      {
+        "itemId": 210354,
+        "quality": 4,
+        "name": "Nano Crystal (Ritualistic Touch)"
+      },
+      {
+        "itemId": 210356,
+        "quality": 17,
+        "name": "Nano Crystal (Ritualistic Blow)"
+      },
+      {
+        "itemId": 210388,
+        "quality": 21,
+        "name": "Nano Crystal (Rudimentary Dissipation)"
+      },
+      {
+        "itemId": 210733,
+        "quality": 5,
+        "name": "Nano Crystal (Slap of the Zombie)"
+      },
+      {
+        "itemId": 210735,
+        "quality": 29,
+        "name": "Nano Crystal (Knock of the Poltergeist)"
+      },
+      {
+        "itemId": 210737,
+        "quality": 71,
+        "name": "Nano Crystal (Kick of the Phantom)"
+      },
+      {
+        "itemId": 210739,
+        "quality": 106,
+        "name": "Nano Crystal (Hand of the Shadow)"
+      },
+      {
+        "itemId": 210747,
+        "quality": 36,
+        "name": "Nano Crystal (Sneak)"
+      },
+      {
+        "itemId": 210749,
+        "quality": 82,
+        "name": "Nano Crystal (Mugger)"
+      },
+      {
+        "itemId": 210788,
+        "quality": 22,
+        "name": "Nano Crystal (Footpad Apprentice)"
+      },
+      {
+        "itemId": 210790,
+        "quality": 66,
+        "name": "Nano Crystal (Silent Dagger)"
+      },
+      {
+        "itemId": 210792,
+        "quality": 108,
+        "name": "Nano Crystal (Dagger in the Back)"
+      },
+      {
+        "itemId": 210805,
+        "quality": 14,
+        "name": "Nano Crystal (Dual Defender)"
+      },
+      {
+        "itemId": 210807,
+        "quality": 44,
+        "name": "Nano Crystal (Double Cover)"
+      },
+      {
+        "itemId": 210809,
+        "quality": 97,
+        "name": "Nano Crystal (Twice the Shield)"
+      },
+      {
+        "itemId": 211147,
+        "quality": 122,
+        "name": "Nano Crystal (Probe of Death)"
+      },
+      {
+        "itemId": 211149,
+        "quality": 87,
+        "name": "Nano Crystal (Piercing Gash)"
+      },
+      {
+        "itemId": 211151,
+        "quality": 49,
+        "name": "Nano Crystal (Piercing Tooth)"
+      },
+      {
+        "itemId": 211153,
+        "quality": 19,
+        "name": "Nano Crystal (Sharpen Dagger)"
+      },
+      {
+        "itemId": 297333,
+        "quality": 1,
+        "name": "Nano Crystal (Spirit Siphon)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      }
+    ],
+    "Nanotechnician": [
+      {
+        "itemId": 28795,
+        "quality": 33,
+        "name": "Nano Crystal (Abyssal Flames)"
+      },
+      {
+        "itemId": 28796,
+        "quality": 109,
+        "name": "Nano Crystal (Barrage of Fire)"
+      },
+      {
+        "itemId": 28798,
+        "quality": 33,
+        "name": "Nano Crystal (Blight)"
+      },
+      {
+        "itemId": 28802,
+        "quality": 50,
+        "name": "Nano Crystal (Circle of Winter)"
+      },
+      {
+        "itemId": 28804,
+        "quality": 10,
+        "name": "Nano Crystal (Corrosive Spray)"
+      },
+      {
+        "itemId": 28805,
+        "quality": 4,
+        "name": "Nano Crystal (Corruption)"
+      },
+      {
+        "itemId": 28806,
+        "quality": 90,
+        "name": "Nano Crystal (Dark Movement)"
+      },
+      {
+        "itemId": 28808,
+        "quality": 53,
+        "name": "Nano Crystal (Energy Projectile)"
+      },
+      {
+        "itemId": 28810,
+        "quality": 27,
+        "name": "Nano Crystal (Fire Snake)"
+      },
+      {
+        "itemId": 28811,
+        "quality": 7,
+        "name": "Nano Crystal (Fire Stream)"
+      },
+      {
+        "itemId": 28812,
+        "quality": 96,
+        "name": "Nano Crystal (Freezing Surge)"
+      },
+      {
+        "itemId": 28813,
+        "quality": 83,
+        "name": "Nano Crystal (Furious Assault)"
+      },
+      {
+        "itemId": 28814,
+        "quality": 14,
+        "name": "Nano Crystal (Hot Feet)"
+      },
+      {
+        "itemId": 28817,
+        "quality": 70,
+        "name": "Nano Crystal (Invasive Presence)"
+      },
+      {
+        "itemId": 28824,
+        "quality": 80,
+        "name": "Nano Crystal (Lightning Strike)"
+      },
+      {
+        "itemId": 28825,
+        "quality": 47,
+        "name": "Nano Crystal (Microblade Whirlwind)"
+      },
+      {
+        "itemId": 28830,
+        "quality": 37,
+        "name": "Nano Crystal (Phoenix Swarm)"
+      },
+      {
+        "itemId": 28831,
+        "quality": 50,
+        "name": "Nano Crystal (Plasma Lights)"
+      },
+      {
+        "itemId": 28832,
+        "quality": 76,
+        "name": "Nano Crystal (Plasma Swirl)"
+      },
+      {
+        "itemId": 28833,
+        "quality": 30,
+        "name": "Nano Crystal (Poison Missile)"
+      },
+      {
+        "itemId": 28834,
+        "quality": 4,
+        "name": "Nano Crystal (Radiation Pulse)"
+      },
+      {
+        "itemId": 28835,
+        "quality": 99,
+        "name": "Nano Crystal (Radioactive Cloud)"
+      },
+      {
+        "itemId": 28836,
+        "quality": 14,
+        "name": "Nano Crystal (Shockball)"
+      },
+      {
+        "itemId": 28837,
+        "quality": 66,
+        "name": "Nano Crystal (Shockwave Slash)"
+      },
+      {
+        "itemId": 28839,
+        "quality": 93,
+        "name": "Nano Crystal (Slime Cascade)"
+      },
+      {
+        "itemId": 28842,
+        "quality": 113,
+        "name": "Nano Crystal (Vulcan Flechette)"
+      },
+      {
+        "itemId": 29391,
+        "quality": 43,
+        "name": "Nano Crystal (MatCrea Mastery)"
+      },
+      {
+        "itemId": 42111,
+        "quality": 1,
+        "name": "Nanotechnician: Startup Crystal - Malaise of Movement"
+      },
+      {
+        "itemId": 42544,
+        "quality": 20,
+        "name": "Nano Crystal (Halon Cloud)"
+      },
+      {
+        "itemId": 42545,
+        "quality": 17,
+        "name": "Nano Crystal (Deep Slash)"
+      },
+      {
+        "itemId": 42546,
+        "quality": 17,
+        "name": "Nano Crystal (Molecule Lance)"
+      },
+      {
+        "itemId": 45326,
+        "quality": 57,
+        "name": "Nano Crystal (Weak Chemical Liquefaction)"
+      },
+      {
+        "itemId": 45327,
+        "quality": 33,
+        "name": "Nano Crystal (Weak Gravity Collapse)"
+      },
+      {
+        "itemId": 45330,
+        "quality": 63,
+        "name": "Nano Crystal (Stinging Missile)"
+      },
+      {
+        "itemId": 45334,
+        "quality": 116,
+        "name": "Nano Crystal (Tear Flesh)"
+      },
+      {
+        "itemId": 45335,
+        "quality": 60,
+        "name": "Nano Crystal (Thunderclap)"
+      },
+      {
+        "itemId": 45336,
+        "quality": 43,
+        "name": "Nano Crystal (Thunderous Blow)"
+      },
+      {
+        "itemId": 45337,
+        "quality": 119,
+        "name": "Nano Crystal (Unstable Hadron String)"
+      },
+      {
+        "itemId": 45338,
+        "quality": 66,
+        "name": "Nano Crystal (Viral Assault)"
+      },
+      {
+        "itemId": 45339,
+        "quality": 86,
+        "name": "Nano Crystal (Void Warmth)"
+      },
+      {
+        "itemId": 45340,
+        "quality": 66,
+        "name": "Nano Crystal (Neutron Spiral)"
+      },
+      {
+        "itemId": 45341,
+        "quality": 96,
+        "name": "Nano Crystal (Ol' Faithful)"
+      },
+      {
+        "itemId": 45343,
+        "quality": 90,
+        "name": "Nano Crystal (Particle Shower)"
+      },
+      {
+        "itemId": 45344,
+        "quality": 83,
+        "name": "Nano Crystal (Phosphor Torch)"
+      },
+      {
+        "itemId": 45345,
+        "quality": 96,
+        "name": "Nano Crystal (Positron Stream)"
+      },
+      {
+        "itemId": 45347,
+        "quality": 76,
+        "name": "Nano Crystal (Radiation Scour)"
+      },
+      {
+        "itemId": 45353,
+        "quality": 103,
+        "name": "Nano Crystal (Meson Blast)"
+      },
+      {
+        "itemId": 45357,
+        "quality": 53,
+        "name": "Nano Crystal (Nano Contagion)"
+      },
+      {
+        "itemId": 45360,
+        "quality": 57,
+        "name": "Nano Crystal (Hoary Seep)"
+      },
+      {
+        "itemId": 45362,
+        "quality": 50,
+        "name": "Nano Crystal (Isotope Deluge)"
+      },
+      {
+        "itemId": 45363,
+        "quality": 109,
+        "name": "Nano Crystal (Lesser Coronet of Frost)"
+      },
+      {
+        "itemId": 45365,
+        "quality": 113,
+        "name": "Nano Crystal (Energized Collapse)"
+      },
+      {
+        "itemId": 45366,
+        "quality": 30,
+        "name": "Nano Crystal (Entropy Beam)"
+      },
+      {
+        "itemId": 45367,
+        "quality": 90,
+        "name": "Nano Crystal (Feeble Gravitational Anomaly)"
+      },
+      {
+        "itemId": 45368,
+        "quality": 116,
+        "name": "Nano Crystal (Focused Ray)"
+      },
+      {
+        "itemId": 45369,
+        "quality": 43,
+        "name": "Nano Crystal (Frosty Welcome)"
+      },
+      {
+        "itemId": 45371,
+        "quality": 37,
+        "name": "Nano Crystal (Gaping Puncture)"
+      },
+      {
+        "itemId": 45372,
+        "quality": 50,
+        "name": "Nano Crystal (Glacial Advance)"
+      },
+      {
+        "itemId": 45376,
+        "quality": 103,
+        "name": "Nano Crystal (Chemical Liquefaction)"
+      },
+      {
+        "itemId": 45379,
+        "quality": 70,
+        "name": "Nano Crystal (Compressed Shockwave)"
+      },
+      {
+        "itemId": 45383,
+        "quality": 103,
+        "name": "Nano Crystal (Corrupt Molecular Integrity)"
+      },
+      {
+        "itemId": 45385,
+        "quality": 76,
+        "name": "Nano Crystal (Deep Chemical Burn)"
+      },
+      {
+        "itemId": 45386,
+        "quality": 106,
+        "name": "Nano Crystal (Dispersed Nanoblade Cloud)"
+      },
+      {
+        "itemId": 45387,
+        "quality": 73,
+        "name": "Nano Crystal (Arctic Welcome)"
+      },
+      {
+        "itemId": 45389,
+        "quality": 119,
+        "name": "Nano Crystal (Bio-Acid Spray)"
+      },
+      {
+        "itemId": 45390,
+        "quality": 57,
+        "name": "Nano Crystal (Burning Orb)"
+      },
+      {
+        "itemId": 45392,
+        "quality": 93,
+        "name": "Nano Crystal (Burning Triumvirate)"
+      },
+      {
+        "itemId": 45394,
+        "quality": 40,
+        "name": "Nano Crystal (Cellular Decay)"
+      },
+      {
+        "itemId": 45395,
+        "quality": 47,
+        "name": "Nano Crystal (Chaotic Entropy)"
+      },
+      {
+        "itemId": 45396,
+        "quality": 24,
+        "name": "Nano Crystal (Chemical Burn)"
+      },
+      {
+        "itemId": 45397,
+        "quality": 24,
+        "name": "Nano Crystal (Accelerated Decay)"
+      },
+      {
+        "itemId": 45398,
+        "quality": 24,
+        "name": "Nano Crystal (Accelerated Titanium Pellet)"
+      },
+      {
+        "itemId": 45399,
+        "quality": 27,
+        "name": "Nano Crystal (Acidic Conversion)"
+      },
+      {
+        "itemId": 45400,
+        "quality": 30,
+        "name": "Nano Crystal (Aggressive Mutagen)"
+      },
+      {
+        "itemId": 45945,
+        "quality": 27,
+        "name": "Nano Crystal (Wind Blade)"
+      },
+      {
+        "itemId": 45946,
+        "quality": 40,
+        "name": "Nano Crystal (Shower With Sludge)"
+      },
+      {
+        "itemId": 45947,
+        "quality": 24,
+        "name": "Nano Crystal (Smiting Missile)"
+      },
+      {
+        "itemId": 45948,
+        "quality": 57,
+        "name": "Nano Crystal (Smiting Missile Mk II)"
+      },
+      {
+        "itemId": 45951,
+        "quality": 24,
+        "name": "Nano Crystal (Sudden Chill)"
+      },
+      {
+        "itemId": 45952,
+        "quality": 37,
+        "name": "Nano Crystal (Toxic Field)"
+      },
+      {
+        "itemId": 45955,
+        "quality": 109,
+        "name": "Nano Crystal (Tri-Ion Stream)"
+      },
+      {
+        "itemId": 45956,
+        "quality": 7,
+        "name": "Nano Crystal (Open Wound)"
+      },
+      {
+        "itemId": 45957,
+        "quality": 83,
+        "name": "Nano Crystal (Pellet of Fire)"
+      },
+      {
+        "itemId": 45958,
+        "quality": 63,
+        "name": "Nano Crystal (RNA Reaper)"
+      },
+      {
+        "itemId": 45959,
+        "quality": 83,
+        "name": "Nano Crystal (Limited Shrapnel Spray)"
+      },
+      {
+        "itemId": 45961,
+        "quality": 17,
+        "name": "Nano Crystal (Micro Flechette)"
+      },
+      {
+        "itemId": 45962,
+        "quality": 116,
+        "name": "Nano Crystal (Micro Flechette Swarm)"
+      },
+      {
+        "itemId": 45963,
+        "quality": 37,
+        "name": "Nano Crystal (Mild Toxic Spill)"
+      },
+      {
+        "itemId": 45964,
+        "quality": 57,
+        "name": "Nano Crystal (Minor Bane)"
+      },
+      {
+        "itemId": 45965,
+        "quality": 1,
+        "name": "Nano Crystal (Minor Toxic Barb)"
+      },
+      {
+        "itemId": 45966,
+        "quality": 10,
+        "name": "Nano Crystal (Minor Toxic Field)"
+      },
+      {
+        "itemId": 45967,
+        "quality": 83,
+        "name": "Nano Crystal (Greater Toxic Field)"
+      },
+      {
+        "itemId": 45969,
+        "quality": 14,
+        "name": "Nano Crystal (Ion Stream)"
+      },
+      {
+        "itemId": 45971,
+        "quality": 40,
+        "name": "Nano Crystal (Lesser Bane of the Living)"
+      },
+      {
+        "itemId": 45972,
+        "quality": 47,
+        "name": "Nano Crystal (Lesser Encircle With Blades)"
+      },
+      {
+        "itemId": 45973,
+        "quality": 14,
+        "name": "Nano Crystal (Lesser RNA Reaper)"
+      },
+      {
+        "itemId": 45975,
+        "quality": 90,
+        "name": "Nano Crystal (Foul Bane)"
+      },
+      {
+        "itemId": 45977,
+        "quality": 103,
+        "name": "Nano Crystal (Furious Wind Blade)"
+      },
+      {
+        "itemId": 45978,
+        "quality": 119,
+        "name": "Nano Crystal (Greater Blade Chaos)"
+      },
+      {
+        "itemId": 45979,
+        "quality": 70,
+        "name": "Nano Crystal (Greater Chilling Stream)"
+      },
+      {
+        "itemId": 45983,
+        "quality": 43,
+        "name": "Nano Crystal (Dense Matter Missile)"
+      },
+      {
+        "itemId": 45984,
+        "quality": 86,
+        "name": "Nano Crystal (Dense Matter Missile MK II)"
+      },
+      {
+        "itemId": 45985,
+        "quality": 103,
+        "name": "Nano Crystal (Dense Poison Fog)"
+      },
+      {
+        "itemId": 45986,
+        "quality": 109,
+        "name": "Nano Crystal (Dissolving Sphere)"
+      },
+      {
+        "itemId": 45987,
+        "quality": 20,
+        "name": "Nano Crystal (Dual Energized Beams)"
+      },
+      {
+        "itemId": 45988,
+        "quality": 60,
+        "name": "Nano Crystal (Dual Ion Stream)"
+      },
+      {
+        "itemId": 45992,
+        "quality": 76,
+        "name": "Nano Crystal (Eroding Spray)"
+      },
+      {
+        "itemId": 45993,
+        "quality": 70,
+        "name": "Nano Crystal (Expanding Neutron Pulse)"
+      },
+      {
+        "itemId": 45994,
+        "quality": 7,
+        "name": "Nano Crystal (Feeble Blade Chaos)"
+      },
+      {
+        "itemId": 45996,
+        "quality": 33,
+        "name": "Nano Crystal (Chilling Stream)"
+      },
+      {
+        "itemId": 45997,
+        "quality": 60,
+        "name": "Nano Crystal (Circle Scythe)"
+      },
+      {
+        "itemId": 45998,
+        "quality": 30,
+        "name": "Nano Crystal (Condensed Halon Jet)"
+      },
+      {
+        "itemId": 45999,
+        "quality": 99,
+        "name": "Nano Crystal (Condensed Pellet of Fire)"
+      },
+      {
+        "itemId": 46000,
+        "quality": 76,
+        "name": "Nano Crystal (Convergent Energy Beam)"
+      },
+      {
+        "itemId": 46001,
+        "quality": 103,
+        "name": "Nano Crystal (Crystalizing Ray)"
+      },
+      {
+        "itemId": 46002,
+        "quality": 50,
+        "name": "Nano Crystal (Augmented Energized Beam)"
+      },
+      {
+        "itemId": 46003,
+        "quality": 113,
+        "name": "Nano Crystal (Bane of the Living)"
+      },
+      {
+        "itemId": 46004,
+        "quality": 96,
+        "name": "Nano Crystal (Barrage of Blades)"
+      },
+      {
+        "itemId": 46005,
+        "quality": 73,
+        "name": "Nano Crystal (Basic Crystalizing Ray)"
+      },
+      {
+        "itemId": 46006,
+        "quality": 86,
+        "name": "Nano Crystal (Blade Chaos)"
+      },
+      {
+        "itemId": 46007,
+        "quality": 24,
+        "name": "Nano Crystal (Brief Poison Fog)"
+      },
+      {
+        "itemId": 46008,
+        "quality": 93,
+        "name": "Nano Crystal (Burn from Within)"
+      },
+      {
+        "itemId": 56174,
+        "quality": 106,
+        "name": "Nano Crystal (Ball and Chain)"
+      },
+      {
+        "itemId": 56176,
+        "quality": 73,
+        "name": "Nano Crystal (Feet of Iron)"
+      },
+      {
+        "itemId": 56177,
+        "quality": 40,
+        "name": "Nano Crystal (Weak Gravity Pull)"
+      },
+      {
+        "itemId": 56178,
+        "quality": 14,
+        "name": "Nano Crystal (Feet of Stone)"
+      },
+      {
+        "itemId": 70630,
+        "quality": 80,
+        "name": "Nano Crystal (Searing Agony)"
+      },
+      {
+        "itemId": 83965,
+        "quality": 37,
+        "name": "Nano Crystal (Wild Eye Gouger)"
+      },
+      {
+        "itemId": 83967,
+        "quality": 109,
+        "name": "Nano Crystal (Mass Cornea Attack)"
+      },
+      {
+        "itemId": 83968,
+        "quality": 20,
+        "name": "Nano Crystal (Mass Claw Eyes)"
+      },
+      {
+        "itemId": 83970,
+        "quality": 57,
+        "name": "Nano Crystal (Enveloping Darkness)"
+      },
+      {
+        "itemId": 83973,
+        "quality": 66,
+        "name": "Nano Crystal (Shroud of Darkness)"
+      },
+      {
+        "itemId": 83974,
+        "quality": 119,
+        "name": "Nano Crystal (Pronounce Blindness)"
+      },
+      {
+        "itemId": 83975,
+        "quality": 4,
+        "name": "Nano Crystal (Poke Eyes)"
+      },
+      {
+        "itemId": 83977,
+        "quality": 86,
+        "name": "Nano Crystal (Lesser Eyeblighter)"
+      },
+      {
+        "itemId": 83978,
+        "quality": 27,
+        "name": "Nano Crystal (Gouge Eyes)"
+      },
+      {
+        "itemId": 83982,
+        "quality": 47,
+        "name": "Nano Crystal (Curtain of Darkness)"
+      },
+      {
+        "itemId": 83983,
+        "quality": 96,
+        "name": "Nano Crystal (Cornea Attack)"
+      },
+      {
+        "itemId": 83984,
+        "quality": 7,
+        "name": "Nano Crystal (Claw Eyes)"
+      },
+      {
+        "itemId": 90407,
+        "quality": 17,
+        "name": "Nano Crystal (Basic Humidity Extractor)"
+      },
+      {
+        "itemId": 90408,
+        "quality": 99,
+        "name": "Nano Crystal (Superior Humidity Extractor)"
+      },
+      {
+        "itemId": 90409,
+        "quality": 1,
+        "name": "Nano Crystal (Rudimentary Humidity Extractor)"
+      },
+      {
+        "itemId": 90410,
+        "quality": 40,
+        "name": "Nano Crystal (Humidity Extractor)"
+      },
+      {
+        "itemId": 90411,
+        "quality": 80,
+        "name": "Nano Crystal (Efficient Humidity Extractor)"
+      },
+      {
+        "itemId": 95420,
+        "quality": 73,
+        "name": "Nano Crystal (On-The-Fly Compression)"
+      },
+      {
+        "itemId": 95421,
+        "quality": 33,
+        "name": "Nano Crystal (Run-Time Recompiler)"
+      },
+      {
+        "itemId": 95422,
+        "quality": 47,
+        "name": "Nano Crystal (CrunchCom Nano Compressor)"
+      },
+      {
+        "itemId": 95427,
+        "quality": 10,
+        "name": "Nano Crystal (CrunchCom Code Sieve)"
+      },
+      {
+        "itemId": 95449,
+        "quality": 63,
+        "name": "Nano Crystal (Cohesion Amplifier)"
+      },
+      {
+        "itemId": 95452,
+        "quality": 4,
+        "name": "Nano Crystal (Enhance Nano Communication)"
+      },
+      {
+        "itemId": 95453,
+        "quality": 20,
+        "name": "Nano Crystal (Enhance Nano Cohesion)"
+      },
+      {
+        "itemId": 95454,
+        "quality": 40,
+        "name": "Nano Crystal (Coherent Nano Pathway)"
+      },
+      {
+        "itemId": 95455,
+        "quality": 93,
+        "name": "Nano Crystal (Superior Nano Command)"
+      },
+      {
+        "itemId": 100447,
+        "quality": 30,
+        "name": "Nano Crystal (Bewilder)"
+      },
+      {
+        "itemId": 100462,
+        "quality": 60,
+        "name": "Nano Crystal (Project Calm)"
+      },
+      {
+        "itemId": 118113,
+        "quality": 107,
+        "name": "Nano Crystal (Advanced Layered Protection)"
+      },
+      {
+        "itemId": 118123,
+        "quality": 80,
+        "name": "Nano Crystal (Layered Protection)"
+      },
+      {
+        "itemId": 150504,
+        "quality": 90,
+        "name": "Nano Crystal (Nullity Sphere)"
+      },
+      {
+        "itemId": 151778,
+        "quality": 21,
+        "name": "Nano Crystal (Teachings of Material Creation)"
+      },
+      {
+        "itemId": 203806,
+        "quality": 68,
+        "name": "NanoCrystal (Tear Constraints)"
+      },
+      {
+        "itemId": 205442,
+        "quality": 93,
+        "name": "Nano Crystal (Enfraam's Inverted Restrainer)"
+      },
+      {
+        "itemId": 302080,
+        "quality": 1,
+        "name": "Sealed Profession Nanodeck"
+      }
+    ]
+  },
+  "assignments": [
+    {
+      "vendor": "(VendingMachine:12FE8DA2)",
+      "profession": "Engineer",
+      "scores": [
+        [
+          "Engineer",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ],
+        [
+          "Agent",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8DA1)",
+      "profession": "Soldier",
+      "scores": [
+        [
+          "Soldier",
+          2
+        ],
+        [
+          "MartialArtist",
+          2
+        ],
+        [
+          "Engineer",
+          2
+        ],
+        [
+          "Fixer",
+          2
+        ],
+        [
+          "Adventurer",
+          2
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8DA0)",
+      "profession": "Bureaucrat",
+      "scores": [
+        [
+          "Bureaucrat",
+          2
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D9F)",
+      "profession": "Doctor",
+      "scores": [
+        [
+          "Doctor",
+          6
+        ],
+        [
+          "Agent",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D9E)",
+      "profession": "Engineer",
+      "scores": [
+        [
+          "Engineer",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ],
+        [
+          "Agent",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D9D)",
+      "profession": "Engineer",
+      "scores": [
+        [
+          "Engineer",
+          10
+        ],
+        [
+          "Keeper",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D9C)",
+      "profession": "Fixer",
+      "scores": [
+        [
+          "Fixer",
+          10
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Agent",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D95)",
+      "profession": "Engineer",
+      "scores": [
+        [
+          "Engineer",
+          4
+        ],
+        [
+          "Fixer",
+          1
+        ],
+        [
+          "Trader",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D96)",
+      "profession": "Soldier",
+      "scores": [
+        [
+          "Soldier",
+          1
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ],
+        [
+          "Agent",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D97)",
+      "profession": "Shade",
+      "scores": [
+        [
+          "Shade",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D98)",
+      "profession": "Nanotechnician",
+      "scores": [
+        [
+          "Nanotechnician",
+          4
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D99)",
+      "profession": "UNKNOWN",
+      "scores": [
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ],
+        [
+          "Agent",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D9A)",
+      "profession": "Doctor",
+      "scores": [
+        [
+          "Doctor",
+          3
+        ],
+        [
+          "MartialArtist",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "Engineer",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ]
+      ]
+    },
+    {
+      "vendor": "(VendingMachine:12FE8D9B)",
+      "profession": "Engineer",
+      "scores": [
+        [
+          "Engineer",
+          1
+        ],
+        [
+          "Keeper",
+          1
+        ],
+        [
+          "Soldier",
+          0
+        ],
+        [
+          "MartialArtist",
+          0
+        ],
+        [
+          "Fixer",
+          0
+        ]
+      ]
+    }
+  ]
+}

@@ -26,6 +26,8 @@ namespace ZoneEngine.Core
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using MsgPack;
+
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Playfields;
@@ -64,6 +66,12 @@ namespace ZoneEngine.Core
         public const int CommandHeal = 12;
 
         public const int CommandReport = 14;
+
+        /// <summary>
+        /// Capture 20260806-pet-warp: shared pet-warp nano (all pet professions).
+        /// OnUse is FunctionType.SummonPets with argument [0].
+        /// </summary>
+        public const int WarpPetsNanoId = 209488;
 
         // Pet dialogue: Zone FormatFeedback only (working look before Your Pets attempts).
 
@@ -136,6 +144,97 @@ namespace ZoneEngine.Core
             }
 
             ExecuteForPet(owner, client, pet, commandId, commandTarget);
+        }
+
+        /// <summary>
+        /// Capture 20260806-pet-warp nano 209488 / SummonPets [0]:
+        /// Follow chat → SetPos pet to owner exact coords → DesiredTargetDistance=0 + follow.
+        /// </summary>
+        public static bool WarpAllOwnedPetsToOwner(ICharacter owner)
+        {
+            if (owner == null || owner.Playfield == null)
+            {
+                return false;
+            }
+
+            Playfield playfield = owner.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return false;
+            }
+
+            Coordinate ownerCoord = owner.Coordinates();
+            foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
+            {
+                ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
+                if (pet == null)
+                {
+                    continue;
+                }
+
+                WarpOwnedPetToOwner(owner, pet, playfield, ownerCoord);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Capture 20260806-pet-warp: SummonPets with a single int argument 0 means warp,
+        /// not spawn (spawn uses pet-hash string + type id).
+        /// </summary>
+        public static bool IsPetWarpSummonPetsArguments(MessagePackObject[] arguments)
+        {
+            if (arguments == null || arguments.Length != 1)
+            {
+                return false;
+            }
+
+            try
+            {
+                return arguments[0].AsInt32() == 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void WarpOwnedPetToOwner(
+            ICharacter owner,
+            ICharacter pet,
+            Playfield playfield,
+            Coordinate ownerCoord)
+        {
+            var petController = pet.Controller as NPCController;
+            if (petController == null)
+            {
+                return;
+            }
+
+            ActiveHealCommands.Remove(pet.Identity.Instance);
+            PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+
+            // Capture order: Follow chat, then SetPos to owner, then DesiredTargetDistance=0.
+            AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Follow(pet));
+
+            pet.Coordinates(ownerCoord);
+            playfield.Announce(
+                new SetPosMessage
+                {
+                    Identity = pet.Identity,
+                    Coordinates =
+                        new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                        {
+                            X = ownerCoord.x,
+                            Y = ownerCoord.y,
+                            Z = ownerCoord.z
+                        },
+                    Unknown1 = 1
+                });
+
+            ClearPetCombatState(pet, petController, playfield);
+            ApplyPetFollowDesiredDistance(pet, 0);
+            petController.Follow(owner.Identity, 2.0);
         }
 
         private static void ExecuteForAllOwnedPets(

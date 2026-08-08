@@ -127,6 +127,7 @@ namespace AORebirth.Core.Inventory
                 (int)FunctionType.HeadMesh,
                 (int)FunctionType.BackMesh,
                 (int)FunctionType.Shouldermesh,
+                (int)FunctionType.AttractorMesh,
                 (int)FunctionType.Texture,
                 (int)FunctionType.ChangeBodyMesh
             };

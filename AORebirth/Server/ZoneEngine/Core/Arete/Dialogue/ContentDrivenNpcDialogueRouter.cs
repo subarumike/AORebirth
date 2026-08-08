@@ -447,6 +447,27 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 ThrakGardenVendorInteractionRules.SonLenInstance,
                 ThrakGardenVendorInteractionRules.SonLenIdentityText);
 
+        // Capture 20260806-naleb-transport: Zyvania Bagh Neleb / Steps of Madness transport.
+        private const int AndromedaIccHqPlayfieldId = 655;
+        private const int ZyvaniaBaghInstance = unchecked((int)0x7976BCF3);
+
+        private static readonly ContentDrivenNpcDialogueRegistration ZyvaniaBaghRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Zyvania Bagh",
+                ExpectedNpcName = "Zyvania Bagh",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = ZyvaniaBaghInstance
+                    },
+                NpcIdentityText = "SimpleChar:7976BCF3",
+                PlayfieldId = AndromedaIccHqPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "ZYVANIA_BAGH"
+            };
+
         private static readonly ContentDrivenNpcDialogueRegistration[] Registrations =
         {
             RexLarssonRegistration,
@@ -476,7 +497,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
             CraigOrFlamingBarrelsRegistration,
             CraigOrGearAndAmmoRegistration,
             CraigOrProtectionRegistration,
-            SonLenRegistration
+            SonLenRegistration,
+            ZyvaniaBaghRegistration
         };
 
         private static readonly Dictionary<string, DialogueSessionRecord> SessionsByCharacter =
@@ -984,6 +1006,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
             if (IsRegistration(registration, ShippingManifestTerminalRegistration))
             {
                 ShippingManifestTerminalQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
+            if (IsRegistration(registration, ZyvaniaBaghRegistration))
+            {
+                ZoneEngine.Core.Andromeda.ZyvaniaBaghTransportRuntime.TryHandleDialogueAnswer(
                     source,
                     previousNodeId,
                     answerIndex);

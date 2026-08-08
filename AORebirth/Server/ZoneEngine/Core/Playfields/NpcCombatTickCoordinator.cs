@@ -89,10 +89,12 @@ namespace AORebirth.Core.Playfields
             bool hasRegisteredCapturedContract = CapturedEnemyCombatRuntimeRegistry.TryGet(
                 attacker.Identity.Instance,
                 out capturedContract);
+            // Incomplete/quarantined capture contracts: use ordinary auto-attack, do not abort.
             if (hasRegisteredCapturedContract && !capturedContract.IsCombatReady)
             {
-                this.ClearTracking(attacker.Identity);
-                return;
+                CapturedEnemyCombatRuntimeRegistry.Remove(attacker.Identity.Instance);
+                hasRegisteredCapturedContract = false;
+                capturedContract = null;
             }
 
             if (hasRegisteredCapturedContract
@@ -286,8 +288,9 @@ namespace AORebirth.Core.Playfields
                     out registeredCapturedContract)
                 && !registeredCapturedContract.IsCombatReady)
             {
-                this.playfield.ClearNpcCombatTracking(attacker.Identity);
-                return;
+                // Quarantined capture: fall through to ordinary NPC auto-attack.
+                CapturedEnemyCombatRuntimeRegistry.Remove(attacker.Identity.Instance);
+                registeredCapturedContract = null;
             }
 
             if (registeredCapturedContract != null
@@ -1573,14 +1576,44 @@ namespace AORebirth.Core.Playfields
                 {
                     attackRange = capturedContract.CapturedAttackRange.Value;
                 }
-                else if (!capturedContract.CapturedUsesEquippedWeapon
-                         || !this.TryResolveCapturedWeaponAttackRange(
-                             attacker,
-                             capturedContract,
-                             out attackRange))
+                else if (capturedContract.CapturedUsesEquippedWeapon)
+                {
+                    if (!this.TryResolveCapturedWeaponAttackRange(
+                            attacker,
+                            capturedContract,
+                            out attackRange))
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    // Authored FixedAttackOnSight / unarmed fixed damage — melee range.
+                    attackRange = NpcCombatAttackRules.MaxMeleeCombatDistance;
+                }
+
+                if (!IsResolvedAttackRange(attackRange))
                 {
                     return null;
                 }
+
+                bool unarmedFixed = !capturedContract.CapturedUsesEquippedWeapon;
+                int attackInfoWeaponSlot = unarmedFixed
+                                               ? this.GetUnarmedAttackInfoWeaponSlot(attacker)
+                                               : capturedContract.AttackInfoWeaponSlot;
+                int attackInfoWeaponInstance = unarmedFixed
+                                                   ? this.GetUnarmedAttackInfoWeaponInstance(attacker)
+                                                   : capturedContract.AttackInfoWeaponInstance;
+                int attackInfoAmmoCount = capturedContract.AttackInfoAmmoCount != 0
+                                              ? capturedContract.AttackInfoAmmoCount
+                                              : (unarmedFixed
+                                                     ? NpcCombatAttackRules.UnarmedAttackInfoAmmoCount
+                                                     : 0);
+                int attackInfoHitType = capturedContract.AttackInfoHitType != 0
+                                            ? capturedContract.AttackInfoHitType
+                                            : (unarmedFixed
+                                                   ? NpcCombatAttackRules.NormalAttackInfoHitType
+                                                   : 0);
 
                 return new CombatAttackSource
                        {
@@ -1590,17 +1623,17 @@ namespace AORebirth.Core.Playfields
                            Range = attackRange,
                            RechargeSeconds = capturedContract.RechargeSeconds,
                            UsesEquippedWeapon = capturedContract.CapturedUsesEquippedWeapon,
-                           AttackInfoAmmoCount = capturedContract.AttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = capturedContract.AttackInfoWeaponSlot,
+                           AttackInfoAmmoCount = attackInfoAmmoCount,
+                           AttackInfoWeaponSlot = attackInfoWeaponSlot,
                            AttackInfoUnk1 = capturedContract.AttackInfoUnknown,
-                           AttackInfoHitType = capturedContract.AttackInfoHitType,
-                           AttackInfoWeaponInstance = capturedContract.AttackInfoWeaponInstance,
+                           AttackInfoHitType = attackInfoHitType,
+                           AttackInfoWeaponInstance = attackInfoWeaponInstance,
                            AttackInfoN3Unknown = capturedContract.AttackInfoN3Unknown,
                            UsesCapturedWeaponEnergy = capturedContract.WeaponDefinition != null
                                                       && capturedContract.AttackInfoWeaponSlot
                                                          == capturedContract.WeaponDefinition.InventorySlot
                                                       && capturedContract.AttackInfoWeaponInstance == 0,
-                           SendAttackInfo = capturedContract.SendCapturedAttackInfo,
+                           SendAttackInfo = true,
                            CapturedDamageObservations = capturedContract.CapturedDamageObservations,
                            CapturedLandedIntervalObservationsSeconds =
                                capturedContract.CapturedLandedIntervalObservationsSeconds
@@ -1648,7 +1681,7 @@ namespace AORebirth.Core.Playfields
                            AttackInfoUnk1 = 0,
                            AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
                            AttackInfoWeaponInstance = this.GetUnarmedAttackInfoWeaponInstance(attacker),
-                           SendAttackInfo = Playfield.IsCapturedCleaningRobot(attacker)
+                           SendAttackInfo = true
                         };
             }
 

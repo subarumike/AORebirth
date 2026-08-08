@@ -117,6 +117,7 @@
     <Compile Include="Core\Arete\AreteContentManifest.cs" />
     <Compile Include="Core\Arete\AreteContentManifestLoader.cs" />
     <Compile Include="Core\Arete\AreteEnvironmentGate.cs" />
+    <Compile Include="Core\Andromeda\ZyvaniaBaghTransportRuntime.cs" />
     <Compile Include="Core\Arete\AreteAggregateContentValidator.cs" />
     <Compile Include="Core\Arete\AreteAggregateValidationReport.cs" />
     <Compile Include="Core\Arete\AreteConditionReferenceValidator.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\PlayerSpecialAttackRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
+    <Compile Include="Core\DailyLoginRewardRuntime.cs" />
     <Compile Include="Core\CombatXpRuntimeService.cs" />
     <Compile Include="Core\ShadowlandsGardenSaveRuntimeService.cs" />
     <Compile Include="Core\AlienXpRuntimeService.cs" />
@@ -213,6 +215,7 @@
     <Compile Include="Core\Functions\FunctionCollection.cs" />
     <Compile Include="Core\Functions\FunctionPrototype.cs" />
     <Compile Include="Core\Functions\GameFunctions\applytexture.cs" />
+    <Compile Include="Core\Functions\GameFunctions\attractormesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\backmesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\changebodymesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\changeactionrestriction.cs" />
@@ -449,7 +452,11 @@
     <Compile Include="Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\NascenceStatueTeleportCatalog.cs" />
     <Compile Include="Core\MessageHandlers\NascenceStatueTeleportInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\LuxuryApartmentSunriseRules.cs" />
+    <Compile Include="Core\MessageHandlers\LuxuryApartmentInstanceRuntime.cs" />
+    <Compile Include="Core\MessageHandlers\LuxuryApartmentSunriseInteractionHandler.cs" />
     <Compile Include="Core\InventoryContainerRuntimeService.cs" />
+    <Compile Include="Core\SealedQuabbitOpenRuntime.cs" />
     <Compile Include="Core\QuestNpcOutboundTransportDiagnostics.cs" />
     <Compile Include="Core\PacketSequencingCoordinator.cs" />
     <Compile Include="Core\MessageHandlers\InventoryContainerInteractionHandler.cs" />
@@ -860,6 +867,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Nascence\life-dialogs\dialogue\nascence-life-dialogs.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Andromeda\zyvania-bagh\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Andromeda\zyvania-bagh\dialogue\zyvania-bagh.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Daily\day10-profession-nanos.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\dummy.txt">

@@ -1183,6 +1183,28 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            // Capture 20260806-210903: luxury apartment → Sunrise Station lobby uses
+            // PlayfieldProxy (0xC79E) + Playfield2=(100003:C0001772) + 4-byte payload.
+            if (LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(this.Identity.Instance)
+                && playfieldInstance == LuxuryApartmentSunriseRules.SunriseStationPlayfieldId)
+            {
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    dynel.RawCoordinates.X,
+                    dynel.RawCoordinates.Y,
+                    dynel.RawCoordinates.Z);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedLuxuryApartmentExit(
+                        character,
+                        envelope,
+                        heading,
+                        playfieldInstance));
+                return;
+            }
+
             this.Teleport(dynel, destination, heading, playfieldIdentity);
         }
 
@@ -1718,6 +1740,9 @@ namespace AORebirth.Core.Playfields
             this.SendDeathRespawnGameTime(character);
             this.SendDeathSocialStatus(character);
             FullCharacterMessageHandler.Default.Send(character);
+            InventoryContainerRuntimeService.Default.ResyncCharacterInventoryToClient(character);
+            InventoryContainerRuntimeService.Default.SchedulePostLoginInventoryResync(
+                client);
             this.SendDeathRespawnPlayfieldReadyBlock(client, character);
             this.SendDeathRespawnAction(character);
             this.runtimeSystems.EnsureWeaponVisualMeshes(character, false);

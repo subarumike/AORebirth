@@ -346,6 +346,11 @@ namespace ZoneEngine.Core
             if (playerCharacter != null)
             {
                 playerCharacter.ReloadTrainedPerksFromDatabase();
+                // True reconnect (not zone hop): reload bags from DB. Zone hops keep memory.
+                if (pooledCharacter != null && !isZoningReload && playerCharacter.BaseInventory != null)
+                {
+                    playerCharacter.BaseInventory.Read();
+                }
             }
 
             this.PreserveLogoutSitOnConnect =
@@ -497,8 +502,18 @@ namespace ZoneEngine.Core
                         }
 
                         SubwayVisibilitySnapshotDiagnostics.OnTransportFailed(buffer, e);
-                        LogUtil.Debug(DebugInfoDetail.Error, "Error writing to zStream");
-                        LogUtil.ErrorException(e);
+                        // Client already closed the TCP session (logout/crash/zone) — not a server bug.
+                        if (IsClientTransportAbort(e))
+                        {
+                            LogUtil.Debug(
+                                DebugInfoDetail.Network,
+                                "Client closed connection during send: " + e.Message);
+                        }
+                        else
+                        {
+                            LogUtil.Debug(DebugInfoDetail.Error, "Error writing to zStream");
+                            LogUtil.ErrorException(e);
+                        }
                     }
                 }
                 else
@@ -551,6 +566,40 @@ namespace ZoneEngine.Core
             }
 
             LogUtil.Debug(DebugInfoDetail.Network, HexOutput.Output(buffer));
+        }
+
+        private static bool IsClientTransportAbort(Exception exception)
+        {
+            Exception current = exception;
+            while (current != null)
+            {
+                SocketException socketException = current as SocketException;
+                if (socketException != null)
+                {
+                    SocketError code = socketException.SocketErrorCode;
+                    if (code == SocketError.ConnectionAborted
+                        || code == SocketError.ConnectionReset
+                        || code == SocketError.Shutdown
+                        || code == SocketError.NotConnected
+                        || code == SocketError.TimedOut)
+                    {
+                        return true;
+                    }
+                }
+
+                string message = current.Message ?? string.Empty;
+                if (message.IndexOf("aborted by the software in your host machine", StringComparison.OrdinalIgnoreCase) >= 0
+                    || message.IndexOf("forcibly closed", StringComparison.OrdinalIgnoreCase) >= 0
+                    || message.IndexOf("Unable to write data to the transport connection", StringComparison.OrdinalIgnoreCase)
+                       >= 0)
+                {
+                    return true;
+                }
+
+                current = current.InnerException;
+            }
+
+            return false;
         }
 
         private static bool ContainsTradeOpcode(byte[] buffer)

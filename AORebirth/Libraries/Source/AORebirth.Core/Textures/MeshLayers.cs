@@ -243,8 +243,21 @@ namespace AORebirth.Core.Textures
                 {
                     if (aoMeshs.Position == counter)
                     {
-                        cloth = aoMeshs;
-                        break;
+                        // Capture 20260807-205713 / live SCFU: pos0 can stack attractor
+                        // (layer 0/2) beside the real head (layer 4). Prefer the highest
+                        // layer as the cloth/head entry so attractors do not replace the head.
+                        if (counter == 0)
+                        {
+                            if (cloth == null || aoMeshs.Layer > cloth.Layer)
+                            {
+                                cloth = aoMeshs;
+                            }
+                        }
+                        else
+                        {
+                            cloth = aoMeshs;
+                            break;
+                        }
                     }
                 }
 
@@ -256,6 +269,42 @@ namespace AORebirth.Core.Textures
                     }
                 }
 
+                // Capture 20260806-132103 / 20260807-205713 (Penumbra White Quabbit):
+                // AppearanceUpdate stacks attractor mesh 301724 at pos0/layer0 with the real
+                // head at pos0/layer4 (armor and social). Emit lower-layer head-slot meshes
+                // first so the client keeps both the rabbit and the character head.
+                if (counter == 0)
+                {
+                    foreach (AOMeshs attractor in meshs)
+                    {
+                        if (attractor.Position != 0 || attractor.Layer >= 4)
+                        {
+                            continue;
+                        }
+
+                        output.Add(attractor);
+                    }
+
+                    if (showsocial || socialonly)
+                    {
+                        int headBase = (int)character.Stats[StatIds.headmesh].BaseValue;
+                        foreach (AOMeshs attractor in socials)
+                        {
+                            if (attractor.Position != 0 || attractor.Mesh == headBase)
+                            {
+                                continue;
+                            }
+
+                            if (attractor.Layer >= 4)
+                            {
+                                continue;
+                            }
+
+                            output.Add(attractor);
+                        }
+                    }
+                }
+
                 if (social != null)
                 {
                     if ((cloth != null) && (social != null))
@@ -263,7 +312,9 @@ namespace AORebirth.Core.Textures
                         // Compare layer only when both slots are set
                         if (cloth.Position == 0)
                         {
-                            if (social.Mesh != character.Stats[StatIds.headmesh].BaseValue)
+                            // Same-layer social helmet replaces head; attractors already emitted.
+                            if (social.Mesh != character.Stats[StatIds.headmesh].BaseValue
+                                && social.Layer == cloth.Layer)
                             {
                                 cloth = social;
                             }

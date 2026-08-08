@@ -108,6 +108,10 @@ namespace ZoneEngine.Core.PacketHandlers
 
             ActiveNanoRuntimeService.Default.PrepareCharacterForLogin(client.Controller.Character);
 
+            // Saved apartment PF survives logout; in-memory leases do not. Re-bind so
+            // PAF building stamp and later lobby re-entry keep the same instance.
+            LuxuryApartmentInstanceRuntime.RehydrateLeaseFromLogin(client.Controller.Character);
+
             // now we have to start sending packets like 
             // character stats, inventory, playfield info
             // and so on. I will put some packets here just 
@@ -124,6 +128,21 @@ namespace ZoneEngine.Core.PacketHandlers
 
             /* send playfield info to client */
             PlayfieldAnarchyFMessageHandler.Default.Send(client.Controller.Character);
+
+            // Capture 20260806-202421: DoorStatusUpdate for apartment exit door immediately after PAF.
+            if (client.Controller.Character.Playfield != null
+                && LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                DoorStatusUpdateMessageHandler.Default.SendStatus(
+                    client.Controller.Character,
+                    new Identity
+                    {
+                        Type = IdentityType.Door,
+                        Instance = LuxuryApartmentSunriseRules.ApartmentExitDoorInstance
+                    },
+                    false);
+            }
             // Live 20260725-184103: DoorFullUpdate flood starts immediately after PAF
             // (before SCFU/FullCharacter). Delayed-only replay left the map grey/wrong.
             if (client.Controller.Character.Playfield != null
@@ -291,6 +310,10 @@ client.Controller.Character.Playfield.Identity,
                         "ClientConnected",
                         "zone-login-after-prepare-before-fullchar");
                     FullCharacterMessageHandler.Default.Send(client.Controller.Character);
+                    // Client often never sends CharInPlay after login; bag UI stays empty until
+                    // zone hop. Push InventoryUpdate immediately (and delayed) after FullCharacter.
+                    InventoryContainerRuntimeService.Default.ResyncCharacterInventoryToClient(
+                        client.Controller.Character);
                     // Client only honors the XP-bar floor (LastSaveXP 372) from a standalone
                     // StatMessage, not from the FullCharacter bulk. Re-send floor stats
                     // (Unknown=1, no cumulative XP, no feedback) so the bar shows progress
@@ -300,6 +323,11 @@ client.Controller.Character.Playfield.Identity,
                         client.Controller.Character,
                         "ClientConnected",
                         "zone-login-after-fullchar");
+
+                    // Stuck hoverboard/yalm: MonsterData/IsVehicle can persist after NCU cancel
+                    // or unequip if MorphState was lost on reboot.
+                    AdventurerMorphFlightRuntime.HealOrphanedVehicleMorphOnLogin(
+                        client.Controller.Character);
 
                     // FullCharacter has no perk list yet — re-teach trained perks immediately
                     // (do not wait for CharInPlay; reconnect UI clears on FullCharacter).
@@ -335,6 +363,7 @@ client.Controller.Character.Playfield.Identity,
                     identity));
 
             ActiveNanoRuntimeService.Default.SchedulePostLoginNanoRestore(client);
+            InventoryContainerRuntimeService.Default.SchedulePostLoginInventoryResync(client);
 
             var specials = new[]
                            {
@@ -410,6 +439,15 @@ client.Controller.Character.Playfield.Identity,
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
             CompleteDeathRespawnCharInPlay(client);
             SendAliveDeadTimerBaseline(client);
+
+            // Daily rewards web UI: publish account Taken board (browser often has no CharacterID).
+            try
+            {
+                DailyLoginRewardRuntime.PublishActiveAccountBoard(client.Controller.Character);
+            }
+            catch
+            {
+            }
 
             // done, so we call a hook.
             // Call all OnConnect script Methods

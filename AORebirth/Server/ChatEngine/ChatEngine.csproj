@@ -133,6 +133,7 @@
     <Compile Include="Packets\MessageType.cs" />
     <Compile Include="Packets\MsgAnonymousVicinity.cs" />
     <Compile Include="Packets\MsgPredefined.cs" />
+    <Compile Include="Packets\MsgPrivate.cs" />
     <Compile Include="Packets\MsgPrivateGroup.cs" />
     <Compile Include="Packets\MsgSystem.cs" />
     <Compile Include="Packets\MsgVicinity.cs" />
