@@ -154,28 +154,28 @@ namespace ZoneEngine.Core
                 { 46363, new CapturedBureaucratPetProfile("Bureaucrat Worker", 6, 110, 96056, 93, 33) },
                 { 46399, new CapturedBureaucratPetProfile("Bureaucrat Worker", 8, 146, 96056, 94, 42) },
                 { 46386, new CapturedBureaucratPetProfile("Bureaucrat Worker", 14, 288, 96056, 97, 73) },
-                { 46405, new CapturedBureaucratPetProfile("Bureaucrat Helper", 16, 341, 96056, 97, 83) },
-                { 46359, new CapturedBureaucratPetProfile("Bureaucrat Helper", 18, 394, 96056, 98, 93) },
-                { 46374, new CapturedBureaucratPetProfile("Bureaucrat Helper", 20, 447, 96056, 99, 103) },
-                { 46411, new CapturedBureaucratPetProfile("Bureaucrat Helper", 22, 500, 96056, 99, 113) },
-                { 46357, new CapturedBureaucratPetProfile("Bureaucrat Helper", 24, 553, 96056, 100, 123) },
-                { 46382, new CapturedBureaucratPetProfile("Bureaucrat Helper", 26, 629, 96056, 101, 133) },
-                { 46392, new CapturedBureaucratPetProfile("Bureaucrat Helper", 28, 728, 96056, 101, 143) },
-                { 46409, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 39, 1271, 96056, 103, 197) },
-                { 46355, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 42, 1419, 96056, 104, 213) },
-                { 46380, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 45, 1567, 96056, 104, 228) },
-                { 46390, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 48, 1715, 96056, 105, 243) },
-                { 46408, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 60, 2489, 96056, 107, 307) },
-                { 46354, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 63, 2691, 96056, 107, 324) },
-                { 46379, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 66, 2894, 96056, 107, 338) },
-                { 46389, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 69, 3096, 96056, 108, 356) },
-                { 46407, new CapturedBureaucratPetProfile("Bureaucrat Aide", 81, 3907, 96056, 109, 419) },
-                { 46353, new CapturedBureaucratPetProfile("Bureaucrat Aide", 84, 4109, 96056, 110, 436) },
-                { 46378, new CapturedBureaucratPetProfile("Bureaucrat Aide", 87, 4312, 96056, 110, 452) },
-                { 46388, new CapturedBureaucratPetProfile("Bureaucrat Aide", 91, 4609, 96056, 111, 472) },
-                { 46398, new CapturedBureaucratPetProfile("Bureaucrat Secretary", 107, 6128, 96056, 113, 537) },
-                { 46350, new CapturedBureaucratPetProfile("Bureaucrat Secretary", 111, 6507, 96056, 113, 552) },
-                { 46384, new CapturedBureaucratPetProfile("Bureaucrat Secretary", 115, 6887, 96056, 114, 568) },
+                { 46405, new CapturedBureaucratPetProfile("Bureaucrat Helper", 16, 341, 96056, 97, 83, materialTextureId: 96040) },
+                { 46359, new CapturedBureaucratPetProfile("Bureaucrat Helper", 18, 394, 96056, 98, 93, materialTextureId: 96040) },
+                { 46374, new CapturedBureaucratPetProfile("Bureaucrat Helper", 20, 447, 96056, 99, 103, materialTextureId: 96040) },
+                { 46411, new CapturedBureaucratPetProfile("Bureaucrat Helper", 22, 500, 96056, 99, 113, materialTextureId: 96040) },
+                { 46357, new CapturedBureaucratPetProfile("Bureaucrat Helper", 24, 553, 96056, 100, 123, materialTextureId: 96040) },
+                { 46382, new CapturedBureaucratPetProfile("Bureaucrat Helper", 26, 629, 96056, 101, 133, materialTextureId: 96040) },
+                { 46392, new CapturedBureaucratPetProfile("Bureaucrat Helper", 28, 728, 96056, 101, 143, materialTextureId: 96040) },
+                { 46409, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 39, 1271, 96056, 103, 197, materialTextureId: 96039) },
+                { 46355, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 42, 1419, 96056, 104, 213, materialTextureId: 96039) },
+                { 46380, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 45, 1567, 96056, 104, 228, materialTextureId: 96039) },
+                { 46390, new CapturedBureaucratPetProfile("Bureaucrat Attendant", 48, 1715, 96056, 105, 243, materialTextureId: 96039) },
+                { 46408, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 60, 2489, 96056, 107, 307, materialTextureId: 96035) },
+                { 46354, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 63, 2691, 96056, 107, 324, materialTextureId: 96035) },
+                { 46379, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 66, 2894, 96056, 107, 338, materialTextureId: 96035) },
+                { 46389, new CapturedBureaucratPetProfile("Bureaucrat Assistant", 69, 3096, 96056, 108, 356, materialTextureId: 96035) },
+                { 46407, new CapturedBureaucratPetProfile("Bureaucrat Aide", 81, 3907, 96056, 109, 419, materialTextureId: 96037) },
+                { 46353, new CapturedBureaucratPetProfile("Bureaucrat Aide", 84, 4109, 96056, 110, 436, materialTextureId: 96037) },
+                { 46378, new CapturedBureaucratPetProfile("Bureaucrat Aide", 87, 4312, 96056, 110, 452, materialTextureId: 96037) },
+                { 46388, new CapturedBureaucratPetProfile("Bureaucrat Aide", 91, 4609, 96056, 111, 472, materialTextureId: 96037) },
+                { 46398, new CapturedBureaucratPetProfile("Bureaucrat Secretary", 107, 6128, 96056, 113, 537, materialTextureId: 96038) },
+                { 46350, new CapturedBureaucratPetProfile("Bureaucrat Secretary", 111, 6507, 96056, 113, 552, materialTextureId: 96038) },
+                { 46384, new CapturedBureaucratPetProfile("Bureaucrat Secretary", 115, 6887, 96056, 114, 568, materialTextureId: 96038) },
                 { 46391, new CapturedBureaucratPetProfile("Bureaucrat Bodyguard", 200, 29148, 17627, 121, 821) },
                 { 235386, new CapturedBureaucratPetProfile("Corporate Guardian", 205, 29288, 227701, 130, 909) },
                 { 273300, new CapturedBureaucratPetProfile("CEO Guardian", 215, 34513, 227701, 125, 1062) },
@@ -183,15 +183,16 @@ namespace ZoneEngine.Core
                 { 258580, new CapturedBureaucratPetProfile("Carlo Pinnetti", 220, 55687, 258209, 130, 1138, 40121, 97) },
             };
 
-        // Capture 20260713-110254: each Bureaucrat summon nano grants a unique shell
+        // Capture 20260713-110254 / 20260806-crat-pets: each Bureaucrat summon nano grants a unique shell
         // item low/high pair and quality. The client name comes from that item template.
+        // 20260806-crat-pets corrected nano 46399 shell to 150722/150721 QL8 (was 150721/150720).
         private static readonly Dictionary<int, CapturedBureaucratShellDisplay> BureaucratShellDisplayByNano =
             new Dictionary<int, CapturedBureaucratShellDisplay>
             {
                 { 46397, new CapturedBureaucratShellDisplay(96235, 150722, 2) },
                 { 46362, new CapturedBureaucratShellDisplay(96235, 150722, 3) },
                 { 46363, new CapturedBureaucratShellDisplay(150722, 150721, 6) },
-                { 46399, new CapturedBureaucratShellDisplay(150721, 150720, 8) },
+                { 46399, new CapturedBureaucratShellDisplay(150722, 150721, 8) },
                 { 46405, new CapturedBureaucratShellDisplay(150736, 150735, 16) },
                 { 46386, new CapturedBureaucratShellDisplay(150721, 150720, 14) },
                 { 46374, new CapturedBureaucratShellDisplay(150735, 150735, 20) },
@@ -310,6 +311,61 @@ namespace ZoneEngine.Core
             out CapturedBureaucratPetProfile profile)
         {
             return BureaucratProfiles.TryGetValue(nanoId, out profile);
+        }
+
+        public static bool TryGetBureaucratMaterialTextureId(int nanoId, out int materialTextureId)
+        {
+            materialTextureId = 0;
+            CapturedBureaucratPetProfile profile;
+            if (!TryGetBureaucratProfile(nanoId, out profile) || profile.MaterialTextureId <= 0)
+            {
+                return false;
+            }
+
+            materialTextureId = profile.MaterialTextureId;
+            return true;
+        }
+
+        public static bool TryGetBureaucratMaterialTextureIdByName(string petName, out int materialTextureId)
+        {
+            materialTextureId = 0;
+            if (string.IsNullOrWhiteSpace(petName))
+            {
+                return false;
+            }
+
+            // Capture 20260806-crat-pets: Material #468 color matches shell tier color.
+            if (petName.StartsWith("Bureaucrat Helper", StringComparison.Ordinal))
+            {
+                materialTextureId = 96040;
+                return true;
+            }
+
+            if (petName.StartsWith("Bureaucrat Attendant", StringComparison.Ordinal))
+            {
+                materialTextureId = 96039;
+                return true;
+            }
+
+            if (petName.StartsWith("Bureaucrat Secretary", StringComparison.Ordinal))
+            {
+                materialTextureId = 96038;
+                return true;
+            }
+
+            if (petName.StartsWith("Bureaucrat Aide", StringComparison.Ordinal))
+            {
+                materialTextureId = 96037;
+                return true;
+            }
+
+            if (petName.StartsWith("Bureaucrat Assistant", StringComparison.Ordinal))
+            {
+                materialTextureId = 96035;
+                return true;
+            }
+
+            return false;
         }
 
         public static bool TryGetBureaucratShellDisplay(
@@ -753,7 +809,8 @@ namespace ZoneEngine.Core
             int monsterScale,
             int runSpeed,
             int headMesh = 0,
-            int npcFamily = 95)
+            int npcFamily = 95,
+            int materialTextureId = 0)
         {
             this.Name = name;
             this.Level = level;
@@ -763,6 +820,7 @@ namespace ZoneEngine.Core
             this.RunSpeed = runSpeed;
             this.HeadMesh = headMesh;
             this.NpcFamily = npcFamily;
+            this.MaterialTextureId = materialTextureId;
         }
 
         public string Name { get; private set; }
@@ -780,5 +838,11 @@ namespace ZoneEngine.Core
         public int HeadMesh { get; private set; }
 
         public int NpcFamily { get; private set; }
+
+        /// <summary>
+        /// Capture 20260806-crat-pets SCFU Material #468 texture id (shell color match).
+        /// 0 = no HasExtendedTextures (Worker / Bodyguard).
+        /// </summary>
+        public int MaterialTextureId { get; private set; }
     }
 }

@@ -157,6 +157,28 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.Unknown4 = 0;
                     x.GeneratorPayload = payload;
                 }
+                else if (LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(
+                             character.Playfield.Identity.Instance))
+                {
+                    // Capture 20260806-220142: per-character apartment PF + building instance.
+                    // Must run before private-city candidate checks on overlapping bands.
+                    int buildingInstance;
+                    if (!LuxuryApartmentInstanceRuntime.TryGetBuildingInstance(
+                            character.Playfield.Identity.Instance,
+                            out buildingInstance))
+                    {
+                        buildingInstance = LuxuryApartmentSunriseRules.LuxuryApartmentBuildingInstance;
+                    }
+
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = IdentityType.Playfield,
+                                         Instance = buildingInstance
+                                     };
+                    x.Unknown3 = 0;
+                    x.Unknown4 = 0;
+                    x.GeneratorPayload = CreateCapturedLuxuryApartmentGeneratorPayload(buildingInstance);
+                }
                 else if (AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
                 {
                     x.PlayfieldId1 = new Identity
@@ -224,6 +246,51 @@ namespace ZoneEngine.Core.MessageHandlers
             return IsCapturedMontroyalPrivateCityInstance(playfieldInstance)
                        ? CapturedMontroyalPrivateCityBuildingInstance
                        : CapturedPrivateCityBuildingInstance;
+        }
+
+        /// <summary>
+        /// Capture 20260806-202421 / 20260806-213039 PlayfieldAnarchyF generator payload.
+        /// Mail entry MUST be IdentityType.MailTerminal (0xC773), not Terminal (0xC73D) —
+        /// wrong type left the Mail Terminal missing inside the apartment.
+        /// Evidence 20260806-213039: MailTerminal:79A84D @ (512, 51.7, 482);
+        /// first layout uses instance 79A08A with the same type/position.
+        /// </summary>
+        private static byte[] CreateCapturedLuxuryApartmentGeneratorPayload(int buildingInstance)
+        {
+            byte[] payload =
+                {
+                       0x00, 0x00, 0xC7, 0x7B, 0x00, 0x5E, 0x38, 0x20,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04,
+                       0x00, 0x00, 0x17, 0x71, 0x00, 0x00, 0xC7, 0x9C,
+                       0x00, 0x00, 0x17, 0x72, 0xC0, 0x00, 0x17, 0x72,
+                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                       0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x86, 0xA0,
+                       0x00, 0x00, 0x00, 0x00, 0x17, 0xE7, 0x94, 0xA0,
+                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1E,
+                       0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0xC7, 0x3D,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+                       0x00, 0x00, 0x00, 0x03, 0x57, 0xC1, 0x2A, 0x71,
+                       // Mail Terminal — capture 20260806-213039 type=C773 (was wrongly C73D).
+                       0x00, 0x00, 0xC7, 0x73, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x79, 0xA0, 0x8A, 0x00, 0x00, 0xC7, 0x3D,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04,
+                       0x00, 0x00, 0x00, 0x01, 0x57, 0xC1, 0x2A, 0x74,
+                       0x00, 0x00, 0xC7, 0x48, 0x00, 0x00, 0x00, 0x01,
+                       0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01,
+                       0x10, 0x9D, 0xE4, 0x93, 0x00, 0x00, 0xC7, 0x3D,
+                       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x06,
+                       0x00, 0x00, 0x00, 0x02, 0x57, 0xC1, 0x2A, 0x75,
+                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+                   };
+
+            // Patch C77B building instance (bytes 4..7 big-endian).
+            uint building = unchecked((uint)buildingInstance);
+            payload[4] = (byte)((building >> 24) & 0xFF);
+            payload[5] = (byte)((building >> 16) & 0xFF);
+            payload[6] = (byte)((building >> 8) & 0xFF);
+            payload[7] = (byte)(building & 0xFF);
+            return payload;
         }
 
         private static byte[] CreateCapturedPrivateCityGeneratorPayload(int playfieldId)

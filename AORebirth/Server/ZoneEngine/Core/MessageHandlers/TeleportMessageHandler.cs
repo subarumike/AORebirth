@@ -113,6 +113,118 @@ namespace ZoneEngine.Core.MessageHandlers
                 false);
         }
 
+
+        /// <summary>
+        /// Capture 20260806-202421 / 20260806-220142 apartment enter N3Teleport —
+        /// Playfield=(Playfield:building) ChangePlayfield=(Playfield2:apartmentPf) Playfield2=(100002:1).
+        /// </summary>
+        internal void SendCapturedLuxuryApartmentEntry(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            int buildingInstance)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = IdentityType.Playfield,
+                                      Instance = buildingInstance
+                                  };
+                    x.GameServerId = 0;
+                    x.SgId = 0;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = new Identity
+                                   {
+                                       Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
+                                       Instance = CapturedMissionTeleportPlayfield2Instance
+                                   };
+                    x.Payload = new byte[0];
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260806-221532 apartment Enter The Grid N3Teleport:
+        /// Playfield=(PlayfieldProxy/0xC79E:98) GS=1 ChangePlayfield=(Playfield2:166801)
+        /// Playfield2=(Playfield3:260098) payload 3F00000000000000.
+        /// Rebirth lands on shared Grid PF 152 (ChangePlayfield instance = destination PF).
+        /// </summary>
+        internal void SendCapturedApartmentGridEnter(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                LivePlayfieldProxyType,
+                1,
+                0,
+                new Identity
+                {
+                    Type = IdentityType.Playfield3,
+                    Instance = LuxuryApartmentSunriseRules.CapturedApartmentGridPlayfield3Instance
+                },
+                new byte[] { 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+        }
+
+        /// <summary>
+        /// Capture 20260806-210903 apartment exit N3Teleport:
+        /// Playfield=(PlayfieldProxy:1772 / 0xC79E) ChangePlayfield=(Playfield2:1772)
+        /// Playfield2=(100003:C0001772) Unknown6=4 payload 00 00 00 01.
+        /// Do not use Playfield1 (0xC79C) here — wrong type disconnects the client.
+        /// </summary>
+        internal void SendCapturedLuxuryApartmentExit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                LivePlayfieldProxyType,
+                0,
+                0,
+                new Identity
+                {
+                    Type = (IdentityType)100003,
+                    Instance = LuxuryApartmentSunriseRules.OrbitalApartmentDoorC000
+                },
+                new byte[] { 0, 0, 0, 1 });
+        }
+
         internal void SendOfficialDungeonProxyTransfer(
             ICharacter character,
             Vector3 envelopeDestination,

@@ -601,6 +601,20 @@ namespace ZoneEngine.Core.Packets
                         ZoneEngine.Core.PetSummonScfuExtensions.CloneGuardianExtendedTextureOverrideData();
                     scfu.VisualFlags = 31;
                 }
+                else
+                {
+                    byte[] bureaucratColorTextures;
+                    if (petMasterInstance != 0
+                        && ZoneEngine.Core.PetSummonScfuExtensions
+                            .TryGetBureaucratAttackPetExtendedTextureOverride(
+                                charName,
+                                out bureaucratColorTextures))
+                    {
+                        // Capture 20260806-crat-pets: Material #468 shell-matching color on visibility SCFU.
+                        scfu.ExtendedTextureOverrideData = bureaucratColorTextures;
+                        scfu.VisualFlags = 31;
+                    }
+                }
             }
 
             scfu.ActiveNanos = (from nano in nanos

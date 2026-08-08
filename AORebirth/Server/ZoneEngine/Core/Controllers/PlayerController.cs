@@ -62,6 +62,7 @@ namespace ZoneEngine.Core.Controllers
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Functions.GameFunctions;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
@@ -518,11 +519,30 @@ namespace ZoneEngine.Core.Controllers
                 // Instant Hit drain nanos must not be treated as NCU buffs on the caster.
                 if (duration > 0 && !NanoEventRuntimeService.Default.HasOffensiveHitOnUse(nano))
                 {
+                    // Capture 20260806-085523: self-cast Target is often None — duration
+                    // Identity must still be the caster SimpleChar or cancel cannot reverse morph.
+                    Identity durationIdentity = (target.Type != IdentityType.None && target.Instance != 0)
+                                                   ? target
+                                                   : this.Character.Identity;
                     CharacterActionMessageHandler.Default.SetNanoDuration(
                         this.Character,
-                        target,
+                        durationIdentity,
                         nanoId,
                         duration);
+                }
+                else if (duration <= 0
+                         && AdventurerMorphFlightRuntime.IsMorphFlightNano(nanoId)
+                         && !NanoEventRuntimeService.Default.HasOffensiveHitOnUse(nano))
+                {
+                    // Some vehicle nanos report attribute 8 as 0; still need an NCU entry.
+                    Identity durationIdentity = (target.Type != IdentityType.None && target.Instance != 0)
+                                                   ? target
+                                                   : this.Character.Identity;
+                    CharacterActionMessageHandler.Default.SetNanoDuration(
+                        this.Character,
+                        durationIdentity,
+                        nanoId,
+                        AdventurerMorphFlightRuntime.FallbackNcuDurationCentiseconds);
                 }
             }
 

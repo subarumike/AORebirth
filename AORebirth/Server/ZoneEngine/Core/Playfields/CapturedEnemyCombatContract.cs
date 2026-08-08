@@ -694,6 +694,13 @@ namespace AORebirth.Core.Playfields
                 switch (this.AttackModel)
                 {
                     case CapturedEnemyAttackModel.FixedAttackInfo:
+                        // Authored FixedAttackOnSight (mission/Arete/Lorelei): combat-ready without
+                        // full corpus observations so mobs can retaliate with real AttackInfo.
+                        if (this.IsAuthoredFixedAttackFallback())
+                        {
+                            return true;
+                        }
+
                         return this.EvidenceSourceIdentity > 0
                                && this.HasCapturedRequiredPacketFields
                                && this.HasCapturedSpecialAttackWeaponContext
@@ -1152,6 +1159,22 @@ namespace AORebirth.Core.Playfields
                        - this.CapturedLandedIntervalObservationsSeconds[0]) < 0.000001d;
         }
 
+        /// <summary>
+        /// Production FixedAttackOnSight: damage + attack-start without corpus WIFU observations.
+        /// </summary>
+        private bool IsAuthoredFixedAttackFallback()
+        {
+            return this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo
+                   && this.Retaliates
+                   && this.MinDamage > 0
+                   && this.MaxDamage >= this.MinDamage
+                   && this.RechargeSeconds > 0
+                   && this.HasCapturedAttackStartContext
+                   && this.HasCapturedSpecialAttackWeaponContext
+                   && this.EvidenceSourceIdentity <= 0
+                   && !this.HasCapturedRequiredPacketFields;
+        }
+
         private bool HasExplicitCapturedAttackRange()
         {
             return this.CapturedAttackRange.HasValue
@@ -1349,6 +1372,7 @@ namespace AORebirth.Core.Playfields
                 HasCapturedAttackStartContext = true,
                 HasEmptySpecialAttackWeaponContext = true,
                 HasCapturedSpecialAttackWeaponContext = true,
+                SendCapturedAttackInfo = true,
                 CapturedSpecialAttacks = new CapturedEnemySpecialAttackDefinition[0]
             };
         }
@@ -1967,14 +1991,10 @@ namespace AORebirth.Core.Playfields
                 {
                     contract = resolved;
                 }
-                else if (!hasDirectCaptureCertification
-                         || string.IsNullOrWhiteSpace(resolutionFailure)
-                         || !resolutionFailure.StartsWith(
-                             "no canonical raw combat profile for ",
-                             StringComparison.Ordinal))
+                else if (!hasDirectCaptureCertification)
                 {
-                    // Keep a complete source-local CapturedFixedPacketSequence (e.g. Nascence
-                    // Barking Chimera from 20260723-225021) when the Subway corpus has no match.
+                    // Keep authored FixedAttackOnSight when already combat-ready; only quarantine
+                    // contracts that cannot fight without corpus data.
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="
                         + (string.IsNullOrWhiteSpace(resolutionFailure)

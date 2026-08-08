@@ -120,6 +120,14 @@ namespace ZoneEngine.Core.Functions.GameFunctions
         private static bool TryResolveItemId(string hash, int quality, out int itemId)
         {
             itemId = 0;
+
+            // Capture 20260806-rabbit: sealed Quabbit 301782 OnUse SpawnItem PUWT → 301749.
+            if (string.Equals(hash, "PUWT", StringComparison.OrdinalIgnoreCase))
+            {
+                itemId = 301749;
+                return ItemLoader.ItemList.ContainsKey(itemId);
+            }
+
             int seedId;
             if (string.Equals(hash, "OIHO", StringComparison.OrdinalIgnoreCase))
             {

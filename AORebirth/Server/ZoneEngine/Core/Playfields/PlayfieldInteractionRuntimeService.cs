@@ -64,6 +64,11 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (LuxuryApartmentSunriseInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             // Insurance Terminal → SaveChar (must run; playfields.dat has no SaveChar OnUse).
             // Surgery clinic Uses are excluded inside InsuranceTerminalInteractionHandler so they
             // fall through to SurgeryClinicInteractionHandler (Arete Terminal:574187D1).

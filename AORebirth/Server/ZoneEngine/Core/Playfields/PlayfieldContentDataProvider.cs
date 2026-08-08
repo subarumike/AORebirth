@@ -22,6 +22,7 @@ namespace ZoneEngine.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Navigation;
 
@@ -81,6 +82,18 @@ namespace ZoneEngine.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Zoning,
                     "HoloDeck PF 7001 created without PFData statels evidence=20260719-155043");
+                return new List<StatelData>();
+            }
+
+            // Capture 20260806-202421: luxury apartment instance 0x19E000 (no PFData row).
+            if (LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Luxury apartment instance created without PFData statels instance={0} evidence=20260806-202421",
+                        playfieldIdentity.Instance));
                 return new List<StatelData>();
             }
 

@@ -3,9 +3,12 @@ namespace ZoneEngine.Core
     using System;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     /// <summary>
     /// Capture 20260723-133842: Air/Water/Ground vehicles (IsVehicle) wear on WeaponPage Hud1.
@@ -75,6 +78,19 @@ namespace ZoneEngine.Core
             }
 
             AdventurerMorphFlightRuntime.ClearEquipmentVehicleMorph(character);
+        }
+
+        internal static bool HasEquippedVehicle(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null
+                || !character.BaseInventory.Pages.ContainsKey((int)IdentityType.WeaponPage))
+            {
+                return false;
+            }
+
+            IInventoryPage weaponPage = character.BaseInventory.Pages[(int)IdentityType.WeaponPage];
+            IItem hudItem = weaponPage[(int)WeaponSlots.Hud1];
+            return IsVehicleItem(hudItem);
         }
 
         /// <summary>

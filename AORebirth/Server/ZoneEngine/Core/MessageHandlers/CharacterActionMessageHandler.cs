@@ -250,16 +250,9 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 case CharacterActionType.SitDown:
                 {
-                    if ((client.Controller.Character.MoveMode == MoveModes.Sit)
-                        || (client.Controller.Character.MoveMode == MoveModes.Sleep)
-                        || (client.Controller.Character.MoveMode == MoveModes.Lounge))
-                    {
-                        this.ApplyStand(client);
-                    }
-                    else
-                    {
-                        this.ApplySit(client);
-                    }
+                    // Capture 20260806-063619: OUT Action=263 Target=self is Daily Login claim,
+                    // not posture. Posture uses StandUp / ChangeAnimationAndStance.
+                    DailyLoginRewardRuntime.TryHandleClaim(client.Controller.Character);
                 }
 
                     break;

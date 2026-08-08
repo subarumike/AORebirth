@@ -14,7 +14,9 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Functions.GameFunctions;
+    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
@@ -161,6 +163,12 @@ namespace AORebirth.Core.Playfields
         private const float CapturedHoloDeckExitLandingHeadingZ = 0.0f;
 
         private const float CapturedHoloDeckExitLandingHeadingW = 0.5969435f;
+
+        private readonly HashSet<int> capturedSunriseLobbyEntryContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedSunriseApartmentExitContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedSunriseApartmentDoorEntryContacts = new HashSet<int>();
 
         private static readonly Dictionary<int, DateTime> PostZoneCollisionGraceUntil =
             new Dictionary<int, DateTime>();
@@ -318,6 +326,32 @@ namespace AORebirth.Core.Playfields
             }
 
             if (this.TryHandleCapturedHoloDeckExit(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedSunriseLobbyEntry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedSunriseApartmentProximityEntry(
+                dynel,
+                playfieldIdentity,
+                stopMovement))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedSunriseApartmentExit(
                 dynel,
                 playfieldIdentity,
                 stopMovement,
@@ -992,6 +1026,258 @@ namespace AORebirth.Core.Playfields
                     sourceY,
                     sourceZ,
                     CapturedHoloDeckEntrySourcePlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedSunriseApartmentProximityEntry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement)
+        {
+            if (character == null
+                || playfieldIdentity.Instance != LuxuryApartmentSunriseRules.SunriseStationPlayfieldId
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            if (!InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    character,
+                    LuxuryApartmentSunriseRules.CapturedApartmentAccessCardTemplateId))
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            bool inDoorTrigger = false;
+            foreach (float[] spot in LuxuryApartmentSunriseRules.OrbitalApartmentDoorProximitySpots)
+            {
+                double deltaX = sourceX - spot[0];
+                double deltaZ = sourceZ - spot[2];
+                double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+                double verticalDistance = Math.Abs(sourceY - spot[1]);
+                if (horizontalDistanceSquared
+                    <= LuxuryApartmentSunriseRules.OrbitalApartmentDoorProximityRadius
+                       * LuxuryApartmentSunriseRules.OrbitalApartmentDoorProximityRadius
+                    && verticalDistance
+                       <= LuxuryApartmentSunriseRules.OrbitalApartmentDoorProximityVerticalTolerance)
+                {
+                    inDoorTrigger = true;
+                    break;
+                }
+            }
+
+            int dynelId = character.Identity.Instance;
+            if (!inDoorTrigger)
+            {
+                this.capturedSunriseApartmentDoorEntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            if (this.capturedSunriseApartmentDoorEntryContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedSunriseApartmentDoorEntryContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedSunriseApartmentDoorEntryContacts.Add(dynelId);
+            stopMovement(character);
+
+            if (!LuxuryApartmentSunriseInteractionHandler.Default.TryProximityEnterFromLobby(character))
+            {
+                return false;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Sunrise apartment proximity entry character={0} source=({1:F3},{2:F3},{3:F3}) evidence=20260806-220142",
+                    character.Identity.ToString(true),
+                    sourceX,
+                    sourceY,
+                    sourceZ));
+            return true;
+        }
+
+        private bool TryHandleCapturedSunriseApartmentExit(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - LuxuryApartmentSunriseRules.ApartmentExitTriggerX;
+            double deltaZ = sourceZ - LuxuryApartmentSunriseRules.ApartmentExitTriggerZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - LuxuryApartmentSunriseRules.ApartmentExitTriggerY);
+            bool inExitTrigger =
+                horizontalDistanceSquared
+                <= LuxuryApartmentSunriseRules.ApartmentExitTriggerRadius
+                   * LuxuryApartmentSunriseRules.ApartmentExitTriggerRadius
+                && verticalDistance <= LuxuryApartmentSunriseRules.ApartmentExitTriggerVerticalTolerance;
+            int dynelId = character.Identity.Instance;
+            if (!inExitTrigger)
+            {
+                this.capturedSunriseApartmentExitContacts.Remove(dynelId);
+                return false;
+            }
+
+            // Landing is ~1.5m from the exit trigger — arm only after leave/re-enter
+            // (same pattern as HoloDeck exit). Capture 20260806-210903: walk-out, no Use.
+            if (this.capturedSunriseApartmentExitContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedSunriseApartmentExitContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedSunriseApartmentExitContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                LuxuryApartmentSunriseRules.ApartmentExitLobbyX,
+                LuxuryApartmentSunriseRules.ApartmentExitLobbyY,
+                LuxuryApartmentSunriseRules.ApartmentExitLobbyZ);
+            var heading = new RuntimeQuaternion(
+                0.0f,
+                LuxuryApartmentSunriseRules.ApartmentExitLobbyHeadingY,
+                0.0f,
+                LuxuryApartmentSunriseRules.ApartmentExitLobbyHeadingW);
+
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue =
+                LuxuryApartmentSunriseRules.LuxuryApartmentPlayfieldId;
+
+            stopMovement(character);
+            teleportToPlayfield(
+                dynel,
+                destination,
+                heading,
+                LuxuryApartmentSunriseRules.SunriseStationPlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Sunrise apartment exit teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260806-210903",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    LuxuryApartmentSunriseRules.SunriseStationPlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedSunriseLobbyEntry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || playfieldIdentity.Instance != LuxuryApartmentSunriseRules.IccHqPlayfieldId
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - LuxuryApartmentSunriseRules.LobbyEntrySourceX;
+            double deltaZ = sourceZ - LuxuryApartmentSunriseRules.LobbyEntrySourceZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - LuxuryApartmentSunriseRules.LobbyEntrySourceY);
+            bool inEntryTrigger =
+                horizontalDistanceSquared
+                <= LuxuryApartmentSunriseRules.LobbyEntryRadius
+                   * LuxuryApartmentSunriseRules.LobbyEntryRadius
+                && verticalDistance <= LuxuryApartmentSunriseRules.LobbyEntryVerticalTolerance;
+            int dynelId = character.Identity.Instance;
+            if (!inEntryTrigger)
+            {
+                this.capturedSunriseLobbyEntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            if (this.capturedSunriseLobbyEntryContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedSunriseLobbyEntryContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedSunriseLobbyEntryContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                LuxuryApartmentSunriseRules.LobbyLandingX,
+                LuxuryApartmentSunriseRules.LobbyLandingY,
+                LuxuryApartmentSunriseRules.LobbyLandingZ);
+            var heading = new RuntimeQuaternion(
+                0.0f,
+                LuxuryApartmentSunriseRules.LobbyLandingHeadingY,
+                0.0f,
+                LuxuryApartmentSunriseRules.LobbyLandingHeadingW);
+
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue =
+                LuxuryApartmentSunriseRules.IccHqPlayfieldId;
+
+            stopMovement(character);
+            teleportToPlayfield(
+                dynel,
+                destination,
+                heading,
+                LuxuryApartmentSunriseRules.SunriseStationPlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Sunrise Station lobby entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260806-202421",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    LuxuryApartmentSunriseRules.SunriseStationPlayfieldId,
                     destination.x,
                     destination.y,
                     destination.z));

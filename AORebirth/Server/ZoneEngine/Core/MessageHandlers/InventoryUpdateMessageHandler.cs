@@ -101,7 +101,21 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             return x =>
             {
-                x.BagIdentity = page.Identity;
+                // PlayerInventoryPage stores inverted Identity (Type=charId, Instance=page).
+                // Client InventoryUpdate expects BagIdentity Type=Inventory, Instance=character.
+                if (page is PlayerInventoryPage && character != null)
+                {
+                    x.BagIdentity = new Identity
+                    {
+                        Type = IdentityType.Inventory,
+                        Instance = character.Identity.Instance
+                    };
+                }
+                else
+                {
+                    x.BagIdentity = page.Identity;
+                }
+
                 x.NumberOfSlots = page.MaxSlots;
                 x.SlotnumberInMainInventory = 0;
                 List<InventoryEntry> temp = new List<InventoryEntry>();

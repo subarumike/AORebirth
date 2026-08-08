@@ -914,6 +914,15 @@ namespace ZoneEngine.Core
                     owner,
                     spawnPetHash);
             }
+            else if (summonNanoId > 0
+                     && !PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
+            {
+                // Capture 20260806-crat-pets: A020 Material #468 tint matches shell color.
+                // No-ops for Worker/Bodyguard (no ExtTex) and non-bureaucrat nanos.
+                PetSummonScfuExtensions.ApplyCapturedBureaucratAttackPetMetadata(
+                    message,
+                    summonNanoId);
+            }
 
             return message;
         }

@@ -53,6 +53,19 @@ namespace ZoneEngine.Core
             0x00, 0x00, 0x00, 0x00
         };
 
+        // Capture 20260806-crat-pets: Material #468 body tint (48 bytes, same layout as Constad).
+        // BE texture id at offset 36: Helper=96040, Attendant=96039, Secretary=96038,
+        // Aide=96037, Assistant=96035. Worker/Bodyguard omit ExtTex.
+        private static readonly byte[] CapturedBureaucratMaterial468Template =
+        {
+            0x00, 0x00, 0x07, 0xE2, 0x4D, 0x61, 0x74, 0x65, 0x72, 0x69, 0x61, 0x6C, 0x20, 0x23, 0x34,
+            0x36, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00
+        };
+
+        private const int CapturedBureaucratMaterialTextureOffset = 36;
+
         public static void ApplyCapturedMpPetMetadata(
             SimpleCharFullUpdateMessage message,
             int petSlotStrain,
@@ -90,12 +103,64 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
+        /// Capture 20260806-crat-pets: shell-colored A020 pets use Material #468 HasExtendedTextures.
+        /// Worker / Bodyguard omit the override (no ExtTex on capture).
+        /// </summary>
+        public static void ApplyCapturedBureaucratAttackPetMetadata(
+            SimpleCharFullUpdateMessage message,
+            int summonNanoId)
+        {
+            if (message == null)
+            {
+                return;
+            }
+
+            int materialTextureId;
+            if (!PetSummonNanoCatalog.TryGetBureaucratMaterialTextureId(summonNanoId, out materialTextureId))
+            {
+                return;
+            }
+
+            message.ExtendedTextureOverrideData = BuildMaterial468Override(materialTextureId);
+            message.VisualFlags = 31;
+        }
+
+        public static bool TryGetBureaucratAttackPetExtendedTextureOverride(
+            string petName,
+            out byte[] data)
+        {
+            int materialTextureId;
+            if (!PetSummonNanoCatalog.TryGetBureaucratMaterialTextureIdByName(petName, out materialTextureId))
+            {
+                data = null;
+                return false;
+            }
+
+            data = BuildMaterial468Override(materialTextureId);
+            return true;
+        }
+
+        /// <summary>
         /// Guardian body/face texture override (hellface2/hell1/hell2) shared by CEO and Corporate guardians.
         /// Used to make the visibility SCFU other players receive match the owner's capture-wire appearance.
         /// </summary>
         public static byte[] CloneGuardianExtendedTextureOverrideData()
         {
             return (byte[])CapturedGuardianExtendedTextureOverrideData.Clone();
+        }
+
+        private static byte[] BuildMaterial468Override(int materialTextureId)
+        {
+            byte[] data = (byte[])CapturedBureaucratMaterial468Template.Clone();
+            data[CapturedBureaucratMaterialTextureOffset] =
+                (byte)((materialTextureId >> 24) & 0xFF);
+            data[CapturedBureaucratMaterialTextureOffset + 1] =
+                (byte)((materialTextureId >> 16) & 0xFF);
+            data[CapturedBureaucratMaterialTextureOffset + 2] =
+                (byte)((materialTextureId >> 8) & 0xFF);
+            data[CapturedBureaucratMaterialTextureOffset + 3] =
+                (byte)(materialTextureId & 0xFF);
+            return data;
         }
     }
 }

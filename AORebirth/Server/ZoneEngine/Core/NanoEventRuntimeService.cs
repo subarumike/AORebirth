@@ -317,6 +317,12 @@ namespace ZoneEngine.Core
 
         public bool HasSummonPetOnUse(int nanoId)
         {
+            // Capture 20260806-pet-warp: nano 209488 warps pets; it is not a summon strain.
+            if (nanoId == PetCommandService.WarpPetsNanoId)
+            {
+                return false;
+            }
+
             if (PetSummonNanoCatalog.IsCatalogSummonNano(nanoId))
             {
                 return true;
@@ -338,6 +344,11 @@ namespace ZoneEngine.Core
                 return false;
             }
 
+            if (nano.ID == PetCommandService.WarpPetsNanoId)
+            {
+                return false;
+            }
+
             foreach (Event nanoEvent in nano.Events.Where(x => x.EventType == EventType.OnUse))
             {
                 if (nanoEvent.Functions == null)
@@ -347,8 +358,18 @@ namespace ZoneEngine.Core
 
                 foreach (Function function in nanoEvent.Functions)
                 {
-                    if (function.FunctionType == SummonPetFunctionId
-                        || function.FunctionType == SummonPetsFunctionId)
+                    if (function == null)
+                    {
+                        continue;
+                    }
+
+                    if (function.FunctionType == SummonPetFunctionId)
+                    {
+                        return true;
+                    }
+
+                    if (function.FunctionType == SummonPetsFunctionId
+                        && !IsPetWarpSummonPetsFunction(function))
                     {
                         return true;
                     }
@@ -356,6 +377,29 @@ namespace ZoneEngine.Core
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Capture 20260806-pet-warp: SummonPets [0] warps living pets to the caster.
+        /// </summary>
+        private static bool IsPetWarpSummonPetsFunction(Function function)
+        {
+            if (function == null
+                || function.Arguments == null
+                || function.Arguments.Values == null
+                || function.Arguments.Values.Count != 1)
+            {
+                return false;
+            }
+
+            try
+            {
+                return function.Arguments.Values[0].AsInt32() == 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool HasOffensiveHitOnUse(NanoFormula nano)

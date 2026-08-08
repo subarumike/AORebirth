@@ -231,6 +231,14 @@ namespace ChatEngine.CoreServer
                     return;
                 }
 
+                var privateSystem = messageObject.DataObject as PrivateSystemMessage;
+                if (privateSystem != null)
+                {
+                    // Capture 20260806-063619: Daily Login PrivateMsg Sender=0 Unk1=3.
+                    this.DistributePrivateSystem(privateSystem);
+                    return;
+                }
+
                 var chatCommand = messageObject.DataObject as ChatCommand;
                 if (chatCommand != null)
                 {
@@ -475,6 +483,63 @@ namespace ChatEngine.CoreServer
                           + " clients="
                           + this.ConnectedClients.Count;
             LogUtil.Debug(DebugInfoDetail.Error, miss);
+        }
+
+        /// <summary>
+        /// Capture 20260806-063619 Daily Login PrivateMsg to the claiming character only.
+        /// </summary>
+        private void DistributePrivateSystem(PrivateSystemMessage message)
+        {
+            if (message == null || string.IsNullOrEmpty(message.Text))
+            {
+                return;
+            }
+
+            byte[] packet = MsgPrivate.Create(
+                0,
+                message.Text,
+                message.Unk1 != 0 ? message.Unk1 : 3,
+                message.Unk2);
+            if (packet == null)
+            {
+                return;
+            }
+
+            Client cli;
+            uint characterId = unchecked((uint)message.CharacterId);
+            if (this.ConnectedClients.TryGetValue(characterId, out cli)
+                && cli != null
+                && cli.Character != null)
+            {
+                cli.Send(packet);
+                return;
+            }
+
+            string wantName = message.CharacterName ?? string.Empty;
+            foreach (Client connected in this.ConnectedClients.Values)
+            {
+                if (connected == null || connected.Character == null)
+                {
+                    continue;
+                }
+
+                if (wantName.Length > 0
+                    && string.Equals(
+                        connected.Character.characterName,
+                        wantName,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    connected.Send(packet);
+                    return;
+                }
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                "DistributePrivateSystem: no chat client for CharacterId="
+                + message.CharacterId
+                + " name="
+                + wantName);
         }
 
         private void DistributeVicinityChat(VicinityChatMessage vicinityChatMessage)

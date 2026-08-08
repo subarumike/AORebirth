@@ -46,6 +46,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             }
 
             affected.Stats[statId].Modifier += amount;
+            // Record for NCU cancel RemoveModifiers. MorphState NoteScalingModify is only a
+            // fallback when CalculateSkills has not ClearModifiers'd yet — reverse must be safe.
+            NanoEventRuntimeService.Default.RecordModifier(affected, statId, amount, false);
             AdventurerMorphFlightRuntime.NoteScalingModify(affected, statId, amount);
             return true;
         }

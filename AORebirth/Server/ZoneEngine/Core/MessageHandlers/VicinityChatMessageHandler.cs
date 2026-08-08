@@ -118,15 +118,21 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 List<IDynel> charsInRange = playfield.FindInRange(character, range);
 
+                // FindInRange excludes self — speaker must still receive their own vicinity line.
+                List<int> recipientIds =
+                    charsInRange.Select(x => x.Identity.Instance).ToList();
+                int senderId = character.Identity.Instance;
+                if (!recipientIds.Contains(senderId))
+                {
+                    recipientIds.Insert(0, senderId);
+                }
+
                 VicinityChatMessage vicinityChat = new VicinityChatMessage
                                                    {
-                                                       CharacterIds =
-                                                           charsInRange.Select(
-                                                               x => x.Identity.Instance)
-                                                           .ToList(),
+                                                       CharacterIds = recipientIds,
                                                        MessageType = (byte)message.Message.Type,
                                                        Text = message.Message.Text,
-                                                       SenderId = character.Identity.Instance
+                                                       SenderId = senderId
                                                    };
 
                 Program.ISComClient.TrySend(vicinityChat);

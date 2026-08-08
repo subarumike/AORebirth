@@ -74,6 +74,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
+            // Capture 20260806-202421: UseItemOnItem on Orbital Apartment Door → luxury apartment.
+            if (LuxuryApartmentSunriseInteractionHandler.Default.TryHandleUseItemOnItem(client, message))
+            {
+                return true;
+            }
+
             // CellAO GenericCmd UseItemOnItem: stamp insignia + Pool StaticDynel OnUseItemOn first.
             if (InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message))
             {

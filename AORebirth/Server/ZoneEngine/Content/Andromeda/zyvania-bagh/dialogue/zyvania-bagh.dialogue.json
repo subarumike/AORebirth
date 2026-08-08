@@ -1,0 +1,840 @@
+{
+  "Identity": {
+    "Id": "andromeda-zyvania-bagh-dialogue-20260806-naleb-transport",
+    "Version": "captured-20260806-naleb-transport",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260806-naleb-transport"
+  },
+  "SourceCaptures": [
+    "20260806-naleb-transport"
+  ],
+  "Npcs": [
+    {
+      "Id": "zyvania-bagh",
+      "NpcIdentity": "SimpleChar:7976BCF3",
+      "Name": "Zyvania Bagh",
+      "RootNodeId": "zyvania_001",
+      "Aliases": [
+        "(SimpleChar:7976BCF3)"
+      ],
+      "Nodes": [
+        {
+          "Id": "zyvania_001",
+          "PromptText": "What do you want?",
+          "PromptTextConfidence": "KnubotAppendText U2=0 capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "What do you want?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_001_0",
+              "Index": 0,
+              "Text": "Who are you...?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_002",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_001_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_002",
+          "PromptText": null,
+          "PromptTextConfidence": "KnubotAppendText U2=1+0 capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "The nano mage female turns to you and her white eyes bore into you. She looks blind, but somehow you know she isn't, and can actually see much more than an average person.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Child, my Awoken name is Zyvania Bagh. I am the Third of the Nelebai.",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_002_0",
+              "Index": 0,
+              "Text": "The Nelebai?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_003",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_002_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_002_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_003",
+          "PromptText": null,
+          "PromptTextConfidence": "KnubotAppendText U2=0 capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "Yes. We are the Enlightened ones. We have understood the Awareness of Master Neleb, who works from his sanctuary in Omni Forest. I am called the Third because I was the third Sleeper to Awaken.\\n\\nI expect you are familiar with Master Neleb?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_003_0",
+              "Index": 0,
+              "Text": "No, I don't know what you're talking about.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_004",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_003_1",
+              "Index": 1,
+              "Text": "Yes, I've heard of Neleb.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_003_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_003_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_004",
+          "PromptText": null,
+          "PromptTextConfidence": "KnubotAppendText U2=1+0 capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "She smiles and closes her eyes halfway.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Then allow me to explain. It is always a privilege to inform a Sleeper as yourself.\\n\\nMaster Neleb had a difficult child hood, like every member of his Nelebai. We have all experienced some sort of abuse, mental or physical. Some were victims of very bad domestic violence, others escaped or were released from test facilities, scarred for life. \\n\\nMaster Neleb also had challenging early years. His foster parents regularly beat him in the cruelest way, he was denied schooling and was eventually thrown out of the home much too early. But, as an adult, he has never carried resentment and vengeance. He is convinced that these challenges were necessary for him to Awaken and find the Path.\\n\\nPerhaps you can experience it too. Will you seek out Master Neleb and discover your Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_004_0",
+              "Index": 0,
+              "Text": "Awakening?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awakening",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_004_1",
+              "Index": 1,
+              "Text": "Path?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_path_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_004_2",
+              "Index": 2,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_004_3",
+              "Index": 3,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_004_4",
+              "Index": 4,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_004_5",
+              "Index": 5,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_004_5_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_seek",
+          "PromptText": null,
+          "PromptTextConfidence": "Yes-heard AppendText not in capture; reused captured explain closing invitation",
+          "PromptSegments": [
+            {
+              "Text": "Perhaps you can experience it too. Will you seek out Master Neleb and discover your Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_seek_0",
+              "Index": 0,
+              "Text": "Awakening?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awakening",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_seek_1",
+              "Index": 1,
+              "Text": "Path?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_path_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_seek_2",
+              "Index": 2,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_seek_3",
+              "Index": 3,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_seek_4",
+              "Index": 4,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_seek_5",
+              "Index": 5,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_seek_5_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_awakening",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "The Awakening is the moment in which a Sleeper, one who does not yet understand the Awareness of Neleb, opens his or her mind and heart and connects to the common mind the Nelebai share. The journey after the Awakening is called the Path.",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_aw_0",
+              "Index": 0,
+              "Text": "Path?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_path_after_aw",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_aw_1",
+              "Index": 1,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_after_aw",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_aw_2",
+              "Index": 2,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_after_aw",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_aw_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_aw_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_path_from_seek",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "The Path is the life after the Awakening, when the Nelebai have successfully expelled the despair, anger and fear that used to rule our lives. We now live only to explain to people about the great vision and truth of Master Neleb, hoping that more people like ourselves will break free from the chains of past terrors.",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_path_from_seek_0",
+              "Index": 0,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_after_path",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_path_from_seek_1",
+              "Index": 1,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_after_path",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_path_from_seek_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_path_from_seek_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_path_after_aw",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "The Path is the life after the Awakening, when the Nelebai have successfully expelled the despair, anger and fear that used to rule our lives. We now live only to explain to people about the great vision and truth of Master Neleb, hoping that more people like ourselves will break free from the chains of past terrors.",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_path_after_aw_0",
+              "Index": 0,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_after_path",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_path_after_aw_1",
+              "Index": 1,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_after_path",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_path_after_aw_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_path_after_aw_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_neleb_from_seek",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_neleb_from_seek_0",
+              "Index": 0,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_after_neleb",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_neleb_from_seek_1",
+              "Index": 1,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_neleb_from_seek_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_neleb_from_seek_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_neleb_after_aw",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_neleb_after_aw_0",
+              "Index": 0,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_after_neleb",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_neleb_after_aw_1",
+              "Index": 1,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_neleb_after_aw_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_neleb_after_aw_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_neleb_after_path",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_neleb_after_path_0",
+              "Index": 0,
+              "Text": "Awareness?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_awareness_after_neleb",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_neleb_after_path_1",
+              "Index": 1,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_neleb_after_path_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_neleb_after_path_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_awareness_from_seek",
+          "PromptText": null,
+          "PromptTextConfidence": "Awareness AppendText not in capture 20260806-naleb-transport; options preserved; prompt uses captured Neleb sanctuary text",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "afs_0",
+              "Index": 0,
+              "Text": "Path?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_path_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "afs_1",
+              "Index": 1,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_from_seek",
+              "Actions": []
+            },
+            {
+              "Id": "afs_2",
+              "Index": 2,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "afs_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "afs_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_awareness_after_aw",
+          "PromptText": null,
+          "PromptTextConfidence": "Awareness AppendText not in capture 20260806-naleb-transport; options preserved; prompt uses captured Neleb sanctuary text",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "aa_0",
+              "Index": 0,
+              "Text": "Path?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_path_after_aw",
+              "Actions": []
+            },
+            {
+              "Id": "aa_1",
+              "Index": 1,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_after_aw",
+              "Actions": []
+            },
+            {
+              "Id": "aa_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "aa_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_awareness_after_path",
+          "PromptText": null,
+          "PromptTextConfidence": "Awareness AppendText not in capture 20260806-naleb-transport; options preserved; prompt uses captured Neleb sanctuary text",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "ap_0",
+              "Index": 0,
+              "Text": "Neleb?",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_neleb_after_path",
+              "Actions": []
+            },
+            {
+              "Id": "ap_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "ap_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_awareness_after_neleb",
+          "PromptText": null,
+          "PromptTextConfidence": "Awareness AppendText not in capture 20260806-naleb-transport; options preserved; prompt uses captured Neleb sanctuary text",
+          "PromptSegments": [
+            {
+              "Text": "Master Neleb has chosen the life of the hermit, living in his Sanctuary in Omni Forest outside Omni-Ent. There, he has found a place where he continues his Awareness without being too disturbed by the outside world. He does not deny anyone entrance, but it isn't a place for unwilling Sleepers.\\n\\nIn his Sanctuary, he is able to expel all the negativity and focus more on his plans for the Awakening and Path for new Nelebai. Perhaps you would like to visit with Master Neleb and discover your own Awakening?",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "an_0",
+              "Index": 0,
+              "Text": "Sure, whatever you say.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_transport_offer",
+              "Actions": []
+            },
+            {
+              "Id": "an_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "an_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_transport_offer",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport",
+          "PromptSegments": [
+            {
+              "Text": "I sense that you are unsure of the powers of Master Neleb. I suggest you visit him. You will be convinced of the right Path, I am sure of it. If you are willing, I can transport you to the entrance of the Sanctuary and you can begin your ascension towards Awareness.",
+              "Unknown2": 0
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_to_0",
+              "Index": 0,
+              "Text": "Riiight. Fine, sure. Send me to the...uh...\"Path of Awareness\".",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_teleport",
+              "Actions": []
+            },
+            {
+              "Id": "zyvania_to_1",
+              "Index": 1,
+              "Text": "You're crazy, woman. I want nothing to do with you.",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_to_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            },
+            {
+              "Id": "zyvania_to_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_to_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_teleport",
+          "PromptText": null,
+          "PromptTextConfidence": "capture 20260806-naleb-transport; teleport PF716 side effect",
+          "PromptSegments": [
+            {
+              "Text": "Very good. If your heart and mind is open, you can Awaken. I wish you good luck, child.",
+              "Unknown2": 0
+            },
+            {
+              "Text": "She closes her eyes and starts weaving the intricate pattern of a teleporting nano program.",
+              "Unknown2": 1
+            }
+          ],
+          "Options": [
+            {
+              "Id": "zyvania_tp_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260806-naleb-transport",
+              "NextNodeId": "zyvania_close",
+              "Actions": [
+                {
+                  "Id": "zyvania_tp_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Goodbye"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "zyvania_close",
+          "PromptText": "",
+          "PromptTextConfidence": "close",
+          "PromptSegments": [],
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "zyvania_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "close"
+            }
+          ]
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

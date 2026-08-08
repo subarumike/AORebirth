@@ -174,6 +174,78 @@ namespace ZoneEngine.Core
             }
         }
 
+        /// <summary>
+        /// Client often drops FullCharacter bag contents on login/death until CharInPlay
+        /// (which this fork frequently never receives). Re-push inventory pages so items
+        /// show without requiring a zone hop.
+        /// </summary>
+        public void ResyncCharacterInventoryToClient(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return;
+            }
+
+            int[] pageTypes =
+                {
+                    (int)IdentityType.Inventory,
+                    (int)IdentityType.WeaponPage,
+                    (int)IdentityType.ArmorPage,
+                    (int)IdentityType.ImplantPage,
+                    (int)IdentityType.SocialPage
+                };
+
+            for (int i = 0; i < pageTypes.Length; i++)
+            {
+                IInventoryPage page;
+                if (!character.BaseInventory.Pages.TryGetValue(pageTypes[i], out page) || page == null)
+                {
+                    continue;
+                }
+
+                InventoryUpdateMessageHandler.Default.Send(character, page);
+            }
+
+            this.PublishMailBlockedContainerLinks(character);
+        }
+
+        /// <summary>
+        /// Delayed bag resync after login/death FullCharacter — client UI is not always ready
+        /// for the immediate InventoryUpdate.
+        /// </summary>
+        public void SchedulePostLoginInventoryResync(IZoneClient client)
+        {
+            if (client == null || client.Controller == null || client.Controller.Character == null)
+            {
+                return;
+            }
+
+            ThreadPool.QueueUserWorkItem(
+                _ =>
+                {
+                    Thread.Sleep(600);
+                    ICharacter character = client.Controller != null ? client.Controller.Character : null;
+                    if (character == null || character.Controller == null || character.Controller.Client == null)
+                    {
+                        return;
+                    }
+
+                    try
+                    {
+                        this.ResyncCharacterInventoryToClient(character);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Error,
+                            "Post-login inventory resync failed char="
+                            + character.Identity.Instance
+                            + " err="
+                            + ex.Message);
+                    }
+                });
+        }
+
         public void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)
         {
             if (PetBureaucratGuardianAppearance.IsGuardianPet(character))
@@ -945,6 +1017,12 @@ namespace ZoneEngine.Core
             }
 
             if (PetShellItemService.IsPetShellItem(item))
+            {
+                return true;
+            }
+
+            // Capture 20260806-rabbit: Use sealed Quabbit (301782) → grant opened 301749 + consume sealed.
+            if (SealedQuabbitOpenRuntime.TryHandleUse(character, itemPosition, item))
             {
                 return true;
             }

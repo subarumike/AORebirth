@@ -243,6 +243,7 @@ namespace ZoneEngine.Core
             }
 
             ICharacter character = client.Controller.Character;
+            int requestedNanoId = this.ResolveNanoIdFromRemoveMessage(character, message);
             List<ActiveNanoRemovalTarget> removalTargets = this.BuildRemovalTargets(character, message);
             if (removalTargets.Count == 0)
             {
@@ -253,10 +254,27 @@ namespace ZoneEngine.Core
                     message.Parameter1,
                     message.Parameter2,
                     character.ActiveNanos.Count);
-                CharacterActionMessageHandler.Default.AcknowledgeRemoveFriendlyNano(
-                    character,
-                    message,
-                    character.ActiveNanos.Count == 1 ? character.ActiveNanos.Values.First().ID : 0);
+
+                // Capture 20260806-085523: Buff alone left hoverboard/Phasefront morph stuck when
+                // ActiveNanos never tracked the cast. Always reverse vehicle morph on cancel.
+                if (requestedNanoId > 0)
+                {
+                    AdventurerMorphFlightRuntime.CancelVehicleMorphNano(character, requestedNanoId);
+                    CharacterActionMessageHandler.Default.AcknowledgeRemoveFriendlyNano(
+                        character,
+                        message,
+                        requestedNanoId);
+                }
+                else
+                {
+                    AdventurerMorphFlightRuntime.ForceClearStuckVehicleOrMorph(character);
+                    CharacterActionMessageHandler.Default.AcknowledgeRemoveFriendlyNano(
+                        character,
+                        message,
+                        character.ActiveNanos.Count == 1 ? character.ActiveNanos.Values.First().ID : 0);
+                }
+
+                this.SyncPersistedStore(character);
                 return;
             }
 
@@ -273,10 +291,21 @@ namespace ZoneEngine.Core
                 "RemoveFriendlyNano clearing nanoIds={0}",
                 string.Join(",", removalTargets.Select(x => x.NanoId.ToString())));
 
+            // Buff remove first. Morph reverse already ran inside RemoveActiveNanoByNanoId
+            // → OnMorphNanoRemoved. Do not CancelVehicleMorphNano / ForceClear again — that
+            // re-sent Phasefront SpellList removes and broke Adventurer demorph.
             CharacterActionMessageHandler.Default.CompleteFriendlyNanoRemoval(
                 character,
                 message,
                 removalTargets);
+
+            if (requestedNanoId > 0
+                && !removalTargets.Any(x => x.NanoId == requestedNanoId)
+                && (AdventurerMorphFlightRuntime.IsMorphFlightNano(requestedNanoId)
+                    || AdventurerMorphFlightRuntime.IsVehicleMorphNano(requestedNanoId)))
+            {
+                AdventurerMorphFlightRuntime.CancelVehicleMorphNano(character, requestedNanoId);
+            }
 
             this.SyncPersistedStore(character);
         }
@@ -576,6 +605,8 @@ namespace ZoneEngine.Core
             }
 
             this.SyncCurrentNcuStat(character);
+
+            AdventurerMorphFlightRuntime.EnsureMorphStateMatchesActiveNanos(character);
         }
 
         public void CleanupOrphanSummonPetNanosAfterPetRestore(ICharacter character)
