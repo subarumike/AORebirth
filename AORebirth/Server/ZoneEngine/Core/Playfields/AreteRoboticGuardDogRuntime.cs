@@ -26,6 +26,11 @@ namespace ZoneEngine.Core.Playfields
 
         private const int DogMonsterData = 17720;
 
+        internal const int DogCombatEvidenceSourceIdentity = unchecked((int)0x78E0FCE9);
+
+        internal const string DogCombatProfileSelector =
+            "resource=6553|md=17720|level=13|name=Robotic Guard Dog";
+
         // Capture: LeaveSneak at ~7m from dog spawn → Attack ~3s later.
         // Keep aggro inside the short home leash so the dog does not yo-yo.
         private const float AggroRadiusMeters = 8.0f;
@@ -87,7 +92,7 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
-        internal static void RegisterDog(ICharacter dog)
+        internal static void RegisterDog(ICharacter dog, bool combatReady)
         {
             if (dog == null)
             {
@@ -99,35 +104,37 @@ namespace ZoneEngine.Core.Playfields
                 DogNpcInstances.Add(dog.Identity.Instance);
             }
 
-            MissionInstanceMobCombat.RegisterAggressive(dog.Identity);
+            if (combatReady)
+            {
+                MissionInstanceMobCombat.RegisterAggressive(dog.Identity);
+            }
         }
 
-        internal static void PrepareSpawnedDog(Character dog, NPCController controller)
+        internal static void PrepareSpawnedDog(
+            Character dog,
+            NPCController controller,
+            string combatProfileSelector,
+            int combatEvidenceSourceIdentity)
         {
             if (dog == null || controller == null)
             {
                 return;
             }
 
-            controller.AiProfile = NpcAiProfile.Aggressive;
-            string unused;
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
+            CapturedEnemyCombatContract contract = AreteRegularMobCombatProfileSelector.Create(
                 "arete-guard-dog-20260722-212421",
-                5,
-                8,
-                2.0,
-                1,
+                combatProfileSelector,
+                combatEvidenceSourceIdentity,
                 0,
                 0,
-                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                NpcCombatAttackRules.NormalAttackInfoHitType,
-                0,
-                0,
-                0,
-                0);
-            CapturedEnemyCombatRuntime.Prepare(dog, controller, contract, out unused);
-            controller.AiProfile = NpcAiProfile.Aggressive;
-            RegisterDog(dog);
+                NpcAiProfile.Aggressive);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                dog,
+                controller,
+                contract,
+                out combatFailure);
+            RegisterDog(dog, combatReady);
         }
 
         internal static bool IsRegisteredDog(ICharacter npc)
@@ -152,6 +159,14 @@ namespace ZoneEngine.Core.Playfields
         public static ICharacter FindAutomaticAggroTarget(ICharacter npc)
         {
             if (npc == null || npc.Playfield == null || npc.Stats[StatIds.health].Value <= 0)
+            {
+                return null;
+            }
+
+            CapturedEnemyCombatContract preparedContract;
+            if (!CapturedEnemyCombatRuntimeRegistry.TryGet(npc.Identity.Instance, out preparedContract)
+                || preparedContract == null
+                || !preparedContract.IsCombatReady)
             {
                 return null;
             }

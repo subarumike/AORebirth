@@ -24,6 +24,11 @@ namespace ZoneEngine.Core.Playfields
     {
         internal const string PeacekeeperName = "ICC Peacekeeper";
 
+        internal const string PeacekeeperCombatProfileSelector =
+            "2a00185997e49d3a-0a5f6153239ce087";
+
+        internal const int PeacekeeperCombatEvidenceSourceIdentity = unchecked((int)0x78D0F291);
+
         private const int GatePeacekeeperInstance = unchecked((int)0x797D337E);
 
         private const int BridgePeacekeeperInstance = unchecked((int)0x7962A3F9);
@@ -88,36 +93,34 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
-        public static void PrepareSpawnedPeacekeeper(Character mob, NPCController controller)
+        public static void PrepareSpawnedPeacekeeper(
+            Character mob,
+            NPCController controller,
+            string combatProfileSelector,
+            int combatEvidenceSourceIdentity)
         {
             if (mob == null || controller == null)
             {
                 return;
             }
 
-            // Passive: no AOS on players; CanRetaliate so defense AcquireAggro works.
-            controller.AiProfile = NpcAiProfile.Passive;
-
-            // Capture 20260722-235510 AttackInfo Amount=62 WeaponSlot=6 vs Rollerrat.
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
+            CapturedEnemyCombatContract contract = AreteRegularMobCombatProfileSelector.Create(
                 "arete-icc-peacekeeper-defend-20260722-235510",
-                55,
-                70,
-                2.0,
-                6,
-                4,
-                0,
-                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                NpcCombatAttackRules.NormalAttackInfoHitType,
+                combatProfileSelector,
+                combatEvidenceSourceIdentity,
                 0,
                 0,
-                0,
-                0);
-            string unused;
-            CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            controller.AiProfile = NpcAiProfile.Passive;
-
-            Register(mob.Identity.Instance);
+                NpcAiProfile.Passive);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                mob,
+                controller,
+                contract,
+                out combatFailure);
+            if (combatReady)
+            {
+                Register(mob.Identity.Instance);
+            }
         }
 
         public static bool TryApplyPatrol(int captureInstance, NPCController controller)

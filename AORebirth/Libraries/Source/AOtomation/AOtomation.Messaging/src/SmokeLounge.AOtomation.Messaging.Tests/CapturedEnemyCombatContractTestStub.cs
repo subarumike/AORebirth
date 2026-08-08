@@ -325,6 +325,16 @@ namespace AORebirth.Core.Playfields
                        && this.RechargeSeconds > 0;
             }
         }
+
+        internal bool IsValidOneShot
+        {
+            get
+            {
+                return this.MinDamage > 0
+                       && this.MaxDamage >= this.MinDamage
+                       && this.RechargeSeconds == 0.0d;
+            }
+        }
     }
 
     internal sealed class CapturedEnemySpecialAttackDefinition
@@ -424,15 +434,19 @@ namespace AORebirth.Core.Playfields
     {
         internal CapturedEnemyParallelAttackStreamDefinition(
             double initialDelaySeconds,
-            CapturedEnemyCombatAttackDefinition attack)
+            CapturedEnemyCombatAttackDefinition attack,
+            bool repeats = true)
         {
             this.InitialDelaySeconds = initialDelaySeconds;
             this.Attack = attack;
+            this.Repeats = repeats;
         }
 
         internal double InitialDelaySeconds { get; private set; }
 
         internal CapturedEnemyCombatAttackDefinition Attack { get; private set; }
+
+        internal bool Repeats { get; private set; }
 
         internal bool IsValid
         {
@@ -440,7 +454,9 @@ namespace AORebirth.Core.Playfields
             {
                 return this.InitialDelaySeconds >= 0
                        && this.Attack != null
-                       && this.Attack.IsValid;
+                       && (this.Repeats
+                               ? this.Attack.IsValid
+                               : this.Attack.IsValidOneShot);
             }
         }
     }
@@ -457,7 +473,8 @@ namespace AORebirth.Core.Playfields
             int specialAttackWeaponUnknown5,
             byte specialAttackWeaponN3Unknown,
             byte attackN3Unknown,
-            byte attackAction)
+            byte attackAction,
+            double attackStartDelaySeconds = 0.0d)
         {
             this.Streams = streams;
             this.SpecialAttacks = specialAttacks;
@@ -469,6 +486,7 @@ namespace AORebirth.Core.Playfields
             this.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
             this.AttackN3Unknown = attackN3Unknown;
             this.AttackAction = attackAction;
+            this.AttackStartDelaySeconds = attackStartDelaySeconds;
         }
 
         internal CapturedEnemyParallelAttackStreamDefinition[] Streams { get; private set; }
@@ -491,12 +509,17 @@ namespace AORebirth.Core.Playfields
 
         internal byte AttackAction { get; private set; }
 
+        internal double AttackStartDelaySeconds { get; private set; }
+
         internal bool IsValid
         {
             get
             {
                 return this.Streams != null
                        && this.Streams.Length > 0
+                       && !double.IsNaN(this.AttackStartDelaySeconds)
+                       && !double.IsInfinity(this.AttackStartDelaySeconds)
+                       && this.AttackStartDelaySeconds >= 0.0d
                        && this.Streams.All(
                            stream => stream != null && stream.IsValid);
             }
@@ -643,14 +666,15 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract CapturedParallelAttackSequence(
             string evidence,
             CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence,
-            bool requiresDamageLineOfSight = false)
+            bool requiresDamageLineOfSight = false,
+            ZoneEngine.Core.NpcAiProfile aiProfile = ZoneEngine.Core.NpcAiProfile.Passive)
         {
             CapturedEnemyCombatContract contract = new CapturedEnemyCombatContract
             {
                 AttackModel = CapturedEnemyAttackModel.Specialized,
                 Evidence = evidence,
                 Retaliates = true,
-                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
+                AiProfile = aiProfile,
                 ParallelAttackSequence = parallelAttackSequence,
                 RequiresDamageLineOfSight = requiresDamageLineOfSight,
                 HasCapturedSpecialAttackWeaponContext = true,
@@ -673,6 +697,32 @@ namespace AORebirth.Core.Playfields
             };
             contract.RefreshSpecializedReadiness();
             return contract;
+        }
+
+        internal static CapturedEnemyCombatContract CapturedProfileSelector(
+            string evidence,
+            int evidenceSourceIdentityHint,
+            string profileSelectorHint,
+            ZoneEngine.Core.NpcAiProfile aiProfile,
+            double? capturedAttackRange,
+            int? specialAttackWeaponUnknown5,
+            double? attackStartDelaySeconds,
+            bool requiresDamageLineOfSight = false)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.Unresolved,
+                IsCombatReady = false,
+                Evidence = evidence,
+                Retaliates = true,
+                AiProfile = aiProfile,
+                EvidenceSourceIdentityHint = evidenceSourceIdentityHint,
+                EvidenceProfileSelectorHint = profileSelectorHint ?? string.Empty,
+                EvidenceSpecialAttackWeaponUnknown5Hint = specialAttackWeaponUnknown5,
+                EvidenceAttackStartDelaySecondsHint = attackStartDelaySeconds,
+                CapturedAttackRange = capturedAttackRange,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
+            };
         }
 
         internal static CapturedEnemyCombatContract Unresolved(
@@ -832,6 +882,12 @@ namespace AORebirth.Core.Playfields
         internal int EvidenceSourceIdentity { get; set; }
 
         internal int EvidenceSourceIdentityHint { get; set; }
+
+        internal string EvidenceProfileSelectorHint { get; set; }
+
+        internal int? EvidenceSpecialAttackWeaponUnknown5Hint { get; set; }
+
+        internal double? EvidenceAttackStartDelaySecondsHint { get; set; }
 
         internal bool HasCapturedRequiredPacketFields { get; set; }
 
@@ -1105,6 +1161,14 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.EvidenceSourceIdentityHint = sourceIdentity;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithEvidenceProfileSelectorHint(
+            string profileSelector)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.EvidenceProfileSelectorHint = profileSelector ?? string.Empty;
             return clone;
         }
 

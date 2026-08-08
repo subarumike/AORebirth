@@ -127,6 +127,10 @@ namespace AORebirth.Core.Playfields
         internal string DynaLevelBandKey { get; set; }
         internal string DynaFamilyKey { get; set; }
         internal string EventKey { get; set; }
+        internal int CombatEvidenceSourceIdentity { get; set; }
+        internal string CombatProfileSelector { get; set; }
+        internal bool CombatReady { get; set; }
+        internal bool SuppressMonsterDataFallbackLoot { get; set; }
         internal int Seed { get; set; }
     }
 

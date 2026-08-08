@@ -301,23 +301,27 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             AssignCapturedPatrolWaypoints(mobCharacter, spawn);
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
+            CapturedEnemyCombatContract contract = AreteRegularMobCombatProfileSelector.Create(
                 "arete-malfunctioning-cleaning-robot-20260721-Rox-robots",
-                NpcCombatAttackRules.CapturedCleaningRobotLeftHandDamage,
-                NpcCombatAttackRules.CapturedCleaningRobotRightHandDamage,
-                NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds,
+                spawn.CombatProfileSelector,
+                spawn.CombatEvidenceSourceIdentity,
                 0,
                 0,
-                0,
-                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                NpcCombatAttackRules.NormalAttackInfoHitType,
-                0,
-                0,
-                0,
-                0);
-            string unused;
-            CapturedEnemyCombatRuntime.Prepare(mobCharacter, npcController, contract, out unused);
-            npcController.AiProfile = NpcAiProfile.Passive;
+                NpcAiProfile.Passive);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                mobCharacter,
+                npcController,
+                contract,
+                out combatFailure);
+            if (!combatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Captured Arete robot intentionally quarantined sourceIdentity=SimpleChar:"
+                    + spawn.SourceInstance.ToString("X8") + " reason=" + combatFailure);
+            }
+
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
                 PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,

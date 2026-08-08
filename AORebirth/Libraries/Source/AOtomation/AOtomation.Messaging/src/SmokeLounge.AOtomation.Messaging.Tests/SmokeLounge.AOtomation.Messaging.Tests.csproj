@@ -77,6 +77,13 @@
     <Compile Include="CapturedEnemyCombatProfileCatalogFixtures.g.cs" />
     <Compile Include="CapturedEnemyCombatProfileCatalogTestStubs.cs" />
     <Compile Include="CapturedEnemyCombatProfileCatalogTests.cs" />
+    <Compile Include="AreteRegularMobCombatAcceptanceTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\AreteRegularMobCombatProfileSelector.cs">
+      <Link>AreteRegularMobCombatProfileSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\AreteCombatLootIdentityPolicy.cs">
+      <Link>AreteCombatLootIdentityPolicy.cs</Link>
+    </Compile>
     <Compile Include="CapturedSubwayRetaliationEligibilityResolverTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedIntObservationCursor.cs">
       <Link>CapturedIntObservationCursor.cs</Link>

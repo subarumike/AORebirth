@@ -547,6 +547,7 @@
     <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />
     <Compile Include="Core\Playfields\AreteRoboticGuardDogRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteRegularMobCombatProfileSelector.cs" />
     <Compile Include="Core\Playfields\AreteIccPeacekeeperPatrolRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingPopulationEnsure.cs" />
     <Compile Include="Core\Playfields\MarcusPadAmbientCombat.cs" />
@@ -582,6 +583,7 @@
     <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyLootTableAdapter.cs" />
     <Compile Include="Core\Playfields\LootDefinitions.cs" />
+    <Compile Include="Core\Playfields\AreteCombatLootIdentityPolicy.cs" />
     <Compile Include="Core\Playfields\LootGenerationService.cs" />
     <Compile Include="Core\Playfields\WorldPopulationDefinitions.cs" />
     <Compile Include="Core\Playfields\WorldPopulationController.cs" />

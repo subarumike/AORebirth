@@ -49,6 +49,13 @@ namespace ZoneEngine.Core.Playfields
 
         private const int MissingVisualId = 1234567890;
 
+        private const string CombatProfileSelector =
+            "1c42797c1a980105-998f3f8fca4b8167";
+
+        private const int CombatEvidenceSourceIdentity = unchecked((int)0x7988C8C3);
+
+        private const int CombatAttackRangeMicrometers = 5155609;
+
         private const double RespawnSeconds = 30.0;
 
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
@@ -198,23 +205,27 @@ namespace ZoneEngine.Core.Playfields
             CombatTestMobArchetype.Prepare(robot, CombatTestMobArchetype.MalfunctioningCleaningRobot);
             robot.Name = RobotName;
             ApplyCaptureStats(robot);
-            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "cleaning-robot-20260720-212302",
-                4,
-                6,
-                2.0,
-                0,
-                0,
-                1279612721,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0);
-            string unused;
-            CapturedEnemyCombatRuntime.Prepare(robot, controller, contract, out unused);
-            controller.AiProfile = NpcAiProfile.Passive;
+            CapturedEnemyCombatContract contract =
+                AreteRegularMobCombatProfileSelector.Create(
+                    "cleaning-robot-20260720-212302",
+                    CombatProfileSelector,
+                    CombatEvidenceSourceIdentity,
+                    CombatAttackRangeMicrometers,
+                    0,
+                    NpcAiProfile.Passive);
+            string combatFailure;
+            bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                robot,
+                controller,
+                contract,
+                out combatFailure);
+            if (!combatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "Junkyard Cleaning Robot intentionally quarantined reason=" + combatFailure);
+            }
+
             robot.Coordinates(new Coordinate { x = pos[0], y = pos[1], z = pos[2] });
             robot.DoNotDoTimers = false;
             activateNpc(robot);

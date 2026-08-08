@@ -568,6 +568,12 @@ namespace AORebirth.Core.Playfields
 
         internal int EvidenceSourceIdentityHint { get; private set; }
 
+        internal string EvidenceProfileSelectorHint { get; private set; }
+
+        internal int? EvidenceSpecialAttackWeaponUnknown5Hint { get; private set; }
+
+        internal double? EvidenceAttackStartDelaySecondsHint { get; private set; }
+
         internal bool HasCapturedRequiredPacketFields { get; private set; }
 
         internal bool UsesEquippedWeaponDamage { get; private set; }
@@ -843,6 +849,14 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.EvidenceSourceIdentityHint = sourceIdentity;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithEvidenceProfileSelectorHint(
+            string profileSelector)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.EvidenceProfileSelectorHint = profileSelector ?? string.Empty;
             return clone;
         }
 
@@ -1125,6 +1139,8 @@ namespace AORebirth.Core.Playfields
                        value => !double.IsNaN(value)
                                 && !double.IsInfinity(value)
                                 && value > 0.0d)
+                   && (this.CapturedUsesEquippedWeapon
+                       || this.HasExplicitCapturedAttackRange())
                    && Math.Abs(
                        this.AttackStartDelaySeconds
                        - this.CapturedAttackStartDelayObservationsSeconds[0]) < 0.000001d
@@ -1667,13 +1683,14 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract CapturedParallelAttackSequence(
             string evidence,
             CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence,
-            bool requiresDamageLineOfSight = false)
+            bool requiresDamageLineOfSight = false,
+            NpcAiProfile aiProfile = NpcAiProfile.Passive)
         {
             return new CapturedEnemyCombatContract
             {
                 Evidence = evidence,
                 Retaliates = true,
-                AiProfile = NpcAiProfile.Passive,
+                AiProfile = aiProfile,
                 AttackModel = CapturedEnemyAttackModel.Specialized,
                 ParallelAttackSequence = parallelAttackSequence,
                 RequiresDamageLineOfSight = requiresDamageLineOfSight,
@@ -1696,6 +1713,31 @@ namespace AORebirth.Core.Playfields
                     parallelAttackSequence.SpecialAttackWeaponUnknown5,
                 AttackN3Unknown = parallelAttackSequence.AttackN3Unknown,
                 AttackAction = parallelAttackSequence.AttackAction
+            };
+        }
+
+        internal static CapturedEnemyCombatContract CapturedProfileSelector(
+            string evidence,
+            int evidenceSourceIdentityHint,
+            string profileSelectorHint,
+            NpcAiProfile aiProfile,
+            double? capturedAttackRange,
+            int? specialAttackWeaponUnknown5,
+            double? attackStartDelaySeconds,
+            bool requiresDamageLineOfSight = false)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                Evidence = evidence ?? string.Empty,
+                Retaliates = true,
+                AiProfile = aiProfile,
+                AttackModel = CapturedEnemyAttackModel.Unresolved,
+                EvidenceSourceIdentityHint = evidenceSourceIdentityHint,
+                EvidenceProfileSelectorHint = profileSelectorHint ?? string.Empty,
+                EvidenceSpecialAttackWeaponUnknown5Hint = specialAttackWeaponUnknown5,
+                EvidenceAttackStartDelaySecondsHint = attackStartDelaySeconds,
+                CapturedAttackRange = capturedAttackRange,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
             };
         }
 
@@ -1977,6 +2019,46 @@ namespace AORebirth.Core.Playfields
                 character.Identity.Instance,
                 contract,
                 capturedWeapon);
+            return true;
+        }
+
+        internal static bool PrepareAndRequireCombatReady(
+            Character character,
+            NPCController controller,
+            CapturedEnemyCombatContract contract,
+            out string failure)
+        {
+            if (!Prepare(character, controller, contract, out failure))
+            {
+                if (controller != null)
+                {
+                    controller.AiProfile = NpcAiProfile.Passive;
+                }
+
+                return false;
+            }
+
+            CapturedEnemyCombatContract prepared;
+            if (character == null
+                || !CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out prepared)
+                || prepared == null
+                || !prepared.IsCombatReady)
+            {
+                if (controller != null)
+                {
+                    controller.AiProfile = NpcAiProfile.Passive;
+                }
+
+                if (string.IsNullOrWhiteSpace(failure))
+                {
+                    failure = "captured combat preparation did not produce a runtime-ready contract";
+                }
+
+                return false;
+            }
+
             return true;
         }
 

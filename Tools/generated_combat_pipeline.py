@@ -325,24 +325,55 @@ def _project_active_variant(value: Any, label: str) -> dict[str, Any]:
             "runtimeContractReady",
             "captureSessions",
             "sourceIdentities",
+            "semanticProfileId",
             "runtimeMissingEvidence",
             "representativeWifuPacketId",
             "representativeSawPacketId",
             "representativeAttackPacketId",
         ),
     )
+    if "baseSignature" in variant:
+        projected["baseSignature"] = _present_fields(
+            _require_json_mapping(variant["baseSignature"], f"{label}.baseSignature"),
+            ("weaponContextKind",),
+        )
     if "streams" in variant:
         streams = _require_json_list(variant["streams"], f"{label}.streams")
         projected_streams = []
         for index, value in enumerate(streams):
             stream = _require_json_mapping(value, f"{label}.streams[{index}]")
-            projected_stream: dict[str, Any] = {}
+            projected_stream: dict[str, Any] = _present_fields(
+                stream,
+                (
+                    "capturedTerminalHitOnly",
+                    "damageObservations",
+                    "attackStartDelayObservationsSeconds",
+                    "firstHitDelayObservationsSeconds",
+                    "initialAmmoCandidates",
+                    "landedIntervalObservationsSeconds",
+                ),
+            )
             if "attackInfoPacketIds" in stream:
                 packet_ids = _require_json_list(
                     stream["attackInfoPacketIds"],
                     f"{label}.streams[{index}].attackInfoPacketIds",
                 )
                 projected_stream["attackInfoPacketIds"] = list(packet_ids)
+            if "pairedFightTimingObservations" in stream:
+                timings = _require_json_list(
+                    stream["pairedFightTimingObservations"],
+                    f"{label}.streams[{index}].pairedFightTimingObservations",
+                )
+                projected_stream["pairedFightTimingObservations"] = [
+                    _present_fields(
+                        _require_json_mapping(
+                            timing,
+                            f"{label}.streams[{index}].pairedFightTimingObservations[{timing_index}]",
+                        ),
+                        ("sourceIdentity", "attackStartDelaySeconds"),
+                    )
+                    for timing_index, timing in enumerate(timings)
+                ]
             projected_streams.append(projected_stream)
         projected["streams"] = projected_streams
     if "rawWireVariantObservations" in variant:
@@ -361,7 +392,7 @@ def _project_active_variant(value: Any, label: str) -> dict[str, Any]:
                 _require_json_mapping(
                     row, f"{label}.mutableSawStateObservations[{index}]"
                 ),
-                ("unknown5",),
+                ("sourceIdentity", "unknown5"),
             )
             for index, row in enumerate(rows)
         ]
