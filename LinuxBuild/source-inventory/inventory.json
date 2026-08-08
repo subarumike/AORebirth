@@ -39,6 +39,15 @@
     {
       "legacyProject": "AORebirth/Libraries/Source/AORebirth.ObjectManager/AORebirth.ObjectManager.csproj",
       "output": "LinuxBuild/source-inventory/AORebirth.ObjectManager.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props",
+      "contentOutput": "LinuxBuild/source-inventory/AORebirth.Database.ContentItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Stats/AORebirth.Stats.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Stats.CompileItems.props"
     }
   ]
 }

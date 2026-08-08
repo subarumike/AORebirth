@@ -26,8 +26,10 @@ run assembly-identity, MsgPack byte-vector/round-trip, resource, portable
 metrics, and compression smoke checks. The current foundation compiles
 `SmokeLounge.AOtomation.Messaging`, `Cell.Util`, `MsgPack.Mono`, `Translations`,
 `Cell.Core`, `Utility`, `AORebirth.Enums`, `AORebirth.Core.Exceptions`,
-`AORebirth.Interfaces`, and `AORebirth.ObjectManager` from guarded legacy
-source/resource inventories.
+`AORebirth.Interfaces`, `AORebirth.ObjectManager`, `AORebirth.Database`, and
+`AORebirth.Stats` from guarded legacy source/resource inventories. Database's
+34 SQL assets are guarded from the legacy Content inventory and copied exactly
+to build and publish outputs.
 Utility uses a Linux-only source for portable CPU/RAM metrics and references a
 separate `Ionic.Zlib` compatibility assembly, preserving the original external
 type boundary while using modern .NET compression. It does not yet produce a
@@ -73,6 +75,24 @@ The Linux Interfaces and Exceptions overlays deliberately omit the source-unused
 legacy MemBus and NLog references; the contract smoke fails if either dependency
 reappears.
 
+Stage 3 preserves the Database and Stats public/runtime contracts while using
+net10-compatible Dapper, MySqlConnector, Npgsql, and Microsoft.Data.SqlClient.
+The Linux-only `System.Data.Linq.Binary` type matches the .NET Framework public
+API and byte/hash/serialization behavior. Run the legacy/Linux semantic gate
+and the database-free runtime/artifact gate after the approved Windows build:
+
+```bat
+LinuxBuild\verify-stage3-contracts.cmd
+LinuxBuild\verify-stage3-offline.cmd
+```
+
+The offline gate exercises Dapper binary parameters/materialization, closed
+provider construction, SQL generation, and safe Stats behavior without opening
+a connection. It also verifies the exact 34 SQL assets by name, case, length,
+and SHA-256 in source, build, and `linux-x64` publish output. MySQL remains the
+only operationally supported schema dialect; PostgreSQL and SQL Server are
+compile-covered only.
+
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:
 
@@ -83,7 +103,8 @@ dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.
   --check
 ```
 
-This checkpoint proves modern-.NET compile feasibility only. It is not yet a
-ChatEngine build, Linux runtime validation, packet-parity proof, or deployment.
+This checkpoint proves modern-.NET compile and offline parity feasibility only.
+It is not yet a ChatEngine build, native Linux runtime validation, live database
+parity proof, packet-parity proof, or deployment.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).

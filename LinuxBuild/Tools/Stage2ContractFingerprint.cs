@@ -231,6 +231,11 @@ namespace AORebirth.LinuxBuild
                     "constant=" + (field.IsLiteral ? FormatConstant(field.GetRawConstantValue()) : string.Empty));
             }
 
+            foreach (string eventContract in type.GetEvents(PublicDeclared).Select(FormatEvent).OrderBy(value => value, StringComparer.Ordinal))
+            {
+                AddLine(lines, "type.event", eventContract);
+            }
+
             foreach (string method in type.GetMethods(PublicDeclared).Select(FormatMethod).OrderBy(value => value, StringComparer.Ordinal))
             {
                 AddLine(lines, "type.method", method);
@@ -272,6 +277,24 @@ namespace AORebirth.LinuxBuild
                 indexParameters,
                 GetAccessibility(getter),
                 GetAccessibility(setter));
+        }
+
+        private static string FormatEvent(EventInfo eventInfo)
+        {
+            MethodInfo addMethod = eventInfo.GetAddMethod(true);
+            MethodInfo removeMethod = eventInfo.GetRemoveMethod(true);
+            MethodInfo raiseMethod = eventInfo.GetRaiseMethod(true);
+            MethodInfo representative = addMethod ?? removeMethod ?? raiseMethod;
+            string staticModifier = representative != null && representative.IsStatic ? "static" : "instance";
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "public {0} {1} {2} {{add:{3};remove:{4};raise:{5}}}",
+                staticModifier,
+                NormalizeType(eventInfo.EventHandlerType),
+                eventInfo.Name,
+                GetAccessibility(addMethod),
+                GetAccessibility(removeMethod),
+                GetAccessibility(raiseMethod));
         }
 
         private static string FormatMethod(MethodInfo method)
@@ -345,10 +368,14 @@ namespace AORebirth.LinuxBuild
             }
 
             string paramArray = parameter.IsDefined(typeof(ParamArrayAttribute), false) ? "params " : string.Empty;
-            string optional = parameter.IsOptional
-                ? " optional=" + FormatConstant(parameter.DefaultValue)
-                : string.Empty;
-            return paramArray + direction + NormalizeType(parameterType) + " " + parameter.Name + optional;
+            string optionalAndDefault = string.Empty;
+            if (parameter.IsOptional || parameter.HasDefaultValue)
+            {
+                optionalAndDefault = " optional=" + parameter.IsOptional.ToString().ToLowerInvariant()
+                    + ";default=" + (parameter.HasDefaultValue ? FormatConstant(parameter.DefaultValue) : "none");
+            }
+
+            return paramArray + direction + NormalizeType(parameterType) + " " + parameter.Name + optionalAndDefault;
         }
 
         private static string FormatGenericParameter(Type parameter)
@@ -394,7 +421,7 @@ namespace AORebirth.LinuxBuild
                 string.Join(",", typeConstraints));
         }
 
-        private static string NormalizeType(Type type)
+        internal static string NormalizeType(Type type)
         {
             if (type == null)
             {

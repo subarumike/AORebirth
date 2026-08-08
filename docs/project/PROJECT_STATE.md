@@ -23,12 +23,14 @@ completion matrices and dated evidence retain detailed provenance.
 - Generated mission graph and mission reproducibility: PASS.
 - Debug server build: PASS.
 - Parallel Linux compile-feasibility lane: Messaging, Cell.Util, MsgPack.Mono,
-  Translations, Cell.Core, Utility, Enums, Exceptions, Interfaces, and
-  ObjectManager build on .NET 10 from guarded linked source/resource
-  inventories, with a separate Linux-only `Ionic.Zlib` compatibility assembly.
-  Stages 0-2 Windows-hosted compatibility checks, exhaustive Stage 2 public API
-  parity, and the unchanged Windows debug build pass. Native Ubuntu validation,
-  Database/Stats, ChatEngine, and deployment are not yet complete.
+  Translations, Cell.Core, Utility, Enums, Exceptions, Interfaces,
+  ObjectManager, Database, and Stats build on .NET 10 from guarded linked
+  source/resource/content inventories, with a separate Linux-only `Ionic.Zlib`
+  compatibility assembly. Stages 0-3 Windows-hosted compatibility checks,
+  exhaustive public/mapping/table contracts, Database/Stats offline behavior,
+  exact SQL publish assets, and the unchanged Windows debug build pass. Native
+  Ubuntu validation, live disposable-MySQL parity, ChatEngine, and deployment
+  are not yet complete.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete

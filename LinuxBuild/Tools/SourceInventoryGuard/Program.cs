@@ -18,7 +18,11 @@ internal static class Program
             IReadOnlySet<string> trackedPaths = LoadTrackedPaths(options.RepositoryRoot);
             foreach (InventoryJob job in options.GetJobs())
             {
-                string expected = Generate(options.RepositoryRoot, job.LegacyProjectPath, trackedPaths);
+                string expected = Generate(
+                    options.RepositoryRoot,
+                    job.LegacyProjectPath,
+                    trackedPaths,
+                    job.ContentOnly);
 
                 if (options.Write)
                 {
@@ -61,7 +65,8 @@ internal static class Program
     private static string Generate(
         string repositoryRoot,
         string legacyProjectPath,
-        IReadOnlySet<string> trackedPaths)
+        IReadOnlySet<string> trackedPaths,
+        bool contentOnly)
     {
         XDocument legacyProject = XDocument.Load(legacyProjectPath, LoadOptions.PreserveWhitespace);
         XNamespace msbuild = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -70,13 +75,22 @@ internal static class Program
 
         var projectItems = legacyProject
             .Descendants()
-            .Where(element => element.Name == msbuild + "Compile" || element.Name == msbuild + "EmbeddedResource")
-            .Select(element => CreateProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths))
+            .Where(
+                element => contentOnly
+                    ? element.Name == msbuild + "Content"
+                    : element.Name == msbuild + "Compile" || element.Name == msbuild + "EmbeddedResource")
+            .Select(
+                element => contentOnly
+                    ? CreateContentProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths)
+                    : CreateProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths))
             .ToArray();
 
         if (projectItems.Length == 0)
         {
-            throw new InvalidOperationException("Legacy project contains no Compile or EmbeddedResource items.");
+            throw new InvalidOperationException(
+                contentOnly
+                    ? "Legacy project contains no Content items."
+                    : "Legacy project contains no Compile or EmbeddedResource items.");
         }
 
         var seenItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -109,6 +123,36 @@ internal static class Program
         }
 
         return builder.ToString() + "\n";
+    }
+
+    private static XElement CreateContentProjectItem(
+        XElement legacyElement,
+        string legacyDirectory,
+        string repositoryRoot,
+        IReadOnlySet<string> trackedPaths)
+    {
+        XElement validatedItem = CreateProjectItem(
+            legacyElement,
+            legacyDirectory,
+            repositoryRoot,
+            trackedPaths);
+        XElement[] legacyMetadata = legacyElement.Elements().ToArray();
+        if (legacyMetadata.Length != 1
+            || legacyMetadata[0].Name.LocalName != "CopyToOutputDirectory"
+            || legacyMetadata[0].Value != "PreserveNewest")
+        {
+            string include = legacyElement.Attribute("Include")?.Value ?? "<missing>";
+            throw new InvalidOperationException(
+                $"Content item must have only CopyToOutputDirectory=PreserveNewest metadata: {include}");
+        }
+
+        string legacyInclude = legacyElement.Attribute("Include")!.Value;
+        return new XElement(
+            "Content",
+            new XAttribute("Include", validatedItem.Attribute("Include")!.Value),
+            new XAttribute("Link", legacyInclude.Replace('\\', '/')),
+            new XAttribute("CopyToOutputDirectory", "PreserveNewest"),
+            new XAttribute("CopyToPublishDirectory", "PreserveNewest"));
     }
 
     private static XElement CreateProjectItem(
@@ -226,7 +270,7 @@ internal static class Program
         }
     }
 
-    private sealed record InventoryJob(string LegacyProjectPath, string OutputPath);
+    private sealed record InventoryJob(string LegacyProjectPath, string OutputPath, bool ContentOnly);
 
     private sealed record Options(
         string RepositoryRoot,
@@ -239,7 +283,7 @@ internal static class Program
         {
             if (ManifestPath == null)
             {
-                return new[] { new InventoryJob(LegacyProjectPath!, OutputPath!) };
+                return new[] { new InventoryJob(LegacyProjectPath!, OutputPath!, false) };
             }
 
             using FileStream stream = File.OpenRead(ManifestPath);
@@ -252,11 +296,32 @@ internal static class Program
                 throw new InvalidOperationException("Inventory manifest contains no projects.");
             }
 
-            return manifest.Projects
-                .Select(entry => new InventoryJob(
-                    Path.GetFullPath(Path.Combine(RepositoryRoot, entry.LegacyProject)),
-                    Path.GetFullPath(Path.Combine(RepositoryRoot, entry.Output))))
-                .ToArray();
+            var jobs = new List<InventoryJob>();
+            foreach (InventoryManifestEntry entry in manifest.Projects)
+            {
+                string legacyProjectPath = Path.GetFullPath(
+                    Path.Combine(RepositoryRoot, entry.LegacyProject));
+                jobs.Add(
+                    new InventoryJob(
+                        legacyProjectPath,
+                        Path.GetFullPath(Path.Combine(RepositoryRoot, entry.Output)),
+                        false));
+                if (entry.ContentOutput != null)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.ContentOutput))
+                    {
+                        throw new InvalidOperationException("Inventory contentOutput cannot be empty.");
+                    }
+
+                    jobs.Add(
+                        new InventoryJob(
+                            legacyProjectPath,
+                            Path.GetFullPath(Path.Combine(RepositoryRoot, entry.ContentOutput)),
+                            true));
+                }
+            }
+
+            return jobs;
         }
 
         public static Options Parse(string[] args)
@@ -324,5 +389,5 @@ internal static class Program
 
     private sealed record InventoryManifest(InventoryManifestEntry[] Projects);
 
-    private sealed record InventoryManifestEntry(string LegacyProject, string Output);
+    private sealed record InventoryManifestEntry(string LegacyProject, string Output, string? ContentOutput);
 }

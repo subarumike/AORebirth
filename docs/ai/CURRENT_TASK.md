@@ -11,8 +11,9 @@ Framework solution as the reference build.
 - Branch: `codex/linux-parallel-build`.
 - Linux SDK lane: .NET 10, intended for Ubuntu 24.04.
 - Messaging, Cell.Util, MsgPack.Mono, Translations, Cell.Core, Utility, Enums,
-  Exceptions, Interfaces, and ObjectManager compile from guarded linked
-  source/resource inventories.
+  Exceptions, Interfaces, ObjectManager, Database, and Stats compile from
+  guarded linked source/resource inventories. Database's 34 SQL Content assets
+  are guarded and copied to build/publish output.
 - A separate Linux-only `Ionic.Zlib` compatibility assembly preserves the
   external compression type boundary.
 - Stage 1 Windows-hosted validation passes for assembly identity, resources,
@@ -21,15 +22,19 @@ Framework solution as the reference build.
 - Stage 2 Windows-hosted validation passes exact legacy/Linux public-contract
   parity for all four assemblies plus ObjectManager lifecycle behavior. Unused
   legacy MemBus and Exceptions NLog dependencies are excluded.
+- Stage 3 Windows-hosted validation passes Database/Stats semantic contracts,
+  mapping/table fixtures, exact modern provider pins, 143 database-free runtime
+  checks, and 156 SQL/package artifact checks. Windows Debug remains passing;
+  no database connection or schema operation was performed.
 - This is compile feasibility only; no engine is Linux-deployable yet.
 - Native Ubuntu execution remains pending VPS connection details.
 
 ## Next slice
 
-Port Database and Stats without changing schemas. Replace the
-`System.Data.Linq.Binary` compile boundary, use modern database packages without
-framework fallback, retain MySQL behavior, and keep non-MySQL provider decisions
-explicit. Then advance toward Communication and Core.
+Port Communication and Core. Replace or adapt the net40-only MemBus boundary
+without changing ISCom ordering/concurrency, retain dynamic-message/MEF
+discovery, and keep socket behavior cross-platform. Then advance to
+PlayfieldLoader and ChatEngine.
 
 ## Constraints
 

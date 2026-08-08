@@ -22,10 +22,12 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 | 5 | PlayfieldLoader and ChatEngine | Remove NBug WinForms startup, deploy `Config.xml`, package `playfields.dat`, fix Linux paths, add service shutdown | Chat startup/login/chat/channel packet parity and clean shutdown on Ubuntu |
 | 6 | Ubuntu service package | `linux-x64` publish, unprivileged service account, systemd unit, logs, backups and firewall | Restart/reboot recovery and sustained multi-player soak test |
 
-Current status: Stages 0 through 2 pass their Windows-hosted build and
-compatibility gates. Stage 2 has exact legacy/Linux public-contract parity and
-ObjectManager runtime smoke coverage. Native Ubuntu execution is still required
-before the full cross-platform exit gates are complete.
+Current status: Stages 0 through 3 pass their Windows-hosted compile, contract,
+offline runtime, publish-artifact, and compatibility gates. Stage 3 preserves
+Database/Stats API and mapping contracts, proves Dapper binary conversion and
+safe Stats behavior without a live database, and carries all 34 SQL assets
+exactly. Native Ubuntu execution and authorized disposable-MySQL CRUD parity
+are still required before the full cross-platform exit gates are complete.
 
 ## Rules for each stage
 
@@ -43,8 +45,8 @@ before the full cross-platform exit gates are complete.
 
 - NBug 1.2.2 selects WinForms and must be replaced with headless exception
   logging in the Linux lane.
-- Database entity blobs use `System.Data.Linq.Binary`, which modern .NET does
-  not provide.
+- Live Database read/write/query parity still requires an authorized disposable
+  MySQL schema; offline gates intentionally never open a connection.
 - Communication uses the legacy MemBus `Net40-Client` asset.
 - Chat log and datafile paths assume Windows separators/current directory.
 - `playfields.dat` is required at startup but is not currently a publish asset.

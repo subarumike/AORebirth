@@ -35,7 +35,11 @@ namespace AORebirth.Database
 
     using System;
     using System.Data;
+#if AOREBIRTH_LINUX
+    using Microsoft.Data.SqlClient;
+#else
     using System.Data.SqlClient;
+#endif
 
     using AORebirth.Interfaces;
 
