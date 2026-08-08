@@ -42,14 +42,18 @@ Framework solution as the reference build.
   listener-free eight-channel topology; it does not open a database or socket.
 - Stage 5 Windows/Linux contract, authentication, lifecycle, negative secret,
   and framework-dependent/self-contained publish-structure gates pass locally.
-- Native Ubuntu execution remains pending VPS connection details.
+- Native Ubuntu 24.04.4 x86_64 validation passes: the self-contained apphost,
+  exact-case startup, listener-free lifecycle, systemd unit, `Type=notify`
+  readiness after both loopback listeners, and real SIGTERM shutdown all pass.
+  Release `4470aa71` is installed on the test VPS but left disabled/inactive,
+  without a database secret; its temporary upload was removed.
 
 ## Next slice
 
-Validate the published ChatEngine apphost, systemd unit, `sd_notify` readiness,
-exact-case assets, and real SIGTERM shutdown on the Ubuntu 24.04 VPS. Do not
-open a live database or public listener until the VPS topology and
-disposable-database authorization are supplied.
+Obtain authorization and credentials for an isolated disposable MySQL target,
+then validate database readiness, schema compatibility, and bounded login
+behavior without exposing the player or ISCom ports publicly. Do not use the
+website/mail databases or enable the service at boot for this test.
 
 ## Constraints
 

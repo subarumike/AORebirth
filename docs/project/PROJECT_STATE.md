@@ -38,8 +38,10 @@ completion matrices and dated evidence retain detailed provenance.
   framework-dependent and self-contained publish-structure gates pass.
   PlayfieldLoader/full Core are deferred; the three required legacy
   authentication sources are isolated in `AORebirth.Chat.Authentication`.
-  Native Ubuntu/systemd/SIGTERM validation and live disposable-MySQL parity are
-  not yet complete.
+  Native Ubuntu 24.04.4 x86_64 apphost, exact-case configuration, listener-free
+  lifecycle, `Type=notify` readiness with both loopback listeners, and real
+  SIGTERM shutdown pass. The test release is installed disabled/inactive with
+  no database secret. Live disposable-MySQL parity is not yet complete.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
