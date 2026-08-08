@@ -48,6 +48,10 @@
     {
       "legacyProject": "AORebirth/Libraries/Source/AORebirth.Stats/AORebirth.Stats.csproj",
       "output": "LinuxBuild/source-inventory/AORebirth.Stats.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Communication/AORebirth.Communication.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Communication.CompileItems.props"
     }
   ]
 }

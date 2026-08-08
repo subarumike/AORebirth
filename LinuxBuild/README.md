@@ -27,9 +27,9 @@ metrics, and compression smoke checks. The current foundation compiles
 `SmokeLounge.AOtomation.Messaging`, `Cell.Util`, `MsgPack.Mono`, `Translations`,
 `Cell.Core`, `Utility`, `AORebirth.Enums`, `AORebirth.Core.Exceptions`,
 `AORebirth.Interfaces`, `AORebirth.ObjectManager`, `AORebirth.Database`, and
-`AORebirth.Stats` from guarded legacy source/resource inventories. Database's
-34 SQL assets are guarded from the legacy Content inventory and copied exactly
-to build and publish outputs.
+`AORebirth.Stats`, and `AORebirth.Communication` from guarded legacy
+source/resource inventories. Database's 34 SQL assets are guarded from the
+legacy Content inventory and copied exactly to build and publish outputs.
 Utility uses a Linux-only source for portable CPU/RAM metrics and references a
 separate `Ionic.Zlib` compatibility assembly, preserving the original external
 type boundary while using modern .NET compression. It does not yet produce a
@@ -92,6 +92,25 @@ a connection. It also verifies the exact 34 SQL assets by name, case, length,
 and SHA-256 in source, build, and `linux-x64` publish output. MySQL remains the
 only operationally supported schema dialect; PostgreSQL and SQL Server are
 compile-covered only.
+
+Stage 4 replaces Communication's source-dead net40-only MemBus dependency with
+an identity-compatible inert Linux assembly and configures TCP keepalive with
+portable socket options while leaving the Windows IOControl path unchanged.
+Its strict contract gate covers public/protected metadata, defaults, dependency
+identities, legacy MsgPack goldens, production ISCom framing, culture/thread
+stability, and DynamicMessage resolution. Its bounded offline gate uses only an
+ephemeral IPv4 loopback listener:
+
+```bat
+LinuxBuild\verify-stage4-contracts.cmd
+LinuxBuild\verify-stage4-offline.cmd
+```
+
+The first ChatEngine milestone does not require `AORebirth.Core` or
+`PlayfieldLoader`: the only Chat startup call populates a cache that Chat never
+reads. The Linux Chat overlay will condition out that import/call and guard the
+published dependency set; Windows behavior remains unchanged. Full Core stays
+in scope for later LoginEngine/ZoneEngine work.
 
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:

@@ -87,6 +87,9 @@ namespace AORebirth.Communication
 
         /// <summary>
         /// </summary>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnClientConnectedToServer(object sender, EventArgs e);
 
         /// <summary>
@@ -95,12 +98,18 @@ namespace AORebirth.Communication
         /// </param>
         /// <param name="args">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnReceivedMessageFromClient(object sender, OnMessageArgs e);
 
         /// <summary>
         /// </summary>
         /// <param name="args">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnReceivedMessageFromServer(object sender, OnMessageArgs e);
 
         #endregion

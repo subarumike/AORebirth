@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Libraries/">
+    <Project Path="Projects/AORebirth.Communication.Linux.csproj" />
     <Project Path="Projects/AORebirth.Database.Linux.csproj" />
     <Project Path="Projects/AORebirth.Enums.Linux.csproj" />
     <Project Path="Projects/AORebirth.Exceptions.Linux.csproj" />
@@ -9,6 +10,7 @@
     <Project Path="Projects/Cell.Core.Linux.csproj" />
     <Project Path="Projects/Cell.Util.Linux.csproj" />
     <Project Path="Projects/Ionic.Zlib.Linux.csproj" />
+    <Project Path="Projects/MemBus.Linux.csproj" />
     <Project Path="Projects/MsgPack.Mono.Linux.csproj" />
     <Project Path="Projects/SmokeLounge.AOtomation.Messaging.Linux.csproj" />
     <Project Path="Projects/Translations.Linux.csproj" />
