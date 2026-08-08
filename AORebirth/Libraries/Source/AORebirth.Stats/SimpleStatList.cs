@@ -7,8 +7,6 @@ namespace AORebirth.Stats
 {
     using AORebirth.Enums;
     using AORebirth.Interfaces;
-    using AORebirth.ObjectManager;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
