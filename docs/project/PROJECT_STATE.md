@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -22,6 +22,11 @@ completion matrices and dated evidence retain detailed provenance.
   enabled, and Soldier completed entry/residency/exit validation on 2026-08-04.
 - Generated mission graph and mission reproducibility: PASS.
 - Debug server build: PASS.
+- Parallel Linux compile-feasibility lane: Messaging, Cell.Util, MsgPack.Mono,
+  and Translations build on .NET 10 from guarded linked source/resource
+  inventories; assembly identity, MsgPack byte-vector/round-trip, translation
+  resources, and the unchanged Windows debug build pass. ChatEngine, Ubuntu
+  runtime validation, and deployment are not yet complete.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
