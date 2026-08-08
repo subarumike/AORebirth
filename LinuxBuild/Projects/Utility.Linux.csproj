@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Utility</AssemblyName>
+    <RootNamespace>Utility</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="6.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Ionic.Zlib.Linux.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <ProjectReference Include="MsgPack.Mono.Linux.csproj" />
+    <ProjectReference Include="Translations.Linux.csproj" />
+  </ItemGroup>
+
+  <Import Project="../source-inventory/Utility.CompileItems.props" />
+
+  <ItemGroup>
+    <Compile Remove="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/CpuRamUtilization.cs" />
+    <Compile Include="../Compatibility/Utility/CpuRamUtilization.Linux.cs" Link="CpuRamUtilization.cs" />
+  </ItemGroup>
+</Project>

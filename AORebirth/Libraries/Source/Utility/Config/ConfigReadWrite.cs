@@ -142,9 +142,16 @@ namespace Utility.Config
             try
             {
                 XmlSerializer ser = new XmlSerializer(typeof(Config));
+#if AOREBIRTH_LINUX
+                using (FileStream stream = File.Create("Config.xml"))
+                {
+                    ser.Serialize(stream, this._config);
+                }
+#else
                 MemoryStream ms = new MemoryStream();
                 ser.Serialize(ms, this._config);
                 File.WriteAllText("config.xml", Encoding.UTF8.GetString(ms.GetBuffer()));
+#endif
             }
             catch
             {

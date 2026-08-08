@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Ionic.Zlib">
+      <HintPath>../../../AORebirth/packages/Ionic.Zlib.1.9.1.5/lib/Ionic.Zlib.dll</HintPath>
+    </Reference>
+    <Reference Include="MsgPack">
+      <HintPath>../../../AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono/bin/Debug/MsgPack.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>../../../AORebirth/packages/NLog.2.1.0/lib/net40/NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="SmokeLounge.AOtomation.Messaging">
+      <HintPath>../../../AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/bin/Debug/SmokeLounge.AOtomation.Messaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility">
+      <HintPath>../../../AORebirth/Libraries/Source/Utility/bin/Debug/Utility.dll</HintPath>
+    </Reference>
+    <Reference Include="locales">
+      <HintPath>../../../AORebirth/Libraries/Source/Translations/bin/Debug/locales.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

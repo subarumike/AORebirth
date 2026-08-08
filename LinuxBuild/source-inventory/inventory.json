@@ -9,12 +9,20 @@
       "output": "LinuxBuild/source-inventory/Cell.Util.CompileItems.props"
     },
     {
+      "legacyProject": "AORebirth/Libraries/Source/Cell.Core/Cell.Core.csproj",
+      "output": "LinuxBuild/source-inventory/Cell.Core.CompileItems.props"
+    },
+    {
       "legacyProject": "AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono/MsgPack.Mono.csproj",
       "output": "LinuxBuild/source-inventory/MsgPack.Mono.CompileItems.props"
     },
     {
       "legacyProject": "AORebirth/Libraries/Source/Translations/Translations.csproj",
       "output": "LinuxBuild/source-inventory/Translations.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Utility/Utility.csproj",
+      "output": "LinuxBuild/source-inventory/Utility.CompileItems.props"
     }
   ]
 }

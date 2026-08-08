@@ -2,5 +2,6 @@
   <PropertyGroup>
     <BaseOutputPath>$(MSBuildThisFileDirectory)bin/$(MSBuildProjectName)/</BaseOutputPath>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    <WarningsAsErrors>$(WarningsAsErrors);NU1701</WarningsAsErrors>
   </PropertyGroup>
 </Project>

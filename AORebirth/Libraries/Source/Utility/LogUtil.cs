@@ -371,7 +371,11 @@ namespace Utility
             config.LoggingRules.Add(new LoggingRule("*", logLevel, consoleTarget));
 
             LogManager.Configuration = config;
+#if AOREBIRTH_LINUX
+            LogManager.ResumeLogging();
+#else
             LogManager.EnableLogging();
+#endif
         }
 
         /// <summary>
@@ -388,7 +392,11 @@ namespace Utility
             config.AddTarget("logfile", fileTarget);
             config.LoggingRules.Add(new LoggingRule("*", logLevel, fileTarget));
             LogManager.Configuration = config;
+#if AOREBIRTH_LINUX
+            LogManager.ResumeLogging();
+#else
             LogManager.EnableLogging();
+#endif
         }
 
         /// <summary>
@@ -413,7 +421,11 @@ namespace Utility
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, consoleTarget));
 
             LogManager.Configuration = config;
+#if AOREBIRTH_LINUX
+            LogManager.ResumeLogging();
+#else
             LogManager.EnableLogging();
+#endif
         }
 
         /// <summary>

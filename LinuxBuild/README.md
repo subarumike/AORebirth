@@ -22,11 +22,36 @@ On Linux:
 ```
 
 Both wrappers verify every checked-in source inventory before building, then
-run assembly-identity, MsgPack byte-vector/round-trip, and translation-resource
-smoke checks. The current first slice compiles
-`SmokeLounge.AOtomation.Messaging`, `Cell.Util`, `MsgPack.Mono`, and
-`Translations` from the same source and resource files used by the legacy
-projects. It does not yet produce a deployable engine.
+run assembly-identity, MsgPack byte-vector/round-trip, resource, portable
+metrics, and compression smoke checks. The current foundation compiles
+`SmokeLounge.AOtomation.Messaging`, `Cell.Util`, `MsgPack.Mono`, `Translations`,
+`Cell.Core`, and `Utility` from guarded legacy source/resource inventories.
+Utility uses a Linux-only source for portable CPU/RAM metrics and references a
+separate `Ionic.Zlib` compatibility assembly, preserving the original external
+type boundary while using modern .NET compression. It does not yet produce a
+deployable engine.
+
+The compatibility assembly preserves the legacy `Ionic.Zlib` simple name and
+version but is intentionally unsigned. It is not binary-interchangeable with
+the strong-named Windows package; every Linux consumer must be rebuilt against
+the Linux lane, and Windows/Linux binaries must not be mixed.
+
+Checked-in list and dictionary fixtures were produced by the legacy Windows
+Utility/Ionic.Zlib build. The normal compatibility smoke test proves that the
+Linux reader accepts both legacy formats; their byte lengths and SHA-256 hashes
+are pinned in `Fixtures/LegacyUtilityFixtures.manifest`. After the approved
+Windows debug build, run the reverse compatibility gate to prove the legacy
+reader accepts a Linux-produced list file—the only format used by current data
+loaders:
+
+```bat
+LinuxBuild\verify-legacy-compression.cmd
+```
+
+`Tools/LegacyUtilityFixtureTool` is the reproducible .NET Framework fixture
+writer/list verifier; it is intentionally excluded from the Linux solution.
+The legacy dictionary reader calls an unsupported zlib seek operation and
+cannot read its own fixture; no current runtime source calls that overload.
 
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:

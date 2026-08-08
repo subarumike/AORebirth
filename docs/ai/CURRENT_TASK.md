@@ -10,18 +10,22 @@ Framework solution as the reference build.
 
 - Branch: `codex/linux-parallel-build`.
 - Linux SDK lane: .NET 10, intended for Ubuntu 24.04.
-- Messaging, Cell.Util, MsgPack.Mono, and Translations compile from guarded
-  linked source/resource inventories.
-- Assembly identity, MsgPack byte-vector/round-trip, translation-resource, and
-  unchanged Windows debug-build validation pass.
+- Messaging, Cell.Util, MsgPack.Mono, Translations, Cell.Core, and Utility
+  compile from guarded linked source/resource inventories.
+- A separate Linux-only `Ionic.Zlib` compatibility assembly preserves the
+  external compression type boundary.
+- Stage 1 Windows-hosted validation passes for assembly identity, resources,
+  unsafe readers, buffer/TCP behavior, portable metrics, canonical `Config.xml`,
+  NLog output, legacy zlib fixtures, and the unchanged Windows debug build.
 - This is compile feasibility only; no engine is Linux-deployable yet.
+- Native Ubuntu execution remains pending VPS connection details.
 
 ## Next slice
 
-Port Cell.Core and Utility. Resolve modern NLog/resource handling and replace or
-isolate the Windows performance-counter path without changing Windows behavior.
-Then advance through the dependency closure documented in
-`LinuxBuild/PORTING_PLAN.md` toward ChatEngine as the first server milestone.
+Port Enums, Exceptions, Interfaces, and ObjectManager while preserving their
+assembly boundaries and exact source inventories. Then advance through the
+dependency closure documented in `LinuxBuild/PORTING_PLAN.md` toward ChatEngine
+as the first server milestone.
 
 ## Constraints
 

@@ -15,12 +15,16 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 | Stage | Scope | Main portability work | Exit gate |
 | --- | --- | --- | --- |
 | 0 | Messaging, Cell.Util, MsgPack.Mono, Translations | SDK overlays, exact inventories, Reflection.Emit in-memory support | Windows wrapper, Linux wrapper, assembly identity, MsgPack byte vector and resources pass |
-| 1 | Cell.Core and Utility | Modern NLog, portable CPU/RAM metrics, modern resource handling, unsafe parser build | Unit tests and serialized/compressed-data parity pass on Windows and Ubuntu |
+| 1 | Cell.Core, Utility, and Ionic.Zlib adapter | Modern NLog, portable CPU/RAM metrics, modern resource handling, unsafe parser build | Two-way list compression parity, legacy dictionary ingestion, and runtime tests pass on Windows and Ubuntu |
 | 2 | Enums, Exceptions, Interfaces, ObjectManager | Preserve assembly boundaries and shared assembly metadata | Full contract closure builds with no framework fallback packages |
 | 3 | Database and Stats | Modern Dapper/MySqlConnector, replace `System.Data.Linq.Binary`, keep schemas unchanged | Read/write/query parity against a disposable test database |
 | 4 | Communication and Core | Replace or adapt MemBus without changing ordering; retain MEF discovery | ISCom ordering/concurrency and dynamic-message resolution parity |
-| 5 | PlayfieldLoader and ChatEngine | Remove NBug WinForms startup, canonicalize `Config.xml`, package `playfields.dat`, fix Linux paths, add service shutdown | Chat startup/login/chat/channel packet parity and clean shutdown on Ubuntu |
+| 5 | PlayfieldLoader and ChatEngine | Remove NBug WinForms startup, deploy `Config.xml`, package `playfields.dat`, fix Linux paths, add service shutdown | Chat startup/login/chat/channel packet parity and clean shutdown on Ubuntu |
 | 6 | Ubuntu service package | `linux-x64` publish, unprivileged service account, systemd unit, logs, backups and firewall | Restart/reboot recovery and sustained multi-player soak test |
+
+Current status: Stage 0 is complete. Stage 1 passes its Windows-hosted build and
+compatibility gates; native Ubuntu execution is still required before the full
+Stage 1 exit gate is complete.
 
 ## Rules for each stage
 
@@ -34,20 +38,20 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 5. Do not remove a dependency or startup action until its behavioral parity
    test passes.
 
-## Known ChatEngine blockers
+## Remaining known ChatEngine blockers
 
 - NBug 1.2.2 selects WinForms and must be replaced with headless exception
   logging in the Linux lane.
-- Utility uses Windows performance counters.
 - Database entity blobs use `System.Data.Linq.Binary`, which modern .NET does
   not provide.
 - Communication uses the legacy MemBus `Net40-Client` asset.
-- `Config.xml` is read with different casing than the file written by the
-  current code.
 - Chat log and datafile paths assume Windows separators/current directory.
 - `playfields.dat` is required at startup but is not currently a publish asset.
 - systemd shutdown needs a reliable stop path; the existing shutdown-file
   mechanism can be used for the first smoke deployment.
+
+The Stage 1 Linux lane now replaces Utility's Windows performance counters and
+uses canonical `Config.xml` casing without changing the Windows code path.
 
 ## Ubuntu test input still needed
 

@@ -69,3 +69,6 @@ tools-temp/AOSharpLiveInjector/patches/*.patch whitespace=-blank-at-eol
 *.PDF  diff=astextplain
 *.rtf  diff=astextplain
 *.RTF  diff=astextplain
+
+# Preserve compression-parity fixtures byte-for-byte.
+LinuxBuild/Tools/CompatibilitySmokeTests/Fixtures/*.dat binary

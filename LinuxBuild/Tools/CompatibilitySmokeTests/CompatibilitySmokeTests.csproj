@@ -9,9 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Projects/Cell.Core.Linux.csproj" />
     <ProjectReference Include="../../Projects/Cell.Util.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Ionic.Zlib.Linux.csproj" />
     <ProjectReference Include="../../Projects/MsgPack.Mono.Linux.csproj" />
     <ProjectReference Include="../../Projects/SmokeLounge.AOtomation.Messaging.Linux.csproj" />
     <ProjectReference Include="../../Projects/Translations.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Fixtures/*.dat" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures/LegacyUtilityFixtures.manifest" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
