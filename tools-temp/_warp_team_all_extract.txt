@@ -1,0 +1,108 @@
+3: 2026-08-08T11:36:12.6444686Z [PLUGIN] Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status
+27: 2026-08-08T11:36:12.6504646Z [SNAPSHOT] reason=initial server=3515 clientInst=1345072655 playfield=(Playfield2:1AB824) chars=2 npcs=1 corpses=0 dynels=77 identity=(SimpleChar:502C2E0F) name=Engnera player=True npc=False pet=False inPlay=True alive=True hp=2824/3748 pct=75.3 level=187 computerLiteracy=913 pos=(211.4183, 5.01, 128.1889) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=0 currentState=0 actionCategory=1234567890 deadTimer=75 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+30: 2026-08-08T11:36:13.6438531Z [CHAR-SEEN] identity=(SimpleChar:502C2E0F) name=Engnera player=True npc=False pet=False inPlay=True alive=True hp=2833/3748 pct=75.6 level=187 computerLiteracy=913 pos=(211.4183, 5.01, 128.1889) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=0 currentState=0 actionCategory=1234567890 deadTimer=75 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+31: 2026-08-08T11:36:13.6448527Z [CHAR-SEEN] identity=(SimpleChar:79CF9F73) name=OT Bartender player=False npc=True pet=False inPlay=True alive=True hp=19928/19928 pct=100.0 level=194 computerLiteracy=6 pos=(159.7771, 5.807031, 115.7935) attacking=False fightingTarget=null monsterData=26139 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+55: 2026-08-08T11:36:23.7706192Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=140 Unknown1=0 Target=(SimpleChar:502C2E0F) Parameter1=0 Parameter2=10000 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+57: 2026-08-08T11:36:23.7716186Z [IN-N3-DETAIL] CharacterActionMessage { Action=140 Unknown1=0 Target=(SimpleChar:502C2E0F) Parameter1=0 Parameter2=10000 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+64: 2026-08-08T11:36:23.7746159Z [IN-N3] #16 type=FormatFeedback identity=(SimpleChar:502C2E0F)
+65: 2026-08-08T11:36:23.7766150Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":!!!)<sHYou have 5 minutes (or until you leave the playfield) to swap implants." Unknown2=0 FormattedMessage="~&!!!":!!!)<sHYou have 5 minutes (or until you leave the playfield) to swap implants." N3MessageType=FormatFeedback Identity=(SimpleChar:502C2E0F) Unknown=1 PacketType=N3Message }
+66: 2026-08-08T11:36:23.7766150Z [IN-N3] #17 type=CastNanoSpell identity=(SimpleChar:502C2E0F)
+68: 2026-08-08T11:36:23.7776136Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:26732) Parameter1=1345072655 Parameter2=90000 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+70: 2026-08-08T11:36:23.7776136Z [IN-N3-DETAIL] CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:26732) Parameter1=1345072655 Parameter2=90000 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+71: 2026-08-08T11:36:23.7826117Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=124 Parameter2=5 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+73: 2026-08-08T11:36:23.7826117Z [IN-N3-DETAIL] CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=124 Parameter2=5 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+76: 2026-08-08T11:36:28.3118220Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=124 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+78: 2026-08-08T11:36:28.3118220Z [IN-N3-DETAIL] CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=124 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+79: 2026-08-08T11:36:38.6944311Z [IN-N3] #23 type=SimpleCharFullUpdate identity=(SimpleChar:35FE2868)
+80: 2026-08-08T11:36:38.6964299Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage PlayfieldId=1751076 FightingTarget=null Position=(205.01, 5.01, 109.81) Heading=X: 0 | Y: 0 | Z: 0 | W: 1 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Madamp" CharacterFlags=Unknown, Unknown2, PetTower, Unknown5, CollideWithStatels, Unknown7 AccountFlags=1 Expansions=1 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+PlayerInfo Level=200 Health=2778 HealthDamage=0 MonsterData=0 MonsterScale=100 VisualFlags=127 VisibleTitle=0 ScfuUnk1=byte[42]:0000000000000000000000000301000100010001000100000003000000000000 HeadMesh=223918 RunSpeedBase=963 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture] Meshes=count=6
+81: 2026-08-08T11:36:38.6984287Z [IN-N3] #24 type=WeaponItemFullUpdate identity=(WeaponInstance:19E8513C)
+82: 2026-08-08T11:36:38.6994281Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:35FE2868) PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=262 Stats=count=7[Flags=67109921,StaticInstance=303060,ACGItemLevel=100,ACGItemTemplateID=303060,ACGItemTemplateID2=303060,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:19E8513C) Unknown=0 PacketType=N3Message }
+83: 2026-08-08T11:36:38.6994281Z [IN-N3] #25 type=WeaponItemFullUpdate identity=(WeaponInstance:19E8513E)
+84: 2026-08-08T11:36:38.6994281Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:35FE2868) PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=264 Stats=count=7[Flags=67109921,StaticInstance=303060,ACGItemLevel=100,ACGItemTemplateID=303060,ACGItemTemplateID2=303060,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:19E8513E) Unknown=0 PacketType=N3Message }
+85: 2026-08-08T11:36:38.7014265Z [IN-N3] #26 type=SimpleItemFullUpdate identity=(51056:458038)
+86: 2026-08-08T11:36:38.7014265Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=905848936 Position=null Rotation=null PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=342 Stats=count=13[Flags=201326593,StaticInstance=281129,ACGItemLevel=1,ACGItemTemplateID=281129,ACGItemTemplateID2=281129,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(51056:458038) Unknown=0 PacketType=N3Message }
+87: 2026-08-08T11:36:38.7024265Z [IN-N3] #27 type=ChestFullUpdate identity=(Container:A5D6706)
+88: 2026-08-08T11:36:38.7024265Z [IN-N3] #28 type=AppearanceUpdate identity=(SimpleChar:35FE2868)
+89: 2026-08-08T11:36:38.7184160Z [DYNEL-SPAWNED] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=False alive=True hp=2778/2778 pct=100.0 level=200 computerLiteracy=154 pos=(205.01, 5.01, 109.81) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+91: 2026-08-08T11:36:38.7184160Z [OUT-N3-DETAIL] CharacterActionMessage { Action=128 Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+93: 2026-08-08T11:36:38.7549168Z [CHAR-SEEN] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=False alive=True hp=2778/2778 pct=100.0 level=200 computerLiteracy=154 pos=(205.01, 5.01, 109.81) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+94: 2026-08-08T11:36:38.8651964Z [IN-N3] #29 type=TeamMemberInfo identity=(SimpleChar:502C2E0F)
+101: 2026-08-08T11:36:39.3964884Z [CHAR-IN-PLAY] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=True alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=154 pos=(205.01, 5.01, 109.81) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+102: 2026-08-08T11:36:39.3964884Z [IN-N3] #33 type=CharInPlay identity=(SimpleChar:35FE2868)
+103: 2026-08-08T11:36:39.3964884Z [IN-N3-DETAIL] CharInPlayMessage { N3MessageType=CharInPlay Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+116: 2026-08-08T11:36:51.1082790Z [IN-N3] #40 type=CastNanoSpell identity=(SimpleChar:35FE2868)
+123: 2026-08-08T11:36:53.3988678Z [SMOKE] IN CharacterAction identity=(SimpleChar:35FE2868) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=29302 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+125: 2026-08-08T11:36:53.3988678Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=29302 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+126: 2026-08-08T11:36:53.3998673Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:7276) Parameter1=905848936 Parameter2=1440000 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+128: 2026-08-08T11:36:53.3998673Z [IN-N3-DETAIL] CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:7276) Parameter1=905848936 Parameter2=1440000 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+129: 2026-08-08T11:36:53.3998673Z [IN-N3] #46 type=FormatFeedback identity=(SimpleChar:502C2E0F)
+130: 2026-08-08T11:36:53.3998673Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMadampsMocham's Gift: MatMet" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMadampsMocham's Gift: MatMet" N3MessageType=FormatFeedback Identity=(SimpleChar:502C2E0F) Unknown=1 PacketType=N3Message }
+198: 2026-08-08T11:37:12.0227513Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:502C2E0F) Parameter1=53019 Parameter2=154913 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+199: 2026-08-08T11:37:12.1846517Z [IN-N3] #76 type=CastNanoSpell identity=(SimpleChar:502C2E0F)
+252: 2026-08-08T11:37:38.2306164Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=154913 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+254: 2026-08-08T11:37:38.2306164Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=154913 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+255: 2026-08-08T11:37:38.2306164Z [IN-N3] #104 type=Feedback identity=(SimpleChar:502C2E0F)
+256: 2026-08-08T11:37:38.2306164Z [IN-N3-DETAIL] FeedbackMessage { Unknown1=1107296280 CategoryId=110 MessageId=124550313 N3MessageType=Feedback Identity=(SimpleChar:502C2E0F) Unknown=1 PacketType=N3Message }
+257: 2026-08-08T11:37:38.5504193Z [IN-N3] #105 type=SimpleCharFullUpdate identity=(SimpleChar:35FE2868)
+258: 2026-08-08T11:37:38.5514186Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage PlayfieldId=1751076 FightingTarget=null Position=(209.5356, 5.010001, 127.514) Heading=X: 0 | Y: -0.8177497 | Z: 0 | W: 0.5755739 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Madamp" CharacterFlags=Unknown, Unknown2, PetTower, Unknown5, CollideWithStatels, Unknown7 AccountFlags=1 Expansions=1 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+PlayerInfo Level=200 Health=2778 HealthDamage=0 MonsterData=0 MonsterScale=100 VisualFlags=127 VisibleTitle=0 ScfuUnk1=byte[42]:8000000000000000800000000301000100010001000100000003000000000000 HeadMesh=223918 RunSpeedBase=963 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData.Texture,SmokeLounge.AOtomation.Messaging.GameData
+259: 2026-08-08T11:37:38.5524180Z [IN-N3] #106 type=WeaponItemFullUpdate identity=(WeaponInstance:19E8513C)
+260: 2026-08-08T11:37:38.5524180Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:35FE2868) PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=262 Stats=count=7[Flags=67109921,StaticInstance=303060,ACGItemLevel=100,ACGItemTemplateID=303060,ACGItemTemplateID2=303060,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:19E8513C) Unknown=0 PacketType=N3Message }
+261: 2026-08-08T11:37:38.5524180Z [IN-N3] #107 type=WeaponItemFullUpdate identity=(WeaponInstance:19E8513E)
+262: 2026-08-08T11:37:38.5524180Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:35FE2868) PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=264 Stats=count=7[Flags=67109921,StaticInstance=303060,ACGItemLevel=100,ACGItemTemplateID=303060,ACGItemTemplateID2=303060,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:19E8513E) Unknown=0 PacketType=N3Message }
+263: 2026-08-08T11:37:38.5524180Z [IN-N3] #108 type=SimpleItemFullUpdate identity=(51056:458038)
+264: 2026-08-08T11:37:38.5524180Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=905848936 Position=null Rotation=null PlayfieldId=1751076 StateMachine=(1000015:0000) Unknown2=342 Stats=count=13[Flags=201326593,StaticInstance=281129,ACGItemLevel=1,ACGItemTemplateID=281129,ACGItemTemplateID2=281129,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(51056:458038) Unknown=0 PacketType=N3Message }
+265: 2026-08-08T11:37:38.5524180Z [IN-N3] #109 type=ChestFullUpdate identity=(Container:A5D6706)
+266: 2026-08-08T11:37:38.5524180Z [IN-N3] #110 type=AppearanceUpdate identity=(SimpleChar:35FE2868)
+267: 2026-08-08T11:37:38.5684085Z [DYNEL-SPAWNED] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=False alive=True hp=2778/2778 pct=100.0 level=200 computerLiteracy=154 pos=(209.5356, 5.01, 127.514) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+269: 2026-08-08T11:37:38.5684085Z [OUT-N3-DETAIL] CharacterActionMessage { Action=128 Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+274: 2026-08-08T11:37:38.7263108Z [IN-N3] #113 type=TeamMemberInfo identity=(SimpleChar:502C2E0F)
+275: 2026-08-08T11:37:38.9681626Z [CHAR-SEEN] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=False alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=154 pos=(209.5356, 5.01, 127.514) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+286: 2026-08-08T11:37:39.7077065Z [CHAR-IN-PLAY] identity=(SimpleChar:35FE2868) name=Madamp player=True npc=False pet=False inPlay=True alive=True hp=7136/7136 pct=100.0 level=200 computerLiteracy=154 pos=(209.5356, 5.01, 127.514) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+287: 2026-08-08T11:37:39.7077065Z [IN-N3] #119 type=CharInPlay identity=(SimpleChar:35FE2868)
+288: 2026-08-08T11:37:39.7077065Z [IN-N3-DETAIL] CharInPlayMessage { N3MessageType=CharInPlay Identity=(SimpleChar:35FE2868) Unknown=0 PacketType=N3Message }
+
+=== SCFU ROWS 2 ===
+(SimpleChar:35FE2868) | Madamp | lvl=200 hp=2778 pos=(205.01,5.01,109.809967) flags=UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage
+(SimpleChar:35FE2868) | Madamp | lvl=200 hp=2778 pos=(209.535614,5.010001,127.514015) flags=UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage
+
+=== RAW N3 TYPES ===
+[('Stat', 89), ('CharDCMove', 23), ('CharacterAction', 10), ('1', 4), ('2', 4), ('11', 4), ('WeaponItemFullUpdate', 4), ('CastNanoSpell', 3), ('GenericCmd', 2), ('FormatFeedback', 2), ('SimpleCharFullUpdate', 2), ('SimpleItemFullUpdate', 2), ('ChestFullUpdate', 2), ('AppearanceUpdate', 2), ('TeamMemberInfo', 2), ('OrgInfoPacket', 2), ('CharInPlay', 2), ('LookAt', 1), ('HealthDamage', 1), ('Buff', 1), ('N3Teleport', 1), ('Despawn', 1), ('Feedback', 1)]
+
+=== RAW INTERESTING ===
+2026-08-08T11:36:23.7686204Z IN seq=14 CharacterAction id=50000:1345072655
+2026-08-08T11:36:23.7696203Z IN seq=19 CastNanoSpell id=50000:1345072655
+2026-08-08T11:36:23.7696203Z IN seq=21 CharacterAction id=50000:1345072655
+2026-08-08T11:36:23.7696203Z IN seq=22 CharacterAction id=50000:1345072655
+2026-08-08T11:36:28.3098245Z IN seq=24 CharacterAction id=50000:1345072655
+2026-08-08T11:36:38.6724447Z IN seq=25 SimpleCharFullUpdate id=50000:905848936
+2026-08-08T11:36:38.6934318Z IN seq=26 WeaponItemFullUpdate id=51018:434655548
+2026-08-08T11:36:38.6934318Z IN seq=27 WeaponItemFullUpdate id=51018:434655550
+2026-08-08T11:36:38.6934318Z IN seq=28 SimpleItemFullUpdate id=51056:4554808
+2026-08-08T11:36:38.6944311Z IN seq=29 ChestFullUpdate id=51017:173893382
+2026-08-08T11:36:38.6944311Z IN seq=30 AppearanceUpdate id=50000:905848936
+2026-08-08T11:36:38.7184160Z OUT seq=4 CharacterAction id=50000:1345072655
+2026-08-08T11:36:38.8651964Z IN seq=31 TeamMemberInfo id=50000:1345072655
+2026-08-08T11:36:39.3954885Z IN seq=35 CharInPlay id=50000:905848936
+2026-08-08T11:36:51.1082790Z IN seq=44 CastNanoSpell id=50000:905848936
+2026-08-08T11:36:53.3988678Z IN seq=48 CharacterAction id=50000:905848936
+2026-08-08T11:36:53.3988678Z IN seq=49 CharacterAction id=50000:1345072655
+2026-08-08T11:37:12.0217515Z OUT seq=9 CharacterAction id=50000:1345072655
+2026-08-08T11:37:12.1846517Z IN seq=80 CastNanoSpell id=50000:1345072655
+2026-08-08T11:37:38.2306164Z IN seq=109 CharacterAction id=50000:1345072655
+2026-08-08T11:37:38.2306164Z IN seq=110 Feedback id=50000:1345072655
+2026-08-08T11:37:38.5504193Z IN seq=111 SimpleCharFullUpdate id=50000:905848936
+2026-08-08T11:37:38.5504193Z IN seq=112 WeaponItemFullUpdate id=51018:434655548
+2026-08-08T11:37:38.5504193Z IN seq=113 WeaponItemFullUpdate id=51018:434655550
+2026-08-08T11:37:38.5504193Z IN seq=114 SimpleItemFullUpdate id=51056:4554808
+2026-08-08T11:37:38.5504193Z IN seq=115 ChestFullUpdate id=51017:173893382
+2026-08-08T11:37:38.5504193Z IN seq=116 AppearanceUpdate id=50000:905848936
+2026-08-08T11:37:38.5684085Z OUT seq=11 CharacterAction id=50000:1345072655
+2026-08-08T11:37:38.7263108Z IN seq=119 TeamMemberInfo id=50000:1345072655
+2026-08-08T11:37:39.7067070Z IN seq=125 CharInPlay id=50000:905848936
+
+=== CAST/FINISH NANOS ===
+FINISH nano=29302
+FINISH nano=29302
+CAST target=SimpleChar:502C2E0F nano=154913
+FINISH nano=154913
+FINISH nano=154913

@@ -1,0 +1,167 @@
+// PreferredPetHashByNano engineer entries
+                { 43325, "PT10" }, // Eng L1
+                { 45664, "PT14" }, // Eng L67
+                { 45665, "PT15" }, // Eng L100
+                { 45671, "PT20" }, // Eng L200
+                { 45672, "PT19" }, // Eng L193
+                { 45675, "PT13" }, // Eng L34
+                { 45676, "PT11" }, // Eng L9
+                { 45680, "PT13" }, // Eng L43
+                { 45681, "PT11" }, // Eng L15
+                { 45682, "PT14" }, // Eng L76
+                { 45686, "PT15" }, // Eng L85
+                { 45691, "PT12" }, // Eng L19
+                { 45692, "PT10" }, // Eng L2
+                { 45693, "PT14" }, // Eng L49
+                { 45694, "PT15" }, // Eng L82
+                { 45697, "PT13" }, // Eng L40
+                { 45698, "PT11" }, // Eng L13
+                { 45699, "PT14" }, // Eng L73
+                { 45700, "PT15" }, // Eng L106
+                { 45701, "PT14" }, // Eng L64
+                { 45702, "PT15" }, // Eng L97
+                { 45703, "PT12" }, // Eng L23
+                { 45705, "PT14" }, // Eng L55
+                { 45706, "PT15" }, // Eng L88
+                { 45712, "PT12" }, // Eng L17
+                { 45713, "PT14" }, // Eng L46
+                { 45714, "PT15" }, // Eng L79
+                { 45717, "PT12" }, // Eng L25
+                { 45718, "PT10" }, // Eng L5
+                { 45719, "PT14" }, // Eng L58
+                { 45720, "PT15" }, // Eng L91
+                { 45723, "PT12" }, // Eng L28
+                { 45725, "PT14" }, // Eng L61
+                { 45726, "PT15" }, // Eng L94
+                { 45730, "PT13" }, // Eng L37
+                { 45731, "PT11" }, // Eng L11
+                { 45732, "PT14" }, // Eng L70
+                { 45733, "PT15" }, // Eng L103
+                { 45736, "PT13" }, // Eng L31
+                { 45737, "PT11" }, // Eng L7
+
+// PreferredPetTypeByNano
+                { 43325, 1 },
+                { 45664, 67 },
+                { 45665, 100 },
+                { 45671, 200 },
+                { 45672, 193 },
+                { 45675, 34 },
+                { 45676, 9 },
+                { 45680, 43 },
+                { 45681, 15 },
+                { 45682, 76 },
+                { 45686, 85 },
+                { 45691, 19 },
+                { 45692, 2 },
+                { 45693, 49 },
+                { 45694, 82 },
+                { 45697, 40 },
+                { 45698, 13 },
+                { 45699, 73 },
+                { 45700, 106 },
+                { 45701, 64 },
+                { 45702, 97 },
+                { 45703, 23 },
+                { 45705, 55 },
+                { 45706, 88 },
+                { 45712, 17 },
+                { 45713, 46 },
+                { 45714, 79 },
+                { 45717, 25 },
+                { 45718, 5 },
+                { 45719, 58 },
+                { 45720, 91 },
+                { 45723, 28 },
+                { 45725, 61 },
+                { 45726, 94 },
+                { 45730, 37 },
+                { 45731, 11 },
+                { 45732, 70 },
+                { 45733, 103 },
+                { 45736, 31 },
+                { 45737, 7 },
+
+// EngineerShellDisplayByNano
+                { 43325, new CapturedBureaucratShellDisplay(96196, 96196, 1) },
+                { 45664, new CapturedBureaucratShellDisplay(150783, 150782, 67) },
+                { 45665, new CapturedBureaucratShellDisplay(150778, 150778, 100) },
+                { 45671, new CapturedBureaucratShellDisplay(96218, 96218, 200) },
+                { 45672, new CapturedBureaucratShellDisplay(150776, 150775, 193) },
+                { 45675, new CapturedBureaucratShellDisplay(150793, 150792, 34) },
+                { 45676, new CapturedBureaucratShellDisplay(150788, 150787, 9) },
+                { 45680, new CapturedBureaucratShellDisplay(150791, 96228, 43) },
+                { 45681, new CapturedBureaucratShellDisplay(150786, 150786, 15) },
+                { 45682, new CapturedBureaucratShellDisplay(150782, 96215, 76) },
+                { 45686, new CapturedBureaucratShellDisplay(150780, 150779, 85) },
+                { 45691, new CapturedBureaucratShellDisplay(150797, 150796, 19) },
+                { 45692, new CapturedBureaucratShellDisplay(96196, 150790, 2) },
+                { 45693, new CapturedBureaucratShellDisplay(150785, 150784, 49) },
+                { 45694, new CapturedBureaucratShellDisplay(150780, 150779, 82) },
+                { 45697, new CapturedBureaucratShellDisplay(150791, 150791, 40) },
+                { 45698, new CapturedBureaucratShellDisplay(150787, 150786, 13) },
+                { 45699, new CapturedBureaucratShellDisplay(150783, 150782, 73) },
+                { 45700, new CapturedBureaucratShellDisplay(150778, 150777, 106) },
+                { 45701, new CapturedBureaucratShellDisplay(150784, 150783, 64) },
+                { 45702, new CapturedBureaucratShellDisplay(150779, 150778, 97) },
+                { 45703, new CapturedBureaucratShellDisplay(150796, 150795, 23) },
+                { 45705, new CapturedBureaucratShellDisplay(150784, 150784, 55) },
+                { 45706, new CapturedBureaucratShellDisplay(150780, 150779, 88) },
+                { 45712, new CapturedBureaucratShellDisplay(150797, 150796, 17) },
+                { 45713, new CapturedBureaucratShellDisplay(150785, 150784, 46) },
+                { 45714, new CapturedBureaucratShellDisplay(150781, 150780, 79) },
+                { 45717, new CapturedBureaucratShellDisplay(150795, 150795, 25) },
+                { 45718, new CapturedBureaucratShellDisplay(150790, 150790, 5) },
+                { 45719, new CapturedBureaucratShellDisplay(150784, 150783, 58) },
+                { 45720, new CapturedBureaucratShellDisplay(150779, 150778, 91) },
+                { 45723, new CapturedBureaucratShellDisplay(150795, 150794, 28) },
+                { 45725, new CapturedBureaucratShellDisplay(150784, 150783, 61) },
+                { 45726, new CapturedBureaucratShellDisplay(150779, 150778, 94) },
+                { 45730, new CapturedBureaucratShellDisplay(150792, 150791, 37) },
+                { 45731, new CapturedBureaucratShellDisplay(150787, 150786, 11) },
+                { 45732, new CapturedBureaucratShellDisplay(150783, 150782, 70) },
+                { 45733, new CapturedBureaucratShellDisplay(150778, 150777, 103) },
+                { 45736, new CapturedBureaucratShellDisplay(150793, 150792, 31) },
+                { 45737, new CapturedBureaucratShellDisplay(150788, 150787, 7) },
+
+// EngineerProfilesByNano
+                { 43325, new CapturedBureaucratPetProfile("Engineer Automaton I", 1, 30, 17649, 90, 8, npcFamily: 95) },
+                { 45664, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 67, 4442, 45873, 108, 345, npcFamily: 95) },
+                { 45665, new CapturedBureaucratPetProfile("Engineer Guardbot", 100, 8195, 45873, 112, 508, npcFamily: 95) },
+                { 45671, new CapturedBureaucratPetProfile("Engineer Slayerdroid II", 200, 43720, 22821, 121, 821, npcFamily: 95) },
+                { 45672, new CapturedBureaucratPetProfile("Engineer Slayerdroid I", 193, 23735, 22821, 120, 739, npcFamily: 95) },
+                { 45675, new CapturedBureaucratPetProfile("Engineer Android II", 34, 1535, 17649, 102, 174, npcFamily: 95) },
+                { 45676, new CapturedBureaucratPetProfile("Engineer Automaton II", 9, 246, 17649, 95, 47, npcFamily: 95) },
+                { 45680, new CapturedBureaucratPetProfile("Engineer Android II", 43, 2201, 17649, 104, 219, npcFamily: 95) },
+                { 45681, new CapturedBureaucratPetProfile("Engineer Automaton II", 15, 471, 17649, 97, 77, npcFamily: 95) },
+                { 45682, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 76, 5354, 45873, 109, 394, npcFamily: 95) },
+                { 45686, new CapturedBureaucratPetProfile("Engineer Guardbot", 85, 6266, 45873, 110, 442, npcFamily: 95) },
+                { 45691, new CapturedBureaucratPetProfile("Engineer Android I", 19, 631, 17649, 98, 97, npcFamily: 95) },
+                { 45692, new CapturedBureaucratPetProfile("Engineer Automaton I", 2, 57, 17649, 91, 15, npcFamily: 95) },
+                { 45693, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 49, 2645, 45873, 105, 248, npcFamily: 95) },
+                { 45694, new CapturedBureaucratPetProfile("Engineer Guardbot", 82, 5962, 45873, 109, 425, npcFamily: 95) },
+                { 45697, new CapturedBureaucratPetProfile("Engineer Android II", 40, 1979, 17649, 103, 203, npcFamily: 95) },
+                { 45698, new CapturedBureaucratPetProfile("Engineer Automaton II", 13, 392, 17649, 96, 67, npcFamily: 95) },
+                { 45699, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 73, 5050, 45873, 108, 377, npcFamily: 95) },
+                { 45700, new CapturedBureaucratPetProfile("Engineer Guardbot", 106, 9049, 45873, 112, 531, npcFamily: 95) },
+                { 45701, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 64, 4138, 45873, 107, 328, npcFamily: 95) },
+                { 45702, new CapturedBureaucratPetProfile("Engineer Guardbot", 97, 7769, 45873, 111, 496, npcFamily: 95) },
+                { 45703, new CapturedBureaucratPetProfile("Engineer Android I", 23, 790, 17649, 100, 119, npcFamily: 95) },
+                { 45705, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 55, 3226, 45873, 106, 279, npcFamily: 95) },
+                { 45706, new CapturedBureaucratPetProfile("Engineer Guardbot", 88, 6570, 45873, 110, 457, npcFamily: 95) },
+                { 45712, new CapturedBureaucratPetProfile("Engineer Android I", 17, 551, 17649, 98, 87, npcFamily: 95) },
+                { 45713, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 46, 2423, 45873, 105, 233, npcFamily: 95) },
+                { 45714, new CapturedBureaucratPetProfile("Engineer Guardbot", 79, 5658, 45873, 109, 408, npcFamily: 95) },
+                { 45717, new CapturedBureaucratPetProfile("Engineer Android I", 25, 869, 17649, 100, 128, npcFamily: 95) },
+                { 45718, new CapturedBureaucratPetProfile("Engineer Automaton I", 5, 138, 17649, 93, 29, npcFamily: 95) },
+                { 45719, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 58, 3530, 45873, 106, 296, npcFamily: 95) },
+                { 45720, new CapturedBureaucratPetProfile("Engineer Guardbot", 91, 6915, 45873, 111, 472, npcFamily: 95) },
+                { 45723, new CapturedBureaucratPetProfile("Engineer Android I", 28, 1091, 17649, 101, 143, npcFamily: 95) },
+                { 45725, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 61, 3834, 45873, 107, 311, npcFamily: 95) },
+                { 45726, new CapturedBureaucratPetProfile("Engineer Guardbot", 94, 7342, 45873, 111, 485, npcFamily: 95) },
+                { 45730, new CapturedBureaucratPetProfile("Engineer Android II", 37, 1757, 17649, 103, 187, npcFamily: 95) },
+                { 45731, new CapturedBureaucratPetProfile("Engineer Automaton II", 11, 312, 17649, 96, 57, npcFamily: 95) },
+                { 45732, new CapturedBureaucratPetProfile("Engineer Gladiatorbot", 70, 4746, 45873, 108, 359, npcFamily: 95) },
+                { 45733, new CapturedBureaucratPetProfile("Engineer Guardbot", 103, 8622, 45873, 112, 521, npcFamily: 95) },
+                { 45736, new CapturedBureaucratPetProfile("Engineer Android II", 31, 1313, 17649, 102, 158, npcFamily: 95) },
+                { 45737, new CapturedBureaucratPetProfile("Engineer Automaton II", 7, 192, 17649, 94, 38, npcFamily: 95) },

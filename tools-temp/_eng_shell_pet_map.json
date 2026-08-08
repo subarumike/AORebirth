@@ -1,0 +1,2179 @@
+{
+  "capture": "20260808-131854",
+  "character": "Engnera",
+  "petScfuCount": 40,
+  "correlatedCycles": 40,
+  "nanoToShells": {
+    "43325": [
+      {
+        "low": 96196,
+        "high": 96196,
+        "ql": 1,
+        "u2": 87,
+        "ts": "2026-08-08T11:25:03.2987512Z"
+      }
+    ],
+    "45664": [
+      {
+        "low": 150783,
+        "high": 150782,
+        "ql": 67,
+        "u2": 87,
+        "ts": "2026-08-08T11:20:37.5406489Z"
+      }
+    ],
+    "45665": [
+      {
+        "low": 150778,
+        "high": 150778,
+        "ql": 100,
+        "u2": 87,
+        "ts": "2026-08-08T11:19:13.6940055Z"
+      }
+    ],
+    "45671": [
+      {
+        "low": 96218,
+        "high": 96218,
+        "ql": 200,
+        "u2": 87,
+        "ts": "2026-08-08T11:30:26.5356119Z"
+      }
+    ],
+    "45672": [
+      {
+        "low": 150776,
+        "high": 150775,
+        "ql": 193,
+        "u2": 87,
+        "ts": "2026-08-08T11:29:26.7046721Z"
+      },
+      {
+        "low": 259270,
+        "high": 259270,
+        "ql": 100,
+        "u2": 87,
+        "ts": "2026-08-08T11:30:12.8099429Z"
+      }
+    ],
+    "45675": [
+      {
+        "low": 150793,
+        "high": 150792,
+        "ql": 34,
+        "u2": 87,
+        "ts": "2026-08-08T11:24:35.5204466Z"
+      }
+    ],
+    "45676": [
+      {
+        "low": 150788,
+        "high": 150787,
+        "ql": 9,
+        "u2": 87,
+        "ts": "2026-08-08T11:24:49.8256744Z"
+      }
+    ],
+    "45680": [
+      {
+        "low": 150791,
+        "high": 96228,
+        "ql": 43,
+        "u2": 87,
+        "ts": "2026-08-08T11:24:05.2448153Z"
+      }
+    ],
+    "45681": [
+      {
+        "low": 150786,
+        "high": 150786,
+        "ql": 15,
+        "u2": 87,
+        "ts": "2026-08-08T11:23:50.6842152Z"
+      }
+    ],
+    "45682": [
+      {
+        "low": 150782,
+        "high": 96215,
+        "ql": 76,
+        "u2": 87,
+        "ts": "2026-08-08T11:20:52.5307405Z"
+      }
+    ],
+    "45686": [
+      {
+        "low": 150780,
+        "high": 150779,
+        "ql": 85,
+        "u2": 87,
+        "ts": "2026-08-08T11:19:45.6500523Z"
+      }
+    ],
+    "45691": [
+      {
+        "low": 150797,
+        "high": 150796,
+        "ql": 19,
+        "u2": 87,
+        "ts": "2026-08-08T11:26:51.2544856Z"
+      }
+    ],
+    "45692": [
+      {
+        "low": 96196,
+        "high": 150790,
+        "ql": 2,
+        "u2": 87,
+        "ts": "2026-08-08T11:25:19.3976438Z"
+      }
+    ],
+    "45693": [
+      {
+        "low": 150785,
+        "high": 150784,
+        "ql": 49,
+        "u2": 87,
+        "ts": "2026-08-08T11:23:35.2408558Z"
+      }
+    ],
+    "45694": [
+      {
+        "low": 150780,
+        "high": 150779,
+        "ql": 82,
+        "u2": 87,
+        "ts": "2026-08-08T11:21:22.5431847Z"
+      }
+    ],
+    "45697": [
+      {
+        "low": 150791,
+        "high": 150791,
+        "ql": 40,
+        "u2": 87,
+        "ts": "2026-08-08T11:27:48.8478387Z"
+      }
+    ],
+    "45698": [
+      {
+        "low": 150787,
+        "high": 150786,
+        "ql": 13,
+        "u2": 87,
+        "ts": "2026-08-08T11:24:20.4346756Z"
+      }
+    ],
+    "45699": [
+      {
+        "low": 150783,
+        "high": 150782,
+        "ql": 73,
+        "u2": 87,
+        "ts": "2026-08-08T11:21:07.7717570Z"
+      }
+    ],
+    "45700": [
+      {
+        "low": 150778,
+        "high": 150777,
+        "ql": 106,
+        "u2": 87,
+        "ts": "2026-08-08T11:19:29.7134617Z"
+      }
+    ],
+    "45701": [
+      {
+        "low": 150784,
+        "high": 150783,
+        "ql": 64,
+        "u2": 87,
+        "ts": "2026-08-08T11:22:12.6898139Z"
+      }
+    ],
+    "45702": [
+      {
+        "low": 150779,
+        "high": 150778,
+        "ql": 97,
+        "u2": 87,
+        "ts": "2026-08-08T11:28:17.4835057Z"
+      }
+    ],
+    "45703": [
+      {
+        "low": 150796,
+        "high": 150795,
+        "ql": 23,
+        "u2": 87,
+        "ts": "2026-08-08T11:27:05.3018978Z"
+      }
+    ],
+    "45705": [
+      {
+        "low": 150784,
+        "high": 150784,
+        "ql": 55,
+        "u2": 87,
+        "ts": "2026-08-08T11:21:43.1486256Z"
+      }
+    ],
+    "45706": [
+      {
+        "low": 150780,
+        "high": 150779,
+        "ql": 88,
+        "u2": 87,
+        "ts": "2026-08-08T11:21:57.6120679Z"
+      }
+    ],
+    "45712": [
+      {
+        "low": 150797,
+        "high": 150796,
+        "ql": 17,
+        "u2": 87,
+        "ts": "2026-08-08T11:26:19.2424450Z"
+      }
+    ],
+    "45713": [
+      {
+        "low": 150785,
+        "high": 150784,
+        "ql": 46,
+        "u2": 87,
+        "ts": "2026-08-08T11:26:34.7251618Z"
+      }
+    ],
+    "45714": [
+      {
+        "low": 150781,
+        "high": 150780,
+        "ql": 79,
+        "u2": 87,
+        "ts": "2026-08-08T11:23:19.9733620Z"
+      }
+    ],
+    "45717": [
+      {
+        "low": 150795,
+        "high": 150795,
+        "ql": 25,
+        "u2": 87,
+        "ts": "2026-08-08T11:25:35.6925930Z"
+      }
+    ],
+    "45718": [
+      {
+        "low": 150790,
+        "high": 150790,
+        "ql": 5,
+        "u2": 87,
+        "ts": "2026-08-08T11:25:50.9906649Z"
+      }
+    ],
+    "45719": [
+      {
+        "low": 150784,
+        "high": 150783,
+        "ql": 58,
+        "u2": 87,
+        "ts": "2026-08-08T11:22:47.6545491Z"
+      }
+    ],
+    "45720": [
+      {
+        "low": 150779,
+        "high": 150778,
+        "ql": 91,
+        "u2": 87,
+        "ts": "2026-08-08T11:22:29.4658158Z"
+      }
+    ],
+    "45723": [
+      {
+        "low": 150795,
+        "high": 150794,
+        "ql": 28,
+        "u2": 87,
+        "ts": "2026-08-08T11:27:19.8082511Z"
+      }
+    ],
+    "45725": [
+      {
+        "low": 150784,
+        "high": 150783,
+        "ql": 61,
+        "u2": 87,
+        "ts": "2026-08-08T11:23:02.6207624Z"
+      }
+    ],
+    "45726": [
+      {
+        "low": 150779,
+        "high": 150778,
+        "ql": 94,
+        "u2": 87,
+        "ts": "2026-08-08T11:20:02.2052714Z"
+      }
+    ],
+    "45730": [
+      {
+        "low": 150792,
+        "high": 150791,
+        "ql": 37,
+        "u2": 87,
+        "ts": "2026-08-08T11:28:45.8930874Z"
+      }
+    ],
+    "45731": [
+      {
+        "low": 150787,
+        "high": 150786,
+        "ql": 11,
+        "u2": 87,
+        "ts": "2026-08-08T11:26:05.5987323Z"
+      }
+    ],
+    "45732": [
+      {
+        "low": 150783,
+        "high": 150782,
+        "ql": 70,
+        "u2": 87,
+        "ts": "2026-08-08T11:28:03.7247778Z"
+      }
+    ],
+    "45733": [
+      {
+        "low": 150778,
+        "high": 150777,
+        "ql": 103,
+        "u2": 87,
+        "ts": "2026-08-08T11:20:21.9130818Z"
+      }
+    ],
+    "45736": [
+      {
+        "low": 150793,
+        "high": 150792,
+        "ql": 31,
+        "u2": 87,
+        "ts": "2026-08-08T11:27:35.3943817Z"
+      }
+    ],
+    "45737": [
+      {
+        "low": 150788,
+        "high": 150787,
+        "ql": 7,
+        "u2": 87,
+        "ts": "2026-08-08T11:28:32.5714620Z"
+      }
+    ]
+  },
+  "cycles": [
+    {
+      "castNano": 45665,
+      "castTs": "2026-08-08T11:19:08.4698817Z",
+      "finishTs": "2026-08-08T11:19:13.6930062Z",
+      "shellLowId": 150778,
+      "shellHighId": 150778,
+      "shellQl": 100,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:19:16.2645352Z",
+      "petIdent": "SimpleChar:79CF9F7D",
+      "petName": "Engineer Guardbot",
+      "petLevel": 100,
+      "petHp": 8195,
+      "monsterData": 45873,
+      "monsterScale": 112,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 111,
+      "runSpeedBase": 508,
+      "npcFamily": 95,
+      "health": 8195,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45700,
+      "castTs": "2026-08-08T11:19:24.4216695Z",
+      "finishTs": "2026-08-08T11:19:29.7134617Z",
+      "shellLowId": 150778,
+      "shellHighId": 150777,
+      "shellQl": 106,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:19:32.3418433Z",
+      "petIdent": "SimpleChar:79CF9F7F",
+      "petName": "Engineer Guardbot",
+      "petLevel": 106,
+      "petHp": 9049,
+      "monsterData": 45873,
+      "monsterScale": 112,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 234,
+      "runSpeedBase": 531,
+      "npcFamily": 95,
+      "health": 9049,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45686,
+      "castTs": "2026-08-08T11:19:40.0363563Z",
+      "finishTs": "2026-08-08T11:19:45.6500523Z",
+      "shellLowId": 150780,
+      "shellHighId": 150779,
+      "shellQl": 85,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:19:50.1506836Z",
+      "petIdent": "SimpleChar:79CF9F80",
+      "petName": "Engineer Guardbot",
+      "petLevel": 85,
+      "petHp": 6266,
+      "monsterData": 45873,
+      "monsterScale": 110,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 369,
+      "runSpeedBase": 442,
+      "npcFamily": 95,
+      "health": 6266,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45726,
+      "castTs": "2026-08-08T11:19:57.0756773Z",
+      "finishTs": "2026-08-08T11:20:02.2052714Z",
+      "shellLowId": 150779,
+      "shellHighId": 150778,
+      "shellQl": 94,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:20:05.6801304Z",
+      "petIdent": "SimpleChar:79CF9F82",
+      "petName": "Engineer Guardbot",
+      "petLevel": 94,
+      "petHp": 7342,
+      "monsterData": 45873,
+      "monsterScale": 111,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 492,
+      "runSpeedBase": 485,
+      "npcFamily": 95,
+      "health": 7342,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45733,
+      "castTs": "2026-08-08T11:20:16.6450931Z",
+      "finishTs": "2026-08-08T11:20:21.9130818Z",
+      "shellLowId": 150778,
+      "shellHighId": 150777,
+      "shellQl": 103,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:20:24.6214144Z",
+      "petIdent": "SimpleChar:79CF9F83",
+      "petName": "Engineer Guardbot",
+      "petLevel": 103,
+      "petHp": 8622,
+      "monsterData": 45873,
+      "monsterScale": 112,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 649,
+      "runSpeedBase": 521,
+      "npcFamily": 95,
+      "health": 8622,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45664,
+      "castTs": "2026-08-08T11:20:32.6457729Z",
+      "finishTs": "2026-08-08T11:20:37.5406489Z",
+      "shellLowId": 150783,
+      "shellHighId": 150782,
+      "shellQl": 67,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:20:39.6274997Z",
+      "petIdent": "SimpleChar:79CF9F86",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 67,
+      "petHp": 4442,
+      "monsterData": 45873,
+      "monsterScale": 108,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 772,
+      "runSpeedBase": 345,
+      "npcFamily": 95,
+      "health": 4442,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45682,
+      "castTs": "2026-08-08T11:20:47.5532029Z",
+      "finishTs": "2026-08-08T11:20:52.5307405Z",
+      "shellLowId": 150782,
+      "shellHighId": 96215,
+      "shellQl": 76,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:20:55.6467681Z",
+      "petIdent": "SimpleChar:79CF9F87",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 76,
+      "petHp": 5354,
+      "monsterData": 45873,
+      "monsterScale": 109,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 899,
+      "runSpeedBase": 394,
+      "npcFamily": 95,
+      "health": 5354,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45699,
+      "castTs": "2026-08-08T11:21:02.7797752Z",
+      "finishTs": "2026-08-08T11:21:07.7707566Z",
+      "shellLowId": 150783,
+      "shellHighId": 150782,
+      "shellQl": 73,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:21:10.3220111Z",
+      "petIdent": "SimpleChar:79CF9F88",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 73,
+      "petHp": 5050,
+      "monsterData": 45873,
+      "monsterScale": 108,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1018,
+      "runSpeedBase": 377,
+      "npcFamily": 95,
+      "health": 5050,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45694,
+      "castTs": "2026-08-08T11:21:18.1217456Z",
+      "finishTs": "2026-08-08T11:21:22.5431847Z",
+      "shellLowId": 150780,
+      "shellHighId": 150779,
+      "shellQl": 82,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:21:24.9317198Z",
+      "petIdent": "SimpleChar:79CF9F8A",
+      "petName": "Engineer Guardbot",
+      "petLevel": 82,
+      "petHp": 5962,
+      "monsterData": 45873,
+      "monsterScale": 109,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1137,
+      "runSpeedBase": 425,
+      "npcFamily": 95,
+      "health": 5962,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45705,
+      "castTs": "2026-08-08T11:21:38.3805177Z",
+      "finishTs": "2026-08-08T11:21:43.1476261Z",
+      "shellLowId": 150784,
+      "shellHighId": 150784,
+      "shellQl": 55,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:21:46.0670582Z",
+      "petIdent": "SimpleChar:79CF9F8C",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 55,
+      "petHp": 3226,
+      "monsterData": 45873,
+      "monsterScale": 106,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1314,
+      "runSpeedBase": 279,
+      "npcFamily": 95,
+      "health": 3226,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45706,
+      "castTs": "2026-08-08T11:21:52.5109727Z",
+      "finishTs": "2026-08-08T11:21:57.6120679Z",
+      "shellLowId": 150780,
+      "shellHighId": 150779,
+      "shellQl": 88,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:21:59.6408184Z",
+      "petIdent": "SimpleChar:79CF9F8E",
+      "petName": "Engineer Guardbot",
+      "petLevel": 88,
+      "petHp": 6570,
+      "monsterData": 45873,
+      "monsterScale": 110,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1429,
+      "runSpeedBase": 457,
+      "npcFamily": 95,
+      "health": 6570,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45701,
+      "castTs": "2026-08-08T11:22:07.3170929Z",
+      "finishTs": "2026-08-08T11:22:12.6898139Z",
+      "shellLowId": 150784,
+      "shellHighId": 150783,
+      "shellQl": 64,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:22:16.7003436Z",
+      "petIdent": "SimpleChar:79CF9F8F",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 64,
+      "petHp": 4138,
+      "monsterData": 45873,
+      "monsterScale": 107,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1560,
+      "runSpeedBase": 328,
+      "npcFamily": 95,
+      "health": 4138,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45720,
+      "castTs": "2026-08-08T11:22:24.3137703Z",
+      "finishTs": "2026-08-08T11:22:29.4648160Z",
+      "shellLowId": 150779,
+      "shellHighId": 150778,
+      "shellQl": 91,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:22:32.5547445Z",
+      "petIdent": "SimpleChar:79CF9F90",
+      "petName": "Engineer Guardbot",
+      "petLevel": 91,
+      "petHp": 6915,
+      "monsterData": 45873,
+      "monsterScale": 111,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1683,
+      "runSpeedBase": 472,
+      "npcFamily": 95,
+      "health": 6915,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45719,
+      "castTs": "2026-08-08T11:22:42.8336074Z",
+      "finishTs": "2026-08-08T11:22:47.6535495Z",
+      "shellLowId": 150784,
+      "shellHighId": 150783,
+      "shellQl": 58,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:22:50.2649412Z",
+      "petIdent": "SimpleChar:79CF9F92",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 58,
+      "petHp": 3530,
+      "monsterData": 45873,
+      "monsterScale": 106,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1780,
+      "runSpeedBase": 296,
+      "npcFamily": 95,
+      "health": 3530,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45725,
+      "castTs": "2026-08-08T11:22:57.8191257Z",
+      "finishTs": "2026-08-08T11:23:02.6197628Z",
+      "shellLowId": 150784,
+      "shellHighId": 150783,
+      "shellQl": 61,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:23:05.0505486Z",
+      "petIdent": "SimpleChar:79CF9F94",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 61,
+      "petHp": 3834,
+      "monsterData": 45873,
+      "monsterScale": 107,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1873,
+      "runSpeedBase": 311,
+      "npcFamily": 95,
+      "health": 3834,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45714,
+      "castTs": "2026-08-08T11:23:14.9884331Z",
+      "finishTs": "2026-08-08T11:23:19.9733620Z",
+      "shellLowId": 150781,
+      "shellHighId": 150780,
+      "shellQl": 79,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:23:23.4632147Z",
+      "petIdent": "SimpleChar:79CF9F95",
+      "petName": "Engineer Guardbot",
+      "petLevel": 79,
+      "petHp": 5658,
+      "monsterData": 45873,
+      "monsterScale": 109,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 1994,
+      "runSpeedBase": 408,
+      "npcFamily": 95,
+      "health": 5658,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45693,
+      "castTs": "2026-08-08T11:23:30.5595875Z",
+      "finishTs": "2026-08-08T11:23:35.2408558Z",
+      "shellLowId": 150785,
+      "shellHighId": 150784,
+      "shellQl": 49,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:23:38.7509629Z",
+      "petIdent": "SimpleChar:79CF9F96",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 49,
+      "petHp": 2645,
+      "monsterData": 45873,
+      "monsterScale": 105,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2087,
+      "runSpeedBase": 248,
+      "npcFamily": 95,
+      "health": 2645,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45681,
+      "castTs": "2026-08-08T11:23:46.3156628Z",
+      "finishTs": "2026-08-08T11:23:50.6842152Z",
+      "shellLowId": 150786,
+      "shellHighId": 150786,
+      "shellQl": 15,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:23:53.0220183Z",
+      "petIdent": "SimpleChar:79CF9F98",
+      "petName": "Engineer Automaton II",
+      "petLevel": 15,
+      "petHp": 471,
+      "monsterData": 17649,
+      "monsterScale": 97,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2176,
+      "runSpeedBase": 77,
+      "npcFamily": 95,
+      "health": 471,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45680,
+      "castTs": "2026-08-08T11:24:00.5946828Z",
+      "finishTs": "2026-08-08T11:24:05.2438161Z",
+      "shellLowId": 150791,
+      "shellHighId": 96228,
+      "shellQl": 43,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:24:07.6663242Z",
+      "petIdent": "SimpleChar:79CF9F9A",
+      "petName": "Engineer Android II",
+      "petLevel": 43,
+      "petHp": 2201,
+      "monsterData": 17649,
+      "monsterScale": 104,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2267,
+      "runSpeedBase": 219,
+      "npcFamily": 95,
+      "health": 2201,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45698,
+      "castTs": "2026-08-08T11:24:16.1031573Z",
+      "finishTs": "2026-08-08T11:24:20.4346756Z",
+      "shellLowId": 150787,
+      "shellHighId": 150786,
+      "shellQl": 13,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:24:22.8431914Z",
+      "petIdent": "SimpleChar:79CF9F9B",
+      "petName": "Engineer Automaton II",
+      "petLevel": 13,
+      "petHp": 392,
+      "monsterData": 17649,
+      "monsterScale": 96,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2358,
+      "runSpeedBase": 67,
+      "npcFamily": 95,
+      "health": 392,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45675,
+      "castTs": "2026-08-08T11:24:30.5085317Z",
+      "finishTs": "2026-08-08T11:24:35.5204466Z",
+      "shellLowId": 150793,
+      "shellHighId": 150792,
+      "shellQl": 34,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:24:38.6095448Z",
+      "petIdent": "SimpleChar:79CF9F9E",
+      "petName": "Engineer Android II",
+      "petLevel": 34,
+      "petHp": 1535,
+      "monsterData": 17649,
+      "monsterScale": 102,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2451,
+      "runSpeedBase": 174,
+      "npcFamily": 95,
+      "health": 1535,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45676,
+      "castTs": "2026-08-08T11:24:45.0735945Z",
+      "finishTs": "2026-08-08T11:24:49.8256744Z",
+      "shellLowId": 150788,
+      "shellHighId": 150787,
+      "shellQl": 9,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:24:51.3647267Z",
+      "petIdent": "SimpleChar:79CF9F9F",
+      "petName": "Engineer Automaton II",
+      "petLevel": 9,
+      "petHp": 246,
+      "monsterData": 17649,
+      "monsterScale": 95,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2538,
+      "runSpeedBase": 47,
+      "npcFamily": 95,
+      "health": 246,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 43325,
+      "castTs": "2026-08-08T11:25:01.0886229Z",
+      "finishTs": "2026-08-08T11:25:03.2987512Z",
+      "shellLowId": 96196,
+      "shellHighId": 96196,
+      "shellQl": 1,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:25:05.9699027Z",
+      "petIdent": "SimpleChar:79CF9FA1",
+      "petName": "Engineer Automaton I",
+      "petLevel": 1,
+      "petHp": 30,
+      "monsterData": 17649,
+      "monsterScale": 90,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2627,
+      "runSpeedBase": 8,
+      "npcFamily": 95,
+      "health": 30,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45692,
+      "castTs": "2026-08-08T11:25:14.6854185Z",
+      "finishTs": "2026-08-08T11:25:19.3966438Z",
+      "shellLowId": 96196,
+      "shellHighId": 150790,
+      "shellQl": 2,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:25:21.6572543Z",
+      "petIdent": "SimpleChar:79CF9FA2",
+      "petName": "Engineer Automaton I",
+      "petLevel": 2,
+      "petHp": 57,
+      "monsterData": 17649,
+      "monsterScale": 91,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2718,
+      "runSpeedBase": 15,
+      "npcFamily": 95,
+      "health": 57,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45717,
+      "castTs": "2026-08-08T11:25:30.7907173Z",
+      "finishTs": "2026-08-08T11:25:35.6925930Z",
+      "shellLowId": 150795,
+      "shellHighId": 150795,
+      "shellQl": 25,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:25:38.0614313Z",
+      "petIdent": "SimpleChar:79CF9FA4",
+      "petName": "Engineer Android I",
+      "petLevel": 25,
+      "petHp": 869,
+      "monsterData": 17649,
+      "monsterScale": 100,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2815,
+      "runSpeedBase": 128,
+      "npcFamily": 95,
+      "health": 869,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45718,
+      "castTs": "2026-08-08T11:25:46.2868734Z",
+      "finishTs": "2026-08-08T11:25:50.9896655Z",
+      "shellLowId": 150790,
+      "shellHighId": 150790,
+      "shellQl": 5,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:25:53.4461532Z",
+      "petIdent": "SimpleChar:79CF9FA5",
+      "petName": "Engineer Automaton I",
+      "petLevel": 5,
+      "petHp": 138,
+      "monsterData": 17649,
+      "monsterScale": 93,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2906,
+      "runSpeedBase": 29,
+      "npcFamily": 95,
+      "health": 138,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45731,
+      "castTs": "2026-08-08T11:26:01.2793916Z",
+      "finishTs": "2026-08-08T11:26:05.5977334Z",
+      "shellLowId": 150787,
+      "shellHighId": 150786,
+      "shellQl": 11,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:26:07.4815735Z",
+      "petIdent": "SimpleChar:79CF9FA6",
+      "petName": "Engineer Automaton II",
+      "petLevel": 11,
+      "petHp": 312,
+      "monsterData": 17649,
+      "monsterScale": 96,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 2993,
+      "runSpeedBase": 57,
+      "npcFamily": 95,
+      "health": 312,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45712,
+      "castTs": "2026-08-08T11:26:14.8400472Z",
+      "finishTs": "2026-08-08T11:26:19.2424450Z",
+      "shellLowId": 150797,
+      "shellHighId": 150796,
+      "shellQl": 17,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:26:21.9098294Z",
+      "petIdent": "SimpleChar:79CF9FA8",
+      "petName": "Engineer Android I",
+      "petLevel": 17,
+      "petHp": 551,
+      "monsterData": 17649,
+      "monsterScale": 98,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3084,
+      "runSpeedBase": 87,
+      "npcFamily": 95,
+      "health": 551,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45713,
+      "castTs": "2026-08-08T11:26:30.0740835Z",
+      "finishTs": "2026-08-08T11:26:34.7251618Z",
+      "shellLowId": 150785,
+      "shellHighId": 150784,
+      "shellQl": 46,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:26:36.9941729Z",
+      "petIdent": "SimpleChar:79CF9FA9",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 46,
+      "petHp": 2423,
+      "monsterData": 45873,
+      "monsterScale": 105,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3177,
+      "runSpeedBase": 233,
+      "npcFamily": 95,
+      "health": 2423,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45691,
+      "castTs": "2026-08-08T11:26:46.3377502Z",
+      "finishTs": "2026-08-08T11:26:51.2534864Z",
+      "shellLowId": 150797,
+      "shellHighId": 150796,
+      "shellQl": 19,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:26:52.4537472Z",
+      "petIdent": "SimpleChar:79CF9FAC",
+      "petName": "Engineer Android I",
+      "petLevel": 19,
+      "petHp": 631,
+      "monsterData": 17649,
+      "monsterScale": 98,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3292,
+      "runSpeedBase": 97,
+      "npcFamily": 95,
+      "health": 631,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45703,
+      "castTs": "2026-08-08T11:27:00.8296550Z",
+      "finishTs": "2026-08-08T11:27:05.3008983Z",
+      "shellLowId": 150796,
+      "shellHighId": 150795,
+      "shellQl": 23,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:27:07.7903658Z",
+      "petIdent": "SimpleChar:79CF9FAE",
+      "petName": "Engineer Android I",
+      "petLevel": 23,
+      "petHp": 790,
+      "monsterData": 17649,
+      "monsterScale": 100,
+      "visualFlags": 31,
+      "sourceKind": "scfu",
+      "eventIndex": 3387,
+      "runSpeedBase": 119,
+      "npcFamily": 95,
+      "health": 790,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45723,
+      "castTs": "2026-08-08T11:27:14.8639663Z",
+      "finishTs": "2026-08-08T11:27:19.8082511Z",
+      "shellLowId": 150795,
+      "shellHighId": 150794,
+      "shellQl": 28,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:27:22.4786128Z",
+      "petIdent": "SimpleChar:79CF9FB1",
+      "petName": "Engineer Android I",
+      "petLevel": 28,
+      "petHp": 1091,
+      "monsterData": 17649,
+      "monsterScale": 101,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3478,
+      "runSpeedBase": 143,
+      "npcFamily": 95,
+      "health": 1091,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45736,
+      "castTs": "2026-08-08T11:27:30.8931551Z",
+      "finishTs": "2026-08-08T11:27:35.3943817Z",
+      "shellLowId": 150793,
+      "shellHighId": 150792,
+      "shellQl": 31,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:27:38.9832212Z",
+      "petIdent": "SimpleChar:79CF9FB2",
+      "petName": "Engineer Android II",
+      "petLevel": 31,
+      "petHp": 1313,
+      "monsterData": 17649,
+      "monsterScale": 102,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3573,
+      "runSpeedBase": 158,
+      "npcFamily": 95,
+      "health": 1313,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45697,
+      "castTs": "2026-08-08T11:27:44.2036349Z",
+      "finishTs": "2026-08-08T11:27:48.8478387Z",
+      "shellLowId": 150791,
+      "shellHighId": 150791,
+      "shellQl": 40,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:27:52.8355775Z",
+      "petIdent": "SimpleChar:79CF9FB5",
+      "petName": "Engineer Android II",
+      "petLevel": 40,
+      "petHp": 1979,
+      "monsterData": 17649,
+      "monsterScale": 103,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3664,
+      "runSpeedBase": 203,
+      "npcFamily": 95,
+      "health": 1979,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45732,
+      "castTs": "2026-08-08T11:27:58.8310207Z",
+      "finishTs": "2026-08-08T11:28:03.7237784Z",
+      "shellLowId": 150783,
+      "shellHighId": 150782,
+      "shellQl": 70,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:28:07.4354952Z",
+      "petIdent": "SimpleChar:79CF9FB7",
+      "petName": "Engineer Gladiatorbot",
+      "petLevel": 70,
+      "petHp": 4746,
+      "monsterData": 45873,
+      "monsterScale": 108,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3755,
+      "runSpeedBase": 359,
+      "npcFamily": 95,
+      "health": 4746,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45702,
+      "castTs": "2026-08-08T11:28:12.3095330Z",
+      "finishTs": "2026-08-08T11:28:17.4835057Z",
+      "shellLowId": 150779,
+      "shellHighId": 150778,
+      "shellQl": 97,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:28:20.2548260Z",
+      "petIdent": "SimpleChar:79CF9FB8",
+      "petName": "Engineer Guardbot",
+      "petLevel": 97,
+      "petHp": 7769,
+      "monsterData": 45873,
+      "monsterScale": 111,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 3842,
+      "runSpeedBase": 496,
+      "npcFamily": 95,
+      "health": 7769,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45737,
+      "castTs": "2026-08-08T11:28:28.3197356Z",
+      "finishTs": "2026-08-08T11:28:32.5714620Z",
+      "shellLowId": 150788,
+      "shellHighId": 150787,
+      "shellQl": 7,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:28:34.8510597Z",
+      "petIdent": "SimpleChar:79CF9FBD",
+      "petName": "Engineer Automaton II",
+      "petLevel": 7,
+      "petHp": 192,
+      "monsterData": 17649,
+      "monsterScale": 94,
+      "visualFlags": 31,
+      "sourceKind": "scfu",
+      "eventIndex": 3935,
+      "runSpeedBase": 38,
+      "npcFamily": 95,
+      "health": 192,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45730,
+      "castTs": "2026-08-08T11:28:41.2568061Z",
+      "finishTs": "2026-08-08T11:28:45.8920881Z",
+      "shellLowId": 150792,
+      "shellHighId": 150791,
+      "shellQl": 37,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:28:48.1136708Z",
+      "petIdent": "SimpleChar:79CF9FBE",
+      "petName": "Engineer Android II",
+      "petLevel": 37,
+      "petHp": 1757,
+      "monsterData": 17649,
+      "monsterScale": 103,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 4022,
+      "runSpeedBase": 187,
+      "npcFamily": 95,
+      "health": 1757,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45672,
+      "castTs": "2026-08-08T11:29:20.5386419Z",
+      "finishTs": "2026-08-08T11:29:26.7046721Z",
+      "shellLowId": 150776,
+      "shellHighId": 150775,
+      "shellQl": 193,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:29:29.3830866Z",
+      "petIdent": "SimpleChar:79CF9FC5",
+      "petName": "Engineer Slayerdroid I",
+      "petLevel": 193,
+      "petHp": 23735,
+      "monsterData": 22821,
+      "monsterScale": 120,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 4205,
+      "runSpeedBase": 739,
+      "npcFamily": 95,
+      "health": 23735,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    },
+    {
+      "castNano": 45671,
+      "castTs": "2026-08-08T11:30:20.2798344Z",
+      "finishTs": "2026-08-08T11:30:26.5356119Z",
+      "shellLowId": 96218,
+      "shellHighId": 96218,
+      "shellQl": 200,
+      "shellTemplateUnknown2": 87,
+      "useSlot": "004A",
+      "useTs": "2026-08-08T11:30:29.1282712Z",
+      "petIdent": "SimpleChar:79CF9FC9",
+      "petName": "Engineer Slayerdroid II",
+      "petLevel": 200,
+      "petHp": 43720,
+      "monsterData": 22821,
+      "monsterScale": 121,
+      "visualFlags": 31,
+      "sourceKind": "dynel",
+      "eventIndex": 4359,
+      "runSpeedBase": 821,
+      "npcFamily": 95,
+      "health": 43720,
+      "flags": "IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet",
+      "breed": "HumanMonster",
+      "side": "Neutral",
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "playfieldId": "1751076",
+      "pos": [
+        215.41832,
+        5.01,
+        128.188873
+      ]
+    }
+  ],
+  "shellToPets": {
+    "96196/96196 QL1": [
+      {
+        "nano": 43325,
+        "petName": "Engineer Automaton I player=False npc=True pet=False inPlay=True",
+        "level": 1,
+        "md": 17649,
+        "scale": 90,
+        "hp": 30,
+        "run": 8,
+        "ident": "SimpleChar:79CF9FA1"
+      }
+    ],
+    "96196/150790 QL2": [
+      {
+        "nano": 45692,
+        "petName": "Engineer Automaton I player=False npc=True pet=False inPlay=True",
+        "level": 2,
+        "md": 17649,
+        "scale": 91,
+        "hp": 57,
+        "run": 15,
+        "ident": "SimpleChar:79CF9FA2"
+      }
+    ],
+    "96218/96218 QL200": [
+      {
+        "nano": 45671,
+        "petName": "Engineer Slayerdroid II player=False npc=True pet=False inPlay=True",
+        "level": 200,
+        "md": 22821,
+        "scale": 121,
+        "hp": 43720,
+        "run": 821,
+        "ident": "SimpleChar:79CF9FC9"
+      }
+    ],
+    "150776/150775 QL193": [
+      {
+        "nano": 45672,
+        "petName": "Engineer Slayerdroid I player=False npc=True pet=False inPlay=True",
+        "level": 193,
+        "md": 22821,
+        "scale": 120,
+        "hp": 23735,
+        "run": 739,
+        "ident": "SimpleChar:79CF9FC5"
+      }
+    ],
+    "150778/150778 QL100": [
+      {
+        "nano": 45665,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 100,
+        "md": 45873,
+        "scale": 112,
+        "hp": 8195,
+        "run": 508,
+        "ident": "SimpleChar:79CF9F7D"
+      }
+    ],
+    "150778/150777 QL103": [
+      {
+        "nano": 45733,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 103,
+        "md": 45873,
+        "scale": 112,
+        "hp": 8622,
+        "run": 521,
+        "ident": "SimpleChar:79CF9F83"
+      }
+    ],
+    "150778/150777 QL106": [
+      {
+        "nano": 45700,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 106,
+        "md": 45873,
+        "scale": 112,
+        "hp": 9049,
+        "run": 531,
+        "ident": "SimpleChar:79CF9F7F"
+      }
+    ],
+    "150779/150778 QL91": [
+      {
+        "nano": 45720,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 91,
+        "md": 45873,
+        "scale": 111,
+        "hp": 6915,
+        "run": 472,
+        "ident": "SimpleChar:79CF9F90"
+      }
+    ],
+    "150779/150778 QL94": [
+      {
+        "nano": 45726,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 94,
+        "md": 45873,
+        "scale": 111,
+        "hp": 7342,
+        "run": 485,
+        "ident": "SimpleChar:79CF9F82"
+      }
+    ],
+    "150779/150778 QL97": [
+      {
+        "nano": 45702,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 97,
+        "md": 45873,
+        "scale": 111,
+        "hp": 7769,
+        "run": 496,
+        "ident": "SimpleChar:79CF9FB8"
+      }
+    ],
+    "150780/150779 QL82": [
+      {
+        "nano": 45694,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 82,
+        "md": 45873,
+        "scale": 109,
+        "hp": 5962,
+        "run": 425,
+        "ident": "SimpleChar:79CF9F8A"
+      }
+    ],
+    "150780/150779 QL85": [
+      {
+        "nano": 45686,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 85,
+        "md": 45873,
+        "scale": 110,
+        "hp": 6266,
+        "run": 442,
+        "ident": "SimpleChar:79CF9F80"
+      }
+    ],
+    "150780/150779 QL88": [
+      {
+        "nano": 45706,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 88,
+        "md": 45873,
+        "scale": 110,
+        "hp": 6570,
+        "run": 457,
+        "ident": "SimpleChar:79CF9F8E"
+      }
+    ],
+    "150781/150780 QL79": [
+      {
+        "nano": 45714,
+        "petName": "Engineer Guardbot player=False npc=True pet=False inPlay=True",
+        "level": 79,
+        "md": 45873,
+        "scale": 109,
+        "hp": 5658,
+        "run": 408,
+        "ident": "SimpleChar:79CF9F95"
+      }
+    ],
+    "150782/96215 QL76": [
+      {
+        "nano": 45682,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 76,
+        "md": 45873,
+        "scale": 109,
+        "hp": 5354,
+        "run": 394,
+        "ident": "SimpleChar:79CF9F87"
+      }
+    ],
+    "150783/150782 QL67": [
+      {
+        "nano": 45664,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 67,
+        "md": 45873,
+        "scale": 108,
+        "hp": 4442,
+        "run": 345,
+        "ident": "SimpleChar:79CF9F86"
+      }
+    ],
+    "150783/150782 QL70": [
+      {
+        "nano": 45732,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 70,
+        "md": 45873,
+        "scale": 108,
+        "hp": 4746,
+        "run": 359,
+        "ident": "SimpleChar:79CF9FB7"
+      }
+    ],
+    "150783/150782 QL73": [
+      {
+        "nano": 45699,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 73,
+        "md": 45873,
+        "scale": 108,
+        "hp": 5050,
+        "run": 377,
+        "ident": "SimpleChar:79CF9F88"
+      }
+    ],
+    "150784/150784 QL55": [
+      {
+        "nano": 45705,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 55,
+        "md": 45873,
+        "scale": 106,
+        "hp": 3226,
+        "run": 279,
+        "ident": "SimpleChar:79CF9F8C"
+      }
+    ],
+    "150784/150783 QL58": [
+      {
+        "nano": 45719,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 58,
+        "md": 45873,
+        "scale": 106,
+        "hp": 3530,
+        "run": 296,
+        "ident": "SimpleChar:79CF9F92"
+      }
+    ],
+    "150784/150783 QL61": [
+      {
+        "nano": 45725,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 61,
+        "md": 45873,
+        "scale": 107,
+        "hp": 3834,
+        "run": 311,
+        "ident": "SimpleChar:79CF9F94"
+      }
+    ],
+    "150784/150783 QL64": [
+      {
+        "nano": 45701,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 64,
+        "md": 45873,
+        "scale": 107,
+        "hp": 4138,
+        "run": 328,
+        "ident": "SimpleChar:79CF9F8F"
+      }
+    ],
+    "150785/150784 QL46": [
+      {
+        "nano": 45713,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 46,
+        "md": 45873,
+        "scale": 105,
+        "hp": 2423,
+        "run": 233,
+        "ident": "SimpleChar:79CF9FA9"
+      }
+    ],
+    "150785/150784 QL49": [
+      {
+        "nano": 45693,
+        "petName": "Engineer Gladiatorbot player=False npc=True pet=False inPlay=True",
+        "level": 49,
+        "md": 45873,
+        "scale": 105,
+        "hp": 2645,
+        "run": 248,
+        "ident": "SimpleChar:79CF9F96"
+      }
+    ],
+    "150786/150786 QL15": [
+      {
+        "nano": 45681,
+        "petName": "Engineer Automaton II player=False npc=True pet=False inPlay=True",
+        "level": 15,
+        "md": 17649,
+        "scale": 97,
+        "hp": 471,
+        "run": 77,
+        "ident": "SimpleChar:79CF9F98"
+      }
+    ],
+    "150787/150786 QL11": [
+      {
+        "nano": 45731,
+        "petName": "Engineer Automaton II player=False npc=True pet=False inPlay=True",
+        "level": 11,
+        "md": 17649,
+        "scale": 96,
+        "hp": 312,
+        "run": 57,
+        "ident": "SimpleChar:79CF9FA6"
+      }
+    ],
+    "150787/150786 QL13": [
+      {
+        "nano": 45698,
+        "petName": "Engineer Automaton II player=False npc=True pet=False inPlay=True",
+        "level": 13,
+        "md": 17649,
+        "scale": 96,
+        "hp": 392,
+        "run": 67,
+        "ident": "SimpleChar:79CF9F9B"
+      }
+    ],
+    "150788/150787 QL7": [
+      {
+        "nano": 45737,
+        "petName": "Engineer Automaton II",
+        "level": 7,
+        "md": 17649,
+        "scale": 94,
+        "hp": 192,
+        "run": 38,
+        "ident": "SimpleChar:79CF9FBD"
+      }
+    ],
+    "150788/150787 QL9": [
+      {
+        "nano": 45676,
+        "petName": "Engineer Automaton II player=False npc=True pet=False inPlay=True",
+        "level": 9,
+        "md": 17649,
+        "scale": 95,
+        "hp": 246,
+        "run": 47,
+        "ident": "SimpleChar:79CF9F9F"
+      }
+    ],
+    "150790/150790 QL5": [
+      {
+        "nano": 45718,
+        "petName": "Engineer Automaton I player=False npc=True pet=False inPlay=True",
+        "level": 5,
+        "md": 17649,
+        "scale": 93,
+        "hp": 138,
+        "run": 29,
+        "ident": "SimpleChar:79CF9FA5"
+      }
+    ],
+    "150791/150791 QL40": [
+      {
+        "nano": 45697,
+        "petName": "Engineer Android II player=False npc=True pet=False inPlay=True",
+        "level": 40,
+        "md": 17649,
+        "scale": 103,
+        "hp": 1979,
+        "run": 203,
+        "ident": "SimpleChar:79CF9FB5"
+      }
+    ],
+    "150791/96228 QL43": [
+      {
+        "nano": 45680,
+        "petName": "Engineer Android II player=False npc=True pet=False inPlay=True",
+        "level": 43,
+        "md": 17649,
+        "scale": 104,
+        "hp": 2201,
+        "run": 219,
+        "ident": "SimpleChar:79CF9F9A"
+      }
+    ],
+    "150792/150791 QL37": [
+      {
+        "nano": 45730,
+        "petName": "Engineer Android II player=False npc=True pet=False inPlay=True",
+        "level": 37,
+        "md": 17649,
+        "scale": 103,
+        "hp": 1757,
+        "run": 187,
+        "ident": "SimpleChar:79CF9FBE"
+      }
+    ],
+    "150793/150792 QL31": [
+      {
+        "nano": 45736,
+        "petName": "Engineer Android II player=False npc=True pet=False inPlay=True",
+        "level": 31,
+        "md": 17649,
+        "scale": 102,
+        "hp": 1313,
+        "run": 158,
+        "ident": "SimpleChar:79CF9FB2"
+      }
+    ],
+    "150793/150792 QL34": [
+      {
+        "nano": 45675,
+        "petName": "Engineer Android II player=False npc=True pet=False inPlay=True",
+        "level": 34,
+        "md": 17649,
+        "scale": 102,
+        "hp": 1535,
+        "run": 174,
+        "ident": "SimpleChar:79CF9F9E"
+      }
+    ],
+    "150795/150795 QL25": [
+      {
+        "nano": 45717,
+        "petName": "Engineer Android I player=False npc=True pet=False inPlay=True",
+        "level": 25,
+        "md": 17649,
+        "scale": 100,
+        "hp": 869,
+        "run": 128,
+        "ident": "SimpleChar:79CF9FA4"
+      }
+    ],
+    "150795/150794 QL28": [
+      {
+        "nano": 45723,
+        "petName": "Engineer Android I player=False npc=True pet=False inPlay=True",
+        "level": 28,
+        "md": 17649,
+        "scale": 101,
+        "hp": 1091,
+        "run": 143,
+        "ident": "SimpleChar:79CF9FB1"
+      }
+    ],
+    "150796/150795 QL23": [
+      {
+        "nano": 45703,
+        "petName": "Engineer Android I",
+        "level": 23,
+        "md": 17649,
+        "scale": 100,
+        "hp": 790,
+        "run": 119,
+        "ident": "SimpleChar:79CF9FAE"
+      }
+    ],
+    "150797/150796 QL17": [
+      {
+        "nano": 45712,
+        "petName": "Engineer Android I player=False npc=True pet=False inPlay=True",
+        "level": 17,
+        "md": 17649,
+        "scale": 98,
+        "hp": 551,
+        "run": 87,
+        "ident": "SimpleChar:79CF9FA8"
+      }
+    ],
+    "150797/150796 QL19": [
+      {
+        "nano": 45691,
+        "petName": "Engineer Android I player=False npc=True pet=False inPlay=True",
+        "level": 19,
+        "md": 17649,
+        "scale": 98,
+        "hp": 631,
+        "run": 97,
+        "ident": "SimpleChar:79CF9FAC"
+      }
+    ]
+  }
+}

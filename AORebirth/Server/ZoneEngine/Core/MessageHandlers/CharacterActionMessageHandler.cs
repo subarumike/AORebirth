@@ -793,6 +793,8 @@ namespace ZoneEngine.Core.MessageHandlers
             if (duration > 0)
             {
                 // Perk pet buffs (Channel Rage) must land on the pet even if NCU gate is tight.
+                // Vehicle/morph nanos must also stay in ActiveNanos — otherwise NCU cancel
+                // only removes the client Buff and leaves MonsterData/IsVehicle stuck.
                 if (!ActiveNanoRuntimeService.Default.ApplyActiveNano(
                     recipient,
                     unknown1,
@@ -800,9 +802,23 @@ namespace ZoneEngine.Core.MessageHandlers
                     target,
                     strain))
                 {
-                    // Still notify client so NCU icon/duration appear for perk buffs.
-                    this.Send(character, this.ConstructSetNanoDuration(character, target, unknown1, duration));
-                    return;
+                    if (AdventurerMorphFlightRuntime.IsMorphFlightNano(unknown1)
+                        || AdventurerMorphFlightRuntime.IsVehicleMorphNano(unknown1))
+                    {
+                        ActiveNanoRuntimeService.Default.ApplyActiveNano(
+                            recipient,
+                            unknown1,
+                            duration,
+                            target,
+                            strain,
+                            true);
+                    }
+                    else
+                    {
+                        // Still notify client so NCU icon/duration appear for perk buffs.
+                        this.Send(character, this.ConstructSetNanoDuration(character, target, unknown1, duration));
+                        return;
+                    }
                 }
 
                 if (character.Controller != null && character.Controller.Client != null)

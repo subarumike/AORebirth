@@ -1,0 +1,13 @@
+21:2026-08-08T11:34:06.6928270Z [OUT-N3] #2 type=CharacterAction identity=(SimpleChar:502C2E0F)
+22:2026-08-08T11:34:06.6928270Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=53019 Parameter2=154914 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+23:2026-08-08T11:34:06.8857090Z [IN-N3] #8 type=CastNanoSpell identity=(SimpleChar:502C2E0F)
+60:2026-08-08T11:34:23.3835520Z [SMOKE] IN CharacterAction identity=(SimpleChar:502C2E0F) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=154914 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+61:2026-08-08T11:34:23.3835520Z [IN-N3] #26 type=CharacterAction identity=(SimpleChar:502C2E0F)
+62:2026-08-08T11:34:23.3835520Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=154914 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+63:2026-08-08T11:34:23.3835520Z [IN-N3] #27 type=Feedback identity=(SimpleChar:502C2E0F)
+64:2026-08-08T11:34:23.3835520Z [IN-N3-DETAIL] FeedbackMessage { Unknown1=1107296280 CategoryId=110 MessageId=124550313 N3MessageType=Feedback Identity=(SimpleChar:502C2E0F) Unknown=1 PacketType=N3Message }
+75:2026-08-08T11:34:23.3885492Z [OUT-N3] #3 type=CharacterAction identity=(SimpleChar:502C2E0F)
+76:2026-08-08T11:34:23.3885492Z [OUT-N3-DETAIL] CharacterActionMessage { Action=128 Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+77:2026-08-08T11:34:23.3985441Z [OUT-N3] #4 type=CharacterAction identity=(SimpleChar:502C2E0F)
+78:2026-08-08T11:34:23.3985441Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:35FE2868) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:502C2E0F) Unknown=0 PacketType=N3Message }
+80:2026-08-08T11:34:23.5434537Z [IN-N3] #34 type=TeamMemberInfo identity=(SimpleChar:502C2E0F)

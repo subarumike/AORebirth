@@ -43,10 +43,13 @@ namespace ZoneEngine.Core
             new Dictionary<int, string>
             {
                 { 125738, "MT01" },
+                { 125742, "MT05" },
                 { 125743, "MT04" },
                 { 125744, "MT03" },
                 { 125745, "MT02" },
                 { 125746, "BSLX" },
+                { 150309, "UMUL" },
+                { 156128, "DISP" },
                 { 43324, "PT50" },
                 { 46350, "A020" },
                 { 46353, "A020" },
@@ -84,6 +87,7 @@ namespace ZoneEngine.Core
                 { 43723, "PT52" },
                 { 43734, "PT52" },
                 { 43735, "PT53" },
+                { 43756, "PT53" },
                 { 43732, "PT54" },
                 { 43737, "PT56" },
             };
@@ -92,10 +96,13 @@ namespace ZoneEngine.Core
             new Dictionary<int, int>
             {
                 { 125738, 14 },
+                { 125742, 99 },
                 { 125743, 77 },
                 { 125744, 55 },
                 { 125745, 33 },
                 { 125746, 192 },
+                { 150309, 199 },
+                { 156128, 5 },
                 { 43324, 10 },
                 { 46350, 111 },
                 { 46353, 84 },
@@ -133,6 +140,7 @@ namespace ZoneEngine.Core
                 { 43723, 52 },
                 { 43734, 62 },
                 { 43735, 95 },
+                { 43756, 95 },
                 { 43732, 137 },
                 { 43737, 200 },
             };
@@ -229,11 +237,17 @@ namespace ZoneEngine.Core
 
         public static bool IsCatalogSummonNano(int nanoId)
         {
-            return PreferredPetHashByNano.ContainsKey(nanoId);
+            return PreferredPetHashByNano.ContainsKey(nanoId)
+                || PetEngineerSummonCatalog.IsEngineerSummonNano(nanoId);
         }
 
         public static bool TryResolveShellSummonParams(int nanoId, out PetSummonParams summonParams)
         {
+            if (PetEngineerSummonCatalog.TryResolveShellSummonParams(nanoId, out summonParams))
+            {
+                return true;
+            }
+
             summonParams = null;
             string preferredHash;
             if (!PreferredPetHashByNano.TryGetValue(nanoId, out preferredHash))
@@ -429,6 +443,21 @@ namespace ZoneEngine.Core
                 return true;
             }
 
+            if ((Profession)profession == Profession.Engineer)
+            {
+                if (!PetEngineerSummonCatalog.TryResolveShellNano(
+                        shellItemLowId,
+                        shellItemHighId,
+                        shellQuality,
+                        out nanoId)
+                    || !TryResolveShellSummonParams(nanoId, out summonParams))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             foreach (UploadedNano uploadedNano in character.UploadedNanos)
             {
                 nanoId = uploadedNano.NanoId;
@@ -495,6 +524,12 @@ namespace ZoneEngine.Core
                 return false;
             }
 
+            // Capture 20260808-131854: Engineer nanos SpawnItem shells only (no SummonPet candidates).
+            if (PetEngineerSummonCatalog.TryResolveShellSummonParams(nanoId, out summonParams))
+            {
+                return true;
+            }
+
             string preferredHash;
             if (PreferredPetHashByNano.TryGetValue(nanoId, out preferredHash))
             {
@@ -553,7 +588,12 @@ namespace ZoneEngine.Core
         public static string GetPreferredPetHash(int nanoId)
         {
             string preferredHash;
-            return PreferredPetHashByNano.TryGetValue(nanoId, out preferredHash)
+            if (PreferredPetHashByNano.TryGetValue(nanoId, out preferredHash))
+            {
+                return preferredHash;
+            }
+
+            return PetEngineerSummonCatalog.TryGetPreferredPetHash(nanoId, out preferredHash)
                 ? preferredHash
                 : null;
         }
@@ -570,18 +610,30 @@ namespace ZoneEngine.Core
             new Dictionary<int, string>
             {
                 { 125738, "Calling of Medinos" },
+                { 125742, "Calling of Restite" },
                 { 125743, "Calling of Sanoo" },
                 { 125744, "Calling of Valentyia" },
                 { 125745, "Calling of Salvinous" },
                 { 125746, "Calling of Belamorte" },
+                { 150309, "Summoning of Tumulten" },
+                { 156128, "Distracting Sphere" },
+                { 43756, "Wrath Incarnation" },
             };
 
         private static int ResolvePreferredPetType(int nanoId)
         {
             int petTypeId;
-            return PreferredPetTypeByNano.TryGetValue(nanoId, out petTypeId)
-                ? petTypeId
-                : 1;
+            if (PreferredPetTypeByNano.TryGetValue(nanoId, out petTypeId))
+            {
+                return petTypeId;
+            }
+
+            if (PetEngineerSummonCatalog.IsEngineerSummonNano(nanoId))
+            {
+                return PetEngineerSummonCatalog.ResolvePreferredPetType(nanoId);
+            }
+
+            return 1;
         }
 
         private static List<PetSummonParams> CollectCandidates(int nanoId, NanoFormula nano)
@@ -684,6 +736,7 @@ namespace ZoneEngine.Core
                 || string.Equals(petHash, "MT02", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(petHash, "MT03", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(petHash, "MT04", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "MT05", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(petHash, "BSLX", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -719,16 +772,22 @@ namespace ZoneEngine.Core
             switch (petHash.ToUpperInvariant())
             {
                 case "RHEF":
+                case "SAFE":
                     return 6;
                 case "MNKW":
+                case "DSEJ":
                     return 5;
                 case "QRMT":
+                case "GWAD":
                     return 4;
                 case "DKEL":
+                case "MBYQ":
                     return 3;
                 case "JBOB":
+                case "KCIO":
                     return 2;
                 case "LYNX":
+                case "TRXY":
                     return 1;
                 default:
                     return 0;

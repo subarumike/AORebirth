@@ -22,6 +22,15 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<string, string> PrefixFallbacks =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
+                // Capture 20260808-131854: Engineer shell pets PT10-PT20 share Automaton base row.
+                { "PT10", "A120" },
+                { "PT11", "A120" },
+                { "PT12", "A120" },
+                { "PT13", "A120" },
+                { "PT14", "A120" },
+                { "PT15", "A120" },
+                { "PT19", "A120" },
+                { "PT20", "A120" },
                 { "PT50", "A120" },
                 { "PT51", "A020" },
                 { "PT52", "A120" },
@@ -41,6 +50,13 @@ namespace ZoneEngine.Core
                 { "QRMT", "MT02" },
                 { "MNKW", "MT02" },
                 { "RHEF", "MT02" },
+                // Capture 20260808-mp-pets: Restite (MT05) Soothing Spirits spawn hashes.
+                { "TRXY", "MT05" },
+                { "KCIO", "MT05" },
+                { "MBYQ", "MT05" },
+                { "GWAD", "MT05" },
+                { "DSEJ", "MT05" },
+                { "SAFE", "MT05" },
             };
 
         public static string Resolve(string petHash)
