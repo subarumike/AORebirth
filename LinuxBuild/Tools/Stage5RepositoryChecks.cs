@@ -298,6 +298,7 @@ namespace AORebirth.LinuxBuild.Contracts
                 "Environment=AO_REBIRTH_REQUIRED_SQL_TYPE=MySql",
                 "EnvironmentFile=/etc/ao-rebirth/chatengine/chatengine.env",
                 "ExecStartPre=/opt/ao-rebirth/chatengine/current/ChatEngine --validate-startup",
+                "ExecStartPre=/opt/ao-rebirth/chatengine/current/ChatEngine --validate-database",
                 "ExecStart=/opt/ao-rebirth/chatengine/current/ChatEngine --headless",
                 "KillSignal=SIGTERM",
                 "ProtectSystem=strict",

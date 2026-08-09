@@ -34,6 +34,7 @@ namespace ChatEngine
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.IO;
     using System.Net;
@@ -1104,6 +1105,136 @@ namespace ChatEngine
             }
         }
 
+        private static int ValidateDatabase()
+        {
+            string[] requiredTables =
+            {
+                "characterstimers",
+                "characters",
+                "charactersactivenanos",
+                "charactersmeshs",
+                "charactersuploadednanos",
+                "charactersperks",
+                "instanceditems",
+                "itemnames",
+                "items",
+                "login",
+                "missionaccountflags",
+                "missionflags",
+                "missionobjectiveobservations",
+                "missionobjectiveprogress",
+                "missionrewardledger",
+                "missionstates",
+                "mobdroptable",
+                "mobspawns",
+                "mobspawnsactivenanos",
+                "mobspawnsinventory",
+                "mobspawnsmeshs",
+                "mobspawnsuploadednanos",
+                "mobspawns_stats",
+                "mobtemplate",
+                "organizations",
+                "proxydestinations",
+                "receivedmessages",
+                "shopinventorytemplates",
+                "staticdynels",
+                "stats",
+                "teleports",
+                "tradeskill",
+                "vendors",
+                "vendortemplate"
+            };
+
+            try
+            {
+                Utility.Config.Config configuration = LoadStrictConfiguration();
+                if (!string.Equals(configuration.SQLType, "MySql", StringComparison.Ordinal))
+                {
+                    throw new InvalidDataException("The Linux database readiness gate requires MySql.");
+                }
+
+                using (IDbConnection connection = Connector.GetConnection())
+                {
+                    if (connection.State != ConnectionState.Open)
+                    {
+                        throw new InvalidOperationException("The database connection did not open.");
+                    }
+
+                    string activeDatabase;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT DATABASE()";
+                        activeDatabase = Convert.ToString(command.ExecuteScalar());
+                    }
+
+                    if (string.IsNullOrWhiteSpace(activeDatabase))
+                    {
+                        throw new InvalidDataException("The connection did not select a database.");
+                    }
+
+                    var actualTables = new HashSet<string>(StringComparer.Ordinal);
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT table_name FROM information_schema.tables "
+                            + "WHERE table_schema=DATABASE() AND table_type='BASE TABLE'";
+                        using (IDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                actualTables.Add(Convert.ToString(reader.GetValue(0)));
+                            }
+                        }
+                    }
+
+                    foreach (string tableName in requiredTables)
+                    {
+                        if (!actualTables.Contains(tableName))
+                        {
+                            throw new InvalidDataException("Required database table is missing: " + tableName);
+                        }
+
+                        using (IDbCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = "SELECT 1 FROM `" + tableName + "` LIMIT 0";
+                            using (IDataReader reader = command.ExecuteReader())
+                            {
+                            }
+                        }
+                    }
+
+                    long onlineColumnCount;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM information_schema.columns "
+                            + "WHERE table_schema=DATABASE() AND table_name='characters' "
+                            + "AND column_name='Online'";
+                        onlineColumnCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    if (onlineColumnCount != 1)
+                    {
+                        throw new InvalidDataException("characters.Online schema contract mismatch.");
+                    }
+
+                    Console.WriteLine(
+                        "CHATENGINE_DATABASE_OK provider=MySql requiredTables="
+                        + requiredTables.Length
+                        + " visibleTables="
+                        + actualTables.Count
+                        + " listeners=0");
+                }
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("CHATENGINE_DATABASE_FAILED error=" + e.Message);
+                return 1;
+            }
+        }
+
         private static int ValidateLifecycle(string[] args)
         {
             bool headlessLoggingConfigured = false;
@@ -1156,6 +1287,11 @@ namespace ChatEngine
             if (HasEitherArgument(args, "/validate-startup", "--validate-startup"))
             {
                 return ValidateStartup();
+            }
+
+            if (HasEitherArgument(args, "/validate-database", "--validate-database"))
+            {
+                return ValidateDatabase();
             }
 
             if (HasEitherArgument(args, "/validate-lifecycle", "--validate-lifecycle"))

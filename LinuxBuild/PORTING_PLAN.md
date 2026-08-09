@@ -20,7 +20,9 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 | 3 | Database and Stats | Modern Dapper/MySqlConnector, replace `System.Data.Linq.Binary`, keep schemas unchanged | Read/write/query parity against a disposable test database |
 | 4 | Communication and Core dependency audit | Adapt Communication's inert MemBus boundary without changing ISCom ordering; identify the smallest Core slice needed by Chat | ISCom framing/FIFO and dynamic-message resolution parity; guarded full-Core exclusion |
 | 5 | ChatEngine | Remove NBug WinForms startup, extract the three required authentication sources, omit the unused PlayfieldLoader cache, deploy `Config.xml`, fix Linux paths, add service shutdown | Chat contracts/offline startup/publish parity and clean shutdown on Ubuntu |
-| 6 | Ubuntu service package | `linux-x64` publish, unprivileged service account, systemd unit, logs, backups and firewall | Restart/reboot recovery and sustained multi-player soak test |
+| 6 | Ubuntu ChatEngine database acceptance | Isolated MySQL 8.4 target, governed schema bootstrap, restricted runtime account, live DB preflight and bounded login harness | Exact 34-table import, production Connector/DAO/encrypted-login parity, zero fixture residue, disabled systemd readiness and shutdown pass |
+| 7 | LoginEngine | Audit its exact dependency closure, add a guarded SDK overlay, remove Windows-only startup dependencies, and reuse the strict config/database/service patterns | Windows/Linux contracts plus listener-free and loopback Ubuntu lifecycle pass |
+| 8 | ZoneEngine and persistent stack | Port the full Core/PlayfieldLoader/data closure, coordinate multi-engine readiness and bounded shutdown | Restart/reboot recovery and sustained multi-player soak test |
 
 Current status: Stages 0 through 4 pass their Windows-hosted compile, contract,
 offline runtime, publish-artifact, and compatibility gates. Stage 3 preserves
@@ -34,9 +36,12 @@ and coordinated shutdown. PlayfieldLoader and full Core are deferred, while the
 exact three Core authentication sources are kept in a contained Linux assembly.
 Strict Stage 5 contract and offline artifact gates now pass locally; native
 Ubuntu 24.04.4 x86_64 apphost, listener-free lifecycle, systemd readiness, both
-loopback listeners, and SIGTERM shutdown also pass. Authorized disposable-MySQL
-CRUD parity is still required before the full cross-platform exit gates are
-complete.
+loopback listeners, and SIGTERM shutdown also pass. Stage 6 now passes an exact
+governed 34-table import into a uniquely named/labeled MySQL 8.4 target, a
+restricted runtime account, production Connector/DAO/password/encrypted-login
+behavior, negative authentication, zero-residue cleanup, and the service's new
+read-only live database `ExecStartPre`. The service remains disabled and all
+player/ISCom/database listeners remain loopback-only.
 
 ## Rules for each stage
 
@@ -52,26 +57,24 @@ complete.
 
 ## Remaining ChatEngine acceptance work
 
-- Provision or authorize an isolated disposable MySQL target and verify
-  connection/schema readiness before any player authentication test.
-- Native listener-free startup/lifecycle and systemd readiness/SIGTERM now pass;
-  the full contract tools remain reproducibly covered by the Windows-hosted
-  .NET 10 lane.
-- Live Database read/write/query parity still requires an authorized disposable
-  MySQL schema; offline gates intentionally never open a connection.
+- Native listener-free startup/lifecycle, live database preflight, bounded
+  authentication, systemd readiness, and SIGTERM now pass; the full contract
+  tools remain reproducibly covered by the Windows-hosted .NET 10 lane.
 - Legacy per-channel chat logging remains disabled because its writer is not
   concurrency-safe; journald server logging is the supported first deployment path.
 - Player disconnect persists offline state synchronously, so shutdown can still
   exceed the 45-second systemd limit under heavy load or a slow database.
-- Full Core/PlayfieldLoader work remains required for LoginEngine and ZoneEngine,
-  including active MemBus, MEF discovery, MathNet replacement, and data assets.
+- Stage 7 begins by measuring LoginEngine's exact closure; do not assume it
+  needs the full Core/PlayfieldLoader graph. Full Core/PlayfieldLoader, active
+  MemBus, MEF discovery, MathNet replacement, and data assets remain Stage 8
+  ZoneEngine work unless the Stage 7 source audit proves a narrower dependency.
 
 The Stage 1 Linux lane now replaces Utility's Windows performance counters and
 uses canonical `Config.xml` casing without changing the Windows code path.
 
-## Ubuntu test input still needed
+## Ubuntu test boundary
 
-Before Stage 6 validation, provide the VPS host, SSH port, SSH user, and the
-local path to the SSH key (or confirm another authentication method). Database
-credentials should be placed directly on the server as protected environment
-or configuration files and must not be committed or pasted into build logs.
+The Ubuntu 24.04 test VPS and SSH key are configured outside the repository.
+Database credentials remain root-owned on the VPS and are never committed or
+printed. The disposable database uses a loopback-only host binding and
+`--restart=no`; ChatEngine remains disabled until a later player-test approval.

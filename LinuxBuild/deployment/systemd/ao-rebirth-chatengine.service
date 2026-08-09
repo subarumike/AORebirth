@@ -12,6 +12,7 @@ WorkingDirectory=/opt/ao-rebirth/chatengine/current
 Environment=AO_REBIRTH_REQUIRED_SQL_TYPE=MySql
 EnvironmentFile=/etc/ao-rebirth/chatengine/chatengine.env
 ExecStartPre=/opt/ao-rebirth/chatengine/current/ChatEngine --validate-startup
+ExecStartPre=/opt/ao-rebirth/chatengine/current/ChatEngine --validate-database
 ExecStart=/opt/ao-rebirth/chatengine/current/ChatEngine --headless
 Restart=on-failure
 RestartSec=5s

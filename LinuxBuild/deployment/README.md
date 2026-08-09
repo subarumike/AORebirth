@@ -41,7 +41,7 @@ sudo groupadd --system aorebirth
 sudo useradd --system --gid aorebirth --home-dir /nonexistent \
   --shell /usr/sbin/nologin aorebirth
 
-AO_RELEASE_PATH=/opt/ao-rebirth/chatengine/releases/stage5-test
+AO_RELEASE_PATH=/opt/ao-rebirth/chatengine/releases/stage6-test-001
 sudo install -d -o root -g root -m 0755 /opt/ao-rebirth/chatengine/releases
 sudo install -d -o root -g root -m 0755 "$AO_RELEASE_PATH"
 sudo cp -a /tmp/ao-rebirth-chatengine-publish/. "$AO_RELEASE_PATH"/
@@ -72,11 +72,59 @@ sudoedit /etc/ao-rebirth/chatengine/chatengine.env
 These are first-install commands: `groupadd`, `useradd`, and the `current`
 symlink deliberately fail instead of replacing an existing installation.
 
+For an update, stop the still-disabled service, install into a new immutable
+versioned release directory, remember the prior target, and replace `current`
+atomically. Never copy new files over an existing release:
+
+```sh
+sudo systemctl stop ao-rebirth-chatengine.service
+AO_PREVIOUS_RELEASE="$(readlink -f -- /opt/ao-rebirth/chatengine/current)"
+AO_RELEASE_PATH=/opt/ao-rebirth/chatengine/releases/stage6-test-002
+AO_NEXT_LINK=/opt/ao-rebirth/chatengine/.current-stage6-next
+AO_ROLLBACK_LINK=/opt/ao-rebirth/chatengine/.current-stage6-rollback
+test -d "$AO_PREVIOUS_RELEASE"
+test ! -e "$AO_RELEASE_PATH"
+test ! -e "$AO_NEXT_LINK"
+sudo install -d -o root -g root -m 0755 "$AO_RELEASE_PATH"
+sudo cp -a /tmp/ao-rebirth-chatengine-publish/. "$AO_RELEASE_PATH"/
+sudo chown -R root:root "$AO_RELEASE_PATH"
+sudo find "$AO_RELEASE_PATH" -type d -exec chmod 0755 {} +
+sudo find "$AO_RELEASE_PATH" -type f -exec chmod 0644 {} +
+sudo chmod 0755 "$AO_RELEASE_PATH/ChatEngine"
+sudo ln -sT "$AO_RELEASE_PATH" "$AO_NEXT_LINK"
+sudo mv -Tf "$AO_NEXT_LINK" /opt/ao-rebirth/chatengine/current
+AO_UNIT_PATH=/etc/systemd/system/ao-rebirth-chatengine.service
+AO_UNIT_BACKUP=/etc/systemd/system/ao-rebirth-chatengine.service.stage6-test-002-previous
+test -f "$AO_UNIT_PATH"
+test ! -e "$AO_UNIT_BACKUP"
+sudo cp --preserve=mode,ownership,timestamps "$AO_UNIT_PATH" "$AO_UNIT_BACKUP"
+sudo install -o root -g root -m 0644 \
+  /tmp/ao-rebirth-chatengine.service "$AO_UNIT_PATH"
+sudo systemctl daemon-reload
+```
+
+If validation fails, roll back both artifacts while the service remains
+inactive:
+
+```sh
+test ! -e "$AO_ROLLBACK_LINK"
+sudo ln -sT "$AO_PREVIOUS_RELEASE" "$AO_ROLLBACK_LINK"
+sudo mv -Tf "$AO_ROLLBACK_LINK" /opt/ao-rebirth/chatengine/current
+sudo install -o root -g root -m 0644 "$AO_UNIT_BACKUP" "$AO_UNIT_PATH"
+sudo systemctl daemon-reload
+```
+
+Change `current` or the unit only while the service is inactive; the unit
+resolves `current` separately for its preflight and runtime commands.
+
 Copy `chatengine.env.example` on the VPS, set its mode to `0600`, and add the
 real `AO_REBIRTH_MYSQL_CONNECTION` value there. Do not put the database secret
 in Git, `Config.xml`, command-line arguments, or chat output. The service's
-`ExecStartPre` validates configuration and constructs a closed provider
-connection object; it never calls `Open`.
+first `ExecStartPre` validates configuration and constructs a closed provider
+connection object. Its second `ExecStartPre` opens the configured database
+read-only, requires all 34 governed ChatEngine tables plus
+`characters.Online`, and verifies that the runtime account can read every
+required table before either listener starts.
 
 Keep `/etc/ao-rebirth` and `/etc/ao-rebirth/chatengine` as `root:aorebirth`
 mode `0750`: exact-case validation enumerates the latter, so the service needs
@@ -108,6 +156,11 @@ sudo systemd-run --quiet --wait --pipe --collect \
   --working-directory=/opt/ao-rebirth/chatengine/current \
   --property=EnvironmentFile=/etc/ao-rebirth/chatengine/chatengine.env \
   /opt/ao-rebirth/chatengine/current/ChatEngine --validate-startup
+sudo systemd-run --quiet --wait --pipe --collect \
+  --uid=aorebirth \
+  --working-directory=/opt/ao-rebirth/chatengine/current \
+  --property=EnvironmentFile=/etc/ao-rebirth/chatengine/chatengine.env \
+  /opt/ao-rebirth/chatengine/current/ChatEngine --validate-database
 ```
 
 Then prove real Linux SIGTERM delivery through the listener-free lifecycle mode:
@@ -130,7 +183,151 @@ The final grep must report `status=clean`. This mode opens no database or
 listener. Cross-RID packages are structure-validated on the build host; the
 target apphost must still run these modes on matching Ubuntu architecture.
 
-Then reload systemd and start the service:
+## Isolated Stage 6 MySQL acceptance
+
+The checked-in `mysql-stage6` scripts provision a deliberately disposable
+MySQL 8.4 target without touching an existing AORebirth, website, or mail
+database. The exact boundary is:
+
+- container `aorebirth-chatengine-mysql-stage6`;
+- database `aorebirth_chatengine_stage6`;
+- runtime user `aorebirth_stage6`;
+- dedicated network and volume with the Stage 6 disposable label;
+- host binding `127.0.0.1:33067` only;
+- `--restart=no`, so it is not enabled across a VPS reboot;
+- root-owned credentials below `/etc/ao-rebirth/chatengine/stage6`, mode `0600`.
+
+Upload the four scripts in `LinuxBuild/deployment/mysql-stage6` to a unique
+root-only temporary directory. From Windows, with `YOUR_VPS` replaced by the
+configured host:
+
+```bat
+ssh.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 root@YOUR_VPS "test ! -e /root/aorebirth-stage6-mysql-001 && install -d -o root -g root -m 0700 /root/aorebirth-stage6-mysql-001"
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\mysql-stage6\provision-disposable-mysql.sh LinuxBuild\deployment\mysql-stage6\apply-governed-schema.sh LinuxBuild\deployment\mysql-stage6\remove-disposable-mysql.sh LinuxBuild\deployment\mysql-stage6\validate-disabled-service.sh root@YOUR_VPS:/root/aorebirth-stage6-mysql-001/
+```
+
+On Ubuntu, pull the exact immutable MySQL 8.4 image, lock the script modes,
+provision the empty container, load the governed publish inventory, and run the
+live database preflight without opening a listener:
+
+```sh
+sudo docker pull mysql@sha256:c592c15aaf4a1961e15d82eb31ea5987dda862d1c4b1e93424438c0e91dc1f8d
+sudo chmod 0700 \
+  /root/aorebirth-stage6-mysql-001/provision-disposable-mysql.sh \
+  /root/aorebirth-stage6-mysql-001/apply-governed-schema.sh \
+  /root/aorebirth-stage6-mysql-001/remove-disposable-mysql.sh \
+  /root/aorebirth-stage6-mysql-001/validate-disabled-service.sh
+sudo bash /root/aorebirth-stage6-mysql-001/provision-disposable-mysql.sh
+sudo bash /root/aorebirth-stage6-mysql-001/apply-governed-schema.sh \
+  /opt/ao-rebirth/chatengine/current/SqlTables
+sudo systemd-run --quiet --wait --pipe --collect \
+  --uid=aorebirth \
+  --working-directory=/opt/ao-rebirth/chatengine/current \
+  --property=EnvironmentFile=/etc/ao-rebirth/chatengine/stage6/chatengine.env \
+  /opt/ao-rebirth/chatengine/current/ChatEngine --validate-database
+```
+
+The schema loader refuses an existing table, missing/extra/case-mismatched SQL
+file, wrong container label/network/database, or non-root credential mode. It
+does not use wildcards or `mysql --force`. After import it verifies the exact
+34-table set, fresh mutable-table state, and `characters.Online`, then reduces
+the application account to `SELECT`, `INSERT`, `UPDATE`, and `DELETE` on only
+the disposable database.
+
+Build the listener-free integration harness locally with:
+
+```bat
+LinuxBuild\verify-stage6-mysql.cmd
+```
+
+Publish it self-contained for the VPS architecture from the repository root:
+
+```bat
+set STAGE6_TOOL_VERSION=stage6-tool-001
+if exist LinuxBuild\artifacts\stage6-mysql\%STAGE6_TOOL_VERSION% exit /b 1
+dotnet restore LinuxBuild\Tools\Stage6MySqlIntegrationTests\Stage6MySqlIntegrationTests.csproj --runtime linux-x64
+dotnet publish LinuxBuild\Tools\Stage6MySqlIntegrationTests\Stage6MySqlIntegrationTests.csproj --configuration Release --runtime linux-x64 --self-contained true --no-restore --output LinuxBuild\artifacts\stage6-mysql\%STAGE6_TOOL_VERSION%
+ssh.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 root@YOUR_VPS "test ! -e /tmp/%STAGE6_TOOL_VERSION%"
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 -r LinuxBuild\artifacts\stage6-mysql\%STAGE6_TOOL_VERSION% root@YOUR_VPS:/tmp/%STAGE6_TOOL_VERSION%
+```
+
+Then make the upload root-controlled but executable by the service account and
+run only the exact disposable mode through the root-read environment file:
+
+```sh
+STAGE6_TOOL_PATH=/tmp/stage6-tool-001
+sudo chown -R root:aorebirth "$STAGE6_TOOL_PATH"
+sudo chmod 0750 "$STAGE6_TOOL_PATH"
+sudo find "$STAGE6_TOOL_PATH" -type f -exec chmod 0640 {} +
+sudo chmod 0750 "$STAGE6_TOOL_PATH/Stage6MySqlIntegrationTests"
+sudo systemd-run --quiet --wait --pipe --collect \
+  --uid=aorebirth \
+  --working-directory="$STAGE6_TOOL_PATH" \
+  --property=EnvironmentFile=/etc/ao-rebirth/chatengine/stage6/chatengine.env \
+  "$STAGE6_TOOL_PATH/Stage6MySqlIntegrationTests" --run-disposable
+```
+
+The live gate
+uses the production configuration, connector, DAOs, password hashing, and
+encrypted login-key path. It commits one uniquely named login/character pair
+so the production DAOs can see it, exercises positive and negative login and
+ownership cases, deletes character then login in `finally`, and requires zero
+fixture residue before passing. It never opens a listener or prints a secret.
+
+After installing a package that includes `--validate-database`, prove the
+disabled systemd unit end to end. The validator adds a root-owned runtime
+systemd drop-in below `/run`, removes it on exit, and never replaces the normal
+environment file:
+
+```sh
+sudo bash /root/aorebirth-stage6-mysql-001/validate-disabled-service.sh
+```
+
+This transiently starts the still-disabled unit, requires both configuration
+and live database `ExecStartPre` gates, waits for `Type=notify`, proves both
+listeners are loopback-only, delivers SIGTERM, requires a clean service result,
+and removes its runtime drop-in even on failure. The normal
+`/etc/ao-rebirth/chatengine/chatengine.env` is never replaced.
+If the validator is killed untrappably, its drop-in forces the service to stop
+after 90 seconds. Recover the exact disabled state with:
+
+```sh
+sudo bash /root/aorebirth-stage6-mysql-001/validate-disabled-service.sh \
+  --recover-stage6-validation
+```
+
+When the disposable target is no longer needed, remove only its exact labeled
+resources and root-only test credentials with:
+
+```sh
+sudo bash /root/aorebirth-stage6-mysql-001/remove-disposable-mysql.sh \
+  --confirm-remove-aorebirth-chatengine-stage6
+```
+
+The removal script fails closed on any name, label, or secret-directory
+mismatch and can safely resume after a partial prior removal. Provisioning
+attempts to roll back only exact resources created by a failed invocation.
+
+After removal and recovery have passed, delete only the two verified upload
+directories:
+
+```sh
+test "$(realpath -e -- /root/aorebirth-stage6-mysql-001)" = \
+  /root/aorebirth-stage6-mysql-001 || exit 1
+test "$(realpath -e -- /tmp/stage6-tool-001)" = /tmp/stage6-tool-001 \
+  || exit 1
+sudo rm -r -- /root/aorebirth-stage6-mysql-001 /tmp/stage6-tool-001
+```
+
+Stage 6 ends here. Keep the service disabled and inactive after the disposable
+database is removed.
+
+## Production activation (separate approval)
+
+Do not run this step against the disposable Stage 6 database. Activation
+requires separate approval, a persistent production database that passes both
+preflight modes, a populated root-only normal environment file, and confirmed
+TCP 7012 firewall policy. Only then reload systemd and enable the service:
 
 ```sh
 sudo systemctl daemon-reload
@@ -156,6 +353,6 @@ journalctl -u ao-rebirth-chatengine.service
   example environment bind it to `127.0.0.1`; never expose it publicly.
 - UDP is disabled.
 
-The first VPS pass must run `--validate-startup` and `--validate-lifecycle`
-before starting either listener. A live database open, schema check, public
-firewall change, or player test requires separate authorization and credentials.
+The first VPS pass must run `--validate-startup`, `--validate-database`, and
+`--validate-lifecycle` before production listener activation. A public firewall
+change or player test still requires separate authorization.

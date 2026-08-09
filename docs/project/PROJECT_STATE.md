@@ -40,8 +40,15 @@ completion matrices and dated evidence retain detailed provenance.
   authentication sources are isolated in `AORebirth.Chat.Authentication`.
   Native Ubuntu 24.04.4 x86_64 apphost, exact-case configuration, listener-free
   lifecycle, `Type=notify` readiness with both loopback listeners, and real
-  SIGTERM shutdown pass. The test release is installed disabled/inactive with
-  no database secret. Live disposable-MySQL parity is not yet complete.
+  SIGTERM shutdown pass. An isolated, uniquely named/labeled MySQL 8.4 target
+  now passes the exact governed 34-table import, restricted runtime-account
+  reads/CRUD, production Connector/DAO/password/encrypted-login behavior,
+  negative authentication cases, and zero-residue fixture cleanup. ChatEngine
+  has a read-only live database preflight in systemd before listener startup.
+  The updated test release and unit pass `Type=notify`, loopback-only listeners,
+  and clean SIGTERM against that database, then remain disabled/inactive with
+  the normal secret-free environment untouched. The website and mail database
+  containers, networks, and firewall were unchanged.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete

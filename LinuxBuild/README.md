@@ -77,6 +77,8 @@ reappears.
 
 Stage 3 preserves the Database and Stats public/runtime contracts while using
 net10-compatible Dapper, MySqlConnector, Npgsql, and Microsoft.Data.SqlClient.
+The deployable Linux lane pins MySqlConnector 2.6.1; the legacy net48 contract
+fixture remains on its historical dependency only for cross-runtime evidence.
 The Linux-only `System.Data.Linq.Binary` type matches the .NET Framework public
 API and byte/hash/serialization behavior. Run the legacy/Linux semantic gate
 and the database-free runtime/artifact gate after the approved Windows build:
@@ -120,7 +122,9 @@ default, requires the MySQL secret from the environment, detects listener bind
 failures, reports readiness to systemd only after both listeners pass, and shuts
 down both listeners through SIGTERM/SIGINT without `Environment.Exit`. Offline
 startup validation constructs only closed provider objects and listener-free
-topology:
+topology; the separate `--validate-database` mode opens the configured MySQL
+target read-only and requires the governed ChatEngine schema before systemd can
+start either listener:
 
 ```bat
 set AO_REBIRTH_CONFIG_PATH=%CD%\LinuxBuild\Projects\bin\ChatEngine.Linux\Release\net10.0\Config.xml
@@ -154,8 +158,9 @@ dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.
 This checkpoint includes a publishable ChatEngine build plus passing
 Windows/Linux contract, authentication, negative configuration, lifecycle, and
 publish-structure gates. Native Ubuntu 24.04.4 x86_64 apphost execution,
-listener-free validation, systemd readiness with both loopback listeners, and
-real SIGTERM delivery also pass. Live database parity, boot persistence, and
-player traffic remain pending.
+listener-free validation, an exact 34-table MySQL 8.4 import, production
+database/login-path parity, systemd live database readiness with both loopback
+listeners, and real SIGTERM delivery also pass. Boot persistence and player
+traffic remain pending.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).

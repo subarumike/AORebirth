@@ -577,7 +577,7 @@ internal static class Program
         {
             { "Dapper", "2.1.79" },
             { "Microsoft.Data.SqlClient", "7.0.2" },
-            { "MySqlConnector", "2.6.0" },
+            { "MySqlConnector", "2.6.1" },
             { "Npgsql", "10.0.3" }
         };
 
