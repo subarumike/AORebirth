@@ -50,8 +50,10 @@ namespace ZoneEngine
 
     using locales;
 
+#if !AOREBIRTH_LINUX
     using NBug;
     using NBug.Properties;
+#endif
 
     using NLog;
 
@@ -543,11 +545,13 @@ namespace ZoneEngine
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
 
+#if !AOREBIRTH_LINUX
                 // NBug initialization
                 SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.config");
                 Settings.WriteLogToDisk = true;
                 AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
                 TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+#endif
             }
             catch (Exception e)
             {

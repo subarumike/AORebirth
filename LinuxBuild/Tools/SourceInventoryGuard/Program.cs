@@ -22,7 +22,8 @@ internal static class Program
                     options.RepositoryRoot,
                     job.LegacyProjectPath,
                     trackedPaths,
-                    job.ContentOnly);
+                    job.ContentOnly,
+                    job.RuntimeCopyOnly);
 
                 if (options.Write)
                 {
@@ -66,7 +67,8 @@ internal static class Program
         string repositoryRoot,
         string legacyProjectPath,
         IReadOnlySet<string> trackedPaths,
-        bool contentOnly)
+        bool contentOnly,
+        bool runtimeCopyOnly)
     {
         XDocument legacyProject = XDocument.Load(legacyProjectPath, LoadOptions.PreserveWhitespace);
         XNamespace msbuild = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -78,11 +80,16 @@ internal static class Program
             .Where(
                 element => contentOnly
                     ? element.Name == msbuild + "Content"
-                    : element.Name == msbuild + "Compile" || element.Name == msbuild + "EmbeddedResource")
+                    : runtimeCopyOnly
+                        ? (element.Name == msbuild + "None" || element.Name == msbuild + "Compile")
+                            && HasPreserveNewestCopyMetadata(element)
+                        : element.Name == msbuild + "Compile" || element.Name == msbuild + "EmbeddedResource")
             .Select(
                 element => contentOnly
                     ? CreateContentProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths)
-                    : CreateProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths))
+                    : runtimeCopyOnly
+                        ? CreateRuntimeCopyProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths)
+                        : CreateProjectItem(element, legacyDirectory, repositoryRoot, trackedPaths))
             .ToArray();
 
         if (projectItems.Length == 0)
@@ -90,6 +97,8 @@ internal static class Program
             throw new InvalidOperationException(
                 contentOnly
                     ? "Legacy project contains no Content items."
+                    : runtimeCopyOnly
+                        ? "Legacy project contains no copied None or Compile items."
                     : "Legacy project contains no Compile or EmbeddedResource items.");
         }
 
@@ -137,22 +146,84 @@ internal static class Program
             repositoryRoot,
             trackedPaths);
         XElement[] legacyMetadata = legacyElement.Elements().ToArray();
-        if (legacyMetadata.Length != 1
-            || legacyMetadata[0].Name.LocalName != "CopyToOutputDirectory"
-            || legacyMetadata[0].Value != "PreserveNewest")
+        XElement? copyMetadata = legacyMetadata.SingleOrDefault(
+            element => element.Name.LocalName == "CopyToOutputDirectory");
+        XElement? linkMetadata = legacyMetadata.SingleOrDefault(
+            element => element.Name.LocalName == "Link");
+        bool hasOnlySupportedMetadata = legacyMetadata.All(
+            element => element.Name.LocalName == "CopyToOutputDirectory"
+                || element.Name.LocalName == "Link");
+        if (!hasOnlySupportedMetadata
+            || (copyMetadata != null && copyMetadata.Value != "PreserveNewest")
+            || legacyMetadata.Count(element => element.Name.LocalName == "CopyToOutputDirectory") > 1
+            || legacyMetadata.Count(element => element.Name.LocalName == "Link") > 1)
         {
             string include = legacyElement.Attribute("Include")?.Value ?? "<missing>";
             throw new InvalidOperationException(
-                $"Content item must have only CopyToOutputDirectory=PreserveNewest metadata: {include}");
+                $"Content item must have only optional Link and optional CopyToOutputDirectory=PreserveNewest metadata: {include}");
         }
 
         string legacyInclude = legacyElement.Attribute("Include")!.Value;
+        string link = linkMetadata?.Value ?? legacyInclude;
+        var contentItem = new XElement(
+            "Content",
+            new XAttribute("Include", validatedItem.Attribute("Include")!.Value),
+            new XAttribute("Link", link.Replace('\\', '/')));
+        if (copyMetadata != null)
+        {
+            contentItem.Add(
+                new XAttribute("CopyToOutputDirectory", "PreserveNewest"),
+                new XAttribute("CopyToPublishDirectory", "PreserveNewest"));
+        }
+
+        return contentItem;
+    }
+
+    private static XElement CreateRuntimeCopyProjectItem(
+        XElement legacyElement,
+        string legacyDirectory,
+        string repositoryRoot,
+        IReadOnlySet<string> trackedPaths)
+    {
+        XElement validatedItem = CreateProjectItem(
+            legacyElement,
+            legacyDirectory,
+            repositoryRoot,
+            trackedPaths);
+        XElement[] legacyMetadata = legacyElement.Elements().ToArray();
+        XElement? copyMetadata = legacyMetadata.SingleOrDefault(
+            element => element.Name.LocalName == "CopyToOutputDirectory");
+        XElement? linkMetadata = legacyMetadata.SingleOrDefault(
+            element => element.Name.LocalName == "Link");
+        bool hasOnlySupportedMetadata = legacyMetadata.All(
+            element => element.Name.LocalName == "CopyToOutputDirectory"
+                || element.Name.LocalName == "Link");
+        if (!hasOnlySupportedMetadata
+            || copyMetadata == null
+            || copyMetadata.Value != "PreserveNewest"
+            || legacyMetadata.Count(element => element.Name.LocalName == "CopyToOutputDirectory") != 1
+            || legacyMetadata.Count(element => element.Name.LocalName == "Link") > 1)
+        {
+            string include = legacyElement.Attribute("Include")?.Value ?? "<missing>";
+            throw new InvalidOperationException(
+                $"Runtime copy item must have only optional Link and CopyToOutputDirectory=PreserveNewest metadata: {include}");
+        }
+
+        string legacyInclude = legacyElement.Attribute("Include")!.Value;
+        string link = linkMetadata?.Value ?? legacyInclude;
         return new XElement(
             "Content",
             new XAttribute("Include", validatedItem.Attribute("Include")!.Value),
-            new XAttribute("Link", legacyInclude.Replace('\\', '/')),
+            new XAttribute("Link", link.Replace('\\', '/')),
             new XAttribute("CopyToOutputDirectory", "PreserveNewest"),
             new XAttribute("CopyToPublishDirectory", "PreserveNewest"));
+    }
+
+    private static bool HasPreserveNewestCopyMetadata(XElement legacyElement)
+    {
+        return legacyElement.Elements().Any(
+            element => element.Name.LocalName == "CopyToOutputDirectory"
+                && element.Value == "PreserveNewest");
     }
 
     private static XElement CreateProjectItem(
@@ -270,7 +341,7 @@ internal static class Program
         }
     }
 
-    private sealed record InventoryJob(string LegacyProjectPath, string OutputPath, bool ContentOnly);
+    private sealed record InventoryJob(string LegacyProjectPath, string OutputPath, bool ContentOnly, bool RuntimeCopyOnly);
 
     private sealed record Options(
         string RepositoryRoot,
@@ -283,7 +354,7 @@ internal static class Program
         {
             if (ManifestPath == null)
             {
-                return new[] { new InventoryJob(LegacyProjectPath!, OutputPath!, false) };
+                return new[] { new InventoryJob(LegacyProjectPath!, OutputPath!, false, false) };
             }
 
             using FileStream stream = File.OpenRead(ManifestPath);
@@ -305,6 +376,7 @@ internal static class Program
                     new InventoryJob(
                         legacyProjectPath,
                         Path.GetFullPath(Path.Combine(RepositoryRoot, entry.Output)),
+                        false,
                         false));
                 if (entry.ContentOutput != null)
                 {
@@ -317,6 +389,22 @@ internal static class Program
                         new InventoryJob(
                             legacyProjectPath,
                             Path.GetFullPath(Path.Combine(RepositoryRoot, entry.ContentOutput)),
+                            true,
+                            false));
+                }
+
+                if (entry.RuntimeCopyOutput != null)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.RuntimeCopyOutput))
+                    {
+                        throw new InvalidOperationException("Inventory runtimeCopyOutput cannot be empty.");
+                    }
+
+                    jobs.Add(
+                        new InventoryJob(
+                            legacyProjectPath,
+                            Path.GetFullPath(Path.Combine(RepositoryRoot, entry.RuntimeCopyOutput)),
+                            false,
                             true));
                 }
             }
@@ -389,5 +477,9 @@ internal static class Program
 
     private sealed record InventoryManifest(InventoryManifestEntry[] Projects);
 
-    private sealed record InventoryManifestEntry(string LegacyProject, string Output, string? ContentOutput);
+    private sealed record InventoryManifestEntry(
+        string LegacyProject,
+        string Output,
+        string? ContentOutput,
+        string? RuntimeCopyOutput);
 }

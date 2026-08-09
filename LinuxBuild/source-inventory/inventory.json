@@ -54,12 +54,26 @@
       "output": "LinuxBuild/source-inventory/AORebirth.Communication.CompileItems.props"
     },
     {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Core/AORebirth.Core.csproj",
+      "output": "LinuxBuild/source-inventory/AORebirth.Core.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/PlayfieldLoader/PlayfieldLoader.csproj",
+      "output": "LinuxBuild/source-inventory/PlayfieldLoader.CompileItems.props"
+    },
+    {
       "legacyProject": "AORebirth/Server/ChatEngine/ChatEngine.csproj",
       "output": "LinuxBuild/source-inventory/ChatEngine.CompileItems.props"
     },
     {
       "legacyProject": "AORebirth/Server/LoginEngine/LoginEngine.csproj",
       "output": "LinuxBuild/source-inventory/LoginEngine.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Server/ZoneEngine/ZoneEngine.csproj",
+      "output": "LinuxBuild/source-inventory/ZoneEngine.CompileItems.props",
+      "contentOutput": "LinuxBuild/source-inventory/ZoneEngine.ContentItems.props",
+      "runtimeCopyOutput": "LinuxBuild/source-inventory/ZoneEngine.RuntimeCopyItems.props"
     }
   ]
 }

@@ -62,6 +62,16 @@ completion matrices and dated evidence retain detailed provenance.
   ChatEngine remain disabled/inactive, TCP 7500 is closed, MySQL is healthy and
   bound only to `127.0.0.1:33067`, and existing website/mail containers were
   unchanged.
+- Stage 8 adds full `AORebirth.Core`, `PlayfieldLoader`, and `ZoneEngine` .NET
+  10 overlays from exact guarded source inventories. ZoneEngine's copied
+  XML/JSON/capture content, scripts, and required datafiles are governed by
+  checked-in content/runtime-copy inventories and verified by a listener-free
+  Stage 8 smoke. Linux excludes the WinForms NBug dependency, preserves JSON
+  loader compatibility through a narrow `JavaScriptSerializer` shim, and extends
+  the Linux Ionic shim with the diagnostic members ZoneEngine expects. The Linux
+  wrapper and Stage 8 smoke pass locally; Windows Debug is currently blocked by a
+  stale generated-combat catalog preflight because the local SCFU analyzer
+  dependency needed to regenerate it is missing.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete

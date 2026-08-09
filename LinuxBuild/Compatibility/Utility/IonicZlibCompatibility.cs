@@ -96,6 +96,16 @@ namespace Ionic.Zlib
             set { this.Seek(value, SeekOrigin.Begin); }
         }
 
+        public long TotalIn
+        {
+            get { return this.position; }
+        }
+
+        public long TotalOut
+        {
+            get { return -1L; }
+        }
+
         public override void Flush()
         {
             this.ThrowIfDisposed();
