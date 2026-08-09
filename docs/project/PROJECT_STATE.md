@@ -68,10 +68,16 @@ completion matrices and dated evidence retain detailed provenance.
   checked-in content/runtime-copy inventories and verified by a listener-free
   Stage 8 smoke. Linux excludes the WinForms NBug dependency, preserves JSON
   loader compatibility through a narrow `JavaScriptSerializer` shim, and extends
-  the Linux Ionic shim with the diagnostic members ZoneEngine expects. The Linux
-  wrapper and Stage 8 smoke pass locally; Windows Debug is currently blocked by a
-  stale generated-combat catalog preflight because the local SCFU analyzer
-  dependency needed to regenerate it is missing.
+  the Linux Ionic shim with the diagnostic members ZoneEngine expects.
+  ZoneEngine now has Linux-only listener-free startup and lifecycle validation
+  modes for exact-case config, closed provider construction, loopback topology,
+  required runtime assets, and bounded shutdown-file handling, plus a read-only
+  database preflight requiring the expected MySQL database, exact governed
+  34-table set, `characters.Online`, and zero online characters. The Linux
+  wrapper and Stage 8 smoke pass locally, including child-process validation
+  from the build output; Windows Debug is currently blocked by a stale
+  generated-combat catalog preflight because governed regeneration fails on
+  missing raw-derived SCFU metadata for captured realm 655 provenance.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete

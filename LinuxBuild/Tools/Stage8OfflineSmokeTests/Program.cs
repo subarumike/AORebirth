@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 using AORebirth.Core.Entities;
@@ -33,6 +35,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 VerifyJavaScriptSerializerCompatibility();
                 VerifyZlibDiagnosticsCompatibility();
                 VerifyZoneCopiedAssets(repositoryRoot, zoneOutput);
+                VerifyZoneValidationModes(zoneOutput);
 
                 Console.WriteLine("PASS: Stage 8 offline ZoneEngine smoke");
                 return 0;
@@ -41,6 +44,91 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             {
                 Console.Error.WriteLine("FAIL: " + exception.Message);
                 return 1;
+            }
+        }
+
+        private static void VerifyZoneValidationModes(string zoneOutput)
+        {
+            string configPath = Path.Combine(zoneOutput, "Config.xml");
+            Require(File.Exists(configPath), "Missing ZoneEngine Config.xml output");
+
+            RunZoneValidation(
+                zoneOutput,
+                new[] { "--validate-startup" },
+                "ZONEENGINE_VALIDATION_OK mode=startup provider=MySql listeners=0 assets=ok");
+
+            string shutdownFile = Path.Combine(
+                zoneOutput,
+                "stage8-zone-lifecycle-" + Guid.NewGuid().ToString("N") + ".shutdown");
+            File.WriteAllText(shutdownFile, "stop");
+            try
+            {
+                RunZoneValidation(
+                    zoneOutput,
+                    new[] { "--validate-lifecycle", "--shutdown-file", shutdownFile },
+                    "ZONEENGINE_LIFECYCLE_STOPPED status=clean");
+            }
+            finally
+            {
+                if (File.Exists(shutdownFile))
+                {
+                    File.Delete(shutdownFile);
+                }
+            }
+        }
+
+        private static void RunZoneValidation(string zoneOutput, string[] arguments, string expectedOutput)
+        {
+            string zoneAssembly = Path.Combine(zoneOutput, "ZoneEngine.dll");
+            Require(File.Exists(zoneAssembly), "Missing ZoneEngine.dll output");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = "dotnet";
+            startInfo.WorkingDirectory = zoneOutput;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.ArgumentList.Add(zoneAssembly);
+            foreach (string argument in arguments)
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            startInfo.Environment.Remove("AO_REBIRTH_CONFIG_PATH");
+            startInfo.Environment.Remove("AO_REBIRTH_MYSQL_CONNECTION");
+            startInfo.Environment.Remove("AO_REBIRTH_REQUIRED_SQL_TYPE");
+            startInfo.Environment.Remove("AO_REBIRTH_ZONE_LISTEN_IP");
+            startInfo.Environment.Remove("AO_REBIRTH_CHAT_LISTEN_IP");
+            startInfo.Environment["AO_REBIRTH_CONFIG_PATH"] = Path.Combine(zoneOutput, "Config.xml");
+            startInfo.Environment["AO_REBIRTH_REQUIRED_SQL_TYPE"] = "MySql";
+            startInfo.Environment["AO_REBIRTH_MYSQL_CONNECTION"] =
+                "Server=127.0.0.1;Port=33067;Database=aorebirth_chatengine_stage6;Uid=aorebirth_stage8;Pwd=stage8-placeholder;SslMode=None";
+            startInfo.Environment["AO_REBIRTH_ZONE_LISTEN_IP"] = "127.0.0.1";
+            startInfo.Environment["AO_REBIRTH_CHAT_LISTEN_IP"] = "127.0.0.1";
+
+            using (Process process = Process.Start(startInfo))
+            {
+                Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                Task<string> errorTask = process.StandardError.ReadToEndAsync();
+                if (!process.WaitForExit(30000))
+                {
+                    try
+                    {
+                        process.Kill();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+
+                    throw new TimeoutException("ZoneEngine validation child timed out.");
+                }
+
+                string output = outputTask.GetAwaiter().GetResult();
+                string error = errorTask.GetAwaiter().GetResult();
+                Require(process.ExitCode == 0, "ZoneEngine validation child failed: " + error + output);
+                Require(
+                    output.IndexOf(expectedOutput, StringComparison.Ordinal) >= 0,
+                    "ZoneEngine validation child did not emit expected output: " + expectedOutput);
             }
         }
 
