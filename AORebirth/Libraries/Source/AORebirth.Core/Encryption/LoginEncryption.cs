@@ -206,7 +206,34 @@ namespace AO.Core.Encryption
                 return false;
             }
 
-            if (!PasswordHash.ValidatePassword(ClientPassword, passwordHash))
+            if (string.IsNullOrWhiteSpace(passwordHash))
+            {
+                return false;
+            }
+
+            bool passwordIsValid;
+            try
+            {
+                passwordIsValid = PasswordHash.ValidatePassword(ClientPassword, passwordHash);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return false;
+            }
+            catch (OverflowException)
+            {
+                return false;
+            }
+
+            if (!passwordIsValid)
             {
                 return false;
             }
@@ -241,6 +268,11 @@ namespace AO.Core.Encryption
             }
 
             string passwordHash = this.GetLoginPassword(UserName);
+            if (string.IsNullOrEmpty(passwordHash))
+            {
+                return false;
+            }
+
             return this.IsValidLogin(LoginKey, ServerSalt, UserName, passwordHash);
         }
 

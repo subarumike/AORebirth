@@ -45,15 +45,29 @@ Framework solution as the reference build.
 - Native Ubuntu 24.04.4 x86_64 validation passes: the self-contained apphost,
   exact-case startup, listener-free lifecycle, systemd unit, `Type=notify`
   readiness after both loopback listeners, and real SIGTERM shutdown all pass.
-  Release `4470aa71` is installed on the test VPS but left disabled/inactive,
-  without a database secret; its temporary upload was removed.
+  The Stage 6 test release is installed on the test VPS but left
+  disabled/inactive.
+- Stage 6 provisions a separately named and labeled MySQL 8.4 container,
+  volume, network, database, and runtime user. Only `127.0.0.1:33067` is bound;
+  the existing AO website and mail databases/networks remain untouched.
+- The exact governed 34-file schema imports and verifies on Ubuntu. The runtime
+  account has only `SELECT`, `INSERT`, `UPDATE`, and `DELETE` on the disposable
+  database.
+- A listener-free integration harness passes the production Config/Connector,
+  DAO, password-hash, encrypted login-key, account/character ownership, negative
+  authentication, and exact cleanup paths with zero fixture residue.
+- ChatEngine now has a read-only `--validate-database` mode, and systemd runs it
+  before listener startup. The disabled unit passes live DB preflight,
+  `Type=notify`, loopback listener checks, and clean SIGTERM. The Stage 6
+  validator uses a runtime drop-in and leaves the normal secret-free service
+  environment untouched.
 
 ## Next slice
 
-Obtain authorization and credentials for an isolated disposable MySQL target,
-then validate database readiness, schema compatibility, and bounded login
-behavior without exposing the player or ISCom ports publicly. Do not use the
-website/mail databases or enable the service at boot for this test.
+Port LoginEngine as the next independently deployable Linux engine, retaining
+the guarded shared-source approach and the isolated Stage 6 database. Keep both
+player-facing services disabled and loopback-bound until the LoginEngine
+contracts, live database preflight, and Ubuntu lifecycle gate pass.
 
 ## Constraints
 
@@ -62,4 +76,5 @@ website/mail databases or enable the service at boot for this test.
 - Preserve assembly boundaries, names, versions, and strong-name identities.
 - Require Windows regression and cross-runtime parity checks for shared-source
   compatibility changes.
-- Ubuntu runtime and service validation require the VPS SSH connection details.
+- VPS access is configured outside the repository; never record credentials or
+  private-key material here.
