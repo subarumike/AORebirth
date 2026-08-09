@@ -137,13 +137,47 @@ namespace LoginEngine.Packets
         /// </param>
         public void DeleteChar(int charid)
         {
+            this.TryDeleteChar(charid);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="charid">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool TryDeleteChar(int charid)
+        {
             try
             {
                 CharacterDao.Instance.Delete(charid);
+                return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(this.Name + e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="accountName">
+        /// </param>
+        /// <param name="charid">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool TryDeleteChar(string accountName, int charid)
+        {
+            try
+            {
+                return CharacterDao.Instance.DeleteForUser(accountName, charid);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(this.Name + e.Message);
+                return false;
             }
         }
 
