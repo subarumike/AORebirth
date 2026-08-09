@@ -76,15 +76,24 @@ Framework solution as the reference build.
   preflight, `Type=notify`, exact main-PID ownership of `127.0.0.1:7500`, and
   clean SIGTERM pass. LoginEngine remains disabled/inactive, TCP 7500 is closed,
   and the healthy disposable database remains bound only to loopback.
+- Stage 8 now builds full `AORebirth.Core`, `PlayfieldLoader`, and `ZoneEngine`
+  on .NET 10 from exact guarded source inventories. ZoneEngine also has guarded
+  copied content and runtime-copy inventories for its XML/JSON/capture assets,
+  script files, and datafiles. Linux excludes the WinForms NBug dependency,
+  supplies a narrow `JavaScriptSerializer` compatibility source, and extends the
+  Linux Ionic shim with diagnostic `TotalIn`/`TotalOut` members. The full Linux
+  wrapper and Stage 8 listener-free smoke pass locally. Windows Debug validation
+  is currently blocked before compile by stale generated combat catalog
+  preflight; the generator wrapper is unavailable because the local SCFU analyzer
+  dependency directory is missing.
 
 ## Next slice
 
-Begin Stage 8 by porting ZoneEngine and the full Core/PlayfieldLoader data
-closure, then coordinate multi-engine readiness and bounded shutdown. Keep the
-proven LoginEngine slice disabled and loopback-only: public exposure remains
-unapproved until ZoneEngine exists, official-client end-to-end login plus
-retry/error UX is proven, character-count semantics are resolved, and a
-sustained multiplayer soak passes.
+Continue Stage 8 with ZoneEngine startup/database/readiness validation,
+multi-engine ordering, and bounded shutdown. Keep the proven LoginEngine slice
+disabled and loopback-only: public exposure remains unapproved until
+official-client end-to-end login plus retry/error UX is proven, character-count
+semantics are resolved, and a sustained multiplayer soak passes.
 
 ## Constraints
 
