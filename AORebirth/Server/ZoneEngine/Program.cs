@@ -34,6 +34,8 @@ namespace ZoneEngine
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
+    using System.Data;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -157,22 +159,43 @@ namespace ZoneEngine
             return false;
         }
 
+        private static bool HasEitherArgument(string[] args, string firstArgument, string secondArgument)
+        {
+            return HasArgument(args, firstArgument) || HasArgument(args, secondArgument);
+        }
+
+        private static string GetEitherArgumentValue(string[] args, string firstArgument, string secondArgument)
+        {
+            string value = GetArgumentValue(args, firstArgument);
+            return string.IsNullOrWhiteSpace(value) ? GetArgumentValue(args, secondArgument) : value;
+        }
+
+        private static void CreateParentDirectoryIfNeeded(string path)
+        {
+            string fullPath = Path.GetFullPath(path);
+            string directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
         private static void ConfigureHeadlessConsoleLogging(string[] args)
         {
-            string stdoutLog = GetArgumentValue(args, "/stdout-log");
+            string stdoutLog = GetEitherArgumentValue(args, "/stdout-log", "--stdout-log");
             if (!string.IsNullOrWhiteSpace(stdoutLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stdoutLog));
+                CreateParentDirectoryIfNeeded(stdoutLog);
                 headlessOutputWriter = new StreamWriter(
                     new FileStream(stdoutLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessOutputWriter.AutoFlush = true;
                 Console.SetOut(headlessOutputWriter);
             }
 
-            string stderrLog = GetArgumentValue(args, "/stderr-log");
+            string stderrLog = GetEitherArgumentValue(args, "/stderr-log", "--stderr-log");
             if (!string.IsNullOrWhiteSpace(stderrLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stderrLog));
+                CreateParentDirectoryIfNeeded(stderrLog);
                 headlessErrorWriter = new StreamWriter(
                     new FileStream(stderrLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessErrorWriter.AutoFlush = true;
@@ -195,7 +218,7 @@ namespace ZoneEngine
 
         private static void StartShutdownFileWatcher(string[] args)
         {
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             if (string.IsNullOrWhiteSpace(shutdownFile))
             {
                 return;
@@ -227,7 +250,7 @@ namespace ZoneEngine
             Console.WriteLine("Starting ZoneEngine in headless mode.");
             StartTheServer();
 
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             while (!exited)
             {
                 if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
@@ -738,6 +761,7 @@ namespace ZoneEngine
             return true;
         }
 
+
         /// <summary>
         /// Entry point
         /// </summary>
@@ -746,7 +770,9 @@ namespace ZoneEngine
         /// </param>
         private static void Main(string[] args)
         {
-            bool headless = HasArgument(args, "/headless");
+
+            bool headless = HasEitherArgument(args, "/headless", "--headless");
+
             if (headless)
             {
                 ConfigureHeadlessConsoleLogging(args);

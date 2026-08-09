@@ -81,19 +81,28 @@ Framework solution as the reference build.
   copied content and runtime-copy inventories for its XML/JSON/capture assets,
   script files, and datafiles. Linux excludes the WinForms NBug dependency,
   supplies a narrow `JavaScriptSerializer` compatibility source, and extends the
-  Linux Ionic shim with diagnostic `TotalIn`/`TotalOut` members. The full Linux
-  wrapper and Stage 8 listener-free smoke pass locally. Windows Debug validation
-  is currently blocked before compile by stale generated combat catalog
-  preflight; the generator wrapper is unavailable because the local SCFU analyzer
-  dependency directory is missing.
+  Linux Ionic shim with diagnostic `TotalIn`/`TotalOut` members. ZoneEngine now
+  has Linux-only listener-free `--validate-startup` and `--validate-lifecycle`
+  modes covering exact-case configuration, closed provider construction,
+  loopback topology, required runtime assets, and bounded shutdown-file handling.
+  ZoneEngine also has a read-only `--validate-database` mode requiring the
+  expected MySQL database, exact governed 34-table set, `characters.Online`, and
+  zero online characters before listener startup. The full Linux wrapper and
+  Stage 8 smoke pass locally, including child-process validation of startup and
+  lifecycle modes from the build output. Windows Debug validation is currently
+  blocked before compile by stale generated combat catalog preflight; the
+  analyzer dependency now builds, but the governed generator fails because
+  captured realm 655 provenance does not contain matching raw-derived SCFU
+  metadata.
 
 ## Next slice
 
-Continue Stage 8 with ZoneEngine startup/database/readiness validation,
-multi-engine ordering, and bounded shutdown. Keep the proven LoginEngine slice
-disabled and loopback-only: public exposure remains unapproved until
-official-client end-to-end login plus retry/error UX is proven, character-count
-semantics are resolved, and a sustained multiplayer soak passes.
+Continue Stage 8 with ZoneEngine systemd readiness, multi-engine ordering,
+publish/deployment scaffolding, and native Ubuntu disabled-service validation.
+Keep the proven LoginEngine slice disabled and loopback-only: public exposure
+remains unapproved until official-client end-to-end login plus retry/error UX is
+proven, character-count semantics are resolved, and a sustained multiplayer soak
+passes.
 
 ## Constraints
 
