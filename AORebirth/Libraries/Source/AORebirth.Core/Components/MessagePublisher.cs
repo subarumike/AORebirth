@@ -37,6 +37,7 @@ namespace AORebirth.Core.Components
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
 
@@ -52,6 +53,15 @@ namespace AORebirth.Core.Components
         /// <summary>
         /// </summary>
         private readonly Dictionary<Type, IList<IHandleMessage>> messageHandlers;
+
+        /// <summary>
+        /// </summary>
+        private readonly object nullSenderSync = new object();
+
+        /// <summary>
+        /// </summary>
+        private readonly ConditionalWeakTable<object, object> senderLocks =
+            new ConditionalWeakTable<object, object>();
 
         #endregion
 
@@ -106,15 +116,21 @@ namespace AORebirth.Core.Components
         /// </param>
         public void Publish(object sender, Message message)
         {
-            IList<IHandleMessage> handlers;
-            if (this.messageHandlers.TryGetValue(message.Body.GetType(), out handlers) == false)
+            object senderSync = sender == null
+                                    ? this.nullSenderSync
+                                    : this.senderLocks.GetValue(sender, key => new object());
+            lock (senderSync)
             {
-                return;
-            }
+                IList<IHandleMessage> handlers;
+                if (this.messageHandlers.TryGetValue(message.Body.GetType(), out handlers) == false)
+                {
+                    return;
+                }
 
-            foreach (IHandleMessage handler in handlers)
-            {
-                handler.Handle(sender, message);
+                foreach (IHandleMessage handler in handlers)
+                {
+                    handler.Handle(sender, message);
+                }
             }
         }
 

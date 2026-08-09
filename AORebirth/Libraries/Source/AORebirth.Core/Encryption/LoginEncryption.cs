@@ -59,11 +59,7 @@ namespace AO.Core.Encryption
         /// <summary>
         /// 
         /// </summary>
-#if DEBUG
-        public bool i_Enable = false;
-#else
         public bool i_Enable = true;
-#endif
 
         #endregion
 
@@ -188,7 +184,7 @@ namespace AO.Core.Encryption
 
             if (this.i_Enable == false)
             {
-                return true;
+                return false;
             }
 
             try
@@ -264,7 +260,7 @@ namespace AO.Core.Encryption
         {
             if (this.i_Enable == false)
             {
-                return true;
+                return false;
             }
 
             string passwordHash = this.GetLoginPassword(UserName);

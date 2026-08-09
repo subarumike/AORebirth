@@ -62,9 +62,20 @@ namespace LoginEngine.MessageHandlers
         {
             var client = (Client)sender;
             var deleteCharacterMessage = (DeleteCharacterMessage)message.Body;
+            string authenticatedAccount;
+            if (!client.TryGetAuthenticatedAccountName(out authenticatedAccount))
+            {
+                client.RejectAuthentication();
+                return;
+            }
 
             var characterName = new CharacterName();
-            characterName.DeleteChar(deleteCharacterMessage.CharacterId);
+            if (!characterName.TryDeleteChar(authenticatedAccount, deleteCharacterMessage.CharacterId))
+            {
+                client.RejectAuthentication();
+                return;
+            }
+
             var characterDeletedMessage = new CharacterDeletedMessage
                                           {
                                               CharacterId = deleteCharacterMessage.CharacterId

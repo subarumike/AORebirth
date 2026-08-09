@@ -21,7 +21,7 @@ follow only after the shared library lane and ChatEngine runtime are proven.
 | 4 | Communication and Core dependency audit | Adapt Communication's inert MemBus boundary without changing ISCom ordering; identify the smallest Core slice needed by Chat | ISCom framing/FIFO and dynamic-message resolution parity; guarded full-Core exclusion |
 | 5 | ChatEngine | Remove NBug WinForms startup, extract the three required authentication sources, omit the unused PlayfieldLoader cache, deploy `Config.xml`, fix Linux paths, add service shutdown | Chat contracts/offline startup/publish parity and clean shutdown on Ubuntu |
 | 6 | Ubuntu ChatEngine database acceptance | Isolated MySQL 8.4 target, governed schema bootstrap, restricted runtime account, live DB preflight and bounded login harness | Exact 34-table import, production Connector/DAO/encrypted-login parity, zero fixture residue, disabled systemd readiness and shutdown pass |
-| 7 | LoginEngine | Audit its exact dependency closure, add a guarded SDK overlay, remove Windows-only startup dependencies, and reuse the strict config/database/service patterns | Windows/Linux contracts plus listener-free and loopback Ubuntu lifecycle pass |
+| 7 | LoginEngine | Audit its exact dependency closure, add a guarded SDK overlay, remove Windows-only startup dependencies, reuse the strict config/database/service patterns, and harden authenticated character operations | Windows/Linux contracts, offline security gates, listener-free disposable MySQL acceptance, and guarded disabled-service Ubuntu lifecycle pass |
 | 8 | ZoneEngine and persistent stack | Port the full Core/PlayfieldLoader/data closure, coordinate multi-engine readiness and bounded shutdown | Restart/reboot recovery and sustained multi-player soak test |
 
 Current status: Stages 0 through 4 pass their Windows-hosted compile, contract,
@@ -45,8 +45,16 @@ exact 35-source inventory plus a contained identity-compatible Core slice. The
 unchanged legacy adapters use pinned MemBus 4.0.1 for active six-handler MEF
 dispatch. Windows/Linux contracts, offline lifecycle, native apphost structure,
 Ubuntu live database preflight, `Type=notify` readiness, exact PID-owned
-`127.0.0.1:7500`, and clean SIGTERM pass. Both services remain disabled and all
-player/ISCom/database listeners remain loopback-only.
+`127.0.0.1:7500`, and clean SIGTERM pass. Stage 7.1 now also provides
+fail-closed per-client authenticated state, CSPRNG server salt, canonical
+identity/ownership guards, same-client FIFO dispatch with bounded drain, and
+transactional cleanup of the governed character-owned graph. Its offline
+contract/security gates and listener-free disposable MySQL 8.4 acceptance pass
+with zero fixture residue. A guarded atomic upgrade installed
+`stage7-20260809-login-003`; the live service validation passes and leaves the
+unit disabled/inactive, TCP 7500 closed, and the healthy database loopback-only.
+Both services remain disabled and all player/ISCom/database listeners remain
+loopback-only.
 
 ## Rules for each stage
 
@@ -72,12 +80,14 @@ player/ISCom/database listeners remain loopback-only.
 - Stage 7's narrow active Core/MemBus/MEF closure is proven only for LoginEngine;
   full Core, PlayfieldLoader, MathNet replacement, and ZoneEngine data assets
   remain Stage 8 work.
-- LoginEngine TCP 7500 remains disabled and loopback-only. Public exposure is
-  blocked on an authenticated per-connection state machine, ownership checks for
-  character mutations, and a cryptographically secure server salt.
-- LoginEngine shutdown does not yet drain outstanding asynchronous MemBus work,
-  and its live readiness gate does not yet fingerprint every runtime table
-  column/index or exercise the full create/delete DAO graph.
+- LoginEngine TCP 7500 remains disabled and loopback-only. Its Stage 7.1
+  authentication, ownership, secure-salt, ordered-dispatch, bounded-drain, and
+  create/select/delete data-cleanup gates pass; those items are no longer public
+  exposure blockers.
+- Public exposure is still unapproved because ZoneEngine/full Core are absent,
+  official-client end-to-end login and retry/error UX have not been proven,
+  account character-count semantics remain unresolved, and no sustained
+  multiplayer soak has passed.
 
 The Stage 1 Linux lane now replaces Utility's Windows performance counters and
 uses canonical `Config.xml` casing without changing the Windows code path.

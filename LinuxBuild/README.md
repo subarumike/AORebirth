@@ -166,6 +166,20 @@ LinuxBuild\publish-loginengine.cmd linux-x64 true
 The Stage 7 gate preserves Windows/Linux public, protected, packet, serializer,
 MEF, and active-message-dispatch behavior; validates the native apphost and
 publish contents; and runs listener-free startup/lifecycle negative cases.
+Stage 7.1 adds fail-closed per-client authenticated state, CSPRNG server salt,
+canonical authenticated identity and ownership guards, same-client FIFO with a
+bounded shutdown drain, and transactional cleanup of the governed
+character-owned graph. Run its offline contract/security gates with:
+
+```bat
+LinuxBuild\verify-stage7-contracts.cmd
+LinuxBuild\verify-stage7-security-mysql.cmd
+```
+
+The security wrapper builds and runs
+`LinuxBuild/Tools/Stage7MySqlSecurityIntegrationTests`. Its guarded disposable
+mode is documented in [`deployment/README.md`](deployment/README.md); the
+listener-free MySQL 8.4 live acceptance passes with zero fixture residue.
 
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:
@@ -178,12 +192,15 @@ dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.
 ```
 
 This checkpoint includes publishable ChatEngine and LoginEngine builds plus
-passing Windows/Linux contract, authentication, negative configuration,
+passing Windows/Linux contract, authentication/security, negative configuration,
 lifecycle, and publish-structure gates. Native Ubuntu 24.04.4 x86_64 apphost
 execution, an exact 34-table MySQL 8.4 import, production database/login-path
-parity, systemd live database readiness, loopback listener ownership, and real
-SIGTERM delivery pass for both disabled service slices. Boot persistence,
-ZoneEngine, public LoginEngine security hardening, and player traffic remain
-pending.
+parity, listener-free Stage 7.1 security acceptance with zero residue, guarded
+atomic upgrade to `stage7-20260809-login-003`, systemd live database readiness,
+loopback listener ownership, and real SIGTERM delivery pass. The LoginEngine
+unit remains disabled/inactive, TCP 7500 is closed, and MySQL remains healthy on
+loopback. Stage 8 ZoneEngine/full Core, official-client end-to-end and retry/UX
+proof, resolved character-count semantics, sustained multiplayer soak, boot
+persistence, and public player traffic remain pending.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).

@@ -51,13 +51,17 @@ completion matrices and dated evidence retain detailed provenance.
   containers, networks, and firewall were unchanged.
 - The parallel Linux lane now also builds LoginEngine from its exact 35-source
   inventory with a contained identity-compatible Core slice, pinned MemBus 4.0.1,
-  and the six legacy MEF handlers. Windows/Linux contract, packet, serialization,
-  active-dispatch, offline lifecycle, and apphost gates pass. On Ubuntu 24.04
-  x86_64 the disabled unit passes the live 34-table database preflight,
-  `Type=notify`, exact main-PID ownership of loopback TCP 7500, and clean
-  SIGTERM. LoginEngine and ChatEngine remain disabled/inactive; TCP 7500 is not
-  publicly exposed, MySQL remains only on `127.0.0.1:33067`, and existing
-  website/mail containers were unchanged.
+  and the six legacy MEF handlers. Stage 7.1 adds fail-closed per-client
+  authenticated state, CSPRNG challenge salt, canonical identity and ownership
+  guards, same-client FIFO dispatch with bounded drain, and transactional cleanup
+  of the governed character-owned data graph. Offline contract/security gates
+  pass, as does listener-free disposable MySQL 8.4 security acceptance through
+  the production paths with zero fixture residue. The guarded atomic upgrade to
+  `stage7-20260809-login-003` and live database preflight, `Type=notify`, exact
+  main-PID ownership of `127.0.0.1:7500`, and clean SIGTERM pass. LoginEngine and
+  ChatEngine remain disabled/inactive, TCP 7500 is closed, MySQL is healthy and
+  bound only to `127.0.0.1:33067`, and existing website/mail containers were
+  unchanged.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
@@ -210,12 +214,13 @@ migrations; details and exact source references are recorded in
 
 ## Remaining debt boundary
 
-- Do not expose LoginEngine TCP 7500 until all character operations require a
-  successfully authenticated connection, mutation ownership is enforced, and
-  its server salt uses a cryptographically secure generator.
-- Add bounded draining for active asynchronous LoginEngine MemBus handlers and a
-  disposable full create/update/delete DAO acceptance fixture before claiming a
-  persistent multi-player service.
+- Do not expose LoginEngine TCP 7500 yet. Stage 7.1 completes authenticated
+  connection state, mutation ownership, CSPRNG salt, bounded dispatch draining,
+  and disposable create/select/delete DAO acceptance, but ZoneEngine/full Core
+  are not present.
+- Before a public player test, prove official-client end-to-end login and
+  retry/error UX, resolve account character-count semantics from authoritative
+  evidence, and pass a sustained multiplayer soak.
 - Rotate the previously exposed database credential externally.
 - Perform authorized live WebEngine verification only after a valid disposable
   database credential is supplied. Current validation intentionally makes no

@@ -366,11 +366,131 @@ state. A successful run prints:
 PASS: disabled LoginEngine passed live database preflight, Type=notify readiness, exact loopback listener ownership, and clean SIGTERM shutdown.
 ```
 
-Do not expose or enable LoginEngine yet. The legacy handler flow lacks a
-fail-closed authenticated-session state for every character operation, delete
-ownership enforcement is incomplete, and the server salt uses `System.Random`.
-ZoneEngine is also not present at the advertised loopback endpoint
-`127.0.0.1:7501`.
+## Stage 7.1 security acceptance and disabled-service upgrade
+
+Stage 7.1 adds fail-closed per-client authenticated state, CSPRNG server salt,
+canonical authenticated identity and character-ownership guards, same-client
+FIFO dispatch with a bounded shutdown drain, and transactional cleanup of the
+governed character-owned data graph. Run both checked-in offline gates before
+building or uploading a test package:
+
+```bat
+LinuxBuild\verify-stage7-contracts.cmd
+LinuxBuild\verify-stage7-security-mysql.cmd
+```
+
+The second wrapper builds and runs
+`LinuxBuild/Tools/Stage7MySqlSecurityIntegrationTests`. Live disposable mode is
+deliberately guarded: it requires the exact Stage 6 database/user/loopback target
+and the acknowledgement below, opens no listener, fingerprints the governed
+tables before and after, and fails unless the baseline is restored exactly.
+After publishing and uploading the self-contained tool to an exact reviewed
+directory, run it through a transient unit:
+
+```sh
+sudo systemd-run --quiet --wait --pipe --collect \
+  --uid=aorebirth \
+  --working-directory=/tmp/stage7-security-tool-003 \
+  --property=EnvironmentFile=/etc/ao-rebirth/chatengine/stage6/chatengine.env \
+  --property=RuntimeMaxSec=120s \
+  --setenv=AO_REBIRTH_STAGE7_SECURITY_DISPOSABLE_ACK=AO_REBIRTH_STAGE7_SECURITY_DISPOSABLE_ONLY \
+  /tmp/stage7-security-tool-003/Stage7MySqlSecurityIntegrationTests --run-disposable
+```
+
+The accepted MySQL 8.4 run prints `residue=0` and leaves both engine listeners
+closed. Never reuse the acknowledgement against a persistent or differently
+named database.
+
+The guarded release upgrade requires Ubuntu's `acl` and `attr` packages so it
+can validate and canonicalize ACLs and extended attributes instead of inheriting
+upload metadata:
+
+```sh
+sudo apt-get install --no-install-recommends acl attr file libcap2-bin util-linux
+command -v file findmnt flock getcap getfacl getfattr realpath setcap setfacl
+```
+
+Publish LoginEngine, then upload the publish directory, reviewed unit, guarded
+upgrade, and existing live validator to their exact input paths:
+
+```bat
+ssh.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 root@YOUR_VPS "set -eu; test ! -e /tmp/ao-rebirth-loginengine-publish; test ! -L /tmp/ao-rebirth-loginengine-publish; test ! -e /tmp/ao-rebirth-loginengine.service; test ! -L /tmp/ao-rebirth-loginengine.service; test ! -e /tmp/ao-rebirth-loginengine-upgrade.sh; test ! -L /tmp/ao-rebirth-loginengine-upgrade.sh; test ! -e /tmp/ao-rebirth-loginengine-validate.sh; test ! -L /tmp/ao-rebirth-loginengine-validate.sh"
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 -r LinuxBuild\artifacts\loginengine\linux-x64\self-contained root@YOUR_VPS:/tmp/ao-rebirth-loginengine-publish
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\systemd\ao-rebirth-loginengine.service root@YOUR_VPS:/tmp/ao-rebirth-loginengine.service
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\login-stage7\upgrade-disabled-service.sh root@YOUR_VPS:/tmp/ao-rebirth-loginengine-upgrade.sh
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\login-stage7\validate-disabled-service.sh root@YOUR_VPS:/tmp/ao-rebirth-loginengine-validate.sh
+```
+
+Windows-to-Linux copies can retain permissive directory modes. Before changing
+them recursively, require the upload to resolve to the exact expected directory
+and reject links or special files. Then remove group/world write access, lock the
+script modes, perform the atomic disabled-service upgrade, and rerun live
+validation:
+
+```sh
+(
+set -euo pipefail
+login_upload=/tmp/ao-rebirth-loginengine-publish
+test "$(realpath -e -- "$login_upload")" = "$login_upload"
+test -d "$login_upload"
+test ! -L "$login_upload"
+link_path="$(find -P "$login_upload" -xdev -type l -print -quit)"
+special_path="$(find -P "$login_upload" -xdev ! -type d ! -type f -print -quit)"
+hardlink_path="$(find -P "$login_upload" -xdev -type f -links +1 -print -quit)"
+foreign_owner_path="$(find -P "$login_upload" -xdev ! -user root -print -quit)"
+foreign_group_path="$(find -P "$login_upload" -xdev ! -group root -print -quit)"
+mount_path="$(findmnt -rn -o TARGET | awk -v root="$login_upload" '$0 == root || index($0, root "/") == 1 { print; exit }')"
+test -z "$link_path"
+test -z "$special_path"
+test -z "$hardlink_path"
+test -z "$foreign_owner_path"
+test -z "$foreign_group_path"
+test -z "$mount_path"
+sudo chmod -R go-w -- "$login_upload"
+sudo chmod 0700 /tmp/ao-rebirth-loginengine-upgrade.sh /tmp/ao-rebirth-loginengine-validate.sh
+sudo bash /tmp/ao-rebirth-loginengine-upgrade.sh stage7-20260809-login-003
+sudo bash /tmp/ao-rebirth-loginengine-validate.sh
+)
+```
+
+The pre-upload absence check is mandatory: never let `scp -r` merge a new
+package into an old directory. After a successful upgrade and validation, this
+exact root-only cleanup removes the disposable upload without following links or
+crossing a mounted subtree:
+
+```sh
+(
+set -euo pipefail
+login_upload=/tmp/ao-rebirth-loginengine-publish
+test "$(realpath -e -- "$login_upload")" = "$login_upload"
+test -d "$login_upload"
+test ! -L "$login_upload"
+link_path="$(find -P "$login_upload" -xdev -type l -print -quit)"
+special_path="$(find -P "$login_upload" -xdev ! -type d ! -type f -print -quit)"
+hardlink_path="$(find -P "$login_upload" -xdev -type f -links +1 -print -quit)"
+foreign_owner_path="$(find -P "$login_upload" -xdev ! -user root -print -quit)"
+mount_path="$(findmnt -rn -o TARGET | awk -v root="$login_upload" '$0 == root || index($0, root "/") == 1 { print; exit }')"
+test -z "$link_path"
+test -z "$special_path"
+test -z "$hardlink_path"
+test -z "$foreign_owner_path"
+test -z "$mount_path"
+sudo rm -r --one-file-system -- "$login_upload"
+)
+```
+
+The upgrade uses a fixed lock, validates package/unit/environment boundaries,
+installs a new immutable release, switches `current` atomically, and rolls back
+without deleting an active target if validation fails. The accepted release is
+`stage7-20260809-login-003`; database preflight, `Type=notify`, exact main-PID
+ownership of `127.0.0.1:7500`, and clean SIGTERM pass. The unit remains
+disabled/inactive, TCP 7500 is closed, and the MySQL 8.4 target is healthy and
+bound only to loopback.
+
+Do not expose or enable LoginEngine yet. ZoneEngine is not present at
+`127.0.0.1:7501`, official-client end-to-end login and retry/error UX have not
+been proven, account character-count semantics remain unresolved, and no
+sustained multiplayer soak has passed.
 
 ## ChatEngine production activation (separate approval)
 

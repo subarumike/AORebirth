@@ -64,22 +64,27 @@ Framework solution as the reference build.
 - Stage 7 builds LoginEngine from the exact guarded 35-source inventory plus a
   contained `AORebirth.Core` LoginEngine closure. The unchanged legacy MemBus
   adapters use pinned MemBus 4.0.1, and MEF composes the six active handlers.
-- Stage 7 Windows/Linux API, wire, serializer, MEF, active dispatch, offline
-  lifecycle, negative configuration, and framework-dependent/self-contained
-  apphost gates pass.
-- Native Ubuntu 24.04 x86_64 validation passes the live 34-table database
-  preflight, `Type=notify` readiness, exact main-PID ownership of
-  `127.0.0.1:7500`, and clean SIGTERM. LoginEngine and ChatEngine remain
-  disabled/inactive; the database remains loopback-only and the existing website
-  and mail containers were unchanged.
+- Stage 7.1 adds fail-closed per-client authenticated state, a CSPRNG server
+  salt, canonical authenticated identity and character-ownership guards,
+  same-client FIFO dispatch with a bounded shutdown drain, and transactional
+  cleanup of the full governed character-owned data graph.
+- The Stage 7 contract and security gates pass offline. The listener-free
+  disposable MySQL 8.4 security acceptance also passes against the production
+  Config/Connector/DAO paths with zero fixture residue.
+- The guarded atomic disabled-service upgrade to
+  `stage7-20260809-login-003` passes on Ubuntu 24.04 x86_64. Live database
+  preflight, `Type=notify`, exact main-PID ownership of `127.0.0.1:7500`, and
+  clean SIGTERM pass. LoginEngine remains disabled/inactive, TCP 7500 is closed,
+  and the healthy disposable database remains bound only to loopback.
 
 ## Next slice
 
-Keep the proven LoginEngine slice disabled and loopback-only while adding its
-public-exposure safety boundary: authenticated per-connection state, character
-ownership checks, secure server salts, and bounded asynchronous-dispatch drain.
-Then port ZoneEngine/full Core and coordinate multi-engine readiness; no public
-player test is authorized yet.
+Begin Stage 8 by porting ZoneEngine and the full Core/PlayfieldLoader data
+closure, then coordinate multi-engine readiness and bounded shutdown. Keep the
+proven LoginEngine slice disabled and loopback-only: public exposure remains
+unapproved until ZoneEngine exists, official-client end-to-end login plus
+retry/error UX is proven, character-count semantics are resolved, and a
+sustained multiplayer soak passes.
 
 ## Constraints
 

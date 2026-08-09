@@ -77,6 +77,7 @@ namespace AORebirth.LinuxBuild.Contracts
             VerifyLoginSourceInventory(root);
             VerifyLinuxProjects(root);
             VerifyHandlerSourceMappings(root);
+            VerifySecuritySourceContracts(root);
             VerifyDeploymentDatabaseIdentity(root);
         }
 
@@ -183,7 +184,14 @@ namespace AORebirth.LinuxBuild.Contracts
                 lines.Add(line);
             }
 
-            AddLine(lines, "safety", "listeners=excluded", "dao=excluded", "authentication=excluded");
+            AddLine(
+                lines,
+                "safety",
+                "listeners=excluded",
+                "dao=guarded-offline",
+                "authentication=state-gated",
+                "ownership=source-gated",
+                "shutdown-drain=linux-verified");
             return NormalizeManifest(string.Join("\n", lines) + "\n");
         }
 
@@ -478,12 +486,248 @@ namespace AORebirth.LinuxBuild.Contracts
 
         private static void VerifyHandlerSourceMappings(string root)
         {
-            VerifyHandlerSource(root, "UserLoginHandler.cs", new[] { "ServerSaltMessage" }, new[] { "0x00002B3F" });
+            VerifyHandlerSource(root, "UserLoginHandler.cs", new[] { "LoginErrorMessage", "ServerSaltMessage" }, new[] { "0x00001F83", "0x00002B3F" });
             VerifyHandlerSource(root, "UserCredentialsHandler.cs", new[] { "CharacterListMessage", "LoginErrorMessage" }, new[] { "0x00001F83", "0x0000615B" });
             VerifyHandlerSource(root, "SelectCharacterHandler.cs", new[] { "LoginErrorMessage", "ZoneInfoMessage" }, new[] { "0x00001F83", "0x0000615B" });
             VerifyHandlerSource(root, "RandomNameRequestHandler.cs", new[] { "SuggestNameMessage" }, new[] { "0x0000FFFF" });
-            VerifyHandlerSource(root, "DeleteCharacterHandler.cs", new[] { "CharacterDeletedMessage" }, new[] { "0x0000FFFF" });
-            VerifyHandlerSource(root, "CreateCharacterHandler.cs", new[] { "CharacterCreatedMessage", "NameInUseMessage" }, new[] { "0x0000FFFF" });
+            VerifyHandlerSource(root, "DeleteCharacterHandler.cs", new[] { "CharacterDeletedMessage", "LoginErrorMessage" }, new[] { "0x00001F83", "0x0000FFFF" });
+            VerifyHandlerSource(root, "CreateCharacterHandler.cs", new[] { "CharacterCreatedMessage", "LoginErrorMessage", "NameInUseMessage" }, new[] { "0x00001F83", "0x0000FFFF" });
+        }
+
+        private static void VerifySecuritySourceContracts(string root)
+        {
+            string coreSourceRoot = Path.Combine(
+                root,
+                "AORebirth",
+                "Libraries",
+                "Source",
+                "AORebirth.Core");
+            string loginSourceRoot = Path.Combine(root, "AORebirth", "Server", "LoginEngine");
+
+            string loginEncryption = ReadSourceWithoutComments(
+                Path.Combine(coreSourceRoot, "Encryption", "LoginEncryption.cs"),
+                "LoginEncryption security source");
+            Assert(
+                Regex.Matches(loginEncryption, @"\bpublic\s+bool\s+i_Enable\s*=\s*true\s*;").Count == 1,
+                "LoginEncryption must enable authentication in every build configuration.");
+            Assert(
+                !Regex.IsMatch(loginEncryption, @"\bi_Enable\s*=\s*false\s*;"),
+                "LoginEncryption retained a disabled authentication path.");
+            Assert(
+                loginEncryption.IndexOf("#if DEBUG", StringComparison.Ordinal) < 0,
+                "LoginEncryption retained a DEBUG authentication bypass.");
+            const string disabledGuard =
+                @"if\s*\(\s*this\s*\.\s*i_Enable\s*==\s*false\s*\)\s*\{\s*return\s+false\s*;\s*\}";
+            Assert(
+                Regex.Matches(loginEncryption, disabledGuard, RegexOptions.Singleline).Count == 2,
+                "Both LoginEncryption disabled branches must fail closed.");
+            Assert(
+                !Regex.IsMatch(
+                    loginEncryption,
+                    @"if\s*\(\s*this\s*\.\s*i_Enable\s*==\s*false\s*\)\s*\{\s*return\s+true\s*;",
+                    RegexOptions.Singleline),
+                "LoginEncryption retained a disabled-state return-true bypass.");
+
+            string userLogin = ReadSourceWithoutComments(
+                Path.Combine(loginSourceRoot, "MessageHandlers", "UserLoginHandler.cs"),
+                "UserLoginHandler security source");
+            RequireSourceToken(
+                userLogin,
+                "RandomNumberGenerator.Create()",
+                "UserLoginHandler cryptographic salt generator");
+            Assert(
+                !Regex.IsMatch(userLogin, @"\bnew\s+(?:System\s*\.\s*)?Random\s*\("),
+                "UserLoginHandler retained System.Random salt generation.");
+            Assert(
+                userLogin.IndexOf("System.Random", StringComparison.Ordinal) < 0,
+                "UserLoginHandler retained an explicit System.Random reference.");
+            RequireSourceToken(userLogin, "BeginAuthentication", "UserLoginHandler challenge state transition");
+
+            string client = ReadSourceWithoutComments(
+                Path.Combine(loginSourceRoot, "CoreClient", "Client.cs"),
+                "LoginEngine client authentication state source");
+            foreach (string token in new[]
+            {
+                "authenticationSync",
+                "authenticationGeneration",
+                "AwaitingLogin",
+                "ChallengeIssued",
+                "Authenticating",
+                "Authenticated",
+                "Closed",
+                "BeginAuthentication",
+                "TryBeginAuthenticationAttempt",
+                "CompleteAuthentication",
+                "TryGetAuthenticatedAccountName",
+                "RejectAuthentication"
+            })
+            {
+                RequireSourceToken(client, token, "LoginEngine client authentication state");
+            }
+
+            string create = ReadSourceWithoutComments(
+                Path.Combine(loginSourceRoot, "MessageHandlers", "CreateCharacterHandler.cs"),
+                "CreateCharacterHandler security source");
+            VerifyAnonymousGuardBeforeDataAccess(
+                create,
+                "CreateCharacterHandler",
+                new[] { "new CharacterName" });
+            RequireSourceToken(create, "AccountName = authenticatedAccount", "CreateCharacterHandler authenticated identity");
+
+            string select = ReadSourceWithoutComments(
+                Path.Combine(loginSourceRoot, "MessageHandlers", "SelectCharacterHandler.cs"),
+                "SelectCharacterHandler security source");
+            VerifyAnonymousGuardBeforeDataAccess(
+                select,
+                "SelectCharacterHandler",
+                new[] { "new CheckLogin", "CharacterDao.Instance" });
+            RequireSourceToken(
+                select,
+                "IsCharacterOnAccount(authenticatedAccount",
+                "SelectCharacterHandler ownership check");
+
+            string delete = ReadSourceWithoutComments(
+                Path.Combine(loginSourceRoot, "MessageHandlers", "DeleteCharacterHandler.cs"),
+                "DeleteCharacterHandler security source");
+            VerifyAnonymousGuardBeforeDataAccess(
+                delete,
+                "DeleteCharacterHandler",
+                new[] { "new CheckLogin", "new CharacterName" });
+            RequireSourceToken(
+                delete,
+                "TryDeleteChar(authenticatedAccount",
+                "DeleteCharacterHandler authenticated ownership delete");
+
+            string characterName = ReadSourceWithoutComments(
+                Path.Combine(loginSourceRoot, "Packets", "CharacterName.cs"),
+                "CharacterName ownership delete source");
+            RequireSourceToken(
+                characterName,
+                "DeleteForUser(accountName, charid)",
+                "CharacterName account-scoped delete");
+
+            string characterDao = ReadSourceWithoutComments(
+                Path.Combine(
+                    root,
+                    "AORebirth",
+                    "Libraries",
+                    "Source",
+                    "AORebirth.Database",
+                    "Dao",
+                    "CharacterDao.cs"),
+                "CharacterDao ownership delete source");
+            RequireSourceToken(characterDao, "DeleteForUser", "CharacterDao account-scoped delete operation");
+            RequireSourceToken(characterDao, "Username = accountName", "CharacterDao delete ownership predicate");
+            RequireSourceToken(characterDao, "BeginTransaction()", "CharacterDao transactional ownership delete");
+            RequireSourceToken(
+                characterDao,
+                "DELETE FROM characters WHERE Id=@Id AND Username=@Username",
+                "CharacterDao destructive ownership predicate");
+            RequireSourceToken(characterDao, "deleted != 1", "CharacterDao ownership race rejection");
+            foreach (string table in new[]
+            {
+                "missionflags",
+                "missionstates",
+                "missionobjectiveprogress",
+                "missionobjectiveobservations",
+                "missionrewardledger",
+                "characterstimers",
+                "charactersactivenanos",
+                "charactersmeshs",
+                "charactersuploadednanos",
+                "charactersperks"
+            })
+            {
+                RequireSourceToken(
+                    characterDao,
+                    "DELETE FROM " + table + " WHERE CharacterId=@CharacterId",
+                    "CharacterDao " + table + " cleanup");
+            }
+
+            RequireSourceToken(
+                characterDao,
+                "ReceivedMessagesDao.Instance.Delete(new { PlayerId = id }, connection, transaction)",
+                "CharacterDao receivedmessages PlayerId cleanup");
+
+            string messagePublisher = ReadSourceWithoutComments(
+                Path.Combine(coreSourceRoot, "Components", "MessagePublisher.cs"),
+                "MessagePublisher ordering source");
+            RequireSourceToken(
+                messagePublisher,
+                "ConditionalWeakTable<object, object>",
+                "MessagePublisher per-sender lock table");
+            RequireSourceToken(messagePublisher, "GetValue(sender", "MessagePublisher sender lock lookup");
+            RequireSourceToken(messagePublisher, "lock (senderSync)", "MessagePublisher per-sender critical section");
+
+            string memBusAdapter = ReadSourceWithoutComments(
+                Path.Combine(coreSourceRoot, "Components", "MemBusAdapter.cs"),
+                "MemBusAdapter shutdown source");
+            foreach (string token in new[]
+            {
+                "ConditionalWeakTable<object, SenderDispatchQueue>",
+                "Queue<MessageReceivedEvent>",
+                "CompleteOrderedDispatch",
+                "pendingMessages",
+                "StopAcceptingMessages",
+                "WaitForIdle",
+                "TrySetDispatchCompletion",
+                "CompleteDispatch"
+            })
+            {
+                RequireSourceToken(memBusAdapter, token, "MemBusAdapter bounded drain");
+            }
+
+            string receivedHandler = ReadSourceWithoutComments(
+                Path.Combine(coreSourceRoot, "EventHandlers", "Handlers", "MessageReceivedHandler.cs"),
+                "MessageReceivedHandler completion source");
+            RequireSourceToken(receivedHandler, "finally", "MessageReceivedHandler completion guarantee");
+            RequireSourceToken(receivedHandler, "obj.CompleteDispatch()", "MessageReceivedHandler dispatch completion");
+
+            string linuxProgram = ReadSourceWithoutComments(
+                Path.Combine(root, "LinuxBuild", "Compatibility", "LoginEngine", "LinuxProgram.cs"),
+                "Linux LoginEngine shutdown source");
+            int stopIndex = linuxProgram.IndexOf("StopAcceptingMessages", StringComparison.Ordinal);
+            int waitIndex = linuxProgram.IndexOf("WaitForIdle", StringComparison.Ordinal);
+            Assert(
+                stopIndex >= 0 && waitIndex > stopIndex,
+                "Linux LoginEngine must stop accepting dispatches before waiting for the bounded drain.");
+            RequireSourceToken(
+                linuxProgram,
+                "TimeSpan.FromSeconds(30)",
+                "Linux LoginEngine bounded drain timeout");
+        }
+
+        private static void VerifyAnonymousGuardBeforeDataAccess(
+            string source,
+            string description,
+            IEnumerable<string> dataAccessTokens)
+        {
+            int guard = source.IndexOf("TryGetAuthenticatedAccountName", StringComparison.Ordinal);
+            int rejection = source.IndexOf("RejectAuthentication", guard < 0 ? 0 : guard, StringComparison.Ordinal);
+            int earlyReturn = source.IndexOf("return;", rejection < 0 ? 0 : rejection, StringComparison.Ordinal);
+            int firstDataAccess = dataAccessTokens
+                .Select(token => source.IndexOf(token, StringComparison.Ordinal))
+                .Where(index => index >= 0)
+                .DefaultIfEmpty(-1)
+                .Min();
+            Assert(guard >= 0, description + " is missing its authenticated-session guard.");
+            Assert(rejection > guard, description + " does not reject a failed authenticated-session guard.");
+            Assert(firstDataAccess > rejection, description + " authenticates after data access begins.");
+            Assert(earlyReturn > rejection && earlyReturn < firstDataAccess, description + " does not return before data access after rejection.");
+        }
+
+        private static string ReadSourceWithoutComments(string path, string description)
+        {
+            string source = File.ReadAllText(RequireFile(path, description));
+            source = Regex.Replace(source, @"/\*.*?\*/", string.Empty, RegexOptions.Singleline);
+            return Regex.Replace(source, @"//.*?$", string.Empty, RegexOptions.Multiline);
+        }
+
+        private static void RequireSourceToken(string source, string token, string description)
+        {
+            Assert(
+                source.IndexOf(token, StringComparison.Ordinal) >= 0,
+                description + " is missing required source token " + token + ".");
         }
 
         private static void VerifyDeploymentDatabaseIdentity(string root)
@@ -547,15 +791,27 @@ namespace AORebirth.LinuxBuild.Contracts
             string source = File.ReadAllText(path);
             source = Regex.Replace(source, @"/\*.*?\*/", string.Empty, RegexOptions.Singleline);
             source = Regex.Replace(source, @"//.*?$", string.Empty, RegexOptions.Multiline);
-            string[] responses = Regex.Matches(source, @"\bnew\s+([A-Za-z][A-Za-z0-9_]*Message)\b")
+            IEnumerable<string> responseNames = Regex.Matches(source, @"\bnew\s+([A-Za-z][A-Za-z0-9_]*Message)\b")
                 .Cast<Match>()
-                .Select(match => match.Groups[1].Value)
+                .Select(match => match.Groups[1].Value);
+            if (source.IndexOf("RejectAuthentication", StringComparison.Ordinal) >= 0)
+            {
+                responseNames = responseNames.Concat(new[] { "LoginErrorMessage" });
+            }
+
+            string[] responses = responseNames
                 .Distinct(StringComparer.Ordinal)
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray();
-            string[] receivers = Regex.Matches(source, @"\bclient\.Send\s*\(\s*(0x[0-9A-Fa-f]+)")
+            IEnumerable<string> receiverNames = Regex.Matches(source, @"\bclient\.Send\s*\(\s*(0x[0-9A-Fa-f]+)")
                 .Cast<Match>()
-                .Select(match => match.Groups[1].Value.ToUpperInvariant().Replace("X", "x"))
+                .Select(match => match.Groups[1].Value.ToUpperInvariant().Replace("X", "x"));
+            if (source.IndexOf("RejectAuthentication", StringComparison.Ordinal) >= 0)
+            {
+                receiverNames = receiverNames.Concat(new[] { "0x00001F83" });
+            }
+
+            string[] receivers = receiverNames
                 .Distinct(StringComparer.Ordinal)
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray();

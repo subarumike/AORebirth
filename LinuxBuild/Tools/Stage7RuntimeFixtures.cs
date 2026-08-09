@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
 using AORebirth.Core.Components;
 using AORebirth.Core.EventHandlers.Events;
+using AORebirth.Core.EventHandlers.Handlers;
 
 using Cell.Core;
 
@@ -31,7 +33,19 @@ internal static class Stage7RuntimeFixtures
         VerifyClientFramingAndReceive(lines);
         AddSerializerGoldens(lines);
         VerifySafeHandlers(lines);
+        VerifyAuthenticationSecurity(lines);
+        VerifyMessagePublisherOrdering(lines);
+        VerifyAdapterOrdering(lines);
         VerifyActiveDispatch(lines);
+#if AOREBIRTH_LINUX
+        VerifyLinuxBoundedDrain();
+#endif
+        AddLine(
+            lines,
+            "runtime.shutdown-drain",
+            "linux-only=held-message-rejected-and-drained",
+            "actual-handler=MessageReceivedHandler",
+            "wait=bounded");
         return Normalize(string.Join("\n", lines) + "\n");
     }
 
@@ -272,6 +286,398 @@ internal static class Stage7RuntimeFixtures
         }
     }
 
+    private static void VerifyAuthenticationSecurity(ICollection<string> lines)
+    {
+        var encryption = new AO.Core.Encryption.LoginEncryption();
+        Assert(encryption.i_Enable, "Login encryption is disabled in the active build configuration.");
+        encryption.i_Enable = false;
+        Assert(
+            !encryption.IsValidLogin("invalid-login-key", "invalid-salt", "Stage7User", "invalid-password-hash"),
+            "Disabled four-argument login validation bypassed invalid credentials.");
+        Assert(
+            !encryption.IsValidLogin("invalid-login-key", "invalid-salt", "Stage7User"),
+            "Disabled three-argument login validation bypassed invalid credentials.");
+
+        VerifyAnonymousHandler(
+            new CreateCharacterHandler(),
+            new CreateCharacterMessage(),
+            "create-character");
+        VerifyAnonymousHandler(
+            new SelectCharacterHandler(),
+            new SelectCharacterMessage { CharacterId = 1 },
+            "select-character");
+        VerifyAnonymousHandler(
+            new DeleteCharacterHandler(),
+            new DeleteCharacterMessage { CharacterId = 1 },
+            "delete-character");
+        VerifyAuthenticationStateMachine();
+
+        AddLine(
+            lines,
+            "runtime.authentication-security",
+            "debug-encryption=enabled",
+            "disabled-bypass=fail-closed",
+            "anonymous-create=reject-before-dao",
+            "anonymous-select=reject-before-dao",
+            "anonymous-delete=reject-before-dao",
+            "challenge-reset=verified",
+            "challenge-replay=rejected");
+    }
+
+    private static void VerifyAnonymousHandler(
+        IHandleMessage handler,
+        MessageBody body,
+        string description)
+    {
+        var serializer = new RecordingSerializer
+        {
+            SerializedBytes = new byte[] { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE }
+        };
+        var bus = new RecordingBus();
+        var factory = new ClientFactory(serializer, bus);
+        var server = new LoginServer(factory);
+        var client = new CaptureClient(server, serializer, bus);
+        try
+        {
+            handler.Handle(
+                client,
+                new Message { Header = CreateHeader(body, 1), Body = body });
+
+            Assert(
+                serializer.SerializedMessages.Count == 1,
+                "Anonymous " + description + " did not emit exactly one rejection.");
+            Message response = serializer.SerializedMessages[0];
+            Assert(
+                response.Header.Receiver == 0x00001F83,
+                "Anonymous " + description + " rejection receiver changed.");
+            var loginError = response.Body as LoginErrorMessage;
+            Assert(
+                loginError != null && loginError.Error == LoginError.InvalidUserNamePassword,
+                "Anonymous " + description + " emitted a non-authentication response.");
+            Assert(
+                client.SentPackets.Count == 1,
+                "Anonymous " + description + " emitted an unexpected packet count.");
+        }
+        finally
+        {
+            client.Dispose();
+            server.Dispose();
+        }
+    }
+
+    private static void VerifyAuthenticationStateMachine()
+    {
+        var serializer = new RecordingSerializer();
+        var bus = new RecordingBus();
+        var factory = new ClientFactory(serializer, bus);
+        var server = new LoginServer(factory);
+        var client = new CaptureClient(server, serializer, bus);
+        try
+        {
+            object[] unauthenticated = { string.Empty };
+            Assert(
+                !(bool)InvokeRequired(client, "TryGetAuthenticatedAccountName", unauthenticated),
+                "Fresh LoginEngine client reported an authenticated account.");
+
+            Assert(
+                (bool)InvokeRequired(
+                    client,
+                    "BeginAuthentication",
+                    new object[] { "Stage7User", "18.8.53_EP1", "stage7-salt-one" }),
+                "LoginEngine client did not issue its first authentication challenge.");
+
+            object[] wrongAttempt = { "WrongUser", string.Empty, string.Empty, 0L };
+            Assert(
+                !(bool)InvokeRequired(client, "TryBeginAuthenticationAttempt", wrongAttempt),
+                "Authentication challenge accepted a different account name.");
+
+            object[] firstAttempt = { "Stage7User", string.Empty, string.Empty, 0L };
+            Assert(
+                (bool)InvokeRequired(client, "TryBeginAuthenticationAttempt", firstAttempt),
+                "LoginEngine client did not consume its first authentication challenge.");
+            Assert(
+                string.Equals((string)firstAttempt[1], "Stage7User", StringComparison.Ordinal)
+                && string.Equals((string)firstAttempt[2], "stage7-salt-one", StringComparison.Ordinal),
+                "Authentication attempt did not return the challenged identity and salt.");
+            long firstGeneration = (long)firstAttempt[3];
+
+            Assert(
+                (bool)InvokeRequired(
+                    client,
+                    "BeginAuthentication",
+                    new object[] { "Stage7Replacement", "18.8.53_EP1", "stage7-salt-two" }),
+                "LoginEngine client did not replace an in-flight authentication challenge.");
+            Assert(
+                !(bool)InvokeRequired(
+                    client,
+                    "CompleteAuthentication",
+                    new object[] { "Stage7User", firstGeneration }),
+                "Replaced authentication challenge completed with a stale generation.");
+
+            object[] replacementAttempt = { "Stage7Replacement", string.Empty, string.Empty, 0L };
+            Assert(
+                (bool)InvokeRequired(client, "TryBeginAuthenticationAttempt", replacementAttempt),
+                "Replacement authentication challenge could not begin.");
+            long replacementGeneration = (long)replacementAttempt[3];
+            Assert(
+                replacementGeneration != firstGeneration,
+                "Replacement authentication challenge reused its generation.");
+            Assert(
+                (bool)InvokeRequired(
+                    client,
+                    "CompleteAuthentication",
+                    new object[] { "Stage7Replacement", replacementGeneration }),
+                "Replacement authentication challenge could not complete.");
+            Assert(
+                !(bool)InvokeRequired(
+                    client,
+                    "CompleteAuthentication",
+                    new object[] { "Stage7Replacement", replacementGeneration }),
+                "Completed authentication challenge was replayable.");
+            Assert(
+                string.Equals(client.ServerSalt, string.Empty, StringComparison.Ordinal),
+                "Successful authentication retained the server challenge salt.");
+
+            object[] authenticated = { string.Empty };
+            Assert(
+                (bool)InvokeRequired(client, "TryGetAuthenticatedAccountName", authenticated)
+                && string.Equals((string)authenticated[0], "Stage7Replacement", StringComparison.Ordinal),
+                "Completed authentication did not expose the authenticated identity.");
+
+            Assert(
+                (bool)InvokeRequired(
+                    client,
+                    "BeginAuthentication",
+                    new object[] { "Stage7Final", "18.8.53_EP1", "stage7-salt-three" }),
+                "LoginEngine client did not reset an authenticated session for a new challenge.");
+            object[] resetAuthentication = { string.Empty };
+            Assert(
+                !(bool)InvokeRequired(client, "TryGetAuthenticatedAccountName", resetAuthentication),
+                "A new challenge retained the prior authenticated identity.");
+        }
+        finally
+        {
+            client.Dispose();
+            server.Dispose();
+        }
+    }
+
+    private static void VerifyMessagePublisherOrdering(ICollection<string> lines)
+    {
+        using (var handler = new SequencingMessageHandler())
+        {
+            var publisher = new MessagePublisher(new IHandleMessage[] { handler });
+            var sameSender = new object();
+            var firstFailure = new ThreadFailure();
+            var secondFailure = new ThreadFailure();
+            Thread first = StartPublishThread(
+                publisher,
+                sameSender,
+                "same-first",
+                null,
+                firstFailure);
+            Thread second = null;
+            try
+            {
+                Assert(
+                    handler.SameFirstEntered.Wait(TimeSpan.FromSeconds(5)),
+                    "Same-sender first dispatch did not enter its handler.");
+                second = StartPublishThread(
+                    publisher,
+                    sameSender,
+                    "same-second",
+                    handler.SameSecondStarted,
+                    secondFailure);
+                Assert(
+                    handler.SameSecondStarted.Wait(TimeSpan.FromSeconds(5)),
+                    "Same-sender second dispatch thread did not start.");
+                Assert(
+                    !handler.SameSecondEntered.Wait(TimeSpan.FromMilliseconds(250)),
+                    "Same-sender second dispatch overtook a held first dispatch.");
+
+                handler.ReleaseSame.Set();
+                Assert(first.Join(5000), "Same-sender first dispatch did not complete.");
+                Assert(second.Join(5000), "Same-sender second dispatch did not complete.");
+                Assert(firstFailure.Value == null, "Same-sender first dispatch threw: " + FormatException(firstFailure.Value));
+                Assert(secondFailure.Value == null, "Same-sender second dispatch threw: " + FormatException(secondFailure.Value));
+                Assert(
+                    handler.SameOrder.SequenceEqual(new[] { "same-first", "same-second" }),
+                    "Same-sender dispatch order was not FIFO.");
+
+                var differentFirstFailure = new ThreadFailure();
+                var differentSecondFailure = new ThreadFailure();
+                Thread differentFirst = StartPublishThread(
+                    publisher,
+                    new object(),
+                    "different-first",
+                    null,
+                    differentFirstFailure);
+                Thread differentSecond = StartPublishThread(
+                    publisher,
+                    new object(),
+                    "different-second",
+                    null,
+                    differentSecondFailure);
+                try
+                {
+                    Assert(
+                        handler.DifferentEntered.Wait(TimeSpan.FromSeconds(5)),
+                        "Different-sender dispatches did not enter concurrently.");
+                    Assert(
+                        handler.MaximumDifferentActive >= 2,
+                        "Different-sender dispatches were serialized.");
+                }
+                finally
+                {
+                    handler.ReleaseDifferent.Set();
+                }
+
+                Assert(differentFirst.Join(5000), "Different-sender first dispatch did not complete.");
+                Assert(differentSecond.Join(5000), "Different-sender second dispatch did not complete.");
+                Assert(differentFirstFailure.Value == null, "Different-sender first dispatch threw: " + FormatException(differentFirstFailure.Value));
+                Assert(differentSecondFailure.Value == null, "Different-sender second dispatch threw: " + FormatException(differentSecondFailure.Value));
+            }
+            finally
+            {
+                handler.ReleaseSame.Set();
+                handler.ReleaseDifferent.Set();
+                if (first != null && first.IsAlive) first.Join(5000);
+                if (second != null && second.IsAlive) second.Join(5000);
+            }
+        }
+
+        AddLine(
+            lines,
+            "runtime.message-publisher-defense",
+            "same-sender=fifo",
+            "different-sender=concurrent",
+            "different-sender-overlap=2");
+    }
+
+    private static void VerifyAdapterOrdering(ICollection<string> lines)
+    {
+        using (var publisher = new AdapterSequencingPublisher())
+        {
+            var actualHandler = new MessageReceivedHandler(publisher);
+            IBus adapter = CreateMemBusAdapter(new SingleInstanceContainer(actualHandler));
+            var sameSender = new object();
+            try
+            {
+                adapter.Publish(CreateReceivedEvent(sameSender, "adapter-same-first"));
+                Assert(
+                    publisher.SameFirstEntered.Wait(TimeSpan.FromSeconds(5)),
+                    "Adapter same-sender first dispatch did not enter its handler.");
+                adapter.Publish(CreateReceivedEvent(sameSender, "adapter-same-second"));
+                Assert(
+                    !publisher.SameSecondEntered.Wait(TimeSpan.FromMilliseconds(250)),
+                    "Adapter dispatched a same-sender message before its predecessor completed.");
+
+                publisher.ReleaseSame.Set();
+                Assert(
+                    publisher.SameSecondCompleted.Wait(TimeSpan.FromSeconds(5)),
+                    "Adapter same-sender queue did not advance after completion.");
+                Assert(
+                    publisher.SameOrder.SequenceEqual(new[] { "adapter-same-first", "adapter-same-second" }),
+                    "Adapter same-sender dispatch order was not FIFO.");
+
+                adapter.Publish(CreateReceivedEvent(new object(), "adapter-different-first"));
+                adapter.Publish(CreateReceivedEvent(new object(), "adapter-different-second"));
+                Assert(
+                    publisher.DifferentEntered.Wait(TimeSpan.FromSeconds(5)),
+                    "Adapter different-sender dispatches did not enter concurrently.");
+                Assert(
+                    publisher.MaximumDifferentActive >= 2,
+                    "Adapter serialized dispatches from different senders.");
+            }
+            finally
+            {
+                publisher.ReleaseSame.Set();
+                publisher.ReleaseDifferent.Set();
+            }
+
+            Assert(
+                publisher.DifferentCompleted.Wait(TimeSpan.FromSeconds(5)),
+                "Adapter different-sender dispatches did not complete.");
+        }
+
+        AddLine(
+            lines,
+            "runtime.dispatch-ordering",
+            "adapter=MemBusAdapter",
+            "actual-handler=MessageReceivedHandler",
+            "same-sender=fifo",
+            "different-sender=concurrent",
+            "different-sender-overlap=2");
+    }
+
+    private static MessageReceivedEvent CreateReceivedEvent(object sender, string marker)
+    {
+        var body = new UserLoginMessage { UserName = marker, ClientVersion = "stage7.1" };
+        return new MessageReceivedEvent(
+            sender,
+            new Message { Header = CreateHeader(body, 1), Body = body });
+    }
+
+#if AOREBIRTH_LINUX
+    private static void VerifyLinuxBoundedDrain()
+    {
+        using (var holdingPublisher = new HoldingMessagePublisher())
+        {
+            var actualHandler = new MessageReceivedHandler(holdingPublisher);
+            var container = new SingleInstanceContainer(actualHandler);
+            IBus adapter = CreateMemBusAdapter(container);
+            var body = new UserLoginMessage { UserName = "drain-held", ClientVersion = "stage7.1" };
+            var receivedEvent = new MessageReceivedEvent(
+                new object(),
+                new Message { Header = CreateHeader(body, 1), Body = body });
+            try
+            {
+                adapter.Publish(receivedEvent);
+                Assert(
+                    holdingPublisher.Entered.Wait(TimeSpan.FromSeconds(5)),
+                    "Linux drain fixture did not enter the actual MessageReceivedHandler.");
+
+                InvokeRequired(adapter, "StopAcceptingMessages", new object[0]);
+                Assert(
+                    !(bool)InvokeRequired(
+                        adapter,
+                        "WaitForIdle",
+                        new object[] { TimeSpan.FromMilliseconds(150) }),
+                    "Linux drain reported idle while an actual MessageReceivedHandler was held.");
+
+                bool rejected = false;
+                try
+                {
+                    adapter.Publish(
+                        new MessageReceivedEvent(
+                            new object(),
+                            new Message { Header = CreateHeader(body, 1), Body = body }));
+                }
+                catch (InvalidOperationException)
+                {
+                    rejected = true;
+                }
+
+                Assert(rejected, "Linux drain accepted a message after shutdown began.");
+            }
+            finally
+            {
+                holdingPublisher.Release.Set();
+            }
+
+            Assert(
+                (bool)InvokeRequired(
+                    adapter,
+                    "WaitForIdle",
+                    new object[] { TimeSpan.FromSeconds(5) }),
+                "Linux drain did not become idle after the held handler completed.");
+            Assert(
+                holdingPublisher.Executions == 1,
+                "Linux drain did not execute the held MessageReceivedHandler exactly once.");
+        }
+    }
+#endif
+
     private static void VerifyActiveDispatch(ICollection<string> lines)
     {
         var serializer = new RecordingSerializer { SerializedBytes = new byte[] { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE } };
@@ -426,6 +832,64 @@ internal static class Stage7RuntimeFixtures
         while (Interlocked.CompareExchange(ref target, candidate, current) != current);
     }
 
+    private static object InvokeRequired(object target, string methodName, object[] arguments)
+    {
+        MethodInfo[] methods = target.GetType()
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(method => string.Equals(method.Name, methodName, StringComparison.Ordinal)
+                && method.GetParameters().Length == arguments.Length)
+            .ToArray();
+        Assert(
+            methods.Length == 1,
+            "Expected exactly one " + target.GetType().FullName + "." + methodName + " method.");
+        return methods[0].Invoke(target, arguments);
+    }
+
+    private static IBus CreateMemBusAdapter(IContainer container)
+    {
+        object iocAdapter = Activator.CreateInstance(
+            typeof(MemBusIoCAdapter),
+            new object[] { container });
+        object adapter = Activator.CreateInstance(
+            typeof(MemBusAdapter),
+            new[] { iocAdapter });
+        var bus = adapter as IBus;
+        Assert(bus != null, "Stage 7.1 fixture could not construct MemBusAdapter.");
+        return bus;
+    }
+
+    private static Thread StartPublishThread(
+        MessagePublisher publisher,
+        object sender,
+        string marker,
+        ManualResetEventSlim started,
+        ThreadFailure failure)
+    {
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                if (started != null) started.Set();
+                var body = new UserLoginMessage { UserName = marker, ClientVersion = "stage7.1" };
+                publisher.Publish(
+                    sender,
+                    new Message { Header = CreateHeader(body, 1), Body = body });
+            }
+            catch (Exception exception)
+            {
+                failure.Value = exception;
+            }
+        });
+        thread.IsBackground = true;
+        thread.Start();
+        return thread;
+    }
+
+    private static string FormatException(Exception exception)
+    {
+        return exception == null ? string.Empty : exception.GetType().FullName + ": " + exception.Message;
+    }
+
     private static Header CreateHeader(MessageBody body, int receiver)
     {
         return new Header
@@ -496,6 +960,236 @@ internal static class Stage7RuntimeFixtures
     private static void Assert(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);
+    }
+
+    private sealed class ThreadFailure
+    {
+        internal Exception Value;
+    }
+
+    private sealed class SequencingMessageHandler : IHandleMessage<UserLoginMessage>, IDisposable
+    {
+        private readonly object sameOrderSync = new object();
+        private readonly List<string> sameOrder = new List<string>();
+        private int differentActive;
+        private int maximumDifferentActive;
+
+        internal readonly ManualResetEventSlim SameFirstEntered = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim SameSecondStarted = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim SameSecondEntered = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim ReleaseSame = new ManualResetEventSlim(false);
+        internal readonly CountdownEvent DifferentEntered = new CountdownEvent(2);
+        internal readonly ManualResetEventSlim ReleaseDifferent = new ManualResetEventSlim(false);
+
+        internal IEnumerable<string> SameOrder
+        {
+            get
+            {
+                lock (this.sameOrderSync)
+                {
+                    return this.sameOrder.ToArray();
+                }
+            }
+        }
+
+        internal int MaximumDifferentActive
+        {
+            get
+            {
+                return Volatile.Read(ref this.maximumDifferentActive);
+            }
+        }
+
+        public void Handle(object sender, Message message)
+        {
+            var body = (UserLoginMessage)message.Body;
+            string marker = body.UserName;
+            if (marker.StartsWith("same-", StringComparison.Ordinal))
+            {
+                lock (this.sameOrderSync)
+                {
+                    this.sameOrder.Add(marker);
+                }
+
+                if (string.Equals(marker, "same-first", StringComparison.Ordinal))
+                {
+                    this.SameFirstEntered.Set();
+                    this.ReleaseSame.Wait(TimeSpan.FromSeconds(10));
+                }
+                else
+                {
+                    this.SameSecondEntered.Set();
+                }
+
+                return;
+            }
+
+            int active = Interlocked.Increment(ref this.differentActive);
+            UpdateMaximum(ref this.maximumDifferentActive, active);
+            try
+            {
+                this.DifferentEntered.Signal();
+                this.ReleaseDifferent.Wait(TimeSpan.FromSeconds(10));
+            }
+            finally
+            {
+                Interlocked.Decrement(ref this.differentActive);
+            }
+        }
+
+        public void Dispose()
+        {
+            this.SameFirstEntered.Dispose();
+            this.SameSecondStarted.Dispose();
+            this.SameSecondEntered.Dispose();
+            this.ReleaseSame.Dispose();
+            this.DifferentEntered.Dispose();
+            this.ReleaseDifferent.Dispose();
+        }
+    }
+
+    private sealed class AdapterSequencingPublisher : IMessagePublisher, IDisposable
+    {
+        private readonly object sameOrderSync = new object();
+        private readonly List<string> sameOrder = new List<string>();
+        private int differentActive;
+        private int maximumDifferentActive;
+
+        internal readonly ManualResetEventSlim SameFirstEntered = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim SameSecondEntered = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim SameSecondCompleted = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim ReleaseSame = new ManualResetEventSlim(false);
+        internal readonly CountdownEvent DifferentEntered = new CountdownEvent(2);
+        internal readonly CountdownEvent DifferentCompleted = new CountdownEvent(2);
+        internal readonly ManualResetEventSlim ReleaseDifferent = new ManualResetEventSlim(false);
+
+        internal IEnumerable<string> SameOrder
+        {
+            get
+            {
+                lock (this.sameOrderSync)
+                {
+                    return this.sameOrder.ToArray();
+                }
+            }
+        }
+
+        internal int MaximumDifferentActive
+        {
+            get
+            {
+                return Volatile.Read(ref this.maximumDifferentActive);
+            }
+        }
+
+        public void Publish(object sender, Message message)
+        {
+            var body = (UserLoginMessage)message.Body;
+            string marker = body.UserName;
+            if (marker.StartsWith("adapter-same-", StringComparison.Ordinal))
+            {
+                lock (this.sameOrderSync)
+                {
+                    this.sameOrder.Add(marker);
+                }
+
+                if (string.Equals(marker, "adapter-same-first", StringComparison.Ordinal))
+                {
+                    this.SameFirstEntered.Set();
+                    this.ReleaseSame.Wait(TimeSpan.FromSeconds(10));
+                }
+                else
+                {
+                    this.SameSecondEntered.Set();
+                    this.SameSecondCompleted.Set();
+                }
+
+                return;
+            }
+
+            int active = Interlocked.Increment(ref this.differentActive);
+            UpdateMaximum(ref this.maximumDifferentActive, active);
+            try
+            {
+                this.DifferentEntered.Signal();
+                this.ReleaseDifferent.Wait(TimeSpan.FromSeconds(10));
+            }
+            finally
+            {
+                Interlocked.Decrement(ref this.differentActive);
+                this.DifferentCompleted.Signal();
+            }
+        }
+
+        public void Dispose()
+        {
+            this.SameFirstEntered.Dispose();
+            this.SameSecondEntered.Dispose();
+            this.SameSecondCompleted.Dispose();
+            this.ReleaseSame.Dispose();
+            this.DifferentEntered.Dispose();
+            this.DifferentCompleted.Dispose();
+            this.ReleaseDifferent.Dispose();
+        }
+    }
+
+#if AOREBIRTH_LINUX
+    private sealed class HoldingMessagePublisher : IMessagePublisher, IDisposable
+    {
+        private int executions;
+
+        internal readonly ManualResetEventSlim Entered = new ManualResetEventSlim(false);
+        internal readonly ManualResetEventSlim Release = new ManualResetEventSlim(false);
+
+        internal int Executions
+        {
+            get
+            {
+                return Volatile.Read(ref this.executions);
+            }
+        }
+
+        public void Publish(object sender, Message message)
+        {
+            Interlocked.Increment(ref this.executions);
+            this.Entered.Set();
+            this.Release.Wait(TimeSpan.FromSeconds(10));
+        }
+
+        public void Dispose()
+        {
+            this.Entered.Dispose();
+            this.Release.Dispose();
+        }
+    }
+#endif
+
+    private sealed class SingleInstanceContainer : IContainer
+    {
+        private readonly object instance;
+
+        internal SingleInstanceContainer(object instance)
+        {
+            this.instance = instance;
+        }
+
+        public IEnumerable<object> GetAllInstances(Type serviceType)
+        {
+            return serviceType.IsInstanceOfType(this.instance)
+                ? new[] { this.instance }
+                : new object[0];
+        }
+
+        public object GetInstance(Type serviceType, string key = null)
+        {
+            if (serviceType.IsInstanceOfType(this.instance)) return this.instance;
+            throw new InvalidOperationException("No Stage 7.1 fixture instance for " + serviceType.FullName + ".");
+        }
+
+        public T GetInstance<T>(string key = null)
+        {
+            return (T)this.GetInstance(typeof(T), key);
+        }
     }
 
     private sealed class RecordingSerializer : IMessageSerializer

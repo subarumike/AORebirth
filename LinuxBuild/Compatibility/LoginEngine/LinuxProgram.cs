@@ -66,9 +66,13 @@ namespace LoginEngine
 
         private static int cleanupStarted;
 
+        private static MemBusAdapter dispatchBus;
+
         private static LoginServer loginServer;
 
         private static int shutdownRequested;
+
+        private static volatile bool shutdownDrainFailed;
 
         private static PosixSignalRegistration sigIntRegistration;
 
@@ -126,7 +130,8 @@ namespace LoginEngine
                     Thread.Sleep(250);
                 }
 
-                return 0;
+                CompleteShutdown();
+                return shutdownDrainFailed ? 1 : 0;
             }
             catch (Exception exception)
             {
@@ -158,11 +163,23 @@ namespace LoginEngine
                         loginServer.TCPEnabled = false;
                     }
 
+                    if (dispatchBus != null)
+                    {
+                        dispatchBus.StopAcceptingMessages();
+                        if (!dispatchBus.WaitForIdle(TimeSpan.FromSeconds(30)))
+                        {
+                            shutdownDrainFailed = true;
+                            Console.Error.WriteLine(
+                                "LoginEngine shutdown failed: message dispatch did not drain within 30 seconds.");
+                        }
+                    }
+
                     loginServer.Stop();
                     loginServer.Dispose();
                 }
                 catch (Exception exception)
                 {
+                    shutdownDrainFailed = true;
                     Console.Error.WriteLine("LoginEngine shutdown failed: " + exception.Message);
                 }
             }
@@ -271,6 +288,12 @@ namespace LoginEngine
             {
                 throw new InvalidOperationException(
                     "LoginEngine MEF composition expected exactly six message handlers.");
+            }
+
+            dispatchBus = container.GetInstance<IBus>() as MemBusAdapter;
+            if (dispatchBus == null)
+            {
+                throw new InvalidOperationException("LoginEngine did not compose its drainable message bus.");
             }
 
             loginServer = container.GetInstance<LoginServer>();

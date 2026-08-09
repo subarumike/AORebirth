@@ -228,6 +228,7 @@ api|assembly.end%7CLoginEngine
 protected|LoginEngine.CoreClient.Client|method protected instance System.Boolean OnReceive(Cell.Core.BufferSegment buffer) virtual=true abstract=false final=false
 protected|LoginEngine.CoreClient.Client|method protected instance System.UInt32 GetMessageNumber(Cell.Core.BufferSegment segment) virtual=false abstract=false final=false
 protected|LoginEngine.CoreClient.Client|method protected instance System.UInt32 GetMessageNumber(System.Byte[] segment) virtual=false abstract=false final=false
+protected|LoginEngine.CoreClient.Client|method protected instance System.Void Dispose(System.Boolean disposing) virtual=true abstract=false final=false
 protected|LoginEngine.CoreServer.LoginServer|method protected instance Cell.Core.IClient CreateClient(System.Net.IPAddress address) virtual=true abstract=false final=false
 protected|LoginEngine.CoreServer.LoginServer|method protected instance System.Void OnReceiveUDP(System.Int32 num_bytes,System.Byte[] buf,System.Net.IPEndPoint ip) virtual=true abstract=false final=false
 protected|LoginEngine.CoreServer.LoginServer|method protected instance System.Void OnSendTo(System.Net.IPEndPoint clientIP,System.Int32 num_bytes) virtual=true abstract=false final=false
@@ -506,5 +507,9 @@ runtime.wire|user-credentials|78|436e06f36441833d44ac71cd7d761d760f8d1e4f191108b
 runtime.wire|user-login|84|d018c9c3007bd1e93671bdf1a854a02f4c93bbe6e7b3cae3238c92ea596c9c8f|398AAQABAFQAAAABobLD1AAAACIAAAACU3RhZ2U3VXNlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADE4LjguNTNfRVAxAAAAAAAAAAAA
 runtime.wire|zone-info|38|34b1776f77269988f9c7e4162a9f4edf869190182155974768aa885321619a7c|398AAQABACYAAAABobLD1AAAABcQIDBAfwAAAR1NESIzRFVmd4g=
 runtime.safe-handler|random-name|receiver=0x0000FFFF|shape=verified|exact-random-bytes=excluded
+runtime.authentication-security|debug-encryption=enabled|disabled-bypass=fail-closed|anonymous-create=reject-before-dao|anonymous-select=reject-before-dao|anonymous-delete=reject-before-dao|challenge-reset=verified|challenge-replay=rejected
+runtime.message-publisher-defense|same-sender=fifo|different-sender=concurrent|different-sender-overlap=2
+runtime.dispatch-ordering|adapter=MemBusAdapter|actual-handler=MessageReceivedHandler|same-sender=fifo|different-sender=concurrent|different-sender-overlap=2
 runtime.active-dispatch|publish=nonblocking|controlled-handlers=concurrent|controlled-executions=2|user-login=exactly-once|response=ServerSaltMessage|receiver=0x00002B3F|salt-shape=verified|exact-random-bytes=excluded
-safety|listeners=excluded|dao=excluded|authentication=excluded
+runtime.shutdown-drain|linux-only=held-message-rejected-and-drained|actual-handler=MessageReceivedHandler|wait=bounded
+safety|listeners=excluded|dao=guarded-offline|authentication=state-gated|ownership=source-gated|shutdown-drain=linux-verified

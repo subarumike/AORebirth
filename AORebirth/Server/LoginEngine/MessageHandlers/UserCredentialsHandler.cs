@@ -71,43 +71,55 @@ namespace LoginEngine.MessageHandlers
             var client = (Client)sender;
             var userCredentialsMessage = (UserCredentialsMessage)message.Body;
             var checkLogin = new CheckLogin();
-            if (checkLogin.IsLoginAllowed(client, userCredentialsMessage.UserName) == false)
+            string challengedAccount;
+            string challengedServerSalt;
+            long challengedGeneration;
+            if (!client.TryBeginAuthenticationAttempt(
+                userCredentialsMessage.UserName,
+                out challengedAccount,
+                out challengedServerSalt,
+                out challengedGeneration)
+                || checkLogin.IsLoginAllowed(challengedAccount) == false)
             {
                 Colouring.Push(ConsoleColor.Green);
                 Console.WriteLine(
-                    "Client '" + client.AccountName
+                    "Client '" + Client.ToLogValue(client.AccountName)
                     + "' banned, not a valid username, or sent a malformed Authentication Packet");
                 Colouring.Pop();
 
-                client.Send(0x00001F83, new LoginErrorMessage { Error = LoginError.InvalidUserNamePassword });
-                client.Server.DisconnectClient(client);
+                client.RejectAuthentication();
                 return;
             }
 
-            if (checkLogin.IsLoginCorrect(client, userCredentialsMessage.Credentials) == false)
+            if (checkLogin.IsLoginCorrect(
+                challengedAccount,
+                challengedServerSalt,
+                userCredentialsMessage.Credentials) == false)
             {
                 Colouring.Push(ConsoleColor.Green);
-                Console.WriteLine("Client '" + client.AccountName + "' failed Authentication.");
+                Console.WriteLine(
+                    "Client '" + Client.ToLogValue(challengedAccount) + "' failed Authentication.");
 
-                client.Send(0x00001F83, new LoginErrorMessage { Error = LoginError.InvalidUserNamePassword });
-                client.Server.DisconnectClient(client);
+                client.RejectAuthentication();
                 Colouring.Pop();
 
                 return;
             }
 
-            int expansions = 0;
-            int allowedCharacters = 0;
-
             /* This checks your expansions and
                number of characters allowed (num. of chars doesn't work)*/
-            string sqlQuery = "SELECT `Expansions`,`AllowedCharacters` FROM `login` WHERE Username = '"
-                              + client.AccountName + "'";
-            DBLoginData loginData = LoginDataDao.Instance.GetByUsername(client.AccountName);
-            expansions = loginData.Expansions;
-            allowedCharacters = loginData.AllowedCharacters;
+            DBLoginData loginData = LoginDataDao.Instance.GetByUsername(challengedAccount);
+            if (loginData == null || string.IsNullOrWhiteSpace(loginData.Username))
+            {
+                client.RejectAuthentication();
+                return;
+            }
 
-            IEnumerable<LoginCharacterInfo> characters = from c in CharacterList.LoadCharacters(client.AccountName)
+            string authenticatedAccount = loginData.Username;
+            int expansions = loginData.Expansions;
+            int allowedCharacters = loginData.AllowedCharacters;
+
+            IEnumerable<LoginCharacterInfo> characters = from c in CharacterList.LoadCharacters(authenticatedAccount)
                 select
                     new LoginCharacterInfo
                     {
@@ -130,9 +142,16 @@ namespace LoginEngine.MessageHandlers
                         AreaName = "area unknown",
                         Status = CharacterStatus.Active
                     };
+            LoginCharacterInfo[] characterArray = characters.ToArray();
+            if (!client.CompleteAuthentication(authenticatedAccount, challengedGeneration))
+            {
+                client.RejectAuthentication();
+                return;
+            }
+
             var characterListMessage = new CharacterListMessage
                                        {
-                                           Characters = characters.ToArray(),
+                                           Characters = characterArray,
                                            AllowedCharacters = allowedCharacters,
                                            Expansions = expansions
                                        };
