@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-08
+Updated: 2026-08-09
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -49,6 +49,15 @@ completion matrices and dated evidence retain detailed provenance.
   and clean SIGTERM against that database, then remain disabled/inactive with
   the normal secret-free environment untouched. The website and mail database
   containers, networks, and firewall were unchanged.
+- The parallel Linux lane now also builds LoginEngine from its exact 35-source
+  inventory with a contained identity-compatible Core slice, pinned MemBus 4.0.1,
+  and the six legacy MEF handlers. Windows/Linux contract, packet, serialization,
+  active-dispatch, offline lifecycle, and apphost gates pass. On Ubuntu 24.04
+  x86_64 the disabled unit passes the live 34-table database preflight,
+  `Type=notify`, exact main-PID ownership of loopback TCP 7500, and clean
+  SIGTERM. LoginEngine and ChatEngine remain disabled/inactive; TCP 7500 is not
+  publicly exposed, MySQL remains only on `127.0.0.1:33067`, and existing
+  website/mail containers were unchanged.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
@@ -201,6 +210,12 @@ migrations; details and exact source references are recorded in
 
 ## Remaining debt boundary
 
+- Do not expose LoginEngine TCP 7500 until all character operations require a
+  successfully authenticated connection, mutation ownership is enforced, and
+  its server salt uses a cryptographically secure generator.
+- Add bounded draining for active asynchronous LoginEngine MemBus handlers and a
+  disposable full create/update/delete DAO acceptance fixture before claiming a
+  persistent multi-player service.
 - Rotate the previously exposed database credential externally.
 - Perform authorized live WebEngine verification only after a valid disposable
   database credential is supplied. Current validation intentionally makes no
