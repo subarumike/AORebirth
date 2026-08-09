@@ -61,13 +61,25 @@ Framework solution as the reference build.
   `Type=notify`, loopback listener checks, and clean SIGTERM. The Stage 6
   validator uses a runtime drop-in and leaves the normal secret-free service
   environment untouched.
+- Stage 7 builds LoginEngine from the exact guarded 35-source inventory plus a
+  contained `AORebirth.Core` LoginEngine closure. The unchanged legacy MemBus
+  adapters use pinned MemBus 4.0.1, and MEF composes the six active handlers.
+- Stage 7 Windows/Linux API, wire, serializer, MEF, active dispatch, offline
+  lifecycle, negative configuration, and framework-dependent/self-contained
+  apphost gates pass.
+- Native Ubuntu 24.04 x86_64 validation passes the live 34-table database
+  preflight, `Type=notify` readiness, exact main-PID ownership of
+  `127.0.0.1:7500`, and clean SIGTERM. LoginEngine and ChatEngine remain
+  disabled/inactive; the database remains loopback-only and the existing website
+  and mail containers were unchanged.
 
 ## Next slice
 
-Port LoginEngine as the next independently deployable Linux engine, retaining
-the guarded shared-source approach and the isolated Stage 6 database. Keep both
-player-facing services disabled and loopback-bound until the LoginEngine
-contracts, live database preflight, and Ubuntu lifecycle gate pass.
+Keep the proven LoginEngine slice disabled and loopback-only while adding its
+public-exposure safety boundary: authenticated per-connection state, character
+ownership checks, secure server salts, and bounded asynchronous-dispatch drain.
+Then port ZoneEngine/full Core and coordinate multi-engine readiness; no public
+player test is authorized yet.
 
 ## Constraints
 

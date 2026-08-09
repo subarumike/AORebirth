@@ -2,6 +2,7 @@
   <Folder Name="/Libraries/">
     <Project Path="Projects/AORebirth.Chat.Authentication.Linux.csproj" />
     <Project Path="Projects/AORebirth.Communication.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Core.Login.Linux.csproj" />
     <Project Path="Projects/AORebirth.Database.Linux.csproj" />
     <Project Path="Projects/AORebirth.Enums.Linux.csproj" />
     <Project Path="Projects/AORebirth.Exceptions.Linux.csproj" />
@@ -19,6 +20,7 @@
   </Folder>
   <Folder Name="/Servers/">
     <Project Path="Projects/ChatEngine.Linux.csproj" />
+    <Project Path="Projects/LoginEngine.Linux.csproj" />
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Tools/CompatibilitySmokeTests/CompatibilitySmokeTests.csproj" />

@@ -145,6 +145,28 @@ Pass `true` as the second argument for a self-contained package. Deployment
 layout, secret handling, systemd, and firewall boundaries are documented in
 [`deployment/README.md`](deployment/README.md).
 
+Stage 7 builds LoginEngine as a separate .NET 10 executable from the exact
+35-item legacy compile inventory. Its narrow runtime dependency is emitted with
+the legacy `AORebirth.Core` identity but contains only the LoginEngine component,
+message, serialization, and encryption closure. The unchanged legacy MemBus
+adapters run against pinned MemBus 4.0.1, and MEF composes the six legacy login
+handlers; this does not claim that full Core or PlayfieldLoader has been ported.
+NBug and `System.Messaging` remain excluded from the Linux executable.
+
+The LoginEngine Linux entrypoint uses exact-case configuration, env-only MySQL
+credentials, a loopback-only TCP listener, live read-only database preflight,
+`Type=notify` readiness, and SIGTERM/SIGINT cleanup. Build its contract and
+runtime gate, then publish the Ubuntu package with:
+
+```bat
+LinuxBuild\verify-stage7-contracts.cmd
+LinuxBuild\publish-loginengine.cmd linux-x64 true
+```
+
+The Stage 7 gate preserves Windows/Linux public, protected, packet, serializer,
+MEF, and active-message-dispatch behavior; validates the native apphost and
+publish contents; and runs listener-free startup/lifecycle negative cases.
+
 Linux projects import checked-in source inventories generated directly from
 the legacy project files. Validate all inventories independently with:
 
@@ -155,12 +177,13 @@ dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.
   --check
 ```
 
-This checkpoint includes a publishable ChatEngine build plus passing
-Windows/Linux contract, authentication, negative configuration, lifecycle, and
-publish-structure gates. Native Ubuntu 24.04.4 x86_64 apphost execution,
-listener-free validation, an exact 34-table MySQL 8.4 import, production
-database/login-path parity, systemd live database readiness with both loopback
-listeners, and real SIGTERM delivery also pass. Boot persistence and player
-traffic remain pending.
+This checkpoint includes publishable ChatEngine and LoginEngine builds plus
+passing Windows/Linux contract, authentication, negative configuration,
+lifecycle, and publish-structure gates. Native Ubuntu 24.04.4 x86_64 apphost
+execution, an exact 34-table MySQL 8.4 import, production database/login-path
+parity, systemd live database readiness, loopback listener ownership, and real
+SIGTERM delivery pass for both disabled service slices. Boot persistence,
+ZoneEngine, public LoginEngine security hardening, and player traffic remain
+pending.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).

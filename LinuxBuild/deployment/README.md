@@ -1,7 +1,8 @@
-# ChatEngine Ubuntu service package
+# AORebirth Ubuntu service packages
 
-This is the first deployable Linux server slice. It runs ChatEngine only;
-LoginEngine and ZoneEngine remain on the later porting stages.
+The Linux deployment lane now packages ChatEngine and a separate LoginEngine
+slice. ZoneEngine remains on a later porting stage. Both installed test services
+stay disabled and loopback-only.
 
 ## Build the package
 
@@ -21,6 +22,18 @@ LinuxBuild\publish-chatengine.cmd linux-x64 true
 Use `linux-arm64` instead only when the VPS architecture is ARM64. Publishing
 is deliberately untrimmed, non-single-file, and non-AOT because the messaging
 and serialization paths use runtime type discovery.
+
+Build the Stage 7 LoginEngine package with:
+
+```bat
+LinuxBuild\publish-loginengine.cmd linux-x64 true
+```
+
+The output is
+`LinuxBuild/artifacts/loginengine/linux-x64/self-contained`. The helper starts
+from a guarded empty target, restores for the requested RID, and validates the
+ELF apphost, architecture, assemblies, MemBus asset, configuration, and 34 SQL
+files before it reports success.
 
 ## Server layout
 
@@ -319,10 +332,47 @@ test "$(realpath -e -- /tmp/stage6-tool-001)" = /tmp/stage6-tool-001 \
 sudo rm -r -- /root/aorebirth-stage6-mysql-001 /tmp/stage6-tool-001
 ```
 
-Stage 6 ends here. Keep the service disabled and inactive after the disposable
-database is removed.
+Stage 6 ChatEngine acceptance ends here. Keep the service disabled and inactive.
+Retain the disposable database only when proceeding directly to Stage 7;
+otherwise remove it with the guarded Stage 6 workflow above.
 
-## Production activation (separate approval)
+## Isolated Stage 7 LoginEngine acceptance
+
+Stage 7 reuses the isolated Stage 6 database on `127.0.0.1:33067`; it does not
+touch the website or mail database containers. Publish `linux-x64` self-contained
+and upload the package plus the exact unit/installer/validator paths expected by
+the first-install guard:
+
+```bat
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 -r LinuxBuild\artifacts\loginengine\linux-x64\self-contained root@YOUR_VPS:/tmp/ao-rebirth-loginengine-publish
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\systemd\ao-rebirth-loginengine.service root@YOUR_VPS:/tmp/ao-rebirth-loginengine.service
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\login-stage7\install-disabled-service.sh root@YOUR_VPS:/tmp/ao-rebirth-loginengine-install.sh
+scp.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 LinuxBuild\deployment\login-stage7\validate-disabled-service.sh root@YOUR_VPS:/tmp/ao-rebirth-loginengine-validate.sh
+ssh.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 root@YOUR_VPS chmod -R go-w -- /tmp/ao-rebirth-loginengine-publish
+ssh.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 root@YOUR_VPS bash /tmp/ao-rebirth-loginengine-install.sh stage7-YYYYMMDD-login-001
+ssh.exe -i C:\Users\YOUR_USER\.ssh\id_ed25519 root@YOUR_VPS bash /tmp/ao-rebirth-loginengine-validate.sh
+```
+
+The installer is root-only and first-install-only. It imports exactly one
+Stage 6 connection assignment without printing it, installs a unique immutable
+release below `/opt/ao-rebirth/loginengine/releases`, pins the expected database,
+and leaves `ao-rebirth-loginengine.service` disabled and inactive. The validator
+rejects unreviewed systemd drop-ins, transiently starts the still-disabled unit,
+requires live database preflight and `Type=notify`, proves that the exact main PID
+alone owns `127.0.0.1:7500`, delivers SIGTERM, and restores disabled/inactive
+state. A successful run prints:
+
+```text
+PASS: disabled LoginEngine passed live database preflight, Type=notify readiness, exact loopback listener ownership, and clean SIGTERM shutdown.
+```
+
+Do not expose or enable LoginEngine yet. The legacy handler flow lacks a
+fail-closed authenticated-session state for every character operation, delete
+ownership enforcement is incomplete, and the server salt uses `System.Random`.
+ZoneEngine is also not present at the advertised loopback endpoint
+`127.0.0.1:7501`.
+
+## ChatEngine production activation (separate approval)
 
 Do not run this step against the disposable Stage 6 database. Activation
 requires separate approval, a persistent production database that passes both
@@ -351,6 +401,10 @@ journalctl -u ao-rebirth-chatengine.service
   it to `127.0.0.1`; change `AO_REBIRTH_CHAT_LISTEN_IP` only after that approval.
 - TCP 6996 is unauthenticated internal ISCom traffic. The Linux default and
   example environment bind it to `127.0.0.1`; never expose it publicly.
+- TCP 7500 is LoginEngine. Stage 7 requires `127.0.0.1` and leaves its unit
+  disabled; public exposure is not approved.
+- TCP 7501 is the currently advertised ZoneEngine endpoint, but ZoneEngine is
+  not part of this checkpoint.
 - UDP is disabled.
 
 The first VPS pass must run `--validate-startup`, `--validate-database`, and

@@ -40,7 +40,12 @@ loopback listeners, and SIGTERM shutdown also pass. Stage 6 now passes an exact
 governed 34-table import into a uniquely named/labeled MySQL 8.4 target, a
 restricted runtime account, production Connector/DAO/password/encrypted-login
 behavior, negative authentication, zero-residue cleanup, and the service's new
-read-only live database `ExecStartPre`. The service remains disabled and all
+read-only live database `ExecStartPre`. Stage 7 now builds LoginEngine from its
+exact 35-source inventory plus a contained identity-compatible Core slice. The
+unchanged legacy adapters use pinned MemBus 4.0.1 for active six-handler MEF
+dispatch. Windows/Linux contracts, offline lifecycle, native apphost structure,
+Ubuntu live database preflight, `Type=notify` readiness, exact PID-owned
+`127.0.0.1:7500`, and clean SIGTERM pass. Both services remain disabled and all
 player/ISCom/database listeners remain loopback-only.
 
 ## Rules for each stage
@@ -55,7 +60,7 @@ player/ISCom/database listeners remain loopback-only.
 5. Do not remove a dependency or startup action until its behavioral parity
    test passes.
 
-## Remaining ChatEngine acceptance work
+## Remaining engine acceptance work
 
 - Native listener-free startup/lifecycle, live database preflight, bounded
   authentication, systemd readiness, and SIGTERM now pass; the full contract
@@ -64,10 +69,15 @@ player/ISCom/database listeners remain loopback-only.
   concurrency-safe; journald server logging is the supported first deployment path.
 - Player disconnect persists offline state synchronously, so shutdown can still
   exceed the 45-second systemd limit under heavy load or a slow database.
-- Stage 7 begins by measuring LoginEngine's exact closure; do not assume it
-  needs the full Core/PlayfieldLoader graph. Full Core/PlayfieldLoader, active
-  MemBus, MEF discovery, MathNet replacement, and data assets remain Stage 8
-  ZoneEngine work unless the Stage 7 source audit proves a narrower dependency.
+- Stage 7's narrow active Core/MemBus/MEF closure is proven only for LoginEngine;
+  full Core, PlayfieldLoader, MathNet replacement, and ZoneEngine data assets
+  remain Stage 8 work.
+- LoginEngine TCP 7500 remains disabled and loopback-only. Public exposure is
+  blocked on an authenticated per-connection state machine, ownership checks for
+  character mutations, and a cryptographically secure server salt.
+- LoginEngine shutdown does not yet drain outstanding asynchronous MemBus work,
+  and its live readiness gate does not yet fingerprint every runtime table
+  column/index or exercise the full create/delete DAO graph.
 
 The Stage 1 Linux lane now replaces Utility's Windows performance counters and
 uses canonical `Config.xml` casing without changing the Windows code path.
@@ -77,4 +87,5 @@ uses canonical `Config.xml` casing without changing the Windows code path.
 The Ubuntu 24.04 test VPS and SSH key are configured outside the repository.
 Database credentials remain root-owned on the VPS and are never committed or
 printed. The disposable database uses a loopback-only host binding and
-`--restart=no`; ChatEngine remains disabled until a later player-test approval.
+`--restart=no`; ChatEngine and LoginEngine remain disabled until a later
+player-test approval.

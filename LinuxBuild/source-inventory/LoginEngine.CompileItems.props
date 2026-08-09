@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/SolutionAssemblyInfo.cs">
+      <Link>Properties/SolutionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreClient/Client.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/AdventurerStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/AgentStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/BureaucratStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/DoctorStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/EngineerStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/EnforcerStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/FixerStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/KeeperStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/MartialArtistStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/MetaphysicistStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/NanotechnicianStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/ShadeStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/SoldierStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/StarterVitalStats.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/StarterXpStats.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/TraderStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Component/ClientFactory.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreServer/LoginServer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/CreateCharacterHandler.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/DeleteCharacterHandler.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/RandomNameRequestHandler.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/SelectCharacterHandler.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/UserCredentialsHandler.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/UserLoginHandler.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Packets/CharacterEntry.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Packets/CharacterName.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Packets/CheckLogin.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Program.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Properties/AssemblyInfo.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/QueryBase/CharacterList.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/QueryBase/LoginFlags.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/QueryBase/LoginName.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/QueryBase/LoginPasswd.cs" />
+  </ItemGroup>
+</Project>

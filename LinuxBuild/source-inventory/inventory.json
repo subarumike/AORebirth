@@ -56,6 +56,10 @@
     {
       "legacyProject": "AORebirth/Server/ChatEngine/ChatEngine.csproj",
       "output": "LinuxBuild/source-inventory/ChatEngine.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Server/LoginEngine/LoginEngine.csproj",
+      "output": "LinuxBuild/source-inventory/LoginEngine.CompileItems.props"
     }
   ]
 }

@@ -1,0 +1,510 @@
+manifest|AORebirth.Stage7LoginEngineContract|1
+api|manifest%7CAORebirth.Stage2Contract%7C1
+api|assembly.begin%7CLoginEngine
+api|assembly.name%7CLoginEngine
+api|assembly.version%7C1.0.0.0
+api|assembly.public-key-token%7Cnull
+api|assembly.file-version%7C1.0.0.0
+api|assembly.title%7CLoginEngine
+api|assembly.description%7C
+api|assembly.configuration%7C
+api|assembly.company%7C
+api|assembly.product%7CLoginEngine
+api|assembly.copyright%7CCopyright © 2014 CellAO Team
+api|assembly.trademark%7C
+api|assembly.culture%7C
+api|assembly.guid%7C8e7d127d-1730-4e2c-a342-f04ba82b2697
+api|assembly.com-visible%7Cfalse
+api|assembly.utility-revision-name%7CAO Rebirth
+api|type.begin%7CLoginEngine.Component.ClientFactory
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor(AORebirth.Core.Components.IMessageSerializer messageSerializer,AORebirth.Core.Components.IBus bus)
+api|type.method%7Cpublic instance LoginEngine.CoreClient.Client Create(LoginEngine.CoreServer.LoginServer loginServer)
+api|type.end%7CLoginEngine.Component.ClientFactory
+api|type.begin%7CLoginEngine.CoreClient.Client
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CCell.Core.ClientBase
+api|type.constructor%7Cpublic instance .ctor(Cell.Core.ServerBase server,AORebirth.Core.Components.IMessageSerializer messageSerializer,AORebirth.Core.Components.IBus bus)
+api|type.property%7Cpublic instance System.String AccountName {get:public;set:public}
+api|type.property%7Cpublic instance System.String ClientVersion {get:public;set:public}
+api|type.property%7Cpublic instance System.String ServerSalt {get:public;set:public}
+api|type.method%7Cpublic instance System.Void Send(System.Int32 receiver,SmokeLounge.AOtomation.Messaging.Messages.MessageBody messageBody)
+api|type.method%7Cpublic instance special-name System.String get_AccountName()
+api|type.method%7Cpublic instance special-name System.String get_ClientVersion()
+api|type.method%7Cpublic instance special-name System.String get_ServerSalt()
+api|type.method%7Cpublic instance special-name System.Void set_AccountName(System.String value)
+api|type.method%7Cpublic instance special-name System.Void set_ClientVersion(System.String value)
+api|type.method%7Cpublic instance special-name System.Void set_ServerSalt(System.String value)
+api|type.end%7CLoginEngine.CoreClient.Client
+api|type.begin%7CLoginEngine.CoreServer.LoginServer
+api|type.kind%7Cclass
+api|type.modifiers%7Csealed
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CCell.Core.ServerBase
+api|type.constructor%7Cpublic instance .ctor(LoginEngine.Component.ClientFactory clientfactory)
+api|type.property%7Cpublic static System.TimeSpan RunTime {get:public;set:none}
+api|type.field%7CSystem.DateTime%7CStartTime%7Cstatic=true%7Cinitonly=true%7Cliteral=false%7Cconstant=
+api|type.method%7Cpublic static special-name System.TimeSpan get_RunTime()
+api|type.end%7CLoginEngine.CoreServer.LoginServer
+api|type.begin%7CLoginEngine.MessageHandlers.CreateCharacterHandler
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage<SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.CreateCharacterMessage>
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+api|type.end%7CLoginEngine.MessageHandlers.CreateCharacterHandler
+api|type.begin%7CLoginEngine.MessageHandlers.DeleteCharacterHandler
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage<SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.DeleteCharacterMessage>
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+api|type.end%7CLoginEngine.MessageHandlers.DeleteCharacterHandler
+api|type.begin%7CLoginEngine.MessageHandlers.RandomNameRequestHandler
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage<SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.RandomNameRequestMessage>
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+api|type.end%7CLoginEngine.MessageHandlers.RandomNameRequestHandler
+api|type.begin%7CLoginEngine.MessageHandlers.SelectCharacterHandler
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage<SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.SelectCharacterMessage>
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+api|type.end%7CLoginEngine.MessageHandlers.SelectCharacterHandler
+api|type.begin%7CLoginEngine.MessageHandlers.UserCredentialsHandler
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage<SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.UserCredentialsMessage>
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+api|type.end%7CLoginEngine.MessageHandlers.UserCredentialsHandler
+api|type.begin%7CLoginEngine.MessageHandlers.UserLoginHandler
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage
+api|type.interface%7CAORebirth.Core.Components.IHandleMessage<SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.UserLoginMessage>
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+api|type.end%7CLoginEngine.MessageHandlers.UserLoginHandler
+api|type.begin%7CLoginEngine.Packets.CharacterEntry
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor()
+api|type.property%7Cpublic instance System.Int32 Breed {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Gender {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Id {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Level {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Playfield {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Profession {get:public;set:public}
+api|type.property%7Cpublic instance System.String Name {get:public;set:public}
+api|type.method%7Cpublic instance special-name System.Int32 get_Breed()
+api|type.method%7Cpublic instance special-name System.Int32 get_Gender()
+api|type.method%7Cpublic instance special-name System.Int32 get_Id()
+api|type.method%7Cpublic instance special-name System.Int32 get_Level()
+api|type.method%7Cpublic instance special-name System.Int32 get_Playfield()
+api|type.method%7Cpublic instance special-name System.Int32 get_Profession()
+api|type.method%7Cpublic instance special-name System.String get_Name()
+api|type.method%7Cpublic instance special-name System.Void set_Breed(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Gender(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Id(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Level(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Name(System.String value)
+api|type.method%7Cpublic instance special-name System.Void set_Playfield(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Profession(System.Int32 value)
+api|type.end%7CLoginEngine.Packets.CharacterEntry
+api|type.begin%7CLoginEngine.Packets.CharacterName
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor()
+api|type.property%7Cpublic instance System.Int32 Breed {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Fatness {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Gender {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 HeadMesh {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Level {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 MonsterScale {get:public;set:public}
+api|type.property%7Cpublic instance System.Int32 Profession {get:public;set:public}
+api|type.property%7Cpublic instance System.String AccountName {get:public;set:public}
+api|type.property%7Cpublic instance System.String Name {get:public;set:public}
+api|type.method%7Cpublic instance System.Int32 CheckAgainstDatabase()
+api|type.method%7Cpublic instance System.String GetRandomName(SmokeLounge.AOtomation.Messaging.GameData.Profession profession)
+api|type.method%7Cpublic instance System.Void DeleteChar(System.Int32 charid)
+api|type.method%7Cpublic instance System.Void SendNameToStartPlayfield(System.Boolean startInSL,System.Int32 charid)
+api|type.method%7Cpublic instance special-name System.Int32 get_Breed()
+api|type.method%7Cpublic instance special-name System.Int32 get_Fatness()
+api|type.method%7Cpublic instance special-name System.Int32 get_Gender()
+api|type.method%7Cpublic instance special-name System.Int32 get_HeadMesh()
+api|type.method%7Cpublic instance special-name System.Int32 get_Level()
+api|type.method%7Cpublic instance special-name System.Int32 get_MonsterScale()
+api|type.method%7Cpublic instance special-name System.Int32 get_Profession()
+api|type.method%7Cpublic instance special-name System.String get_AccountName()
+api|type.method%7Cpublic instance special-name System.String get_Name()
+api|type.method%7Cpublic instance special-name System.Void set_AccountName(System.String value)
+api|type.method%7Cpublic instance special-name System.Void set_Breed(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Fatness(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Gender(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_HeadMesh(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Level(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_MonsterScale(System.Int32 value)
+api|type.method%7Cpublic instance special-name System.Void set_Name(System.String value)
+api|type.method%7Cpublic instance special-name System.Void set_Profession(System.Int32 value)
+api|type.end%7CLoginEngine.Packets.CharacterName
+api|type.begin%7CLoginEngine.Packets.CheckLogin
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance System.Boolean IsCharacterOnAccount(LoginEngine.CoreClient.Client client,System.Int32 characterId)
+api|type.method%7Cpublic instance System.Boolean IsLoginAllowed(LoginEngine.CoreClient.Client client,System.String accountName)
+api|type.method%7Cpublic instance System.Boolean IsLoginCorrect(LoginEngine.CoreClient.Client client,System.String loginKey)
+api|type.end%7CLoginEngine.Packets.CheckLogin
+api|type.begin%7CLoginEngine.QueryBase.CharacterList
+api|type.kind%7Cclass
+api|type.modifiers%7Cabstract,sealed
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.method%7Cpublic static System.Collections.Generic.List<LoginEngine.Packets.CharacterEntry> LoadCharacters(System.String accountName)
+api|type.end%7CLoginEngine.QueryBase.CharacterList
+api|type.begin%7CLoginEngine.QueryBase.LoginFlags
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor()
+api|type.property%7Cpublic instance System.Int32 FlagsL {get:public;set:none}
+api|type.method%7Cpublic instance System.Void GetLoginFlags(System.String recvLogin)
+api|type.method%7Cpublic instance special-name System.Int32 get_FlagsL()
+api|type.end%7CLoginEngine.QueryBase.LoginFlags
+api|type.begin%7CLoginEngine.QueryBase.LoginName
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor()
+api|type.property%7Cpublic instance System.String LoginN {get:public;set:none}
+api|type.method%7Cpublic instance System.Void GetLoginName(System.String recvLogin)
+api|type.method%7Cpublic instance special-name System.String get_LoginN()
+api|type.end%7CLoginEngine.QueryBase.LoginName
+api|type.begin%7CLoginEngine.QueryBase.LoginPasswd
+api|type.kind%7Cclass
+api|type.modifiers%7C
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor()
+api|type.property%7Cpublic instance System.String PasswdL {get:public;set:none}
+api|type.method%7Cpublic instance System.Void GetLoginPassword(System.String recvLogin)
+api|type.method%7Cpublic instance special-name System.String get_PasswdL()
+api|type.end%7CLoginEngine.QueryBase.LoginPasswd
+api|assembly.end%7CLoginEngine
+protected|LoginEngine.CoreClient.Client|method protected instance System.Boolean OnReceive(Cell.Core.BufferSegment buffer) virtual=true abstract=false final=false
+protected|LoginEngine.CoreClient.Client|method protected instance System.UInt32 GetMessageNumber(Cell.Core.BufferSegment segment) virtual=false abstract=false final=false
+protected|LoginEngine.CoreClient.Client|method protected instance System.UInt32 GetMessageNumber(System.Byte[] segment) virtual=false abstract=false final=false
+protected|LoginEngine.CoreServer.LoginServer|method protected instance Cell.Core.IClient CreateClient(System.Net.IPAddress address) virtual=true abstract=false final=false
+protected|LoginEngine.CoreServer.LoginServer|method protected instance System.Void OnReceiveUDP(System.Int32 num_bytes,System.Byte[] buf,System.Net.IPEndPoint ip) virtual=true abstract=false final=false
+protected|LoginEngine.CoreServer.LoginServer|method protected instance System.Void OnSendTo(System.Net.IPEndPoint clientIP,System.Int32 num_bytes) virtual=true abstract=false final=false
+core.contract|assembly.name%7CAORebirth.Core
+core.contract|assembly.version%7C1.0.0.0
+core.contract|assembly.public-key-token%7Cnull
+core.contract|assembly.file-version%7C1.0.0.0
+core.contract|assembly.title%7CAORebirth.Core
+core.contract|assembly.description%7C
+core.contract|assembly.configuration%7C
+core.contract|assembly.company%7C
+core.contract|assembly.product%7CAORebirth.Core
+core.contract|assembly.copyright%7CCopyright © 2014 CellAO Team
+core.contract|assembly.trademark%7C
+core.contract|assembly.culture%7C
+core.contract|assembly.guid%7C5f7951d6-7f73-4a08-a7df-586f413d91fa
+core.contract|assembly.com-visible%7Cfalse
+core.contract|assembly.utility-revision-name%7CAO Rebirth
+core.contract|type.begin%7CAO.Core.Encryption.BigInteger
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.constructor%7Cpublic instance .ctor()
+core.contract|type.constructor%7Cpublic instance .ctor(AO.Core.Encryption.BigInteger bi)
+core.contract|type.constructor%7Cpublic instance .ctor(System.Byte[] inData)
+core.contract|type.constructor%7Cpublic instance .ctor(System.Byte[] inData,System.Int32 inLen)
+core.contract|type.constructor%7Cpublic instance .ctor(System.Int64 value)
+core.contract|type.constructor%7Cpublic instance .ctor(System.String value,System.Int32 radix)
+core.contract|type.constructor%7Cpublic instance .ctor(System.UInt32[] inData)
+core.contract|type.constructor%7Cpublic instance .ctor(System.UInt64 value)
+core.contract|type.field%7CSystem.Int32%7CdataLength%7Cstatic=false%7Cinitonly=false%7Cliteral=false%7Cconstant=
+core.contract|type.field%7CSystem.Int32[]%7CprimesBelow2000%7Cstatic=true%7Cinitonly=true%7Cliteral=false%7Cconstant=
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger abs()
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger gcd(AO.Core.Encryption.BigInteger bi)
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger genCoPrime(System.Int32 bits,System.Random rand)
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger max(AO.Core.Encryption.BigInteger bi)
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger min(AO.Core.Encryption.BigInteger bi)
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger modInverse(AO.Core.Encryption.BigInteger modulus)
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger modPow(AO.Core.Encryption.BigInteger exp,AO.Core.Encryption.BigInteger n)
+core.contract|type.method%7Cpublic instance AO.Core.Encryption.BigInteger sqrt()
+core.contract|type.method%7Cpublic instance System.Boolean FermatLittleTest(System.Int32 confidence)
+core.contract|type.method%7Cpublic instance System.Boolean LucasStrongTest()
+core.contract|type.method%7Cpublic instance System.Boolean RabinMillerTest(System.Int32 confidence)
+core.contract|type.method%7Cpublic instance System.Boolean SolovayStrassenTest(System.Int32 confidence)
+core.contract|type.method%7Cpublic instance System.Boolean isProbablePrime()
+core.contract|type.method%7Cpublic instance System.Boolean isProbablePrime(System.Int32 confidence)
+core.contract|type.method%7Cpublic instance System.Byte[] getBytes()
+core.contract|type.method%7Cpublic instance System.Int32 IntValue()
+core.contract|type.method%7Cpublic instance System.Int32 bitCount()
+core.contract|type.method%7Cpublic instance System.Int64 LongValue()
+core.contract|type.method%7Cpublic instance System.String ToHexString()
+core.contract|type.method%7Cpublic instance System.String ToString(System.Int32 radix)
+core.contract|type.method%7Cpublic instance System.Void genRandomBits(System.Int32 bits,System.Random rand)
+core.contract|type.method%7Cpublic instance System.Void setBit(System.UInt32 bitNum)
+core.contract|type.method%7Cpublic instance System.Void unsetBit(System.UInt32 bitNum)
+core.contract|type.method%7Cpublic instance virtual System.Boolean Equals(System.Object o)
+core.contract|type.method%7Cpublic instance virtual System.Int32 GetHashCode()
+core.contract|type.method%7Cpublic instance virtual System.String ToString()
+core.contract|type.method%7Cpublic static AO.Core.Encryption.BigInteger genPseudoPrime(System.Int32 bits,System.Int32 confidence,System.Random rand)
+core.contract|type.method%7Cpublic static AO.Core.Encryption.BigInteger[] LucasSequence(AO.Core.Encryption.BigInteger P,AO.Core.Encryption.BigInteger Q,AO.Core.Encryption.BigInteger k,AO.Core.Encryption.BigInteger n)
+core.contract|type.method%7Cpublic static System.Int32 Jacobi(AO.Core.Encryption.BigInteger a,AO.Core.Encryption.BigInteger b)
+core.contract|type.method%7Cpublic static System.Void MulDivTest(System.Int32 rounds)
+core.contract|type.method%7Cpublic static System.Void RSATest(System.Int32 rounds)
+core.contract|type.method%7Cpublic static System.Void RSATest2(System.Int32 rounds)
+core.contract|type.method%7Cpublic static System.Void SqrtTest(System.Int32 rounds)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Addition(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_BitwiseAnd(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_BitwiseOr(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Decrement(AO.Core.Encryption.BigInteger bi1)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Division(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_ExclusiveOr(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Implicit(System.Int32 value)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Implicit(System.Int64 value)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Implicit(System.UInt32 value)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Implicit(System.UInt64 value)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Increment(AO.Core.Encryption.BigInteger bi1)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_LeftShift(AO.Core.Encryption.BigInteger bi1,System.Int32 shiftVal)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Modulus(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Multiply(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_OnesComplement(AO.Core.Encryption.BigInteger bi1)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_RightShift(AO.Core.Encryption.BigInteger bi1,System.Int32 shiftVal)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_Subtraction(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name AO.Core.Encryption.BigInteger op_UnaryNegation(AO.Core.Encryption.BigInteger bi1)
+core.contract|type.method%7Cpublic static special-name System.Boolean op_Equality(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name System.Boolean op_GreaterThan(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name System.Boolean op_GreaterThanOrEqual(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name System.Boolean op_Inequality(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name System.Boolean op_LessThan(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.method%7Cpublic static special-name System.Boolean op_LessThanOrEqual(AO.Core.Encryption.BigInteger bi1,AO.Core.Encryption.BigInteger bi2)
+core.contract|type.end%7CAO.Core.Encryption.BigInteger
+core.contract|type.begin%7CAO.Core.Encryption.LoginEncryption
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.constructor%7Cpublic instance .ctor()
+core.contract|type.field%7CSystem.Boolean%7Ci_Enable%7Cstatic=false%7Cinitonly=false%7Cliteral=false%7Cconstant=
+core.contract|type.method%7Cpublic instance System.Boolean IsCharacterOnAccount(System.String UserName,System.UInt32 CharacterID)
+core.contract|type.method%7Cpublic instance System.Boolean IsValidLogin(System.String LoginKey,System.String ServerSalt,System.String UserName)
+core.contract|type.method%7Cpublic instance System.Boolean IsValidLogin(System.String LoginKey,System.String ServerSalt,System.String UserName,System.String passwordHash)
+core.contract|type.method%7Cpublic instance System.String GeneratePasswordHash(System.String clearPassword)
+core.contract|type.method%7Cpublic instance System.Void DecryptLoginKey(System.String LoginKey,out System.String UserName,out System.String ServerSalt,out System.String Password)
+core.contract|type.end%7CAO.Core.Encryption.LoginEncryption
+core.contract|type.begin%7CAORebirth.Core.Components.IBus
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.base%7C
+core.contract|type.method%7Cpublic instance abstract virtual System.IDisposable Subscribe<!!0:T>(System.Action<!!0:T> action) where !!0:T[modifiers=;constraints=]
+core.contract|type.method%7Cpublic instance abstract virtual System.Void Publish(System.Object message)
+core.contract|type.end%7CAORebirth.Core.Components.IBus
+core.contract|type.begin%7CAORebirth.Core.Components.IContainer
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.base%7C
+core.contract|type.method%7Cpublic instance abstract virtual !!0:T GetInstance<!!0:T>(System.String key optional=true;default=null) where !!0:T[modifiers=;constraints=]
+core.contract|type.method%7Cpublic instance abstract virtual System.Collections.Generic.IEnumerable<System.Object> GetAllInstances(System.Type serviceType)
+core.contract|type.method%7Cpublic instance abstract virtual System.Object GetInstance(System.Type serviceType,System.String key optional=true;default=null)
+core.contract|type.end%7CAORebirth.Core.Components.IContainer
+core.contract|type.begin%7CAORebirth.Core.Components.IHandle<!0:T>
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.generic-parameter%7C!0:T[modifiers=contravariant;constraints=]
+core.contract|type.base%7C
+core.contract|type.method%7Cpublic instance abstract virtual System.Void Handle(!0:T obj)
+core.contract|type.end%7CAORebirth.Core.Components.IHandle<!0:T>
+core.contract|type.begin%7CAORebirth.Core.Components.IHandleMessage
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.base%7C
+core.contract|type.method%7Cpublic instance abstract virtual System.Void Handle(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+core.contract|type.end%7CAORebirth.Core.Components.IHandleMessage
+core.contract|type.begin%7CAORebirth.Core.Components.IHandleMessage<!0:T>
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.generic-parameter%7C!0:T[modifiers=;constraints=SmokeLounge.AOtomation.Messaging.Messages.MessageBody]
+core.contract|type.base%7C
+core.contract|type.interface%7CAORebirth.Core.Components.IHandleMessage
+core.contract|type.end%7CAORebirth.Core.Components.IHandleMessage<!0:T>
+core.contract|type.begin%7CAORebirth.Core.Components.IMessagePublisher
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.base%7C
+core.contract|type.method%7Cpublic instance abstract virtual System.Void Publish(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+core.contract|type.end%7CAORebirth.Core.Components.IMessagePublisher
+core.contract|type.begin%7CAORebirth.Core.Components.IMessageSerializer
+core.contract|type.kind%7Cinterface
+core.contract|type.modifiers%7Cabstract
+core.contract|type.serializable-attribute%7Cnot-applicable
+core.contract|type.base%7C
+core.contract|type.method%7Cpublic instance abstract virtual SmokeLounge.AOtomation.Messaging.Messages.Message Deserialize(System.Byte[] buffer)
+core.contract|type.method%7Cpublic instance abstract virtual System.Byte[] Serialize(SmokeLounge.AOtomation.Messaging.Messages.Message message)
+core.contract|type.end%7CAORebirth.Core.Components.IMessageSerializer
+core.contract|type.begin%7CAORebirth.Core.Components.MefContainer
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.interface%7CAORebirth.Core.Components.IContainer
+core.contract|type.constructor%7Cpublic instance .ctor()
+core.contract|type.method%7Cpublic instance virtual final !!0:T GetInstance<!!0:T>(System.String key optional=true;default=null) where !!0:T[modifiers=;constraints=]
+core.contract|type.method%7Cpublic instance virtual final System.Collections.Generic.IEnumerable<System.Object> GetAllInstances(System.Type serviceType)
+core.contract|type.method%7Cpublic instance virtual final System.Object GetInstance(System.Type serviceType,System.String key optional=true;default=null)
+core.contract|type.end%7CAORebirth.Core.Components.MefContainer
+core.contract|type.begin%7CAORebirth.Core.Components.MemBusAdapter
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.interface%7CAORebirth.Core.Components.IBus
+core.contract|type.constructor%7Cpublic instance .ctor(MemBus.IocAdapter iocAdapter)
+core.contract|type.method%7Cpublic instance virtual final System.IDisposable Subscribe<!!0:T>(System.Action<!!0:T> action) where !!0:T[modifiers=;constraints=]
+core.contract|type.method%7Cpublic instance virtual final System.Void Publish(System.Object message)
+core.contract|type.end%7CAORebirth.Core.Components.MemBusAdapter
+core.contract|type.begin%7CAORebirth.Core.Components.MemBusIoCAdapter
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.interface%7CMemBus.IocAdapter
+core.contract|type.constructor%7Cpublic instance .ctor(AORebirth.Core.Components.IContainer container)
+core.contract|type.method%7Cpublic instance virtual final System.Collections.Generic.IEnumerable<System.Object> GetAllInstances(System.Type desiredType)
+core.contract|type.end%7CAORebirth.Core.Components.MemBusIoCAdapter
+core.contract|type.begin%7CAORebirth.Core.Components.MessagePublisher
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.interface%7CAORebirth.Core.Components.IMessagePublisher
+core.contract|type.constructor%7Cpublic instance .ctor(System.Collections.Generic.IEnumerable<AORebirth.Core.Components.IHandleMessage> messageHandlers)
+core.contract|type.method%7Cpublic instance virtual final System.Void Publish(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+core.contract|type.end%7CAORebirth.Core.Components.MessagePublisher
+core.contract|type.begin%7CAORebirth.Core.Components.MessageSerializer
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.interface%7CAORebirth.Core.Components.IMessageSerializer
+core.contract|type.constructor%7Cpublic instance .ctor()
+core.contract|type.method%7Cpublic instance virtual final SmokeLounge.AOtomation.Messaging.Messages.Message Deserialize(System.Byte[] buffer)
+core.contract|type.method%7Cpublic instance virtual final System.Byte[] Serialize(SmokeLounge.AOtomation.Messaging.Messages.Message message)
+core.contract|type.end%7CAORebirth.Core.Components.MessageSerializer
+core.contract|type.begin%7CAORebirth.Core.Encryption.PasswordHash
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.constructor%7Cpublic instance .ctor()
+core.contract|type.field%7CSystem.Int32%7CHashSize%7Cstatic=true%7Cinitonly=false%7Cliteral=true%7Cconstant=System.Int32:30
+core.contract|type.field%7CSystem.Int32%7CMinPBKDF2Iterations%7Cstatic=true%7Cinitonly=false%7Cliteral=true%7Cconstant=System.Int32:1111
+core.contract|type.field%7CSystem.Int32%7CSaltSize%7Cstatic=true%7Cinitonly=false%7Cliteral=true%7Cconstant=System.Int32:30
+core.contract|type.method%7Cpublic static System.Boolean ValidatePassword(System.String password,System.String correctHash)
+core.contract|type.method%7Cpublic static System.String CreateHash(System.String password)
+core.contract|type.end%7CAORebirth.Core.Encryption.PasswordHash
+core.contract|type.begin%7CAORebirth.Core.EventHandlers.Events.MessageReceivedEvent
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.constructor%7Cpublic instance .ctor(System.Object sender,SmokeLounge.AOtomation.Messaging.Messages.Message message)
+core.contract|type.property%7Cpublic instance SmokeLounge.AOtomation.Messaging.Messages.Message Message {get:public;set:none}
+core.contract|type.property%7Cpublic instance System.Object Sender {get:public;set:none}
+core.contract|type.method%7Cpublic instance special-name SmokeLounge.AOtomation.Messaging.Messages.Message get_Message()
+core.contract|type.method%7Cpublic instance special-name System.Object get_Sender()
+core.contract|type.end%7CAORebirth.Core.EventHandlers.Events.MessageReceivedEvent
+core.contract|type.begin%7CAORebirth.Core.EventHandlers.Handlers.MessageReceivedHandler
+core.contract|type.kind%7Cclass
+core.contract|type.modifiers%7C
+core.contract|type.serializable-attribute%7Cfalse
+core.contract|type.base%7CSystem.Object
+core.contract|type.interface%7CAORebirth.Core.Components.IHandle<AORebirth.Core.EventHandlers.Events.MessageReceivedEvent>
+core.contract|type.constructor%7Cpublic instance .ctor(AORebirth.Core.Components.IMessagePublisher messagePublisher)
+core.contract|type.method%7Cpublic instance virtual final System.Void Handle(AORebirth.Core.EventHandlers.Events.MessageReceivedEvent obj)
+core.contract|type.end%7CAORebirth.Core.EventHandlers.Handlers.MessageReceivedHandler
+handler|LoginEngine.MessageHandlers.CreateCharacterHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.CreateCharacterMessage|export=IHandleMessage
+handler|LoginEngine.MessageHandlers.DeleteCharacterHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.DeleteCharacterMessage|export=IHandleMessage
+handler|LoginEngine.MessageHandlers.RandomNameRequestHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.RandomNameRequestMessage|export=IHandleMessage
+handler|LoginEngine.MessageHandlers.SelectCharacterHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.SelectCharacterMessage|export=IHandleMessage
+handler|LoginEngine.MessageHandlers.UserCredentialsHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.UserCredentialsMessage|export=IHandleMessage
+handler|LoginEngine.MessageHandlers.UserLoginHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.UserLoginMessage|export=IHandleMessage
+reference|AORebirth.Core|1.0.0.0|
+reference|AORebirth.Database|1.0.0.0|
+reference|Cell.Core|0.5.0.0|
+reference|NBug|1.2.0.0|a4292a325f69b123
+reference|NLog|2.1.0.0|5120e14c03d0593c
+reference|SmokeLounge.AOtomation.Messaging|0.62.1.0|366f6caa557bb5ed
+reference|System|4.0.0.0|b77a5c561934e089
+reference|System.ComponentModel.Composition|4.0.0.0|b77a5c561934e089
+reference|System.Core|4.0.0.0|b77a5c561934e089
+reference|System.Data|4.0.0.0|b77a5c561934e089
+reference|Utility|1.0.0.0|
+reference|locales|1.0.0.0|
+reference|mscorlib|4.0.0.0|b77a5c561934e089
+runtime.topology|running=false|clients=0|tcp-endpoint=null|udp-endpoint=null|tcp-listener=null|udp-listener=null|pending=100
+runtime.client-packet|first|8|88166724dbbb543f85d3853daef161fce07c22df6d5697a4b50b37878cb552fd|AQDM3e4AAAA=
+runtime.client-packet|second|8|4c8358b01a7626be1bcb28aeb96e15345dacb6a5b7943fa62fbbb428ffb7bf37|AgDM3e4AAAA=
+runtime.client-receive|message-number=0x12345678|valid=retain+publish|null=retain+reject|malformed=reject
+runtime.wire|character-created|28|cfb80eb7bbfc1e685ac69483c9e5b2c09f5e22e819816d83eb6c91666ed69c67|398AAQABABwAAAABobLD1AAAABEQIDBAsNL//w==
+runtime.wire|character-deleted|24|10a7d27f26e2b85bfc39fc1a2fa426fbb9f70595bef904ecd193e2f500f51661|398AAQABABgAAAABobLD1AAAABUQIDBA
+runtime.wire|character-list|144|92b98a7e05dc78bdea99a31028d6bba3719bd2f2349988a3cafe066fff413198|398AAQABAJAAAAABobLD1AAAAA4AAAABAAAABBAgMEBhAADHnQAAGZkAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAUQIDBAAAAAAAAAAApTdGFnZVNldmVuAAAAAQAAAAMAAAABAAAAKgAAAAVBcmV0ZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAgAAAf/
+runtime.wire|create-character|134|1f25eca6e629156de5b1acc2e1cfe04568e26fe9aaf96093046c642065150db3|398AAQABAIYAAAABobLD1AAAAA8BAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fICEiIyQlJicoKSorLC0uLzAxAAAAClN0YWdlU2V2ZW4AAAACAAAAAwAAAAQAAAABAAAAB1J1YmktS2EAAAAHAAAACQAAnLsAAABkAAAAAQAAAAA=
+runtime.wire|delete-character|24|f24c2b6f8b90974f0f2aff5cd95d6eb8b222da2d6339086eb3ae815468af0bae|398AAQABABgAAAABobLD1AAAABQQIDBA
+runtime.wire|login-error|24|fc91c68693245147916f51eb6c9b7655f4d414c013fc11e676b3effc8faa8a48|398AAQABABgAAAABobLD1AAAAA0AAABq
+runtime.wire|name-in-use|24|32bd43de924106449599ac1a3d8cf2780f97354cc012f1ccd634e0fa4fa0af4b|398AAQABABgAAAABobLD1AAAABAAAAAe
+runtime.wire|random-name-request|24|f57d43e907ba0890a6a7c0c5ee1e014f425be5d803c384da27d878999e17ef62|398AAQABABgAAAABobLD1AAAAFUAAAAD
+runtime.wire|select-character|24|fd2e311b2582ef4d4223b7055189dee0cf9dd6e759e8a228b51669e56790f89a|398AAQABABgAAAABobLD1AAAABYQIDBA
+runtime.wire|server-salt|52|bda0ee4813d47d06734c07724fa3168dc115085cf14effdf03f2f5e159ba8c13|398AAQABADQAAAABobLD1AAAACQBAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fIA==
+runtime.wire|suggest-name|32|a7f6f5fe6fb4b8d0e9a224b884a1504087562415b47a28babc592abc41f57faa|398AAQABACAAAAABobLD1AAAAFYAClN0YWdlU2V2ZW4=
+runtime.wire|user-credentials|78|436e06f36441833d44ac71cd7d761d760f8d1e4f191108b23385413e98475b44|398AAQABAE4AAAABobLD1AAAACVTdGFnZTdVc2VyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADmZpeHR1cmUta2V5fD8K
+runtime.wire|user-login|84|d018c9c3007bd1e93671bdf1a854a02f4c93bbe6e7b3cae3238c92ea596c9c8f|398AAQABAFQAAAABobLD1AAAACIAAAACU3RhZ2U3VXNlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADE4LjguNTNfRVAxAAAAAAAAAAAA
+runtime.wire|zone-info|38|34b1776f77269988f9c7e4162a9f4edf869190182155974768aa885321619a7c|398AAQABACYAAAABobLD1AAAABcQIDBAfwAAAR1NESIzRFVmd4g=
+runtime.safe-handler|random-name|receiver=0x0000FFFF|shape=verified|exact-random-bytes=excluded
+runtime.active-dispatch|publish=nonblocking|controlled-handlers=concurrent|controlled-executions=2|user-login=exactly-once|response=ServerSaltMessage|receiver=0x00002B3F|salt-shape=verified|exact-random-bytes=excluded
+safety|listeners=excluded|dao=excluded|authentication=excluded
