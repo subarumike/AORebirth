@@ -1103,6 +1103,55 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (!string.IsNullOrWhiteSpace(current.EvidenceProfileSelectorHint))
+            {
+                CapturedEnemyCombatProfileDefinition[] selectorMatches = Profiles.Where(
+                    value => value.MatchesKey(resourceId, name, monsterData, level)
+                             && string.Equals(
+                                 value.ProfileId,
+                                 current.EvidenceProfileSelectorHint,
+                                 StringComparison.Ordinal)).ToArray();
+                if (selectorMatches.Length != 1)
+                {
+                    failure = string.Format(
+                        "captured profile selector {0} does not identify one exact profile for resource={1} name={2} MonsterData={3} level={4}",
+                        current.EvidenceProfileSelectorHint,
+                        resourceId,
+                        name,
+                        monsterData,
+                        level);
+                    return false;
+                }
+
+                if (sourceIdentityHint == 0 || !selectorMatches[0].ContainsSource(sourceIdentityHint))
+                {
+                    failure = string.Format(
+                        "captured source {0:X8} is not evidence for selected profile {1}",
+                        sourceIdentityHint,
+                        current.EvidenceProfileSelectorHint);
+                    return false;
+                }
+
+                CapturedEnemyCombatProfileDefinition selectedProfile = selectorMatches[0];
+                if (selectedProfile.WeaponDefinition == null
+                    && selectedProfile.GetReusableNaturalAttackStreams().Length > 0)
+                {
+                    CapturedEnemyCombatContract parallelContract;
+                    if (!TryResolveCapturedProfileSelectorParallelSequence(
+                            selectedProfile,
+                            sourceIdentityHint,
+                            current,
+                            out parallelContract,
+                            out failure))
+                    {
+                        return false;
+                    }
+
+                    resolved = parallelContract;
+                    return true;
+                }
+            }
+
             CapturedEnemyCombatContract generatedResultDomainContract;
             if (TryResolveMathematicallyGeneratedResultDomain(
                     resourceId,
@@ -1465,15 +1514,6 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            if (!current.CapturedAttackRange.HasValue
-                || current.CapturedAttackRange.Value <= 0.0d
-                || double.IsNaN(current.CapturedAttackRange.Value)
-                || double.IsInfinity(current.CapturedAttackRange.Value))
-            {
-                failure = "selected natural-attack profile has no capture-backed attack range";
-                return false;
-            }
-
             // The generated profile constructor retains one representative Unknown5 value,
             // while the active-coverage generator certifies the selector hint against this
             // exact source identity. Do not collapse a source-local value back to the profile
@@ -1496,6 +1536,29 @@ namespace AORebirth.Core.Playfields
                 failure = "selected profile lacks a complete captured attack stream";
                 return false;
             }
+
+            double[] capturedAttackRanges = cadenceStreams.Select(
+                stream => stream.CapturedAttackRange ?? double.NaN).ToArray();
+            bool hasSingleGeneratedAttackRange =
+                capturedAttackRanges.All(
+                    value => !double.IsNaN(value)
+                             && !double.IsInfinity(value)
+                             && value > 0.0d)
+                && capturedAttackRanges.All(
+                    value => Math.Abs(value - capturedAttackRanges[0]) < 0.000001d);
+            double? selectedAttackRange = hasSingleGeneratedAttackRange
+                                              ? (double?)capturedAttackRanges[0]
+                                              : current.CapturedAttackRange;
+            if ((profile.ResourceId == 6553 && !hasSingleGeneratedAttackRange)
+                || !selectedAttackRange.HasValue
+                || double.IsNaN(selectedAttackRange.Value)
+                || double.IsInfinity(selectedAttackRange.Value)
+                || selectedAttackRange.Value <= 0.0d)
+            {
+                failure = "selected natural-attack profile has no single generated capture-backed attack range";
+                return false;
+            }
+            double capturedAttackRange = selectedAttackRange.Value;
 
             double[] attackStartDelays = cadenceStreams.SelectMany(
                 stream => stream.CapturedAttackStartDelayObservationsSeconds).ToArray();
@@ -1538,7 +1601,7 @@ namespace AORebirth.Core.Playfields
                             stream.CapturedDamageObservations.Min(),
                             stream.CapturedDamageObservations.Max(),
                             stream.CapturedDamageBonus.Value,
-                            current.CapturedAttackRange.Value,
+                            capturedAttackRange,
                             repeats ? landedIntervals[0] : 0.0d,
                             false,
                             stream.InitialAmmoCount,
@@ -1604,7 +1667,8 @@ namespace AORebirth.Core.Playfields
                 .WithCaptureCertification(profile.Evidence, sourceIdentityHint, null)
                 .WithCapturedSpecialAttackWeaponUnknown5Observations(
                     new[] { current.EvidenceSpecialAttackWeaponUnknown5Hint.Value })
-                .WithCaptureProvenArchetype(profile.ProfileId);
+                .WithCaptureProvenArchetype(profile.ProfileId)
+                .WithCapturedAttackRange(capturedAttackRange);
             if (!resolved.IsCombatReady)
             {
                 failure = "selected parallel profile failed shared readiness: "

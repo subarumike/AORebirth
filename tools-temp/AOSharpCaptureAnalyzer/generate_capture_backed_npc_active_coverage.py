@@ -6,8 +6,8 @@ than copied into a second hand-maintained list.  Combat classification is then
 resolved against ``capture_backed_npc_combat_inventory.json`` using the same
 two safe lookup modes as the generated runtime catalog:
 
-* an exact runtime source-identity/profile-selector hint, including an exact
-  capture-backed non-equipped attack range supplied by content; or
+* an exact runtime source-identity/profile-selector hint, with non-equipped
+  attack range resolved independently from captured SAW templates and ItemDb; or
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
@@ -2065,7 +2065,6 @@ def classify_arete_content_selector_level(
         or profile is None
         or actor.runtime_source_identity_hint is None
         or not actor.runtime_profile_selector
-        or actor.runtime_attack_range_micrometers <= 0
         or actor.runtime_special_attack_weapon_unknown5 is None
     ):
         return None
@@ -2085,6 +2084,21 @@ def classify_arete_content_selector_level(
         return None
 
     variant = selected[0]
+    captured_range = variant.get("capturedAttackRangeMeters")
+    captured_range_evidence = variant.get("capturedAttackRangeEvidence")
+    stream_ranges = {
+        stream.get("capturedAttackRange")
+        for stream in variant.get("streams", [])
+    }
+    if (
+        not isinstance(captured_range, (int, float))
+        or captured_range <= 0
+        or not isinstance(captured_range_evidence, dict)
+        or captured_range_evidence.get("attackRangeMeters") != captured_range
+        or captured_range_evidence.get("statId") != 287
+        or stream_ranges != {captured_range}
+    ):
+        return None
     source_saw_states = {
         row.get("unknown5")
         for row in variant.get("mutableSawStateObservations", [])
@@ -2145,16 +2159,24 @@ def classify_arete_content_selector_level(
             f"resource={actor.resource}|md={actor.monster_data}|level={level}|name={actor.name}"
         ),
         "classification": "certified",
-        "resolutionMode": "exact-arete-content-range-profile-selector",
+        "resolutionMode": "exact-arete-generated-range-profile-selector",
         "captureSessions": sorted_unique(variant.get("captureSessions", [])),
         "evidencePacketIds": sorted_unique(packet_ids),
         "evidenceSourceIdentities": [source_hint],
         "evidenceFound": [
             {
-                "observationType": "exact-captured-combat-profile-with-content-range",
+                "observationType": "exact-captured-combat-profile-with-itemdb-range",
                 "semanticProfileId": variant.get("semanticProfileId"),
                 "sourceIdentity": source_hint,
-                "capturedAttackRangeMicrometers": actor.runtime_attack_range_micrometers,
+                "capturedAttackRangeMeters": captured_range,
+                "attackRangeEvidenceId": captured_range_evidence.get("evidenceId"),
+                "attackRangeItemDatabaseSha256": captured_range_evidence.get(
+                    "itemDatabaseSha256"
+                ),
+                "attackRangeStatId": captured_range_evidence.get("statId"),
+                "capturedSpecialAttackWeaponPacketId": captured_range_evidence.get(
+                    "representativeSawPacketId"
+                ),
                 "specialAttackWeaponUnknown5": actor.runtime_special_attack_weapon_unknown5,
                 "capturedAttackStartDelaySeconds": 0.0,
                 "capturedAttackStreamCount": len(streams),
@@ -2165,6 +2187,8 @@ def classify_arete_content_selector_level(
         "runtimeMissingEvidence": [],
         "disabledGameplayCapability": None,
         "semanticProfileId": variant.get("semanticProfileId"),
+        "capturedAttackRangeMeters": captured_range,
+        "attackRangeEvidenceId": captured_range_evidence.get("evidenceId"),
     }
 
 

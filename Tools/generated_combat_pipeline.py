@@ -39,6 +39,7 @@ MAX_ARTIFACT_BYTES = 512 * 1024 * 1024
 GENERATOR_INVENTORY_PROJECTION_KEYS = (
     "schemaVersion",
     "authoritativeInputs",
+    "attackRangeAuthority",
     "sessions",
     "profiles",
     "capturedRealmToRuntimeResource",
@@ -55,6 +56,12 @@ ACTIVE_GENERATOR = Path(
 )
 FORMULA_GENERATOR = Path(
     "tools-temp/AOSharpCaptureAnalyzer/analyze_enemy_combat_setup_formula.py"
+)
+ATTACK_RANGE_AUDIT = Path(
+    "tools-temp/AOSharpCaptureAnalyzer/audit_capture_backed_npc_attack_range.py"
+)
+SECONDARY_EVIDENCE_AUDIT = Path(
+    "tools-temp/AOSharpCaptureAnalyzer/audit_capture_backed_npc_secondary_evidence.py"
 )
 ITEM_DATABASE = Path("AORebirth/Datafiles/items.dat")
 SCFU_ANALYZER = Path(
@@ -80,6 +87,16 @@ FORMULA_CAPTURE_SOURCE_NAMES = (
     "raw-packets.csv",
     "scfu-appearance.csv",
 )
+ARETE_ATTACK_RANGE_ITEM_TEMPLATE_IDS = (
+    120910,
+    120911,
+    120913,
+    120914,
+    121038,
+    121039,
+    121041,
+    121042,
+)
 
 # This is a private producer output: it records the exact capture-input snapshot
 # used by the aggregate worker without making that snapshot a published artifact.
@@ -104,12 +121,24 @@ ARTIFACT_RELATIVE_PATHS: dict[str, PurePosixPath] = {
     "formulaDataset": PurePosixPath(
         "docs/generated/enemy_combat_setup_formula_dataset.json"
     ),
+    "attackRangeAudit": PurePosixPath(
+        "docs/generated/capture_backed_npc_attack_range_audit.json"
+    ),
+    "secondaryEvidenceAudit": PurePosixPath(
+        "docs/generated/capture_backed_npc_secondary_evidence_audit.json"
+    ),
 }
 MANIFEST_RELATIVE_PATH = PurePosixPath(
     "docs/generated/capture_backed_npc_combat_generation_manifest.json"
 )
 JSON_ARTIFACT_ROLES = frozenset(
-    ("inventory", "activeCoverage", "formulaDataset")
+    (
+        "inventory",
+        "activeCoverage",
+        "formulaDataset",
+        "attackRangeAudit",
+        "secondaryEvidenceAudit",
+    )
 )
 
 GENERATOR_PATHS: dict[str, PurePosixPath] = {
@@ -122,6 +151,8 @@ GENERATOR_PATHS: dict[str, PurePosixPath] = {
     "primary": PurePosixPath(PRIMARY_GENERATOR.as_posix()),
     "activeCoverage": PurePosixPath(ACTIVE_GENERATOR.as_posix()),
     "formulaDataset": PurePosixPath(FORMULA_GENERATOR.as_posix()),
+    "attackRangeAudit": PurePosixPath(ATTACK_RANGE_AUDIT.as_posix()),
+    "secondaryEvidenceAudit": PurePosixPath(SECONDARY_EVIDENCE_AUDIT.as_posix()),
     "itemTemplateProjection": PurePosixPath(
         ITEM_TEMPLATE_PROJECTION_SOURCE.as_posix()
     ),
@@ -132,6 +163,18 @@ LEASE_DELEGATION_ENVIRONMENT = "AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION"
 LEASE_REPO_ROOT_ENVIRONMENT = "AO_REBIRTH_GENERATED_COMBAT_LEASE_REPO_ROOT"
 PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT = (
     "AO_REBIRTH_GENERATED_COMBAT_PRIMARY_CAPTURE_REPO_ROOT"
+)
+NPC_COMBAT_AUDIT_REPO_ROOT_ENVIRONMENT = (
+    "AO_REBIRTH_NPC_COMBAT_AUDIT_REPO_ROOT"
+)
+NPC_COMBAT_AUDIT_INVENTORY_ENVIRONMENT = (
+    "AO_REBIRTH_NPC_COMBAT_AUDIT_INVENTORY"
+)
+NPC_COMBAT_AUDIT_INVENTORY_LOGICAL_PATH_ENVIRONMENT = (
+    "AO_REBIRTH_NPC_COMBAT_AUDIT_INVENTORY_LOGICAL_PATH"
+)
+NPC_COMBAT_SECONDARY_AUDIT_OUTPUT_ENVIRONMENT = (
+    "AO_REBIRTH_NPC_COMBAT_SECONDARY_AUDIT_OUTPUT"
 )
 
 
@@ -258,7 +301,12 @@ def decode_json_text(raw: str) -> Any:
 def _is_transient_json_decoder_failure(error: BaseException) -> bool:
     if isinstance(error, json.JSONDecodeError):
         return True
-    if not isinstance(error, (TypeError, AttributeError)):
+    if (
+        isinstance(error, RuntimeError)
+        and "internal error in regular expression engine" in str(error)
+    ):
+        return True
+    if not isinstance(error, (TypeError, AttributeError, RuntimeError)):
         return False
     traceback = error.__traceback__
     while traceback is not None:
@@ -271,7 +319,9 @@ def _is_transient_json_decoder_failure(error: BaseException) -> bool:
             "_scan_once",
             "scan_once",
         } and (
-            filename.endswith("/json/decoder.py")
+            filename == "json/decoder.py"
+            or filename == "json/scanner.py"
+            or filename.endswith("/json/decoder.py")
             or filename.endswith("/json/scanner.py")
         ):
             return True
@@ -330,6 +380,8 @@ def _project_active_variant(value: Any, label: str) -> dict[str, Any]:
             "representativeWifuPacketId",
             "representativeSawPacketId",
             "representativeAttackPacketId",
+            "capturedAttackRangeMeters",
+            "capturedAttackRangeEvidence",
         ),
     )
     if "baseSignature" in variant:
@@ -351,6 +403,8 @@ def _project_active_variant(value: Any, label: str) -> dict[str, Any]:
                     "firstHitDelayObservationsSeconds",
                     "initialAmmoCandidates",
                     "landedIntervalObservationsSeconds",
+                    "capturedAttackRange",
+                    "capturedAttackRangeEvidenceId",
                 ),
             )
             if "attackInfoPacketIds" in stream:
@@ -504,6 +558,7 @@ def build_generator_inventory_projection(
     return {
         "schemaVersion": inventory["schemaVersion"],
         "authoritativeInputs": authoritative_inputs,
+        "attackRangeAuthority": inventory["attackRangeAuthority"],
         "sessions": [
             _present_fields(
                 _require_json_mapping(row, f"primary sessions[{index}]"),
@@ -697,6 +752,16 @@ def collect_referenced_formula_template_ids(
 def primary_output_signature(
     artifacts: Mapping[str, Path], snapshot_descriptor: Mapping[str, Any]
 ) -> str:
+    return sha256_bytes(
+        canonical_json_bytes(
+            primary_output_signature_descriptor(artifacts, snapshot_descriptor)
+        )
+    )
+
+
+def primary_output_signature_descriptor(
+    artifacts: Mapping[str, Path], snapshot_descriptor: Mapping[str, Any]
+) -> dict[str, Any]:
     paths = {
         "inventory": artifacts["inventory"],
         "catalog": artifacts["catalog"],
@@ -722,7 +787,7 @@ def primary_output_signature(
             "captureManifestByteLength",
         )
     }
-    return sha256_bytes(canonical_json_bytes(descriptors))
+    return descriptors
 
 
 def load_json_object(
@@ -760,7 +825,7 @@ def load_json_object(
     for attempt in range(1, GOVERNED_JSON_READ_MAX_ATTEMPTS + 1):
         try:
             value = decode_json_text(raw)
-        except (json.JSONDecodeError, TypeError, AttributeError) as error:
+        except (json.JSONDecodeError, TypeError, AttributeError, RuntimeError) as error:
             if not _is_transient_json_decoder_failure(error):
                 raise
             if isinstance(error, json.JSONDecodeError):
@@ -879,6 +944,44 @@ def extract_acceptance_counts(
             summary.get("decodeOrProjectionErrors"), "generator error count"
         ),
     }
+
+
+def validate_audit_inventory_bindings(
+    inventory_path: Path,
+    attack_range_audit: Mapping[str, Any],
+    secondary_evidence_audit: Mapping[str, Any],
+) -> None:
+    logical_path = ARTIFACT_RELATIVE_PATHS["inventory"].as_posix()
+    inventory_sha256 = sha256_file(inventory_path)
+    inventory_byte_length = inventory_path.stat().st_size
+
+    if attack_range_audit.get("inventory") != logical_path:
+        raise CohortValidationError(
+            "attack-range audit is not bound to the governed inventory path"
+        )
+    if attack_range_audit.get("inventorySha256") != inventory_sha256:
+        raise CohortValidationError(
+            "attack-range audit is not bound to the governed inventory SHA-256"
+        )
+
+    secondary_input = secondary_evidence_audit.get("combatInventoryInput")
+    if not isinstance(secondary_input, dict):
+        raise CohortValidationError(
+            "secondary-evidence audit inventory binding is missing"
+        )
+    expected_secondary_binding = {
+        "path": logical_path,
+        "exists": True,
+        "sizeBytes": inventory_byte_length,
+        "hashStatus": "content-sha256",
+        "sha256": inventory_sha256,
+    }
+    for key, expected in expected_secondary_binding.items():
+        if secondary_input.get(key) != expected:
+            raise CohortValidationError(
+                "secondary-evidence audit is not bound to the governed inventory "
+                f"{key}"
+            )
 
 
 def _normalized_capture_snapshot_document(
@@ -1263,18 +1366,21 @@ def assert_manifest_is_path_independent(value: Any, location: str = "manifest") 
 def assert_generated_value_is_path_independent(
     value: Any, location: str
 ) -> None:
-    if isinstance(value, dict):
-        for key, child in value.items():
-            assert_generated_value_is_path_independent(child, f"{location}.{key}")
-        return
-    if isinstance(value, list):
-        for index, child in enumerate(value):
-            assert_generated_value_is_path_independent(child, f"{location}[{index}]")
-        return
-    if isinstance(value, str) and _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(value):
-        raise CohortValidationError(
-            f"{location} contains an absolute repository-location-dependent path"
-        )
+    stack: list[tuple[Any, str]] = [(value, location)]
+    while stack:
+        current, current_location = stack.pop()
+        if isinstance(current, dict):
+            for key, child in current.items():
+                stack.append((child, f"{current_location}.{key}"))
+            continue
+        if isinstance(current, list):
+            for index, child in enumerate(current):
+                stack.append((child, f"{current_location}[{index}]"))
+            continue
+        if isinstance(current, str) and _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(current):
+            raise CohortValidationError(
+                f"{current_location} contains an absolute repository-location-dependent path"
+            )
 
 
 def _manifest_identity_payload(manifest: Mapping[str, Any]) -> dict[str, Any]:
@@ -1304,9 +1410,24 @@ def build_generation_manifest(
     inventory = load_json_object(artifacts["inventory"], "primary inventory")
     active = load_json_object(artifacts["activeCoverage"], "active coverage")
     formula = load_json_object(artifacts["formulaDataset"], "formula dataset")
+    attack_range_audit = load_json_object(
+        artifacts["attackRangeAudit"], "attack-range audit"
+    )
+    secondary_evidence_audit = load_json_object(
+        artifacts["secondaryEvidenceAudit"], "secondary-evidence audit"
+    )
     assert_generated_value_is_path_independent(inventory, "primary inventory")
     assert_generated_value_is_path_independent(active, "active coverage")
     assert_generated_value_is_path_independent(formula, "formula dataset")
+    assert_generated_value_is_path_independent(
+        attack_range_audit, "attack-range audit"
+    )
+    assert_generated_value_is_path_independent(
+        secondary_evidence_audit, "secondary-evidence audit"
+    )
+    validate_audit_inventory_bindings(
+        artifacts["inventory"], attack_range_audit, secondary_evidence_audit
+    )
     counts = extract_acceptance_counts(inventory, active, formula)
 
     artifact_rows = []
@@ -1619,19 +1740,24 @@ def _build_item_template_projection(
     *,
     repo_root: Path,
     frozen_repo_root: Path,
-    formula_inventory_projection: Mapping[str, Any],
+    template_ids: Sequence[int],
+    projection_name: str,
     item_database_path: Path,
     item_database_sha256: str,
     item_database_byte_length: int,
     lease: Any,
-) -> bytes:
-    template_ids = sorted(
-        collect_referenced_formula_template_ids(formula_inventory_projection)
-    )
+) -> tuple[bytes, Path]:
+    template_ids = sorted(set(template_ids))
     if not template_ids:
-        raise PipelineError("formula inventory references no item templates")
-    output = frozen_repo_root / "_item-template-projection" / "templates.json"
-    output.parent.mkdir()
+        raise PipelineError("item-template projection references no templates")
+    if not re.fullmatch(r"[a-z0-9-]+", projection_name):
+        raise PipelineError("item-template projection name is invalid")
+    output = (
+        frozen_repo_root
+        / "_item-template-projection"
+        / (projection_name + ".json")
+    )
+    output.parent.mkdir(exist_ok=True)
     completed = run_checked(
         (
             str(repo_root / SCFU_ANALYZER),
@@ -1661,7 +1787,82 @@ def _build_item_template_projection(
         raise PipelineError("item-template projection contains an invalid ID") from error
     if actual_ids != set(template_ids):
         raise PipelineError("item-template projection membership is incomplete")
-    return canonical_json_bytes(document)
+    payload = canonical_json_bytes(document)
+    try:
+        output.unlink()
+    except OSError as error:
+        raise PipelineError("item-template projection could not be replaced") from error
+    _write_verified_private_input(output, payload, "item-template projection")
+    return payload, output
+
+
+def _run_candidate_inventory_audits(
+    *,
+    repo_root: Path,
+    artifacts: Mapping[str, Path],
+    auxiliary_snapshot: Any,
+    lease: Any,
+) -> None:
+    inventory_logical_path = ARTIFACT_RELATIVE_PATHS["inventory"].as_posix()
+    run_checked(
+        (
+            sys.executable,
+            "-B",
+            "-I",
+            "-u",
+            "-X",
+            "faulthandler",
+            str(auxiliary_snapshot.path_for(ATTACK_RANGE_AUDIT.as_posix())),
+            "--inventory",
+            str(artifacts["inventory"]),
+            "--inventory-logical-path",
+            inventory_logical_path,
+            "--output",
+            str(artifacts["attackRangeAudit"]),
+            "--write",
+            "--summary-only",
+        ),
+        repo_root=repo_root,
+        lease=lease,
+        label="attack-range audit",
+        environment_overrides={
+            NPC_COMBAT_AUDIT_REPO_ROOT_ENVIRONMENT: str(repo_root)
+        },
+        retry_interpreter_failures=True,
+    )
+    load_json_object(artifacts["attackRangeAudit"], "attack-range audit")
+
+    run_checked(
+        (
+            sys.executable,
+            "-B",
+            "-I",
+            "-u",
+            "-X",
+            "faulthandler",
+            str(
+                auxiliary_snapshot.path_for(
+                    SECONDARY_EVIDENCE_AUDIT.as_posix()
+                )
+            ),
+            "--write",
+        ),
+        repo_root=repo_root,
+        lease=lease,
+        label="secondary-evidence audit",
+        environment_overrides={
+            NPC_COMBAT_AUDIT_REPO_ROOT_ENVIRONMENT: str(repo_root),
+            NPC_COMBAT_AUDIT_INVENTORY_ENVIRONMENT: str(artifacts["inventory"]),
+            NPC_COMBAT_AUDIT_INVENTORY_LOGICAL_PATH_ENVIRONMENT: inventory_logical_path,
+            NPC_COMBAT_SECONDARY_AUDIT_OUTPUT_ENVIRONMENT: str(
+                artifacts["secondaryEvidenceAudit"]
+            ),
+        },
+        retry_interpreter_failures=True,
+    )
+    load_json_object(
+        artifacts["secondaryEvidenceAudit"], "secondary-evidence audit"
+    )
 
 
 def _run_active_formula_fixed_point(
@@ -1829,12 +2030,49 @@ def build_candidate_cohort(
     artifacts = _candidate_artifact_paths(candidate_root)
     generators_before = generator_descriptors(repo_root)
     runtime_before = runtime_descriptor()
+    frozen_repo_root = auxiliary_snapshot.snapshot_root
+    item_database_record = next(
+        (
+            record
+            for record in auxiliary_snapshot.records
+            if record.relative_path == ITEM_DATABASE.as_posix()
+        ),
+        None,
+    )
+    if item_database_record is None:
+        raise PipelineError("frozen item database descriptor is missing")
+    _read_verified_private_input(
+        auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
+        expected_sha256=item_database_record.sha256,
+        expected_byte_length=item_database_record.size,
+        label="frozen item database",
+    )
+    (
+        arete_range_item_projection_payload,
+        arete_range_item_projection_path,
+    ) = _build_item_template_projection(
+        repo_root=repo_root,
+        frozen_repo_root=frozen_repo_root,
+        template_ids=ARETE_ATTACK_RANGE_ITEM_TEMPLATE_IDS,
+        projection_name="arete-attack-range",
+        item_database_path=auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
+        item_database_sha256=item_database_record.sha256,
+        item_database_byte_length=item_database_record.size,
+        lease=lease,
+    )
+    arete_range_projection_sha256 = sha256_bytes(
+        arete_range_item_projection_payload
+    )
+    arete_range_projection_byte_length = len(
+        arete_range_item_projection_payload
+    )
     with tempfile.TemporaryDirectory(
         prefix="aorebirth-generated-combat-input-snapshot-"
     ) as snapshot_root_name:
         snapshot_path = Path(snapshot_root_name) / "capture-input-snapshot.json"
         accepted_primary_signatures: set[str] = set()
         observed_primary_signatures: list[str] = []
+        observed_primary_descriptors: list[dict[str, Any]] = []
         for primary_attempt in range(1, PRIMARY_AGGREGATION_MAX_ATTEMPTS + 1):
             snapshot_path.unlink(missing_ok=True)
             run_checked(
@@ -1853,6 +2091,16 @@ def build_candidate_cohort(
                     str(artifacts["catalog"]),
                     "--fixture-output",
                     str(artifacts["fixtures"]),
+                    "--item-template-projection",
+                    str(arete_range_item_projection_path),
+                    "--item-template-projection-sha256",
+                    arete_range_projection_sha256,
+                    "--item-template-projection-byte-length",
+                    str(arete_range_projection_byte_length),
+                    "--item-database-sha256",
+                    item_database_record.sha256,
+                    "--item-database-byte-length",
+                    str(item_database_record.size),
                     PRIMARY_SNAPSHOT_ARGUMENT,
                     str(snapshot_path),
                 ),
@@ -1883,6 +2131,9 @@ def build_candidate_cohort(
                 signature = primary_output_signature(
                     artifacts, snapshot_descriptor
                 )
+                descriptor = primary_output_signature_descriptor(
+                    artifacts, snapshot_descriptor
+                )
             except CohortValidationError as error:
                 if primary_attempt < PRIMARY_AGGREGATION_MAX_ATTEMPTS:
                     continue
@@ -1891,6 +2142,7 @@ def build_candidate_cohort(
                     f"{primary_attempt}/{PRIMARY_AGGREGATION_MAX_ATTEMPTS}: {error}"
                 ) from error
             observed_primary_signatures.append(signature)
+            observed_primary_descriptors.append(descriptor)
             if signature in accepted_primary_signatures:
                 break
             accepted_primary_signatures.add(signature)
@@ -1899,9 +2151,14 @@ def build_candidate_cohort(
                 "primary aggregation did not produce two matching validated outputs "
                 f"in {PRIMARY_AGGREGATION_MAX_ATTEMPTS} attempts: "
                 + ", ".join(observed_primary_signatures)
+                + "; descriptors="
+                + json.dumps(
+                    observed_primary_descriptors,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
             )
 
-    frozen_repo_root = auxiliary_snapshot.snapshot_root
     for role in ("inventory", "catalog", "fixtures"):
         frozen_path = frozen_repo_root / Path(ARTIFACT_RELATIVE_PATHS[role])
         frozen_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1927,26 +2184,13 @@ def build_candidate_cohort(
     ):
         raise PipelineError("private formula inventory projection is not canonical")
 
-    item_database_record = next(
-        (
-            record
-            for record in auxiliary_snapshot.records
-            if record.relative_path == ITEM_DATABASE.as_posix()
-        ),
-        None,
-    )
-    if item_database_record is None:
-        raise PipelineError("frozen item database descriptor is missing")
-    item_database_payload = _read_verified_private_input(
-        auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
-        expected_sha256=item_database_record.sha256,
-        expected_byte_length=item_database_record.size,
-        label="frozen item database",
-    )
-    item_template_projection_payload = _build_item_template_projection(
+    item_template_projection_payload, _ = _build_item_template_projection(
         repo_root=repo_root,
         frozen_repo_root=frozen_repo_root,
-        formula_inventory_projection=formula_inventory_projection,
+        template_ids=sorted(
+            collect_referenced_formula_template_ids(formula_inventory_projection)
+        ),
+        projection_name="formula",
         item_database_path=auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
         item_database_sha256=item_database_record.sha256,
         item_database_byte_length=item_database_record.size,
@@ -1965,6 +2209,13 @@ def build_candidate_cohort(
     )
     artifacts["activeCoverage"].write_bytes(fixed_point.state.active_coverage)
     artifacts["formulaDataset"].write_bytes(fixed_point.state.formula_dataset)
+
+    _run_candidate_inventory_audits(
+        repo_root=repo_root,
+        artifacts=artifacts,
+        auxiliary_snapshot=auxiliary_snapshot,
+        lease=lease,
+    )
 
     generators_after = generator_descriptors(repo_root)
     runtime_after = runtime_descriptor()
@@ -2151,6 +2402,11 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
     inventory = parsed_json_artifacts["inventory"]
     active = parsed_json_artifacts["activeCoverage"]
     formula = parsed_json_artifacts["formulaDataset"]
+    validate_audit_inventory_bindings(
+        cohort_root / Path(ARTIFACT_RELATIVE_PATHS["inventory"]),
+        parsed_json_artifacts["attackRangeAudit"],
+        parsed_json_artifacts["secondaryEvidenceAudit"],
+    )
     if manifest["counts"] != extract_acceptance_counts(inventory, active, formula):
         raise CohortValidationError("generation manifest counts are stale")
 

@@ -443,6 +443,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs">
       <Link>NpcCombatAttackRules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatSpatialPolicy.cs">
+      <Link>NpcCombatSpatialPolicy.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs">
       <Link>OrdinaryEnemyCombatSetupGenerator.cs</Link>
     </Compile>

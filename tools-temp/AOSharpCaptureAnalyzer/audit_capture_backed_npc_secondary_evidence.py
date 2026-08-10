@@ -11,23 +11,68 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import tempfile
 import time
 from collections import Counter, defaultdict
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(
+    os.environ.get(
+        "AO_REBIRTH_NPC_COMBAT_AUDIT_REPO_ROOT",
+        str(Path(__file__).resolve().parents[2]),
+    )
+).resolve(strict=True)
 PRIMARY_CAPTURE_ROOT = (
     REPO_ROOT / "tools-temp" / "AOSharpLiveCapture" / "bin" / "Debug" / "captures"
 )
 LEGACY_CAPTURE_ROOT = REPO_ROOT / "For Repo"
-OUTPUT_PATH = REPO_ROOT / "docs" / "generated" / "capture_backed_npc_secondary_evidence_audit.json"
-COMBAT_INVENTORY_PATH = (
-    REPO_ROOT / "docs" / "generated" / "capture_backed_npc_combat_inventory.json"
+OUTPUT_PATH = Path(
+    os.environ.get(
+        "AO_REBIRTH_NPC_COMBAT_SECONDARY_AUDIT_OUTPUT",
+        str(
+            REPO_ROOT
+            / "docs"
+            / "generated"
+            / "capture_backed_npc_secondary_evidence_audit.json"
+        ),
+    )
+).resolve()
+OUTPUT_LOGICAL_PATH = (
+    "docs/generated/capture_backed_npc_secondary_evidence_audit.json"
+)
+COMBAT_INVENTORY_PATH = Path(
+    os.environ.get(
+        "AO_REBIRTH_NPC_COMBAT_AUDIT_INVENTORY",
+        str(
+            REPO_ROOT
+            / "docs"
+            / "generated"
+            / "capture_backed_npc_combat_inventory.json"
+        ),
+    )
+).resolve()
+COMBAT_INVENTORY_LOGICAL_PATH = os.environ.get(
+    "AO_REBIRTH_NPC_COMBAT_AUDIT_INVENTORY_LOGICAL_PATH",
+    "docs/generated/capture_backed_npc_combat_inventory.json",
+)
+_combat_inventory_logical_path = PurePosixPath(COMBAT_INVENTORY_LOGICAL_PATH)
+if (
+    _combat_inventory_logical_path.is_absolute()
+    or ".." in _combat_inventory_logical_path.parts
+    or _combat_inventory_logical_path.as_posix() != COMBAT_INVENTORY_LOGICAL_PATH
+):
+    raise RuntimeError(
+        "AO_REBIRTH_NPC_COMBAT_AUDIT_INVENTORY_LOGICAL_PATH must be a "
+        "normalized relative POSIX path"
+    )
+GENERATOR_LOGICAL_PATH = (
+    "tools-temp/AOSharpCaptureAnalyzer/"
+    "audit_capture_backed_npc_secondary_evidence.py"
 )
 SUBWAY_REPORT_PATH = REPO_ROOT / "docs" / "generated" / "subway_enemy_combat_contracts.json"
 REQUIRED_EVIDENCE_DOCUMENT_PATHS = (
@@ -76,6 +121,19 @@ EVIDENCE_CONTENT_RE = re.compile(
 EVIDENCE_EXCLUDED_PATHS = {
     COMBAT_INVENTORY_PATH.resolve(),
     OUTPUT_PATH.resolve(),
+    *(
+        (
+            REPO_ROOT / "docs" / "generated" / name
+        ).resolve()
+        for name in (
+            "capture_backed_npc_combat_inventory.json",
+            "capture_backed_npc_combat_active_coverage.json",
+            "capture_backed_npc_combat_generation_manifest.json",
+            "capture_backed_npc_attack_range_audit.json",
+            "capture_backed_npc_secondary_evidence_audit.json",
+            "enemy_combat_setup_formula_dataset.json",
+        )
+    ),
 }
 
 SCHEMA_VERSION = 2
@@ -1036,14 +1094,14 @@ def evidence_document_records(available_capture_ids: set[str]) -> list[dict[str,
 def inventory_input_record(content_sha256: str | None = None) -> dict[str, Any]:
     if not COMBAT_INVENTORY_PATH.exists():
         return {
-            "path": relative_path(COMBAT_INVENTORY_PATH),
+            "path": COMBAT_INVENTORY_LOGICAL_PATH,
             "exists": False,
             "sizeBytes": None,
             "hashStatus": "missing",
             "sha256": None,
         }
     return {
-        "path": relative_path(COMBAT_INVENTORY_PATH),
+        "path": COMBAT_INVENTORY_LOGICAL_PATH,
         "exists": True,
         "sizeBytes": COMBAT_INVENTORY_PATH.stat().st_size,
         **(
@@ -1068,7 +1126,8 @@ def build_audit() -> dict[str, Any]:
         )
     if not COMBAT_INVENTORY_PATH.exists():
         raise RuntimeError(
-            f"missing combat inventory required for semantic cross-reference: {relative_path(COMBAT_INVENTORY_PATH)}"
+            "missing combat inventory required for semantic cross-reference: "
+            f"{COMBAT_INVENTORY_LOGICAL_PATH}"
         )
     loaded_inventory, inventory_sha256 = stable_json_load_and_sha256(COMBAT_INVENTORY_PATH)
     if not isinstance(loaded_inventory, dict):
@@ -1110,7 +1169,7 @@ def build_audit() -> dict[str, Any]:
 
     return {
         "schemaVersion": SCHEMA_VERSION,
-        "generator": relative_path(Path(__file__)),
+        "generator": GENERATOR_LOGICAL_PATH,
         "authority": "cross-reference audit only; derived evidence is never a production combat-contract input",
         "scope": {
             "captureRoots": [
@@ -1162,11 +1221,11 @@ def write_output(document: dict[str, Any]) -> None:
 def check_output(document: dict[str, Any]) -> None:
     expected = serialize(document)
     if not OUTPUT_PATH.exists():
-        raise RuntimeError(f"missing generated output: {relative_path(OUTPUT_PATH)}")
+        raise RuntimeError(f"missing generated output: {OUTPUT_LOGICAL_PATH}")
     actual = OUTPUT_PATH.read_bytes()
     if actual != expected:
         raise RuntimeError(
-            f"generated output is stale: run {relative_path(Path(__file__))} --write"
+            f"generated output is stale: run {GENERATOR_LOGICAL_PATH} --write"
         )
 
 
@@ -1347,14 +1406,14 @@ def main(argv: list[str]) -> int:
             subway = document["subwayCrossReference"]
             print(
                 "WROTE "
-                f"{relative_path(OUTPUT_PATH)} sessions={summary['captureSessionCount']} "
+                f"{OUTPUT_LOGICAL_PATH} sessions={summary['captureSessionCount']} "
                 f"artifacts={summary['captureArtifactCount']} "
                 f"subwayMissingCaptures={len(subway['missingReferencedCaptureIds'])} "
                 f"subwayNormalWithoutRawContract={subway['entriesWithNormalAttackInfoButNoCompleteRawContractCount']}"
             )
         else:
             check_output(document)
-            print(f"PASS {relative_path(OUTPUT_PATH)} is current")
+            print(f"PASS {OUTPUT_LOGICAL_PATH} is current")
         return 0
     except Exception as exception:  # deterministic CLI boundary
         print(f"ERROR: {exception}", file=sys.stderr)

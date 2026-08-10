@@ -707,21 +707,24 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             role: root / Path(relative)
             for role, relative in pipeline.ARTIFACT_RELATIVE_PATHS.items()
         }
-        documents = {
-            "inventory": {
-                "schemaVersion": 1,
-                "summary": {
-                    "captureSessionsDiscovered": 7,
-                    "canonicalValidSessions": 6,
-                    "completeAttackInfoChains": 11,
-                    "captureCertifiedProfiles": 2,
-                    "runtimeReadyProfiles": 2,
-                    "captureCertifiedSemanticDefinitions": 4,
-                    "runtimeReadyGeneratedSemanticDefinitions": 3,
-                    "unresolvedProfiles": 3,
-                    "decodeOrProjectionErrors": 0,
-                },
+        inventory_document = {
+            "schemaVersion": 1,
+            "summary": {
+                "captureSessionsDiscovered": 7,
+                "canonicalValidSessions": 6,
+                "completeAttackInfoChains": 11,
+                "captureCertifiedProfiles": 2,
+                "runtimeReadyProfiles": 2,
+                "captureCertifiedSemanticDefinitions": 4,
+                "runtimeReadyGeneratedSemanticDefinitions": 3,
+                "unresolvedProfiles": 3,
+                "decodeOrProjectionErrors": 0,
             },
+        }
+        inventory_payload = pipeline.canonical_json_bytes(inventory_document)
+        inventory_sha256 = pipeline.sha256_bytes(inventory_payload)
+        documents = {
+            "inventory": inventory_document,
             "activeCoverage": {
                 "schemaVersion": 1,
                 "totals": {
@@ -741,6 +744,27 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 "incompleteRebuildFormula": {"activeBindings": []},
                 "molestedMoleculesFormula": {"activeBindings": []},
                 "fixedScopeSelectorBindings": {"activeBindings": []},
+            },
+            "attackRangeAudit": {
+                "schemaVersion": 2,
+                "inventory": pipeline.ARTIFACT_RELATIVE_PATHS[
+                    "inventory"
+                ].as_posix(),
+                "inventorySha256": inventory_sha256,
+            },
+            "secondaryEvidenceAudit": {
+                "schemaVersion": 2,
+                "combatInventoryInput": {
+                    "path": pipeline.ARTIFACT_RELATIVE_PATHS[
+                        "inventory"
+                    ].as_posix(),
+                    "exists": True,
+                    "sizeBytes": len(inventory_payload),
+                    "hashStatus": "content-sha256",
+                    "sha256": inventory_sha256,
+                    "manifestSha256": None,
+                    "manifestDigestMatches": None,
+                },
             },
         }
         for role, path in artifacts.items():
@@ -1729,8 +1753,17 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             frozen_primary = root / "frozen" / "primary.py"
             frozen_primary.parent.mkdir()
             frozen_primary.write_text("# frozen primary\n", encoding="ascii")
+            frozen_projection = root / "frozen" / "arete-range-items.json"
             auxiliary_snapshot = mock.Mock()
             auxiliary_snapshot.path_for.return_value = frozen_primary
+            auxiliary_snapshot.snapshot_root = root / "frozen"
+            auxiliary_snapshot.records = [
+                mock.Mock(
+                    relative_path=pipeline.ITEM_DATABASE.as_posix(),
+                    sha256="a" * 64,
+                    size=1,
+                )
+            ]
             observed = {}
 
             def intercept(command, **kwargs):
@@ -1744,6 +1777,12 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 pipeline, "runtime_descriptor", return_value={}
             ), mock.patch.object(
                 pipeline, "run_checked", side_effect=intercept
+            ), mock.patch.object(
+                pipeline, "_read_verified_private_input", return_value=b"x"
+            ), mock.patch.object(
+                pipeline,
+                "_build_item_template_projection",
+                return_value=(b"{}\n", frozen_projection),
             ):
                 with self.assertRaises(StopAfterPrimaryCommand):
                     pipeline.build_candidate_cohort(
@@ -1753,10 +1792,12 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                         lease=object(),
                     )
 
-            auxiliary_snapshot.path_for.assert_called_once_with(
+            auxiliary_snapshot.path_for.assert_any_call(
                 pipeline.PRIMARY_GENERATOR.as_posix()
             )
             self.assertIn(str(frozen_primary), observed["command"])
+            self.assertIn("--item-template-projection", observed["command"])
+            self.assertIn(str(frozen_projection), observed["command"])
             self.assertEqual("primary aggregation", observed["kwargs"]["label"])
             self.assertEqual(
                 {
@@ -1766,6 +1807,141 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 },
                 observed["kwargs"]["environment_overrides"],
             )
+
+    def test_candidate_inventory_audits_consume_candidate_inventory_and_publish_candidate_outputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            inventory = root / "candidate-inventory.json"
+            attack_output = root / "candidate-attack-range.json"
+            secondary_output = root / "candidate-secondary.json"
+            inventory.write_text("{}\n", encoding="ascii")
+            artifacts = {
+                "inventory": inventory,
+                "attackRangeAudit": attack_output,
+                "secondaryEvidenceAudit": secondary_output,
+            }
+            attack_script = root / "frozen-attack-range.py"
+            secondary_script = root / "frozen-secondary.py"
+            auxiliary_snapshot = mock.Mock()
+
+            def frozen_path(logical_path):
+                if logical_path == pipeline.ATTACK_RANGE_AUDIT.as_posix():
+                    return attack_script
+                if logical_path == pipeline.SECONDARY_EVIDENCE_AUDIT.as_posix():
+                    return secondary_script
+                raise AssertionError(logical_path)
+
+            auxiliary_snapshot.path_for.side_effect = frozen_path
+            observed = []
+
+            def complete(command, **kwargs):
+                observed.append((tuple(command), kwargs))
+                if kwargs["label"] == "attack-range audit":
+                    Path(command[command.index("--output") + 1]).write_text(
+                        "{}\n", encoding="ascii"
+                    )
+                elif kwargs["label"] == "secondary-evidence audit":
+                    Path(
+                        kwargs["environment_overrides"][
+                            pipeline.NPC_COMBAT_SECONDARY_AUDIT_OUTPUT_ENVIRONMENT
+                        ]
+                    ).write_text("{}\n", encoding="ascii")
+                return subprocess.CompletedProcess(command, 0, "", "")
+
+            with mock.patch.object(pipeline, "run_checked", side_effect=complete):
+                pipeline._run_candidate_inventory_audits(
+                    repo_root=root,
+                    artifacts=artifacts,
+                    auxiliary_snapshot=auxiliary_snapshot,
+                    lease=object(),
+                )
+
+            self.assertEqual(
+                ["attack-range audit", "secondary-evidence audit"],
+                [kwargs["label"] for _, kwargs in observed],
+            )
+            attack_command, attack_kwargs = observed[0]
+            self.assertIn(str(inventory), attack_command)
+            self.assertIn(str(attack_output), attack_command)
+            self.assertIn(
+                pipeline.ARTIFACT_RELATIVE_PATHS["inventory"].as_posix(),
+                attack_command,
+            )
+            secondary_environment = observed[1][1]["environment_overrides"]
+            self.assertEqual(
+                str(inventory),
+                secondary_environment[
+                    pipeline.NPC_COMBAT_AUDIT_INVENTORY_ENVIRONMENT
+                ],
+            )
+            self.assertEqual(
+                str(secondary_output),
+                secondary_environment[
+                    pipeline.NPC_COMBAT_SECONDARY_AUDIT_OUTPUT_ENVIRONMENT
+                ],
+            )
+            self.assertEqual(
+                pipeline.ARTIFACT_RELATIVE_PATHS["inventory"].as_posix(),
+                secondary_environment[
+                    pipeline.NPC_COMBAT_AUDIT_INVENTORY_LOGICAL_PATH_ENVIRONMENT
+                ],
+            )
+            self.assertEqual(
+                {
+                    pipeline.NPC_COMBAT_AUDIT_REPO_ROOT_ENVIRONMENT: str(root)
+                },
+                attack_kwargs["environment_overrides"],
+            )
+
+    def test_manifest_rejects_audits_bound_to_a_different_inventory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artifacts = self._write_fixture_artifacts(root)
+            attack_range_audit = json.loads(
+                artifacts["attackRangeAudit"].read_text(encoding="utf-8")
+            )
+            attack_range_audit["inventorySha256"] = "0" * 64
+            artifacts["attackRangeAudit"].write_bytes(
+                pipeline.canonical_json_bytes(attack_range_audit)
+            )
+
+            with self.assertRaisesRegex(
+                pipeline.CohortValidationError,
+                "attack-range audit.*governed inventory SHA-256",
+            ):
+                pipeline.build_generation_manifest(
+                    cohort_root=root,
+                    artifacts=artifacts,
+                    input_snapshot=self._snapshot(),
+                    auxiliary_input_identity="c" * 64,
+                    generators=self._generator_descriptors(),
+                    runtime=self._runtime_descriptor(),
+                )
+
+            inventory_sha256 = pipeline.sha256_file(artifacts["inventory"])
+            attack_range_audit["inventorySha256"] = inventory_sha256
+            artifacts["attackRangeAudit"].write_bytes(
+                pipeline.canonical_json_bytes(attack_range_audit)
+            )
+            secondary_evidence_audit = json.loads(
+                artifacts["secondaryEvidenceAudit"].read_text(encoding="utf-8")
+            )
+            secondary_evidence_audit["combatInventoryInput"]["sha256"] = "0" * 64
+            artifacts["secondaryEvidenceAudit"].write_bytes(
+                pipeline.canonical_json_bytes(secondary_evidence_audit)
+            )
+            with self.assertRaisesRegex(
+                pipeline.CohortValidationError,
+                "secondary-evidence audit.*governed inventory sha256",
+            ):
+                pipeline.build_generation_manifest(
+                    cohort_root=root,
+                    artifacts=artifacts,
+                    input_snapshot=self._snapshot(),
+                    auxiliary_input_identity="c" * 64,
+                    generators=self._generator_descriptors(),
+                    runtime=self._runtime_descriptor(),
+                )
 
     def test_primary_publication_revalidation_uses_frozen_private_validator_and_fails_closed(self):
         with tempfile.TemporaryDirectory() as directory:

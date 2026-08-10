@@ -36468,7 +36468,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "d4dba7cb3a1aafb4a6f8",
+      "bindingKey": "077cf637a7393d1c27b8",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36477,14 +36477,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36494,7 +36494,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "e609da372cd873cc0e25",
+      "bindingKey": "e4d47f0c288a1f4f92ae",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36503,14 +36503,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36520,7 +36520,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "12e18b4b9a164530ff72",
+      "bindingKey": "72deebfc2618646a51be",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36529,14 +36529,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36546,7 +36546,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "30b5409b3a4e4f703eb2",
+      "bindingKey": "4efbde7603fabfca8dd0",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36555,14 +36555,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36572,7 +36572,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "5d3b1f4bb88e3129b679",
+      "bindingKey": "766226a34ddf7a203df7",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36581,14 +36581,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36598,7 +36598,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "d8dc7a8eb72160cb57e7",
+      "bindingKey": "dc1c8b1fcac911d659b5",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36607,14 +36607,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36624,7 +36624,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "a1f1a5a47194f042a04d",
+      "bindingKey": "80b7c806615de4152bb0",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36633,14 +36633,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36650,7 +36650,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "783ea418fca0337aea8c",
+      "bindingKey": "3c2d146fd61f39683780",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36659,14 +36659,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36676,7 +36676,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "81863d3d9e658c5fa6ea",
+      "bindingKey": "d29290cf0c960f0680a3",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36685,14 +36685,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36702,7 +36702,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "f32d3aaf93a3d3cf4d9d",
+      "bindingKey": "9b504211e06b3ddcaa74",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36711,14 +36711,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36728,7 +36728,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "5221fd2053b7d1d4d53f",
+      "bindingKey": "9e6a544c7567a3f4bcb5",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36737,14 +36737,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36754,7 +36754,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "48a453d32d33658ed2e0",
+      "bindingKey": "5b9dc52125f7d3792385",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36763,14 +36763,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36780,7 +36780,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "ca16fbb4d3e33c680fe3",
+      "bindingKey": "502c05bca68343fc699f",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36789,14 +36789,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36806,7 +36806,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "b5afc1d4bdbd88538ff6",
+      "bindingKey": "90e09aec4d2f456e580f",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36815,14 +36815,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36832,7 +36832,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "c7e57a32879b382ccbfe",
+      "bindingKey": "f0e8cb6b98c6862373db",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36841,14 +36841,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17714,
       "name": "Waste Collector",
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "fa6fc8256e910451-c850f3966b62b38e",
@@ -36884,7 +36884,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "d7b48844418f349a1d9f",
+      "bindingKey": "f24a4c25f53ab21a3dfe",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36893,14 +36893,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "7e063764c75543758737",
+      "coverageKey": "e37cc717cf5d6f9f9488",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17657,
       "name": "Garbage Flea",
-      "runtimeAttackRangeMicrometers": 15576482,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "46a87c17eefbd77b-c850f3966b62b38e",
@@ -36936,7 +36936,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "2e4b3775d9558356d13e",
+      "bindingKey": "c62d8c6f171a48b165e9",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -36945,14 +36945,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "7e063764c75543758737",
+      "coverageKey": "e37cc717cf5d6f9f9488",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17657,
       "name": "Garbage Flea",
-      "runtimeAttackRangeMicrometers": 15576482,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "46a87c17eefbd77b-c850f3966b62b38e",
@@ -37040,7 +37040,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "9c82b695b8798f89178d",
+      "bindingKey": "adcdb2d3c29d763e5d67",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37049,14 +37049,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "7e063764c75543758737",
+      "coverageKey": "e37cc717cf5d6f9f9488",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 17657,
       "name": "Garbage Flea",
-      "runtimeAttackRangeMicrometers": 15576482,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "46a87c17eefbd77b-c850f3966b62b38e",
@@ -37092,7 +37092,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "770b0e18a3305932add7",
+      "bindingKey": "60bc1169acb26a8cb036",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37101,14 +37101,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "0151ee26ea762282419f",
+      "coverageKey": "bd3adc51772542f87d7a",
       "level": 2,
       "levelCandidates": [
         2
       ],
       "monsterData": 297023,
       "name": "Cleanmeister Intelligence Robot",
-      "runtimeAttackRangeMicrometers": 2771750,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "028210688643a4d8-6ff86979de5c6526",
@@ -37378,7 +37378,7 @@
     },
     {
       "actorCount": 14,
-      "bindingKey": "6567c39814581582bfa1",
+      "bindingKey": "d495b52837136466200f",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37387,14 +37387,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs"
       ],
-      "coverageKey": "949a900dfd8d945f8649",
+      "coverageKey": "783a35cb270ef125f370",
       "level": 1,
       "levelCandidates": [
         1
       ],
       "monsterData": 297023,
       "name": "Cleaning Robot",
-      "runtimeAttackRangeMicrometers": 5155609,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "1c42797c1a980105-998f3f8fca4b8167",
@@ -37430,7 +37430,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "4d5126486e3bebb37b18",
+      "bindingKey": "1e00d43754a94cbe9908",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37439,14 +37439,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37482,7 +37482,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "0c157af55d30bd78f775",
+      "bindingKey": "b87a62ae5fb9eebec137",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37491,14 +37491,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37534,7 +37534,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "152b0e8f31ff53593d6e",
+      "bindingKey": "6050eef67e7b9560fbd0",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37543,14 +37543,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37560,7 +37560,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "ae3f855a545862187723",
+      "bindingKey": "cfdedc2e33ecd0f6209e",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37569,14 +37569,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37612,7 +37612,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "c45e10a75c1c41cc1bb5",
+      "bindingKey": "93aa9942e8d0364b3feb",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37621,14 +37621,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37716,7 +37716,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "e6a0426808b4837cf45c",
+      "bindingKey": "1e825a7adc3035d07b92",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37725,14 +37725,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37742,7 +37742,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "05a82cebe20f42b3f988",
+      "bindingKey": "36fdfb04d79b82e4c0c1",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37751,14 +37751,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37872,7 +37872,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "d7426cfdcca25e0bdb5e",
+      "bindingKey": "431633d524ad534d16c0",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37881,14 +37881,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37898,7 +37898,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "ba937f1a4ce0f425023e",
+      "bindingKey": "0d10d3a584cf6c43dbdd",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37907,14 +37907,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37924,7 +37924,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "c930328cc3ef4075d9ab",
+      "bindingKey": "5f88c508f61f23fa51d6",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37933,14 +37933,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 30365,
       "name": "Desert Reet",
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -37976,7 +37976,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "31ac29c041eee7e0292d",
+      "bindingKey": "dbf9ac27bb7461060e06",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -37985,14 +37985,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "7c471c7a4183725e7376",
+      "coverageKey": "1ba28065afa854068733",
       "level": 5,
       "levelCandidates": [
         5
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 11018516,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "f05cd862c6056037-c2f9cf4727f71a13",
@@ -38002,7 +38002,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "ff13425dbaf9abcc0933",
+      "bindingKey": "c0d2e9984c410b4268c7",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38011,14 +38011,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "7c471c7a4183725e7376",
+      "coverageKey": "1ba28065afa854068733",
       "level": 5,
       "levelCandidates": [
         5
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 11018516,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "f05cd862c6056037-c2f9cf4727f71a13",
@@ -38028,7 +38028,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "f33b0e96951cfd5a07fc",
+      "bindingKey": "b611f0dcb92f7353aca1",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38037,14 +38037,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "b36cc3888b0046209032",
+      "coverageKey": "c1e3e09bd8cd613018fe",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 18747485,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "3d2df0c70c1adc8a-42554a1c70a69759",
@@ -38054,7 +38054,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "3da2e8b4d220eaffeb2a",
+      "bindingKey": "74ecac21d261926337cb",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38063,14 +38063,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "7c471c7a4183725e7376",
+      "coverageKey": "1ba28065afa854068733",
       "level": 5,
       "levelCandidates": [
         5
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 11018516,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "f05cd862c6056037-c2f9cf4727f71a13",
@@ -38080,7 +38080,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "e3620b3bece0667c4ac3",
+      "bindingKey": "9fb73e1e298bd786dada",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38089,14 +38089,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "b36cc3888b0046209032",
+      "coverageKey": "c1e3e09bd8cd613018fe",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 18747485,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "3d2df0c70c1adc8a-42554a1c70a69759",
@@ -38106,7 +38106,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "6c8207782260e3dd56d8",
+      "bindingKey": "2d7b56fd00c8bce63025",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38115,14 +38115,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "b36cc3888b0046209032",
+      "coverageKey": "c1e3e09bd8cd613018fe",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 18747485,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "3d2df0c70c1adc8a-42554a1c70a69759",
@@ -38132,7 +38132,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "071c6f435cf40e38168e",
+      "bindingKey": "c5a3198a7717b8728303",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38141,14 +38141,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "b36cc3888b0046209032",
+      "coverageKey": "c1e3e09bd8cd613018fe",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 18747485,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "3d2df0c70c1adc8a-42554a1c70a69759",
@@ -38158,7 +38158,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "5fe5e723310fdd67d1d0",
+      "bindingKey": "b153180106a84f27b7d0",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38167,14 +38167,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "b36cc3888b0046209032",
+      "coverageKey": "c1e3e09bd8cd613018fe",
       "level": 6,
       "levelCandidates": [
         6
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 18747485,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "3d2df0c70c1adc8a-42554a1c70a69759",
@@ -38184,7 +38184,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "643e9fd746ba4ceb5a30",
+      "bindingKey": "5368f3fef7b116e10cbb",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -38193,14 +38193,14 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "7c471c7a4183725e7376",
+      "coverageKey": "1ba28065afa854068733",
       "level": 5,
       "levelCandidates": [
         5
       ],
       "monsterData": 17687,
       "name": "Rollerrat",
-      "runtimeAttackRangeMicrometers": 11018516,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 6553,
       "runtimeProfileSelector": "f05cd862c6056037-c2f9cf4727f71a13",
@@ -39740,7 +39740,7 @@
   "combatInventory": {
     "path": "docs/generated/capture_backed_npc_combat_inventory.json",
     "schemaVersion": 3,
-    "sha256": "c8f18b57893a343b284b45274530bf4b79463ca766bdd1097c3fdf072aed1323"
+    "sha256": "9303e58fdff69bcafea22140e04573ba06673ed8a7d93fbea7f07037297c9ba9"
   },
   "contentInputs": [
     {
@@ -39751,7 +39751,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-      "sha256": "5b06a62851ca7ddcc7013d8cc0c0f670d8ba726dc1f689369fc7711a105573c3"
+      "sha256": "72cdbde59a3290e62c4197a01f95326a726a468eb78afa9a2172d0519b754277"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -39786,12 +39786,12 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-      "sha256": "6fc87c7e3523ee642cb7b9e7f13499b879dca723451099a7264b9818f8b97447"
+      "sha256": "e3626497824dc15ee2dff2ed570142a13294c2db2b42bcce9018445906669f39"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-      "sha256": "94e3d5e7b20dcb67a8ad646d71bb34572068575164bd9d31c37b25071f3f604a"
+      "sha256": "700221d43eb7f95aa657fd15f0b861ceab36f9ba5c7dd6f3253d1112449938ce"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -39856,12 +39856,12 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
-      "sha256": "4a07f3dfc2e71106c0324994e574c3cd6b35556ac6eb752d603f021f0055a885"
+      "sha256": "912026730dbceb454f03e48b8e2110e6c11e6ff604d31e96b07f3736ad444b0d"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-      "sha256": "ff82a96000dd1ce46d8cced8980274b77166e13047de637444a2fbbb73ae466c"
+      "sha256": "9cc2a5ebfaea7a875dbb39a283115ab05aaab3b9762e4113a7496f573c402a08"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -39923,7 +39923,8 @@
     "authoritativeInputs": [
       "canonical reconciliation of packets.hex.log and raw-packets.csv",
       "canonical raw reconciliation of every SCFU against projections and the current decoder",
-      "raw-only legacy capture directories under For Repo"
+      "raw-only legacy capture directories under For Repo",
+      "captured SpecialAttackWeapon template identities joined to immutable AORebirth/Datafiles/items.dat Stat 287"
     ],
     "scope": "all sessions scanned by the canonical combat inventory extractor",
     "sessionCount": 381,
@@ -55097,7 +55098,7 @@
       },
       {
         "auditFamily": "cleaning-robots",
-        "auditKey": "7efc964867d43b7d94f7",
+        "auditKey": "a334ab048dccca75229f",
         "captureSearchScope": null,
         "captureSessions": [
           "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107",
@@ -55116,10 +55117,14 @@
             "level": 1,
             "observations": [
               {
-                "capturedAttackRangeMicrometers": 5155609,
+                "attackRangeEvidenceId": "74bc79c11861b63f",
+                "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+                "attackRangeStatId": 287,
+                "capturedAttackRangeMeters": 2.0,
                 "capturedAttackStartDelaySeconds": 0.0,
                 "capturedAttackStreamCount": 2,
-                "observationType": "exact-captured-combat-profile-with-content-range",
+                "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4200|59e16c2eec52",
+                "observationType": "exact-captured-combat-profile-with-itemdb-range",
                 "semanticProfileId": "1c42797c1a980105-998f3f8fca4b8167",
                 "sourceIdentity": "0x7988C8C3",
                 "specialAttackWeaponUnknown5": 0
@@ -55134,7 +55139,7 @@
           "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4527|bd53e859c1fa"
         ],
         "fixedDenominatorActorCount": 14,
-        "fixedDenominatorCoverageKey": "949a900dfd8d945f8649",
+        "fixedDenominatorCoverageKey": "783a35cb270ef125f370",
         "level": 1,
         "levelCandidates": [
           1
@@ -55153,7 +55158,7 @@
       },
       {
         "auditFamily": "cleaning-robots",
-        "auditKey": "788e1950f335c9e6a925",
+        "auditKey": "c94f73746bb45579d51f",
         "captureSearchScope": null,
         "captureSessions": [
           "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725",
@@ -55173,10 +55178,14 @@
             "level": 2,
             "observations": [
               {
-                "capturedAttackRangeMicrometers": 2771750,
+                "attackRangeEvidenceId": "3aca0910145d2f3a",
+                "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+                "attackRangeStatId": 287,
+                "capturedAttackRangeMeters": 2.0,
                 "capturedAttackStartDelaySeconds": 0.0,
                 "capturedAttackStreamCount": 3,
-                "observationType": "exact-captured-combat-profile-with-content-range",
+                "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|4812|7c2651b2083f",
+                "observationType": "exact-captured-combat-profile-with-itemdb-range",
                 "semanticProfileId": "028210688643a4d8-6ff86979de5c6526",
                 "sourceIdentity": "0x798915E0",
                 "specialAttackWeaponUnknown5": 82
@@ -55192,7 +55201,7 @@
           "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-211754|IN|3720|e38e21f43fb4"
         ],
         "fixedDenominatorActorCount": 1,
-        "fixedDenominatorCoverageKey": "0151ee26ea762282419f",
+        "fixedDenominatorCoverageKey": "bd3adc51772542f87d7a",
         "level": 2,
         "levelCandidates": [
           2
@@ -188998,17 +189007,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs"
       ],
-      "coverageKey": "949a900dfd8d945f8649",
+      "coverageKey": "783a35cb270ef125f370",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 1,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 5155609,
+              "attackRangeEvidenceId": "74bc79c11861b63f",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4200|59e16c2eec52",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "1c42797c1a980105-998f3f8fca4b8167",
               "sourceIdentity": "0x7988C8C3",
               "specialAttackWeaponUnknown5": 0
@@ -189028,20 +189041,26 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "74bc79c11861b63f",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=297023|level=1|name=Cleaning Robot",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 5155609,
+              "attackRangeEvidenceId": "74bc79c11861b63f",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4200|59e16c2eec52",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "1c42797c1a980105-998f3f8fca4b8167",
               "sourceIdentity": "0x7988C8C3",
               "specialAttackWeaponUnknown5": 0
@@ -189058,7 +189077,7 @@
           ],
           "level": 1,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "1c42797c1a980105-998f3f8fca4b8167"
@@ -189068,7 +189087,7 @@
       "monsterData": 297023,
       "name": "Cleaning Robot",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 5155609,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -189098,17 +189117,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "0151ee26ea762282419f",
+      "coverageKey": "bd3adc51772542f87d7a",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 2,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 2771750,
+              "attackRangeEvidenceId": "3aca0910145d2f3a",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 3,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|4812|7c2651b2083f",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "028210688643a4d8-6ff86979de5c6526",
               "sourceIdentity": "0x798915E0",
               "specialAttackWeaponUnknown5": 82
@@ -189129,21 +189152,27 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "3aca0910145d2f3a",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-211754",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=297023|level=2|name=Cleanmeister Intelligence Robot",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 2771750,
+              "attackRangeEvidenceId": "3aca0910145d2f3a",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 3,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|4812|7c2651b2083f",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "028210688643a4d8-6ff86979de5c6526",
               "sourceIdentity": "0x798915E0",
               "specialAttackWeaponUnknown5": 82
@@ -189161,7 +189190,7 @@
           ],
           "level": 2,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "028210688643a4d8-6ff86979de5c6526"
@@ -189171,7 +189200,7 @@
       "monsterData": 297023,
       "name": "Cleanmeister Intelligence Robot",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 2771750,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -190330,17 +190359,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "1acedff6868174f9d5db",
+      "coverageKey": "08fcd05af0c457748183",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 6,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 23167874,
+              "attackRangeEvidenceId": "7a68a5ae9a6765aa",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4066|d1830bcfbb10",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "45c6e511d794c6bf-8c8a88032be6ca97",
               "sourceIdentity": "0x798828F0",
               "specialAttackWeaponUnknown5": 0
@@ -190360,19 +190393,25 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "7a68a5ae9a6765aa",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=30365|level=6|name=Desert Reet",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 23167874,
+              "attackRangeEvidenceId": "7a68a5ae9a6765aa",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4066|d1830bcfbb10",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "45c6e511d794c6bf-8c8a88032be6ca97",
               "sourceIdentity": "0x798828F0",
               "specialAttackWeaponUnknown5": 0
@@ -190389,7 +190428,7 @@
           ],
           "level": 6,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "45c6e511d794c6bf-8c8a88032be6ca97"
@@ -190399,7 +190438,7 @@
       "monsterData": 30365,
       "name": "Desert Reet",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 23167874,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -192934,17 +192973,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "7e063764c75543758737",
+      "coverageKey": "e37cc717cf5d6f9f9488",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 2,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 15576482,
+              "attackRangeEvidenceId": "60fd1cfe46468cbe",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|7824|78074c7c3b99",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "46a87c17eefbd77b-c850f3966b62b38e",
               "sourceIdentity": "0x7988C914",
               "specialAttackWeaponUnknown5": 117
@@ -192964,19 +193007,25 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "60fd1cfe46468cbe",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=17657|level=2|name=Garbage Flea",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 15576482,
+              "attackRangeEvidenceId": "60fd1cfe46468cbe",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|7824|78074c7c3b99",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "46a87c17eefbd77b-c850f3966b62b38e",
               "sourceIdentity": "0x7988C914",
               "specialAttackWeaponUnknown5": 117
@@ -192993,7 +193042,7 @@
           ],
           "level": 2,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "46a87c17eefbd77b-c850f3966b62b38e"
@@ -193003,7 +193052,7 @@
       "monsterData": 17657,
       "name": "Garbage Flea",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 15576482,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -214477,17 +214526,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "7c471c7a4183725e7376",
+      "coverageKey": "1ba28065afa854068733",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 5,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 11018516,
+              "attackRangeEvidenceId": "38df1751d321d33f",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 3,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|2494|d167d852409c",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "f05cd862c6056037-c2f9cf4727f71a13",
               "sourceIdentity": "0x79882AEC",
               "specialAttackWeaponUnknown5": 0
@@ -214508,21 +214561,27 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "38df1751d321d33f",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=17687|level=5|name=Rollerrat",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 11018516,
+              "attackRangeEvidenceId": "38df1751d321d33f",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 3,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|2494|d167d852409c",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "f05cd862c6056037-c2f9cf4727f71a13",
               "sourceIdentity": "0x79882AEC",
               "specialAttackWeaponUnknown5": 0
@@ -214540,7 +214599,7 @@
           ],
           "level": 5,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "f05cd862c6056037-c2f9cf4727f71a13"
@@ -214550,7 +214609,7 @@
       "monsterData": 17687,
       "name": "Rollerrat",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 11018516,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -214580,17 +214639,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs"
       ],
-      "coverageKey": "b36cc3888b0046209032",
+      "coverageKey": "c1e3e09bd8cd613018fe",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 6,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 18747485,
+              "attackRangeEvidenceId": "457e449ea5772f13",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|7996|1821cb9e8672",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "3d2df0c70c1adc8a-42554a1c70a69759",
               "sourceIdentity": "0x798912B8",
               "specialAttackWeaponUnknown5": 0
@@ -214611,21 +214674,27 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "457e449ea5772f13",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=17687|level=6|name=Rollerrat",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 18747485,
+              "attackRangeEvidenceId": "457e449ea5772f13",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|7996|1821cb9e8672",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "3d2df0c70c1adc8a-42554a1c70a69759",
               "sourceIdentity": "0x798912B8",
               "specialAttackWeaponUnknown5": 0
@@ -214643,7 +214712,7 @@
           ],
           "level": 6,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "3d2df0c70c1adc8a-42554a1c70a69759"
@@ -214653,7 +214722,7 @@
       "monsterData": 17687,
       "name": "Rollerrat",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 18747485,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -215676,17 +215745,21 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
       ],
-      "coverageKey": "05ccc11e58157e72b81e",
+      "coverageKey": "cdbe47cf28320c9715b6",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 2,
           "observations": [
             {
-              "capturedAttackRangeMicrometers": 1332759,
+              "attackRangeEvidenceId": "8a48c165e6fc80c2",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753|IN|7127|72438d27df2e",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "fa6fc8256e910451-c850f3966b62b38e",
               "sourceIdentity": "0x7988CAFF",
               "specialAttackWeaponUnknown5": 0
@@ -215706,6 +215779,7 @@
       ],
       "levelCoverage": [
         {
+          "attackRangeEvidenceId": "8a48c165e6fc80c2",
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525",
@@ -215714,15 +215788,20 @@
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454"
           ],
+          "capturedAttackRangeMeters": 2.0,
           "classification": "certified",
           "combatProfileKey": "resource=6553|md=17714|level=2|name=Waste Collector",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "capturedAttackRangeMicrometers": 1332759,
+              "attackRangeEvidenceId": "8a48c165e6fc80c2",
+              "attackRangeItemDatabaseSha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c",
+              "attackRangeStatId": 287,
+              "capturedAttackRangeMeters": 2.0,
               "capturedAttackStartDelaySeconds": 0.0,
               "capturedAttackStreamCount": 2,
-              "observationType": "exact-captured-combat-profile-with-content-range",
+              "capturedSpecialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753|IN|7127|72438d27df2e",
+              "observationType": "exact-captured-combat-profile-with-itemdb-range",
               "semanticProfileId": "fa6fc8256e910451-c850f3966b62b38e",
               "sourceIdentity": "0x7988CAFF",
               "specialAttackWeaponUnknown5": 0
@@ -215739,7 +215818,7 @@
           ],
           "level": 2,
           "missingEvidence": [],
-          "resolutionMode": "exact-arete-content-range-profile-selector",
+          "resolutionMode": "exact-arete-generated-range-profile-selector",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
           "semanticProfileId": "fa6fc8256e910451-c850f3966b62b38e"
@@ -215749,7 +215828,7 @@
       "monsterData": 17714,
       "name": "Waste Collector",
       "notes": [],
-      "runtimeAttackRangeMicrometers": 1332759,
+      "runtimeAttackRangeMicrometers": null,
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -223643,7 +223722,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          519
+          520
         ]
       },
       {
@@ -223743,7 +223822,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          217
+          218
         ]
       },
       {
@@ -223754,8 +223833,8 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
         "prepareCallCount": 2,
         "prepareCallSourceLines": [
-          628,
-          681
+          629,
+          682
         ]
       },
       {

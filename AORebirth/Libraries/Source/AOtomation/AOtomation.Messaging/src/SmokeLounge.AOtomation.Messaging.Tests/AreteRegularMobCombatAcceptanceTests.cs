@@ -12,11 +12,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Navigation;
     using ZoneEngine.Core.Playfields;
 
     [TestClass]
     public class AreteRegularMobCombatAcceptanceTests
     {
+        private static readonly DateTime SpatialEpoch =
+            new DateTime(2026, 8, 9, 0, 0, 0, DateTimeKind.Utc);
+
         private sealed class ExpectedMob
         {
             internal string Name;
@@ -28,22 +32,82 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             internal int SpecialAttackWeaponUnknown5;
             internal NpcAiProfile AiProfile;
             internal bool AutomaticAggro;
+            internal double ExpectedAttackRangeMeters;
+        }
+
+        private sealed class ClearSurfaceSpatialContractProvider : IPlayfieldChaseNavigationProvider
+        {
+            public int PlayfieldResource
+            {
+                get { return 6553; }
+            }
+
+            public ChaseNavigationCapability Capability
+            {
+                get { return ChaseNavigationCapability.Supported; }
+            }
+
+            public string GeometryVersion
+            {
+                get { return "clear-surface-spatial-contract-v1"; }
+            }
+
+            public bool TryProjectToSurface(
+                ChaseNavigationPoint reference,
+                double x,
+                double z,
+                out ChaseNavigationPoint projected)
+            {
+                projected = new ChaseNavigationPoint(x, reference.Y, z);
+                return true;
+            }
+
+            public bool IsSegmentTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end)
+            {
+                return start.IsFinite && end.IsFinite;
+            }
+
+            public bool IsAttackLineTraversable(ChaseNavigationPoint start, ChaseNavigationPoint end)
+            {
+                return this.IsSegmentTraversable(start, end);
+            }
+
+            public ChaseRoutePlan RequestRoute(
+                ChaseNavigationPoint start,
+                ChaseNavigationPoint goal,
+                ChaseRouteSearchLimits limits)
+            {
+                return ChaseRoutePlan.Failed(
+                    ChaseRoutePlanStatus.Unreachable,
+                    this.GeometryVersion,
+                    0,
+                    0);
+            }
+
+            public bool IsRouteCurrent(ChaseRoutePlan route)
+            {
+                return route != null
+                       && string.Equals(
+                           route.GeometryVersion,
+                           this.GeometryVersion,
+                           StringComparison.Ordinal);
+            }
         }
 
         private static readonly ExpectedMob[] SupportedMobs =
         {
-            Mob("Waste Collector", 17714, 2, 0x7988CAFFu, "fa6fc8256e910451-c850f3966b62b38e", 1332759, 0, NpcAiProfile.Aggressive, true),
-            Mob("Garbage Flea", 17657, 2, 0x7988C914u, "46a87c17eefbd77b-c850f3966b62b38e", 15576482, 117, NpcAiProfile.Aggressive, true),
-            Mob("Cleanmeister Intelligence Robot", 297023, 2, 0x798915E0u, "028210688643a4d8-6ff86979de5c6526", 2771750, 82, NpcAiProfile.Aggressive, true),
-            Mob("Cleaning Robot", 297023, 1, 0x7988C8C3u, "1c42797c1a980105-998f3f8fca4b8167", 5155609, 0, NpcAiProfile.Passive, false),
-            Mob("Desert Reet", 30365, 6, 0x798828F0u, "45c6e511d794c6bf-8c8a88032be6ca97", 23167874, 0, NpcAiProfile.Passive, false),
-            Mob("Rollerrat", 17687, 5, 0x79882AECu, "f05cd862c6056037-c2f9cf4727f71a13", 11018516, 0, NpcAiProfile.Aggressive, true),
-            Mob("Rollerrat", 17687, 6, 0x798912B8u, "3d2df0c70c1adc8a-42554a1c70a69759", 18747485, 0, NpcAiProfile.Aggressive, true),
-            Mob("ICC Peacekeeper", 26092, 40, 0x78D0F291u, "2a00185997e49d3a-0a5f6153239ce087", 0, 0, NpcAiProfile.Passive, false)
+            Mob("Waste Collector", 17714, 2, 0x7988CAFFu, "fa6fc8256e910451-c850f3966b62b38e", 0, 0, NpcAiProfile.Aggressive, true, 2.0),
+            Mob("Garbage Flea", 17657, 2, 0x7988C914u, "46a87c17eefbd77b-c850f3966b62b38e", 0, 117, NpcAiProfile.Aggressive, true, 2.0),
+            Mob("Cleanmeister Intelligence Robot", 297023, 2, 0x798915E0u, "028210688643a4d8-6ff86979de5c6526", 0, 82, NpcAiProfile.Aggressive, true, 2.0),
+            Mob("Cleaning Robot", 297023, 1, 0x7988C8C3u, "1c42797c1a980105-998f3f8fca4b8167", 0, 0, NpcAiProfile.Passive, false, 2.0),
+            Mob("Desert Reet", 30365, 6, 0x798828F0u, "45c6e511d794c6bf-8c8a88032be6ca97", 0, 0, NpcAiProfile.Passive, false, 2.0),
+            Mob("Rollerrat", 17687, 5, 0x79882AECu, "f05cd862c6056037-c2f9cf4727f71a13", 0, 0, NpcAiProfile.Aggressive, true, 2.0),
+            Mob("Rollerrat", 17687, 6, 0x798912B8u, "3d2df0c70c1adc8a-42554a1c70a69759", 0, 0, NpcAiProfile.Aggressive, true, 2.0),
+            Mob("ICC Peacekeeper", 26092, 40, 0x78D0F291u, "2a00185997e49d3a-0a5f6153239ce087", 0, 0, NpcAiProfile.Passive, false, 0.0)
         };
 
         [TestMethod]
-        public void SupportedRegularMobsSpawnResolveFightDieAndCreateCorpses()
+        public void SupportedRegularMobContractsResolveCapturedPacketsAndCorpseOrdering()
         {
             for (int index = 0; index < SupportedMobs.Length; index++)
             {
@@ -90,15 +154,190 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.IsInstanceOfType(packets[2], typeof(AttackInfoMessage), expected.Name);
                 Assert.IsTrue(damage > 0, expected.Name + " must select captured damage.");
 
-                int health = damage * 2;
-                health -= damage;
-                Assert.IsTrue(health > 0, expected.Name + " must remain in combat after a nonlethal hit.");
-                health -= damage;
-                Assert.IsTrue(health <= 0, expected.Name + " must reach the death state.");
                 Assert.IsTrue(NpcCorpseLifecycleRules.CorpseSpawnDelay > TimeSpan.Zero, expected.Name);
                 Assert.IsTrue(
                     NpcCorpseLifecycleRules.DeadNpcDespawnDelay > NpcCorpseLifecycleRules.CorpseSpawnDelay,
                     expected.Name + " must create a corpse before the dead actor is removed.");
+            }
+        }
+
+        [TestMethod]
+        public void ExactTwoMetreSpatialPolicyPursuesOutsideHoldsInsideAndRepursuesAfterRetreat()
+        {
+            // AOtomation links the production spatial policy and navigation
+            // runtime, but not the server Playfield/NPCController object graph.
+            // Live FollowTarget command emission remains a server/client smoke.
+            const double attackRange = 2.0;
+            const double epsilon = 0.001;
+            const int attackerInstance = 919999;
+            const int targetInstance = 819999;
+
+            Assert.IsTrue(
+                NpcCombatSpatialPolicy.IsWithinAttackEnvelope(
+                    attackRange - epsilon,
+                    attackRange));
+            Assert.IsFalse(
+                NpcCombatSpatialPolicy.IsWithinAttackEnvelope(
+                    attackRange + epsilon,
+                    attackRange));
+            Assert.IsTrue(
+                NpcCombatSpatialPolicy.ShouldHoldMeleeFollow(
+                    attackRange - epsilon,
+                    attackRange));
+            Assert.IsFalse(
+                NpcCombatSpatialPolicy.ShouldHoldMeleeFollow(
+                    attackRange + epsilon,
+                    attackRange));
+
+            double pursuitStop = NpcCombatSpatialPolicy.BuildPursuitStopDistance(attackRange);
+            Assert.AreEqual(
+                attackRange - NpcCombatSpatialPolicy.NavigationArrivalTolerance,
+                pursuitStop,
+                0.000001);
+
+            var navigation = new NpcChaseNavigationRuntimeService(
+                new ClearSurfaceSpatialContractProvider());
+            var attacker = new ChaseNavigationPoint(0.0, 0.0, 0.0);
+            var target = new ChaseNavigationPoint(attackRange + epsilon, 0.0, 0.0);
+            NpcChaseUpdateResult approach = navigation.UpdatePursuit(
+                attackerInstance,
+                targetInstance,
+                attacker,
+                target,
+                pursuitStop,
+                SpatialEpoch);
+
+            Assert.AreEqual(NpcChaseMovementKind.Direct, approach.Kind);
+            Assert.IsTrue(approach.HasDestination);
+            Assert.IsTrue(approach.ShouldIssueMovement);
+            Assert.IsTrue(approach.Destination.Distance2D(target) <= attackRange);
+
+            attacker = approach.Destination;
+            NpcChaseUpdateResult hold = navigation.UpdatePursuit(
+                attackerInstance,
+                targetInstance,
+                attacker,
+                target,
+                pursuitStop,
+                SpatialEpoch + TimeSpan.FromMilliseconds(150));
+            Assert.AreEqual(NpcChaseMovementKind.Hold, hold.Kind);
+
+            target = new ChaseNavigationPoint(attackRange + 4.0, 0.0, 0.0);
+            NpcChaseUpdateResult resumed = navigation.UpdatePursuit(
+                attackerInstance,
+                targetInstance,
+                attacker,
+                target,
+                pursuitStop,
+                SpatialEpoch + TimeSpan.FromMilliseconds(300));
+            Assert.AreEqual(NpcChaseMovementKind.Direct, resumed.Kind);
+            Assert.IsTrue(resumed.HasDestination);
+            Assert.IsTrue(resumed.ShouldIssueMovement);
+        }
+
+        [TestMethod]
+        public void ResolvedAreteMeleeContractsRequirePursuitBeforePacketEligibilityAndResumeAfterRetreat()
+        {
+            for (int index = 0; index < SupportedMobs.Length; index++)
+            {
+                ExpectedMob expected = SupportedMobs[index];
+                if (expected.ExpectedAttackRangeMeters <= 0.0)
+                {
+                    continue;
+                }
+
+                CapturedEnemyCombatContract resolved = Resolve(expected);
+                double attackRange = ResolveAttackRange(resolved);
+                Assert.AreEqual(
+                    expected.ExpectedAttackRangeMeters,
+                    attackRange,
+                    0.000001,
+                    expected.Name + " must use the exact captured two-metre melee reach.");
+
+                var navigation = new NpcChaseNavigationRuntimeService(
+                    new ClearSurfaceSpatialContractProvider());
+                int attackerInstance = 910000 + index;
+                int targetInstance = 810000 + index;
+                var attacker = new ChaseNavigationPoint(0.0, 0.0, 0.0);
+                var target = new ChaseNavigationPoint(attackRange + 0.05, 0.0, 0.0);
+                double outsideDistance = attacker.Distance2D(target);
+                MessageBody packet;
+
+                Assert.IsFalse(
+                    TryCreateAttackAtDistance(
+                        attackerInstance,
+                        targetInstance,
+                        resolved,
+                        outsideDistance,
+                        attackRange,
+                        out packet),
+                    expected.Name + " must not attack before closing its captured reach.");
+                Assert.IsNull(packet, expected.Name);
+
+                double pursuitStop = NpcCombatSpatialPolicy.BuildPursuitStopDistance(attackRange);
+                NpcChaseUpdateResult approach = navigation.UpdatePursuit(
+                    attackerInstance,
+                    targetInstance,
+                    attacker,
+                    target,
+                    pursuitStop,
+                    SpatialEpoch);
+
+                Assert.AreEqual(NpcChaseMovementKind.Direct, approach.Kind, expected.Name);
+                Assert.IsTrue(approach.HasDestination, expected.Name);
+                Assert.IsTrue(approach.ShouldIssueMovement, expected.Name);
+                Assert.IsTrue(
+                    approach.Destination.Distance2D(target) <= attackRange,
+                    expected.Name + " pursuit must finish inside the attack envelope.");
+
+                attacker = approach.Destination;
+                double closedDistance = attacker.Distance2D(target);
+                Assert.IsTrue(
+                    TryCreateAttackAtDistance(
+                        attackerInstance,
+                        targetInstance,
+                        resolved,
+                        closedDistance,
+                        attackRange,
+                        out packet),
+                    expected.Name + " must attack after pursuit closes the certified distance.");
+                Assert.IsInstanceOfType(packet, typeof(AttackMessage), expected.Name);
+
+                NpcChaseUpdateResult inRange = navigation.UpdatePursuit(
+                    attackerInstance,
+                    targetInstance,
+                    attacker,
+                    target,
+                    pursuitStop,
+                    SpatialEpoch + TimeSpan.FromMilliseconds(150));
+                Assert.AreEqual(NpcChaseMovementKind.Hold, inRange.Kind, expected.Name);
+
+                target = new ChaseNavigationPoint(attackRange + 4.0, 0.0, 0.0);
+                double retreatedDistance = attacker.Distance2D(target);
+                Assert.IsFalse(
+                    TryCreateAttackAtDistance(
+                        attackerInstance,
+                        targetInstance,
+                        resolved,
+                        retreatedDistance,
+                        attackRange,
+                        out packet),
+                    expected.Name + " must stop attacking after the target leaves reach.");
+                Assert.IsNull(packet, expected.Name);
+
+                NpcChaseUpdateResult resumed = navigation.UpdatePursuit(
+                    attackerInstance,
+                    targetInstance,
+                    attacker,
+                    target,
+                    pursuitStop,
+                    SpatialEpoch + TimeSpan.FromMilliseconds(300));
+                Assert.AreEqual(NpcChaseMovementKind.Direct, resumed.Kind, expected.Name);
+                Assert.IsTrue(resumed.HasDestination, expected.Name);
+                Assert.IsTrue(resumed.ShouldIssueMovement, expected.Name);
+                Assert.IsTrue(
+                    resumed.Destination.Distance2D(target) <= attackRange,
+                    expected.Name + " must resume pursuit to the certified attack envelope.");
             }
         }
 
@@ -147,7 +386,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 1,
                 unchecked((int)0x7988C8C3u),
                 "028210688643a4d8-6ff86979de5c6526",
-                5155609,
+                0,
                 0);
             AssertResolutionFails(
                 "Engineer Automaton I",
@@ -237,7 +476,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int rangeMicrometers,
             int specialAttackWeaponUnknown5,
             NpcAiProfile aiProfile,
-            bool automaticAggro)
+            bool automaticAggro,
+            double expectedAttackRangeMeters)
         {
             return new ExpectedMob
             {
@@ -249,7 +489,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 RangeMicrometers = rangeMicrometers,
                 SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5,
                 AiProfile = aiProfile,
-                AutomaticAggro = automaticAggro
+                AutomaticAggro = automaticAggro,
+                ExpectedAttackRangeMeters = expectedAttackRangeMeters
             };
         }
 
@@ -393,6 +634,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             return Math.Max(1, contract.MinDamage);
+        }
+
+        private static double ResolveAttackRange(CapturedEnemyCombatContract contract)
+        {
+            if (contract.CapturedAttackRange.HasValue)
+            {
+                return contract.CapturedAttackRange.Value;
+            }
+
+            CapturedEnemyCombatAttackDefinition attack = FirstAttack(contract);
+            return attack == null ? 0.0 : attack.Range;
+        }
+
+        private static bool TryCreateAttackAtDistance(
+            int attackerInstance,
+            int targetInstance,
+            CapturedEnemyCombatContract contract,
+            double distance,
+            double attackRange,
+            out MessageBody packet)
+        {
+            packet = null;
+            if (!NpcCombatSpatialPolicy.IsWithinAttackEnvelope(distance, attackRange))
+            {
+                return false;
+            }
+
+            packet = CapturedEnemyCombatPacketFactory.CreateAttack(
+                SimpleChar(attackerInstance),
+                SimpleChar(targetInstance),
+                contract);
+            return true;
         }
 
         private static Identity SimpleChar(int instance)

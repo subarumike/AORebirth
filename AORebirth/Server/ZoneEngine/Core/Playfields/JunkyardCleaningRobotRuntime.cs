@@ -54,7 +54,8 @@ namespace ZoneEngine.Core.Playfields
 
         private const int CombatEvidenceSourceIdentity = unchecked((int)0x7988C8C3);
 
-        private const int CombatAttackRangeMicrometers = 5155609;
+        // Exact reach comes from the generated capture-linked ItemDb projection.
+        private const int CombatAttackRangeMicrometers = 0;
 
         private const double RespawnSeconds = 30.0;
 

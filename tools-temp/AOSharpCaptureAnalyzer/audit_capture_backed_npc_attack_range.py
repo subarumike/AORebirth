@@ -16,6 +16,11 @@ An exact stationary hit distance is deliberately strict:
 
 Even a distance passing those checks is only a lower bound on attack range.  A
 landed hit does not prove the server's maximum acceptance threshold.
+
+An exact maximum may instead be proven when the captured SpecialAttackWeapon
+template endpoints both carry the same positive ItemDb AttackRange (Stat 287).
+That authority is generated into the combat inventory; runtime content literals
+are never accepted as evidence by this audit.
 """
 
 from __future__ import annotations
@@ -25,7 +30,7 @@ import csv
 import hashlib
 import json
 import math
-import mmap
+import os
 import re
 import struct
 import subprocess
@@ -33,13 +38,21 @@ import sys
 import tempfile
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(
+    os.environ.get(
+        "AO_REBIRTH_NPC_COMBAT_AUDIT_REPO_ROOT",
+        str(Path(__file__).resolve().parents[2]),
+    )
+).resolve(strict=True)
 DEFAULT_INVENTORY = (
     REPO_ROOT / "docs" / "generated" / "capture_backed_npc_combat_inventory.json"
+)
+DEFAULT_INVENTORY_LOGICAL_PATH = (
+    "docs/generated/capture_backed_npc_combat_inventory.json"
 )
 DEFAULT_OUTPUT = (
     REPO_ROOT
@@ -124,55 +137,52 @@ def distance_xz(
 
 
 def iter_top_level_array_objects(path: Path, key: str) -> Iterable[dict[str, Any]]:
-    """Yield objects from a named top-level JSON array without loading the file."""
+    """Yield objects from a named top-level JSON array."""
 
     marker = ('"' + key + '"').encode("ascii")
-    with path.open("rb") as handle:
-        with mmap.mmap(handle.fileno(), 0, access=mmap.ACCESS_READ) as mapped:
-            marker_at = mapped.find(marker)
-            if marker_at < 0:
-                raise ValueError(f"{path}: top-level key {key!r} was not found")
-            colon_at = mapped.find(b":", marker_at + len(marker))
-            array_at = mapped.find(b"[", colon_at + 1)
-            if colon_at < 0 or array_at < 0:
-                raise ValueError(f"{path}: top-level key {key!r} is not an array")
-            index = array_at + 1
-            length = len(mapped)
-            while index < length:
-                while index < length and mapped[index] in b" \t\r\n,":
+    mapped = path.read_bytes()
+    marker_at = mapped.find(marker)
+    if marker_at < 0:
+        raise ValueError(f"{path}: top-level key {key!r} was not found")
+    colon_at = mapped.find(b":", marker_at + len(marker))
+    array_at = mapped.find(b"[", colon_at + 1)
+    if colon_at < 0 or array_at < 0:
+        raise ValueError(f"{path}: top-level key {key!r} is not an array")
+    index = array_at + 1
+    length = len(mapped)
+    while index < length:
+        while index < length and mapped[index] in b" \t\r\n,":
+            index += 1
+        if index >= length or mapped[index] == ord("]"):
+            return
+        if mapped[index] != ord("{"):
+            raise ValueError(f"{path}: expected object in {key!r} at byte {index}")
+        start = index
+        depth = 0
+        in_string = False
+        escaped = False
+        while index < length:
+            byte = mapped[index]
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif byte == ord("\\"):
+                    escaped = True
+                elif byte == ord('"'):
+                    in_string = False
+            elif byte == ord('"'):
+                in_string = True
+            elif byte == ord("{"):
+                depth += 1
+            elif byte == ord("}"):
+                depth -= 1
+                if depth == 0:
                     index += 1
-                if index >= length or mapped[index] == ord("]"):
-                    return
-                if mapped[index] != ord("{"):
-                    raise ValueError(
-                        f"{path}: expected object in {key!r} at byte {index}"
-                    )
-                start = index
-                depth = 0
-                in_string = False
-                escaped = False
-                while index < length:
-                    byte = mapped[index]
-                    if in_string:
-                        if escaped:
-                            escaped = False
-                        elif byte == ord("\\"):
-                            escaped = True
-                        elif byte == ord('"'):
-                            in_string = False
-                    elif byte == ord('"'):
-                        in_string = True
-                    elif byte == ord("{"):
-                        depth += 1
-                    elif byte == ord("}"):
-                        depth -= 1
-                        if depth == 0:
-                            index += 1
-                            yield json.loads(mapped[start:index])
-                            break
-                    index += 1
-                else:
-                    raise ValueError(f"{path}: unterminated object in {key!r}")
+                    yield json.loads(mapped[start:index])
+                    break
+            index += 1
+        else:
+            raise ValueError(f"{path}: unterminated object in {key!r}")
 
 
 def sha256_file(path: Path) -> str:
@@ -192,6 +202,8 @@ class StreamRef:
     stream_signature_id: str
     signature: dict[str, Any]
     attack_info_packet_ids: tuple[str, ...]
+    captured_attack_range: float | None
+    captured_attack_range_evidence: dict[str, Any] | None
 
 
 @dataclass(frozen=True)
@@ -223,6 +235,10 @@ def collect_natural_special_streams(inventory: Path) -> list[StreamRef]:
                         stream_signature_id=stream["streamSignatureId"],
                         signature=stream["signature"],
                         attack_info_packet_ids=tuple(stream["attackInfoPacketIds"]),
+                        captured_attack_range=stream.get("capturedAttackRange"),
+                        captured_attack_range_evidence=variant.get(
+                            "capturedAttackRangeEvidence"
+                        ),
                     )
                 )
     return result
@@ -917,7 +933,11 @@ def audit_capture_isolated(
     raise AssertionError("capture worker retry loop exited unexpectedly")
 
 
-def audit(inventory: Path) -> dict[str, Any]:
+def audit(
+    inventory: Path,
+    *,
+    inventory_logical_path: str = DEFAULT_INVENTORY_LOGICAL_PATH,
+) -> dict[str, Any]:
     before_stat = inventory.stat()
     inventory_hash = sha256_file(inventory)
     streams = collect_natural_special_streams(inventory)
@@ -969,6 +989,16 @@ def audit(inventory: Path) -> dict[str, Any]:
         reason_counts = Counter(
             reason for row in hits for reason in row.get("reasons", [])
         )
+        template_range_evidence = stream.captured_attack_range_evidence
+        template_proven_maximum = (
+            isinstance(stream.captured_attack_range, (int, float))
+            and stream.captured_attack_range > 0
+            and isinstance(template_range_evidence, dict)
+            and template_range_evidence.get("attackRangeMeters")
+            == stream.captured_attack_range
+            and template_range_evidence.get("statId") == 287
+            and bool(template_range_evidence.get("templateEndpoints"))
+        )
         stream_results.append(
             {
                 "profileKey": stream.profile_key,
@@ -997,14 +1027,28 @@ def audit(inventory: Path) -> dict[str, Any]:
                     else None
                 ),
                 "attackRangeConclusion": (
-                    "observed landed-hit distance lower bound only; maximum threshold unproven"
+                    "exact maximum from captured SAW template identity and immutable ItemDb Stat 287"
+                    if template_proven_maximum
+                    else "observed landed-hit distance lower bound only; maximum threshold unproven"
                     if exact
                     else "no exact stationary landed-hit distance; maximum threshold unproven"
                 ),
-                "maximumThresholdMissingEvidence": [
-                    "no non-equipped item/stat packet carries an attack-range field",
-                    "no controlled stationary boundary pair proves acceptance at one distance and rejection beyond it",
-                ],
+                "templateProvenMaximumAttackRangeMeters": (
+                    stream.captured_attack_range
+                    if template_proven_maximum
+                    else None
+                ),
+                "templateAttackRangeEvidence": (
+                    template_range_evidence if template_proven_maximum else None
+                ),
+                "maximumThresholdMissingEvidence": (
+                    []
+                    if template_proven_maximum
+                    else [
+                        "no captured attack template linked to an immutable item/stat maximum",
+                        "no controlled stationary boundary pair proves acceptance at one distance and rejection beyond it",
+                    ]
+                ),
                 "hitFailureReasons": [
                     {"reason": reason, "count": count}
                     for reason, count in sorted(reason_counts.items())
@@ -1080,15 +1124,30 @@ def audit(inventory: Path) -> dict[str, Any]:
         )
         for row in session_audits
     )
+    template_proven_streams = [
+        row
+        for row in stream_results
+        if row["templateProvenMaximumAttackRangeMeters"] is not None
+    ]
+    template_proven_variants = {
+        row["semanticProfileId"] for row in template_proven_streams
+    }
+    template_proven_profiles = {
+        row["profileKey"] for row in template_proven_streams
+    }
     return {
-        "schemaVersion": 1,
-        "inventory": inventory.relative_to(REPO_ROOT).as_posix(),
+        "schemaVersion": 2,
+        "inventory": inventory_logical_path,
         "inventorySha256": inventory_hash,
         "criteria": {
             "positionTolerance": FLOAT_EPSILON,
             "stationaryProof": "CharDCMove MoveType 21 FullStop before hit",
             "postHitBracket": "same exact raw-derived position before any translation movement",
             "rangeMeaning": "landed distances are lower bounds, never inferred maxima",
+            "exactTemplateAuthority": (
+                "captured SpecialAttackWeapon template endpoints joined to "
+                "immutable ItemDb Stat 287"
+            ),
         },
         "summary": {
             "captureCertifiedNaturalSpecialProfileCount": len(
@@ -1119,7 +1178,15 @@ def audit(inventory: Path) -> dict[str, Any]:
             "profilesWithExactStationaryHitDistance": len(exact_profiles),
             "variantsWithExactStationaryHitDistance": len(exact_variants),
             "streamsWithExactStationaryHitDistance": len(exact_streams),
-            "streamsWithProvenMaximumAttackThreshold": 0,
+            "profilesWithTemplateProvenMaximumAttackThreshold": len(
+                template_proven_profiles
+            ),
+            "variantsWithTemplateProvenMaximumAttackThreshold": len(
+                template_proven_variants
+            ),
+            "streamsWithProvenMaximumAttackThreshold": len(
+                template_proven_streams
+            ),
             "canonicalPacketsWithoutSelectedOrderCount": (
                 canonical_packets_without_order
             ),
@@ -1142,6 +1209,11 @@ def audit(inventory: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--inventory", type=Path, default=DEFAULT_INVENTORY)
+    parser.add_argument(
+        "--inventory-logical-path",
+        default=DEFAULT_INVENTORY_LOGICAL_PATH,
+        help="stable repository-relative identity rendered for the physical inventory input",
+    )
     parser.add_argument("--output", type=Path)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--write", action="store_true")
@@ -1164,8 +1236,18 @@ def main() -> int:
             args._audit_capture_worker_shard,
         )
         return 0
+    inventory_logical_path = PurePosixPath(args.inventory_logical_path)
+    if (
+        inventory_logical_path.is_absolute()
+        or ".." in inventory_logical_path.parts
+        or inventory_logical_path.as_posix() != args.inventory_logical_path
+    ):
+        parser.error("--inventory-logical-path must be a normalized relative POSIX path")
     inventory = args.inventory.resolve()
-    report = audit(inventory)
+    report = audit(
+        inventory,
+        inventory_logical_path=inventory_logical_path.as_posix(),
+    )
     summary = report["summary"]
     hard_issue_fields = (
         "canonicalPacketsWithoutSelectedOrderCount",

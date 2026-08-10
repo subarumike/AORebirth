@@ -102,21 +102,22 @@ namespace ZoneEngine.Core.Playfields
 
         private const int DesertReetLevel6CombatSource = unchecked((int)0x798828F0);
 
-        private const int DesertReetLevel6CombatRangeMicrometers = 23167874;
+        // Exact reach comes from the generated capture-linked ItemDb projection.
+        private const int DesertReetLevel6CombatRangeMicrometers = 0;
 
         private const string RollerratLevel5CombatProfile =
             "f05cd862c6056037-c2f9cf4727f71a13";
 
         private const int RollerratLevel5CombatSource = unchecked((int)0x79882AEC);
 
-        private const int RollerratLevel5CombatRangeMicrometers = 11018516;
+        private const int RollerratLevel5CombatRangeMicrometers = 0;
 
         private const string RollerratLevel6CombatProfile =
             "3d2df0c70c1adc8a-42554a1c70a69759";
 
         private const int RollerratLevel6CombatSource = unchecked((int)0x798912B8);
 
-        private const int RollerratLevel6CombatRangeMicrometers = 18747485;
+        private const int RollerratLevel6CombatRangeMicrometers = 0;
 
         private const double RespawnSeconds = 30.0;
 

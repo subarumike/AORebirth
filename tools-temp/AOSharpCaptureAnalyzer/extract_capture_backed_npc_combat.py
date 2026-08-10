@@ -30,6 +30,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
+if hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits(0)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT = (
@@ -117,6 +119,47 @@ AGGREGATE_CLI_SUMMARY_KEYS = (
     "unresolvedProfiles",
     "decodeOrProjectionErrors",
 )
+ATTACK_RANGE_STAT_ID = 287
+ARETE_EXACT_NATURAL_ATTACK_RANGE_PROFILES = {
+    "resource=6553|md=17657|level=2|name=Garbage Flea": (
+        ("LEW2", 120913, 120914),
+        ("LEW1", 120910, 120911),
+    ),
+    "resource=6553|md=17687|level=5|name=Rollerrat": (
+        ("LEW2", 120913, 120914),
+        ("LEW1", 120910, 120911),
+    ),
+    "resource=6553|md=17687|level=6|name=Rollerrat": (
+        ("LEW2", 120913, 120914),
+        ("LEW1", 120910, 120911),
+    ),
+    "resource=6553|md=17714|level=2|name=Waste Collector": (
+        ("LEW2", 120913, 120914),
+        ("LEW1", 120910, 120911),
+    ),
+    "resource=6553|md=297023|level=1|name=Cleaning Robot": (
+        ("LEW2", 120913, 120914),
+        ("LEW1", 120910, 120911),
+    ),
+    "resource=6553|md=297023|level=2|name=Cleanmeister Intelligence Robot": (
+        ("LEW2", 120913, 120914),
+        ("LEW1", 120910, 120911),
+    ),
+    "resource=6553|md=30365|level=6|name=Desert Reet": (
+        ("REW2", 121041, 121042),
+        ("REW1", 121038, 121039),
+    ),
+}
+ARETE_EXACT_NATURAL_ATTACK_RANGE_TEMPLATE_IDS = tuple(
+    sorted(
+        {
+            template_id
+            for families in ARETE_EXACT_NATURAL_ATTACK_RANGE_PROFILES.values()
+            for _, low_template, high_template in families
+            for template_id in (low_template, high_template)
+        }
+    )
+)
 
 sys.path.insert(0, str(REPO_ROOT / "tools-temp" / "AOSharpLiveCapture"))
 sys.path.insert(0, str(REPO_ROOT / "tools"))
@@ -192,7 +235,11 @@ def hex_identity(value: int) -> str:
 
 
 def canonical(value: Any) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return json.JSONEncoder(
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode(value)
 
 
 def digest(value: Any, length: int = 16) -> str:
@@ -279,7 +326,10 @@ def _positional_json(value: Any) -> str:
     if value_type is str:
         return _json_ascii_string(value)
     if value_type is list:
-        return "[" + ",".join(_positional_json(member) for member in value) + "]"
+        members: list[str] = []
+        for member in value:
+            members.append(_positional_json(member))
+        return "[" + ",".join(members) + "]"
     raise TypeError(
         "packet audit ledger contains unsupported positional JSON type "
         f"{value_type.__name__}"
@@ -304,6 +354,294 @@ def valid_sha256(value: Any) -> bool:
         if character not in "0123456789abcdef":
             return False
     return True
+
+
+def _projected_item_attack_range(
+    templates: dict[str, Any],
+    template_id: int,
+) -> int:
+    template = templates.get(str(template_id))
+    if not isinstance(template, dict):
+        raise ValueError(
+            f"item-template projection is missing attack template {template_id}"
+        )
+    stats = template.get("stats")
+    if not isinstance(stats, dict):
+        raise ValueError(f"item template {template_id} has no stat projection")
+    value = stats.get(str(ATTACK_RANGE_STAT_ID))
+    if type(value) is not int or value <= 0:
+        raise ValueError(
+            f"item template {template_id} has no positive Stat {ATTACK_RANGE_STAT_ID}"
+        )
+    return value
+
+
+def apply_arete_item_template_attack_range_authority(
+    inventory: dict[str, Any],
+    item_template_projection: dict[str, Any],
+    item_database_sha256: str,
+    item_database_byte_length: int,
+) -> None:
+    if not valid_sha256(item_database_sha256):
+        raise ValueError("item database SHA-256 descriptor is invalid")
+    if type(item_database_byte_length) is not int or item_database_byte_length <= 0:
+        raise ValueError("item database byte-length descriptor is invalid")
+    templates = item_template_projection.get("templates")
+    if not isinstance(templates, dict):
+        raise ValueError("item-template projection root is invalid")
+    expected_template_ids = set(ARETE_EXACT_NATURAL_ATTACK_RANGE_TEMPLATE_IDS)
+    try:
+        actual_template_ids = {int(value) for value in templates}
+    except (TypeError, ValueError) as error:
+        raise ValueError("item-template projection contains an invalid template ID") from error
+    if actual_template_ids != expected_template_ids:
+        raise ValueError(
+            "Arete attack-range item projection membership is not exact: "
+            f"expected={sorted(expected_template_ids)} actual={sorted(actual_template_ids)}"
+        )
+
+    profiles_by_key = {
+        profile.get("profileKey"): profile
+        for profile in inventory.get("profiles", [])
+        if isinstance(profile, dict)
+    }
+    authority_rows = []
+    for profile_key, expected_families in sorted(
+        ARETE_EXACT_NATURAL_ATTACK_RANGE_PROFILES.items()
+    ):
+        profile = profiles_by_key.get(profile_key)
+        if profile is None:
+            raise ValueError(f"Arete attack-range profile is missing: {profile_key}")
+        variants = [
+            variant
+            for variant in profile.get("variants", [])
+            if variant.get("captureCertified") is True
+        ]
+        if len(variants) != 1:
+            raise ValueError(
+                f"Arete attack-range profile must have one certified variant: {profile_key}"
+            )
+        variant = variants[0]
+        specials = variant.get("baseSignature", {}).get(
+            "specialAttackWeapon", {}
+        ).get("specials", [])
+        if len(specials) != len(expected_families):
+            raise ValueError(
+                f"Arete attack-range SAW family count changed: {profile_key}"
+            )
+
+        endpoint_rows = []
+        range_values = set()
+        for special, expected in zip(specials, expected_families):
+            family_name, low_template, high_template = expected
+            captured_name = bytes.fromhex(special.get("nameHex", "")).decode(
+                "latin-1"
+            )
+            captured_low = special.get("lowTemplate")
+            captured_high = special.get("highTemplate")
+            if (
+                captured_name != family_name
+                or captured_low != low_template
+                or captured_high not in (low_template, high_template)
+            ):
+                raise ValueError(
+                    f"Arete attack-range captured SAW family changed: {profile_key} "
+                    f"expected={expected} actual={(captured_name, captured_low, captured_high)}"
+                )
+            low_range = _projected_item_attack_range(templates, low_template)
+            high_range = _projected_item_attack_range(templates, high_template)
+            if low_range != high_range:
+                raise ValueError(
+                    f"item-template attack range is not invariant across {family_name} "
+                    f"endpoints {low_template}/{high_template}"
+                )
+            range_values.add(low_range)
+            endpoint_rows.append(
+                {
+                    "weaponName": family_name,
+                    "capturedLowTemplate": captured_low,
+                    "capturedHighTemplate": captured_high,
+                    "itemDatabaseLowTemplate": low_template,
+                    "itemDatabaseHighTemplate": high_template,
+                    "lowTemplateAttackRangeMeters": low_range,
+                    "highTemplateAttackRangeMeters": high_range,
+                }
+            )
+        if len(range_values) != 1:
+            raise ValueError(
+                f"Arete attack-range SAW families disagree: {profile_key}"
+            )
+        attack_range = float(next(iter(range_values)))
+        evidence = {
+            "evidenceId": digest(
+                {
+                    "profileKey": profile_key,
+                    "semanticProfileId": variant["semanticProfileId"],
+                    "representativeSawPacketId": variant[
+                        "representativeSawPacketId"
+                    ],
+                    "itemDatabaseSha256": item_database_sha256,
+                    "statId": ATTACK_RANGE_STAT_ID,
+                    "templateEndpoints": endpoint_rows,
+                    "attackRangeMeters": attack_range,
+                }
+            ),
+            "authority": "captured SpecialAttackWeapon templates joined to immutable ItemDb stats",
+            "sourceItemDatabase": "AORebirth/Datafiles/items.dat",
+            "itemDatabaseSha256": item_database_sha256,
+            "itemDatabaseByteLength": item_database_byte_length,
+            "statId": ATTACK_RANGE_STAT_ID,
+            "statName": "AttackRange",
+            "representativeSawPacketId": variant["representativeSawPacketId"],
+            "templateEndpoints": endpoint_rows,
+            "attackRangeMeters": attack_range,
+        }
+        variant["capturedAttackRangeMeters"] = attack_range
+        variant["capturedAttackRangeEvidence"] = evidence
+        variant["runtimeMissingEvidence"] = [
+            reason
+            for reason in variant.get("runtimeMissingEvidence", [])
+            if reason != "capture-backed non-equipped attack range"
+        ]
+        for stream in variant.get("streams", []):
+            stream["capturedAttackRange"] = attack_range
+            stream["capturedAttackRangeEvidenceId"] = evidence["evidenceId"]
+            stream["runtimeMissingEvidence"] = [
+                reason
+                for reason in stream.get("runtimeMissingEvidence", [])
+                if reason != "capture-backed non-equipped attack range"
+            ]
+            stream["runtimeContractReady"] = not stream["runtimeMissingEvidence"]
+        variant["runtimeContractReady"] = (
+            len(variant.get("streams", [])) == 1
+            and variant["streams"][0]["runtimeContractReady"]
+        )
+        profile["runtimeReadyVariantCount"] = sum(
+            candidate.get("captureCertified") is True
+            and candidate.get("runtimeContractReady") is True
+            for candidate in profile.get("variants", [])
+        )
+        authority_rows.append(
+            {
+                "profileKey": profile_key,
+                "semanticProfileId": variant["semanticProfileId"],
+                "evidenceId": evidence["evidenceId"],
+                "attackRangeMeters": attack_range,
+            }
+        )
+
+    inventory["attackRangeAuthority"] = {
+        "authority": "captured SAW identity plus immutable ItemDb Stat 287",
+        "sourceItemDatabase": "AORebirth/Datafiles/items.dat",
+        "itemDatabaseSha256": item_database_sha256,
+        "itemDatabaseByteLength": item_database_byte_length,
+        "statId": ATTACK_RANGE_STAT_ID,
+        "templateIds": list(ARETE_EXACT_NATURAL_ATTACK_RANGE_TEMPLATE_IDS),
+        "profiles": authority_rows,
+    }
+    authoritative_inputs = inventory.setdefault("authoritativeInputs", [])
+    range_input = (
+        "captured SpecialAttackWeapon template identities joined to immutable "
+        "AORebirth/Datafiles/items.dat Stat 287"
+    )
+    if range_input not in authoritative_inputs:
+        authoritative_inputs.append(range_input)
+    summary = inventory["summary"]
+    summary["itemTemplateAttackRangeProfiles"] = len(authority_rows)
+    summary["itemTemplateAttackRangeSemanticDefinitions"] = len(authority_rows)
+    summary["runtimeReadyProfiles"] = sum(
+        profile.get("runtimeReadyVariantCount", 0) > 0
+        for profile in inventory.get("profiles", [])
+    )
+    summary["runtimeReadyGeneratedSemanticDefinitions"] = sum(
+        1
+        for profile in inventory.get("profiles", [])
+        if runtime_resource_from_public(profile.get("metadata")) is not None
+        for variant in profile.get("variants", [])
+        if variant.get("captureCertified") is True
+        and variant.get("runtimeContractReady") is True
+    )
+    summary["runtimeUnresolvedProfiles"] = (
+        len(inventory.get("profiles", [])) - summary["runtimeReadyProfiles"]
+    )
+
+
+def validate_arete_item_template_attack_range_authority(
+    inventory: dict[str, Any],
+) -> None:
+    authority = inventory.get("attackRangeAuthority")
+    if not isinstance(authority, dict):
+        raise ValueError("generated inventory has no Arete attack-range authority")
+    if (
+        authority.get("statId") != ATTACK_RANGE_STAT_ID
+        or authority.get("templateIds")
+        != list(ARETE_EXACT_NATURAL_ATTACK_RANGE_TEMPLATE_IDS)
+        or not valid_sha256(authority.get("itemDatabaseSha256"))
+        or type(authority.get("itemDatabaseByteLength")) is not int
+        or authority["itemDatabaseByteLength"] <= 0
+    ):
+        raise ValueError("generated Arete attack-range authority descriptor is invalid")
+    rows = authority.get("profiles")
+    if not isinstance(rows, list) or len(rows) != len(
+        ARETE_EXACT_NATURAL_ATTACK_RANGE_PROFILES
+    ):
+        raise ValueError("generated Arete attack-range authority profile count is stale")
+    rows_by_key = {row.get("profileKey"): row for row in rows}
+    profiles_by_key = {
+        profile.get("profileKey"): profile
+        for profile in inventory.get("profiles", [])
+    }
+    if set(rows_by_key) != set(ARETE_EXACT_NATURAL_ATTACK_RANGE_PROFILES):
+        raise ValueError("generated Arete attack-range authority membership is stale")
+    for profile_key, authority_row in rows_by_key.items():
+        profile = profiles_by_key[profile_key]
+        variants = [
+            variant
+            for variant in profile.get("variants", [])
+            if variant.get("captureCertified") is True
+        ]
+        if len(variants) != 1:
+            raise ValueError(
+                f"generated Arete attack-range variant count is stale: {profile_key}"
+            )
+        variant = variants[0]
+        evidence = variant.get("capturedAttackRangeEvidence")
+        if (
+            variant.get("capturedAttackRangeMeters") != 2.0
+            or not isinstance(evidence, dict)
+            or evidence.get("evidenceId") != authority_row.get("evidenceId")
+            or evidence.get("itemDatabaseSha256")
+            != authority.get("itemDatabaseSha256")
+            or evidence.get("attackRangeMeters") != 2.0
+            or variant.get("semanticProfileId")
+            != authority_row.get("semanticProfileId")
+        ):
+            raise ValueError(
+                f"generated Arete attack-range evidence is stale: {profile_key}"
+            )
+        if any(
+            stream.get("capturedAttackRange") != 2.0
+            or stream.get("capturedAttackRangeEvidenceId")
+            != evidence.get("evidenceId")
+            or "capture-backed non-equipped attack range"
+            in stream.get("runtimeMissingEvidence", [])
+            for stream in variant.get("streams", [])
+        ):
+            raise ValueError(
+                f"generated Arete stream attack-range evidence is stale: {profile_key}"
+            )
+        if "capture-backed non-equipped attack range" in variant.get(
+            "runtimeMissingEvidence", []
+        ):
+            raise ValueError(
+                f"generated Arete variant still reports missing range: {profile_key}"
+            )
+    summary = inventory.get("summary", {})
+    if (
+        summary.get("itemTemplateAttackRangeProfiles") != len(rows)
+        or summary.get("itemTemplateAttackRangeSemanticDefinitions") != len(rows)
+    ):
+        raise ValueError("generated Arete attack-range authority summary is stale")
 
 
 def sha256_hex_to_base64(value: str) -> str:
@@ -1188,7 +1526,10 @@ def parse_capture(
             continue
         body = packet[16:]
         packet_hash = hashlib.sha256(packet).hexdigest()
-        packet_id = f"{capture_key}|IN|{raw_record['sequence']}|{packet_hash[:12]}"
+        packet_id = (
+            f"{capture_key}|{raw_record['direction']}|"
+            f"{raw_record['sequence']}|{packet_hash[:12]}"
+        )
         parsed.append(
             PacketRecord(
                 packet_id=packet_id,
@@ -1448,14 +1789,15 @@ def _write_parse_capture_worker_shard(
     if shard in {OUTPUT.resolve(), CATALOG_OUTPUT.resolve(), FIXTURE_OUTPUT.resolve()}:
         raise RuntimeError("capture worker cannot write a production generated output")
 
-    payload = json.dumps(
-        _parse_capture_payload(
-            parse_capture(capture, capture_key),
-            capture,
-        ),
+    payload = json.JSONEncoder(
         ensure_ascii=True,
         separators=(",", ":"),
         sort_keys=True,
+    ).encode(
+        _parse_capture_payload(
+            parse_capture(capture, capture_key),
+            capture,
+        )
     ).encode("utf-8")
     try:
         _write_deterministic_temporary_file(
@@ -2491,19 +2833,28 @@ def correlate(
     complete: list[dict[str, Any]] = []
     incomplete: list[dict[str, Any]] = []
     unsupported: list[dict[str, Any]] = []
+    terminal_action_max_sequence: dict[tuple[str, dt.datetime, Identity], int] = {}
+    for row in records:
+        if (
+            row.message_type != "CharacterAction"
+            or row.source is None
+            or row.decoded.get("action") != 99
+        ):
+            continue
+        action_time = row.time
+        if action_time is None:
+            continue
+        key = (row.capture, action_time, row.source)
+        terminal_action_max_sequence[key] = max(
+            terminal_action_max_sequence.get(key, -1),
+            row.sequence,
+        )
 
     def is_terminal_hit(attack_info: PacketRecord) -> bool:
         if attack_info.target is None or attack_info.time is None:
             return False
-        return any(
-            row.capture == attack_info.capture
-            and row.sequence > attack_info.sequence
-            and row.time == attack_info.time
-            and row.message_type == "CharacterAction"
-            and row.source == attack_info.target
-            and row.decoded.get("action") == 99
-            for row in records
-        )
+        key = (attack_info.capture, attack_info.time, attack_info.target)
+        return terminal_action_max_sequence.get(key, -1) > attack_info.sequence
 
     for record in records:
         if record.message_type in {
@@ -5706,6 +6057,7 @@ def validate_inventory(inventory: dict[str, Any]) -> None:
         raise ValueError(
             "capture-certified semantic definition count does not match profile inventory"
         )
+    validate_arete_item_template_attack_range_authority(inventory)
 
 
 def csharp_string(value: str) -> str:
@@ -5848,6 +6200,12 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                 if initial_ammo is None:
                     initial_ammo = -2147483648
                 weapon_context_kind = variant["baseSignature"]["weaponContextKind"]
+                captured_attack_range = stream.get("capturedAttackRange")
+                captured_attack_range_expression = (
+                    "null"
+                    if captured_attack_range is None
+                    else csharp_double(captured_attack_range)
+                )
                 stream_rows.append(
                     "                        new CapturedEnemyCombatProfileStreamDefinition("
                     + f"{stream['minimumObservedDamage']}, {stream['maximumObservedDamage']}, "
@@ -5861,7 +6219,7 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                     + f"{csharp_double_array(stream['landedIntervalObservationsSeconds'])}, "
                     + "0, "
                     + ("true" if weapon_context_kind == "equipped" else "false")
-                    + ", null, true, "
+                    + f", {captured_attack_range_expression}, true, "
                     + ("true" if stream["capturedTerminalHitOnly"] else "false")
                     + ")"
                 )
@@ -5898,6 +6256,13 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                     for packet_id in stream["attackInfoPacketIds"]
                 )
             )
+            attack_range_evidence = variant.get("capturedAttackRangeEvidence")
+            if attack_range_evidence is not None:
+                evidence += (
+                    "; attackRange="
+                    + str(attack_range_evidence["evidenceId"])
+                    + "@ItemDb.Stat287"
+                )
             mutable_saw_state_observations = []
             seen_mutable_saw_packet_ids = set()
             for sibling in profile["variants"]:
@@ -6475,7 +6840,15 @@ def _validate_aggregate_worker_directory(directory: Path) -> Path:
     return directory
 
 
-def _write_aggregate_worker_outputs(directory: Path, source_plan_path: Path) -> None:
+def _write_aggregate_worker_outputs(
+    directory: Path,
+    source_plan_path: Path,
+    item_template_projection_path: Path,
+    item_template_projection_sha256: str,
+    item_template_projection_byte_length: int,
+    item_database_sha256: str,
+    item_database_byte_length: int,
+) -> None:
     directory = _validate_aggregate_worker_directory(directory)
     source_plan = _load_capture_source_plan(source_plan_path)
     _verify_capture_source_plan(
@@ -6487,6 +6860,27 @@ def _write_aggregate_worker_outputs(directory: Path, source_plan_path: Path) -> 
     inventory, input_snapshot_document = build_inventory(
         directory / CAPTURE_SNAPSHOT_DIRECTORY_NAME,
         source_plan,
+    )
+    projection_sha256, projection_byte_length = _stream_file_sha256_and_length(
+        item_template_projection_path
+    )
+    if (
+        projection_sha256 != item_template_projection_sha256
+        or projection_byte_length != item_template_projection_byte_length
+    ):
+        raise RuntimeError("Arete attack-range item projection descriptor is stale")
+    try:
+        with item_template_projection_path.open("r", encoding="utf-8") as handle:
+            item_template_projection = json.load(handle)
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise RuntimeError(
+            f"Arete attack-range item projection is malformed: {error}"
+        ) from error
+    apply_arete_item_template_attack_range_authority(
+        inventory,
+        item_template_projection,
+        item_database_sha256,
+        item_database_byte_length,
     )
     validate_inventory(inventory)
 
@@ -6694,7 +7088,14 @@ def _load_aggregate_worker_result(
     )
 
 
-def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
+def _run_aggregate_worker_isolated(
+    staging_root: Path,
+    item_template_projection_path: Path,
+    item_template_projection_sha256: str,
+    item_template_projection_byte_length: int,
+    item_database_sha256: str,
+    item_database_byte_length: int,
+) -> AggregateWorkerResult:
     script = _generator_script_path()
     _reject_symlink_or_reparse(staging_root, "aggregate staging root")
     staging_root = staging_root.resolve(strict=True)
@@ -6740,6 +7141,16 @@ def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
             str(attempt_directory),
             "--_input-snapshot-plan",
             str(source_plan_path),
+            "--item-template-projection",
+            str(item_template_projection_path),
+            "--item-template-projection-sha256",
+            item_template_projection_sha256,
+            "--item-template-projection-byte-length",
+            str(item_template_projection_byte_length),
+            "--item-database-sha256",
+            item_database_sha256,
+            "--item-database-byte-length",
+            str(item_database_byte_length),
         ]
         _invoke_self_test_fault(
             "before_aggregate_worker_attempt",
@@ -7006,9 +7417,105 @@ def _validate_exported_input_snapshot_manifest(path: Path) -> dict[str, Any]:
     )
 
 
+def _self_test_arete_attack_range_authority() -> None:
+    templates = {
+        str(template_id): {
+            "stats": {str(ATTACK_RANGE_STAT_ID): 2},
+        }
+        for template_id in ARETE_EXACT_NATURAL_ATTACK_RANGE_TEMPLATE_IDS
+    }
+    profiles = []
+    for profile_key, families in sorted(
+        ARETE_EXACT_NATURAL_ATTACK_RANGE_PROFILES.items()
+    ):
+        specials = [
+            {
+                "nameHex": name.encode("latin-1").hex().upper(),
+                "lowTemplate": low_template,
+                "highTemplate": (
+                    low_template
+                    if "name=Cleaning Robot" in profile_key
+                    else high_template
+                ),
+            }
+            for name, low_template, high_template in families
+        ]
+        profiles.append(
+            {
+                "profileKey": profile_key,
+                "metadata": None,
+                "runtimeReadyVariantCount": 0,
+                "variants": [
+                    {
+                        "semanticProfileId": digest(profile_key),
+                        "captureCertified": True,
+                        "representativeSawPacketId": "self-test|IN|1|000000000000",
+                        "baseSignature": {
+                            "specialAttackWeapon": {"specials": specials}
+                        },
+                        "runtimeMissingEvidence": [
+                            "exact specialized runtime sequence for multiple captured AttackInfo streams",
+                            "capture-backed non-equipped attack range",
+                        ],
+                        "streams": [
+                            {
+                                "runtimeMissingEvidence": [
+                                    "capture-backed non-equipped attack range"
+                                ],
+                                "runtimeContractReady": False,
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    inventory = {
+        "authoritativeInputs": [],
+        "profiles": profiles,
+        "summary": {},
+    }
+    item_database_sha256 = "1" * 64
+    apply_arete_item_template_attack_range_authority(
+        inventory,
+        {"templates": templates},
+        item_database_sha256,
+        1234,
+    )
+    validate_arete_item_template_attack_range_authority(inventory)
+    assert all(
+        variant["capturedAttackRangeMeters"] == 2.0
+        and all(
+            stream["capturedAttackRange"] == 2.0
+            for stream in variant["streams"]
+        )
+        for profile in profiles
+        for variant in profile["variants"]
+    )
+    conflicting_projection = json.loads(json.dumps({"templates": templates}))
+    conflicting_projection["templates"]["120911"]["stats"][
+        str(ATTACK_RANGE_STAT_ID)
+    ] = 3
+    try:
+        apply_arete_item_template_attack_range_authority(
+            {
+                "authoritativeInputs": [],
+                "profiles": json.loads(json.dumps(profiles)),
+                "summary": {},
+            },
+            conflicting_projection,
+            item_database_sha256,
+            1234,
+        )
+    except ValueError as error:
+        assert "not invariant" in str(error)
+    else:
+        raise AssertionError("conflicting ItemDb endpoint ranges were accepted")
+
+
 def self_test() -> None:
     global _SELF_TEST_FAULT_HOOK
 
+    _self_test_arete_attack_range_authority()
     assert _is_native_child_failure(-11)
     assert _is_native_child_failure(0xC0000005)
     assert _is_cancellation_child_failure(0xC000013A)
@@ -8460,7 +8967,25 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--catalog-output", type=Path, default=CATALOG_OUTPUT)
     parser.add_argument("--fixture-output", type=Path, default=FIXTURE_OUTPUT)
+    parser.add_argument("--item-template-projection", type=Path)
+    parser.add_argument("--item-template-projection-sha256")
+    parser.add_argument("--item-template-projection-byte-length", type=int)
+    parser.add_argument("--item-database-sha256")
+    parser.add_argument("--item-database-byte-length", type=int)
     args = parser.parse_args()
+    range_authority_arguments = (
+        args.item_template_projection,
+        args.item_template_projection_sha256,
+        args.item_template_projection_byte_length,
+        args.item_database_sha256,
+        args.item_database_byte_length,
+    )
+    if any(value is not None for value in range_authority_arguments) and not all(
+        value is not None for value in range_authority_arguments
+    ):
+        parser.error(
+            "Arete attack-range authority requires projection and ItemDb descriptors"
+        )
     capture_worker_members = (
         args._parse_capture_worker,
         args._parse_capture_shard,
@@ -8499,9 +9024,16 @@ def main() -> int:
             parser.error("aggregate worker mode requires its input snapshot plan")
         if args._input_snapshot_manifest is not None:
             parser.error("aggregate worker mode cannot export a caller snapshot manifest")
+        if not all(value is not None for value in range_authority_arguments):
+            parser.error("aggregate worker mode requires Arete attack-range authority")
         _write_aggregate_worker_outputs(
             args._aggregate_worker_directory,
             args._input_snapshot_plan,
+            args.item_template_projection,
+            args.item_template_projection_sha256,
+            args.item_template_projection_byte_length,
+            args.item_database_sha256,
+            args.item_database_byte_length,
         )
         return 0
     if args._input_snapshot_plan is not None:
@@ -8511,6 +9043,10 @@ def main() -> int:
             parser.error("self-test mode cannot export an input snapshot manifest")
         self_test()
         return 0
+    if not all(value is not None for value in range_authority_arguments):
+        parser.error(
+            "generated inventory requires the governed Arete attack-range authority"
+        )
     if args._input_snapshot_manifest is not None:
         _validate_temporary_path(
             args._input_snapshot_manifest,
@@ -8554,7 +9090,14 @@ def main() -> int:
     with tempfile.TemporaryDirectory(
         prefix="aorebirth-npc-combat-aggregate-parent-"
     ) as staging_name:
-        result = _run_aggregate_worker_isolated(Path(staging_name))
+        result = _run_aggregate_worker_isolated(
+            Path(staging_name),
+            args.item_template_projection,
+            args.item_template_projection_sha256,
+            args.item_template_projection_byte_length,
+            args.item_database_sha256,
+            args.item_database_byte_length,
+        )
         _revalidate_aggregate_input_snapshot(
             result,
             "aggregate-parent-pre-publish" if args.write else "aggregate-parent-pre-check",

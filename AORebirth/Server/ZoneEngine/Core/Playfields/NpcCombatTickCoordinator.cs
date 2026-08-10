@@ -89,12 +89,10 @@ namespace AORebirth.Core.Playfields
             bool hasRegisteredCapturedContract = CapturedEnemyCombatRuntimeRegistry.TryGet(
                 attacker.Identity.Instance,
                 out capturedContract);
-            // Incomplete/quarantined capture contracts: use ordinary auto-attack, do not abort.
             if (hasRegisteredCapturedContract && !capturedContract.IsCombatReady)
             {
-                CapturedEnemyCombatRuntimeRegistry.Remove(attacker.Identity.Instance);
-                hasRegisteredCapturedContract = false;
-                capturedContract = null;
+                this.ClearTracking(attacker.Identity);
+                return;
             }
 
             if (hasRegisteredCapturedContract
@@ -288,9 +286,8 @@ namespace AORebirth.Core.Playfields
                     out registeredCapturedContract)
                 && !registeredCapturedContract.IsCombatReady)
             {
-                // Quarantined capture: fall through to ordinary NPC auto-attack.
-                CapturedEnemyCombatRuntimeRegistry.Remove(attacker.Identity.Instance);
-                registeredCapturedContract = null;
+                this.playfield.ClearNpcCombatTracking(attacker.Identity);
+                return;
             }
 
             if (registeredCapturedContract != null
