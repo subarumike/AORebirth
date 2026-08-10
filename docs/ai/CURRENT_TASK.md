@@ -94,15 +94,22 @@ Framework solution as the reference build.
   analyzer dependency now builds, but the governed generator fails because
   captured realm 655 provenance does not contain matching raw-derived SCFU
   metadata.
+- Stage 9 publishes ZoneEngine as a self-contained `linux-x64` artifact and
+  validates it as a native Ubuntu x86_64 process on the VPS. Listener-free
+  startup and lifecycle modes pass natively, the systemd validation service
+  installs as disabled, validates the read-only Stage 6 MySQL 34-table preflight,
+  demonstrates start/status/stop/restart, reports a controlled invalid
+  configuration failure deterministically, and returns to disabled/inactive with
+  TCP 7501 closed. Evidence is recorded in
+  `docs/evidence/STAGE9_ZONEENGINE_NATIVE_SYSTEMD_20260809.md`.
 
 ## Next slice
 
-Continue Stage 8 with ZoneEngine systemd readiness, multi-engine ordering,
-publish/deployment scaffolding, and native Ubuntu disabled-service validation.
-Keep the proven LoginEngine slice disabled and loopback-only: public exposure
-remains unapproved until official-client end-to-end login plus retry/error UX is
-proven, character-count semantics are resolved, and a sustained multiplayer soak
-passes.
+Continue with multi-engine ordering and official-client end-to-end validation
+across LoginEngine, ChatEngine, and ZoneEngine. Keep the proven LoginEngine and
+ZoneEngine slices disabled and loopback-only: public exposure remains
+unapproved until official-client end-to-end login plus retry/error UX is proven,
+character-count semantics are resolved, and a sustained multiplayer soak passes.
 
 ## Constraints
 
