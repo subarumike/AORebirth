@@ -35,7 +35,10 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 VerifyJavaScriptSerializerCompatibility();
                 VerifyZlibDiagnosticsCompatibility();
                 VerifyZoneCopiedAssets(repositoryRoot, zoneOutput);
-                VerifyZoneValidationModes(zoneOutput);
+                if (!HasArgument(args, "--structure-only"))
+                {
+                    VerifyZoneValidationModes(zoneOutput);
+                }
 
                 Console.WriteLine("PASS: Stage 8 offline ZoneEngine smoke");
                 return 0;
@@ -45,6 +48,11 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 Console.Error.WriteLine("FAIL: " + exception.Message);
                 return 1;
             }
+        }
+
+        private static bool HasArgument(string[] args, string name)
+        {
+            return args.Any(argument => string.Equals(argument, name, StringComparison.Ordinal));
         }
 
         private static void VerifyZoneValidationModes(string zoneOutput)

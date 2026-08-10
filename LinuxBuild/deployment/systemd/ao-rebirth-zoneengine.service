@@ -1,0 +1,48 @@
+[Unit]
+Description=AORebirth ZoneEngine Stage 9 validation service
+Wants=network-online.target
+After=network-online.target ao-rebirth-chatengine.service ao-rebirth-loginengine.service
+
+[Service]
+Type=simple
+User=aorebirth
+Group=aorebirth
+WorkingDirectory=/opt/ao-rebirth/zoneengine/current
+Environment=AO_REBIRTH_REQUIRED_SQL_TYPE=MySql
+Environment=AO_REBIRTH_EXPECTED_DATABASE=aorebirth_chatengine_stage6
+Environment=AO_REBIRTH_ZONE_LISTEN_IP=127.0.0.1
+Environment=AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1
+Environment=AO_REBIRTH_CONFIG_PATH=/opt/ao-rebirth/zoneengine/current/Config.xml
+EnvironmentFile=/etc/ao-rebirth/zoneengine/zoneengine.env
+RuntimeDirectory=ao-rebirth-zoneengine
+RuntimeDirectoryMode=0750
+ExecStartPre=/usr/bin/test ${AO_REBIRTH_EXPECTED_DATABASE} = aorebirth_chatengine_stage6
+ExecStartPre=/usr/bin/test ${AO_REBIRTH_ZONE_LISTEN_IP} = 127.0.0.1
+ExecStartPre=/usr/bin/rm -f /run/ao-rebirth-zoneengine/shutdown
+ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-startup
+ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database
+ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown
+ExecStop=/usr/bin/touch /run/ao-rebirth-zoneengine/shutdown
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=30s
+TimeoutStopSec=45s
+KillSignal=SIGTERM
+SuccessExitStatus=0
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

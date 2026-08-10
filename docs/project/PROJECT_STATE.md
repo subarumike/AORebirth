@@ -78,6 +78,14 @@ completion matrices and dated evidence retain detailed provenance.
   from the build output; Windows Debug is currently blocked by a stale
   generated-combat catalog preflight because governed regeneration fails on
   missing raw-derived SCFU metadata for captured realm 655 provenance.
+- Stage 9 publishes ZoneEngine as a self-contained `linux-x64` artifact and
+  validates it on native Ubuntu x86_64. Listener-free startup and lifecycle
+  modes pass as Linux processes, read-only database preflight passes through
+  systemd against the isolated Stage 6 MySQL target, and the disabled systemd
+  service demonstrates deterministic start, status, stop, restart, and
+  controlled-failure reporting. ZoneEngine remains disabled/inactive after
+  validation, TCP 7501 is closed, and no database schema, generated-combat,
+  gameplay, or packet behavior was changed.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
