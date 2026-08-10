@@ -249,6 +249,100 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AreteNaturalProfilesResolveGeneratedItemDbRangeWithoutContentAuthority()
+        {
+            var expectedProfiles = new[]
+            {
+                new { Name = "Waste Collector", MonsterData = 17714, Level = 2, Source = unchecked((int)0x7988CAFF), Profile = "fa6fc8256e910451-c850f3966b62b38e", Unknown5 = 0 },
+                new { Name = "Garbage Flea", MonsterData = 17657, Level = 2, Source = unchecked((int)0x7988C914), Profile = "46a87c17eefbd77b-c850f3966b62b38e", Unknown5 = 117 },
+                new { Name = "Cleanmeister Intelligence Robot", MonsterData = 297023, Level = 2, Source = unchecked((int)0x798915E0), Profile = "028210688643a4d8-6ff86979de5c6526", Unknown5 = 82 },
+                new { Name = "Cleaning Robot", MonsterData = 297023, Level = 1, Source = unchecked((int)0x7988C8C3), Profile = "1c42797c1a980105-998f3f8fca4b8167", Unknown5 = 0 },
+                new { Name = "Desert Reet", MonsterData = 30365, Level = 6, Source = unchecked((int)0x798828F0), Profile = "45c6e511d794c6bf-8c8a88032be6ca97", Unknown5 = 0 },
+                new { Name = "Rollerrat", MonsterData = 17687, Level = 5, Source = unchecked((int)0x79882AEC), Profile = "f05cd862c6056037-c2f9cf4727f71a13", Unknown5 = 0 },
+                new { Name = "Rollerrat", MonsterData = 17687, Level = 6, Source = unchecked((int)0x798912B8), Profile = "3d2df0c70c1adc8a-42554a1c70a69759", Unknown5 = 0 }
+            };
+
+            foreach (var expected in expectedProfiles)
+            {
+                foreach (double? authoredRange in new double?[] { null, 99.0d })
+                {
+                    CapturedEnemyCombatContract seed =
+                        CapturedEnemyCombatContract.CapturedProfileSelector(
+                            "generated ItemDb range authority test",
+                            expected.Source,
+                            expected.Profile,
+                            ZoneEngine.Core.NpcAiProfile.Passive,
+                            authoredRange,
+                            expected.Unknown5,
+                            0.0d);
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    Assert.IsTrue(
+                        CapturedEnemyCombatProfileCatalog.TryResolve(
+                            6553,
+                            expected.Name,
+                            expected.MonsterData,
+                            expected.Level,
+                            expected.Source,
+                            seed,
+                            out resolved,
+                            out failure),
+                        expected.Name + " level=" + expected.Level + ": " + failure);
+                    Assert.IsTrue(resolved.IsCombatReady, expected.Name);
+                    Assert.IsTrue(
+                        resolved.CapturedAttackRange.HasValue,
+                        expected.Name
+                        + " ready="
+                        + resolved.IsCombatReady
+                        + " streamRanges="
+                        + string.Join(
+                            ",",
+                            resolved.ParallelAttackSequence == null
+                                ? new string[0]
+                                : resolved.ParallelAttackSequence.Streams.Select(
+                                    stream => stream.Attack.Range.ToString())));
+                    Assert.AreEqual(
+                        2.0d,
+                        resolved.CapturedAttackRange.Value,
+                        expected.Name);
+                    Assert.IsTrue(
+                        resolved.ParallelAttackSequence.Streams.All(
+                            stream => Math.Abs(stream.Attack.Range - 2.0d) < 0.000001d),
+                        expected.Name);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NonAreteNaturalSelectorRetainsItsExistingCapturedRangeInput()
+        {
+            const double existingCapturedRange = 7.25d;
+            CapturedEnemyCombatContract seed =
+                CapturedEnemyCombatContract.CapturedProfileSelector(
+                    "non-Arete range compatibility test",
+                    unchecked((int)0x795451C5),
+                    "61a8f43adca0ad1c-e64d843fc19e908e",
+                    ZoneEngine.Core.NpcAiProfile.Passive,
+                    existingCapturedRange,
+                    0,
+                    0.0d);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Bloodcreeper",
+                    30379,
+                    24,
+                    unchecked((int)0x795451C5),
+                    seed,
+                    out resolved,
+                    out failure),
+                failure);
+            Assert.AreEqual(existingCapturedRange, resolved.CapturedAttackRange.Value);
+        }
+
+        [TestMethod]
         public void ShadowPacketProfilesResolveWithoutInventingNaturalAttackRange()
         {
             var expectedProfiles = new[]

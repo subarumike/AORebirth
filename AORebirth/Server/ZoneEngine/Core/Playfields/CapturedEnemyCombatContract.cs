@@ -892,6 +892,20 @@ namespace AORebirth.Core.Playfields
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesCaptureProvenArchetype = true;
             clone.CaptureProvenArchetypeId = archetypeId ?? string.Empty;
+            if (!clone.CapturedAttackRange.HasValue)
+            {
+                clone.CapturedAttackRange = SharedParallelAttackRange(
+                    clone.ParallelAttackSequence);
+            }
+
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithCapturedAttackRange(
+            double capturedAttackRange)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.CapturedAttackRange = capturedAttackRange;
             return clone;
         }
 
@@ -1162,7 +1176,7 @@ namespace AORebirth.Core.Playfields
         /// <summary>
         /// Production FixedAttackOnSight: damage + attack-start without corpus WIFU observations.
         /// </summary>
-        private bool IsAuthoredFixedAttackFallback()
+        internal bool IsAuthoredFixedAttackFallback()
         {
             return this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo
                    && this.Retaliates
@@ -1710,6 +1724,7 @@ namespace AORebirth.Core.Playfields
             bool requiresDamageLineOfSight = false,
             NpcAiProfile aiProfile = NpcAiProfile.Passive)
         {
+            double? capturedAttackRange = SharedParallelAttackRange(parallelAttackSequence);
             return new CapturedEnemyCombatContract
             {
                 Evidence = evidence,
@@ -1736,8 +1751,31 @@ namespace AORebirth.Core.Playfields
                 SpecialAttackWeaponUnknown5 =
                     parallelAttackSequence.SpecialAttackWeaponUnknown5,
                 AttackN3Unknown = parallelAttackSequence.AttackN3Unknown,
-                AttackAction = parallelAttackSequence.AttackAction
+                AttackAction = parallelAttackSequence.AttackAction,
+                CapturedAttackRange = capturedAttackRange
             };
+        }
+
+        private static double? SharedParallelAttackRange(
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence)
+        {
+            if (parallelAttackSequence == null || parallelAttackSequence.Streams == null)
+            {
+                return null;
+            }
+
+            double[] ranges = parallelAttackSequence.Streams
+                .Where(stream => stream != null && stream.Attack != null)
+                .Select(stream => stream.Attack.Range)
+                .ToArray();
+            if (ranges.Length == 0
+                || ranges.Any(value => value <= 0.0d || double.IsNaN(value) || double.IsInfinity(value))
+                || ranges.Any(value => Math.Abs(value - ranges[0]) > 0.000001d))
+            {
+                return null;
+            }
+
+            return ranges[0];
         }
 
         internal static CapturedEnemyCombatContract CapturedProfileSelector(
@@ -1991,10 +2029,16 @@ namespace AORebirth.Core.Playfields
                 {
                     contract = resolved;
                 }
-                else if (!hasDirectCaptureCertification)
+                else if (!hasDirectCaptureCertification
+                         || (!contract.IsAuthoredFixedAttackFallback()
+                             && (string.IsNullOrWhiteSpace(resolutionFailure)
+                                 || !resolutionFailure.StartsWith(
+                                     "no canonical raw combat profile for ",
+                                     StringComparison.Ordinal))))
                 {
-                    // Keep authored FixedAttackOnSight when already combat-ready; only quarantine
-                    // contracts that cannot fight without corpus data.
+                    // Authored FixedAttackOnSight remains a deliberate non-corpus policy. A
+                    // capture-backed contract may only survive a missing catalog entry; selector,
+                    // source, compatibility, and safety failures must stay quarantined.
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="
                         + (string.IsNullOrWhiteSpace(resolutionFailure)

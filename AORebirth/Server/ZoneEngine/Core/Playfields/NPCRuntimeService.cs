@@ -721,21 +721,14 @@ namespace AORebirth.Core.Playfields
             if (CapturedEnemyCombatRuntimeRegistry.TryGet(target.Identity.Instance, out capturedContract)
                 && !capturedContract.IsCombatReady)
             {
-                // Incomplete capture contracts must not leave mobs as punching bags.
-                // Drop the quarantine entry and fall back to ordinary NPC auto-attack.
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     string.Format(
-                        "Captured enemy combat fallback npc={0} attacker={1} reason=contract-incomplete evidence={2}",
+                        "Captured enemy combat refused npc={0} attacker={1} reason=contract-incomplete evidence={2}",
                         target.Identity,
                         attacker.Identity,
                         capturedContract.Evidence));
-                CapturedEnemyCombatRuntimeRegistry.Remove(target.Identity.Instance);
-                capturedContract = null;
-                if (npcController.AiProfile == NpcAiProfile.Passive)
-                {
-                    npcController.AiProfile = NpcAiProfile.Aggressive;
-                }
+                return;
             }
 
             OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
@@ -853,16 +846,11 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     string.Format(
-                        "Captured enemy taunt fallback npc={0} taunter={1} reason=contract-incomplete evidence={2}",
+                        "Captured enemy taunt refused npc={0} taunter={1} reason=contract-incomplete evidence={2}",
                         target.Identity,
                         taunter.Identity,
                         capturedContract.Evidence));
-                CapturedEnemyCombatRuntimeRegistry.Remove(target.Identity.Instance);
-                capturedContract = null;
-                if (npcController.AiProfile == NpcAiProfile.Passive)
-                {
-                    npcController.AiProfile = NpcAiProfile.Aggressive;
-                }
+                return;
             }
 
             this.StartCombatWithAcquiredTarget(taunter, target, capturedContract);

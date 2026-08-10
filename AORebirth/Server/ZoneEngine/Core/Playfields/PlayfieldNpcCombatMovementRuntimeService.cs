@@ -20,10 +20,6 @@ namespace ZoneEngine.Core.Playfields
     {
         private readonly NpcChaseNavigationRuntimeService chaseNavigation;
 
-        private const double MaxMeleeCombatDistance = NpcCombatAttackRules.MaxMeleeCombatDistance;
-
-        private const double MaxMeleeFollowHoldDistance = 3.0;
-
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
@@ -70,7 +66,9 @@ namespace ZoneEngine.Core.Playfields
 
         internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
-            return GetCombatDistance(attacker, target) <= range;
+            return NpcCombatSpatialPolicy.IsWithinAttackEnvelope(
+                GetCombatDistance(attacker, target),
+                range);
         }
 
         internal void UpdateNpcMeleeFollowHold(
@@ -110,7 +108,7 @@ namespace ZoneEngine.Core.Playfields
             }
 
             double distance = GetCombatDistance(attacker, target);
-            if (distance <= MaxMeleeFollowHoldDistance)
+            if (NpcCombatSpatialPolicy.ShouldHoldMeleeFollow(distance, range))
             {
                 npcController.StopFollow();
                 return;
@@ -298,7 +296,7 @@ namespace ZoneEngine.Core.Playfields
 
         private static double BuildNpcCombatStopDistance(double range)
         {
-            return range > MaxMeleeCombatDistance ? range : MaxMeleeFollowHoldDistance;
+            return NpcCombatSpatialPolicy.BuildPursuitStopDistance(range);
         }
 
         private void MoveNpcTowardCombatTarget(

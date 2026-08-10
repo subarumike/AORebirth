@@ -1200,6 +1200,14 @@ namespace AORebirth.Core.Playfields
             return clone;
         }
 
+        internal CapturedEnemyCombatContract WithCapturedAttackRange(
+            double capturedAttackRange)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.CapturedAttackRange = capturedAttackRange;
+            return clone;
+        }
+
         internal CapturedEnemyCombatContract WithProductionWeaponQuality()
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();

@@ -232,22 +232,25 @@ def create_fixture_candidate(fake_repo: Path, variant: str) -> pipeline.Candidat
         role: candidate_root / Path(relative)
         for role, relative in pipeline.ARTIFACT_RELATIVE_PATHS.items()
     }
-    documents: Mapping[str, Mapping[str, Any]] = {
-        "inventory": {
-            "schemaVersion": 1,
-            "summary": {
-                "captureSessionsDiscovered": 1,
-                "canonicalValidSessions": 1,
-                "completeAttackInfoChains": 1,
-                "captureCertifiedProfiles": 1,
-                "runtimeReadyProfiles": 1,
-                "captureCertifiedSemanticDefinitions": 1,
-                "runtimeReadyGeneratedSemanticDefinitions": 1,
-                "unresolvedProfiles": 1,
-                "decodeOrProjectionErrors": 0,
-            },
-            "fixtureVariant": variant,
+    inventory_document = {
+        "schemaVersion": 1,
+        "summary": {
+            "captureSessionsDiscovered": 1,
+            "canonicalValidSessions": 1,
+            "completeAttackInfoChains": 1,
+            "captureCertifiedProfiles": 1,
+            "runtimeReadyProfiles": 1,
+            "captureCertifiedSemanticDefinitions": 1,
+            "runtimeReadyGeneratedSemanticDefinitions": 1,
+            "unresolvedProfiles": 1,
+            "decodeOrProjectionErrors": 0,
         },
+        "fixtureVariant": variant,
+    }
+    inventory_payload = pipeline.canonical_json_bytes(inventory_document)
+    inventory_sha256 = pipeline.sha256_bytes(inventory_payload)
+    documents: Mapping[str, Mapping[str, Any]] = {
+        "inventory": inventory_document,
         "activeCoverage": {
             "schemaVersion": 1,
             "totals": {
@@ -262,6 +265,21 @@ def create_fixture_candidate(fake_repo: Path, variant: str) -> pipeline.Candidat
             "schemaVersion": 1,
             "profiles": [],
             "fixtureVariant": variant,
+        },
+        "attackRangeAudit": {
+            "schemaVersion": 2,
+            "inventory": pipeline.ARTIFACT_RELATIVE_PATHS["inventory"].as_posix(),
+            "inventorySha256": inventory_sha256,
+        },
+        "secondaryEvidenceAudit": {
+            "schemaVersion": 2,
+            "combatInventoryInput": {
+                "path": pipeline.ARTIFACT_RELATIVE_PATHS["inventory"].as_posix(),
+                "exists": True,
+                "sizeBytes": len(inventory_payload),
+                "hashStatus": "content-sha256",
+                "sha256": inventory_sha256,
+            },
         },
     }
     for role, path in artifacts.items():

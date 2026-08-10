@@ -1003,14 +1003,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         runtimeBaselines.Add(runtimeBaseline);
                     }
                 }
-                else if (resolutionMode == "exact-arete-content-range-profile-selector")
+                else if (resolutionMode == "exact-arete-generated-range-profile-selector")
                 {
                     runtimeBaselines.Add(
                         AreteRegularMobCombatProfileSelector.Create(
                             "generated active-coverage exact Arete selector",
                             runtimeProfileSelector,
                             sourceIdentity,
-                            IntMember(binding, "runtimeAttackRangeMicrometers"),
+                            0,
                             IntMember(binding, "runtimeSpecialAttackWeaponUnknown5"),
                             ZoneEngine.Core.NpcAiProfile.Passive));
                 }

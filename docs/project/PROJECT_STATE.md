@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-07
+Updated: 2026-08-09
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -9,7 +9,7 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Complete AOtomation suite: PASS (998/998).
+- Complete AOtomation suite: PASS (1003/1003).
 - Arete regular-mob combat uses a scoped forward reconciliation against the
   current capture corpus. The retired post-cutoff 60/60 script is not restored;
   the current focused gameplay gate validates supported combat behavior and
@@ -41,11 +41,12 @@ explicitly unresolved observations with zero generator errors.
 
 The active-coverage projection contains 1,534 actors, 1,520 binding records,
 and maximum actor index 1,536. It reconciles 559 certified actors and 975
-explicitly unresolved actors. The Arete family cohort is 52/96 certified and
-the additional Arete binding cohort is 4/17 certified. The transactional
-generator and current-cohort validation pass against the generation identity
-recorded in the checked-in manifest. Unsupported or conflicting observations
-remain fail-closed.
+explicitly unresolved actors. The PF6553/PF8009 Arete active cohort contains
+100 bindings / 113 actors; 43 certified bindings cover 56 actors and 57 bindings
+remain explicit unresolved/quarantined exclusions. The transactional generator,
+current-cohort validation, and deterministic second regeneration pass against
+identity `041b9dc66bed5ddf2b50277d54232173a1b1d2f80196e721f50c38f138f1f1d5`.
+Unsupported or conflicting observations remain fail-closed.
 
 The generated combat surface is now one six-file cohort: five semantic artifacts
 plus a manifest commit marker. A multi-reader/single-writer lease protects
@@ -118,8 +119,11 @@ migrations; details and exact source references are recorded in
   preserving runtime identity. Exact profiles are active for the supported Alex
   Waste Collector, Garbage Flea, and Cleanmeister cohort; level-1 Cleaning
   Robots; level-6 Desert Reets; level-5/6 Rollerrats; and ICC Peacekeepers.
-  Engineer Automaton I, Robotic Guard Dog, and incomplete robot variants remain
-  intentionally passive where exact combat evidence is insufficient.
+  Generated ItemDb Stat 287 attack-range authority fixes supported natural
+  melee profiles at 2m, so observed follow/start separations no longer become
+  attack reach and supported mobs pursue before attacking. Engineer Automaton I,
+  Robotic Guard Dog, and incomplete robot variants remain intentionally passive
+  where exact combat evidence is insufficient.
 - Rubi-Ka character creation persists its initial Arete location as PF 6553,
   X 3607.6, Y 52.4, Z 785.7 without integer rounding.
 - PF127 Subway is complete for its current capture-backed population,

@@ -3053,6 +3053,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     coreDirectory,
                     "Playfields",
                     "NPCRuntimeService.cs"));
+            string resetTickRuntime = SourceSection(
+                coordinator,
+                "internal void ResetCombatTick(ICharacter attacker)",
+                "internal void ClearTracking(Identity identity)");
+            string processTickRuntime = SourceSection(
+                coordinator,
+                "internal void ProcessCombatTick(ICharacter attacker)",
+                "private bool TryApplyCapturedWeaponAmmo(");
+            string acquireAggroRuntime = SourceSection(
+                npcRuntime,
+                "private void AcquireAggro(",
+                "internal void ForceTauntAggro(ICharacter taunter, ICharacter target)");
+            string forceTauntRuntime = SourceSection(
+                npcRuntime,
+                "internal void ForceTauntAggro(ICharacter taunter, ICharacter target)",
+                "internal void ProcessPatrolTick(ICharacter character)");
             string[] otherImplementedHostileEntryPoints =
             {
                 Path.Combine(coreDirectory, "Missions", "MissionInstanceMobCombat.cs"),
@@ -3106,6 +3122,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(contractRuntime.Contains("TryGetCapturedWeaponEnergy"));
             Assert.IsTrue(contractRuntime.Contains("HasCapturedRequiredPacketFields"));
             Assert.IsTrue(coordinator.Contains("&& !registeredCapturedContract.IsCombatReady"));
+            Assert.IsFalse(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
+            Assert.IsTrue(resetTickRuntime.Contains("this.ClearTracking(attacker.Identity);"));
+            Assert.IsFalse(resetTickRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
+            Assert.IsTrue(processTickRuntime.Contains("this.playfield.ClearNpcCombatTracking(attacker.Identity);"));
+            Assert.IsFalse(processTickRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
             Assert.IsTrue(coordinator.Contains("required captured weapon is missing from the live inventory"));
             Assert.IsTrue(coordinator.Contains("if (movementAttackSource == null)"));
             Assert.IsTrue(coordinator.Contains("if (attackSource == null)"));
@@ -3123,7 +3144,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(contractRuntime.Contains("currentEnergy != -1 && currentEnergy <= 0"));
             Assert.IsTrue(contractRuntime.Contains("captured weapon Energy is exhausted"));
             Assert.IsTrue(functionHit.Contains("CapturedEnemyCombatFunctionHitQuarantined"));
+            Assert.IsTrue(npcRuntime.Contains("Captured enemy combat refused"));
             Assert.IsTrue(npcRuntime.Contains("Captured enemy taunt refused"));
+            Assert.IsFalse(npcRuntime.Contains("Captured enemy combat fallback"));
+            Assert.IsFalse(npcRuntime.Contains("Captured enemy taunt fallback"));
+            Assert.IsFalse(npcRuntime.Contains("npcController.AiProfile = NpcAiProfile.Aggressive;"));
+            Assert.IsTrue(acquireAggroRuntime.Contains("Captured enemy combat refused"));
+            Assert.IsFalse(acquireAggroRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
+            Assert.IsFalse(acquireAggroRuntime.Contains("NpcAiProfile.Aggressive"));
+            Assert.IsTrue(forceTauntRuntime.Contains("Captured enemy taunt refused"));
+            Assert.IsFalse(forceTauntRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
+            Assert.IsFalse(forceTauntRuntime.Contains("NpcAiProfile.Aggressive"));
+            Assert.IsTrue(contractRuntime.Contains("!contract.IsAuthoredFixedAttackFallback()"));
+            Assert.IsTrue(
+                contractRuntime.Contains(
+                    "source, compatibility, and safety failures must stay quarantined."));
             Assert.IsTrue(npcRuntime.Contains("!NpcAiProfiles.CanRetaliate(npcController.AiProfile)"));
             Assert.IsTrue(otherImplementedHostileEntryPoints.All(
                 path => File.ReadAllText(path).Contains("CapturedEnemyCombatRuntime.Prepare")));
@@ -3139,6 +3174,45 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 sourceOwnedWeaponCallers.Select(Path.GetFileName).ToArray());
             Assert.IsFalse(combatSources.Any(
                 path => File.ReadAllText(path).Contains("WithEvidenceSource(")));
+        }
+
+        [TestMethod]
+        public void EngineerAutomatonCaptureContractRemainsAnExplicitPassiveExclusion()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string areteFinishRuntime = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    "AORebirth",
+                    "Server",
+                    "ZoneEngine",
+                    "Core",
+                    "Playfields",
+                    "AreteFinishCaptureMobRuntime.cs"));
+
+            Assert.IsTrue(
+                areteFinishRuntime.Contains(
+                    "resource=6553|md=17649|level=5|name=Engineer Automaton I"));
+            Assert.IsTrue(
+                areteFinishRuntime.Contains(
+                    "has no exact source-local combat profile"));
+            Assert.IsTrue(
+                areteFinishRuntime.Contains(
+                    "CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady("));
+            Assert.IsTrue(areteFinishRuntime.Contains("NpcAiProfile.Passive"));
+            Assert.IsTrue(
+                areteFinishRuntime.Contains(
+                    "Engineer Automaton I intentionally quarantined"));
+            Assert.IsFalse(areteFinishRuntime.Contains("Docker"));
+        }
+
+        private static string SourceSection(string source, string startMarker, string endMarker)
+        {
+            int startIndex = source.IndexOf(startMarker, StringComparison.Ordinal);
+            Assert.IsTrue(startIndex >= 0, "Missing source marker: " + startMarker);
+            int endIndex = source.IndexOf(endMarker, startIndex + startMarker.Length, StringComparison.Ordinal);
+            Assert.IsTrue(endIndex > startIndex, "Missing source marker: " + endMarker);
+            return source.Substring(startIndex, endIndex - startIndex);
         }
 
         private static CapturedEnemyCombatContract ResolveRuntimeContract(

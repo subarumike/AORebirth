@@ -1443,6 +1443,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs",
                 @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs",
                 @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs",
+                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\LuxuryApartmentSunriseInteractionHandler.cs",
                 @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\NascenceStatueTeleportInteractionHandler.cs",
                 @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"
             };

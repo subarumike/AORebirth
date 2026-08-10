@@ -22,7 +22,6 @@ namespace ZoneEngine.Core.Playfields
 
     using Utility;
 
-    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Navigation;
 
@@ -32,6 +31,10 @@ namespace ZoneEngine.Core.Playfields
 
     internal sealed class PlayfieldContentDataProvider
     {
+        private const int LuxuryApartmentPlayfieldBase = 0x0019E000;
+
+        private const int LuxuryApartmentMaxSlots = 0x400;
+
         private readonly Func<Identity, bool> isPrivateCityPlayfieldCandidate;
 
         internal PlayfieldContentDataProvider(Func<Identity, bool> isPrivateCityPlayfieldCandidate)
@@ -86,7 +89,7 @@ namespace ZoneEngine.Core.Playfields
             }
 
             // Capture 20260806-202421: luxury apartment instance 0x19E000 (no PFData row).
-            if (LuxuryApartmentSunriseRules.IsLuxuryApartmentPlayfield(playfieldIdentity.Instance))
+            if (IsLuxuryApartmentPlayfield(playfieldIdentity.Instance))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Zoning,
@@ -98,6 +101,12 @@ namespace ZoneEngine.Core.Playfields
             }
 
             return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
+        }
+
+        private static bool IsLuxuryApartmentPlayfield(int playfieldInstance)
+        {
+            return playfieldInstance >= LuxuryApartmentPlayfieldBase
+                   && playfieldInstance < LuxuryApartmentPlayfieldBase + LuxuryApartmentMaxSlots;
         }
 
         internal bool TryResolveVendorStatels(
@@ -393,5 +402,6 @@ namespace ZoneEngine.Core.Playfields
                        "EntryHall",
                        TempleExteriorGeometryDoorIndex);
         }
+
     }
 }

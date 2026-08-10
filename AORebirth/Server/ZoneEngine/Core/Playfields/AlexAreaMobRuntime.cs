@@ -121,21 +121,22 @@ namespace ZoneEngine.Core.Playfields
 
         private const int WasteCollectorCombatSource = unchecked((int)0x7988CAFF);
 
-        private const int WasteCollectorCombatRangeMicrometers = 1332759;
+        // Exact reach comes from the generated capture-linked ItemDb projection.
+        private const int WasteCollectorCombatRangeMicrometers = 0;
 
         private const string GarbageFleaLevel2CombatProfile =
             "46a87c17eefbd77b-c850f3966b62b38e";
 
         private const int GarbageFleaLevel2CombatSource = unchecked((int)0x7988C914);
 
-        private const int GarbageFleaLevel2CombatRangeMicrometers = 15576482;
+        private const int GarbageFleaLevel2CombatRangeMicrometers = 0;
 
         private const string CleanmeisterCombatProfile =
             "028210688643a4d8-6ff86979de5c6526";
 
         private const int CleanmeisterCombatSource = unchecked((int)0x798915E0);
 
-        private const int CleanmeisterCombatRangeMicrometers = 2771750;
+        private const int CleanmeisterCombatRangeMicrometers = 0;
 
         private const double RespawnSeconds = 30.0;
 
