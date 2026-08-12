@@ -63,7 +63,22 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             RunZoneValidation(
                 zoneOutput,
                 new[] { "--validate-startup" },
-                "ZONEENGINE_VALIDATION_OK mode=startup provider=MySql listeners=0 assets=ok");
+                "ZONEENGINE_VALIDATION_OK mode=startup provider=MySql bindPolicy=Loopback address=127.0.0.1 listeners=0 assets=ok");
+
+            RunZoneValidation(
+                zoneOutput,
+                new[] { "--validate-startup" },
+                "ZONEENGINE_VALIDATION_OK mode=startup provider=MySql bindPolicy=Loopback address=127.0.0.1 listeners=0 assets=ok",
+                "Loopback");
+
+            RunZoneValidation(
+                zoneOutput,
+                new[] { "--validate-startup" },
+                "ZONEENGINE_VALIDATION_OK mode=startup provider=MySql bindPolicy=Public address=0.0.0.0 listeners=0 assets=ok",
+                "Public");
+
+            RunZoneValidationFailure(zoneOutput, "NotPublic", "AO_REBIRTH_BIND_MODE must be Loopback or Public");
+            RunZoneValidationFailure(zoneOutput, "   ", "AO_REBIRTH_BIND_MODE must be Loopback or Public");
 
             string shutdownFile = Path.Combine(
                 zoneOutput,
@@ -87,6 +102,33 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
         private static void RunZoneValidation(string zoneOutput, string[] arguments, string expectedOutput)
         {
+            RunZoneValidation(zoneOutput, arguments, expectedOutput, null);
+        }
+
+        private static void RunZoneValidationFailure(string zoneOutput, string bindMode, string expectedError)
+        {
+            ProcessResult result = RunZoneValidationProcess(zoneOutput, new[] { "--validate-startup" }, bindMode);
+            Require(result.ExitCode != 0, "ZoneEngine validation accepted bind mode: " + bindMode);
+            Require(
+                result.StandardError.IndexOf(expectedError, StringComparison.Ordinal) >= 0,
+                "ZoneEngine validation did not reject bind mode with expected error: " + expectedError);
+        }
+
+        private static void RunZoneValidation(
+            string zoneOutput,
+            string[] arguments,
+            string expectedOutput,
+            string bindMode)
+        {
+            ProcessResult result = RunZoneValidationProcess(zoneOutput, arguments, bindMode);
+            Require(result.ExitCode == 0, "ZoneEngine validation child failed: " + result.StandardError + result.StandardOutput);
+            Require(
+                result.StandardOutput.IndexOf(expectedOutput, StringComparison.Ordinal) >= 0,
+                "ZoneEngine validation child did not emit expected output: " + expectedOutput);
+        }
+
+        private static ProcessResult RunZoneValidationProcess(string zoneOutput, string[] arguments, string bindMode)
+        {
             string zoneAssembly = Path.Combine(zoneOutput, "ZoneEngine.dll");
             Require(File.Exists(zoneAssembly), "Missing ZoneEngine.dll output");
 
@@ -107,12 +149,16 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             startInfo.Environment.Remove("AO_REBIRTH_REQUIRED_SQL_TYPE");
             startInfo.Environment.Remove("AO_REBIRTH_ZONE_LISTEN_IP");
             startInfo.Environment.Remove("AO_REBIRTH_CHAT_LISTEN_IP");
+            startInfo.Environment.Remove("AO_REBIRTH_BIND_MODE");
             startInfo.Environment["AO_REBIRTH_CONFIG_PATH"] = Path.Combine(zoneOutput, "Config.xml");
             startInfo.Environment["AO_REBIRTH_REQUIRED_SQL_TYPE"] = "MySql";
             startInfo.Environment["AO_REBIRTH_MYSQL_CONNECTION"] =
                 "Server=127.0.0.1;Port=33067;Database=aorebirth_chatengine_stage6;Uid=aorebirth_stage8;Pwd=stage8-placeholder;SslMode=None";
-            startInfo.Environment["AO_REBIRTH_ZONE_LISTEN_IP"] = "127.0.0.1";
             startInfo.Environment["AO_REBIRTH_CHAT_LISTEN_IP"] = "127.0.0.1";
+            if (bindMode != null)
+            {
+                startInfo.Environment["AO_REBIRTH_BIND_MODE"] = bindMode;
+            }
 
             using (Process process = Process.Start(startInfo))
             {
@@ -133,11 +179,24 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
                 string output = outputTask.GetAwaiter().GetResult();
                 string error = errorTask.GetAwaiter().GetResult();
-                Require(process.ExitCode == 0, "ZoneEngine validation child failed: " + error + output);
-                Require(
-                    output.IndexOf(expectedOutput, StringComparison.Ordinal) >= 0,
-                    "ZoneEngine validation child did not emit expected output: " + expectedOutput);
+                return new ProcessResult(process.ExitCode, output, error);
             }
+        }
+
+        private sealed class ProcessResult
+        {
+            internal ProcessResult(int exitCode, string standardOutput, string standardError)
+            {
+                this.ExitCode = exitCode;
+                this.StandardOutput = standardOutput;
+                this.StandardError = standardError;
+            }
+
+            internal int ExitCode { get; private set; }
+
+            internal string StandardOutput { get; private set; }
+
+            internal string StandardError { get; private set; }
         }
 
         private static string ReadArgument(string[] args, string name)

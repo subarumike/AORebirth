@@ -61,6 +61,7 @@ namespace ZoneEngine
 
     using Utility;
     using Utility.Config;
+    using Utility.Network;
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Arete;
@@ -599,14 +600,10 @@ namespace ZoneEngine
             int Port = Convert.ToInt32(ConfigReadWrite.Instance.CurrentConfig.ZonePort);
             try
             {
-                if (ConfigReadWrite.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    zoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
-                }
-                else
-                {
-                    zoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Parse(ConfigReadWrite.Instance.CurrentConfig.ListenIP), Port);
-                }
+                EngineBindPolicy bindPolicy = EngineBindPolicy.ResolveFromEnvironment();
+                Console.WriteLine("ZoneEngine bind policy: " + bindPolicy.Mode);
+                Console.WriteLine("ZoneEngine listener: " + bindPolicy.AddressText + ":" + Port);
+                zoneServer.TcpEndPoint = new IPEndPoint(bindPolicy.Address, Port);
 
                 zoneServer.MaximumPendingConnections = 100;
             }
@@ -817,7 +814,7 @@ namespace ZoneEngine
                 throw new InvalidDataException("ListenIP must be a valid IP address.");
             }
 
-            GetZoneListenAddress(configuration);
+            GetZoneBindPolicy();
             GetChatEngineAddress(configuration);
 
             if (configuration.ZonePort < 1 || configuration.ZonePort > 65535)
@@ -902,27 +899,9 @@ namespace ZoneEngine
             }
         }
 
-        private static IPAddress GetZoneListenAddress(Utility.Config.Config configuration)
+        private static EngineBindPolicy GetZoneBindPolicy()
         {
-            string listenIP = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_LISTEN_IP");
-            if (string.IsNullOrWhiteSpace(listenIP))
-            {
-                listenIP = "127.0.0.1";
-            }
-
-            IPAddress address;
-            if (!IPAddress.TryParse(listenIP, out address))
-            {
-                throw new InvalidDataException("The Zone listen address is invalid.");
-            }
-
-            if (!IPAddress.IsLoopback(address))
-            {
-                throw new InvalidDataException(
-                    "The first Linux deployment requires a loopback-only Zone listen address.");
-            }
-
-            return address;
+            return EngineBindPolicy.ResolveFromEnvironment();
         }
 
         private static IPAddress GetChatEngineAddress(Utility.Config.Config configuration)
@@ -988,8 +967,9 @@ namespace ZoneEngine
                 ValidateRequiredRuntimeAssets();
 
                 validationZoneServer = new ZoneServer();
+                EngineBindPolicy bindPolicy = GetZoneBindPolicy();
                 validationZoneServer.TcpEndPoint = new IPEndPoint(
-                    GetZoneListenAddress(configuration),
+                    bindPolicy.Address,
                     configuration.ZonePort);
                 validationZoneServer.MaximumPendingConnections = 100;
 
@@ -1008,6 +988,10 @@ namespace ZoneEngine
                 Console.WriteLine(
                     "ZONEENGINE_VALIDATION_OK mode=startup provider="
                     + configuration.SQLType
+                    + " bindPolicy="
+                    + bindPolicy.Mode
+                    + " address="
+                    + bindPolicy.AddressText
                     + " listeners=0 assets=ok");
                 return 0;
             }

@@ -746,16 +746,12 @@ namespace AORebirth.LinuxBuild.Contracts
                 "LoginEngine systemd database identity");
             VerifyExactActiveLine(
                 unit,
-                "Environment=AO_REBIRTH_LOGIN_LISTEN_IP=127.0.0.1",
-                "LoginEngine systemd loopback identity");
+                "Environment=AO_REBIRTH_BIND_MODE=Loopback",
+                "LoginEngine systemd default bind mode");
             VerifyExactActiveLine(
                 unit,
                 "ExecStartPre=/usr/bin/test ${AO_REBIRTH_EXPECTED_DATABASE} = aorebirth_chatengine_stage6",
                 "LoginEngine systemd effective database guard");
-            VerifyExactActiveLine(
-                unit,
-                "ExecStartPre=/usr/bin/test ${AO_REBIRTH_LOGIN_LISTEN_IP} = 127.0.0.1",
-                "LoginEngine systemd effective loopback guard");
             VerifyExactActiveLine(
                 unit,
                 "ExecStartPre=/opt/ao-rebirth/loginengine/current/LoginEngine --validate-startup",
@@ -770,8 +766,8 @@ namespace AORebirth.LinuxBuild.Contracts
                 "LoginEngine environment database identity");
             VerifyExactActiveLine(
                 environment,
-                "AO_REBIRTH_LOGIN_LISTEN_IP=127.0.0.1",
-                "LoginEngine environment loopback identity");
+                "AO_REBIRTH_BIND_MODE=Loopback",
+                "LoginEngine environment default bind mode");
         }
 
         private static void VerifyExactActiveLine(string content, string expected, string description)

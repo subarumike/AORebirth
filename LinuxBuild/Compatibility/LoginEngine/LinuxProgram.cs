@@ -19,6 +19,7 @@ namespace LoginEngine
     using NLog;
 
     using Utility;
+    using Utility.Network;
 
     using Config = Utility.Config.ConfigReadWrite;
 
@@ -236,27 +237,9 @@ namespace LoginEngine
             return null;
         }
 
-        private static IPAddress GetLoginListenAddress(Utility.Config.Config configuration)
+        private static EngineBindPolicy GetLoginBindPolicy()
         {
-            string configuredAddress = Environment.GetEnvironmentVariable("AO_REBIRTH_LOGIN_LISTEN_IP");
-            if (string.IsNullOrWhiteSpace(configuredAddress))
-            {
-                configuredAddress = "127.0.0.1";
-            }
-
-            IPAddress address;
-            if (!IPAddress.TryParse(configuredAddress, out address))
-            {
-                throw new InvalidDataException("The LoginEngine listen address is invalid.");
-            }
-
-            if (!IPAddress.IsLoopback(address))
-            {
-                throw new InvalidDataException(
-                    "The Stage 7 LoginEngine listener must remain bound to a loopback address.");
-            }
-
-            return address;
+            return EngineBindPolicy.ResolveFromEnvironment();
         }
 
         private static bool HasEitherArgument(string[] args, string first, string second)
@@ -297,8 +280,11 @@ namespace LoginEngine
             }
 
             loginServer = container.GetInstance<LoginServer>();
+            EngineBindPolicy bindPolicy = GetLoginBindPolicy();
+            Console.WriteLine("LoginEngine bind policy: " + bindPolicy.Mode);
+            Console.WriteLine("LoginEngine listener: " + bindPolicy.AddressText + ":" + configuration.LoginPort);
             loginServer.TcpEndPoint = new IPEndPoint(
-                GetLoginListenAddress(configuration),
+                bindPolicy.Address,
                 configuration.LoginPort);
             loginServer.MaximumPendingConnections = 100;
         }
@@ -581,8 +567,9 @@ namespace LoginEngine
                 }
 
                 validationServer = container.GetInstance<LoginServer>();
+                EngineBindPolicy bindPolicy = GetLoginBindPolicy();
                 validationServer.TcpEndPoint = new IPEndPoint(
-                    GetLoginListenAddress(configuration),
+                    bindPolicy.Address,
                     configuration.LoginPort);
                 validationServer.MaximumPendingConnections = 100;
 
@@ -601,6 +588,10 @@ namespace LoginEngine
                 Console.WriteLine(
                     "LOGINENGINE_VALIDATION_OK mode=startup handlers=6 provider="
                     + configuration.SQLType
+                    + " bindPolicy="
+                    + bindPolicy.Mode
+                    + " address="
+                    + bindPolicy.AddressText
                     + " nbug=disabled listeners=0");
                 return 0;
             }
@@ -629,7 +620,7 @@ namespace LoginEngine
                 throw new InvalidDataException("ListenIP must be a valid IP address.");
             }
 
-            GetLoginListenAddress(configuration);
+            GetLoginBindPolicy();
 
             if (configuration.LoginPort < 1 || configuration.LoginPort > 65535)
             {

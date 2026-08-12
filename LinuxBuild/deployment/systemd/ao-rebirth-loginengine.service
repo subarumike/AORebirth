@@ -11,10 +11,9 @@ Group=aorebirth
 WorkingDirectory=/opt/ao-rebirth/loginengine/current
 Environment=AO_REBIRTH_REQUIRED_SQL_TYPE=MySql
 Environment=AO_REBIRTH_EXPECTED_DATABASE=aorebirth_chatengine_stage6
-Environment=AO_REBIRTH_LOGIN_LISTEN_IP=127.0.0.1
+Environment=AO_REBIRTH_BIND_MODE=Loopback
 EnvironmentFile=/etc/ao-rebirth/loginengine/loginengine.env
 ExecStartPre=/usr/bin/test ${AO_REBIRTH_EXPECTED_DATABASE} = aorebirth_chatengine_stage6
-ExecStartPre=/usr/bin/test ${AO_REBIRTH_LOGIN_LISTEN_IP} = 127.0.0.1
 ExecStartPre=/opt/ao-rebirth/loginengine/current/LoginEngine --validate-startup
 ExecStartPre=/opt/ao-rebirth/loginengine/current/LoginEngine --validate-database
 ExecStart=/opt/ao-rebirth/loginengine/current/LoginEngine --headless

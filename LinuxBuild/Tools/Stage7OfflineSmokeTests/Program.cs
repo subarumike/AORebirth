@@ -67,7 +67,6 @@ internal static class Program
                 "Server=127.0.0.1;Port=33067;Database=aorebirth_chatengine_stage6;Uid=stage7_offline;Pwd=stage7_offline"
             },
             { "AO_REBIRTH_EXPECTED_DATABASE", "aorebirth_chatengine_stage6" },
-            { "AO_REBIRTH_LOGIN_LISTEN_IP", "127.0.0.1" },
             { "AO_REBIRTH_REQUIRED_SQL_TYPE", "MySql" }
         };
 
@@ -75,9 +74,9 @@ internal static class Program
         Assert(startup.ExitCode == 0, "Published LoginEngine --validate-startup failed: " + startup.StandardError);
         Assert(
             startup.StandardOutput.IndexOf(
-                "LOGINENGINE_VALIDATION_OK mode=startup handlers=6 provider=MySql nbug=disabled listeners=0",
+                "LOGINENGINE_VALIDATION_OK mode=startup handlers=6 provider=MySql bindPolicy=Loopback address=127.0.0.1 nbug=disabled listeners=0",
                 StringComparison.Ordinal) >= 0,
-            "Published LoginEngine startup validation did not report the exact listener-free contract.");
+            "Published LoginEngine startup validation did not report the exact loopback listener-free contract.");
 
         var missingExpectedDatabaseEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
         {
@@ -128,21 +127,69 @@ internal static class Program
                 StringComparison.Ordinal) >= 0,
             "Published LoginEngine startup validation accepted a missing database secret.");
 
-        var wildcardListenEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        var explicitLoopbackEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
         {
-            ["AO_REBIRTH_LOGIN_LISTEN_IP"] = "0.0.0.0"
+            ["AO_REBIRTH_BIND_MODE"] = "Loopback"
         };
-        ProcessResult wildcardListen = RunDotNet(
+        ProcessResult explicitLoopback = RunDotNet(
             publish,
             loginEngine,
             new[] { "--validate-startup" },
-            wildcardListenEnvironment);
+            explicitLoopbackEnvironment);
         Assert(
-            wildcardListen.ExitCode != 0
-            && wildcardListen.StandardError.IndexOf(
-                "must remain bound to a loopback address",
+            explicitLoopback.ExitCode == 0
+            && explicitLoopback.StandardOutput.IndexOf(
+                "bindPolicy=Loopback address=127.0.0.1",
                 StringComparison.Ordinal) >= 0,
-            "Published LoginEngine startup validation accepted a wildcard listener.");
+            "Published LoginEngine startup validation rejected explicit Loopback mode.");
+
+        var publicEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        {
+            ["AO_REBIRTH_BIND_MODE"] = "Public"
+        };
+        ProcessResult publicStartup = RunDotNet(
+            publish,
+            loginEngine,
+            new[] { "--validate-startup" },
+            publicEnvironment);
+        Assert(
+            publicStartup.ExitCode == 0
+            && publicStartup.StandardOutput.IndexOf(
+                "bindPolicy=Public address=0.0.0.0",
+                StringComparison.Ordinal) >= 0,
+            "Published LoginEngine startup validation rejected explicit Public mode.");
+
+        var invalidBindModeEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        {
+            ["AO_REBIRTH_BIND_MODE"] = "Internet"
+        };
+        ProcessResult invalidBindMode = RunDotNet(
+            publish,
+            loginEngine,
+            new[] { "--validate-startup" },
+            invalidBindModeEnvironment);
+        Assert(
+            invalidBindMode.ExitCode != 0
+            && invalidBindMode.StandardError.IndexOf(
+                "AO_REBIRTH_BIND_MODE must be Loopback or Public",
+                StringComparison.Ordinal) >= 0,
+            "Published LoginEngine startup validation accepted an invalid bind mode.");
+
+        var whitespaceBindModeEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        {
+            ["AO_REBIRTH_BIND_MODE"] = "   "
+        };
+        ProcessResult whitespaceBindMode = RunDotNet(
+            publish,
+            loginEngine,
+            new[] { "--validate-startup" },
+            whitespaceBindModeEnvironment);
+        Assert(
+            whitespaceBindMode.ExitCode != 0
+            && whitespaceBindMode.StandardError.IndexOf(
+                "AO_REBIRTH_BIND_MODE must be Loopback or Public",
+                StringComparison.Ordinal) >= 0,
+            "Published LoginEngine startup validation accepted a whitespace bind mode.");
 
         string lifecycleDirectory = Path.Combine(Path.GetTempPath(), "aorebirth-stage7-lifecycle-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(lifecycleDirectory);

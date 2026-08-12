@@ -2,9 +2,9 @@
 
 ## Active
 
-Integrate the validated Linux deployment lane with current AORebirth master,
-then synchronize the disabled Ubuntu installation without creating platform
-divergence or exposing player services prematurely.
+Establish an audited listener-binding policy for AORebirth production services
+and prepare a safe Ubuntu public-mode cutover candidate without creating
+platform divergence.
 
 ## Current checkpoint
 
@@ -15,9 +15,9 @@ divergence or exposing player services prematurely.
   Arete master source.
 - Linux source inventories have been regenerated from the integrated legacy
   project files; the Windows-hosted Linux build and Stage 8 offline smoke pass.
-- Prior Ubuntu proof covers native disabled-service validation only. LoginEngine
-  and ZoneEngine remain disabled/inactive and loopback-only; ZoneEngine Stage 9
-  validation uses listener-free lifecycle mode rather than production gameplay.
+- Listener reachability is now an explicit deployment policy:
+  `AO_REBIRTH_BIND_MODE=Loopback` keeps LoginEngine and ZoneEngine private, and
+  `AO_REBIRTH_BIND_MODE=Public` is required for production public listeners.
 - The unified account architecture remains a design boundary documented in
   `docs/project/UNIFIED_ACCOUNT_ARCHITECTURE.md`; no account schema or production
   authentication change is part of this synchronization.
@@ -26,11 +26,12 @@ divergence or exposing player services prematurely.
 
 - Complete the authoritative Windows mandatory integration gate on the merged,
   clean tree.
-- Publish immutable Linux packages from that validated source and run the
-  approved Ubuntu build/disabled-service verification workflow.
-- Prove multi-engine ordering, official-client login and retry/error behavior,
-  character-count semantics, and sustained multiplayer operation before public
-  production promotion.
+- Publish immutable Linux packages from the validated source.
+- Prove external reachability for LoginEngine and ZoneEngine only when the
+  Ubuntu deployment explicitly sets public mode.
+- Complete official-client login, character selection/creation, zone handoff,
+  Arete entry, movement, and loopback rollback validation before marking the
+  public production cutover accepted.
 
 ## Constraints
 
@@ -39,6 +40,7 @@ divergence or exposing player services prematurely.
 - Do not create Linux-only core implementations or production-only source edits.
 - Preserve generated-combat evidence, exact source inventories, and fail-closed
   quarantine behavior.
-- Keep MySQL and ISCom private. Do not enable or expose LoginEngine, ChatEngine,
-  or ZoneEngine until their documented production gates pass.
+- Keep MySQL and ISCom private. Public reachability is authorized only through
+  the audited LoginEngine/ZoneEngine `AO_REBIRTH_BIND_MODE=Public` deployment
+  switch.
 - Do not launch the AO client without explicit current authorization.

@@ -57,6 +57,7 @@ namespace LoginEngine
     using NLog;
 
     using Utility;
+    using Utility.Network;
 
     using Config = Utility.Config.ConfigReadWrite;
 
@@ -612,14 +613,10 @@ namespace LoginEngine
             int Port = Convert.ToInt32(Config.Instance.CurrentConfig.LoginPort);
             try
             {
-                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    loginServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
-                }
-                else
-                {
-                    loginServer.TcpEndPoint = new IPEndPoint(IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP), Port);
-                }
+                EngineBindPolicy bindPolicy = EngineBindPolicy.ResolveFromEnvironment();
+                Console.WriteLine("LoginEngine bind policy: " + bindPolicy.Mode);
+                Console.WriteLine("LoginEngine listener: " + bindPolicy.AddressText + ":" + Port);
+                loginServer.TcpEndPoint = new IPEndPoint(bindPolicy.Address, Port);
 
                 loginServer.MaximumPendingConnections = 100;
             }

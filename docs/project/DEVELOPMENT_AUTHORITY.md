@@ -50,6 +50,25 @@ deployment, hosting, packaging, service management, monitoring, permissions,
 filesystem layout, and platform integration. It must not create Linux-only core
 behavior.
 
+## Listener exposure
+
+Behavior belongs to source. Reachability belongs to explicit deployment
+configuration.
+
+LoginEngine and ZoneEngine use the governed `AO_REBIRTH_BIND_MODE`
+configuration owner for client listener exposure. Accepted values are
+`Loopback` and `Public`. An absent setting selects `Loopback`, which binds
+`127.0.0.1`; `Public` binds `0.0.0.0`. Invalid or whitespace-only values fail
+startup. Linux does not automatically mean public exposure, and Windows does
+not automatically mean loopback beyond the same default policy. Validation
+environments must remain loopback unless a focused test explicitly selects
+`Public`.
+
+Public mode changes listener reachability only. It does not authorize packet,
+gameplay, authentication, database schema, or database exposure changes. MySQL,
+ISCom, validation, debug, and management listeners remain private unless a
+separate audited policy explicitly changes them.
+
 ## Authoritative workflow
 
 ```text
