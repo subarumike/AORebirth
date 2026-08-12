@@ -8,12 +8,13 @@ Expected startup context/read order:
 
 1. [AGENTS.md](AGENTS.md)
 2. [AI_START_HERE.md](AI_START_HERE.md)
-3. [docs/project/PROJECT_STATE.md](docs/project/PROJECT_STATE.md)
-4. [docs/ai/CURRENT_TASK.md](docs/ai/CURRENT_TASK.md)
-5. [docs/project/KNOWN_DECISIONS.md](docs/project/KNOWN_DECISIONS.md)
-6. [docs/project/SUBSYSTEMS.md](docs/project/SUBSYSTEMS.md) — Mail/Pets/etc. folder ownership + pull workflow
-7. [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md)
-8. [docs/ai/WORKFLOW.md](docs/ai/WORKFLOW.md)
+3. [docs/project/DEVELOPMENT_AUTHORITY.md](docs/project/DEVELOPMENT_AUTHORITY.md)
+4. [docs/project/PROJECT_STATE.md](docs/project/PROJECT_STATE.md)
+5. [docs/ai/CURRENT_TASK.md](docs/ai/CURRENT_TASK.md)
+6. [docs/project/KNOWN_DECISIONS.md](docs/project/KNOWN_DECISIONS.md)
+7. [docs/project/SUBSYSTEMS.md](docs/project/SUBSYSTEMS.md) — Mail/Pets/etc. folder ownership + pull workflow
+8. [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md)
+9. [docs/ai/WORKFLOW.md](docs/ai/WORKFLOW.md)
 
 Before exploratory commands for recurring build, engine, capture, or validation work, read the documented workflow and use the approved wrapper/command first. If the documented command is missing, ambiguous, or stale, stop and report the documentation gap instead of rediscovering the workflow.
 
