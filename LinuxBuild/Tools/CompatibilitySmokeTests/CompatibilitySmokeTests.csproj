@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Stage2ContractFingerprint.cs" Link="Stage2ContractFingerprint.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Projects/AORebirth.Enums.Linux.csproj" />
+    <ProjectReference Include="../../Projects/AORebirth.Exceptions.Linux.csproj" />
+    <ProjectReference Include="../../Projects/AORebirth.Interfaces.Linux.csproj" />
+    <ProjectReference Include="../../Projects/AORebirth.ObjectManager.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Cell.Core.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Cell.Util.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Ionic.Zlib.Linux.csproj" />
+    <ProjectReference Include="../../Projects/MsgPack.Mono.Linux.csproj" />
+    <ProjectReference Include="../../Projects/SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Translations.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Fixtures/*.dat" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures/LegacyUtilityFixtures.manifest" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures/LegacyStage2PublicContracts.manifest" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

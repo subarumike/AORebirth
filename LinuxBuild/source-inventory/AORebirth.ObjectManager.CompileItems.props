@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/SolutionAssemblyInfo.cs">
+      <Link>Properties/SolutionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.ObjectManager/IPooledObject.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.ObjectManager/Pool.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.ObjectManager/PooledObject.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.ObjectManager/Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

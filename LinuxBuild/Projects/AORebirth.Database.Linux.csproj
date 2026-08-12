@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AORebirth.Database</AssemblyName>
+    <RootNamespace>AORebirth.Database</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.79" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageReference Include="MySqlConnector" Version="2.6.1" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Enums.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Interfaces.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Exceptions.Linux.csproj" />
+    <ProjectReference Include="Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../Compatibility/Database/SystemDataLinqBinary.Linux.cs">
+      <Link>Compatibility/SystemDataLinqBinary.Linux.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <Import Project="../source-inventory/AORebirth.Database.CompileItems.props" />
+  <Import Project="../source-inventory/AORebirth.Database.ContentItems.props" />
+</Project>

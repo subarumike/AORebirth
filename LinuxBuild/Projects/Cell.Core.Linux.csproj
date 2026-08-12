@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Cell.Core</AssemblyName>
+    <RootNamespace>Cell.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="6.1.4" />
+    <ProjectReference Include="Cell.Util.Linux.csproj" />
+  </ItemGroup>
+
+  <Import Project="../source-inventory/Cell.Core.CompileItems.props" />
+
+  <ItemGroup>
+    <EmbeddedResource Update="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Core/Localization/Cell.Core.resx">
+      <LogicalName>Cell.Core.Localization.Cell.Core.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

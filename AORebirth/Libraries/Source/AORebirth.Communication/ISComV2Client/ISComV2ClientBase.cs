@@ -125,10 +125,16 @@ namespace AORebirth.Communication.ISComV2Client
         /// </summary>
         /// <param name="dataBytes">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnDataReceived(object sender, OnDataReceivedArgs e);
 
         /// <summary>
         /// </summary>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnDisconnect(object sender, EventArgs e);
 
         #endregion
@@ -305,6 +311,31 @@ namespace AORebirth.Communication.ISComV2Client
             this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             this._tcpSock.NoDelay = true;
             this._tcpSock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+#if AOREBIRTH_LINUX
+            try
+            {
+                this._tcpSock.SetSocketOption(
+                    SocketOptionLevel.Tcp,
+                    SocketOptionName.TcpKeepAliveTime,
+                    5);
+                this._tcpSock.SetSocketOption(
+                    SocketOptionLevel.Tcp,
+                    SocketOptionName.TcpKeepAliveInterval,
+                    1);
+                this._tcpSock.SetSocketOption(
+                    SocketOptionLevel.Tcp,
+                    SocketOptionName.TcpKeepAliveRetryCount,
+                    10);
+            }
+            catch (SocketException)
+            {
+                // KeepAlive option above still applies with OS defaults.
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // KeepAlive option above still applies with OS defaults.
+            }
+#else
             // Windows: enable keepalive probes sooner than the 2h default so a dead
             // ChatEngine is detected before pet chat silently vanishes.
             try
@@ -320,6 +351,7 @@ namespace AORebirth.Communication.ISComV2Client
             {
                 // KeepAlive option above still applies with OS defaults.
             }
+#endif
 
             this._tcpSock.Connect(addr, port);
             this._offset = 0;

@@ -62,10 +62,16 @@ namespace LoginEngine.MessageHandlers
         {
             var client = (Client)sender;
             var createCharacterMessage = (CreateCharacterMessage)message.Body;
+            string authenticatedAccount;
+            if (!client.TryGetAuthenticatedAccountName(out authenticatedAccount))
+            {
+                client.RejectAuthentication();
+                return;
+            }
 
             var characterName = new CharacterName
                                 {
-                                    AccountName = client.AccountName,
+                                    AccountName = authenticatedAccount,
                                     Name = createCharacterMessage.Name,
                                     Breed = (int)createCharacterMessage.Breed,
                                     Gender = (int)createCharacterMessage.Gender,

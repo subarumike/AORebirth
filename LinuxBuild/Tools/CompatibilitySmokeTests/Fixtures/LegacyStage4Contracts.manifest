@@ -1,0 +1,651 @@
+manifest|AORebirth.Stage4Contract|1
+api|manifest|AORebirth.Stage2Contract|1
+api|assembly.begin|AORebirth.Communication
+api|assembly.name|AORebirth.Communication
+api|assembly.version|1.0.0.0
+api|assembly.public-key-token|null
+api|assembly.file-version|1.0.0.0
+api|assembly.title|AORebirth.Communication
+api|assembly.description|
+api|assembly.configuration|
+api|assembly.company|
+api|assembly.product|AORebirth.Communication
+api|assembly.copyright|Copyright © 2014 CellAO Team
+api|assembly.trademark|
+api|assembly.culture|
+api|assembly.guid|94f7fa1e-3abd-426b-8145-0a1add12f4b3
+api|assembly.com-visible|false
+api|assembly.utility-revision-name|AO Rebirth
+api|type.begin|AORebirth.Communication.HandleClientRequest
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor(System.Net.Sockets.TcpClient clientConnected)
+api|type.event|public instance AORebirth.Communication.HandleClientRequest.ConnectHandler OnConnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.HandleClientRequest.DisconnectHandler OnDisconnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.HandleClientRequest.MessageReceivedHandler MessageReceived {add:public;remove:public;raise:none}
+api|type.method|public instance System.Void ReadCallBack(System.IAsyncResult asyncResult)
+api|type.method|public instance System.Void SendData(AORebirth.Communication.OnMessageArgs args)
+api|type.method|public instance System.Void StartClient()
+api|type.method|public instance System.Void WaitForRequest()
+api|type.method|public instance special-name System.Void add_MessageReceived(AORebirth.Communication.HandleClientRequest.MessageReceivedHandler value)
+api|type.method|public instance special-name System.Void add_OnConnect(AORebirth.Communication.HandleClientRequest.ConnectHandler value)
+api|type.method|public instance special-name System.Void add_OnDisconnect(AORebirth.Communication.HandleClientRequest.DisconnectHandler value)
+api|type.method|public instance special-name System.Void remove_MessageReceived(AORebirth.Communication.HandleClientRequest.MessageReceivedHandler value)
+api|type.method|public instance special-name System.Void remove_OnConnect(AORebirth.Communication.HandleClientRequest.ConnectHandler value)
+api|type.method|public instance special-name System.Void remove_OnDisconnect(AORebirth.Communication.HandleClientRequest.DisconnectHandler value)
+api|type.end|AORebirth.Communication.HandleClientRequest
+api|type.begin|AORebirth.Communication.HandleClientRequest.ConnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.HandleClientRequest.ConnectHandler
+api|type.begin|AORebirth.Communication.HandleClientRequest.DisconnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.HandleClientRequest.DisconnectHandler
+api|type.begin|AORebirth.Communication.HandleClientRequest.MessageReceivedHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnMessageArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnMessageArgs e)
+api|type.end|AORebirth.Communication.HandleClientRequest.MessageReceivedHandler
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2Client
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|System.IDisposable
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Boolean IsConnected {get:public;set:none}
+api|type.event|public instance AORebirth.Communication.ISComV2Client.ISComV2Client.OnConnectHandler OnConnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.ISComV2Client.ISComV2Client.OnReceiveDataHandler OnReceiveData {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.ISComV2Client.ISComV2Client.ReallyDisconnectedHandler ReallyDisconnected {add:public;remove:public;raise:none}
+api|type.method|public instance System.Boolean Connect(System.Net.IPAddress address,System.Int32 port)
+api|type.method|public instance System.Boolean TryLinkIfChatEngineListening()
+api|type.method|public instance System.Boolean TrySend(AORebirth.Communication.Messages.DynamicMessage dataObject)
+api|type.method|public instance System.Boolean TrySend(AORebirth.Communication.Messages.MessageBase dataObject)
+api|type.method|public instance System.Void Configure(System.Net.IPAddress address,System.Int32 port)
+api|type.method|public instance System.Void Send(AORebirth.Communication.Messages.DynamicMessage dataObject)
+api|type.method|public instance System.Void Send(AORebirth.Communication.Messages.MessageBase dataObject)
+api|type.method|public instance System.Void ShutDown()
+api|type.method|public instance special-name System.Boolean get_IsConnected()
+api|type.method|public instance special-name System.Void add_OnConnect(AORebirth.Communication.ISComV2Client.ISComV2Client.OnConnectHandler value)
+api|type.method|public instance special-name System.Void add_OnReceiveData(AORebirth.Communication.ISComV2Client.ISComV2Client.OnReceiveDataHandler value)
+api|type.method|public instance special-name System.Void add_ReallyDisconnected(AORebirth.Communication.ISComV2Client.ISComV2Client.ReallyDisconnectedHandler value)
+api|type.method|public instance special-name System.Void remove_OnConnect(AORebirth.Communication.ISComV2Client.ISComV2Client.OnConnectHandler value)
+api|type.method|public instance special-name System.Void remove_OnReceiveData(AORebirth.Communication.ISComV2Client.ISComV2Client.OnReceiveDataHandler value)
+api|type.method|public instance special-name System.Void remove_ReallyDisconnected(AORebirth.Communication.ISComV2Client.ISComV2Client.ReallyDisconnectedHandler value)
+api|type.method|public instance virtual final System.Void Dispose()
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2Client
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2Client.OnConnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2Client.OnConnectHandler
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2Client.OnReceiveDataHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.Messages.DynamicMessage e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.Messages.DynamicMessage e)
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2Client.OnReceiveDataHandler
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2Client.ReallyDisconnectedHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2Client.ReallyDisconnectedHandler
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2ClientBase
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|System.IDisposable
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Boolean IsConnected {get:public;set:none}
+api|type.property|public instance System.Int32 Port {get:public;set:none}
+api|type.property|public instance System.Net.IPAddress ServerAddress {get:public;set:none}
+api|type.property|public instance System.Net.Sockets.Socket TcpSocket {get:public;set:public}
+api|type.property|public instance System.UInt32 ReceivedBytes {get:public;set:none}
+api|type.property|public instance System.UInt32 SentBytes {get:public;set:none}
+api|type.field|System.Int32|BufferSize|static=true|initonly=false|literal=true|constant=System.Int32:8192
+api|type.event|public instance AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDataReceived ReceivedData {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDisconnect Disconnected {add:public;remove:public;raise:none}
+api|type.method|public instance System.Void BeginReceive()
+api|type.method|public instance System.Void Connect(System.Net.IPAddress addr,System.Int32 port)
+api|type.method|public instance System.Void Connect(System.String host,System.Int32 port)
+api|type.method|public instance System.Void ResetForReconnect()
+api|type.method|public instance System.Void Send(Cell.Core.BufferSegment segment,System.Int32 length)
+api|type.method|public instance System.Void Send(System.Byte[] packet)
+api|type.method|public instance System.Void SendCopy(System.Byte[] packet)
+api|type.method|public instance special-name System.Boolean get_IsConnected()
+api|type.method|public instance special-name System.Int32 get_Port()
+api|type.method|public instance special-name System.Net.IPAddress get_ServerAddress()
+api|type.method|public instance special-name System.Net.Sockets.Socket get_TcpSocket()
+api|type.method|public instance special-name System.UInt32 get_ReceivedBytes()
+api|type.method|public instance special-name System.UInt32 get_SentBytes()
+api|type.method|public instance special-name System.Void add_Disconnected(AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDisconnect value)
+api|type.method|public instance special-name System.Void add_ReceivedData(AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDataReceived value)
+api|type.method|public instance special-name System.Void remove_Disconnected(AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDisconnect value)
+api|type.method|public instance special-name System.Void remove_ReceivedData(AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDataReceived value)
+api|type.method|public instance special-name System.Void set_TcpSocket(System.Net.Sockets.Socket value)
+api|type.method|public instance virtual System.String ToString()
+api|type.method|public instance virtual System.Void Send(System.Byte[] packet,System.Int32 offset,System.Int32 length)
+api|type.method|public instance virtual final System.Void Dispose()
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2ClientBase
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDataReceived
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnDataReceivedArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnDataReceivedArgs e)
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDataReceived
+api|type.begin|AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDisconnect
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.ISComV2Client.ISComV2ClientBase.OnDisconnect
+api|type.begin|AORebirth.Communication.ISComV2Server.ISComV2ClientHandler
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|Cell.Core.ClientBase
+api|type.constructor|public instance .ctor(Cell.Core.ServerBase server)
+api|type.constructor|public instance .ctor(Cell.Core.ServerBase server,MemBus.IBus messageBus,System.Int32 clientNumber)
+api|type.event|public instance AORebirth.Communication.ISComV2Server.ISComV2ClientHandler.DataReceivedHandler DataReceived {add:public;remove:public;raise:none}
+api|type.method|public instance System.Int32 GetID()
+api|type.method|public instance System.Void Send(AORebirth.Communication.Messages.DynamicMessage dataObject)
+api|type.method|public instance System.Void Send(AORebirth.Communication.Messages.MessageBase message)
+api|type.method|public instance special-name System.Void add_DataReceived(AORebirth.Communication.ISComV2Server.ISComV2ClientHandler.DataReceivedHandler value)
+api|type.method|public instance special-name System.Void remove_DataReceived(AORebirth.Communication.ISComV2Server.ISComV2ClientHandler.DataReceivedHandler value)
+api|type.end|AORebirth.Communication.ISComV2Server.ISComV2ClientHandler
+api|type.begin|AORebirth.Communication.ISComV2Server.ISComV2ClientHandler.DataReceivedHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnDataReceivedArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnDataReceivedArgs e)
+api|type.end|AORebirth.Communication.ISComV2Server.ISComV2ClientHandler.DataReceivedHandler
+api|type.begin|AORebirth.Communication.ISComV2Server.ISComV2Server
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|Cell.Core.ServerBase
+api|type.constructor|public instance .ctor()
+api|type.field|System.Int32|lastClientNumber|static=false|initonly=false|literal=false|constant=
+api|type.event|public instance AORebirth.Communication.ISComV2Server.ISComV2Server.DataReceivedHandler DataReceived {add:public;remove:public;raise:none}
+api|type.method|public instance System.Collections.Generic.List<System.String> GetZoneEngineIds()
+api|type.method|public instance System.Void BroadCast(AORebirth.Communication.Messages.MessageBase message)
+api|type.method|public instance special-name System.Void add_DataReceived(AORebirth.Communication.ISComV2Server.ISComV2Server.DataReceivedHandler value)
+api|type.method|public instance special-name System.Void remove_DataReceived(AORebirth.Communication.ISComV2Server.ISComV2Server.DataReceivedHandler value)
+api|type.end|AORebirth.Communication.ISComV2Server.ISComV2Server
+api|type.begin|AORebirth.Communication.ISComV2Server.ISComV2Server.DataReceivedHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.Messages.DynamicMessage e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.Messages.DynamicMessage e)
+api|type.end|AORebirth.Communication.ISComV2Server.ISComV2Server.DataReceivedHandler
+api|type.begin|AORebirth.Communication.Messages.ChatCommand
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Int32 CharacterId {get:public;set:public}
+api|type.property|public instance System.String ChatCommandString {get:public;set:public}
+api|type.method|public instance special-name System.Int32 get_CharacterId()
+api|type.method|public instance special-name System.String get_ChatCommandString()
+api|type.method|public instance special-name System.Void set_CharacterId(System.Int32 value)
+api|type.method|public instance special-name System.Void set_ChatCommandString(System.String value)
+api|type.end|AORebirth.Communication.Messages.ChatCommand
+api|type.begin|AORebirth.Communication.Messages.CpuRamLoad
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Single CpuLoad {get:public;set:public}
+api|type.property|public instance System.Single RamLoad {get:public;set:public}
+api|type.method|public instance special-name System.Single get_CpuLoad()
+api|type.method|public instance special-name System.Single get_RamLoad()
+api|type.method|public instance special-name System.Void set_CpuLoad(System.Single value)
+api|type.method|public instance special-name System.Void set_RamLoad(System.Single value)
+api|type.end|AORebirth.Communication.Messages.CpuRamLoad
+api|type.begin|AORebirth.Communication.Messages.DynamicMessage
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.EventArgs
+api|type.interface|MsgPack.IPackable
+api|type.interface|MsgPack.IUnpackable
+api|type.constructor|public instance .ctor()
+api|type.property|public instance AORebirth.Communication.Messages.MessageBase DataObject {get:public;set:public}
+api|type.property|public instance System.String TypeName {get:public;set:public}
+api|type.method|public instance special-name AORebirth.Communication.Messages.MessageBase get_DataObject()
+api|type.method|public instance special-name System.String get_TypeName()
+api|type.method|public instance special-name System.Void set_DataObject(AORebirth.Communication.Messages.MessageBase value)
+api|type.method|public instance special-name System.Void set_TypeName(System.String value)
+api|type.method|public instance virtual final System.Void PackToMessage(MsgPack.Packer packer,MsgPack.PackingOptions options)
+api|type.method|public instance virtual final System.Void UnpackFromMessage(MsgPack.Unpacker unpacker)
+api|type.end|AORebirth.Communication.Messages.DynamicMessage
+api|type.begin|AORebirth.Communication.Messages.IMessageData
+api|type.kind|interface
+api|type.modifiers|abstract
+api|type.serializable-attribute|not-applicable
+api|type.base|
+api|type.method|public instance abstract virtual System.Byte[] GetData()
+api|type.end|AORebirth.Communication.Messages.IMessageData
+api|type.begin|AORebirth.Communication.Messages.MessageBase
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|AORebirth.Communication.Messages.IMessageData
+api|type.constructor|public instance .ctor()
+api|type.method|public instance virtual final System.Byte[] GetData()
+api|type.end|AORebirth.Communication.Messages.MessageBase
+api|type.begin|AORebirth.Communication.Messages.OnlineCharacter
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Int32 GMLevel {get:public;set:public}
+api|type.property|public instance System.Int32 Identity {get:public;set:public}
+api|type.property|public instance System.String Name {get:public;set:public}
+api|type.method|public instance special-name System.Int32 get_GMLevel()
+api|type.method|public instance special-name System.Int32 get_Identity()
+api|type.method|public instance special-name System.String get_Name()
+api|type.method|public instance special-name System.Void set_GMLevel(System.Int32 value)
+api|type.method|public instance special-name System.Void set_Identity(System.Int32 value)
+api|type.method|public instance special-name System.Void set_Name(System.String value)
+api|type.end|AORebirth.Communication.Messages.OnlineCharacter
+api|type.begin|AORebirth.Communication.Messages.OnlineCharacters
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.end|AORebirth.Communication.Messages.OnlineCharacters
+api|type.begin|AORebirth.Communication.Messages.Ping
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.field|System.String|dummy|static=false|initonly=false|literal=false|constant=
+api|type.end|AORebirth.Communication.Messages.Ping
+api|type.begin|AORebirth.Communication.Messages.PrivateSystemMessage
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Int32 CharacterId {get:public;set:public}
+api|type.property|public instance System.Int32 Unk1 {get:public;set:public}
+api|type.property|public instance System.Int32 Unk2 {get:public;set:public}
+api|type.property|public instance System.String CharacterName {get:public;set:public}
+api|type.property|public instance System.String Text {get:public;set:public}
+api|type.method|public instance special-name System.Int32 get_CharacterId()
+api|type.method|public instance special-name System.Int32 get_Unk1()
+api|type.method|public instance special-name System.Int32 get_Unk2()
+api|type.method|public instance special-name System.String get_CharacterName()
+api|type.method|public instance special-name System.String get_Text()
+api|type.method|public instance special-name System.Void set_CharacterId(System.Int32 value)
+api|type.method|public instance special-name System.Void set_CharacterName(System.String value)
+api|type.method|public instance special-name System.Void set_Text(System.String value)
+api|type.method|public instance special-name System.Void set_Unk1(System.Int32 value)
+api|type.method|public instance special-name System.Void set_Unk2(System.Int32 value)
+api|type.end|AORebirth.Communication.Messages.PrivateSystemMessage
+api|type.begin|AORebirth.Communication.Messages.RequestPlayfieldList
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Collections.Generic.List<SmokeLounge.AOtomation.Messaging.GameData.Identity> PlayfieldIds {get:public;set:public}
+api|type.property|public instance System.String ZoneEngineAddress {get:public;set:public}
+api|type.method|public instance special-name System.Collections.Generic.List<SmokeLounge.AOtomation.Messaging.GameData.Identity> get_PlayfieldIds()
+api|type.method|public instance special-name System.String get_ZoneEngineAddress()
+api|type.method|public instance special-name System.Void set_PlayfieldIds(System.Collections.Generic.List<SmokeLounge.AOtomation.Messaging.GameData.Identity> value)
+api|type.method|public instance special-name System.Void set_ZoneEngineAddress(System.String value)
+api|type.end|AORebirth.Communication.Messages.RequestPlayfieldList
+api|type.begin|AORebirth.Communication.Messages.SystemChatMessage
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Int32 CharacterId {get:public;set:public}
+api|type.property|public instance System.Int32 Unk1 {get:public;set:public}
+api|type.property|public instance System.Int32 Unk2 {get:public;set:public}
+api|type.property|public instance System.String CharacterName {get:public;set:public}
+api|type.property|public instance System.String Source {get:public;set:public}
+api|type.property|public instance System.String Text {get:public;set:public}
+api|type.method|public instance special-name System.Int32 get_CharacterId()
+api|type.method|public instance special-name System.Int32 get_Unk1()
+api|type.method|public instance special-name System.Int32 get_Unk2()
+api|type.method|public instance special-name System.String get_CharacterName()
+api|type.method|public instance special-name System.String get_Source()
+api|type.method|public instance special-name System.String get_Text()
+api|type.method|public instance special-name System.Void set_CharacterId(System.Int32 value)
+api|type.method|public instance special-name System.Void set_CharacterName(System.String value)
+api|type.method|public instance special-name System.Void set_Source(System.String value)
+api|type.method|public instance special-name System.Void set_Text(System.String value)
+api|type.method|public instance special-name System.Void set_Unk1(System.Int32 value)
+api|type.method|public instance special-name System.Void set_Unk2(System.Int32 value)
+api|type.end|AORebirth.Communication.Messages.SystemChatMessage
+api|type.begin|AORebirth.Communication.Messages.VicinityChatMessage
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|AORebirth.Communication.Messages.MessageBase
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Collections.Generic.List<System.Int32> CharacterIds {get:public;set:public}
+api|type.property|public instance System.Int32 MessageType {get:public;set:public}
+api|type.property|public instance System.Int32 SenderId {get:public;set:public}
+api|type.property|public instance System.String Text {get:public;set:public}
+api|type.method|public instance special-name System.Collections.Generic.List<System.Int32> get_CharacterIds()
+api|type.method|public instance special-name System.Int32 get_MessageType()
+api|type.method|public instance special-name System.Int32 get_SenderId()
+api|type.method|public instance special-name System.String get_Text()
+api|type.method|public instance special-name System.Void set_CharacterIds(System.Collections.Generic.List<System.Int32> value)
+api|type.method|public instance special-name System.Void set_MessageType(System.Int32 value)
+api|type.method|public instance special-name System.Void set_SenderId(System.Int32 value)
+api|type.method|public instance special-name System.Void set_Text(System.String value)
+api|type.end|AORebirth.Communication.Messages.VicinityChatMessage
+api|type.begin|AORebirth.Communication.OnDataReceivedArgs
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.EventArgs
+api|type.constructor|public instance .ctor()
+api|type.property|public instance System.Byte[] dataBytes {get:public;set:public}
+api|type.method|public instance special-name System.Byte[] get_dataBytes()
+api|type.method|public instance special-name System.Void set_dataBytes(System.Byte[] value)
+api|type.end|AORebirth.Communication.OnDataReceivedArgs
+api|type.begin|AORebirth.Communication.OnMessageArgs
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|true
+api|type.base|System.EventArgs
+api|type.constructor|public instance .ctor()
+api|type.field|System.Boolean|IsProtocolPacket|static=false|initonly=false|literal=false|constant=
+api|type.field|System.Byte|ID|static=false|initonly=false|literal=false|constant=
+api|type.field|System.Byte[]|Data|static=false|initonly=false|literal=false|constant=
+api|type.field|System.Int16|Length|static=false|initonly=false|literal=false|constant=
+api|type.end|AORebirth.Communication.OnMessageArgs
+api|type.begin|AORebirth.Communication.Server.ZoneComServer
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor(System.Net.IPAddress ipAddress,System.Int32 ipPort)
+api|type.event|public instance AORebirth.Communication.Server.ZoneComServer.ConnectHandler OnConnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.Server.ZoneComServer.DisconnectHandler OnDisconnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.Server.ZoneComServer.MessageReceivedHandler MessageReceived {add:public;remove:public;raise:none}
+api|type.method|public instance System.Void StartServer()
+api|type.method|public instance special-name System.Void add_MessageReceived(AORebirth.Communication.Server.ZoneComServer.MessageReceivedHandler value)
+api|type.method|public instance special-name System.Void add_OnConnect(AORebirth.Communication.Server.ZoneComServer.ConnectHandler value)
+api|type.method|public instance special-name System.Void add_OnDisconnect(AORebirth.Communication.Server.ZoneComServer.DisconnectHandler value)
+api|type.method|public instance special-name System.Void remove_MessageReceived(AORebirth.Communication.Server.ZoneComServer.MessageReceivedHandler value)
+api|type.method|public instance special-name System.Void remove_OnConnect(AORebirth.Communication.Server.ZoneComServer.ConnectHandler value)
+api|type.method|public instance special-name System.Void remove_OnDisconnect(AORebirth.Communication.Server.ZoneComServer.DisconnectHandler value)
+api|type.end|AORebirth.Communication.Server.ZoneComServer
+api|type.begin|AORebirth.Communication.Server.ZoneComServer.ConnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.Server.ZoneComServer.ConnectHandler
+api|type.begin|AORebirth.Communication.Server.ZoneComServer.DisconnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.Server.ZoneComServer.DisconnectHandler
+api|type.begin|AORebirth.Communication.Server.ZoneComServer.MessageReceivedHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnMessageArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnMessageArgs e)
+api|type.end|AORebirth.Communication.Server.ZoneComServer.MessageReceivedHandler
+api|type.begin|AORebirth.Communication.ZoneCom
+api|type.kind|class
+api|type.modifiers|abstract,sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.property|public static System.Boolean Linked {get:public;set:none}
+api|type.property|public static System.Boolean LinkedWithClient {get:public;set:none}
+api|type.property|public static System.Boolean LinkedWithServer {get:public;set:none}
+api|type.field|System.Boolean|ClientReconnect|static=true|initonly=false|literal=false|constant=
+api|type.event|public static AORebirth.Communication.ZoneCom.OnClientConnectedToServer ClientConnectedToServer {add:public;remove:public;raise:none}
+api|type.event|public static AORebirth.Communication.ZoneCom.OnReceivedMessageFromClient ReceivedMessageFromClient {add:public;remove:public;raise:none}
+api|type.event|public static AORebirth.Communication.ZoneCom.OnReceivedMessageFromServer ReceivedMessageFromServer {add:public;remove:public;raise:none}
+api|type.method|public static System.Void SendMessage(System.Byte ID,System.Byte[] data)
+api|type.method|public static System.Void SendReply(AORebirth.Communication.HandleClientRequest request,System.Byte ID,System.Byte[] data)
+api|type.method|public static System.Void StartClient(System.Net.IPAddress address,System.Int32 port,AORebirth.Communication.ZoneCom.OnReceivedMessageFromServer received)
+api|type.method|public static System.Void StartServer(System.Net.IPAddress address,System.Int32 port,AORebirth.Communication.ZoneCom.OnReceivedMessageFromClient received)
+api|type.method|public static special-name System.Boolean get_Linked()
+api|type.method|public static special-name System.Boolean get_LinkedWithClient()
+api|type.method|public static special-name System.Boolean get_LinkedWithServer()
+api|type.method|public static special-name System.Void add_ClientConnectedToServer(AORebirth.Communication.ZoneCom.OnClientConnectedToServer value)
+api|type.method|public static special-name System.Void add_ReceivedMessageFromClient(AORebirth.Communication.ZoneCom.OnReceivedMessageFromClient value)
+api|type.method|public static special-name System.Void add_ReceivedMessageFromServer(AORebirth.Communication.ZoneCom.OnReceivedMessageFromServer value)
+api|type.method|public static special-name System.Void remove_ClientConnectedToServer(AORebirth.Communication.ZoneCom.OnClientConnectedToServer value)
+api|type.method|public static special-name System.Void remove_ReceivedMessageFromClient(AORebirth.Communication.ZoneCom.OnReceivedMessageFromClient value)
+api|type.method|public static special-name System.Void remove_ReceivedMessageFromServer(AORebirth.Communication.ZoneCom.OnReceivedMessageFromServer value)
+api|type.end|AORebirth.Communication.ZoneCom
+api|type.begin|AORebirth.Communication.ZoneCom.OnClientConnectedToServer
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.ZoneCom.OnClientConnectedToServer
+api|type.begin|AORebirth.Communication.ZoneCom.OnReceivedMessageFromClient
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnMessageArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnMessageArgs e)
+api|type.end|AORebirth.Communication.ZoneCom.OnReceivedMessageFromClient
+api|type.begin|AORebirth.Communication.ZoneCom.OnReceivedMessageFromServer
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnMessageArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnMessageArgs e)
+api|type.end|AORebirth.Communication.ZoneCom.OnReceivedMessageFromServer
+api|type.begin|AORebirth.Communication.ZoneComClient
+api|type.kind|class
+api|type.modifiers|
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|System.IDisposable
+api|type.constructor|public instance .ctor()
+api|type.event|public instance AORebirth.Communication.ZoneComClient.ConnectHandler OnConnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.ZoneComClient.DisconnectHandler OnDisconnect {add:public;remove:public;raise:none}
+api|type.event|public instance AORebirth.Communication.ZoneComClient.MessageReceivedHandler MessageReceived {add:public;remove:public;raise:none}
+api|type.method|public instance System.Void CloseConnection()
+api|type.method|public instance System.Void ConnectToServer(System.Net.IPAddress address,System.Int32 port)
+api|type.method|public instance System.Void SendData(AORebirth.Communication.OnMessageArgs arg)
+api|type.method|public instance System.Void WaitForRequest()
+api|type.method|public instance special-name System.Void add_MessageReceived(AORebirth.Communication.ZoneComClient.MessageReceivedHandler value)
+api|type.method|public instance special-name System.Void add_OnConnect(AORebirth.Communication.ZoneComClient.ConnectHandler value)
+api|type.method|public instance special-name System.Void add_OnDisconnect(AORebirth.Communication.ZoneComClient.DisconnectHandler value)
+api|type.method|public instance special-name System.Void remove_MessageReceived(AORebirth.Communication.ZoneComClient.MessageReceivedHandler value)
+api|type.method|public instance special-name System.Void remove_OnConnect(AORebirth.Communication.ZoneComClient.ConnectHandler value)
+api|type.method|public instance special-name System.Void remove_OnDisconnect(AORebirth.Communication.ZoneComClient.DisconnectHandler value)
+api|type.method|public instance virtual final System.Void Dispose()
+api|type.end|AORebirth.Communication.ZoneComClient
+api|type.begin|AORebirth.Communication.ZoneComClient.ConnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.ZoneComClient.ConnectHandler
+api|type.begin|AORebirth.Communication.ZoneComClient.DisconnectHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,System.EventArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,System.EventArgs e)
+api|type.end|AORebirth.Communication.ZoneComClient.DisconnectHandler
+api|type.begin|AORebirth.Communication.ZoneComClient.MessageReceivedHandler
+api|type.kind|delegate
+api|type.modifiers|sealed
+api|type.serializable-attribute|true
+api|type.base|System.MulticastDelegate
+api|type.constructor|public instance .ctor(System.Object object,System.IntPtr method)
+api|type.method|public instance virtual System.IAsyncResult BeginInvoke(System.Object sender,AORebirth.Communication.OnMessageArgs e,System.AsyncCallback callback,System.Object object)
+api|type.method|public instance virtual System.Void EndInvoke(System.IAsyncResult result)
+api|type.method|public instance virtual System.Void Invoke(System.Object sender,AORebirth.Communication.OnMessageArgs e)
+api|type.end|AORebirth.Communication.ZoneComClient.MessageReceivedHandler
+api|assembly.end|AORebirth.Communication
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2Client|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7CDispose%7CSystem.Boolean disposing
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|field%7Cprotected%7Cinstance%7CCell.Core.BufferSegment%7C_bufferSegment%7Cinitonly=false%7Cliteral=false
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|field%7Cprotected%7Cinstance%7CSystem.Int32%7C_offset%7Cinitonly=false%7Cliteral=false
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|field%7Cprotected%7Cinstance%7CSystem.Int32%7C_remainingLength%7Cinitonly=false%7Cliteral=false
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|field%7Cprotected%7Cinstance%7CSystem.Net.Sockets.Socket%7C_tcpSock%7Cinitonly=false%7Cliteral=false
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=false%7Cfinal=false%7Cspecial=false%7CSystem.Boolean%7COnReceive%7CCell.Core.BufferSegment buffer
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=false%7Cfinal=false%7Cspecial=false%7CSystem.Void%7CDataReceived%7CSystem.Byte[] dataBytes
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=false%7Cfinal=false%7Cspecial=false%7CSystem.Void%7CEnsureBuffer%7C
+protected.member|AORebirth.Communication.ISComV2Client.ISComV2ClientBase|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7CDispose%7CSystem.Boolean disposing
+protected.member|AORebirth.Communication.ISComV2Server.ISComV2ClientHandler|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Boolean%7COnReceive%7CCell.Core.BufferSegment buffer
+protected.member|AORebirth.Communication.ISComV2Server.ISComV2Server|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CCell.Core.IClient%7CCreateClient%7CSystem.Net.IPAddress address
+protected.member|AORebirth.Communication.ISComV2Server.ISComV2Server|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7COnReceiveUDP%7CSystem.Int32 num_bytes,System.Byte[] buf,System.Net.IPEndPoint ip
+protected.member|AORebirth.Communication.ISComV2Server.ISComV2Server|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7COnSendTo%7CSystem.Net.IPEndPoint clientIP,System.Int32 num_bytes
+protected.member|AORebirth.Communication.ZoneComClient|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7CDispose%7CSystem.Boolean disposing
+reference.mapping|AORebirth.Communication|MemBus|legacy-package=2.0.2.0|linux-shim=2.0.2.0|scope=IBus-identity-and-construction-only|behavior=inert-unobserved-bus
+default.instance|AORebirth.Communication.Messages.ChatCommand|CharacterId=0;ChatCommandString=null
+default.instance|AORebirth.Communication.Messages.CpuRamLoad|CpuLoad=0x00000000;RamLoad=0x00000000
+default.instance|AORebirth.Communication.Messages.DynamicMessage|TypeName=null;DataObject=null
+default.instance|AORebirth.Communication.Messages.MessageBase|{}
+default.instance|AORebirth.Communication.Messages.OnlineCharacter|GMLevel=0;Identity=0;Name=null
+default.instance|AORebirth.Communication.Messages.OnlineCharacters|{}
+default.instance|AORebirth.Communication.OnDataReceivedArgs|dataBytes=null
+default.instance|AORebirth.Communication.OnMessageArgs|Data=null;ID=0;IsProtocolPacket=false;Length=0
+default.instance|AORebirth.Communication.Messages.Ping|dummy=utf8:MA==
+default.instance|AORebirth.Communication.Messages.PrivateSystemMessage|CharacterId=0;CharacterName=null;Text=null;Unk1=0;Unk2=0
+default.instance|AORebirth.Communication.Messages.RequestPlayfieldList|PlayfieldIds=[];ZoneEngineAddress=null
+default.instance|AORebirth.Communication.Messages.SystemChatMessage|CharacterId=0;CharacterName=null;Source=null;Text=null;Unk1=0;Unk2=0
+default.instance|AORebirth.Communication.Messages.VicinityChatMessage|CharacterIds=null;MessageType=0;SenderId=0;Text=null
+default.static|AORebirth.Communication.ZoneCom.ClientReconnect|true
+default.runtime|AORebirth.Communication.ISComV2Server.ISComV2Server|lastClientNumber=0|bus=non-null-MemBus.IBus|running=false|tcp-listener=null|udp-listener=null|client-count=0
+message.fixture|chat-command|AORebirth.Communication.Messages.ChatCommand|length=22|sha256=cb3ff8512110c9a00533a5d8d899c2b2a00cbd040662e4fb10df11a50e111b29|base64=ktISNFZ4r3NheSB8IGhlbGxvDQrOqQ==|semantic=CharacterId=305419896;ChatCommandString=utf8:c2F5IHwgaGVsbG8NCs6p
+dynamic.typed.fixture|chat-command|AORebirth.Communication.Messages.DynamicMessage|length=70|sha256=2a68a2ff315a8cc6595819eb95b3ffff155b5ca1c94ded21c9d34387611628b5|base64=2gAsQU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuQ2hhdENvbW1hbmS2ktISNFZ4r3NheSB8IGhlbGxvDQrOqQ==|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuQ2hhdENvbW1hbmQ=;DataObject=CharacterId=305419896;ChatCommandString=utf8:c2F5IHwgaGVsbG8NCs6p
+dynamic.object.fixture|chat-command|AORebirth.Communication.Messages.DynamicMessage|length=70|sha256=2a68a2ff315a8cc6595819eb95b3ffff155b5ca1c94ded21c9d34387611628b5|base64=2gAsQU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuQ2hhdENvbW1hbmS2ktISNFZ4r3NheSB8IGhlbGxvDQrOqQ==|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuQ2hhdENvbW1hbmQ=;DataObject=CharacterId=305419896;ChatCommandString=utf8:c2F5IHwgaGVsbG8NCs6p
+iscom.frame.fixture|chat-command|ISComV2|length=78|sha256=209880f02a34f5480cbde6174c039f645b0d4a7abee61de6e569feb85cfa515a|base64=qlX/AEYAAADaACxBT1JlYmlydGguQ29tbXVuaWNhdGlvbi5NZXNzYWdlcy5DaGF0Q29tbWFuZLaS0hI0Vnivc2F5IHwgaGVsbG8NCs6p|semantic=magic=0x00ff55aa;payload-length=70;payload-sha256=2a68a2ff315a8cc6595819eb95b3ffff155b5ca1c94ded21c9d34387611628b5
+message.fixture|cpu-ram-load|AORebirth.Communication.Messages.CpuRamLoad|length=11|sha256=50415e1b95a10f96a996c6cadb0bd8b1c0629fefd4abb10dc9889aa2e282eda6|base64=kspBSAAAysBQAAA=|semantic=CpuLoad=0x41480000;RamLoad=0xc0500000
+message.fixture|on-data-received-args|AORebirth.Communication.OnDataReceivedArgs|length=6|sha256=5c9d2fa51b125567a44def0d2823d5a765a88d4e520c2b9ee4d9fdbac2f918fa|base64=kaQAfP8K|semantic=dataBytes=base64:AHz/Cg==
+message.fixture|on-message-args|AORebirth.Communication.OnMessageArgs|length=12|sha256=f5ae6cbbdba17e55a15a904278ca52cec0434ed0c27e9b7875510c0ebdd982ae|base64=lKQQAP58zKXD0RI0|semantic=Data=base64:EAD+fA==;ID=165;IsProtocolPacket=true;Length=4660
+message.fixture|online-character|AORebirth.Communication.Messages.OnlineCharacter|length=21|sha256=cd8d1d5c1200d9aa5178279d4b75b5986ba30ca4810238010d26f0d720bb263e|base64=kwfSB1vNFa1ab8OrfExpbmUKVHdv|semantic=GMLevel=7;Identity=123456789;Name=utf8:Wm/Dq3xMaW5lClR3bw==
+message.fixture|ping|AORebirth.Communication.Messages.Ping|length=10|sha256=40b5397688266e9fcd777500efd47899393288d0e30bf64833866ef624680423|base64=kahwaW5nfM68Cg==|semantic=dummy=utf8:cGluZ3zOvAo=
+dynamic.typed.fixture|ping|AORebirth.Communication.Messages.DynamicMessage|length=51|sha256=a229663428311f777d258ace65b043e20c3d9c2e0806d02aa3f2ed393f10f48e|base64=2gAlQU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUGluZ6qRqHBpbmd8zrwK|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUGluZw==;DataObject=dummy=utf8:cGluZ3zOvAo=
+dynamic.object.fixture|ping|AORebirth.Communication.Messages.DynamicMessage|length=51|sha256=a229663428311f777d258ace65b043e20c3d9c2e0806d02aa3f2ed393f10f48e|base64=2gAlQU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUGluZ6qRqHBpbmd8zrwK|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUGluZw==;DataObject=dummy=utf8:cGluZ3zOvAo=
+iscom.frame.fixture|ping|ISComV2|length=59|sha256=a9d506142a311ae0e9a45e8d83e6af94b6a0d7148bd13da3c1815570d27ae532|base64=qlX/ADMAAADaACVBT1JlYmlydGguQ29tbXVuaWNhdGlvbi5NZXNzYWdlcy5QaW5nqpGocGluZ3zOvAo=|semantic=magic=0x00ff55aa;payload-length=51;payload-sha256=a229663428311f777d258ace65b043e20c3d9c2e0806d02aa3f2ed393f10f48e
+message.fixture|private-system-message|AORebirth.Communication.Messages.PrivateSystemMessage|length=36|sha256=62a0a35324d528d366c70f40421bbfb88336d5eb892c6755cbc0f74ea777bb89|base64=lWWqUHJpdmF0ZSDOqbJwcml2YXRlfHRleHQNCmxpbmXv0QgA|semantic=CharacterId=101;CharacterName=utf8:UHJpdmF0ZSDOqQ==;Text=utf8:cHJpdmF0ZXx0ZXh0DQpsaW5l;Unk1=-17;Unk2=2048
+dynamic.typed.fixture|private-system-message|AORebirth.Communication.Messages.DynamicMessage|length=95|sha256=e6e807666619c63023da0d3db270a3b5bea33c33288e3ee44ee7627b8ce695bb|base64=2gA1QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUHJpdmF0ZVN5c3RlbU1lc3NhZ2XaACSVZapQcml2YXRlIM6psnByaXZhdGV8dGV4dA0KbGluZe/RCAA=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUHJpdmF0ZVN5c3RlbU1lc3NhZ2U=;DataObject=CharacterId=101;CharacterName=utf8:UHJpdmF0ZSDOqQ==;Text=utf8:cHJpdmF0ZXx0ZXh0DQpsaW5l;Unk1=-17;Unk2=2048
+dynamic.object.fixture|private-system-message|AORebirth.Communication.Messages.DynamicMessage|length=95|sha256=e6e807666619c63023da0d3db270a3b5bea33c33288e3ee44ee7627b8ce695bb|base64=2gA1QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUHJpdmF0ZVN5c3RlbU1lc3NhZ2XaACSVZapQcml2YXRlIM6psnByaXZhdGV8dGV4dA0KbGluZe/RCAA=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUHJpdmF0ZVN5c3RlbU1lc3NhZ2U=;DataObject=CharacterId=101;CharacterName=utf8:UHJpdmF0ZSDOqQ==;Text=utf8:cHJpdmF0ZXx0ZXh0DQpsaW5l;Unk1=-17;Unk2=2048
+iscom.frame.fixture|private-system-message|ISComV2|length=103|sha256=cf756f66beae654c0fbd6b5f80ecddc6be65fc0df869a4a4c61be6fd1731e37f|base64=qlX/AF8AAADaADVBT1JlYmlydGguQ29tbXVuaWNhdGlvbi5NZXNzYWdlcy5Qcml2YXRlU3lzdGVtTWVzc2FnZdoAJJVlqlByaXZhdGUgzqmycHJpdmF0ZXx0ZXh0DQpsaW5l79EIAA==|semantic=magic=0x00ff55aa;payload-length=95;payload-sha256=e6e807666619c63023da0d3db270a3b5bea33c33288e3ee44ee7627b8ce695bb
+message.fixture|request-playfield-list|AORebirth.Communication.Messages.RequestPlayfieldList|length=45|sha256=d0affc322a63cc0707add39a5e3a735b2c2ee963c5e9f2f1d3d842f61a5bc04d|base64=kpKSf61DYW5iZUFmZmVjdGVkktISNFZ4pTUwMDAxrjEyNy4wLjAuMTo3NTAw|semantic=PlayfieldIds=[50000:127,50001:305419896];ZoneEngineAddress=utf8:MTI3LjAuMC4xOjc1MDA=
+dynamic.typed.fixture|request-playfield-list|AORebirth.Communication.Messages.DynamicMessage|length=104|sha256=5364a89aac2e45634e19f2d0e839e555cdf94c1f17a69a5ee981641c7a592534|base64=2gA1QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUmVxdWVzdFBsYXlmaWVsZExpc3TaAC2SkpJ/rUNhbmJlQWZmZWN0ZWSS0hI0VnilNTAwMDGuMTI3LjAuMC4xOjc1MDA=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUmVxdWVzdFBsYXlmaWVsZExpc3Q=;DataObject=PlayfieldIds=[50000:127,50001:305419896];ZoneEngineAddress=utf8:MTI3LjAuMC4xOjc1MDA=
+dynamic.object.fixture|request-playfield-list|AORebirth.Communication.Messages.DynamicMessage|length=104|sha256=5364a89aac2e45634e19f2d0e839e555cdf94c1f17a69a5ee981641c7a592534|base64=2gA1QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUmVxdWVzdFBsYXlmaWVsZExpc3TaAC2SkpJ/rUNhbmJlQWZmZWN0ZWSS0hI0VnilNTAwMDGuMTI3LjAuMC4xOjc1MDA=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuUmVxdWVzdFBsYXlmaWVsZExpc3Q=;DataObject=PlayfieldIds=[50000:127,50001:305419896];ZoneEngineAddress=utf8:MTI3LjAuMC4xOjc1MDA=
+iscom.frame.fixture|request-playfield-list|ISComV2|length=112|sha256=4efb1b39ca2a51b6817c96955c1c94f6b6de598aec4eba51646dfeb812f4d0c5|base64=qlX/AGgAAADaADVBT1JlYmlydGguQ29tbXVuaWNhdGlvbi5NZXNzYWdlcy5SZXF1ZXN0UGxheWZpZWxkTGlzdNoALZKSkn+tQ2FuYmVBZmZlY3RlZJLSEjRWeKU1MDAwMa4xMjcuMC4wLjE6NzUwMA==|semantic=magic=0x00ff55aa;payload-length=104;payload-sha256=5364a89aac2e45634e19f2d0e839e555cdf94c1f17a69a5ee981641c7a592534
+message.fixture|system-chat-message|AORebirth.Communication.Messages.SystemChatMessage|length=51|sha256=7952bd74b86592e3b8534574c8c95b306ed3e3946760434bac78e628d9e7878b|base64=ltEAyqlTeXN0ZW0gzqmuU3RhZ2U0fGZpeHR1cmWxc3lzdGVtIHRleHQNCmxpbmXt0RAA|semantic=CharacterId=202;CharacterName=utf8:U3lzdGVtIM6p;Source=utf8:U3RhZ2U0fGZpeHR1cmU=;Text=utf8:c3lzdGVtIHRleHQNCmxpbmU=;Unk1=-19;Unk2=4096
+dynamic.typed.fixture|system-chat-message|AORebirth.Communication.Messages.DynamicMessage|length=107|sha256=99517bf20873f31c613fd785f436c5c4db51119572cc24f5c4a96a33f973985a|base64=2gAyQU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuU3lzdGVtQ2hhdE1lc3NhZ2XaADOW0QDKqVN5c3RlbSDOqa5TdGFnZTR8Zml4dHVyZbFzeXN0ZW0gdGV4dA0KbGluZe3REAA=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuU3lzdGVtQ2hhdE1lc3NhZ2U=;DataObject=CharacterId=202;CharacterName=utf8:U3lzdGVtIM6p;Source=utf8:U3RhZ2U0fGZpeHR1cmU=;Text=utf8:c3lzdGVtIHRleHQNCmxpbmU=;Unk1=-19;Unk2=4096
+dynamic.object.fixture|system-chat-message|AORebirth.Communication.Messages.DynamicMessage|length=107|sha256=99517bf20873f31c613fd785f436c5c4db51119572cc24f5c4a96a33f973985a|base64=2gAyQU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuU3lzdGVtQ2hhdE1lc3NhZ2XaADOW0QDKqVN5c3RlbSDOqa5TdGFnZTR8Zml4dHVyZbFzeXN0ZW0gdGV4dA0KbGluZe3REAA=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuU3lzdGVtQ2hhdE1lc3NhZ2U=;DataObject=CharacterId=202;CharacterName=utf8:U3lzdGVtIM6p;Source=utf8:U3RhZ2U0fGZpeHR1cmU=;Text=utf8:c3lzdGVtIHRleHQNCmxpbmU=;Unk1=-19;Unk2=4096
+iscom.frame.fixture|system-chat-message|ISComV2|length=115|sha256=10471adca82bf95f30cc387e37784b8f23dbcb303f9c5104496f04791d18bb3d|base64=qlX/AGsAAADaADJBT1JlYmlydGguQ29tbXVuaWNhdGlvbi5NZXNzYWdlcy5TeXN0ZW1DaGF0TWVzc2FnZdoAM5bRAMqpU3lzdGVtIM6prlN0YWdlNHxmaXh0dXJlsXN5c3RlbSB0ZXh0DQpsaW5l7dEQAA==|semantic=magic=0x00ff55aa;payload-length=107;payload-sha256=99517bf20873f31c613fd785f436c5c4db51119572cc24f5c4a96a33f973985a
+message.fixture|vicinity-chat-message|AORebirth.Communication.Messages.VicinityChatMessage|length=24|sha256=38c4218cfd9598b6b75db61e7a25cb28a01a00e87d2ac8502190df3fe0fcd717|base64=lJMB/tJ/////Kk2sdmljaW5pdHl8zrsK|semantic=CharacterIds=[1,-2,2147483647];MessageType=42;SenderId=77;Text=utf8:dmljaW5pdHl8zrsK
+dynamic.typed.fixture|vicinity-chat-message|AORebirth.Communication.Messages.DynamicMessage|length=80|sha256=da3bdd1e5c7f5a8b78236158ff7fa4bcba244e6458cd3f6a3ec646dd99e73423|base64=2gA0QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuVmljaW5pdHlDaGF0TWVzc2FnZbiUkwH+0n////8qTax2aWNpbml0eXzOuwo=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuVmljaW5pdHlDaGF0TWVzc2FnZQ==;DataObject=CharacterIds=[1,-2,2147483647];MessageType=42;SenderId=77;Text=utf8:dmljaW5pdHl8zrsK
+dynamic.object.fixture|vicinity-chat-message|AORebirth.Communication.Messages.DynamicMessage|length=80|sha256=da3bdd1e5c7f5a8b78236158ff7fa4bcba244e6458cd3f6a3ec646dd99e73423|base64=2gA0QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuVmljaW5pdHlDaGF0TWVzc2FnZbiUkwH+0n////8qTax2aWNpbml0eXzOuwo=|semantic=TypeName=utf8:QU9SZWJpcnRoLkNvbW11bmljYXRpb24uTWVzc2FnZXMuVmljaW5pdHlDaGF0TWVzc2FnZQ==;DataObject=CharacterIds=[1,-2,2147483647];MessageType=42;SenderId=77;Text=utf8:dmljaW5pdHl8zrsK
+iscom.frame.fixture|vicinity-chat-message|ISComV2|length=88|sha256=a3d754b88b5f0cdd6409e5ffc143d934f5c2b036e1c2b2edaedbfa96c00a65ed|base64=qlX/AFAAAADaADRBT1JlYmlydGguQ29tbXVuaWNhdGlvbi5NZXNzYWdlcy5WaWNpbml0eUNoYXRNZXNzYWdluJSTAf7Sf////ypNrHZpY2luaXR5fM67Cg==|semantic=magic=0x00ff55aa;payload-length=80;payload-sha256=da3bdd1e5c7f5a8b78236158ff7fa4bcba244e6458cd3f6a3ec646dd99e73423
+serialization.coverage|message-fixtures=10|dynamic-fixtures=6|wire-framing=ISComV2-production-send-path-little-endian
+serialization.rejected|AORebirth.Communication.Messages.MessageBase|reason=no-serializable-public-fields-or-properties|message=Cannot serialize type 'AORebirth.Communication.Messages.MessageBase' because it does not have any serializable fields nor properties.
+serialization.rejected|AORebirth.Communication.Messages.OnlineCharacters|reason=no-serializable-public-fields-or-properties|message=Cannot serialize type 'AORebirth.Communication.Messages.OnlineCharacters' because it does not have any serializable fields nor properties.
+type-resolution|exact|requested=AORebirth.Communication.Messages.SystemChatMessage|resolved=AORebirth.Communication.Messages.SystemChatMessage
+type-resolution|short-name|requested=Legacy.Namespace.SystemChatMessage|resolved=AORebirth.Communication.Messages.SystemChatMessage
+type-resolution|error|requested=Legacy.Namespace.NotACommunicationMessage|exception=System.InvalidOperationException|message=ISCom DynamicMessage unknown type: Legacy.Namespace.NotACommunicationMessage
+serializer.culture-stability|cultures=invariant,en-US,tr-TR|fixtures=28|stable=true
+serializer.thread-stability|threads=4|iterations-per-thread=4|fixtures=28|stable=true
+legacy.reference|AORebirth.Communication|Cell.Core|0.5.0.0|neutral|null
+legacy.reference|AORebirth.Communication|MemBus|2.0.2.0|neutral|null
+legacy.reference|AORebirth.Communication|MsgPack|0.4.0.0|neutral|a2625990d5dc0167
+legacy.reference|AORebirth.Communication|SmokeLounge.AOtomation.Messaging|0.62.1.0|neutral|366f6caa557bb5ed
+legacy.reference|AORebirth.Communication|System|4.0.0.0|neutral|b77a5c561934e089
+legacy.reference|AORebirth.Communication|System.Core|4.0.0.0|neutral|b77a5c561934e089
+legacy.reference|AORebirth.Communication|Utility|1.0.0.0|neutral|null
+legacy.reference|AORebirth.Communication|mscorlib|4.0.0.0|neutral|b77a5c561934e089

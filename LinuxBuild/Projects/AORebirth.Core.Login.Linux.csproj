@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>AORebirth.Core</AssemblyName>
+    <RootNamespace>AORebirth.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishAot>false</PublishAot>
+    <IsTrimmable>false</IsTrimmable>
+    <NoWarn>$(NoWarn);SYSLIB0023;SYSLIB0060</NoWarn>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MemBus" Version="4.0.1" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Database.Linux.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <ProjectReference Include="Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/SolutionAssemblyInfo.cs">
+      <Link>Properties/SolutionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/IBus.cs">
+      <Link>Components/IBus.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/IContainer.cs">
+      <Link>Components/IContainer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/IHandle.cs">
+      <Link>Components/IHandle.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/IHandleMessage.cs">
+      <Link>Components/IHandleMessage.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/IMessagePublisher.cs">
+      <Link>Components/IMessagePublisher.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/IMessageSerializer.cs">
+      <Link>Components/IMessageSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/MefContainer.cs">
+      <Link>Components/MefContainer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/MessagePublisher.cs">
+      <Link>Components/MessagePublisher.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/MessageSerializer.cs">
+      <Link>Components/MessageSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/MemBusAdapter.cs">
+      <Link>Components/MemBusAdapter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/MemBusIoCAdapter.cs">
+      <Link>Components/MemBusIoCAdapter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Encryption/BigInteger.cs">
+      <Link>Encryption/BigInteger.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Encryption/LoginEncryption.cs">
+      <Link>Encryption/LoginEncryption.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Encryption/PasswordHash.cs">
+      <Link>Encryption/PasswordHash.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/EventHandlers/Events/MessageReceivedEvent.cs">
+      <Link>EventHandlers/Events/MessageReceivedEvent.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/EventHandlers/Handlers/MessageReceivedHandler.cs">
+      <Link>EventHandlers/Handlers/MessageReceivedHandler.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Properties/AssemblyInfo.cs">
+      <Link>Properties/AssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

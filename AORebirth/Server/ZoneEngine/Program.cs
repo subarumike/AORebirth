@@ -34,6 +34,8 @@ namespace ZoneEngine
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
+    using System.Data;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -50,8 +52,10 @@ namespace ZoneEngine
 
     using locales;
 
+#if !AOREBIRTH_LINUX
     using NBug;
     using NBug.Properties;
+#endif
 
     using NLog;
 
@@ -157,22 +161,43 @@ namespace ZoneEngine
             return false;
         }
 
+        private static bool HasEitherArgument(string[] args, string firstArgument, string secondArgument)
+        {
+            return HasArgument(args, firstArgument) || HasArgument(args, secondArgument);
+        }
+
+        private static string GetEitherArgumentValue(string[] args, string firstArgument, string secondArgument)
+        {
+            string value = GetArgumentValue(args, firstArgument);
+            return string.IsNullOrWhiteSpace(value) ? GetArgumentValue(args, secondArgument) : value;
+        }
+
+        private static void CreateParentDirectoryIfNeeded(string path)
+        {
+            string fullPath = Path.GetFullPath(path);
+            string directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
         private static void ConfigureHeadlessConsoleLogging(string[] args)
         {
-            string stdoutLog = GetArgumentValue(args, "/stdout-log");
+            string stdoutLog = GetEitherArgumentValue(args, "/stdout-log", "--stdout-log");
             if (!string.IsNullOrWhiteSpace(stdoutLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stdoutLog));
+                CreateParentDirectoryIfNeeded(stdoutLog);
                 headlessOutputWriter = new StreamWriter(
                     new FileStream(stdoutLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessOutputWriter.AutoFlush = true;
                 Console.SetOut(headlessOutputWriter);
             }
 
-            string stderrLog = GetArgumentValue(args, "/stderr-log");
+            string stderrLog = GetEitherArgumentValue(args, "/stderr-log", "--stderr-log");
             if (!string.IsNullOrWhiteSpace(stderrLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stderrLog));
+                CreateParentDirectoryIfNeeded(stderrLog);
                 headlessErrorWriter = new StreamWriter(
                     new FileStream(stderrLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessErrorWriter.AutoFlush = true;
@@ -195,7 +220,7 @@ namespace ZoneEngine
 
         private static void StartShutdownFileWatcher(string[] args)
         {
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             if (string.IsNullOrWhiteSpace(shutdownFile))
             {
                 return;
@@ -227,7 +252,7 @@ namespace ZoneEngine
             Console.WriteLine("Starting ZoneEngine in headless mode.");
             StartTheServer();
 
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             while (!exited)
             {
                 if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
@@ -543,11 +568,13 @@ namespace ZoneEngine
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
 
+#if !AOREBIRTH_LINUX
                 // NBug initialization
                 SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.config");
                 Settings.WriteLogToDisk = true;
                 AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
                 TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+#endif
             }
             catch (Exception e)
             {
@@ -738,6 +765,490 @@ namespace ZoneEngine
             return true;
         }
 
+        #if AOREBIRTH_LINUX
+        private static string GetConfiguredConfigPath()
+        {
+            string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
+            return string.IsNullOrWhiteSpace(configuredPath) ? "Config.xml" : configuredPath;
+        }
+
+        private static Utility.Config.Config LoadStrictConfiguration()
+        {
+            string fullPath = Path.GetFullPath(GetConfiguredConfigPath());
+            string directory = Path.GetDirectoryName(fullPath);
+            string fileName = Path.GetFileName(fullPath);
+
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+            {
+                throw new DirectoryNotFoundException("Configuration directory does not exist.");
+            }
+
+            bool exactCaseMatch = false;
+            foreach (string candidate in Directory.EnumerateFiles(directory))
+            {
+                if (string.Equals(Path.GetFileName(candidate), fileName, StringComparison.Ordinal))
+                {
+                    exactCaseMatch = true;
+                    break;
+                }
+            }
+
+            if (!exactCaseMatch)
+            {
+                throw new FileNotFoundException("Exact-case configuration file was not found: " + fileName);
+            }
+
+            Utility.Config.Config configuration = ConfigReadWrite.Instance.CurrentConfig;
+            if (configuration == null)
+            {
+                throw new InvalidDataException("Config.xml did not contain a Config document.");
+            }
+
+            ValidateConfigurationValues(configuration);
+            return configuration;
+        }
+
+        private static void ValidateConfigurationValues(Utility.Config.Config configuration)
+        {
+            IPAddress configuredAddress;
+            if (string.IsNullOrWhiteSpace(configuration.ListenIP)
+                || !IPAddress.TryParse(configuration.ListenIP, out configuredAddress))
+            {
+                throw new InvalidDataException("ListenIP must be a valid IP address.");
+            }
+
+            GetZoneListenAddress(configuration);
+            GetChatEngineAddress(configuration);
+
+            if (configuration.ZonePort < 1 || configuration.ZonePort > 65535)
+            {
+                throw new InvalidDataException("ZonePort must be between 1 and 65535.");
+            }
+
+            if (configuration.CommPort < 1 || configuration.CommPort > 65535)
+            {
+                throw new InvalidDataException("CommPort must be between 1 and 65535.");
+            }
+
+            if (configuration.ZonePort == configuration.CommPort)
+            {
+                throw new InvalidDataException("ZonePort and CommPort must be distinct.");
+            }
+
+            if (string.IsNullOrWhiteSpace(configuration.Locale))
+            {
+                throw new InvalidDataException("Locale must be configured.");
+            }
+
+            if (!string.Equals(configuration.SQLType, "MySql", StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment milestone supports only the MySql provider.");
+            }
+
+            string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
+            if (!string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "AO_REBIRTH_REQUIRED_SQL_TYPE must be MySql for the Linux deployment profile.");
+            }
+
+            string connectionString = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidDataException(
+                    "AO_REBIRTH_MYSQL_CONNECTION is required by the Linux MySQL deployment profile.");
+            }
+
+            if (connectionString.IndexOf("REPLACE_WITH_", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                throw new InvalidDataException("The selected database connection string is not configured.");
+            }
+
+            configuration.MysqlConnection = connectionString;
+            ValidateProviderConnection(configuration.SQLType, connectionString);
+        }
+
+        private static void ValidateProviderConnection(string sqlType, string connectionString)
+        {
+            try
+            {
+                IDbConnection connection;
+                if (sqlType == "MySql")
+                {
+                    connection = new MySQLConnector(connectionString).GetConnection();
+                }
+                else if (sqlType == "MsSql")
+                {
+                    connection = new MSSqlConnector(connectionString).GetConnection();
+                }
+                else
+                {
+                    connection = new NpgsqlConnector(connectionString).GetConnection();
+                }
+
+                using (connection)
+                {
+                    if (connection.State != ConnectionState.Closed)
+                    {
+                        throw new InvalidOperationException(
+                            "Startup validation must not open a database connection.");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDataException("The selected database connection string syntax is invalid.", e);
+            }
+        }
+
+        private static IPAddress GetZoneListenAddress(Utility.Config.Config configuration)
+        {
+            string listenIP = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_LISTEN_IP");
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = "127.0.0.1";
+            }
+
+            IPAddress address;
+            if (!IPAddress.TryParse(listenIP, out address))
+            {
+                throw new InvalidDataException("The Zone listen address is invalid.");
+            }
+
+            if (!IPAddress.IsLoopback(address))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment requires a loopback-only Zone listen address.");
+            }
+
+            return address;
+        }
+
+        private static IPAddress GetChatEngineAddress(Utility.Config.Config configuration)
+        {
+            string chatIP = Environment.GetEnvironmentVariable("AO_REBIRTH_CHAT_LISTEN_IP");
+            if (string.IsNullOrWhiteSpace(chatIP))
+            {
+                chatIP = configuration.ChatIP;
+            }
+
+            IPAddress address;
+            if (!IPAddress.TryParse(chatIP, out address))
+            {
+                throw new InvalidDataException("The ChatEngine address is invalid.");
+            }
+
+            if (!IPAddress.IsLoopback(address))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment requires a loopback-only ChatEngine address.");
+            }
+
+            return address;
+        }
+
+        private static void ValidateRequiredRuntimeAssets()
+        {
+            string[] relativePaths =
+                {
+                    "Config.xml",
+                    "items.dat",
+                    "nanos.dat",
+                    "playfields.dat",
+                    "XML Data/Stats.xml",
+                    "XML Data/Playfields.xml",
+                    "Scripts/KnuBotFlappy.cs",
+                    "Scripts/InfoBot.cs",
+                    "Scripts/KnuBotItemGiver.cs",
+                    "Scripts/PerkResetService.cs",
+                    "Content/Captured/Arete/cleaning_robot_patrol_replay.csv",
+                    "Content/Captured/Subway/pf127-geometry.json",
+                    "Content/Official/TempleOfThreeWinds/pf1931-dungeon-geometry.json"
+                };
+
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            foreach (string relativePath in relativePaths)
+            {
+                string fullPath = Path.Combine(baseDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
+                if (!File.Exists(fullPath))
+                {
+                    throw new FileNotFoundException("Required ZoneEngine runtime asset is missing: " + relativePath);
+                }
+            }
+        }
+
+        private static int ValidateStartup()
+        {
+            ZoneServer validationZoneServer = null;
+
+            try
+            {
+                Utility.Config.Config configuration = LoadStrictConfiguration();
+                ValidateRequiredRuntimeAssets();
+
+                validationZoneServer = new ZoneServer();
+                validationZoneServer.TcpEndPoint = new IPEndPoint(
+                    GetZoneListenAddress(configuration),
+                    configuration.ZonePort);
+                validationZoneServer.MaximumPendingConnections = 100;
+
+                if (validationZoneServer.IsRunning
+                    || validationZoneServer.TCPEnabled
+                    || validationZoneServer.UDPEnabled
+                    || validationZoneServer.Clients.Count != 0)
+                {
+                    throw new InvalidOperationException("Offline ZoneEngine topology validation failed.");
+                }
+
+                LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogManager.GetCurrentClassLogger().Debug("ZoneEngine startup logging validation.");
+                LogManager.Flush();
+
+                Console.WriteLine(
+                    "ZONEENGINE_VALIDATION_OK mode=startup provider="
+                    + configuration.SQLType
+                    + " listeners=0 assets=ok");
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("ZONEENGINE_VALIDATION_FAILED mode=startup error=" + e.Message);
+                return 1;
+            }
+            finally
+            {
+                if (validationZoneServer != null)
+                {
+                    validationZoneServer.Dispose();
+                }
+
+                LogManager.Shutdown();
+            }
+        }
+
+        private static int ValidateDatabase()
+        {
+            string[] requiredTables =
+                {
+                    "characterstimers",
+                    "characters",
+                    "charactersactivenanos",
+                    "charactersmeshs",
+                    "charactersuploadednanos",
+                    "charactersperks",
+                    "instanceditems",
+                    "itemnames",
+                    "items",
+                    "login",
+                    "missionaccountflags",
+                    "missionflags",
+                    "missionobjectiveobservations",
+                    "missionobjectiveprogress",
+                    "missionrewardledger",
+                    "missionstates",
+                    "mobdroptable",
+                    "mobspawns",
+                    "mobspawnsactivenanos",
+                    "mobspawnsinventory",
+                    "mobspawnsmeshs",
+                    "mobspawnsuploadednanos",
+                    "mobspawns_stats",
+                    "mobtemplate",
+                    "organizations",
+                    "proxydestinations",
+                    "receivedmessages",
+                    "shopinventorytemplates",
+                    "staticdynels",
+                    "stats",
+                    "teleports",
+                    "tradeskill",
+                    "vendors",
+                    "vendortemplate"
+                };
+
+            try
+            {
+                Utility.Config.Config configuration = LoadStrictConfiguration();
+                if (!string.Equals(configuration.SQLType, "MySql", StringComparison.Ordinal))
+                {
+                    throw new InvalidDataException("The Linux database readiness gate requires MySql.");
+                }
+
+                string expectedDatabase = Environment.GetEnvironmentVariable("AO_REBIRTH_EXPECTED_DATABASE");
+                if (string.IsNullOrWhiteSpace(expectedDatabase))
+                {
+                    throw new InvalidDataException(
+                        "AO_REBIRTH_EXPECTED_DATABASE is required by the Linux deployment profile.");
+                }
+
+                using (IDbConnection connection = Connector.GetConnection())
+                {
+                    if (connection.State != ConnectionState.Open)
+                    {
+                        throw new InvalidOperationException("The database connection did not open.");
+                    }
+
+                    string activeDatabase;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT DATABASE()";
+                        activeDatabase = Convert.ToString(command.ExecuteScalar());
+                    }
+
+                    if (!string.Equals(activeDatabase, expectedDatabase, StringComparison.Ordinal))
+                    {
+                        throw new InvalidDataException(
+                            "The connected database does not match AO_REBIRTH_EXPECTED_DATABASE.");
+                    }
+
+                    var actualTables = new HashSet<string>(StringComparer.Ordinal);
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT table_name FROM information_schema.tables "
+                            + "WHERE table_schema=DATABASE() AND table_type='BASE TABLE'";
+                        using (IDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                actualTables.Add(Convert.ToString(reader.GetValue(0)));
+                            }
+                        }
+                    }
+
+                    if (actualTables.Count != requiredTables.Length)
+                    {
+                        throw new InvalidDataException("Unexpected database table count: " + actualTables.Count);
+                    }
+
+                    foreach (string tableName in requiredTables)
+                    {
+                        if (!actualTables.Contains(tableName))
+                        {
+                            throw new InvalidDataException("Required database table is missing: " + tableName);
+                        }
+
+                        using (IDbCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = "SELECT 1 FROM `" + tableName + "` LIMIT 0";
+                            using (IDataReader reader = command.ExecuteReader())
+                            {
+                            }
+                        }
+                    }
+
+                    long onlineColumnCount;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM information_schema.columns "
+                            + "WHERE table_schema=DATABASE() AND table_name='characters' "
+                            + "AND column_name='Online'";
+                        onlineColumnCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    if (onlineColumnCount != 1)
+                    {
+                        throw new InvalidDataException("characters.Online schema contract mismatch.");
+                    }
+
+                    long onlineCharacterCount;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM characters WHERE Online IS NOT NULL AND Online <> 0";
+                        onlineCharacterCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    if (onlineCharacterCount != 0)
+                    {
+                        throw new InvalidDataException(
+                            "ZoneEngine database readiness requires zero online characters.");
+                    }
+
+                    Console.WriteLine(
+                        "ZONEENGINE_DATABASE_OK provider=MySql database="
+                        + activeDatabase
+                        + " requiredTables="
+                        + requiredTables.Length
+                        + " visibleTables="
+                        + actualTables.Count
+                        + " onlineCharacters=0 listeners=0");
+                }
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("ZONEENGINE_DATABASE_FAILED error=" + e.Message);
+                return 1;
+            }
+        }
+
+        private static int ValidateLifecycle(string[] args)
+        {
+            bool headlessLoggingConfigured = false;
+            try
+            {
+                exited = false;
+                ConfigureHeadlessConsoleLogging(args);
+                headlessLoggingConfigured = true;
+                LoadStrictConfiguration();
+                ValidateRequiredRuntimeAssets();
+
+                string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
+                if (string.IsNullOrWhiteSpace(shutdownFile))
+                {
+                    throw new InvalidDataException("Lifecycle validation requires --shutdown-file.");
+                }
+
+                Console.WriteLine("ZONEENGINE_LIFECYCLE_READY listeners=0 database=closed");
+
+                DateTime deadline = DateTime.UtcNow.AddSeconds(30);
+                while (!exited)
+                {
+                    if (File.Exists(shutdownFile))
+                    {
+                        try
+                        {
+                            File.Delete(shutdownFile);
+                        }
+                        catch (IOException)
+                        {
+                        }
+
+                        exited = true;
+                        break;
+                    }
+
+                    if (DateTime.UtcNow > deadline)
+                    {
+                        throw new TimeoutException("Lifecycle validation timed out waiting for shutdown file.");
+                    }
+
+                    Thread.Sleep(100);
+                }
+
+                Console.WriteLine("ZONEENGINE_LIFECYCLE_STOPPED status=clean");
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("ZONEENGINE_LIFECYCLE_FAILED error=" + e.Message);
+                return 1;
+            }
+            finally
+            {
+                LogManager.Shutdown();
+                if (headlessLoggingConfigured)
+                {
+                    FlushHeadlessConsoleLogging();
+                }
+            }
+        }
+        #endif
+
         /// <summary>
         /// Entry point
         /// </summary>
@@ -746,7 +1257,36 @@ namespace ZoneEngine
         /// </param>
         private static void Main(string[] args)
         {
-            bool headless = HasArgument(args, "/headless");
+            #if AOREBIRTH_LINUX
+            if (HasEitherArgument(args, "/validate-startup", "--validate-startup"))
+            {
+                Environment.ExitCode = ValidateStartup();
+                return;
+            }
+
+            if (HasEitherArgument(args, "/validate-database", "--validate-database"))
+            {
+                Environment.ExitCode = ValidateDatabase();
+                return;
+            }
+
+            if (HasEitherArgument(args, "/validate-lifecycle", "--validate-lifecycle"))
+            {
+                Environment.ExitCode = ValidateLifecycle(args);
+                return;
+            }
+            #endif
+
+            bool headless = HasEitherArgument(args, "/headless", "--headless");
+            #if AOREBIRTH_LINUX
+            if (!headless)
+            {
+                Console.Error.WriteLine("ZoneEngine Linux service mode requires --headless.");
+                Environment.ExitCode = 2;
+                return;
+            }
+            #endif
+
             if (headless)
             {
                 ConfigureHeadlessConsoleLogging(args);

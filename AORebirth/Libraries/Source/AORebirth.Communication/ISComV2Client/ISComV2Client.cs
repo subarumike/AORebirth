@@ -87,10 +87,19 @@ namespace AORebirth.Communication.ISComV2Client
 
         #region Delegates
 
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnConnectHandler(object sender, EventArgs e);
 
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnReceiveDataHandler(object sender, DynamicMessage e);
 
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void ReallyDisconnectedHandler(object sender, EventArgs e);
 
         #endregion

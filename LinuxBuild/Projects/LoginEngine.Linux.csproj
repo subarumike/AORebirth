@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>LoginEngine</AssemblyName>
+    <RootNamespace>LoginEngine</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishAot>false</PublishAot>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <UseAppHost>true</UseAppHost>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="6.1.4" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Core.Login.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Database.Linux.csproj" />
+    <ProjectReference Include="Cell.Core.Linux.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <ProjectReference Include="Translations.Linux.csproj" />
+    <ProjectReference Include="Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Config/Config.xml">
+      <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/LinuxBuild/Compatibility/LoginEngine/LinuxProgram.cs">
+      <Link>LinuxProgram.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <Import Project="../source-inventory/LoginEngine.CompileItems.props" />
+</Project>

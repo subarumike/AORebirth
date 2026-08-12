@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>AORebirth.Core</AssemblyName>
+    <RootNamespace>AORebirth.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishAot>false</PublishAot>
+    <IsTrimmable>false</IsTrimmable>
+    <NoWarn>$(NoWarn);SYSLIB0023;SYSLIB0060</NoWarn>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="MemBus" Version="4.0.1" />
+    <PackageReference Include="NLog" Version="6.1.4" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Database.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Enums.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Exceptions.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Interfaces.Linux.csproj" />
+    <ProjectReference Include="AORebirth.ObjectManager.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Stats.Linux.csproj" />
+    <ProjectReference Include="Cell.Core.Linux.csproj" />
+    <ProjectReference Include="Cell.Util.Linux.csproj" />
+    <ProjectReference Include="MsgPack.Mono.Linux.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <ProjectReference Include="Translations.Linux.csproj" />
+    <ProjectReference Include="Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <Import Project="../source-inventory/AORebirth.Core.CompileItems.props" />
+</Project>

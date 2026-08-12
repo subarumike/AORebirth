@@ -93,30 +93,10 @@ namespace AORebirth.Database.Dao
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
-                    // TODO : move these two to their own DAOs
-
-                    // remove this character from organisations
-
-                    DBOrganization org = OrganizationDao.Instance.GetWhere(new { LeaderId = id }, conn, trans).FirstOrDefault();
-                    if (org != null)
-                    {
-                        // What to do if the leader deletes himself?
-                        // Lets remove the org for now, later on should it switch to secondhighest char in org?
-                        OrganizationDao.Instance.Delete(org.Id, conn, trans);
-
-                        // Remove the org's Stat from the other characters in the org too
-                        StatDao.Instance.Delete(new { StatValue = org.Id, StatId = (int)StatIds.clan }, conn, trans);
-                    }
-
-                    // empty this characters inventory (items and instanced items)
-                    ItemDao.Instance.Delete(new { ContainerInstance = id }, conn, trans);
-                    InstancedItemDao.Instance.Delete(new { ContainerInstance = id }, conn, trans);
+                    this.DeleteOwnedData(id, conn, trans);
 
                     // deletes this character
                     base.Delete(id, conn, trans);
-
-                    // delete characters stats
-                    StatDao.Instance.Delete(new { type = 50000, Id = id }, conn, trans);
                     if (ownsTransaction)
                     {
                         trans.Commit();
@@ -155,6 +135,144 @@ namespace AORebirth.Database.Dao
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Deletes a character only when it belongs to the authenticated account.
+        /// </summary>
+        /// <param name="accountName">
+        /// </param>
+        /// <param name="id">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool DeleteForUser(string accountName, int id)
+        {
+            if (string.IsNullOrWhiteSpace(accountName) || id < 1)
+            {
+                return false;
+            }
+
+            using (IDbConnection connection = Connector.GetConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    DBCharacter character = this.GetWhere(
+                        new { Id = id, Username = accountName },
+                        connection,
+                        transaction).FirstOrDefault();
+                    if (character == null)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+
+                    this.DeleteOwnedData(id, connection, transaction);
+                    int deleted = connection.Execute(
+                        "DELETE FROM characters WHERE Id=@Id AND Username=@Username",
+                        new { Id = id, Username = accountName },
+                        transaction);
+                    if (deleted != 1)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+
+                    transaction.Commit();
+                    return true;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="id">
+        /// </param>
+        /// <param name="connection">
+        /// </param>
+        /// <param name="transaction">
+        /// </param>
+        private void DeleteOwnedData(int id, IDbConnection connection, IDbTransaction transaction)
+        {
+            // TODO : move these two to their own DAOs
+
+            // remove this character from organisations
+            DBOrganization org = OrganizationDao.Instance.GetWhere(
+                new { LeaderId = id },
+                connection,
+                transaction).FirstOrDefault();
+            if (org != null)
+            {
+                // What to do if the leader deletes himself?
+                // Lets remove the org for now, later on should it switch to secondhighest char in org?
+                OrganizationDao.Instance.Delete(org.Id, connection, transaction);
+
+                // Remove the org's Stat from the other characters in the org too
+                StatDao.Instance.Delete(
+                    new { StatValue = org.Id, StatId = (int)StatIds.clan },
+                    connection,
+                    transaction);
+            }
+
+            // empty this characters inventory (items and instanced items)
+            ItemDao.Instance.Delete(new { ContainerType = id }, connection, transaction);
+            InstancedItemDao.Instance.Delete(new { ContainerType = id }, connection, transaction);
+
+            // delete received-message history owned by this character
+            ReceivedMessagesDao.Instance.Delete(new { PlayerId = id }, connection, transaction);
+
+            // delete characters stats
+            StatDao.Instance.Delete(new { Type = 50000, Instance = id }, connection, transaction);
+
+            // delete character-owned mission state
+            connection.Execute(
+                "DELETE FROM missionflags WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM missionstates WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM missionobjectiveprogress WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM missionobjectiveobservations WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM missionrewardledger WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+
+            // delete other character-owned runtime state
+            connection.Execute(
+                "DELETE FROM characterstimers WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM charactersactivenanos WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM charactersmeshs WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM charactersuploadednanos WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "DELETE FROM charactersperks WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
         }
 
         /// <summary>

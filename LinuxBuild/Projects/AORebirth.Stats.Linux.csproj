@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AORebirth.Stats</AssemblyName>
+    <RootNamespace>AORebirth.Stats</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Database.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Enums.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Interfaces.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Exceptions.Linux.csproj" />
+    <ProjectReference Include="Utility.Linux.csproj" />
+  </ItemGroup>
+
+  <Import Project="../source-inventory/AORebirth.Stats.CompileItems.props" />
+</Project>
