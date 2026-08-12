@@ -236,6 +236,9 @@ migrations; details and exact source references are recorded in
   drift: `AO_REBIRTH_BIND_MODE` defaults to `Loopback` (`127.0.0.1`), accepts
   only explicit `Loopback` or `Public`, fails closed on empty or invalid values,
   and binds public production listeners only when set to `Public` (`0.0.0.0`).
+  LoginEngine additionally requires a loopback `ZoneIP` in `Loopback` mode and
+  a concrete non-loopback `ZoneIP` in `Public` mode so client handoff cannot
+  advertise an unusable bind wildcard or private loopback address.
   ChatEngine public and private ISCom bind rules remain separate; MySQL and
   ISCom are not made public by the listener policy.
 - Three obsolete detached worktrees, the unowned Cursor export, 1,877 tracked

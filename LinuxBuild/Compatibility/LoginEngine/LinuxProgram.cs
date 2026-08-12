@@ -620,7 +620,7 @@ namespace LoginEngine
                 throw new InvalidDataException("ListenIP must be a valid IP address.");
             }
 
-            GetLoginBindPolicy();
+            EngineBindPolicy bindPolicy = GetLoginBindPolicy();
 
             if (configuration.LoginPort < 1 || configuration.LoginPort > 65535)
             {
@@ -629,11 +629,24 @@ namespace LoginEngine
 
             IPAddress zoneAddress;
             if (string.IsNullOrWhiteSpace(configuration.ZoneIP)
-                || !IPAddress.TryParse(configuration.ZoneIP, out zoneAddress)
-                || !IPAddress.IsLoopback(zoneAddress))
+                || !IPAddress.TryParse(configuration.ZoneIP, out zoneAddress))
+            {
+                throw new InvalidDataException("ZoneIP must be a valid IP address.");
+            }
+
+            if (bindPolicy.Mode == EngineBindMode.Loopback && !IPAddress.IsLoopback(zoneAddress))
             {
                 throw new InvalidDataException(
-                    "ZoneIP must remain a loopback IP address for the Stage 7 deployment profile.");
+                    "ZoneIP must remain a loopback IP address when AO_REBIRTH_BIND_MODE=Loopback.");
+            }
+
+            if (bindPolicy.Mode == EngineBindMode.Public
+                && (IPAddress.IsLoopback(zoneAddress)
+                    || IPAddress.Any.Equals(zoneAddress)
+                    || IPAddress.IPv6Any.Equals(zoneAddress)))
+            {
+                throw new InvalidDataException(
+                    "ZoneIP must be a concrete non-loopback IP address when AO_REBIRTH_BIND_MODE=Public.");
             }
 
             if (configuration.ZonePort < 1 || configuration.ZonePort > 65535)

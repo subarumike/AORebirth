@@ -145,19 +145,43 @@ internal static class Program
 
         var publicEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
         {
+            ["AO_REBIRTH_BIND_MODE"] = "Public",
+            ["AO_REBIRTH_CONFIG_PATH"] = CreateConfigWithZoneIp(config, "203.0.113.10")
+        };
+        try
+        {
+            ProcessResult publicStartup = RunDotNet(
+                publish,
+                loginEngine,
+                new[] { "--validate-startup" },
+                publicEnvironment);
+            Assert(
+                publicStartup.ExitCode == 0
+                && publicStartup.StandardOutput.IndexOf(
+                    "bindPolicy=Public address=0.0.0.0",
+                    StringComparison.Ordinal) >= 0,
+                "Published LoginEngine startup validation rejected explicit Public mode.");
+        }
+        finally
+        {
+            DeleteIfExists(publicEnvironment["AO_REBIRTH_CONFIG_PATH"]);
+        }
+
+        var publicLoopbackZoneEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        {
             ["AO_REBIRTH_BIND_MODE"] = "Public"
         };
-        ProcessResult publicStartup = RunDotNet(
+        ProcessResult publicLoopbackZone = RunDotNet(
             publish,
             loginEngine,
             new[] { "--validate-startup" },
-            publicEnvironment);
+            publicLoopbackZoneEnvironment);
         Assert(
-            publicStartup.ExitCode == 0
-            && publicStartup.StandardOutput.IndexOf(
-                "bindPolicy=Public address=0.0.0.0",
+            publicLoopbackZone.ExitCode != 0
+            && publicLoopbackZone.StandardError.IndexOf(
+                "ZoneIP must be a concrete non-loopback IP address when AO_REBIRTH_BIND_MODE=Public",
                 StringComparison.Ordinal) >= 0,
-            "Published LoginEngine startup validation rejected explicit Public mode.");
+            "Published LoginEngine startup validation accepted a loopback ZoneIP in Public mode.");
 
         var invalidBindModeEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
         {
@@ -253,6 +277,25 @@ internal static class Program
                 standardOutput.GetAwaiter().GetResult(),
                 standardError.GetAwaiter().GetResult());
         }
+    }
+
+    private static string CreateConfigWithZoneIp(string sourceConfig, string zoneIp)
+    {
+        string configText = File.ReadAllText(sourceConfig);
+        string updatedConfig = configText.Replace("<ZoneIP>127.0.0.1</ZoneIP>", "<ZoneIP>" + zoneIp + "</ZoneIP>");
+        if (string.Equals(configText, updatedConfig, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Could not create public-mode LoginEngine config fixture.");
+        }
+
+        string path = Path.Combine(Path.GetTempPath(), "aorebirth-stage7-login-public-" + Guid.NewGuid().ToString("N") + ".xml");
+        File.WriteAllText(path, updatedConfig);
+        return path;
+    }
+
+    private static void DeleteIfExists(string path)
+    {
+        if (File.Exists(path)) File.Delete(path);
     }
 
     private static IEnumerable<string> QuoteAll(IEnumerable<string> values)
