@@ -4,6 +4,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,6 +18,80 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     {
         private const string FirstQuest = "Mission:FOUNDATION-A";
         private const string SecondQuest = "Mission:FOUNDATION-B";
+
+        [TestMethod]
+        public void MissionStateDirectoryUsesConfiguredWritableStateDirectory()
+        {
+            string previous = Environment.GetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR");
+            string previousZone = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR");
+            string configured = Path.Combine(
+                Path.GetTempPath(),
+                "aorebirth-mission-state",
+                Guid.NewGuid().ToString("N"));
+
+            try
+            {
+                Environment.SetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR", configured);
+                Environment.SetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR", null);
+
+                Assert.AreEqual(
+                    Path.GetFullPath(configured),
+                    MissionStateDirectory.Resolve());
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR", previous);
+                Environment.SetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR", previousZone);
+            }
+        }
+
+        [TestMethod]
+        public void MissionStateDirectoryUsesExistingZoneStateDirectoryConfiguration()
+        {
+            string previous = Environment.GetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR");
+            string previousZone = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR");
+            string configured = Path.Combine(
+                Path.GetTempPath(),
+                "aorebirth-zone-state",
+                Guid.NewGuid().ToString("N"));
+
+            try
+            {
+                Environment.SetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR", null);
+                Environment.SetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR", configured);
+
+                Assert.AreEqual(
+                    Path.GetFullPath(configured),
+                    MissionStateDirectory.Resolve());
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR", previous);
+                Environment.SetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR", previousZone);
+            }
+        }
+
+        [TestMethod]
+        public void MissionStateDirectoryFallsBackToReleaseBaseMissionStateDirectory()
+        {
+            string previous = Environment.GetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR");
+            string previousZone = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR");
+
+            try
+            {
+                Environment.SetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR", null);
+                Environment.SetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR", null);
+
+                Assert.AreEqual(
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? ".", "mission-state"),
+                    MissionStateDirectory.Resolve());
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("AO_REBIRTH_MISSION_STATE_DIR", previous);
+                Environment.SetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR", previousZone);
+            }
+        }
 
         [TestMethod]
         public void SameQuestProgressIsIsolatedByStableCharacterIdentity()

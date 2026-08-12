@@ -1212,7 +1212,7 @@ namespace ZoneEngine.Core.Missions
 
         private static string SidecarDirectory()
         {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? ".", "mission-state");
+            return MissionStateDirectory.Resolve();
         }
 
         private static string SidecarPath(int characterInstance)

@@ -2857,10 +2857,7 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
-            Initialize(
-                Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory ?? ".",
-                    "mission-state"));
+            Initialize(MissionStateDirectory.Resolve());
         }
 
         private sealed class OwnerLedger

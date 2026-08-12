@@ -334,6 +334,7 @@
     <Compile Include="Core\Missions\MissionRollService.cs" />
     <Compile Include="Core\Missions\MissionRollFeeRules.cs" />
     <Compile Include="Core\Missions\MissionRollFeeService.cs" />
+    <Compile Include="Core\Missions\MissionStateDirectory.cs" />
     <Compile Include="Core\Missions\MissionOfferStore.cs" />
     <Compile Include="Core\Missions\MissionOfferIdentityStore.cs" />
     <Compile Include="Core\Missions\MissionLevelGraph.cs" />

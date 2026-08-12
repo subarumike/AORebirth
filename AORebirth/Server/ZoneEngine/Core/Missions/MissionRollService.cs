@@ -880,10 +880,7 @@ namespace ZoneEngine.Core.Missions
             {
                 if (offerIdentityStore == null)
                 {
-                    string missionStateDirectory =
-                        Path.Combine(
-                            AppDomain.CurrentDomain.BaseDirectory ?? ".",
-                            "mission-state");
+                    string missionStateDirectory = MissionStateDirectory.Resolve();
                     offerIdentityStore =
                         new MissionOfferIdentityStore(missionStateDirectory);
                 }
