@@ -34,7 +34,12 @@ namespace AORebirth.Core.Components
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+
+    using AORebirth.Core.EventHandlers.Events;
 
     using MemBus;
     using MemBus.Configurators;
@@ -51,6 +56,33 @@ namespace AORebirth.Core.Components
         /// <summary>
         /// </summary>
         private readonly MemBus.IBus memBus;
+
+        /// <summary>
+        /// </summary>
+        private readonly SenderDispatchQueue nullSenderDispatchQueue = new SenderDispatchQueue();
+
+        /// <summary>
+        /// </summary>
+        private readonly ConditionalWeakTable<object, SenderDispatchQueue> senderDispatchQueues =
+            new ConditionalWeakTable<object, SenderDispatchQueue>();
+
+
+        /// <summary>
+        /// </summary>
+        private sealed class SenderDispatchQueue
+        {
+            /// <summary>
+            /// </summary>
+            internal readonly Queue<MessageReceivedEvent> Pending = new Queue<MessageReceivedEvent>();
+
+            /// <summary>
+            /// </summary>
+            internal readonly object Sync = new object();
+
+            /// <summary>
+            /// </summary>
+            internal bool Dispatching;
+        }
 
         #endregion
 
@@ -79,7 +111,93 @@ namespace AORebirth.Core.Components
         /// </param>
         public void Publish(object message)
         {
-            this.memBus.Publish(message);
+            var receivedEvent = message as MessageReceivedEvent;
+            if (receivedEvent == null)
+            {
+                this.memBus.Publish(message);
+                return;
+            }
+
+
+            SenderDispatchQueue dispatchQueue = receivedEvent.Sender == null
+                                                     ? this.nullSenderDispatchQueue
+                                                     : this.senderDispatchQueues.GetValue(
+                                                         receivedEvent.Sender,
+                                                         key => new SenderDispatchQueue());
+            if (!receivedEvent.TrySetDispatchCompletion(
+                () => this.CompleteOrderedDispatch(dispatchQueue, receivedEvent)))
+            {
+                throw new InvalidOperationException("LoginEngine message dispatch was already registered.");
+            }
+
+            bool startDispatch;
+            lock (dispatchQueue.Sync)
+            {
+                dispatchQueue.Pending.Enqueue(receivedEvent);
+                startDispatch = !dispatchQueue.Dispatching;
+                if (startDispatch)
+                {
+                    dispatchQueue.Dispatching = true;
+                }
+            }
+
+            if (startDispatch)
+            {
+                this.PublishReceivedEvent(receivedEvent);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="dispatchQueue">
+        /// </param>
+        /// <param name="completedEvent">
+        /// </param>
+        private void CompleteOrderedDispatch(
+            SenderDispatchQueue dispatchQueue,
+            MessageReceivedEvent completedEvent)
+        {
+            MessageReceivedEvent nextEvent = null;
+            lock (dispatchQueue.Sync)
+            {
+                if (dispatchQueue.Pending.Count > 0
+                    && object.ReferenceEquals(dispatchQueue.Pending.Peek(), completedEvent))
+                {
+                    dispatchQueue.Pending.Dequeue();
+                }
+
+                if (dispatchQueue.Pending.Count > 0)
+                {
+                    nextEvent = dispatchQueue.Pending.Peek();
+                }
+                else
+                {
+                    dispatchQueue.Dispatching = false;
+                }
+            }
+
+
+            if (nextEvent != null)
+            {
+                this.PublishReceivedEvent(nextEvent);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="receivedEvent">
+        /// </param>
+        private void PublishReceivedEvent(MessageReceivedEvent receivedEvent)
+        {
+            try
+            {
+                this.memBus.Publish(receivedEvent);
+            }
+            catch
+            {
+                receivedEvent.CompleteDispatch();
+                throw;
+            }
         }
 
         /// <summary>
@@ -94,6 +212,7 @@ namespace AORebirth.Core.Components
         {
             return this.memBus.Subscribe(action);
         }
+
 
         #endregion
     }

@@ -33,6 +33,9 @@ namespace AORebirth.Core.EventHandlers.Events
 {
     #region Usings ...
 
+    using System;
+    using System.Threading;
+
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     #endregion
@@ -50,6 +53,10 @@ namespace AORebirth.Core.EventHandlers.Events
         /// <summary>
         /// </summary>
         private readonly object sender;
+
+        /// <summary>
+        /// </summary>
+        private Action dispatchCompletion;
 
         #endregion
 
@@ -89,6 +96,37 @@ namespace AORebirth.Core.EventHandlers.Events
             {
                 return this.sender;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// </summary>
+        internal void CompleteDispatch()
+        {
+            Action completion = Interlocked.Exchange(ref this.dispatchCompletion, null);
+            if (completion != null)
+            {
+                completion();
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="completion">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool TrySetDispatchCompletion(Action completion)
+        {
+            if (completion == null)
+            {
+                throw new ArgumentNullException("completion");
+            }
+
+            return Interlocked.CompareExchange(ref this.dispatchCompletion, completion, null) == null;
         }
 
         #endregion

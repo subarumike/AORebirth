@@ -78,9 +78,26 @@ namespace LoginEngine.Packets
         /// </returns>
         public bool IsCharacterOnAccount(Client client, int characterId)
         {
-            var le = new LoginEncryption();
+            return this.IsCharacterOnAccount(client.AccountName, characterId);
+        }
 
-            return le.IsCharacterOnAccount(client.AccountName, (UInt32)characterId);
+        /// <summary>
+        /// </summary>
+        /// <param name="accountName">
+        /// </param>
+        /// <param name="characterId">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool IsCharacterOnAccount(string accountName, int characterId)
+        {
+            if (string.IsNullOrWhiteSpace(accountName) || characterId < 1)
+            {
+                return false;
+            }
+
+            var le = new LoginEncryption();
+            return le.IsCharacterOnAccount(accountName, (UInt32)characterId);
         }
 
         /// <summary>
@@ -93,7 +110,24 @@ namespace LoginEngine.Packets
         /// </returns>
         public bool IsLoginAllowed(Client client, string accountName)
         {
-            if (accountName.ToLower() != client.AccountName.ToLower())
+            if (!client.HasAuthenticationChallenge(accountName)
+                || !string.Equals(accountName, client.AccountName, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return this.IsLoginAllowed(accountName);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="accountName">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool IsLoginAllowed(string accountName)
+        {
+            if (string.IsNullOrWhiteSpace(accountName))
             {
                 return false;
             }
@@ -101,7 +135,8 @@ namespace LoginEngine.Packets
             this.ln.GetLoginName(accountName);
             this.lf.GetLoginFlags(accountName);
 
-            if (this.ln.LoginN != null && accountName.ToLower() == this.ln.LoginN.ToLower()
+            if (this.ln.LoginN != null
+                && string.Equals(accountName, this.ln.LoginN, StringComparison.OrdinalIgnoreCase)
                 && this.lf.FlagsL == LoginAllowedFlag)
             {
                 return true; // Login OK
@@ -120,11 +155,39 @@ namespace LoginEngine.Packets
         /// </returns>
         public bool IsLoginCorrect(Client client, string loginKey)
         {
+            if (!client.HasAuthenticationChallenge(client.AccountName)
+                || string.IsNullOrWhiteSpace(loginKey))
+            {
+                return false;
+            }
+
+            return this.IsLoginCorrect(client.AccountName, client.ServerSalt, loginKey);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="accountName">
+        /// </param>
+        /// <param name="serverSalt">
+        /// </param>
+        /// <param name="loginKey">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool IsLoginCorrect(string accountName, string serverSalt, string loginKey)
+        {
+            if (string.IsNullOrWhiteSpace(accountName)
+                || string.IsNullOrWhiteSpace(serverSalt)
+                || string.IsNullOrWhiteSpace(loginKey))
+            {
+                return false;
+            }
+
             var le = new LoginEncryption();
 
-            this.lp.GetLoginPassword(client.AccountName);
+            this.lp.GetLoginPassword(accountName);
 
-            return le.IsValidLogin(loginKey, client.ServerSalt, client.AccountName, this.lp.PasswdL);
+            return le.IsValidLogin(loginKey, serverSalt, accountName, this.lp.PasswdL);
         }
 
         #endregion

@@ -22,6 +22,70 @@ completion matrices and dated evidence retain detailed provenance.
   enabled, and Soldier completed entry/residency/exit validation on 2026-08-04.
 - Generated mission graph and mission reproducibility: PASS.
 - Debug server build: PASS.
+- Parallel Linux compile-feasibility lane: Messaging, Cell.Util, MsgPack.Mono,
+  Translations, Cell.Core, Utility, Enums, Exceptions, Interfaces,
+  ObjectManager, Database, Stats, and Communication build on .NET 10 from guarded linked
+  source/resource/content inventories, with a separate Linux-only `Ionic.Zlib`
+  compatibility assembly plus an inert identity-compatible `MemBus` adapter.
+  Stages 0-4 Windows-hosted compatibility checks,
+  exhaustive public/mapping/table contracts, Database/Stats offline behavior,
+  exact SQL publish assets, Communication wire/framing/FIFO loopback behavior,
+  and the unchanged Windows debug build pass. The first .NET 10 ChatEngine
+  executable now builds and publishes with strict configuration, a private
+  ISCom bind, headless logging, fail-closed MySQL secret handling, systemd
+  readiness notification, and coordinated shutdown. Its Windows/Linux contract,
+  listener-free startup/lifecycle, authentication fixture, and both
+  framework-dependent and self-contained publish-structure gates pass.
+  PlayfieldLoader/full Core are deferred; the three required legacy
+  authentication sources are isolated in `AORebirth.Chat.Authentication`.
+  Native Ubuntu 24.04.4 x86_64 apphost, exact-case configuration, listener-free
+  lifecycle, `Type=notify` readiness with both loopback listeners, and real
+  SIGTERM shutdown pass. An isolated, uniquely named/labeled MySQL 8.4 target
+  now passes the exact governed 34-table import, restricted runtime-account
+  reads/CRUD, production Connector/DAO/password/encrypted-login behavior,
+  negative authentication cases, and zero-residue fixture cleanup. ChatEngine
+  has a read-only live database preflight in systemd before listener startup.
+  The updated test release and unit pass `Type=notify`, loopback-only listeners,
+  and clean SIGTERM against that database, then remain disabled/inactive with
+  the normal secret-free environment untouched. The website and mail database
+  containers, networks, and firewall were unchanged.
+- The parallel Linux lane now also builds LoginEngine from its exact 35-source
+  inventory with a contained identity-compatible Core slice, pinned MemBus 4.0.1,
+  and the six legacy MEF handlers. Stage 7.1 adds fail-closed per-client
+  authenticated state, CSPRNG challenge salt, canonical identity and ownership
+  guards, same-client FIFO dispatch with bounded drain, and transactional cleanup
+  of the governed character-owned data graph. Offline contract/security gates
+  pass, as does listener-free disposable MySQL 8.4 security acceptance through
+  the production paths with zero fixture residue. The guarded atomic upgrade to
+  `stage7-20260809-login-003` and live database preflight, `Type=notify`, exact
+  main-PID ownership of `127.0.0.1:7500`, and clean SIGTERM pass. LoginEngine and
+  ChatEngine remain disabled/inactive, TCP 7500 is closed, MySQL is healthy and
+  bound only to `127.0.0.1:33067`, and existing website/mail containers were
+  unchanged.
+- Stage 8 adds full `AORebirth.Core`, `PlayfieldLoader`, and `ZoneEngine` .NET
+  10 overlays from exact guarded source inventories. ZoneEngine's copied
+  XML/JSON/capture content, scripts, and required datafiles are governed by
+  checked-in content/runtime-copy inventories and verified by a listener-free
+  Stage 8 smoke. Linux excludes the WinForms NBug dependency, preserves JSON
+  loader compatibility through a narrow `JavaScriptSerializer` shim, and extends
+  the Linux Ionic shim with the diagnostic members ZoneEngine expects.
+  ZoneEngine now has Linux-only listener-free startup and lifecycle validation
+  modes for exact-case config, closed provider construction, loopback topology,
+  required runtime assets, and bounded shutdown-file handling, plus a read-only
+  database preflight requiring the expected MySQL database, exact governed
+  34-table set, `characters.Online`, and zero online characters. The Linux
+  wrapper and Stage 8 smoke pass locally, including child-process validation
+  from the build output; Windows Debug is currently blocked by a stale
+  generated-combat catalog preflight because governed regeneration fails on
+  missing raw-derived SCFU metadata for captured realm 655 provenance.
+- Stage 9 publishes ZoneEngine as a self-contained `linux-x64` artifact and
+  validates it on native Ubuntu x86_64. Listener-free startup and lifecycle
+  modes pass as Linux processes, read-only database preflight passes through
+  systemd against the isolated Stage 6 MySQL target, and the disabled systemd
+  service demonstrates deterministic start, status, stop, restart, and
+  controlled-failure reporting. ZoneEngine remains disabled/inactive after
+  validation, TCP 7501 is closed, and no database schema, generated-combat,
+  gameplay, or packet behavior was changed.
 - Git LFS and Git object integrity: PASS.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
@@ -178,6 +242,13 @@ migrations; details and exact source references are recorded in
 
 ## Remaining debt boundary
 
+- Do not expose LoginEngine TCP 7500 yet. Stage 7.1 completes authenticated
+  connection state, mutation ownership, CSPRNG salt, bounded dispatch draining,
+  and disposable create/select/delete DAO acceptance, but ZoneEngine/full Core
+  are not present.
+- Before a public player test, prove official-client end-to-end login and
+  retry/error UX, resolve account character-count semantics from authoritative
+  evidence, and pass a sustained multiplayer soak.
 - Rotate the previously exposed database credential externally.
 - Perform authorized live WebEngine verification only after a valid disposable
   database credential is supplied. Current validation intentionally makes no
