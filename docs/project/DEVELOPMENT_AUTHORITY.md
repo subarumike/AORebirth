@@ -64,6 +64,12 @@ not automatically mean loopback beyond the same default policy. Validation
 environments must remain loopback unless a focused test explicitly selects
 `Public`.
 
+When LoginEngine runs in `Loopback` mode, its advertised `ZoneIP` must remain a
+loopback address. When LoginEngine runs in `Public` mode, `ZoneIP` must be a
+concrete non-loopback address so the official client receives a usable
+ZoneEngine handoff target. `0.0.0.0` is a listener bind address, not an
+advertised client destination.
+
 Public mode changes listener reachability only. It does not authorize packet,
 gameplay, authentication, database schema, or database exposure changes. MySQL,
 ISCom, validation, debug, and management listeners remain private unless a
