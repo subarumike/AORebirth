@@ -99,6 +99,9 @@ namespace AORebirth.Communication.ISComV2Server
         /// </param>
         /// <param name="dataBytes">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void DataReceivedHandler(object sender, OnDataReceivedArgs e);
 
         #endregion

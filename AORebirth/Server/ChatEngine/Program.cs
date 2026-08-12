@@ -34,11 +34,19 @@ namespace ChatEngine
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
+    using System.Data;
     using System.IO;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
+    #if AOREBIRTH_LINUX
+    using System.Net.Sockets;
+    using System.Runtime.InteropServices;
+    #endif
+
+    using AORebirth.Database;
     using AORebirth.Communication.ISComV2Server;
     using AORebirth.Communication.Messages;
 
@@ -46,14 +54,18 @@ namespace ChatEngine
 
     using locales;
 
+    #if !AOREBIRTH_LINUX
     using NBug;
     using NBug.Properties;
+    #endif
 
     using NLog;
 
     using Utility;
 
+    #if !AOREBIRTH_LINUX
     using ZoneEngine.Core.Playfields;
+    #endif
 
     using Config = Utility.Config.ConfigReadWrite;
 
@@ -76,7 +88,9 @@ namespace ChatEngine
 
         /// <summary>
         /// </summary>
-        private static ConsoleText ct = new ConsoleText();
+        #if !AOREBIRTH_LINUX
+        private static ConsoleText ct;
+        #endif
 
         /// <summary>
         /// </summary>
@@ -86,11 +100,25 @@ namespace ChatEngine
 
         private const bool UdpEnable = false;
 
-        private static bool exited = false;
+        private static volatile bool exited = false;
+
+        private static int cleanupStarted;
+
+        private static int shutdownRequested;
 
         private static StreamWriter headlessErrorWriter;
 
         private static StreamWriter headlessOutputWriter;
+
+        private static TextWriter originalErrorWriter;
+
+        private static TextWriter originalOutputWriter;
+
+        #if AOREBIRTH_LINUX
+        private static PosixSignalRegistration sigIntRegistration;
+
+        private static PosixSignalRegistration sigTermRegistration;
+        #endif
 
         #endregion
 
@@ -185,22 +213,45 @@ namespace ChatEngine
             return false;
         }
 
+        private static bool HasEitherArgument(string[] args, string first, string second)
+        {
+            return HasArgument(args, first) || HasArgument(args, second);
+        }
+
+        private static string GetEitherArgumentValue(string[] args, string first, string second)
+        {
+            string value = GetArgumentValue(args, first);
+            return value ?? GetArgumentValue(args, second);
+        }
+
+        private static void CreateParentDirectory(string fileName)
+        {
+            string directory = Path.GetDirectoryName(Path.GetFullPath(fileName));
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
         private static void ConfigureHeadlessConsoleLogging(string[] args)
         {
-            string stdoutLog = GetArgumentValue(args, "/stdout-log");
+            originalOutputWriter = Console.Out;
+            originalErrorWriter = Console.Error;
+
+            string stdoutLog = GetEitherArgumentValue(args, "/stdout-log", "--stdout-log");
             if (!string.IsNullOrWhiteSpace(stdoutLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stdoutLog));
+                CreateParentDirectory(stdoutLog);
                 headlessOutputWriter = new StreamWriter(
                     new FileStream(stdoutLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessOutputWriter.AutoFlush = true;
                 Console.SetOut(headlessOutputWriter);
             }
 
-            string stderrLog = GetArgumentValue(args, "/stderr-log");
+            string stderrLog = GetEitherArgumentValue(args, "/stderr-log", "--stderr-log");
             if (!string.IsNullOrWhiteSpace(stderrLog))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(stderrLog));
+                CreateParentDirectory(stderrLog);
                 headlessErrorWriter = new StreamWriter(
                     new FileStream(stderrLog, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
                 headlessErrorWriter.AutoFlush = true;
@@ -221,9 +272,36 @@ namespace ChatEngine
             }
         }
 
+        private static void CloseHeadlessConsoleLogging()
+        {
+            FlushHeadlessConsoleLogging();
+
+            if (headlessOutputWriter != null)
+            {
+                if (originalOutputWriter != null)
+                {
+                    Console.SetOut(originalOutputWriter);
+                }
+
+                headlessOutputWriter.Dispose();
+                headlessOutputWriter = null;
+            }
+
+            if (headlessErrorWriter != null)
+            {
+                if (originalErrorWriter != null)
+                {
+                    Console.SetError(originalErrorWriter);
+                }
+
+                headlessErrorWriter.Dispose();
+                headlessErrorWriter = null;
+            }
+        }
+
         private static void StartShutdownFileWatcher(string[] args)
         {
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             if (string.IsNullOrWhiteSpace(shutdownFile))
             {
                 return;
@@ -236,10 +314,15 @@ namespace ChatEngine
                         {
                             if (File.Exists(shutdownFile))
                             {
+                                ConsumeShutdownFile(shutdownFile);
+                                #if AOREBIRTH_LINUX
+                                RequestShutdown("shutdown file");
+                                #else
                                 Console.WriteLine("Shutdown file requested.");
                                 ShutDownServer(null);
                                 FlushHeadlessConsoleLogging();
                                 Environment.Exit(0);
+                                #endif
                             }
 
                             Thread.Sleep(1000);
@@ -250,25 +333,153 @@ namespace ChatEngine
             shutdownThread.Start();
         }
 
-        private static void RunHeadless(string[] args)
+        private static bool RunHeadless(string[] args)
         {
+            if (exited)
+            {
+                return true;
+            }
+
             Console.WriteLine("Starting ChatEngine in headless mode.");
             StartServer(null);
 
-            string shutdownFile = GetArgumentValue(args, "/shutdown-file");
+            if (chatServer == null || !chatServer.IsRunning || !chatServer.TCPEnabled)
+            {
+                Console.Error.WriteLine("ChatEngine failed to start its TCP listener.");
+                RequestShutdown("chat listener startup failure");
+                return false;
+            }
+
+            if (ISCom == null || !ISCom.IsRunning || !ISCom.TCPEnabled)
+            {
+                Console.Error.WriteLine("ChatEngine failed to start its ISCom TCP listener.");
+                RequestShutdown("ISCom listener startup failure");
+                return false;
+            }
+
+            #if AOREBIRTH_LINUX
+            NotifySystemd("READY=1\nSTATUS=ChatEngine listeners are ready");
+            #endif
+
+            string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             while (!exited)
             {
                 if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
                 {
-                    Console.WriteLine("Headless shutdown requested.");
-                    ShutDownServer(null);
-                    FlushHeadlessConsoleLogging();
-                    Environment.Exit(0);
+                    ConsumeShutdownFile(shutdownFile);
+                    RequestShutdown("shutdown file");
                 }
 
                 Thread.Sleep(1000);
             }
+
+            return true;
         }
+
+        private static void ConsumeShutdownFile(string shutdownFile)
+        {
+            try
+            {
+                File.Delete(shutdownFile);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Unable to remove shutdown file: " + e.Message);
+            }
+        }
+
+        private static void RequestShutdown(string reason)
+        {
+            if (Interlocked.Exchange(ref shutdownRequested, 1) != 0)
+            {
+                return;
+            }
+
+            exited = true;
+            try
+            {
+                Console.WriteLine("Shutdown requested: " + reason + ".");
+            }
+            catch
+            {
+            }
+        }
+
+        private static void RegisterShutdownSignals()
+        {
+            Console.CancelKeyPress += ConsoleCancelKeyPress;
+
+            #if AOREBIRTH_LINUX
+            sigIntRegistration = PosixSignalRegistration.Create(
+                PosixSignal.SIGINT,
+                context =>
+                    {
+                        context.Cancel = true;
+                        RequestShutdown("SIGINT");
+                    });
+            sigTermRegistration = PosixSignalRegistration.Create(
+                PosixSignal.SIGTERM,
+                context =>
+                    {
+                        context.Cancel = true;
+                        RequestShutdown("SIGTERM");
+                    });
+            #endif
+        }
+
+        private static void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            e.Cancel = true;
+            RequestShutdown("console cancel");
+        }
+
+        private static void UnregisterShutdownSignals()
+        {
+            Console.CancelKeyPress -= ConsoleCancelKeyPress;
+
+            #if AOREBIRTH_LINUX
+            if (sigIntRegistration != null)
+            {
+                sigIntRegistration.Dispose();
+                sigIntRegistration = null;
+            }
+
+            if (sigTermRegistration != null)
+            {
+                sigTermRegistration.Dispose();
+                sigTermRegistration = null;
+            }
+            #endif
+        }
+
+        #if AOREBIRTH_LINUX
+        private static void NotifySystemd(string state)
+        {
+            string notifySocket = Environment.GetEnvironmentVariable("NOTIFY_SOCKET");
+            if (string.IsNullOrWhiteSpace(notifySocket))
+            {
+                return;
+            }
+
+            if (notifySocket[0] == '@')
+            {
+                notifySocket = "\0" + notifySocket.Substring(1);
+            }
+
+            try
+            {
+                byte[] payload = System.Text.Encoding.UTF8.GetBytes(state);
+                using (var socket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified))
+                {
+                    socket.SendTo(payload, new UnixDomainSocketEndPoint(notifySocket));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("systemd notification failed: " + e.Message);
+            }
+        }
+        #endif
 
         /// <summary>
         /// </summary>
@@ -307,8 +518,99 @@ namespace ChatEngine
 
         private static void ShutDownServer(string[] obj)
         {
-            StopServer(null);
             exited = true;
+
+            if (chatServer != null)
+            {
+                try
+                {
+                    if (chatServer.IsRunning && chatServer.TCPEnabled)
+                    {
+                        chatServer.TCPEnabled = false;
+                    }
+
+                    chatServer.Stop();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Chat server shutdown failed: " + e.Message);
+                }
+            }
+
+            if (ISCom != null)
+            {
+                try
+                {
+                    ISCom.Stop();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("ISCom shutdown failed: " + e.Message);
+                }
+            }
+        }
+
+        private static void CompleteShutdown()
+        {
+            if (Interlocked.Exchange(ref cleanupStarted, 1) != 0)
+            {
+                return;
+            }
+
+            #if AOREBIRTH_LINUX
+            NotifySystemd("STOPPING=1\nSTATUS=ChatEngine is stopping");
+            #endif
+            ShutDownServer(null);
+            try
+            {
+                UnregisterShutdownSignals();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Signal cleanup failed: " + e.Message);
+            }
+
+            if (ISCom != null)
+            {
+                try
+                {
+                    ISCom.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("ISCom disposal failed: " + e.Message);
+                }
+
+                ISCom = null;
+            }
+
+            if (chatServer != null)
+            {
+                try
+                {
+                    chatServer.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Chat server disposal failed: " + e.Message);
+                }
+
+                chatServer = null;
+            }
+
+            #if AOREBIRTH_LINUX
+            AppDomain.CurrentDomain.UnhandledException -= LinuxUnhandledException;
+            TaskScheduler.UnobservedTaskException -= LinuxUnobservedTaskException;
+            #endif
+
+            try
+            {
+                LogManager.Shutdown();
+            }
+            finally
+            {
+                CloseHeadlessConsoleLogging();
+            }
         }
 
         private static void StopServer(string[] obj)
@@ -367,12 +669,13 @@ namespace ChatEngine
                     return false;
                 }
 
+                #if !AOREBIRTH_LINUX
                 PlayfieldLoader.CacheAllPlayfieldData();
+                #endif
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.ReadLine();
                 return false;
             }
 
@@ -389,16 +692,9 @@ namespace ChatEngine
             {
                 ISCom = new ISComV2Server();
                 ISCom.DataReceived += chatServer.ISComDataReceived;
-                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    ISCom.TcpEndPoint = new IPEndPoint(IPAddress.Any, Config.Instance.CurrentConfig.CommPort);
-                }
-                else
-                {
-                    ISCom.TcpEndPoint = new IPEndPoint(
-                        IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP),
-                        Config.Instance.CurrentConfig.CommPort);
-                }
+                ISCom.TcpEndPoint = new IPEndPoint(
+                    GetISComListenAddress(Config.Instance.CurrentConfig),
+                    Config.Instance.CurrentConfig.CommPort);
 
                 // Prove DynamicMessage can resolve Zone→Chat owner pet SystemChatMessage.
                 Type systemChatType = typeof(SystemChatMessage);
@@ -410,9 +706,14 @@ namespace ChatEngine
                     + systemChatType.Assembly.GetName().Name);
 
                 ISCom.Start(true, false);
+                if (!ISCom.IsRunning || !ISCom.TCPEnabled)
+                {
+                    throw new InvalidOperationException("ISCom TCP listener did not start.");
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.Error.WriteLine("ISCom initialization failed: " + e.Message);
                 return false;
             }
 
@@ -427,8 +728,9 @@ namespace ChatEngine
         {
             try
             {
-                // Setup and enable NLog logging to file
+                // Setup and enable NLog logging.
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                #if !AOREBIRTH_LINUX
                 LogUtil.SetupFileLogging("${basedir}/ChatEngineLog.txt", LogLevel.Trace);
 
                 // NBug initialization
@@ -436,6 +738,10 @@ namespace ChatEngine
                 Settings.WriteLogToDisk = true;
                 AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
                 TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+                #else
+                AppDomain.CurrentDomain.UnhandledException += LinuxUnhandledException;
+                TaskScheduler.UnobservedTaskException += LinuxUnobservedTaskException;
+                #endif
             }
             catch (Exception e)
             {
@@ -449,6 +755,33 @@ namespace ChatEngine
             return true;
         }
 
+        #if AOREBIRTH_LINUX
+        private static void LinuxUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception exception = e.ExceptionObject as Exception;
+            Logger logger = LogManager.GetCurrentClassLogger();
+            if (exception != null)
+            {
+                logger.Fatal(exception, "Unhandled ChatEngine exception");
+                Console.Error.WriteLine(exception);
+            }
+            else
+            {
+                logger.Fatal("Unhandled ChatEngine exception: {0}", e.ExceptionObject);
+                Console.Error.WriteLine(e.ExceptionObject);
+            }
+
+            LogManager.Flush();
+        }
+
+        private static void LinuxUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            LogManager.GetCurrentClassLogger().Error(e.Exception, "Unobserved ChatEngine task exception");
+            Console.Error.WriteLine(e.Exception);
+            LogManager.Flush();
+        }
+        #endif
+
         /// <summary>
         /// </summary>
         /// <returns>
@@ -458,16 +791,9 @@ namespace ChatEngine
             int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ChatPort);
             try
             {
-                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    chatServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
-                }
-                else
-                {
-                    chatServer.TcpEndPoint = new IPEndPoint(
-                        IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP),
-                        Port);
-                }
+                chatServer.TcpEndPoint = new IPEndPoint(
+                    GetChatListenAddress(Config.Instance.CurrentConfig),
+                    Port);
 
                 chatServer.MaximumPendingConnections = 100;
             }
@@ -475,11 +801,479 @@ namespace ChatEngine
             {
                 Console.WriteLine(locales.ErrorIPAddressParseFailed);
                 Console.Write(e.Message);
-                Console.ReadKey();
                 return false;
             }
 
             return true;
+        }
+
+        private static string GetConfiguredConfigPath()
+        {
+            #if AOREBIRTH_LINUX
+            string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
+            if (!string.IsNullOrWhiteSpace(configuredPath))
+            {
+                return configuredPath;
+            }
+            #endif
+
+            return "Config.xml";
+        }
+
+        private static Utility.Config.Config LoadStrictConfiguration()
+        {
+            string configuredPath = GetConfiguredConfigPath();
+            string fullPath = Path.GetFullPath(configuredPath);
+            string directory = Path.GetDirectoryName(fullPath);
+            string fileName = Path.GetFileName(fullPath);
+
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+            {
+                throw new DirectoryNotFoundException("Configuration directory does not exist.");
+            }
+
+            bool exactCaseMatch = false;
+            foreach (string candidate in Directory.EnumerateFiles(directory))
+            {
+                if (string.Equals(Path.GetFileName(candidate), fileName, StringComparison.Ordinal))
+                {
+                    exactCaseMatch = true;
+                    break;
+                }
+            }
+
+            if (!exactCaseMatch)
+            {
+                throw new FileNotFoundException("Exact-case configuration file was not found: " + fileName);
+            }
+
+            Utility.Config.Config configuration = Config.Instance.CurrentConfig;
+
+            if (configuration == null)
+            {
+                throw new InvalidDataException("Config.xml did not contain a Config document.");
+            }
+
+            ValidateConfigurationValues(configuration);
+            return configuration;
+        }
+
+        private static void ValidateConfigurationValues(Utility.Config.Config configuration)
+        {
+            IPAddress configuredAddress;
+            if (string.IsNullOrWhiteSpace(configuration.ListenIP)
+                || !IPAddress.TryParse(configuration.ListenIP, out configuredAddress))
+            {
+                throw new InvalidDataException("ListenIP must be a valid IP address.");
+            }
+
+            GetChatListenAddress(configuration);
+
+            if (configuration.ChatPort < 1 || configuration.ChatPort > 65535)
+            {
+                throw new InvalidDataException("ChatPort must be between 1 and 65535.");
+            }
+
+            if (configuration.CommPort < 1 || configuration.CommPort > 65535)
+            {
+                throw new InvalidDataException("CommPort must be between 1 and 65535.");
+            }
+
+            if (configuration.ChatPort == configuration.CommPort)
+            {
+                throw new InvalidDataException("ChatPort and CommPort must be distinct.");
+            }
+
+            if (string.IsNullOrWhiteSpace(configuration.Locale))
+            {
+                throw new InvalidDataException("Locale must be configured.");
+            }
+
+            string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
+
+            #if AOREBIRTH_LINUX
+            if (configuration.LogChat)
+            {
+                throw new InvalidDataException(
+                    "LogChat must remain disabled for the first Linux deployment milestone.");
+            }
+
+            if (!string.Equals(configuration.SQLType, "MySql", StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment milestone supports only the MySql provider.");
+            }
+
+            if (!string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "AO_REBIRTH_REQUIRED_SQL_TYPE must be MySql for the Linux deployment profile.");
+            }
+            #endif
+
+            string connectionString;
+            if (configuration.SQLType == "MySql")
+            {
+                string environmentConnection = Environment.GetEnvironmentVariable(
+                    "AO_REBIRTH_MYSQL_CONNECTION");
+                #if AOREBIRTH_LINUX
+                if (string.IsNullOrWhiteSpace(environmentConnection))
+                {
+                    throw new InvalidDataException(
+                        "AO_REBIRTH_MYSQL_CONNECTION is required by the Linux MySQL deployment profile.");
+                }
+
+                #endif
+
+                connectionString = string.IsNullOrWhiteSpace(environmentConnection)
+                    ? configuration.MysqlConnection
+                    : environmentConnection;
+                configuration.MysqlConnection = connectionString;
+            }
+            else if (configuration.SQLType == "MsSql")
+            {
+                connectionString = configuration.MsSqlConnection;
+            }
+            else if (configuration.SQLType == "PostgreSQL")
+            {
+                connectionString = configuration.PostgreConnection;
+            }
+            else
+            {
+                throw new InvalidDataException("SQLType must be MySql, MsSql, or PostgreSQL.");
+            }
+
+            if (string.IsNullOrWhiteSpace(connectionString)
+                || connectionString.IndexOf("REPLACE_WITH_", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                throw new InvalidDataException("The selected database connection string is not configured.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(requiredSqlType)
+                && !string.Equals(configuration.SQLType, requiredSqlType, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException("SQLType does not match the required deployment provider.");
+            }
+
+            ValidateProviderConnection(configuration.SQLType, connectionString);
+        }
+
+        private static void ValidateProviderConnection(string sqlType, string connectionString)
+        {
+            try
+            {
+                IDbConnection connection;
+                if (sqlType == "MySql")
+                {
+                    connection = new MySQLConnector(connectionString).GetConnection();
+                }
+                else if (sqlType == "MsSql")
+                {
+                    connection = new MSSqlConnector(connectionString).GetConnection();
+                }
+                else
+                {
+                    connection = new NpgsqlConnector(connectionString).GetConnection();
+                }
+
+                using (connection)
+                {
+                    if (connection.State != ConnectionState.Closed)
+                    {
+                        throw new InvalidOperationException(
+                            "Startup validation must not open a database connection.");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new InvalidDataException("The selected database connection string syntax is invalid.", e);
+            }
+        }
+
+        private static IPAddress GetISComListenAddress(Utility.Config.Config configuration)
+        {
+            string listenIP = configuration.ListenIP;
+            #if AOREBIRTH_LINUX
+            listenIP = Environment.GetEnvironmentVariable("AO_REBIRTH_ISCOM_LISTEN_IP");
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = configuration.ISCommLocalIP;
+            }
+
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = "127.0.0.1";
+            }
+            #endif
+
+            IPAddress address;
+            if (!IPAddress.TryParse(listenIP, out address))
+            {
+                throw new InvalidDataException("The ISCom listen address is invalid.");
+            }
+
+            #if AOREBIRTH_LINUX
+            if (!IPAddress.IsLoopback(address))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment requires a loopback-only ISCom listen address.");
+            }
+            #endif
+
+            return address;
+        }
+
+        private static IPAddress GetChatListenAddress(Utility.Config.Config configuration)
+        {
+            string listenIP = configuration.ListenIP;
+            #if AOREBIRTH_LINUX
+            listenIP = Environment.GetEnvironmentVariable("AO_REBIRTH_CHAT_LISTEN_IP");
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = "127.0.0.1";
+            }
+            #endif
+
+            IPAddress address;
+            if (!IPAddress.TryParse(listenIP, out address))
+            {
+                throw new InvalidDataException("The Chat listen address is invalid.");
+            }
+
+            return address;
+        }
+
+        private static int ValidateStartup()
+        {
+            ChatServer validationChatServer = null;
+            ISComV2Server validationISCom = null;
+
+            try
+            {
+                Utility.Config.Config configuration = LoadStrictConfiguration();
+                validationChatServer = new ChatServer();
+                validationChatServer.TcpEndPoint = new IPEndPoint(
+                    GetChatListenAddress(configuration),
+                    configuration.ChatPort);
+                validationChatServer.MaximumPendingConnections = 100;
+
+                validationISCom = new ISComV2Server();
+                validationISCom.TcpEndPoint = new IPEndPoint(
+                    GetISComListenAddress(configuration),
+                    configuration.CommPort);
+                validationISCom.DataReceived += validationChatServer.ISComDataReceived;
+
+                if (validationChatServer.Channels.Count != 8
+                    || validationChatServer.ConnectedClients.Count != 0
+                    || validationChatServer.IsRunning
+                    || validationChatServer.TCPEnabled
+                    || validationISCom.IsRunning
+                    || validationISCom.TCPEnabled)
+                {
+                    throw new InvalidOperationException("Offline ChatEngine topology validation failed.");
+                }
+
+                LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogManager.GetCurrentClassLogger().Debug("ChatEngine startup logging validation.");
+                LogManager.Flush();
+
+                Console.WriteLine(
+                    "CHATENGINE_VALIDATION_OK mode=startup channels=8 provider="
+                    + configuration.SQLType
+                    + " nbug=disabled listeners=0");
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("CHATENGINE_VALIDATION_FAILED mode=startup error=" + e.Message);
+                return 1;
+            }
+            finally
+            {
+                if (validationISCom != null)
+                {
+                    validationISCom.Dispose();
+                }
+
+                if (validationChatServer != null)
+                {
+                    validationChatServer.Dispose();
+                }
+
+                LogManager.Shutdown();
+            }
+        }
+
+        private static int ValidateDatabase()
+        {
+            string[] requiredTables =
+            {
+                "characterstimers",
+                "characters",
+                "charactersactivenanos",
+                "charactersmeshs",
+                "charactersuploadednanos",
+                "charactersperks",
+                "instanceditems",
+                "itemnames",
+                "items",
+                "login",
+                "missionaccountflags",
+                "missionflags",
+                "missionobjectiveobservations",
+                "missionobjectiveprogress",
+                "missionrewardledger",
+                "missionstates",
+                "mobdroptable",
+                "mobspawns",
+                "mobspawnsactivenanos",
+                "mobspawnsinventory",
+                "mobspawnsmeshs",
+                "mobspawnsuploadednanos",
+                "mobspawns_stats",
+                "mobtemplate",
+                "organizations",
+                "proxydestinations",
+                "receivedmessages",
+                "shopinventorytemplates",
+                "staticdynels",
+                "stats",
+                "teleports",
+                "tradeskill",
+                "vendors",
+                "vendortemplate"
+            };
+
+            try
+            {
+                Utility.Config.Config configuration = LoadStrictConfiguration();
+                if (!string.Equals(configuration.SQLType, "MySql", StringComparison.Ordinal))
+                {
+                    throw new InvalidDataException("The Linux database readiness gate requires MySql.");
+                }
+
+                using (IDbConnection connection = Connector.GetConnection())
+                {
+                    if (connection.State != ConnectionState.Open)
+                    {
+                        throw new InvalidOperationException("The database connection did not open.");
+                    }
+
+                    string activeDatabase;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT DATABASE()";
+                        activeDatabase = Convert.ToString(command.ExecuteScalar());
+                    }
+
+                    if (string.IsNullOrWhiteSpace(activeDatabase))
+                    {
+                        throw new InvalidDataException("The connection did not select a database.");
+                    }
+
+                    var actualTables = new HashSet<string>(StringComparer.Ordinal);
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT table_name FROM information_schema.tables "
+                            + "WHERE table_schema=DATABASE() AND table_type='BASE TABLE'";
+                        using (IDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                actualTables.Add(Convert.ToString(reader.GetValue(0)));
+                            }
+                        }
+                    }
+
+                    foreach (string tableName in requiredTables)
+                    {
+                        if (!actualTables.Contains(tableName))
+                        {
+                            throw new InvalidDataException("Required database table is missing: " + tableName);
+                        }
+
+                        using (IDbCommand command = connection.CreateCommand())
+                        {
+                            command.CommandText = "SELECT 1 FROM `" + tableName + "` LIMIT 0";
+                            using (IDataReader reader = command.ExecuteReader())
+                            {
+                            }
+                        }
+                    }
+
+                    long onlineColumnCount;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM information_schema.columns "
+                            + "WHERE table_schema=DATABASE() AND table_name='characters' "
+                            + "AND column_name='Online'";
+                        onlineColumnCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    if (onlineColumnCount != 1)
+                    {
+                        throw new InvalidDataException("characters.Online schema contract mismatch.");
+                    }
+
+                    Console.WriteLine(
+                        "CHATENGINE_DATABASE_OK provider=MySql requiredTables="
+                        + requiredTables.Length
+                        + " visibleTables="
+                        + actualTables.Count
+                        + " listeners=0");
+                }
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("CHATENGINE_DATABASE_FAILED error=" + e.Message);
+                return 1;
+            }
+        }
+
+        private static int ValidateLifecycle(string[] args)
+        {
+            bool headlessLoggingConfigured = false;
+            try
+            {
+                ConfigureHeadlessConsoleLogging(args);
+                headlessLoggingConfigured = true;
+                LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                RegisterShutdownSignals();
+                Console.WriteLine("CHATENGINE_LIFECYCLE_READY listeners=0 database=closed");
+
+                string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
+                while (!exited)
+                {
+                    if (!string.IsNullOrWhiteSpace(shutdownFile) && File.Exists(shutdownFile))
+                    {
+                        ConsumeShutdownFile(shutdownFile);
+                        RequestShutdown("shutdown file");
+                    }
+
+                    Thread.Sleep(100);
+                }
+
+                Console.WriteLine("CHATENGINE_LIFECYCLE_STOPPED status=clean");
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("CHATENGINE_LIFECYCLE_FAILED error=" + e.Message);
+                return 1;
+            }
+            finally
+            {
+                CompleteShutdown();
+                if (headlessLoggingConfigured)
+                {
+                    CloseHeadlessConsoleLogging();
+                }
+            }
         }
 
         /// <summary>
@@ -488,39 +1282,88 @@ namespace ChatEngine
         /// <param name="args">
         /// Command line parameters
         /// </param>
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
-            bool headless = HasArgument(args, "/headless");
-            if (headless)
+            if (HasEitherArgument(args, "/validate-startup", "--validate-startup"))
             {
-                ConfigureHeadlessConsoleLogging(args);
+                return ValidateStartup();
             }
 
-            ct = new ConsoleText();
-
-            OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Yellow);
-
-            Console.WriteLine();
-
-            Console.WriteLine(locales.ServerConsoleMainText, DateTime.Now.Year);
-
-            if (!Initialize())
+            if (HasEitherArgument(args, "/validate-database", "--validate-database"))
             {
-                Console.WriteLine("Error occured while initilizing. Please check in log.");
-                return;
+                return ValidateDatabase();
             }
 
-            if (headless)
+            if (HasEitherArgument(args, "/validate-lifecycle", "--validate-lifecycle"))
             {
-                RunHeadless(args);
-                LogManager.Configuration = null;
-                FlushHeadlessConsoleLogging();
-                return;
+                return ValidateLifecycle(args);
             }
 
-            StartShutdownFileWatcher(args);
-            CommandLoop(args);
-            LogManager.Configuration = null;
+            bool headless = HasEitherArgument(args, "/headless", "--headless");
+            #if AOREBIRTH_LINUX
+            if (!headless)
+            {
+                Console.Error.WriteLine("ChatEngine Linux service mode requires --headless.");
+                return 2;
+            }
+            #endif
+
+            try
+            {
+                if (headless)
+                {
+                    ConfigureHeadlessConsoleLogging(args);
+                    RegisterShutdownSignals();
+                }
+
+                #if AOREBIRTH_LINUX
+                LoadStrictConfiguration();
+                #endif
+
+                #if !AOREBIRTH_LINUX
+                ct = new ConsoleText();
+                #endif
+
+                OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Yellow);
+
+                Console.WriteLine();
+
+                Console.WriteLine(locales.ServerConsoleMainText, DateTime.Now.Year);
+
+                if (exited)
+                {
+                    return 0;
+                }
+
+                if (!Initialize())
+                {
+                    Console.WriteLine("Error occured while initilizing. Please check in log.");
+                    return 1;
+                }
+
+                if (exited)
+                {
+                    return 0;
+                }
+
+                if (headless)
+                {
+                    return RunHeadless(args) ? 0 : 1;
+                }
+
+                StartShutdownFileWatcher(args);
+                CommandLoop(args);
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("ChatEngine startup failed: " + e.Message);
+                return 1;
+            }
+            finally
+            {
+                CompleteShutdown();
+            }
         }
 
         #endregion

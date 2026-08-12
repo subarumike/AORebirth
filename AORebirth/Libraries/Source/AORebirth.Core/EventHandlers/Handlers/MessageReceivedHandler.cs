@@ -75,7 +75,14 @@ namespace AORebirth.Core.EventHandlers.Handlers
         /// </param>
         public void Handle(MessageReceivedEvent obj)
         {
-            this.messagePublisher.Publish(obj.Sender, obj.Message);
+            try
+            {
+                this.messagePublisher.Publish(obj.Sender, obj.Message);
+            }
+            finally
+            {
+                obj.CompleteDispatch();
+            }
         }
 
         #endregion

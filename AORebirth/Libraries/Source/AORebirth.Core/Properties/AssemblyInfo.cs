@@ -58,6 +58,9 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if AOREBIRTH_LINUX
+using System.Runtime.CompilerServices;
+#endif
 
 #endregion
 
@@ -84,3 +87,6 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("5f7951d6-7f73-4a08-a7df-586f413d91fa")]
+#if AOREBIRTH_LINUX
+[assembly: InternalsVisibleTo("LoginEngine")]
+#endif

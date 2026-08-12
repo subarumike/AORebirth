@@ -59,11 +59,7 @@ namespace AO.Core.Encryption
         /// <summary>
         /// 
         /// </summary>
-#if DEBUG
-        public bool i_Enable = false;
-#else
         public bool i_Enable = true;
-#endif
 
         #endregion
 
@@ -188,7 +184,7 @@ namespace AO.Core.Encryption
 
             if (this.i_Enable == false)
             {
-                return true;
+                return false;
             }
 
             try
@@ -206,7 +202,34 @@ namespace AO.Core.Encryption
                 return false;
             }
 
-            if (!PasswordHash.ValidatePassword(ClientPassword, passwordHash))
+            if (string.IsNullOrWhiteSpace(passwordHash))
+            {
+                return false;
+            }
+
+            bool passwordIsValid;
+            try
+            {
+                passwordIsValid = PasswordHash.ValidatePassword(ClientPassword, passwordHash);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return false;
+            }
+            catch (OverflowException)
+            {
+                return false;
+            }
+
+            if (!passwordIsValid)
             {
                 return false;
             }
@@ -237,10 +260,15 @@ namespace AO.Core.Encryption
         {
             if (this.i_Enable == false)
             {
-                return true;
+                return false;
             }
 
             string passwordHash = this.GetLoginPassword(UserName);
+            if (string.IsNullOrEmpty(passwordHash))
+            {
+                return false;
+            }
+
             return this.IsValidLogin(LoginKey, ServerSalt, UserName, passwordHash);
         }
 

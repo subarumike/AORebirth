@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/CommonAssemblyInfo.cs">
+      <Link>Properties/CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/CommonAssemblyInfo.Pack.cs">
+      <Link>Properties/CommonAssemblyInfo.Pack.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/BigEndianBinary.cs">
+      <Link>BigEndianBinary.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Binary.cs">
+      <Link>Binary.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/CollectionDebuggerProxy`1.cs">
+      <Link>CollectionDebuggerProxy`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/CollectionOperation.cs">
+      <Link>CollectionOperation.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/DictionaryDebuggerProxy`2.cs">
+      <Link>DictionaryDebuggerProxy`2.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/EnumerableStream.cs">
+      <Link>EnumerableStream.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Float32Bits.cs">
+      <Link>Float32Bits.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Float64Bits.cs">
+      <Link>Float64Bits.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/GlobalSuppressions.cs">
+      <Link>GlobalSuppressions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/InvalidMessagePackStreamException.cs">
+      <Link>InvalidMessagePackStreamException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/IPackable.cs">
+      <Link>IPackable.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/ItemsUnpacker.cs">
+      <Link>ItemsUnpacker.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/ItemsUnpacker.Skipping.cs">
+      <Link>ItemsUnpacker.Skipping.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/ItemsUnpacker.Unpacking.cs">
+      <Link>ItemsUnpacker.Unpacking.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/IUnpackable.cs">
+      <Link>IUnpackable.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessageNotSupportedException.cs">
+      <Link>MessageNotSupportedException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackCode.cs">
+      <Link>MessagePackCode.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackConvert.cs">
+      <Link>MessagePackConvert.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackExtendedTypeObject.cs">
+      <Link>MessagePackExtendedTypeObject.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObject.cs">
+      <Link>MessagePackObject.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObject.Utilities.cs">
+      <Link>MessagePackObject.Utilities.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectDictionary.cs">
+      <Link>MessagePackObjectDictionary.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectDictionary.Enumerator.cs">
+      <Link>MessagePackObjectDictionary.Enumerator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectDictionary.KeySet.cs">
+      <Link>MessagePackObjectDictionary.KeySet.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectDictionary.KeySet.Enumerator.cs">
+      <Link>MessagePackObjectDictionary.KeySet.Enumerator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectDictionary.ValueCollection.cs">
+      <Link>MessagePackObjectDictionary.ValueCollection.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectDictionary.ValueCollection.Enumerator.cs">
+      <Link>MessagePackObjectDictionary.ValueCollection.Enumerator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackObjectEqualityComparer.cs">
+      <Link>MessagePackObjectEqualityComparer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessagePackString.cs">
+      <Link>MessagePackString.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/MessageTypeException.cs">
+      <Link>MessageTypeException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Packer.cs">
+      <Link>Packer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Packer.Nullable.cs">
+      <Link>Packer.Nullable.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/PackerCompatibilityOptions.cs">
+      <Link>PackerCompatibilityOptions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/PackerUnpackerExtensions.cs">
+      <Link>PackerUnpackerExtensions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/PackingOptions.cs">
+      <Link>PackingOptions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/ReflectionAbstractions.cs">
+      <Link>ReflectionAbstractions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/AutoMessagePackSerializer`1.cs">
+      <Link>Serialization/AutoMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/CallbackMessagePackSerializer`1.cs">
+      <Link>Serialization/CallbackMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/CollectionKind.cs">
+      <Link>Serialization/CollectionKind.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/CollectionTraits.cs">
+      <Link>Serialization/CollectionTraits.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DataMemberContract.cs">
+      <Link>Serialization/DataMemberContract.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultConcreteTypeRepository.cs">
+      <Link>Serialization/DefaultConcreteTypeRepository.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/ArraySegmentMessageSerializer.cs">
+      <Link>Serialization/DefaultSerializers/ArraySegmentMessageSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/DefaultSerializers.cs">
+      <Link>Serialization/DefaultSerializers/DefaultSerializers.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/EnumMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/EnumMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/EnumMessagePackSerializer`1.cs">
+      <Link>Serialization/DefaultSerializers/EnumMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/MessagePackObjectExtensions.cs">
+      <Link>Serialization/DefaultSerializers/MessagePackObjectExtensions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/MsgPack_MessagePackExtendedTypeObjectMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/MsgPack_MessagePackExtendedTypeObjectMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/MsgPack_MessagePackObjectMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/MsgPack_MessagePackObjectMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/NullableMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/NullableMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/NullableMessagePackSerializer`1.cs">
+      <Link>Serialization/DefaultSerializers/NullableMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_ArraySegment_1MessagePackSerializer`1.cs">
+      <Link>Serialization/DefaultSerializers/System_ArraySegment_1MessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_ByteArrayMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_ByteArrayMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_CharArrayMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_CharArrayMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_Collections_DictionaryEntryMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_Collections_DictionaryEntryMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_Collections_Generic_KeyValuePair_2MessagePackSerializer`2.cs">
+      <Link>Serialization/DefaultSerializers/System_Collections_Generic_KeyValuePair_2MessagePackSerializer`2.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_Collections_Specialized_NameValueCollectionMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_Collections_Specialized_NameValueCollectionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_Numerics_ComplexMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_Numerics_ComplexMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_ObjectMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_ObjectMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_Runtime_InteropServices_ComTypes_FILETIMEMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_Runtime_InteropServices_ComTypes_FILETIMEMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_StringMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_StringMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_Text_StringBuilderMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_Text_StringBuilderMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_UriMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_UriMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/DefaultSerializers/System_VersionMessagePackSerializer.cs">
+      <Link>Serialization/DefaultSerializers/System_VersionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmitterFlavor.cs">
+      <Link>Serialization/EmitterFlavor.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/ArrayEmittingSerializerBuilder`1.cs">
+      <Link>Serialization/EmittingSerializers/ArrayEmittingSerializerBuilder`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/ContextBasedSerializerEmitter.cs">
+      <Link>Serialization/EmittingSerializers/ContextBasedSerializerEmitter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/DefaultSerializationMethodGeneratorManager.cs">
+      <Link>Serialization/EmittingSerializers/DefaultSerializationMethodGeneratorManager.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/EmittingSerializerBuilderLogics.cs">
+      <Link>Serialization/EmittingSerializers/EmittingSerializerBuilderLogics.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/EmittingSerializerBuilder`1.cs">
+      <Link>Serialization/EmittingSerializers/EmittingSerializerBuilder`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/Emittion.cs">
+      <Link>Serialization/EmittingSerializers/Emittion.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/FieldBasedSerializerEmitter.cs">
+      <Link>Serialization/EmittingSerializers/FieldBasedSerializerEmitter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/LocalVariableHolder.cs">
+      <Link>Serialization/EmittingSerializers/LocalVariableHolder.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/MapEmittingSerializerBuilder`1.cs">
+      <Link>Serialization/EmittingSerializers/MapEmittingSerializerBuilder`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/SerializationMethodGeneratorManager.cs">
+      <Link>Serialization/EmittingSerializers/SerializationMethodGeneratorManager.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/EmittingSerializers/SerializerEmitter.cs">
+      <Link>Serialization/EmittingSerializers/SerializerEmitter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ArrayFormatObjectExpressionMessagePackSerializer.cs">
+      <Link>Serialization/ExpressionSerializers/ArrayFormatObjectExpressionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ArrayMessagePackSerializer`1.cs">
+      <Link>Serialization/ExpressionSerializers/ArrayMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ExpressionDumper.cs">
+      <Link>Serialization/ExpressionSerializers/ExpressionDumper.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ExpressionSerializerBuilder`1.cs">
+      <Link>Serialization/ExpressionSerializers/ExpressionSerializerBuilder`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ExpressionSerializerLogics.cs">
+      <Link>Serialization/ExpressionSerializers/ExpressionSerializerLogics.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/IExpressionMessagePackSerializer.cs">
+      <Link>Serialization/ExpressionSerializers/IExpressionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ListExpressionMessagePackSerializer`1.cs">
+      <Link>Serialization/ExpressionSerializers/ListExpressionMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/MapExpressionMessagePackSerializer.cs">
+      <Link>Serialization/ExpressionSerializers/MapExpressionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/MapFormatObjectExpressionMessagePackSerializer.cs">
+      <Link>Serialization/ExpressionSerializers/MapFormatObjectExpressionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/ObjectExpressionMessagePackSerializer.cs">
+      <Link>Serialization/ExpressionSerializers/ObjectExpressionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/SequenceExpressionMessagePackSerializer`1.cs">
+      <Link>Serialization/ExpressionSerializers/SequenceExpressionMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ExpressionSerializers/TupleExpressionMessagePackSerializer.cs">
+      <Link>Serialization/ExpressionSerializers/TupleExpressionMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/FromExpression.cs">
+      <Link>Serialization/FromExpression.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/FromExpression.ToConstructor.cs">
+      <Link>Serialization/FromExpression.ToConstructor.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/FromExpression.ToMethod.cs">
+      <Link>Serialization/FromExpression.ToMethod.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/IdentifierUtility.cs">
+      <Link>Serialization/IdentifierUtility.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/IMessagePackSerializer.cs">
+      <Link>Serialization/IMessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/IMessagePackSingleObjectSerializer.cs">
+      <Link>Serialization/IMessagePackSingleObjectSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/LazyDelegatingMessagePackSerializer`1.cs">
+      <Link>Serialization/LazyDelegatingMessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/MessagePackMemberAttribute.cs">
+      <Link>Serialization/MessagePackMemberAttribute.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/MessagePackSerializer.cs">
+      <Link>Serialization/MessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/MessagePackSerializer`1.cs">
+      <Link>Serialization/MessagePackSerializer`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_DictionaryEntry.cs">
+      <Link>Serialization/Metadata/_DictionaryEntry.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_Enumerable.cs">
+      <Link>Serialization/Metadata/_Enumerable.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_IDictionaryEnumerator.cs">
+      <Link>Serialization/Metadata/_IDictionaryEnumerator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_IDisposable.cs">
+      <Link>Serialization/Metadata/_IDisposable.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_IEnumreator.cs">
+      <Link>Serialization/Metadata/_IEnumreator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_KeyValuePair`2.cs">
+      <Link>Serialization/Metadata/_KeyValuePair`2.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_MessagePackObject.cs">
+      <Link>Serialization/Metadata/_MessagePackObject.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_MessagePackSerializer.cs">
+      <Link>Serialization/Metadata/_MessagePackSerializer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_NotImplementedException.cs">
+      <Link>Serialization/Metadata/_NotImplementedException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_Nullable`1.cs">
+      <Link>Serialization/Metadata/_Nullable`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_Packer.cs">
+      <Link>Serialization/Metadata/_Packer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_SerializationCompatibilityOptions.cs">
+      <Link>Serialization/Metadata/_SerializationCompatibilityOptions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_SerializationContext.cs">
+      <Link>Serialization/Metadata/_SerializationContext.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_String.cs">
+      <Link>Serialization/Metadata/_String.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_Type.cs">
+      <Link>Serialization/Metadata/_Type.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_Unpacker.cs">
+      <Link>Serialization/Metadata/_Unpacker.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_Unpacker.Read.cs">
+      <Link>Serialization/Metadata/_Unpacker.Read.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Metadata/_UnpackHelpers.cs">
+      <Link>Serialization/Metadata/_UnpackHelpers.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/NilImplication.cs">
+      <Link>Serialization/NilImplication.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/ReflectionExtensions.cs">
+      <Link>Serialization/ReflectionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Reflection/GenericTypeExtensions.cs">
+      <Link>Serialization/Reflection/GenericTypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Reflection/ReflectionExtensions.cs">
+      <Link>Serialization/Reflection/ReflectionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Reflection/TracingILGenerator.conveniences.cs">
+      <Link>Serialization/Reflection/TracingILGenerator.conveniences.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Reflection/TracingILGenerator.cs">
+      <Link>Serialization/Reflection/TracingILGenerator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Reflection/TracingILGenerator.emits.cs">
+      <Link>Serialization/Reflection/TracingILGenerator.emits.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializationCompatibilityOptions.cs">
+      <Link>Serialization/SerializationCompatibilityOptions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializationContext.cs">
+      <Link>Serialization/SerializationContext.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializationExceptions.cs">
+      <Link>Serialization/SerializationExceptions.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializationMethod.cs">
+      <Link>Serialization/SerializationMethod.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializationMethodGeneratorOption.cs">
+      <Link>Serialization/SerializationMethodGeneratorOption.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializerBuilder`1.cs">
+      <Link>Serialization/SerializerBuilder`1.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializerGenerator.cs">
+      <Link>Serialization/SerializerGenerator.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializerRepository.cs">
+      <Link>Serialization/SerializerRepository.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializerRepository.defaults.cs">
+      <Link>Serialization/SerializerRepository.defaults.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializerTypeKeyRepository.cs">
+      <Link>Serialization/SerializerTypeKeyRepository.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/SerializingMember.cs">
+      <Link>Serialization/SerializingMember.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/Tracer.cs">
+      <Link>Serialization/Tracer.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/TypeKeyRepository.cs">
+      <Link>Serialization/TypeKeyRepository.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Serialization/UnpackHelpers.cs">
+      <Link>Serialization/UnpackHelpers.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/SetOperation.cs">
+      <Link>SetOperation.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/StreamPacker.cs">
+      <Link>StreamPacker.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/SubtreeUnpacker.cs">
+      <Link>SubtreeUnpacker.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/SubtreeUnpacker.Unpacking.cs">
+      <Link>SubtreeUnpacker.Unpacking.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/TupleItems.cs">
+      <Link>TupleItems.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnassignedMessageTypeException.cs">
+      <Link>UnassignedMessageTypeException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacker.cs">
+      <Link>Unpacker.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacker.Unpacking.cs">
+      <Link>Unpacker.Unpacking.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnpackException.cs">
+      <Link>UnpackException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacking.cs">
+      <Link>Unpacking.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacking.Numerics.cs">
+      <Link>Unpacking.Numerics.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacking.Others.cs">
+      <Link>Unpacking.Others.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacking.Streaming.cs">
+      <Link>Unpacking.Streaming.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Unpacking.String.cs">
+      <Link>Unpacking.String.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnpackingMode.cs">
+      <Link>UnpackingMode.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnpackingResult.cs">
+      <Link>UnpackingResult.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnpackingStream.cs">
+      <Link>UnpackingStream.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnpackingStreamReader.cs">
+      <Link>UnpackingStreamReader.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/UnsafeNativeMethods.cs">
+      <Link>UnsafeNativeMethods.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack/Validation.cs">
+      <Link>Validation.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono/Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

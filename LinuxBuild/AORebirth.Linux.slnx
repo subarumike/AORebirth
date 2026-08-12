@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="Projects/AORebirth.Chat.Authentication.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Communication.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Core.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Core.Login.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Database.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Enums.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Exceptions.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Interfaces.Linux.csproj" />
+    <Project Path="Projects/AORebirth.ObjectManager.Linux.csproj" />
+    <Project Path="Projects/AORebirth.Stats.Linux.csproj" />
+    <Project Path="Projects/Cell.Core.Linux.csproj" />
+    <Project Path="Projects/Cell.Util.Linux.csproj" />
+    <Project Path="Projects/Ionic.Zlib.Linux.csproj" />
+    <Project Path="Projects/MemBus.Linux.csproj" />
+    <Project Path="Projects/MsgPack.Mono.Linux.csproj" />
+    <Project Path="Projects/PlayfieldLoader.Linux.csproj" />
+    <Project Path="Projects/SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+    <Project Path="Projects/Translations.Linux.csproj" />
+    <Project Path="Projects/Utility.Linux.csproj" />
+  </Folder>
+  <Folder Name="/Servers/">
+    <Project Path="Projects/ChatEngine.Linux.csproj" />
+    <Project Path="Projects/LoginEngine.Linux.csproj" />
+    <Project Path="Projects/ZoneEngine.Linux.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/CompatibilitySmokeTests/CompatibilitySmokeTests.csproj" />
+    <Project Path="Tools/PublishDirectoryGuard/PublishDirectoryGuard.csproj" />
+    <Project Path="Tools/SourceInventoryGuard/SourceInventoryGuard.csproj" />
+    <Project Path="Tools/Stage8OfflineSmokeTests/Stage8OfflineSmokeTests.csproj" />
+  </Folder>
+</Solution>

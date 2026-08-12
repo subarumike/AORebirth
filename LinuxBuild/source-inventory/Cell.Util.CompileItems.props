@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/BaseImmutableDictionary.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/IdQueue.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/ImmutableDictionary.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/ImmutableList.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/LockfreeQueue.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/LockfreeStack.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/PriorityQueue.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/SynchronizedDictionary.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/SynchronizedList.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Collections/SynchronizedQueue.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/ObjectPools/IObjectPool.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/ObjectPools/IPooledObject.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/ObjectPools/ObjectPool.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Util/Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Stage2ContractFingerprint.cs" Link="Stage2ContractFingerprint.cs" />
+    <Compile Include="../Stage7ContractFingerprint.cs" Link="Stage7ContractFingerprint.cs" />
+    <Compile Include="../Stage7RuntimeFixtures.cs" Link="Stage7RuntimeFixtures.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AORebirth.Core">
+      <HintPath>../../../AORebirth/Built/Debug/AORebirth.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Cell.Core">
+      <HintPath>../../../AORebirth/Built/Debug/Cell.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="LoginEngine">
+      <HintPath>../../../AORebirth/Built/Debug/LoginEngine.exe</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SmokeLounge.AOtomation.Messaging">
+      <HintPath>../../../AORebirth/Built/Debug/SmokeLounge.AOtomation.Messaging.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

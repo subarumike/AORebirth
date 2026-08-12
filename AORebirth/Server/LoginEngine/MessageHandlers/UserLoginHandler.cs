@@ -36,6 +36,7 @@ namespace LoginEngine.MessageHandlers
     using System;
     using System.ComponentModel.Composition;
     using System.Globalization;
+    using System.Security.Cryptography;
     using System.Text;
 
     using AORebirth.Core.Components;
@@ -66,31 +67,41 @@ namespace LoginEngine.MessageHandlers
         {
             var client = (Client)sender;
             var userLoginMessage = (UserLoginMessage)message.Body;
-            client.AccountName = userLoginMessage.UserName;
-            client.ClientVersion = userLoginMessage.ClientVersion;
-            Colouring.Push(ConsoleColor.Green);
-            Console.WriteLine(
-                "Client '" + client.AccountName + "' connected using version '" + client.ClientVersion + "'");
-            Colouring.Pop();
-
             var salt = new byte[0x20];
-            var rand = new Random();
-
-            rand.NextBytes(salt);
+            using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+            {
+                random.GetBytes(salt);
+                var replacement = new byte[1];
+                for (int index = 0; index < salt.Length; index++)
+                {
+                    while (salt[index] == 0)
+                    {
+                        random.GetBytes(replacement);
+                        salt[index] = replacement[0];
+                    }
+                }
+            }
 
             var sb = new StringBuilder();
             for (int i = 0; i < 32; i++)
             {
-                // 0x00 Breaks Things
-                if (salt[i] == 0)
-                {
-                    salt[i] = 42; // So we change it to something nicer
-                }
-
                 sb.Append(salt[i].ToString("x2", CultureInfo.InvariantCulture));
             }
 
-            client.ServerSalt = sb.ToString();
+            if (!client.BeginAuthentication(
+                userLoginMessage.UserName,
+                userLoginMessage.ClientVersion,
+                sb.ToString()))
+            {
+                client.RejectAuthentication();
+                return;
+            }
+            Colouring.Push(ConsoleColor.Green);
+            Console.WriteLine(
+                "Client '" + Client.ToLogValue(client.AccountName) + "' connected using version '"
+                + Client.ToLogValue(client.ClientVersion) + "'");
+            Colouring.Pop();
+
             var serverSaltMessage = new ServerSaltMessage { ServerSalt = salt };
             client.Send(0x00002B3F, serverSaltMessage);
         }

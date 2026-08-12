@@ -310,23 +310,37 @@ namespace Utility
             Stream fileStream = new FileStream(fname, FileMode.Open);
 
             ZlibStream inputStream = new ZlibStream(fileStream, CompressionMode.Decompress);
+            try
+            {
 
-            inputStream.Seek(0, SeekOrigin.Begin);
-            BinaryReader binaryReader = new BinaryReader(inputStream);
-            byte versionlength = binaryReader.ReadByte();
-            char[] version = new char[versionlength];
-            version = binaryReader.ReadChars(versionlength);
+                inputStream.Seek(0, SeekOrigin.Begin);
+                BinaryReader binaryReader = new BinaryReader(inputStream);
+                byte versionlength = binaryReader.ReadByte();
+                char[] version = new char[versionlength];
+                version = binaryReader.ReadChars(versionlength);
 
-            // TODO: Check version and print a warning if not same as config.xml's
-            MessagePackSerializer<Dictionary<T, TU>> messagePackSerializer =
-                MessagePackSerializer.Create<Dictionary<T, TU>>();
+                // TODO: Check version and print a warning if not same as config.xml's
+                MessagePackSerializer<Dictionary<T, TU>> messagePackSerializer =
+                    MessagePackSerializer.Create<Dictionary<T, TU>>();
 
-            var buffer = new byte[4];
-            inputStream.Read(buffer, 0, 4);
+#if AOREBIRTH_LINUX
+                binaryReader.ReadInt32();
+                binaryReader.ReadInt32();
+#else
+                var buffer = new byte[4];
+                inputStream.Read(buffer, 0, 4);
+                inputStream.Read(buffer, 0, 4);
+#endif
 
-            inputStream.Read(buffer, 0, 4);
-
-            return messagePackSerializer.Unpack(inputStream);
+                return messagePackSerializer.Unpack(inputStream);
+            }
+            finally
+            {
+#if AOREBIRTH_LINUX
+                inputStream.Dispose();
+                fileStream.Dispose();
+#endif
+            }
         }
 
         #endregion
