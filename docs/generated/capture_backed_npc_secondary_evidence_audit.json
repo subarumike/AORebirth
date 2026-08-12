@@ -35,7 +35,7 @@
     "hashStatusCounts": {
       "content-sha256": 5024
     },
-    "evidenceDocumentCount": 198,
+    "evidenceDocumentCount": 199,
     "missingEvidenceDocumentCount": 0
   },
   "mainCorpusReconciliation": {
@@ -828,6 +828,20 @@
         "20260728-010220",
         "20260728-012547"
       ],
+      "missingReferencedCaptureIds": []
+    },
+    {
+      "path": "docs/evidence/STAGE9_ZONEENGINE_NATIVE_SYSTEMD_20260809.md",
+      "exists": true,
+      "discoveryReasons": [
+        "docs-evidence-directory"
+      ],
+      "sizeBytes": 4761,
+      "hashStatus": "content-sha256",
+      "sha256": "d7de248ff3116fc1814a62c166067f5ab7ba58aa366e383c80be911e444dc94f",
+      "manifestSha256": null,
+      "manifestDigestMatches": null,
+      "referencedCaptureIds": [],
       "missingReferencedCaptureIds": []
     },
     {
