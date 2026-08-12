@@ -33,6 +33,9 @@ namespace ChatEngine.PacketHandlers
 {
     #region Usings ...
 
+    using System;
+    using System.Reflection;
+
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
 
@@ -85,6 +88,7 @@ namespace ChatEngine.PacketHandlers
             client.Character.characterName = character.Name;
             client.Character.characterFirstName = character.FirstName;
             client.Character.characterLastName = character.LastName;
+            client.ChatAuthenticatedUtc = DateTime.UtcNow;
 
             client.ChatServer().AddClientToChannels(client);
 

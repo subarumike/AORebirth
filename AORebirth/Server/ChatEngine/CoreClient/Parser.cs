@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -132,6 +132,11 @@ namespace ChatEngine
                     break;
                 case 1500:
                     LftRegister.Read(client, packet);
+                    break;
+                case 1501:
+                    // Client→server: Looking-for-team uncheck (05DD). Server→client uses same
+                    // type for LftQueryReply rows; only inbound client packets hit Parser.
+                    LftUnregister.Read(client, packet);
                     break;
                 case 1502:
                     LftSearch.Read(client, packet);
