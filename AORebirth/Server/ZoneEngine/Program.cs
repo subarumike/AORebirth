@@ -59,6 +59,7 @@ namespace ZoneEngine
 
     using Utility;
     using Utility.Config;
+    using Utility.Network;
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Arete;
@@ -595,14 +596,10 @@ namespace ZoneEngine
             int Port = Convert.ToInt32(ConfigReadWrite.Instance.CurrentConfig.ZonePort);
             try
             {
-                if (ConfigReadWrite.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    zoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
-                }
-                else
-                {
-                    zoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Parse(ConfigReadWrite.Instance.CurrentConfig.ListenIP), Port);
-                }
+                EngineBindPolicy bindPolicy = EngineBindPolicy.ResolveFromEnvironment();
+                Console.WriteLine("ZoneEngine bind policy: " + bindPolicy.Mode);
+                Console.WriteLine("ZoneEngine listener: " + bindPolicy.AddressText + ":" + Port);
+                zoneServer.TcpEndPoint = new IPEndPoint(bindPolicy.Address, Port);
 
                 zoneServer.MaximumPendingConnections = 100;
             }

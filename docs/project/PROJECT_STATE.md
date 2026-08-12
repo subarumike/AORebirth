@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-09
+Updated: 2026-08-12
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -232,6 +232,12 @@ migrations; details and exact source references are recorded in
   `85c1515d274c2e4051013e89ca6d2a355365d5d01df7d621cc060dfa84e38463`.
 - DotNetZip was removed. Archive extraction uses canonical-path containment;
   Zlib-only runtime paths use the isolated Ionic.Zlib package. Npgsql is 4.0.14.
+- LoginEngine and ZoneEngine listener exposure is deployment policy, not source
+  drift: `AO_REBIRTH_BIND_MODE` defaults to `Loopback` (`127.0.0.1`), accepts
+  only explicit `Loopback` or `Public`, fails closed on empty or invalid values,
+  and binds public production listeners only when set to `Public` (`0.0.0.0`).
+  ChatEngine public and private ISCom bind rules remain separate; MySQL and
+  ISCom are not made public by the listener policy.
 - Three obsolete detached worktrees, the unowned Cursor export, 1,877 tracked
   temporary/decompiled files, and 74,054,821,216 bytes of disposable diagnostics
   and tools were removed after manifests and reachability checks.
@@ -242,13 +248,14 @@ migrations; details and exact source references are recorded in
 
 ## Remaining debt boundary
 
-- Do not expose LoginEngine TCP 7500 yet. Stage 7.1 completes authenticated
-  connection state, mutation ownership, CSPRNG salt, bounded dispatch draining,
-  and disposable create/select/delete DAO acceptance, but ZoneEngine/full Core
-  are not present.
-- Before a public player test, prove official-client end-to-end login and
-  retry/error UX, resolve account character-count semantics from authoritative
-  evidence, and pass a sustained multiplayer soak.
+- Public LoginEngine TCP 7500 and ZoneEngine TCP 7501 exposure is permitted only
+  through explicit `AO_REBIRTH_BIND_MODE=Public` production deployment after the
+  repository validation gates pass. `Loopback` remains the default and rollback
+  mode.
+- Before declaring public production accepted, prove official-client
+  end-to-end login, retry/error UX, character list/create/select semantics,
+  ZoneEngine handoff, Arete entry, movement, loopback rollback, and sustained
+  multiplayer operation.
 - Rotate the previously exposed database credential externally.
 - Perform authorized live WebEngine verification only after a valid disposable
   database credential is supplied. Current validation intentionally makes no
