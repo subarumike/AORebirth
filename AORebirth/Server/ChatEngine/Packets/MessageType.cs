@@ -196,12 +196,15 @@ namespace ChatEngine.Packets
         PrivateMessage = 30,
 
         /// <summary>
-        /// Looking for Team register (client → server). Capture 20260727-104625.
+        /// Looking for Team register / check-on comment (client → server).
+        /// Capture 20260727-104625 /lft test → 05DC.
         /// </summary>
         LftRegister = 1500,
 
         /// <summary>
-        /// Looking for Team search reply (server → client). Capture 20260727-104625.
+        /// Dual use:
+        /// Server → client: LFT search reply rows (LftQueryReply).
+        /// Client → server: Looking-for-team uncheck (05DD / often 05DD0000).
         /// </summary>
         LftQueryReply = 1501,
 

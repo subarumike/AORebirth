@@ -121,6 +121,11 @@ namespace ChatEngine.CoreClient
         /// </summary>
         public string ServerSalt { get; set; }
 
+        /// <summary>
+        /// UTC when this chat client finished character login (LFT login-echo grace).
+        /// </summary>
+        public DateTime ChatAuthenticatedUtc { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
@@ -184,7 +189,9 @@ namespace ChatEngine.CoreClient
         /// </returns>
         protected override bool OnReceive(BufferSegment buffer)
         {
-            if (this._remainingLength > 4)
+            // Minimum chat packet is type(2)+length(2)=4 bytes (e.g. LFT uncheck 05DD0000).
+            // Using >4 dropped those and never unlisted.
+            if (this._remainingLength >= 4)
             {
                 byte[] packet = new byte[this._remainingLength];
                 Array.Copy(buffer.SegmentData, 0, packet, 0, this._remainingLength);

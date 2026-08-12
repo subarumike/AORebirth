@@ -412,6 +412,7 @@ namespace ZoneEngine.Core
                     }
                 }
 
+                // Only LFT-search matches are armed/seeded — never all online players.
                 LftInviteClientPresence.SeedCandidatesForSearcher(character, candidateIds, nameOverrides);
                 LftInviteArm.Arm(character, candidateIds, nameOverrides);
                 PushLivePlayfieldsToChat(candidateIds);
@@ -459,12 +460,28 @@ namespace ZoneEngine.Core
                     continue;
                 }
 
+                int expansion = (int)online.Playfield.Expansion;
+
+                /*
+                 * Expansion:
+                 * 1 = Rubi-Ka
+                 * 2 = Shadowlands
+                 */
+                if (expansion != 1 && expansion != 2)
+                {
+                    continue;
+                }
+
                 Program.ISComClient.TrySend(
                     new ChatCommand
                     {
                         CharacterId = online.Identity.Instance,
                         ChatCommandString =
-                            LftPlayfieldRegistryCommandPrefix + " " + online.Playfield.Identity.Instance
+                            LftPlayfieldRegistryCommandPrefix
+                            + " "
+                            + online.Playfield.Identity.Instance
+                            + " "
+                            + expansion
                     });
             }
         }

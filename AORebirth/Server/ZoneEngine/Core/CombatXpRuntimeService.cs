@@ -421,9 +421,7 @@ namespace ZoneEngine.Core
             if (client != null)
             {
                 // Same post-FullCharacter bar wire used on login (SK path at 200-219).
-                // NOTE: SyncXpBarStatsOnLogin skips NewLevelMessage for shadowlevels (200+).
-                // Team Recruit XP warn uses Level from NewLevel — without it, UI can show 200
-                // while Recruit still treats the old level (200→25 = silent; 25→200 = warn).
+                // Always push NewLevel after — Team Recruit XP warn uses Level from NewLevel.
                 SyncXpBarStatsOnLogin(character);
                 SendManualLevelNewLevelMessage(client, character, level);
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.level, (uint)level);
@@ -457,8 +455,39 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
+        /// Push <see cref="NewLevelMessage"/> so client Recruit/LFT GetTeamLevel matches
+        /// the character's real level (required at 200+ where login used to skip it).
+        /// </summary>
+        internal static void EnsureRecruitNewLevelWired(ICharacter character)
+        {
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return;
+            }
+
+            IZoneClient client = character.Controller.Client;
+            if (client == null)
+            {
+                return;
+            }
+
+            int level = GetCurrentLevel(character);
+            if (level < 1)
+            {
+                level = 1;
+            }
+            else if (level > MaxLevel)
+            {
+                level = MaxLevel;
+            }
+
+            SendManualLevelNewLevelMessage(client, character, level);
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.level, (uint)level);
+        }
+
+        /// <summary>
         /// GM <c>/set level</c> must always push one <see cref="NewLevelMessage"/> even at 200+,
-        /// because <see cref="SendLoginXpBarSync"/> skips NewLevel on the SK path.
+        /// because login SK/max paths previously skipped NewLevel (Recruit TooHigh).
         /// </summary>
         private static void SendManualLevelNewLevelMessage(
             IZoneClient client,
@@ -851,7 +880,8 @@ namespace ZoneEngine.Core
             int level = GetCurrentLevel(character);
 
             // Level 200-219: client XP tooltip becomes "Experience 0/0" unless SK + NextSK
-            // are wired. Skip the RK XP NewLevel replay and sync Shadowknowledge instead.
+            // are wired. Still must push NewLevel — Team Recruit / LFT TooHigh uses
+            // GetTeamLevel() from NewLevel, not Stat 54 / SCFU (see SendManualLevelNewLevelMessage).
             if (IsShadowLevelProgression(level))
             {
                 EnsureSkFloorOnLogin(character);
@@ -863,13 +893,15 @@ namespace ZoneEngine.Core
                 ClearStatChangedFlag(character, StatIds.sk);
                 ClearStatChangedFlag(character, StatIds.nextsk);
                 ClearStatChangedFlag(character, StatIds.lastsk);
+                SendManualLevelNewLevelMessage(client, character, level);
                 LogXpTrace(
                     character,
                     "login-bar-sync-sk",
                     "level=" + level.ToString(CultureInfo.InvariantCulture)
                     + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue)
                         .ToString(CultureInfo.InvariantCulture)
-                    + " nextSk=" + GetNextSkRequiredForLevel(level).ToString(CultureInfo.InvariantCulture));
+                    + " nextSk=" + GetNextSkRequiredForLevel(level).ToString(CultureInfo.InvariantCulture)
+                    + " newLevelReplay=true");
                 return;
             }
 
@@ -879,7 +911,8 @@ namespace ZoneEngine.Core
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextsk, 0);
                 ClearStatChangedFlag(character, StatIds.nextxp);
                 ClearStatChangedFlag(character, StatIds.nextsk);
-                LogXpTrace(character, "login-bar-sync-max", "level=220 nextXp=0 nextSk=0");
+                SendManualLevelNewLevelMessage(client, character, level);
+                LogXpTrace(character, "login-bar-sync-max", "level=220 nextXp=0 nextSk=0 newLevelReplay=true");
                 return;
             }
 

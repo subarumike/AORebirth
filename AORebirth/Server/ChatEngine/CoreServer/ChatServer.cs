@@ -277,11 +277,18 @@ namespace ChatEngine.CoreServer
             {
                 string[] parts = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 int playfieldId;
-                if (parts.Length >= 2 && int.TryParse(parts[1], out playfieldId) && playfieldId > 0)
+                int expansion;
+
+                if (parts.Length >= 3
+                    && int.TryParse(parts[1], out playfieldId)
+                    && playfieldId > 0
+                    && int.TryParse(parts[2], out expansion)
+                    && (expansion == 1 || expansion == 2))
                 {
                     LftPlayfieldRegistry.Set(
                         unchecked((uint)chatCommand.CharacterId),
-                        playfieldId);
+                        playfieldId,
+                        expansion);
                 }
             }
         }
