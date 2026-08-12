@@ -15,15 +15,18 @@ ALLOWED_VALUES = {
     "changeme",
     "example",
     "not-set",
+    "offline",
     "placeholder",
     "replace-me",
     "set-in-environment",
+    "stage7_offline",
+    "stage8-placeholder",
 }
 PATTERNS = (
     (
         "connection-string password",
         re.compile(
-            r"(?i)(?:server|host)\s*=\s*[^;\r\n]+;[^\r\n]*(?:pwd|password)\s*=\s*([^;\s<]+)"
+            r"(?i)(?:server|host)\s*=\s*[^;\r\n]+;[^\r\n]*(?:pwd|password)\s*=\s*([^;\s<\"')]+)"
         ),
     ),
     ("XML password", re.compile(r"(?i)<(?:password|mysqlpassword)>\s*([^<]+?)\s*</")),
