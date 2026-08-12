@@ -192,8 +192,8 @@ namespace ChatEngine
         /// </returns>
         private static string GetLogString(string Channel, DateTime Time)
         {
+            string logDirectory = GetLogDirectory();
             StringBuilder Sb = new StringBuilder();
-            Sb.Append(@"Logs\");
             Sb.Append(Channel);
             Sb.Append("-");
             Sb.Append(Time.Year.ToString());
@@ -203,18 +203,24 @@ namespace ChatEngine
             Sb.Append(Time.Day.ToString().PadLeft(2, '0'));
             Sb.Append(".log");
 
-            if (!Directory.Exists("Logs"))
+            if (!Directory.Exists(logDirectory))
             {
                 try
                 {
-                    Directory.CreateDirectory("Logs");
+                    Directory.CreateDirectory(logDirectory);
                 }
                 catch
                 {
                 }
             }
 
-            return Sb.ToString();
+            return Path.Combine(logDirectory, Sb.ToString());
+        }
+
+        private static string GetLogDirectory()
+        {
+
+            return "Logs";
         }
 
         /// <summary>

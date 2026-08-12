@@ -70,13 +70,19 @@ namespace LoginEngine.MessageHandlers
         {
             var client = (Client)sender;
             var selectCharacterMessage = (SelectCharacterMessage)message.Body;
+            string authenticatedAccount;
+            if (!client.TryGetAuthenticatedAccountName(out authenticatedAccount))
+            {
+                client.RejectAuthentication();
+                return;
+            }
 
             var checkLogin = new CheckLogin();
-            if (checkLogin.IsCharacterOnAccount(client, selectCharacterMessage.CharacterId) == false)
+            if (checkLogin.IsCharacterOnAccount(authenticatedAccount, selectCharacterMessage.CharacterId) == false)
             {
                 Colouring.Push(ConsoleColor.Green);
                 Console.WriteLine(
-                    "Client '" + client.AccountName + "' tried to log in as CharID "
+                    "Client '" + authenticatedAccount + "' tried to log in as CharID "
                     + selectCharacterMessage.CharacterId + " but it is not on their account!");
                 Colouring.Pop();
 
@@ -89,7 +95,7 @@ namespace LoginEngine.MessageHandlers
             if (CharacterDao.Instance.IsOnline(selectCharacterMessage.CharacterId) == 1)
             {
                 Console.WriteLine(
-                    "Client '" + client.AccountName
+                    "Client '" + authenticatedAccount
                     + "' is reclaiming stale online state for character " + selectCharacterMessage.CharacterId + ".");
                 CharacterDao.Instance.SetOffline(selectCharacterMessage.CharacterId);
             }

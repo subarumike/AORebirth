@@ -57,6 +57,7 @@
 #region Usings ...
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 #endregion
@@ -84,3 +85,4 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("1a47aa38-7245-4e44-995e-70da7d2108bd")]
+[assembly: InternalsVisibleTo("LoginEngine")]

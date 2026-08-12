@@ -35,6 +35,7 @@ namespace LoginEngine.CoreClient
 
     using System;
     using System.Globalization;
+    using System.Text;
 
     using Cell.Core;
 
@@ -42,6 +43,7 @@ namespace LoginEngine.CoreClient
     using AORebirth.Core.EventHandlers.Events;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 
     using Utility;
 
@@ -63,7 +65,23 @@ namespace LoginEngine.CoreClient
 
         /// <summary>
         /// </summary>
+        private readonly object authenticationSync = new object();
+
+        /// <summary>
+        /// </summary>
         private string accountName = string.Empty;
+
+        /// <summary>
+        /// </summary>
+        private string authenticatedAccountName = string.Empty;
+
+        /// <summary>
+        /// </summary>
+        private long authenticationGeneration;
+
+        /// <summary>
+        /// </summary>
+        private AuthenticationState authenticationState = AuthenticationState.AwaitingLogin;
 
         /// <summary>
         /// </summary>
@@ -76,6 +94,17 @@ namespace LoginEngine.CoreClient
         /// <summary>
         /// </summary>
         private string serverSalt = string.Empty;
+
+        /// <summary>
+        /// </summary>
+        private enum AuthenticationState
+        {
+            AwaitingLogin,
+            ChallengeIssued,
+            Authenticating,
+            Closed,
+            Authenticated
+        }
 
         #endregion
 
@@ -106,12 +135,18 @@ namespace LoginEngine.CoreClient
         {
             get
             {
-                return this.accountName;
+                lock (this.authenticationSync)
+                {
+                    return this.accountName;
+                }
             }
 
             set
             {
-                this.accountName = value;
+                lock (this.authenticationSync)
+                {
+                    this.accountName = value ?? string.Empty;
+                }
             }
         }
 
@@ -121,12 +156,18 @@ namespace LoginEngine.CoreClient
         {
             get
             {
-                return this.clientVersion;
+                lock (this.authenticationSync)
+                {
+                    return this.clientVersion;
+                }
             }
 
             set
             {
-                this.clientVersion = value;
+                lock (this.authenticationSync)
+                {
+                    this.clientVersion = value ?? string.Empty;
+                }
             }
         }
 
@@ -136,12 +177,18 @@ namespace LoginEngine.CoreClient
         {
             get
             {
-                return this.serverSalt;
+                lock (this.authenticationSync)
+                {
+                    return this.serverSalt;
+                }
             }
 
             set
             {
-                this.serverSalt = value;
+                lock (this.authenticationSync)
+                {
+                    this.serverSalt = value ?? string.Empty;
+                }
             }
         }
 
@@ -190,6 +237,231 @@ namespace LoginEngine.CoreClient
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// </summary>
+        /// <param name="value">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal static string ToLogValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            int length = Math.Min(value.Length, 128);
+            var result = new StringBuilder(length);
+            for (int index = 0; index < length; index++)
+            {
+                char character = value[index];
+                result.Append(char.IsControl(character) ? '?' : character);
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="newAccountName">
+        /// </param>
+        /// <param name="newClientVersion">
+        /// </param>
+        /// <param name="newServerSalt">
+        /// </param>
+        internal bool BeginAuthentication(
+            string newAccountName,
+            string newClientVersion,
+            string newServerSalt)
+        {
+            lock (this.authenticationSync)
+            {
+                if (this.authenticationState == AuthenticationState.Closed)
+                {
+                    return false;
+                }
+
+                this.accountName = newAccountName ?? string.Empty;
+                this.clientVersion = newClientVersion ?? string.Empty;
+                this.serverSalt = newServerSalt ?? string.Empty;
+                this.authenticatedAccountName = string.Empty;
+                unchecked
+                {
+                    this.authenticationGeneration++;
+                }
+                this.authenticationState =
+                    string.IsNullOrWhiteSpace(this.accountName) || string.IsNullOrWhiteSpace(this.serverSalt)
+                        ? AuthenticationState.AwaitingLogin
+                        : AuthenticationState.ChallengeIssued;
+                return this.authenticationState == AuthenticationState.ChallengeIssued;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="attemptedAccountName">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool CompleteAuthentication(string attemptedAccountName, long attemptedGeneration)
+        {
+            lock (this.authenticationSync)
+            {
+                if (this.authenticationState != AuthenticationState.Authenticating
+                    || this.authenticationGeneration != attemptedGeneration
+                    || string.IsNullOrWhiteSpace(attemptedAccountName)
+                    || !string.Equals(
+                        this.accountName,
+                        attemptedAccountName,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                this.accountName = attemptedAccountName;
+                this.authenticatedAccountName = attemptedAccountName;
+                this.authenticationState = AuthenticationState.Authenticated;
+                this.serverSalt = string.Empty;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="attemptedAccountName">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool HasAuthenticationChallenge(string attemptedAccountName)
+        {
+            lock (this.authenticationSync)
+            {
+                return this.authenticationState == AuthenticationState.ChallengeIssued
+                       && !string.IsNullOrWhiteSpace(attemptedAccountName)
+                       && string.Equals(
+                           this.accountName,
+                           attemptedAccountName,
+                           StringComparison.OrdinalIgnoreCase)
+                       && !string.IsNullOrWhiteSpace(this.serverSalt);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="attemptedAccountName">
+        /// </param>
+        /// <param name="challengedAccountName">
+        /// </param>
+        /// <param name="challengedServerSalt">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool TryBeginAuthenticationAttempt(
+            string attemptedAccountName,
+            out string challengedAccountName,
+            out string challengedServerSalt,
+            out long challengedGeneration)
+        {
+            lock (this.authenticationSync)
+            {
+                if (this.authenticationState != AuthenticationState.ChallengeIssued
+                    || string.IsNullOrWhiteSpace(attemptedAccountName)
+                    || !string.Equals(
+                        this.accountName,
+                        attemptedAccountName,
+                        StringComparison.OrdinalIgnoreCase)
+                    || string.IsNullOrWhiteSpace(this.serverSalt))
+                {
+                    challengedAccountName = string.Empty;
+                    challengedServerSalt = string.Empty;
+                    challengedGeneration = 0;
+                    return false;
+                }
+
+                this.authenticationState = AuthenticationState.Authenticating;
+                challengedAccountName = this.accountName;
+                challengedServerSalt = this.serverSalt;
+                challengedGeneration = this.authenticationGeneration;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="authenticatedAccount">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool TryGetAuthenticatedAccountName(out string authenticatedAccount)
+        {
+            lock (this.authenticationSync)
+            {
+                if (this.authenticationState != AuthenticationState.Authenticated
+                    || string.IsNullOrWhiteSpace(this.authenticatedAccountName))
+                {
+                    authenticatedAccount = string.Empty;
+                    return false;
+                }
+
+                authenticatedAccount = this.authenticatedAccountName;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        internal void RejectAuthentication()
+        {
+            lock (this.authenticationSync)
+            {
+                if (this.authenticationState == AuthenticationState.Closed)
+                {
+                    return;
+                }
+
+                this.accountName = string.Empty;
+                this.authenticatedAccountName = string.Empty;
+                this.clientVersion = string.Empty;
+                this.serverSalt = string.Empty;
+                unchecked
+                {
+                    this.authenticationGeneration++;
+                }
+                this.authenticationState = AuthenticationState.AwaitingLogin;
+            }
+
+            try
+            {
+                this.Send(0x00001F83, new LoginErrorMessage { Error = LoginError.InvalidUserNamePassword });
+            }
+            finally
+            {
+                this.Server.DisconnectClient(this);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="disposing">
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            lock (this.authenticationSync)
+            {
+                this.accountName = string.Empty;
+                this.authenticatedAccountName = string.Empty;
+                this.clientVersion = string.Empty;
+                this.serverSalt = string.Empty;
+                unchecked
+                {
+                    this.authenticationGeneration++;
+                }
+                this.authenticationState = AuthenticationState.Closed;
+            }
+
+            base.Dispose(disposing);
+        }
 
         /// <summary>
         /// </summary>
