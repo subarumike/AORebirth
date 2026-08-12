@@ -83,10 +83,7 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 catalog = MissionAcgLegacyLayoutCatalogFactory.Create();
-                string missionStateDirectory =
-                    Path.Combine(
-                        AppDomain.CurrentDomain.BaseDirectory ?? ".",
-                        "mission-state");
+                string missionStateDirectory = MissionStateDirectory.Resolve();
                 store = new MissionAcgBindingStore(missionStateDirectory, catalog);
                 MissionAcgBindingLoadResult loaded = store.LoadAll();
                 if (!loaded.IsValid)

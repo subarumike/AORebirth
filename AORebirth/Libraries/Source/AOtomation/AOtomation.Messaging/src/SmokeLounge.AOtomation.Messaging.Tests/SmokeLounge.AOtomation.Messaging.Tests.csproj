@@ -150,6 +150,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferIdentityStore.cs">
       <Link>MissionOfferIdentityStore.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionStateDirectory.cs">
+      <Link>MissionStateDirectory.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferStore.cs">
       <Link>MissionOfferStore.cs</Link>
     </Compile>
