@@ -59,7 +59,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1486
   },
-  "generationIdentity": "dde54f58a1e1322a41003d221ae410eab602de2ee91a45533bc5c99ddc507bea",
+  "generationIdentity": "abb405ec432f695da4147f32e4b23d58092d3f1b20c69f8db7b5119c3a8336f6",
   "generators": {
     "activeCoverage": {
       "byteLength": 152823,
@@ -82,9 +82,9 @@
       "sha256": "1cac02801c9f50ebe9b3022bf1f1efd3da64486169c5db9048a4535fb194847f"
     },
     "coordinator": {
-      "byteLength": 106394,
+      "byteLength": 108673,
       "path": "Tools/generated_combat_pipeline.py",
-      "sha256": "84d7084648c2c60925638ce67f93435d4332f0d8e17c85ca2524d104769a3c8d"
+      "sha256": "3fc65c347fa8ef96cbfe79351f8dab4542b3d9ae105400d29231b2b3e102c5a9"
     },
     "formulaDataset": {
       "byteLength": 193710,
@@ -118,20 +118,20 @@
     }
   },
   "inputSnapshot": {
-    "auxiliarySnapshotIdentity": "1807ed69a92c8636dee3f19cc9027acc85511dbb1124e1f39566e4a965f000f9",
+    "auxiliarySnapshotIdentity": "90161bff40bfafd19c7c6d592da98db1c38c48a609462cecbd91a766f39f07f0",
     "captureManifestByteLength": 402965,
     "captureManifestSha256": "645fce2fb243d68810c39e910fa63839e8d7e1573e7566bd73f164bc11f12df2",
     "captureSchemaVersion": 1,
     "captureSnapshotIdentity": "dea573d24e6904bd5b9d2f4f32b44ed5055fa11d0242bc019ea9f97a25af0715",
-    "identity": "4c5cab3edb811b2decd437944164554de72737355c09b0428f07dfdade9001de",
+    "identity": "3ddd61fe2a84a9eb0746d2b78552bd1e654fa4bf870bf803e693d429c5f36ced",
     "schemaVersion": 2
   },
   "pipeline": "capture-backed-npc-combat",
   "runtime": {
-    "executableByteLength": 105696,
-    "executableSha256": "ef8f51028ac5329641985112f8efb1c2d4c47c86b8011ddf7e6fae21e2b4e5a1",
+    "executableByteLength": 104952,
+    "executableSha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
     "implementation": "CPython",
-    "version": "3.13.14"
+    "version": "3.12.10"
   },
   "schemaVersion": 1
 }
