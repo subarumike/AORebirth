@@ -59,7 +59,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1486
   },
-  "generationIdentity": "f9ffdc87c106410f58f1412527cc3d08a4767f329636a49d09088744df76b9c6",
+  "generationIdentity": "e0620b7a69f89944fedeb6b07fc88b371e7d6d7d5a9751e6b584dd7a4334d59f",
   "generators": {
     "activeCoverage": {
       "byteLength": 152823,
@@ -67,9 +67,9 @@
       "sha256": "bf87135303dedf98736b827a0fe30e518974ae2e172a609e6ee696563740ddba"
     },
     "attackRangeAudit": {
-      "byteLength": 50349,
+      "byteLength": 50400,
       "path": "tools-temp/AOSharpCaptureAnalyzer/audit_capture_backed_npc_attack_range.py",
-      "sha256": "65e94773273d95a1556b4cc3f198827bf674a7fe1358516a3e98c7734f8acea9"
+      "sha256": "ffc886c7954e97df22857ff3197db2774b42bb5bee6a294ff880fb94df91fdbd"
     },
     "captureDecoder": {
       "byteLength": 106886,
@@ -82,9 +82,9 @@
       "sha256": "1cac02801c9f50ebe9b3022bf1f1efd3da64486169c5db9048a4535fb194847f"
     },
     "coordinator": {
-      "byteLength": 106312,
+      "byteLength": 106658,
       "path": "Tools/generated_combat_pipeline.py",
-      "sha256": "9d103c72f193cefbc19a2969c102fafe554e456aa923fb56898a0dbcd63c6d6d"
+      "sha256": "5cecd7d292a31b2569fc798ca0c0b3c2b98bef768f175d4032e7d13aa9297c1b"
     },
     "formulaDataset": {
       "byteLength": 193710,
@@ -97,9 +97,9 @@
       "sha256": "88281b5e19ec03a554ca03e74628ac657b985bf3625b01d30248bea629784cd7"
     },
     "primary": {
-      "byteLength": 366693,
+      "byteLength": 366795,
       "path": "tools-temp/AOSharpCaptureAnalyzer/extract_capture_backed_npc_combat.py",
-      "sha256": "084f416bd460461d67ae9a809b6d8c89857236fbad2d8856a5277ec3119b5ac1"
+      "sha256": "df27059882c49ce0f799b4507830a3141649ba1d38d5295204037ea5cb559b87"
     },
     "scfuAnalyzer": {
       "byteLength": 202240,
@@ -118,12 +118,12 @@
     }
   },
   "inputSnapshot": {
-    "auxiliarySnapshotIdentity": "3d8cfd5430ba55272652d7ac1f2f947423fecf7cb269beb06e7f7aa78d6d6003",
+    "auxiliarySnapshotIdentity": "36df06ed321ee180da371ca7f6e6d65710e08066fb54b1c0c7ce8d5567dfd5ec",
     "captureManifestByteLength": 402965,
-    "captureManifestSha256": "94b4cfa44fabe92a583b9fba89b36e6276cfb9f1e2bca2869951de5103026bf6",
+    "captureManifestSha256": "accd505336e816a8f9cb9e162f270c6b2c3cde96a1c62ff0b539fe58e9e2b729",
     "captureSchemaVersion": 1,
-    "captureSnapshotIdentity": "d8413b80aef3626ab3b24455f97c58ebcc5cd21190ca16e0415cee7d8f72e3ff",
-    "identity": "62f4a2ec5df6cb8c03c61434ddfba4d4176e2eaf480aaf7ce54819b9ec5ba848",
+    "captureSnapshotIdentity": "eb1879bb24c8dd28e561bac9449d4d94ec89d857709af9cb1026abbae35ecbff",
+    "identity": "34760551dda6a4b6f1ffc306d3ccf67d7c09ba16aac48c857b703aefac371dd4",
     "schemaVersion": 2
   },
   "pipeline": "capture-backed-npc-combat",
