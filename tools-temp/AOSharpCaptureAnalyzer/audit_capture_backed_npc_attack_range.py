@@ -856,6 +856,8 @@ def audit_capture_isolated(
             "-I",
             "-X",
             "faulthandler",
+            "-X",
+            "no_specialization",
             str(Path(__file__).resolve()),
             "--_audit-capture-worker-request",
             str(request),
