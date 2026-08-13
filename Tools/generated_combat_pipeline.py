@@ -1324,6 +1324,9 @@ _ABSOLUTE_WINDOWS_PATH = re.compile(r"^[A-Za-z]:[\\/]")
 _ABSOLUTE_WINDOWS_PATH_IN_TEXT = re.compile(
     r"(?<![A-Za-z0-9_+.-])[A-Za-z]:[\\/]|\\\\[^\\/\s]+[\\/]"
 )
+_PATH_BOUNDARY_CHARACTERS = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_+.-"
+)
 _VOLATILE_MANIFEST_KEYS = frozenset(
     {
         "pid",
@@ -1339,6 +1342,19 @@ _VOLATILE_MANIFEST_KEYS = frozenset(
         "absolutepath",
     }
 )
+
+
+def _contains_absolute_windows_path_text(text: str) -> bool:
+    for index in range(max(0, len(text) - 2)):
+        character = text[index]
+        if (
+            character.isalpha()
+            and text[index + 1] == ":"
+            and text[index + 2] in ("\\", "/")
+            and (index == 0 or text[index - 1] not in _PATH_BOUNDARY_CHARACTERS)
+        ):
+            return True
+    return text.startswith("\\\\") or "\\\\" in text
 
 
 def assert_manifest_is_path_independent(value: Any, location: str = "manifest") -> None:
@@ -1375,7 +1391,7 @@ def assert_generated_value_is_path_independent(
         if isinstance(current, list):
             stack.extend(current)
             continue
-        if isinstance(current, str) and _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(current):
+        if isinstance(current, str) and _contains_absolute_windows_path_text(current):
             raise CohortValidationError(
                 f"{location} contains an absolute repository-location-dependent path"
             )
@@ -2398,7 +2414,7 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
                 raise CohortValidationError(
                     f"artifact is stale or mixed: {logical_path}"
                 )
-            if _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(path.read_text(encoding="utf-8")):
+            if _contains_absolute_windows_path_text(path.read_text(encoding="utf-8")):
                 raise CohortValidationError(
                     "artifact contains an absolute repository-location-dependent "
                     f"path: {logical_path}"
@@ -2506,7 +2522,7 @@ def _validate_json_bytes(payload: bytes) -> None:
 
 def _validate_utf8_bytes(payload: bytes) -> None:
     text = payload.decode("utf-8")
-    if _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(text):
+    if _contains_absolute_windows_path_text(text):
         raise ValueError("generated text contains an absolute Windows path")
 
 
@@ -2647,6 +2663,39 @@ def _run_supervised_command(
         ) from error
 
 
+def _run_supervised_delegated_cohort_validation(
+    repo_root: Path, lease: Any, *, label: str
+) -> str:
+    completed = run_checked(
+        (
+            sys.executable,
+            "-B",
+            "-u",
+            "-X",
+            "faulthandler",
+            str(Path(__file__).resolve()),
+            "--_validate-cohort-read-delegation",
+            "--repo-root",
+            str(repo_root),
+        ),
+        repo_root=repo_root,
+        lease=lease,
+        label=label,
+        retry_interpreter_failures=True,
+    )
+    marker = "generated-combat delegated cohort PASS identity="
+    for line in completed.stdout.splitlines():
+        if line.startswith(marker):
+            identity = line[len(marker) :].strip()
+            if re.fullmatch(r"[0-9a-f]{64}", identity):
+                return identity
+    detail = _bounded_process_detail(completed)
+    suffix = f": {detail}" if detail else ""
+    raise PipelineError(
+        f"generated-combat {label} did not report a valid cohort identity{suffix}"
+    )
+
+
 def run_pipeline(
     *,
     repo_root: Path,
@@ -2658,6 +2707,14 @@ def run_pipeline(
     repo_root = repo_root.resolve(strict=True)
     if mode == "validate-read-delegation":
         _validate_delegated_lease(repo_root, "read")
+        return 0
+    if mode == "validate-cohort-read-delegation":
+        _validate_delegated_lease(repo_root, "read")
+        manifest = validate_cohort(repo_root, verify_toolchain=False)
+        print(
+            "generated-combat delegated cohort PASS "
+            f"identity={manifest['generationIdentity']}"
+        )
         return 0
     if mode == "validate":
         with _shared_lease(repo_root, "read") as lease:
@@ -2675,15 +2732,19 @@ def run_pipeline(
         return 0
     if mode == "run-read-lease":
         with _shared_lease(repo_root, "read") as lease:
-            manifest = validate_cohort(repo_root, verify_toolchain=False)
+            identity = _run_supervised_delegated_cohort_validation(
+                repo_root, lease, label="pre-command cohort validation"
+            )
             exit_code = _run_supervised_command(
                 command,
                 repo_root,
                 lease,
                 timeout_seconds=read_lease_command_timeout_seconds,
             )
-            after = validate_cohort(repo_root, verify_toolchain=False)
-            if after["generationIdentity"] != manifest["generationIdentity"]:
+            after_identity = _run_supervised_delegated_cohort_validation(
+                repo_root, lease, label="post-command cohort validation"
+            )
+            if after_identity != identity:
                 raise CohortValidationError(
                     "published cohort changed during read-lease command"
                 )
@@ -2746,6 +2807,11 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     mode.add_argument(
         "--_validate-read-delegation", action="store_true", help=argparse.SUPPRESS
     )
+    mode.add_argument(
+        "--_validate-cohort-read-delegation",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     parser.add_argument(
         "--max-fixed-point-rounds",
@@ -2771,6 +2837,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         mode = "validate"
     elif arguments.run_read_lease:
         mode = "run-read-lease"
+    elif arguments._validate_cohort_read_delegation:
+        mode = "validate-cohort-read-delegation"
     else:
         mode = "validate-read-delegation"
     if mode != "run-read-lease" and arguments.command:
