@@ -88,7 +88,7 @@ FLOAT_EPSILON = 0.025
 TRANSLATION_START_MOVE_TYPES = frozenset({1, 3, 5, 7, 15, 17})
 TRANSLATION_STOP_MOVE_TYPES = frozenset({2, 4, 6, 8, 16, 18})
 FULL_STOP_MOVE_TYPE = 21
-CAPTURE_WORKER_MAX_ATTEMPTS = 3
+CAPTURE_WORKER_MAX_ATTEMPTS = 8
 
 
 def signed32(value: int) -> int:
@@ -856,8 +856,6 @@ def audit_capture_isolated(
             "-I",
             "-X",
             "faulthandler",
-            "-X",
-            "no_specialization",
             str(Path(__file__).resolve()),
             "--_audit-capture-worker-request",
             str(request),
