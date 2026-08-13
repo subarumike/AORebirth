@@ -87,8 +87,8 @@ SCFU_ANALYZER = Path(
         str(SCFU_ANALYZER_SOURCE),
     )
 ).resolve()
-CAPTURE_WORKER_MAX_ATTEMPTS = 3
-AGGREGATE_WORKER_MAX_ATTEMPTS = 3
+CAPTURE_WORKER_MAX_ATTEMPTS = 8
+AGGREGATE_WORKER_MAX_ATTEMPTS = 8
 CAPTURE_WORKER_TIMEOUT_SECONDS = 600
 AGGREGATE_WORKER_TIMEOUT_SECONDS = 7200
 CHILD_CLEANUP_TIMEOUT_SECONDS = 10
@@ -2000,6 +2000,11 @@ def _is_interpreter_corruption_detail(detail: str) -> bool:
             and "TypeError:" in detail
             and ("parse_capture" in detail or "decode_" in detail)
         )
+        or (
+            "TypeError:" in detail
+            and "object is not iterable" in detail
+            and "context_candidates" in detail
+        )
     )
 
 
@@ -2278,8 +2283,6 @@ def parse_capture_isolated_to_snapshot(
             "-I",
             "-X",
             "faulthandler",
-            "-X",
-            "no_specialization",
             str(_generator_script_path()),
             "--_parse-capture-worker",
             str(frozen_capture),
@@ -7138,8 +7141,6 @@ def _run_aggregate_worker_isolated(
             "-u",
             "-X",
             "faulthandler",
-            "-X",
-            "no_specialization",
             str(script),
             "--_aggregate-worker-directory",
             str(attempt_directory),
@@ -7570,7 +7571,7 @@ def self_test() -> None:
     assert not _is_capture_worker_materialization_detail(
         "RuntimeError: deterministic capture failure"
     )
-    assert AGGREGATE_WORKER_MAX_ATTEMPTS == 3
+    assert AGGREGATE_WORKER_MAX_ATTEMPTS == 8
     historical_generation_key = (
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260529-212034"
         "|0x788DA39B|scfu=105263"

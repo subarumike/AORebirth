@@ -1366,20 +1366,18 @@ def assert_manifest_is_path_independent(value: Any, location: str = "manifest") 
 def assert_generated_value_is_path_independent(
     value: Any, location: str
 ) -> None:
-    stack: list[tuple[Any, str]] = [(value, location)]
+    stack: list[Any] = [value]
     while stack:
-        current, current_location = stack.pop()
+        current = stack.pop()
         if isinstance(current, dict):
-            for key, child in current.items():
-                stack.append((child, f"{current_location}.{key}"))
+            stack.extend(current.values())
             continue
         if isinstance(current, list):
-            for index, child in enumerate(current):
-                stack.append((child, f"{current_location}[{index}]"))
+            stack.extend(current)
             continue
         if isinstance(current, str) and _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(current):
             raise CohortValidationError(
-                f"{current_location} contains an absolute repository-location-dependent path"
+                f"{location} contains an absolute repository-location-dependent path"
             )
 
 
@@ -1559,12 +1557,19 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
         and "extract_capture_backed_npc_combat.py" in detail
         and ("parse_capture" in detail or "decode_" in detail)
     )
+    aggregate_worker_state_corruption = (
+        "extract_capture_backed_npc_combat.py" in detail
+        and "TypeError:" in detail
+        and "object is not iterable" in detail
+        and "context_candidates" in detail
+    )
     return (
         json_decoder_failure
         or governed_json_parse_failure
         or governed_json_internal_failure
         or verified_item_database_failure
         or capture_decoder_internal_failure
+        or aggregate_worker_state_corruption
     )
 
 
@@ -1812,8 +1817,6 @@ def _run_candidate_inventory_audits(
             "-u",
             "-X",
             "faulthandler",
-            "-X",
-            "no_specialization",
             str(auxiliary_snapshot.path_for(ATTACK_RANGE_AUDIT.as_posix())),
             "--inventory",
             str(artifacts["inventory"]),
@@ -1842,8 +1845,6 @@ def _run_candidate_inventory_audits(
             "-u",
             "-X",
             "faulthandler",
-            "-X",
-            "no_specialization",
             str(
                 auxiliary_snapshot.path_for(
                     SECONDARY_EVIDENCE_AUDIT.as_posix()
@@ -1923,8 +1924,6 @@ def _run_active_formula_fixed_point(
                 "-u",
                 "-X",
                 "faulthandler",
-                "-X",
-                "no_specialization",
                 str(frozen_repo_root / ACTIVE_GENERATOR),
                 "--write",
                 "--repo-root",
@@ -1972,8 +1971,6 @@ def _run_active_formula_fixed_point(
                 "-u",
                 "-X",
                 "faulthandler",
-                "-X",
-                "no_specialization",
                 str(frozen_repo_root / FORMULA_GENERATOR),
                 "--write",
                 "--inventory",
@@ -2091,8 +2088,6 @@ def build_candidate_cohort(
                     "-u",
                     "-X",
                     "faulthandler",
-                    "-X",
-                    "no_specialization",
                     str(auxiliary_snapshot.path_for(PRIMARY_GENERATOR.as_posix())),
                     "--write",
                     "--output",
@@ -2502,7 +2497,8 @@ def _shared_lease(repo_root: Path, mode: str) -> Iterator[Any]:
 
 
 def _validate_json_bytes(payload: bytes) -> None:
-    value = json.loads(payload.decode("utf-8"))
+    text = payload.decode("utf-8")
+    value = json.loads(text)
     if not isinstance(value, dict):
         raise ValueError("generated JSON root must be an object")
     assert_generated_value_is_path_independent(value, "generated JSON")
@@ -2568,8 +2564,6 @@ def revalidate_candidate_inputs(
                 "-u",
                 "-X",
                 "faulthandler",
-                "-X",
-                "no_specialization",
                 str(auxiliary_snapshot.path_for(PRIMARY_GENERATOR.as_posix())),
                 "--_validate-exported-input-snapshot",
                 str(snapshot_path),
