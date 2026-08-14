@@ -7272,7 +7272,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             AssertTextBefore(
                 teleportMethod,
-                "if (this.TryCompleteGridTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
+                "if (this.TryCompleteLocalTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
                 "this.runtimeSystems.TransferToPlayfield(");
             AssertTextBefore(
                 transferText,
@@ -7507,7 +7507,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "internal void Teleport(");
             string localTeleportMethod = ExtractMethodBlock(
                 playfieldText,
-                "private bool TryCompleteGridTeleportInCurrentPlayfield(");
+                "private bool TryCompleteLocalTeleportInCurrentPlayfield(");
 
             Assert.IsTrue(
                 playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
@@ -7536,7 +7536,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string teleportToPlayfieldMethod = ExtractMethodBlock(playfieldText, "private void TeleportToPlayfield");
             string localTeleportMethod = ExtractMethodBlock(
                 playfieldText,
-                "private bool TryCompleteGridTeleportInCurrentPlayfield(");
+                "private bool TryCompleteLocalTeleportInCurrentPlayfield(");
             string checkStatelCollisionRuntimeMethod = ExtractMethodBlock(
                 statelTransitionText,
                 "internal void CheckStatelCollision(");

@@ -151,6 +151,66 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LocalTeleportRefreshesBothRecipientSnapshotAndReversePlayerVisibility()
+        {
+            string playfieldText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string teleportMethod = ExtractBlock(
+                playfieldText,
+                "internal void Teleport(");
+            string localTeleportMethod = ExtractBlock(
+                playfieldText,
+                "private bool TryCompleteLocalTeleportInCurrentPlayfield(");
+
+            AssertBefore(
+                teleportMethod,
+                "if (this.TryCompleteLocalTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
+                "this.runtimeSystems.TransferToPlayfield(",
+                "Same-playfield teleports must complete locally instead of using the zoning/redirect path.");
+            Assert.IsTrue(
+                localTeleportMethod.Contains("playfield.Type != this.Identity.Type")
+                && localTeleportMethod.Contains("playfield.Instance != this.Identity.Instance")
+                && !localTeleportMethod.Contains("this.Identity.Instance != GridPlayfield"),
+                "The local teleport path must apply to every current playfield, not only Grid.");
+            AssertBefore(
+                localTeleportMethod,
+                "TeleportMessageHandler.Default.SendLocal(",
+                "dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3",
+                "The local teleport packet must precede server coordinate mutation.");
+            AssertBefore(
+                localTeleportMethod,
+                "dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3",
+                "this.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });",
+                "The teleporting client must receive a fresh nearby-character snapshot after landing.");
+            AssertBefore(
+                localTeleportMethod,
+                "this.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });",
+                "this.RefreshCharacterVisibility(character);",
+                "Reverse visibility must be refreshed after the recipient snapshot is rebuilt.");
+        }
+
+        [TestMethod]
+        public void ReconnectDiscardsPooledPlayerWhenImmutableParentDoesNotMatchCurrentPlayfield()
+        {
+            string zoneClientText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs");
+            string createCharacterMethod = ExtractBlock(
+                zoneClientText,
+                "public void CreateCharacter(int charId)");
+
+            AssertBefore(
+                createCharacterMethod,
+                "if (pooledCharacter != null && !pooledCharacter.Parent.Equals(pf.Identity))",
+                "if (pooledCharacter == null)",
+                "A stale pooled player must be discarded before the create/reconnect branch is selected.");
+            Assert.IsTrue(
+                createCharacterMethod.Contains("Pool.Instance.RemoveObject(pooledCharacter);")
+                && createCharacterMethod.Contains("pooledCharacter = null;")
+                && createCharacterMethod.Contains("currentPlayfield="),
+                "Discarding a stale pooled player must remove it from Pool and create a fresh parent-correct character.");
+        }
+
+        [TestMethod]
         public void KnownCharacterDespawnTargetsTrackedRecipientsAndCleansState()
         {
             string playfieldText = ReadRepositoryFile(
