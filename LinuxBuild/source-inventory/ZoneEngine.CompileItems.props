@@ -252,6 +252,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionRollFeeRules.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionRollFeeService.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionStateDirectory.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferStore.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferIdentityStore.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionLevelGraph.cs" />
