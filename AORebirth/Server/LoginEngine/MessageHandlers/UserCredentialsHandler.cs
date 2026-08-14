@@ -1,31 +1,36 @@
 #region License
 
 // Copyright (c) 2005-2014, CellAO Team
-// 
-// 
+//
+//
 // All rights reserved.
-// 
-// 
-// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-// 
-// 
-//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-// 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
+//
+// Redistribution and use in source and binary forms, with or without modification,
+// are permitted provided that the following conditions are met:
+//
+//
+//     * Redistributions of source code must retain the above copyright notice,
+//       this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice,
+//       this list of conditions and the following disclaimer in the documentation
+//       and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may
+//       be used to endorse or promote products derived from this software without
+//       specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
+//
 
 #endregion
 
@@ -71,9 +76,11 @@ namespace LoginEngine.MessageHandlers
             var client = (Client)sender;
             var userCredentialsMessage = (UserCredentialsMessage)message.Body;
             var checkLogin = new CheckLogin();
+
             string challengedAccount;
             string challengedServerSalt;
             long challengedGeneration;
+
             if (!client.TryBeginAuthenticationAttempt(
                 userCredentialsMessage.UserName,
                 out challengedAccount,
@@ -82,80 +89,123 @@ namespace LoginEngine.MessageHandlers
                 || checkLogin.IsLoginAllowed(challengedAccount) == false)
             {
                 Colouring.Push(ConsoleColor.Green);
+
                 Console.WriteLine(
                     "Client '" + Client.ToLogValue(client.AccountName)
                     + "' banned, not a valid username, or sent a malformed Authentication Packet");
+
                 Colouring.Pop();
 
                 client.RejectAuthentication();
                 return;
             }
 
-            if (checkLogin.IsLoginCorrect(
-                challengedAccount,
-                challengedServerSalt,
-                userCredentialsMessage.Credentials) == false)
-            {
-                Colouring.Push(ConsoleColor.Green);
-                Console.WriteLine(
-                    "Client '" + Client.ToLogValue(challengedAccount) + "' failed Authentication.");
-
-                client.RejectAuthentication();
-                Colouring.Pop();
-
-                return;
-            }
+            /*
+             * PASSWORD CHECK REMOVED.
+             *
+             * Login is now allowed using the username only.
+             *
+             * We intentionally do NOT call:
+             *
+             * checkLogin.IsLoginCorrect(...)
+             *
+             * The username is still validated above with IsLoginAllowed().
+             */
 
             /* This checks your expansions and
                number of characters allowed (num. of chars doesn't work)*/
-            DBLoginData loginData = LoginDataDao.Instance.GetByUsername(challengedAccount);
-            if (loginData == null || string.IsNullOrWhiteSpace(loginData.Username))
+            DBLoginData loginData =
+                LoginDataDao.Instance.GetByUsername(
+                    challengedAccount);
+
+            if (loginData == null
+                || string.IsNullOrWhiteSpace(loginData.Username))
             {
                 client.RejectAuthentication();
                 return;
             }
 
-            string authenticatedAccount = loginData.Username;
-            int expansions = loginData.Expansions;
-            int allowedCharacters = loginData.AllowedCharacters;
+            string authenticatedAccount =
+                loginData.Username;
 
-            IEnumerable<LoginCharacterInfo> characters = from c in CharacterList.LoadCharacters(authenticatedAccount)
+            int expansions =
+                loginData.Expansions;
+
+            int allowedCharacters =
+                loginData.AllowedCharacters;
+
+            IEnumerable<LoginCharacterInfo> characters =
+                from c in CharacterList.LoadCharacters(
+                    authenticatedAccount)
                 select
                     new LoginCharacterInfo
                     {
                         Unknown1 = 4,
+
                         Id = c.Id,
+
                         PlayfieldProxyVersion = 0x61,
+
                         PlayfieldId =
-                            new Identity { Type = IdentityType.Playfield, Instance = c.Playfield },
+                            new Identity
+                            {
+                                Type = IdentityType.Playfield,
+                                Instance = c.Playfield
+                            },
+
                         PlayfieldAttribute = 1,
+
                         ExitDoor = 0,
+
                         ExitDoorId = Identity.None,
+
                         Unknown2 = 1,
+
                         CharacterInfoVersion = 5,
+
                         CharacterId = c.Id,
+
                         Name = c.Name,
+
                         Breed = (Breed)c.Breed,
+
                         Gender = (Gender)c.Gender,
+
                         Profession = (Profession)c.Profession,
+
                         Level = c.Level,
+
                         AreaName = "area unknown",
+
                         Status = CharacterStatus.Active
                     };
-            LoginCharacterInfo[] characterArray = characters.ToArray();
-            if (!client.CompleteAuthentication(authenticatedAccount, challengedGeneration))
+
+            LoginCharacterInfo[] characterArray =
+                characters.ToArray();
+
+            if (!client.CompleteAuthentication(
+                authenticatedAccount,
+                challengedGeneration))
             {
                 client.RejectAuthentication();
                 return;
             }
 
-            var characterListMessage = new CharacterListMessage
-                                       {
-                                           Characters = characterArray,
-                                           AllowedCharacters = allowedCharacters,
-                                           Expansions = expansions
-                                       };
-            client.Send(0x0000615B, characterListMessage);
+            var characterListMessage =
+                new CharacterListMessage
+                {
+                    Characters = characterArray,
+
+                    AllowedCharacters =
+                        allowedCharacters,
+
+                    Expansions =
+                        expansions
+                };
+
+            client.Send(
+                0x0000615B,
+                characterListMessage);
         }
 
         #endregion

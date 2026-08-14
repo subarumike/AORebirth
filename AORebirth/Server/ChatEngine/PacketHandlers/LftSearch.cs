@@ -4,23 +4,11 @@
 //
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met.
+// Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer.
 //
-//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer.
-//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED.
+// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.
 
 #endregion
 
@@ -42,77 +30,207 @@ namespace ChatEngine.PacketHandlers
     /// <summary>
     /// Looking for Team search (chat type 0x05DE / 1502).
     ///
-    /// Filters:
-    ///
     /// filter0 = side
     ///     0 = Neutral
     ///     1 = Clan
     ///     2 = Omni
     ///     0xFFFFFFFF = Any
     ///
-    /// filter1 = level filter
+    /// filter1 = profession filter
     ///
     /// filter2 = location
     ///     0 = This Playfield
-    ///     1 = Rubi-Ka
-    ///     2 = Shadowlands
-    ///     3 = Any
-    ///     0xFFFFFFFF = Any
+    ///     1 = Anywhere
+    ///     2 = Rubi-Ka
+    ///     3 = Shadowlands
     ///
-    /// filter3 = currently unused
+    /// filter3 = unknown / unused
+    ///
+    /// IMPORTANT:
+    ///
+    /// Profession and location filtering are performed against
+    /// the LFT CANDIDATE.
+    ///
+    /// The searcher's profession/location does NOT affect the
+    /// candidate filtering.
     /// </summary>
     public static class LftSearch
     {
         private static readonly int ProfessionStatId =
-        (int)StatIds.profession;
+            (int)StatIds.profession;
 
-private static readonly int LevelStatId =
-    (int)StatIds.level;
+        private static readonly int LevelStatId =
+            (int)StatIds.level;
 
-        private static readonly int ExpansionStatId =
-            (int)StatIds.expansion;
+        private const string LftSeedCommandPrefix =
+            "#aorebirth-lft-seed";
 
-        /// <summary>
-        /// Must match ZoneEngine.Core.LftInviteClientPresence.LftSeedCommandPrefix.
-        /// </summary>
-        private const string LftSeedCommandPrefix = "#aorebirth-lft-seed";
+        private const int SeedSettleMilliseconds =
+            1500;
 
-        /// <summary>
-        /// Give ZoneEngine time to seed remote candidates.
-        /// </summary>
-        private const int SeedSettleMilliseconds = 1500;
+        private const uint LocationThisPlayfield =
+            0;
 
-        /*
-         * LFT location filter values.
-         */
-        private const uint LocationThisPlayfield = 0;
-        private const uint LocationRubiKa = 1;
-        private const uint LocationShadowlands = 2;
-        private const uint LocationAny = 3;
+        private const uint LocationAny =
+            1;
+
+        private const uint LocationRubiKa =
+            2;
+
+        private const uint LocationShadowlands =
+            3;
 
         /*
-         * Expansion flags from AORebirth.Enums.Expansions.
+         * ============================================================
+         * SHADOWLANDS PLAYFIELD IDs
+         * ============================================================
          *
-         * NotumWars   = 1 << 0
-         * ShadowLands = 1 << 1
+         * PF ID in this list = Shadowlands.
+         * PF ID not in this list = Rubi-Ka.
          */
-        private const int RubiKaExpansionBit =
-            1 << 0;
+        private static readonly HashSet<uint> ShadowlandsPlayfieldIds =
+            new HashSet<uint>
+            {
+                4211,
+                4212,
+                4213,
+                4214,
+                4215,
+                4001,
 
-        private const int ShadowlandsExpansionBit =
-            1 << 1;
+                4220,
+                4221,
+                4222,
+                4223,
+                4224,
 
-        public static void Read(Client client, byte[] packet)
+                4310,
+                4311,
+                4312,
+                4313,
+                4314,
+                4315,
+                4316,
+                4318,
+
+                4320,
+                4321,
+                4322,
+                4324,
+                4327,
+                4328,
+                4329,
+                4330,
+                4331,
+                4336,
+                4337,
+
+                4364,
+                4365,
+                4366,
+                4367,
+                4368,
+                4374,
+
+                4524,
+                4525,
+                4526,
+                4530,
+                4531,
+                4532,
+                4533,
+                4534,
+                4540,
+                4541,
+                4542,
+                4543,
+                4544,
+
+                4605,
+
+                4621,
+                4622,
+                4623,
+                4624,
+                4625,
+                4626,
+                4627,
+                4628,
+                4629,
+                4630,
+
+                4676,
+                4677,
+                4678,
+                4679,
+                4680,
+                4681,
+                4682,
+                4683,
+                4684,
+                4685,
+                4686,
+                4687,
+                4688,
+                4689,
+                4690,
+                4691,
+                4692,
+                4693,
+                4694,
+                4695,
+                4696,
+                4697,
+                4698,
+                4699,
+
+                4872,
+                4873,
+                4877,
+                4880,
+                4881,
+
+                6011,
+                6012,
+                6013,
+                6015,
+                6020,
+                6021,
+                6022,
+                6024,
+                6041,
+
+                4335,
+                4389,
+                4390,
+                4391,
+                4468,
+                6007,
+                6035,
+                6036
+            };
+
+        public static void Read(
+            Client client,
+            byte[] packet)
         {
-            PacketReader reader = new PacketReader(ref packet);
+            PacketReader reader =
+                new PacketReader(ref packet);
 
-            reader.ReadUInt16(); // type
-            reader.ReadUInt16(); // length
+            reader.ReadUInt16();
+            reader.ReadUInt16();
 
-            uint filter0 = reader.ReadUInt32();
-            uint filter1 = reader.ReadUInt32();
-            uint filter2 = reader.ReadUInt32();
-            uint filter3 = reader.ReadUInt32();
+            uint filter0 =
+                reader.ReadUInt32();
+
+            uint filter1 =
+                reader.ReadUInt32();
+
+            uint filter2 =
+                reader.ReadUInt32();
+
+            uint filter3 =
+                reader.ReadUInt32();
 
             reader.Finish();
 
@@ -133,8 +251,11 @@ private static readonly int LevelStatId =
                 filter3);
 
             /*
-             * Searcher's own data.
+             * ========================================================
+             * SEARCHER DATA
+             * ========================================================
              */
+
             int searcherLevel =
                 ReadStat(
                     client.Character.CharacterId,
@@ -144,8 +265,7 @@ private static readonly int LevelStatId =
             {
                 searcherLevel = 1;
             }
-
-            if (searcherLevel > 220)
+            else if (searcherLevel > 220)
             {
                 searcherLevel = 220;
             }
@@ -157,22 +277,27 @@ private static readonly int LevelStatId =
                 ResolvePlayfield(
                     client.Character.CharacterId);
 
-            int searcherExpansion =
-                ReadStat(
-                    client.Character.CharacterId,
-                    ExpansionStatId);
-
             /*
-             * Statistics for debugging.
+             * ========================================================
+             * DEBUG COUNTERS
+             * ========================================================
              */
+
             int skippedOffline = 0;
             int skippedLevel = 0;
             int skippedSide = 0;
+            int skippedProfession = 0;
             int skippedLocation = 0;
             int registryCount = 0;
 
             List<LftQueryReply.Entry> matches =
                 new List<LftQueryReply.Entry>();
+
+            /*
+             * ========================================================
+             * LFT REGISTRY
+             * ========================================================
+             */
 
             foreach (
                 KeyValuePair<uint, string> registration
@@ -184,17 +309,14 @@ private static readonly int LevelStatId =
                     registration.Key;
 
                 /*
-                 * Never show yourself.
+                 * Never return the searcher himself.
                  */
-                if (candidateId == client.Character.CharacterId)
+                if (candidateId ==
+                    client.Character.CharacterId)
                 {
                     continue;
                 }
 
-                /*
-                 * Candidate must currently be connected
-                 * to ChatEngine.
-                 */
                 Client candidateClient;
 
                 if (!client.ChatServer().ConnectedClients.TryGetValue(
@@ -208,8 +330,11 @@ private static readonly int LevelStatId =
                 }
 
                 /*
-                 * Candidate statistics.
+                 * ====================================================
+                 * CANDIDATE DATA
+                 * ====================================================
                  */
+
                 int candidateProfession =
                     ReadStat(
                         candidateId,
@@ -224,8 +349,7 @@ private static readonly int LevelStatId =
                 {
                     candidateLevel = 1;
                 }
-
-                if (candidateLevel > 220)
+                else if (candidateLevel > 220)
                 {
                     candidateLevel = 220;
                 }
@@ -233,85 +357,211 @@ private static readonly int LevelStatId =
                 int candidateSide =
                     candidateClient.Character.CharacterSide;
 
-                /*
-                 * LIVE PLAYFIELD.
-                 *
-                 * This is used for displaying the actual PF and
-                 * for "This Playfield".
-                 *
-                 * It is NOT used to decide RK versus SL.
-                 */
                 int candidatePlayfield =
-                    ResolvePlayfield(candidateId);
+                    ResolvePlayfield(
+                        candidateId);
 
                 /*
-                 * EXPANSION.
+                 * IMPORTANT:
                  *
-                 * This is what determines RK / SL.
+                 * RK/SL is determined from the CANDIDATE'S
+                 * PLAYFIELD ID.
+                 *
+                 * If candidatePlayfield is in the SL list:
+                 *     SL
+                 *
+                 * Otherwise:
+                 *     RK
                  */
-                int candidateExpansion =
-                    ReadStat(
-                        candidateId,
-                        ExpansionStatId);
+                bool candidateIsShadowlands =
+                    ShadowlandsPlayfieldIds.Contains(
+                        (uint)Math.Max(
+                            0,
+                            candidatePlayfield));
+
+                string candidateLocation =
+                    candidateIsShadowlands
+                        ? "SL"
+                        : "RK";
+
+                client.Server.Debug(
+                    client,
+                    "LFT CANDIDATE: {0} id={1} side={2} level={3} profession={4} pf={5} location={6} filter1={7} filter2={8} filter3={9} searcherPF={10}",
+                    candidateClient.Character.characterName,
+                    candidateId,
+                    candidateSide,
+                    candidateLevel,
+                    candidateProfession,
+                    candidatePlayfield,
+                    candidateLocation,
+                    filter1,
+                    filter2,
+                    filter3,
+                    searcherPlayfield);
 
                 /*
-                 * =====================================================
+                 * ====================================================
                  * SIDE FILTER
-                 * =====================================================
+                 * ====================================================
                  */
+
                 if (filter0 != UInt32.MaxValue)
                 {
-                    if (candidateSide != (int)filter0)
+                    if (candidateSide !=
+                        (int)filter0)
                     {
                         skippedSide++;
+
+                        client.Server.Debug(
+                            client,
+                            "LFT SIDE REJECT: candidate={0} candidateSide={1} filter0={2}",
+                            candidateClient.Character.characterName,
+                            candidateSide,
+                            filter0);
+
                         continue;
                     }
                 }
 
                 /*
-                 * =====================================================
+                 * ====================================================
                  * LEVEL FILTER
-                 * =====================================================
+                 * ====================================================
                  */
+
                 if (!TeamLevelRanges.IsCompatible(
                         searcherLevel,
                         candidateLevel))
                 {
                     skippedLevel++;
+
+                    client.Server.Debug(
+                        client,
+                        "LFT LEVEL REJECT: candidate={0} candidateLevel={1} searcherLevel={2}",
+                        candidateClient.Character.characterName,
+                        candidateLevel,
+                        searcherLevel);
+
                     continue;
                 }
 
                 /*
-                 * =====================================================
-                 * LOCATION FILTER
-                 * =====================================================
+                 * ====================================================
+                 * PROFESSION FILTER
+                 * ====================================================
                  *
                  * IMPORTANT:
                  *
-                 * RK / SL is determined from the EXPANSION stat.
+                 * AO LFT profession filter uses:
                  *
-                 * We do NOT use PF numbers.
+                 * Soldier         = 2
+                 * Martial Artist  = 4
+                 * Engineer        = 8
+                 * Fixer           = 16
+                 * Agent           = 32
+                 * Adventurer      = 64
+                 * Trader          = 128
+                 * Bureaucrat      = 256
+                 * Enforcer        = 512
+                 * Doctor          = 1024
+                 * Nanotechnician  = 2048
+                 * Metaphysicist   = 4096
+                 * Keeper          = 16384
+                 * Shade           = 32768
                  *
-                 * This is important because:
+                 * Therefore:
                  *
-                 *     PF 800 = Borealis = Rubi-Ka
+                 * professionBit = 1 << candidateProfession
                  *
-                 * and PF number itself does not tell us reliably
-                 * whether the character belongs to RK or SL.
+                 * NOT:
+                 *
+                 * 1 << (candidateProfession - 1)
+                 *
+                 * Monster (13) is not an LFT profession filter.
                  */
+
+                if (filter1 != UInt32.MaxValue)
+                {
+                    uint professionBit =
+                        1u << candidateProfession;
+
+                    bool professionMatches =
+                        professionBit == filter1;
+
+                    client.Server.Debug(
+                        client,
+                        "LFT PROFESSION CHECK: candidate={0} profession={1} professionBit={2} filter1={3} matches={4}",
+                        candidateClient.Character.characterName,
+                        candidateProfession,
+                        professionBit,
+                        filter1,
+                        professionMatches);
+
+                    if (!professionMatches)
+                    {
+                        skippedProfession++;
+
+                        client.Server.Debug(
+                            client,
+                            "LFT PROFESSION REJECT: candidate={0} candidateProfession={1} filter1={2}",
+                            candidateClient.Character.characterName,
+                            candidateProfession,
+                            filter1);
+
+                        continue;
+                    }
+                }
+
+                /*
+                 * ====================================================
+                 * LOCATION FILTER
+                 * ====================================================
+                 *
+                 * filter2:
+                 *
+                 * 0 = This Playfield
+                 * 1 = Anywhere
+                 * 2 = Rubi-Ka
+                 * 3 = Shadowlands
+                 */
+
                 if (!MatchesLocation(
                         filter2,
                         searcherPlayfield,
                         candidatePlayfield,
-                        candidateExpansion))
+                        candidateId))
                 {
                     skippedLocation++;
+
+                    client.Server.Debug(
+                        client,
+                        "LFT LOCATION REJECT: candidate={0} candidateId={1} candidatePF={2} candidateLocation={3} filter2={4} searcherPF={5}",
+                        candidateClient.Character.characterName,
+                        candidateId,
+                        candidatePlayfield,
+                        candidateLocation,
+                        filter2,
+                        searcherPlayfield);
+
                     continue;
                 }
 
+                client.Server.Debug(
+                    client,
+                    "LFT LOCATION ACCEPT: candidate={0} candidateId={1} candidatePF={2} candidateLocation={3} filter2={4} searcherPF={5}",
+                    candidateClient.Character.characterName,
+                    candidateId,
+                    candidatePlayfield,
+                    candidateLocation,
+                    filter2,
+                    searcherPlayfield);
+
                 /*
-                 * Candidate passed all filters.
+                 * ====================================================
+                 * MATCH
+                 * ====================================================
                  */
+
                 matches.Add(
                     new LftQueryReply.Entry
                     {
@@ -342,9 +592,15 @@ private static readonly int LevelStatId =
                     });
             }
 
+            /*
+             * ========================================================
+             * SEARCH SUMMARY
+             * ========================================================
+             */
+
             client.Server.Info(
                 client,
-                "{0} >> LftSearch: f0={1} f1={2} f2={3} f3={4} matches={5} searcherLvl={6} searcherSide={7} searcherPF={8} searcherExpansion={9} registry={10} skipOffline={11} skipLevel={12} skipSide={13} skipLocation={14}",
+                "{0} >> LftSearch: f0={1} f1={2} f2={3} f3={4} matches={5} searcherLvl={6} searcherSide={7} searcherPF={8} registry={9} skipOffline={10} skipLevel={11} skipSide={12} skipProfession={13} skipLocation={14}",
                 client.Character.characterName,
                 filter0,
                 filter1,
@@ -354,17 +610,22 @@ private static readonly int LevelStatId =
                 searcherLevel,
                 searcherSide,
                 searcherPlayfield,
-                searcherExpansion,
                 registryCount,
                 skippedOffline,
                 skippedLevel,
                 skippedSide,
+                skippedProfession,
                 skippedLocation);
 
             /*
-             * Push name cache before sending LFT rows.
+             * ========================================================
+             * NAME CACHE
+             * ========================================================
              */
-            for (int i = 0; i < matches.Count; i++)
+
+            for (int i = 0;
+                 i < matches.Count;
+                 i++)
             {
                 PushNameCache(
                     client,
@@ -372,21 +633,23 @@ private static readonly int LevelStatId =
             }
 
             /*
-             * Ask ZoneEngine to seed remote candidates.
+             * ========================================================
+             * SEED REMOTE CANDIDATES
+             * ========================================================
              */
+
             NotifyZoneToSeedRemoteCandidates(
                 client,
                 matches);
 
-            /*
-             * Give ZoneEngine time to update playfields.
-             */
             if (matches.Count > 0)
             {
                 Thread.Sleep(
                     SeedSettleMilliseconds);
 
-                for (int i = 0; i < matches.Count; i++)
+                for (int i = 0;
+                     i < matches.Count;
+                     i++)
                 {
                     int pf =
                         ResolvePlayfield(
@@ -401,21 +664,22 @@ private static readonly int LevelStatId =
             }
 
             /*
-             * Send the final result to the client.
+             * ========================================================
+             * SEND RESULTS
+             * ========================================================
              */
+
             client.Send(
                 LftQueryReply.CreateClear());
 
-            for (int i = 0; i < matches.Count; i++)
+            for (int i = 0;
+                 i < matches.Count;
+                 i++)
             {
                 client.Send(
                     LftQueryReply.CreateEntry(
                         matches[i]));
 
-                /*
-                 * Push name again after the row.
-                 * Invite needs id -> name resolution.
-                 */
                 PushNameCache(
                     client,
                     matches[i]);
@@ -423,110 +687,100 @@ private static readonly int LevelStatId =
         }
 
         /// <summary>
-        /// Checks the location filter.
+        /// Checks the location of the LFT candidate.
         ///
-        /// RK / SL classification is based on the expansion stat,
-        /// NOT on the playfield ID.
+        /// 0 = This Playfield
+        /// 1 = Anywhere
+        /// 2 = Rubi-Ka
+        /// 3 = Shadowlands
+        ///
+        /// Searcher's location is used ONLY for This Playfield.
+        /// RK/SL is determined ONLY from the candidate PF ID.
         /// </summary>
         private static bool MatchesLocation(
             uint filter,
             int searcherPlayfield,
             int candidatePlayfield,
-            int candidateExpansion)
+            uint candidateId)
         {
             /*
-             * Any.
+             * ========================================================
+             * ANYWHERE
+             * ========================================================
+             *
+             * No location filtering at all.
              */
-            if (filter == UInt32.MaxValue
-                || filter == LocationAny)
+            if (filter == LocationAny)
             {
                 return true;
             }
 
             /*
-             * This Playfield.
+             * ========================================================
+             * THIS PLAYFIELD
+             * ========================================================
              *
-             * This one genuinely uses the PF ID because the
-             * client is asking for the same actual playfield.
+             * Compare candidate PF against searcher PF.
              */
             if (filter == LocationThisPlayfield)
             {
-                return
-                    searcherPlayfield > 0
-                    && candidatePlayfield > 0
-                    && candidatePlayfield == searcherPlayfield;
+                if (searcherPlayfield <= 0
+                    || candidatePlayfield <= 0)
+                {
+                    return false;
+                }
+
+                return candidatePlayfield ==
+                       searcherPlayfield;
             }
 
             /*
-             * Rubi-Ka.
+             * ========================================================
+             * CANDIDATE LOCATION
+             * ========================================================
+             *
+             * IMPORTANT:
+             *
+             * RK/SL is determined from the candidate PF ID.
+             *
+             * The candidate CharacterId is NOT used here.
+             */
+            bool candidateIsShadowlands =
+                ShadowlandsPlayfieldIds.Contains(
+                    (uint)Math.Max(
+                        0,
+                        candidatePlayfield));
+
+            /*
+             * ========================================================
+             * RUBI-KA
+             * ========================================================
+             *
+             * If PF is NOT in the SL PF list,
+             * candidate is considered RK.
              */
             if (filter == LocationRubiKa)
             {
-                return IsRubiKa(
-                    candidateExpansion);
+                return !candidateIsShadowlands;
             }
 
             /*
-             * Shadowlands.
+             * ========================================================
+             * SHADOWLANDS
+             * ========================================================
+             *
+             * If PF IS in the SL PF list,
+             * candidate is considered SL.
              */
             if (filter == LocationShadowlands)
             {
-                return IsShadowlands(
-                    candidateExpansion);
+                return candidateIsShadowlands;
             }
 
             /*
-             * Unknown filter.
+             * Unknown location value.
              */
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether the character is in Shadowlands
-        /// using the expansion stat.
-        /// </summary>
-        private static bool IsShadowlands(
-            int expansion)
-        {
-            return
-                (expansion & ShadowlandsExpansionBit) != 0;
-        }
-
-        /// <summary>
-        /// Determines whether the character is in Rubi-Ka
-        /// using the expansion stat.
-        ///
-        /// In AORebirth:
-        ///
-        /// ShadowLands = bit 1 = value 2
-        /// Rubi-Ka     = bit 0 = value 1
-        ///
-        /// Therefore an expansion without the Shadowlands bit
-        /// is treated as Rubi-Ka.
-        /// </summary>
-        private static bool IsRubiKa(
-            int expansion)
-        {
-            /*
-             * Explicit Rubi-Ka bit.
-             */
-            if ((expansion & RubiKaExpansionBit) != 0)
-            {
-                return true;
-            }
-
-            /*
-             * If Shadowlands bit is not present, this is also
-             * treated as Rubi-Ka.
-             *
-             * This handles values such as:
-             *
-             *     0x00000185
-             *
-             * where Shadowlands bit 2 is NOT set.
-             */
-            return
-                (expansion & ShadowlandsExpansionBit) == 0;
+            return false;
         }
 
         /// <summary>
@@ -551,17 +805,11 @@ private static readonly int LevelStatId =
                 return;
             }
 
-            /*
-             * Type 20.
-             */
             client.Send(
                 PlayerName.Create(
                     entry.CharacterId,
                     name));
 
-            /*
-             * Type 21 as fallback for GUI paths.
-             */
             client.Send(
                 NameLookupResult.Create(
                     entry.CharacterId,
@@ -576,16 +824,22 @@ private static readonly int LevelStatId =
         }
 
         /// <summary>
-        /// Resolve the current playfield.
+        /// Resolve current playfield.
+        ///
+        /// Used for:
+        ///
+        ///     - This Playfield
+        ///     - Displaying candidate PF
+        ///
+        /// It is also used to determine RK/SL by
+        /// checking the resulting PF ID against
+        /// ShadowlandsPlayfieldIds.
         /// </summary>
         private static int ResolvePlayfield(
             uint characterId)
         {
             int live;
 
-            /*
-             * First use the live registry.
-             */
             if (LftPlayfieldRegistry.TryGet(
                     characterId,
                     out live)
@@ -594,9 +848,6 @@ private static readonly int LevelStatId =
                 return live;
             }
 
-            /*
-             * Fallback to database.
-             */
             try
             {
                 DBCharacter dbCharacter =
@@ -617,7 +868,7 @@ private static readonly int LevelStatId =
         }
 
         /// <summary>
-        /// Tell ZoneEngine to seed the remote candidates.
+        /// Tell ZoneEngine to seed remote candidates.
         /// </summary>
         private static void NotifyZoneToSeedRemoteCandidates(
             Client client,
@@ -673,7 +924,7 @@ private static readonly int LevelStatId =
         }
 
         /// <summary>
-        /// Read a character stat.
+        /// Read character stat.
         /// </summary>
         private static int ReadStat(
             uint characterId,
@@ -692,5 +943,5 @@ private static readonly int LevelStatId =
                 return 0;
             }
         }
-}
+    }
 }

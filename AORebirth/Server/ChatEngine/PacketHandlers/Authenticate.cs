@@ -1,31 +1,20 @@
 #region License
 
 // Copyright (c) 2005-2014, CellAO Team
-// 
-// 
+//
 // All rights reserved.
-// 
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-// 
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer.
 //     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-// 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.
+//
 
 #endregion
 
@@ -38,9 +27,8 @@ namespace ChatEngine.PacketHandlers
     using System.Net;
     using System.Text;
 
-    using AO.Core.Encryption;
-
     using AORebirth.Communication;
+    using AORebirth.Database.Dao;
 
     using ChatEngine.CoreClient;
     using ChatEngine.Packets;
@@ -68,61 +56,163 @@ namespace ChatEngine.PacketHandlers
             MemoryStream m_stream = new MemoryStream(packet);
             BinaryReader m_reader = new BinaryReader(m_stream);
 
-            // now we should do password check and then send OK or Error
-            // sending OK now
+            /*
+             * Authentication packet:
+             *
+             * bytes 8-11 = character id
+             * after that = username
+             * after username = login key
+             *
+             * The login key is read because the client sends it,
+             * but it is NOT validated.
+             */
+
             m_stream.Position = 12;
 
-            short userNameLength = IPAddress.NetworkToHostOrder(m_reader.ReadInt16());
-            string userName = Encoding.ASCII.GetString(m_reader.ReadBytes(userNameLength));
-            short loginKeyLength = IPAddress.NetworkToHostOrder(m_reader.ReadInt16());
-            string loginKey = Encoding.ASCII.GetString(m_reader.ReadBytes(loginKeyLength));
+            short userNameLength =
+                IPAddress.NetworkToHostOrder(
+                    m_reader.ReadInt16());
 
-            uint characterId = BitConverter.ToUInt32(new[] { packet[11], packet[10], packet[9], packet[8] }, 0);
+            string userName =
+                Encoding.ASCII.GetString(
+                    m_reader.ReadBytes(userNameLength));
 
-            LoginEncryption loginEncryption = new LoginEncryption();
+            short loginKeyLength =
+                IPAddress.NetworkToHostOrder(
+                    m_reader.ReadInt16());
 
-            if (loginEncryption.IsValidLogin(loginKey, client.ServerSalt, userName)
-                && loginEncryption.IsCharacterOnAccount(userName, characterId))
+            /*
+             * The client still sends the login key.
+             * Read it so the packet is consumed correctly,
+             * but do not validate it.
+             */
+            m_reader.ReadBytes(loginKeyLength);
+
+            /*
+             * Character ID.
+             */
+            uint characterId =
+                BitConverter.ToUInt32(
+                    new[]
+                    {
+                    packet[11],
+                    packet[10],
+                    packet[9],
+                    packet[8]
+                    },
+                    0);
+
+            /*
+             * =========================================================
+             * USERNAME-ONLY LOGIN
+             * =========================================================
+             *
+             * We only verify:
+             *
+             * 1. Username exists.
+             * 2. Account is allowed.
+             * 3. Character belongs to that account.
+             *
+             * Password/login key is NOT checked.
+             */
+
+            if (string.IsNullOrWhiteSpace(userName))
             {
-                byte[] loginok = LoginOk.Create();
-                client.Send(loginok);
-            }
-            else
-            {
-                byte[] loginerr = LoginError.Create();
-                client.Send(loginerr);
+                client.Send(LoginError.Create());
                 client.Server.DisconnectClient(client);
-                byte[] invalid = BitConverter.GetBytes(characterId);
-
-                ZoneCom.SendMessage(99, invalid);
                 return;
             }
 
-            // save characters ID in client - note, this is usually 0 if it is a chat client connecting
-            client.Character = new Character(characterId, client);
+            /*
+             * Check that the account exists.
+             */
+            DBLoginData loginData =
+                LoginDataDao.Instance.GetByUsername(userName);
 
-            // add client to connected clients list
-            if (!client.ChatServer().ConnectedClients.ContainsKey(client.Character.CharacterId))
+            if (loginData == null
+                || string.IsNullOrWhiteSpace(loginData.Username))
             {
-                client.ChatServer().ConnectedClients.Add(client.Character.CharacterId, client);
+                client.Send(LoginError.Create());
+                client.Server.DisconnectClient(client);
+                return;
             }
 
-            // add yourself to that list
-            client.KnownClients.Add(client.Character.CharacterId);
+            /*
+             * Check that the character belongs to this account.
+             */
+            bool characterBelongsToAccount =
+                CharacterDao.Instance.IsCharacterOnAccount(
+                    loginData.Username,
+                    characterId);
 
-            // and give client its own name lookup
-            byte[] pname = PlayerName.Create(client, client.Character.CharacterId);
+            if (!characterBelongsToAccount)
+            {
+                client.Send(LoginError.Create());
+                client.Server.DisconnectClient(client);
+                return;
+            }
+
+            /*
+             * =========================================================
+             * LOGIN SUCCESS
+             * =========================================================
+             */
+
+            client.Send(LoginOk.Create());
+
+            /*
+             * Save character ID in client.
+             */
+            client.Character =
+                new Character(
+                    characterId,
+                    client);
+
+            /*
+             * Add client to connected clients list.
+             */
+            if (!client.ChatServer().ConnectedClients.ContainsKey(
+                    client.Character.CharacterId))
+            {
+                client.ChatServer().ConnectedClients.Add(
+                    client.Character.CharacterId,
+                    client);
+            }
+
+            /*
+             * Add yourself to known clients.
+             */
+            client.KnownClients.Add(
+                client.Character.CharacterId);
+
+            /*
+             * Give client its own name lookup.
+             */
+            byte[] pname =
+                PlayerName.Create(
+                    client,
+                    client.Character.CharacterId);
+
             client.Send(pname);
 
-            // send server welcome message to client
-            byte[] anonv = MsgAnonymousVicinity.Create(
-                string.Empty,
-                string.Format(
-                    client.ChatServer().MessageOfTheDay,
-                    AssemblyInfoclass.RevisionName + " " + AssemblyInfoclass.AssemblyVersion),
-                string.Empty);
+            /*
+             * Send server welcome message.
+             */
+            byte[] anonv =
+                MsgAnonymousVicinity.Create(
+                    string.Empty,
+                    string.Format(
+                        client.ChatServer().MessageOfTheDay,
+                        AssemblyInfoclass.RevisionName
+                        + " "
+                        + AssemblyInfoclass.AssemblyVersion),
+                    string.Empty);
+
             client.Send(anonv);
 
+            /*
+             * Add client to channels.
+             */
             client.ChatServer().AddClientToChannels(client);
         }
 
