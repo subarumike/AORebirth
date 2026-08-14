@@ -55,17 +55,13 @@ namespace AORebirth.Database.Dao
 
         private static bool tableEnsured;
 
-        private const string CreateTableSql =
-            "CREATE TABLE IF NOT EXISTS `charactersperks` ("
-            + "`Id` int(32) NOT NULL AUTO_INCREMENT,"
-            + "`CharacterId` int(32) NOT NULL,"
-            + "`PacketId` int(11) NOT NULL,"
-            + "PRIMARY KEY (`Id`),"
-            + "INDEX `Perks` (`CharacterId`, `PacketId`)"
-            + ") ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+        private const string TableExistsSql =
+            "SELECT COUNT(*) FROM information_schema.tables "
+            + "WHERE table_schema = DATABASE() "
+            + "AND table_name = 'charactersperks';";
 
         /// <summary>
-        /// Ensures the charactersperks table exists (safe for existing DBs that never got the Y prompt).
+        /// Ensures the governed charactersperks table exists without attempting runtime DDL.
         /// </summary>
         public void EnsureTable()
         {
@@ -85,7 +81,12 @@ namespace AORebirth.Database.Dao
                 {
                     using (IDbConnection conn = Connector.GetConnection())
                     {
-                        conn.Execute(CreateTableSql);
+                        int tableCount = conn.QuerySingle<int>(TableExistsSql);
+                        if (tableCount <= 0)
+                        {
+                            throw new InvalidOperationException(
+                                "Required table 'charactersperks' is missing. Apply the governed schema before starting the server.");
+                        }
                     }
 
                     tableEnsured = true;
