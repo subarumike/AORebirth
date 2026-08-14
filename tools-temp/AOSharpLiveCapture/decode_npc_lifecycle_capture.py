@@ -201,7 +201,7 @@ def packet_fingerprint(record):
     # retaining the full parsed record for packets the caller does not consume.
     # Avoid hashing here: the source reconciler needs equality, not a content
     # address, and preserving the text makes conflict reports lossless.
-    return record.pop("_rawFingerprint")
+    return record["_rawFingerprint"]
 
 
 def add_source_record(state, record, row_number, retain_record=None):
@@ -212,7 +212,9 @@ def add_source_record(state, record, row_number, retain_record=None):
     if existing_fingerprint is None:
         state["fingerprints"][key] = fingerprint
         if retain:
-            state["records"][key] = record
+            retained_record = dict(record)
+            retained_record.pop("_rawFingerprint", None)
+            state["records"][key] = retained_record
         state["validRows"] += 1
         return
     if existing_fingerprint == fingerprint:

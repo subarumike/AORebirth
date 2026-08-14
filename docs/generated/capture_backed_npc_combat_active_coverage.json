@@ -39740,7 +39740,7 @@
   "combatInventory": {
     "path": "docs/generated/capture_backed_npc_combat_inventory.json",
     "schemaVersion": 3,
-    "sha256": "9303e58fdff69bcafea22140e04573ba06673ed8a7d93fbea7f07037297c9ba9"
+    "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404"
   },
   "contentInputs": [
     {
@@ -39927,7 +39927,7 @@
       "captured SpecialAttackWeapon template identities joined to immutable AORebirth/Datafiles/items.dat Stat 287"
     ],
     "scope": "all sessions scanned by the canonical combat inventory extractor",
-    "sessionCount": 381,
+    "sessionCount": 383,
     "sessionsSearched": [
       "For Repo/Omni-Tek Virtual Training Ground - 138.0, 100.9, 13.5 (138.0 100.9 y 13.5 1108028)",
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260509-175138",
@@ -40309,7 +40309,9 @@
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-233312",
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260729-000735",
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-030702",
-      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-035230"
+      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-035230",
+      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856"
     ]
   },
   "fixedDenominatorExclusions": [
@@ -57059,7 +57061,7 @@
         "auditFamily": "elysium-east-captured-population",
         "auditKey": "6f3722d9bf92e3d6a614",
         "captureSearchScope": "corpusSearch.sessionsSearched",
-        "captureSessionCountSearched": 381,
+        "captureSessionCountSearched": 383,
         "captureSessions": [],
         "capturedContractDataRuntimeReady": false,
         "classification": "unresolved",
@@ -57130,7 +57132,7 @@
         "auditFamily": "scripted-hostiles",
         "auditKey": "81a2c202ddc74e4cf993",
         "captureSearchScope": "corpusSearch.sessionsSearched",
-        "captureSessionCountSearched": 381,
+        "captureSessionCountSearched": 383,
         "captureSessions": [],
         "capturedContractDataRuntimeReady": false,
         "classification": "unresolved",
@@ -93322,7 +93324,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -94620,7 +94622,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -95636,7 +95638,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -149987,7 +149989,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EB",
@@ -150076,7 +150078,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EC",
@@ -150165,7 +150167,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1ED",
@@ -150254,7 +150256,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EE",
@@ -150343,7 +150345,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EF",
@@ -150432,7 +150434,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71BC",
@@ -150521,7 +150523,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71C0",
@@ -150610,7 +150612,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7244",
@@ -150699,7 +150701,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7249",
@@ -150788,7 +150790,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C724A",
@@ -150877,7 +150879,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C724F",
@@ -150966,7 +150968,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7252",
@@ -151055,7 +151057,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C725E",
@@ -151144,7 +151146,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7268",
@@ -151233,7 +151235,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C726B",
@@ -151322,7 +151324,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7276",
@@ -151411,7 +151413,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C727D",
@@ -151500,7 +151502,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7286",
@@ -151589,7 +151591,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C728F",
@@ -151678,7 +151680,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7297",
@@ -151767,7 +151769,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72A2",
@@ -151856,7 +151858,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72A8",
@@ -151945,7 +151947,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1E8",
@@ -152034,7 +152036,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF201",
@@ -152123,7 +152125,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71CD",
@@ -152212,7 +152214,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71D2",
@@ -152301,7 +152303,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71D3",
@@ -152390,7 +152392,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72BF",
@@ -152479,7 +152481,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72CA",
@@ -152568,7 +152570,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72D2",
@@ -152657,7 +152659,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72D5",
@@ -152746,7 +152748,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72EB",
@@ -152835,7 +152837,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72F3",
@@ -152924,7 +152926,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1DE",
@@ -153013,7 +153015,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F6",
@@ -153102,7 +153104,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F7",
@@ -153191,7 +153193,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F8",
@@ -153280,7 +153282,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F9",
@@ -153369,7 +153371,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1FF",
@@ -153458,7 +153460,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72FB",
@@ -153547,7 +153549,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -153635,7 +153637,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -153723,7 +153725,7 @@
     {
       "actorCount": 11,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -153813,7 +153815,7 @@
     {
       "actorCount": 8,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -153903,7 +153905,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -153993,7 +153995,7 @@
     {
       "actorCount": 17,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154081,7 +154083,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154169,7 +154171,7 @@
     {
       "actorCount": 31,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154257,7 +154259,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154345,7 +154347,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154433,7 +154435,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154521,7 +154523,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154609,7 +154611,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154697,7 +154699,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154785,7 +154787,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154873,7 +154875,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -154961,7 +154963,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155049,7 +155051,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155137,7 +155139,7 @@
     {
       "actorCount": 11,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155225,7 +155227,7 @@
     {
       "actorCount": 15,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155313,7 +155315,7 @@
     {
       "actorCount": 9,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155403,7 +155405,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155493,7 +155495,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155581,7 +155583,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155669,7 +155671,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155757,7 +155759,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155845,7 +155847,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -155933,7 +155935,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156021,7 +156023,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156109,7 +156111,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156197,7 +156199,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156285,7 +156287,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156373,7 +156375,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156461,7 +156463,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156549,7 +156551,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156637,7 +156639,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156725,7 +156727,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156813,7 +156815,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156901,7 +156903,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -156991,7 +156993,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157079,7 +157081,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157167,7 +157169,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157255,7 +157257,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157343,7 +157345,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157431,7 +157433,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157519,7 +157521,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157607,7 +157609,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157695,7 +157697,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157783,7 +157785,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157873,7 +157875,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -157961,7 +157963,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158049,7 +158051,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158137,7 +158139,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158225,7 +158227,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158313,7 +158315,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158401,7 +158403,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158489,7 +158491,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158577,7 +158579,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158665,7 +158667,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158753,7 +158755,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158841,7 +158843,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -158931,7 +158933,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159019,7 +159021,7 @@
     {
       "actorCount": 17,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159107,7 +159109,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159195,7 +159197,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159285,7 +159287,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159373,7 +159375,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159461,7 +159463,7 @@
     {
       "actorCount": 18,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159549,7 +159551,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159637,7 +159639,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159725,7 +159727,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159813,7 +159815,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159901,7 +159903,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -159989,7 +159991,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160077,7 +160079,7 @@
     {
       "actorCount": 37,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160165,7 +160167,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160253,7 +160255,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160341,7 +160343,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160429,7 +160431,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160517,7 +160519,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160605,7 +160607,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160695,7 +160697,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160783,7 +160785,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160873,7 +160875,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -160961,7 +160963,7 @@
     {
       "actorCount": 49,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161051,7 +161053,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161141,7 +161143,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161231,7 +161233,7 @@
     {
       "actorCount": 8,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161321,7 +161323,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161411,7 +161413,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161499,7 +161501,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161587,7 +161589,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161675,7 +161677,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161763,7 +161765,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161851,7 +161853,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -161939,7 +161941,7 @@
     {
       "actorCount": 16,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162027,7 +162029,7 @@
     {
       "actorCount": 44,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162115,7 +162117,7 @@
     {
       "actorCount": 15,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162203,7 +162205,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162291,7 +162293,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162379,7 +162381,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162467,7 +162469,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162555,7 +162557,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162643,7 +162645,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162731,7 +162733,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162819,7 +162821,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162907,7 +162909,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -162995,7 +162997,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163083,7 +163085,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163171,7 +163173,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163259,7 +163261,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163347,7 +163349,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163435,7 +163437,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163523,7 +163525,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163611,7 +163613,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163699,7 +163701,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163787,7 +163789,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163875,7 +163877,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163963,7 +163965,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164051,7 +164053,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164139,7 +164141,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164227,7 +164229,7 @@
     {
       "actorCount": 9,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164317,7 +164319,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164405,7 +164407,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164493,7 +164495,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164581,7 +164583,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164669,7 +164671,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164757,7 +164759,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164845,7 +164847,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -164933,7 +164935,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165021,7 +165023,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165109,7 +165111,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165197,7 +165199,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165285,7 +165287,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165373,7 +165375,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165461,7 +165463,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165549,7 +165551,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165637,7 +165639,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165725,7 +165727,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165813,7 +165815,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165901,7 +165903,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -165989,7 +165991,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166077,7 +166079,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166165,7 +166167,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166253,7 +166255,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166341,7 +166343,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166429,7 +166431,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166517,7 +166519,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166605,7 +166607,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166693,7 +166695,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166781,7 +166783,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166869,7 +166871,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -166957,7 +166959,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167045,7 +167047,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167133,7 +167135,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167221,7 +167223,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167309,7 +167311,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167397,7 +167399,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167485,7 +167487,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167573,7 +167575,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167661,7 +167663,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167749,7 +167751,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167837,7 +167839,7 @@
     {
       "actorCount": 18,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -167925,7 +167927,7 @@
     {
       "actorCount": 18,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168013,7 +168015,7 @@
     {
       "actorCount": 28,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168101,7 +168103,7 @@
     {
       "actorCount": 20,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168189,7 +168191,7 @@
     {
       "actorCount": 29,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168277,7 +168279,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168365,7 +168367,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168453,7 +168455,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168541,7 +168543,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168629,7 +168631,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168717,7 +168719,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168805,7 +168807,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168893,7 +168895,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168981,7 +168983,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169069,7 +169071,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -175092,7 +175094,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -189213,7 +189215,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914",
@@ -190451,7 +190453,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -193065,7 +193067,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -201014,7 +201016,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -209065,7 +209067,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212335",
@@ -209990,7 +209992,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -210969,7 +210971,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -212798,7 +212800,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525",
@@ -214735,7 +214737,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -215841,7 +215843,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x7985CD86",
@@ -216362,7 +216364,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -216686,7 +216688,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -217010,7 +217012,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -217334,7 +217336,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -217658,7 +217660,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -217982,7 +217984,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -218306,7 +218308,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -218630,7 +218632,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -218954,7 +218956,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -219278,7 +219280,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -219602,7 +219604,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -219926,7 +219928,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525",
@@ -220277,7 +220279,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -220471,7 +220473,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -220665,7 +220667,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -220859,7 +220861,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -221053,7 +221055,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -221247,7 +221249,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -221441,7 +221443,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -221528,7 +221530,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -221615,7 +221617,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -221702,7 +221704,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -221789,7 +221791,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -221876,7 +221878,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -221963,7 +221965,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222050,7 +222052,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222137,7 +222139,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222224,7 +222226,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222311,7 +222313,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222398,7 +222400,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222485,7 +222487,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222572,7 +222574,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222659,7 +222661,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222746,7 +222748,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222833,7 +222835,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -222920,7 +222922,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223007,7 +223009,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223094,7 +223096,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223181,7 +223183,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223268,7 +223270,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223355,7 +223357,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223442,7 +223444,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223529,7 +223531,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -223616,7 +223618,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 381,
+      "captureSessionCountSearched": 383,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "inventory": "docs/generated/capture_backed_npc_combat_inventory.json",
-  "inventorySha256": "9303e58fdff69bcafea22140e04573ba06673ed8a7d93fbea7f07037297c9ba9",
+  "inventorySha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404",
   "criteria": {
     "positionTolerance": 0.025,
     "stationaryProof": "CharDCMove MoveType 21 FullStop before hit",

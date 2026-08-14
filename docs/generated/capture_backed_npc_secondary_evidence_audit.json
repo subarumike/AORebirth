@@ -18,29 +18,29 @@
     "manifestDigestMismatchCount": 0
   },
   "summary": {
-    "captureSessionCount": 381,
-    "captureArtifactCount": 5024,
-    "captureArtifactBytes": 2359562765,
+    "captureSessionCount": 383,
+    "captureArtifactCount": 5070,
+    "captureArtifactBytes": 2364054139,
     "categoryCounts": {
-      "capture-manifest": 764,
-      "combat": 999,
-      "decoded-projection": 3777,
-      "dynel-state": 1506,
-      "inventory-loot": 375,
-      "lifecycle": 645,
-      "movement": 514,
-      "raw-packets": 483,
-      "weapon-context": 448
+      "capture-manifest": 770,
+      "combat": 1007,
+      "decoded-projection": 3813,
+      "dynel-state": 1520,
+      "inventory-loot": 379,
+      "lifecycle": 653,
+      "movement": 520,
+      "raw-packets": 487,
+      "weapon-context": 452
     },
     "hashStatusCounts": {
-      "content-sha256": 5024
+      "content-sha256": 5070
     },
     "evidenceDocumentCount": 199,
     "missingEvidenceDocumentCount": 0
   },
   "mainCorpusReconciliation": {
-    "mainExtractorSessionCount": 381,
-    "auditedSessionCount": 381,
+    "mainExtractorSessionCount": 383,
+    "auditedSessionCount": 383,
     "sessionSetsMatch": true,
     "mainCorpusSessionsMissingFromAudit": [],
     "unexpectedAuditSessions": [],
@@ -51,9 +51,9 @@
   "combatInventoryInput": {
     "path": "docs/generated/capture_backed_npc_combat_inventory.json",
     "exists": true,
-    "sizeBytes": 124805204,
+    "sizeBytes": 124999078,
     "hashStatus": "content-sha256",
-    "sha256": "9303e58fdff69bcafea22140e04573ba06673ed8a7d93fbea7f07037297c9ba9",
+    "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404",
     "manifestSha256": null,
     "manifestDigestMatches": null
   },
@@ -4514,7 +4514,7 @@
     "allReferencedCapturesExist": true,
     "normalAttackInfoEntryCount": 29,
     "inventoryAvailable": true,
-    "inventoryProfilesScanned": 1746,
+    "inventoryProfilesScanned": 1759,
     "entriesWithNormalAttackInfoButNoCompleteRawContractCount": 22,
     "blockingCompleteRawSequenceEntryCount": 0,
     "blockingCompleteRawSequenceEntries": [],
@@ -35488,6 +35488,48 @@
       },
       "hashStatusCounts": {
         "content-sha256": 25
+      }
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "artifactCount": 23,
+      "totalBytes": 1773702,
+      "categoryCounts": {
+        "capture-manifest": 3,
+        "combat": 4,
+        "decoded-projection": 18,
+        "dynel-state": 7,
+        "inventory-loot": 2,
+        "lifecycle": 4,
+        "movement": 3,
+        "raw-packets": 2,
+        "weapon-context": 2
+      },
+      "hashStatusCounts": {
+        "content-sha256": 23
+      }
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "artifactCount": 23,
+      "totalBytes": 2717672,
+      "categoryCounts": {
+        "capture-manifest": 3,
+        "combat": 4,
+        "decoded-projection": 18,
+        "dynel-state": 7,
+        "inventory-loot": 2,
+        "lifecycle": 4,
+        "movement": 3,
+        "raw-packets": 2,
+        "weapon-context": 2
+      },
+      "hashStatusCounts": {
+        "content-sha256": 23
       }
     }
   ],
@@ -110312,6 +110354,694 @@
       "sizeBytes": 1131,
       "hashStatus": "content-sha256",
       "sha256": "f5a3a21a2730a5a6ba4e4c0776a980596ab1e1f293690f9a952a42ad5b442b08",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/capture-health.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "capture-manifest"
+      ],
+      "sizeBytes": 1787,
+      "hashStatus": "content-sha256",
+      "sha256": "d1a032f64327ee46ce0b7e3c4f06cc3966968ee7a269fc4fd13e0112e0cbe367",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/capture-session.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "capture-manifest"
+      ],
+      "sizeBytes": 416,
+      "hashStatus": "content-sha256",
+      "sha256": "e06c311df6ce119b977fd6ae583401c8a6c6526960ce388dc48e1b483ce2173c",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/capture_info.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "capture-manifest"
+      ],
+      "sizeBytes": 5308,
+      "hashStatus": "content-sha256",
+      "sha256": "12109ab939a51f3b9348bb90a1895ee6a6da1e44b978057568d4f64cf8f6a747",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/corpse-full-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state",
+        "lifecycle"
+      ],
+      "sizeBytes": 1557,
+      "hashStatus": "content-sha256",
+      "sha256": "94142f7dfd99b77f005199c4bfac4bb227534b374bd10d70c66c4e44a4fd6d92",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/corpse-loot-observations.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "inventory-loot",
+        "lifecycle"
+      ],
+      "sizeBytes": 411,
+      "hashStatus": "content-sha256",
+      "sha256": "bf77bea12a05e1131624f85f039b74af1d369cfa4d99dae7ab0630d13802ea9d",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-combat.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection",
+        "weapon-context"
+      ],
+      "sizeBytes": 9995,
+      "hashStatus": "content-sha256",
+      "sha256": "3e38abfa16118eddbcc89414d53d0ac6e52ddaf794e7d48ba27a5e06e580719d",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-dossier.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 47111,
+      "hashStatus": "content-sha256",
+      "sha256": "c17d39def9753918d24fe223079aa60fe2253045a33e029f010c57b561aec03d",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-fight-events.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection"
+      ],
+      "sizeBytes": 28822,
+      "hashStatus": "content-sha256",
+      "sha256": "55bc2cfedbfd719f16dffa71ad0809d67a664f6db75743cfdeacb0e3b5131926",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-full-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 3895,
+      "hashStatus": "content-sha256",
+      "sha256": "6bee9277a8e3de168a400da630b03e273fc23f443009b740296314d575281bb1",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-movement.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "movement"
+      ],
+      "sizeBytes": 69672,
+      "hashStatus": "content-sha256",
+      "sha256": "000779295e81ba0c115a4cfd617057d2f9d995390a26bca44489c200570f5775",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-respawns.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "lifecycle"
+      ],
+      "sizeBytes": 646,
+      "hashStatus": "content-sha256",
+      "sha256": "d1865193c6a741ac0392d043f7e6098ef8d0dce78d5880cf5b576f5fa34b2789",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-stat-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 2746,
+      "hashStatus": "content-sha256",
+      "sha256": "c44773db74cc2702a1fdea56221225de15ebd9986a480f4ce7b8c5c9031a1c01",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-state.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 409696,
+      "hashStatus": "content-sha256",
+      "sha256": "9ee71d0d7454eb9806e190c423c291ce79e7ca97089548971ff4865e892547ec",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-state.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 902772,
+      "hashStatus": "content-sha256",
+      "sha256": "142ce3a89dd51a35ede77dd6693e0b066fbbb6cc9d5d1e53c09574a0ad30875d",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/events.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection"
+      ],
+      "sizeBytes": 121007,
+      "hashStatus": "content-sha256",
+      "sha256": "c7a01b1f63fec280ce0a2a2dfb7cebd6e6baaf2910398d176285826159d85b8d",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/inventory-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "inventory-loot",
+        "weapon-context"
+      ],
+      "sizeBytes": 389,
+      "hashStatus": "content-sha256",
+      "sha256": "9b5c3d0efb21addad20fabfe4119f0a395aae25c79af86d0e22f63aaf66a7684",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/movement-packets.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "movement"
+      ],
+      "sizeBytes": 19015,
+      "hashStatus": "content-sha256",
+      "sha256": "7612ecde9116ff114f496919dc6ffd314c2912a1f00ffbaa584e23e6f6536a46",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/movement-summary.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "movement"
+      ],
+      "sizeBytes": 466,
+      "hashStatus": "content-sha256",
+      "sha256": "1e417402b003436349cdd6da6ef4ffb7e73b41f0a85b4eed4f7be68a67b78e58",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/npc-lifecycle.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "lifecycle"
+      ],
+      "sizeBytes": 31648,
+      "hashStatus": "content-sha256",
+      "sha256": "aa973523347c7ef17d3567d2a8d09d02ae691466247594b89acdd6b8f146db56",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/packets.hex.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "raw-packets"
+      ],
+      "sizeBytes": 47829,
+      "hashStatus": "content-sha256",
+      "sha256": "27661cbd19f9d62cecdd048fd22a42b86553e6d4f7e1bfcce41b2e3dff9443f7",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/raw-packets.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "raw-packets"
+      ],
+      "sizeBytes": 59396,
+      "hashStatus": "content-sha256",
+      "sha256": "e205b3a5c15009dbe071480034753fda36658f08683dd5050b6a91293029d050",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/scfu-appearance.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 6979,
+      "hashStatus": "content-sha256",
+      "sha256": "598dba758458240d654dc5ddaabd9d9069b32debfbec97cac995f428e8ac2942",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/system-messages.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647",
+      "captureId": "20260814-014647",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection"
+      ],
+      "sizeBytes": 2139,
+      "hashStatus": "content-sha256",
+      "sha256": "ccc386037d5d41edf4d0ef7d3ec26975ed9d7a93b9b84f7d051d301d0a44c357",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/capture-health.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "capture-manifest"
+      ],
+      "sizeBytes": 1804,
+      "hashStatus": "content-sha256",
+      "sha256": "d357241c8e4de05468494d8009734568fc6bf4b4aae781dbf939a4ac646a4cae",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/capture-session.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "capture-manifest"
+      ],
+      "sizeBytes": 416,
+      "hashStatus": "content-sha256",
+      "sha256": "236c5c4fc6012d2a552a3c29cbcdbe0efa96c8c1cd2492c6ed8295d88812ee09",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/capture_info.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "capture-manifest"
+      ],
+      "sizeBytes": 5347,
+      "hashStatus": "content-sha256",
+      "sha256": "1551c22db677b0001f9bbdb2f36e4f620ffd8e7313f9f7ca0042478f747d4f21",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/corpse-full-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state",
+        "lifecycle"
+      ],
+      "sizeBytes": 352,
+      "hashStatus": "content-sha256",
+      "sha256": "6eeaa7c7e4e83dfbad473e730a3431f55f9470198118614e0776dd10c244754d",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/corpse-loot-observations.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "inventory-loot",
+        "lifecycle"
+      ],
+      "sizeBytes": 214,
+      "hashStatus": "content-sha256",
+      "sha256": "7ad43f2f8fdd8434d71a029f5ff123f11f90c0f75546a8fe9f7072ebf5de0bb6",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-combat.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection",
+        "weapon-context"
+      ],
+      "sizeBytes": 16650,
+      "hashStatus": "content-sha256",
+      "sha256": "6912937e29fcbf05d018b5c00e9cde66708b3573d39785357bb752e00272063e",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-dossier.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 47541,
+      "hashStatus": "content-sha256",
+      "sha256": "d7225d26f160082b0a050f045416e8b1485025214a29c124b5b2cfab5c250b3e",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-fight-events.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection"
+      ],
+      "sizeBytes": 159354,
+      "hashStatus": "content-sha256",
+      "sha256": "b1575cc8f7cc7fb854cd38ca66e9516de47c78c045fc43e736786bf5d3b14709",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-full-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 103601,
+      "hashStatus": "content-sha256",
+      "sha256": "851edfdcf5fa5cd7a7d69c78a43a2f497d818bc6b0989679cc1c97efafbb4c33",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-movement.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "movement"
+      ],
+      "sizeBytes": 119464,
+      "hashStatus": "content-sha256",
+      "sha256": "d4b948e077bffcf061329e73963818fe3cf64774158ea89da5375e5515f210bb",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-respawns.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "lifecycle"
+      ],
+      "sizeBytes": 303,
+      "hashStatus": "content-sha256",
+      "sha256": "de231a0ac80d57761e1be14a60d69319ca8c298910af8739a1aa8091f9a3f02c",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-stat-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 29351,
+      "hashStatus": "content-sha256",
+      "sha256": "84dcbf92a93ed39410d3a0b4ac9c2799f548db980a45494c1de6899012caccc3",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-state.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 356107,
+      "hashStatus": "content-sha256",
+      "sha256": "6fad94611a7ae251006e60b7e417c6da20c509dfcb5052daeb4aecb4a9e08495",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-state.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 780156,
+      "hashStatus": "content-sha256",
+      "sha256": "47fc3b201ad554bb7322fd1f5298a44b3195ac075938c1e9cbedb701ff0982b0",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/events.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection"
+      ],
+      "sizeBytes": 451337,
+      "hashStatus": "content-sha256",
+      "sha256": "009f3c83be48481a13c4a484746262064c5b6bd7043cc665fc98191e8451ba7b",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/inventory-updates.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "inventory-loot",
+        "weapon-context"
+      ],
+      "sizeBytes": 129,
+      "hashStatus": "content-sha256",
+      "sha256": "1630232c4fb64d6e4b011f38ce50236849521ccd4c93ff9941b45bd2bd2b6c1b",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/movement-packets.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "movement"
+      ],
+      "sizeBytes": 17541,
+      "hashStatus": "content-sha256",
+      "sha256": "9b132eee6d13ab7545f674da9057ff6631920eed796987fc9a2a784044f6e8a2",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/movement-summary.json",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "movement"
+      ],
+      "sizeBytes": 466,
+      "hashStatus": "content-sha256",
+      "sha256": "22a445e6a829d1936eeea1d680c3520cd9283afcbfe4eb3148ff2c449cb99ca3",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/npc-lifecycle.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "lifecycle"
+      ],
+      "sizeBytes": 83323,
+      "hashStatus": "content-sha256",
+      "sha256": "9d2d42c6ed707688fd0c769b3471efdef8a6f29a3472d7e31459b49cc2deb7c7",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/packets.hex.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "raw-packets"
+      ],
+      "sizeBytes": 164100,
+      "hashStatus": "content-sha256",
+      "sha256": "c57fa8cbbdfe3792cdce58d7b0b520e1b113f89c308e5437266b7fdf010acde1",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/raw-packets.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "raw-packets"
+      ],
+      "sizeBytes": 195254,
+      "hashStatus": "content-sha256",
+      "sha256": "0f35f4b535717c8f3bc9f6ad5dcd55df7d0aabd57d0d61b3b5e962b3ecd859d7",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/scfu-appearance.csv",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "decoded-projection",
+        "dynel-state"
+      ],
+      "sizeBytes": 162054,
+      "hashStatus": "content-sha256",
+      "sha256": "7c9b7f8bcc3036b24b98b24169a35143ee35df141c72e3727bd1679171d7d681",
+      "manifestSha256": null,
+      "manifestDigestMatches": null
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/system-messages.log",
+      "session": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856",
+      "captureId": "20260814-015856",
+      "rootKind": "primary",
+      "categories": [
+        "combat",
+        "decoded-projection"
+      ],
+      "sizeBytes": 22808,
+      "hashStatus": "content-sha256",
+      "sha256": "6222cce40ceaee66a2d47d14ff7d000dcadd11ba8b0d796128af93bae52df840",
       "manifestSha256": null,
       "manifestDigestMatches": null
     }
