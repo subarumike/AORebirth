@@ -71,9 +71,12 @@ retains support for the repository's legacy `Z_SYNC_FLUSH` slice framing.
 All children run isolated and unbuffered with Python fault handling enabled. A bounded timeout terminates the complete child process tree and reports the stage label and process identity. Verified UTF-8 JSON may receive bounded retry for `JSONDecodeError` and for impossible stdlib `TypeError` or `AttributeError` failures only when the traceback proves `json.decoder`/`json.scanner` ownership. Deterministic validation failures and unrelated exceptions fail closed. Candidate JSON, UTF-8 outputs, descriptors, counts, hashes, identities, and location independence are validated before publication.
 
 Repository-owned generated-combat, acceptance, build, and test wrappers call
-`Tools/select_python_runtime.cmd`. It selects the governed CPython 3.13.14 runtime through the
-Windows launcher and accepts an explicit `AO_REBIRTH_PYTHON` override. The
-selected executable is the runtime recorded in the governed manifest.
+`Tools/select_python_runtime.cmd`. It selects a non-embedded 64-bit CPython
+3.13.14 runtime, accepts an explicit `AO_REBIRTH_PYTHON` override, and rejects
+the Windows embeddable package because its isolated module path blocks
+repository-local imports. The recommended Windows installer and the CPython
+NuGet distribution are supported. The selected executable is the runtime
+recorded in the governed manifest.
 
 ## Concurrency and read consistency
 

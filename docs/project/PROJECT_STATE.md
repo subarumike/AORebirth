@@ -153,10 +153,12 @@ same bound applies to impossible stdlib JSON `TypeError` or `AttributeError`
 failures only when their traceback proves `json.decoder`/`json.scanner`
 ownership; deterministic and unrelated failures fail closed.
 Repository-owned acceptance, build, test, and generated-combat wrappers select
-CPython 3.13.14 through `Tools/select_python_runtime.cmd`; the selector can be
-overridden with `AO_REBIRTH_PYTHON`. This avoids the locally installed Python
-3.12 runtime whose repeated `python312.dll` access violations prevented stable
-preflight execution. The manifest records the selected CPython 3.13.14 binary.
+a non-embedded 64-bit CPython 3.13.14 runtime through
+`Tools/select_python_runtime.cmd`; the selector can be overridden with
+`AO_REBIRTH_PYTHON` and rejects the isolated Windows embeddable distribution.
+This avoids the locally installed Python 3.12 runtime whose repeated
+`python312.dll` access violations prevented stable preflight execution. The
+manifest records the selected CPython 3.13.14 binary.
 Each mandatory gate holds one read lease across all 13 stages, eliminating the
 former full inventory parse before and after every filtered acceptance wrapper.
 
