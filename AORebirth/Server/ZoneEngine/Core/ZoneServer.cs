@@ -376,7 +376,12 @@ namespace ZoneEngine.Core
             {
                 return;
             }
-
+            if (fullArgs.Equals(
+         "#aorebirth-lft-remove",
+         StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
             // ChatEngine LFT Search → pre-seed remote candidates into searcher's client
             // before Invite click (avoids cross-zone "NoName is too high" Yes-loop).
             if (fullArgs.StartsWith(LftInviteClientPresence.LftSeedCommandPrefix, StringComparison.Ordinal))

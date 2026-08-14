@@ -57,7 +57,7 @@ namespace ZoneEngine.Core.Controllers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
-
+    
     using ZoneEngine.Core;
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Functions.GameFunctions;
@@ -1794,6 +1794,14 @@ namespace ZoneEngine.Core.Controllers
                 }
 
                 CharacterTeams[newMember.Identity.Instance] = teamId;
+                // Character is no longer looking for a team.
+                Program.ISComClient.Send(
+     new AORebirth.Communication.Messages.ChatCommand
+     {
+         CharacterId = newMember.Identity.Instance,
+         ChatCommandString = "#aorebirth-lft-remove"
+     });
+
             }
 
             BroadcastTeamJoined(teamId, members.ToList(), newMember.Identity);
