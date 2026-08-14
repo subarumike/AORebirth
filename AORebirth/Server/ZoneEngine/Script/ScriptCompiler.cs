@@ -75,6 +75,10 @@ namespace ZoneEngine.Script
     /// </summary>
     public class ScriptCompiler : IDisposable
     {
+        private const string ScriptTempEnvironmentVariableName = "AO_REBIRTH_SCRIPT_TEMP_DIR";
+
+        private const string ZoneStateEnvironmentVariableName = "AO_REBIRTH_ZONE_STATE_DIR";
+
         // Holder for Chat commands
 
         public static ScriptCompiler Instance = new ScriptCompiler();
@@ -515,7 +519,7 @@ namespace ZoneEngine.Script
             if (multipleFiles)
             {
                 string scriptOutputDirectory = Path.Combine(
-                    "tmp",
+                    ResolveTemporaryScriptAssemblyRoot(),
                     "run-" + DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture));
 
                 LogScriptAction(
@@ -765,15 +769,36 @@ namespace ZoneEngine.Script
         {
             string fullPath = Path.GetFullPath(assemblyLocation);
             string fileName = Path.GetFileName(fullPath);
-            string tmpPath = Path.GetFullPath("tmp") + Path.DirectorySeparatorChar;
+            string tmpPath = ResolveTemporaryScriptAssemblyRoot();
+            if (!tmpPath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            {
+                tmpPath += Path.DirectorySeparatorChar;
+            }
 
             return string.Equals(fileName, "Scripts.dll", StringComparison.OrdinalIgnoreCase)
                    || fullPath.StartsWith(tmpPath, StringComparison.OrdinalIgnoreCase);
         }
 
+        private static string ResolveTemporaryScriptAssemblyRoot()
+        {
+            string configured = Environment.GetEnvironmentVariable(ScriptTempEnvironmentVariableName);
+            if (!string.IsNullOrWhiteSpace(configured))
+            {
+                return Path.GetFullPath(configured);
+            }
+
+            configured = Environment.GetEnvironmentVariable(ZoneStateEnvironmentVariableName);
+            if (!string.IsNullOrWhiteSpace(configured))
+            {
+                return Path.Combine(Path.GetFullPath(configured), "script-tmp");
+            }
+
+            return Path.GetFullPath("tmp");
+        }
+
         private void CleanTemporaryScriptAssemblies()
         {
-            string tmpPath = Path.GetFullPath("tmp");
+            string tmpPath = ResolveTemporaryScriptAssemblyRoot();
 
             if (!Directory.Exists(tmpPath))
             {
