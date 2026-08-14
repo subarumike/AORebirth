@@ -542,7 +542,20 @@ namespace ZoneEngine.Script
                     }
 
                     // Now compile the dll's
-                    CompilerResults results = this.compiler.CompileAssemblyFromFile(this.p, scriptFile);
+                    CompilerResults results;
+                    try
+                    {
+                        results = this.compiler.CompileAssemblyFromFile(this.p, scriptFile);
+                    }
+                    catch (PlatformNotSupportedException)
+                    {
+                        LogScriptAction(
+                            "ScriptCompiler:",
+                            ConsoleColor.Yellow,
+                            "Runtime script compilation is not supported on this platform; optional script commands were not loaded.",
+                            ConsoleColor.Red);
+                        return false;
+                    }
 
                     // And check for errors
                     if (ErrorReporting(results).Length != 0)
@@ -571,7 +584,20 @@ namespace ZoneEngine.Script
             else
             {
                 // Compile the full Scripts.dll
-                CompilerResults results = this.compiler.CompileAssemblyFromFile(this.p, this.ScriptsList);
+                CompilerResults results;
+                try
+                {
+                    results = this.compiler.CompileAssemblyFromFile(this.p, this.ScriptsList);
+                }
+                catch (PlatformNotSupportedException)
+                {
+                    LogScriptAction(
+                        "ScriptCompiler:",
+                        ConsoleColor.Yellow,
+                        "Runtime script compilation is not supported on this platform; optional script commands were not loaded.",
+                        ConsoleColor.Red);
+                    return false;
+                }
 
                 // And check for errors
                 if (ErrorReporting(results).Length != 0)
