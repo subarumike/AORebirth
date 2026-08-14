@@ -36,6 +36,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/ChatCommand.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LftRegister.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LftSearch.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LftUnregister.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/LoginCharacter.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/OnlineStatus.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/PlayerNameLookup.cs" />
