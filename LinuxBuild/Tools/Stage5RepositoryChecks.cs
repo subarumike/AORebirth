@@ -251,8 +251,8 @@ namespace AORebirth.LinuxBuild.Contracts
                 .Select(element => NormalizeInventoryInclude(RequireAttribute(element, "Include")))
                 .ToArray();
 
-            Assert(legacySources.Length == 74, "Legacy ChatEngine compile inventory must contain exactly 74 items.");
-            Assert(linuxSources.Length == 74, "Linux ChatEngine compile inventory must contain exactly 74 items.");
+            Assert(legacySources.Length == 75, "Legacy ChatEngine compile inventory must contain exactly 75 items.");
+            Assert(linuxSources.Length == 75, "Linux ChatEngine compile inventory must contain exactly 75 items.");
             VerifySequence(legacySources, linuxSources, "ChatEngine compile inventory");
             foreach (string source in linuxSources)
             {
@@ -438,7 +438,7 @@ namespace AORebirth.LinuxBuild.Contracts
                 .Where(match => match.Groups[2].Success)
                 .Select(match => int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture))
                 .ToArray();
-            int[] expectedIds = { 0, 2, 3, 21, 30, 40, 41, 42, 50, 51, 52, 53, 54, 57, 64, 65, 66, 70, 71, 100, 110, 120, 1500, 1502 };
+            int[] expectedIds = { 0, 2, 3, 21, 30, 40, 41, 42, 50, 51, 52, 53, 54, 57, 64, 65, 66, 70, 71, 100, 110, 120, 1500, 1501, 1502 };
             Assert(actualIds.SequenceEqual(expectedIds), "Parser message-number cases changed.");
 
             var expectedHandlers = new Dictionary<int, string>
@@ -449,7 +449,7 @@ namespace AORebirth.LinuxBuild.Contracts
                 { 51, "PrivateGroupKickPlayer" }, { 52, "PrivateGroupJoin" }, { 53, "PrivateGroupLeave" },
                 { 54, "PrivateGroupKickEveryone" }, { 57, "PrivateGroupMessage" }, { 64, "ChannelDataSet" },
                 { 65, "ChannelMessage" }, { 66, "ChannelMode" }, { 120, "ChatCommand" },
-                { 1500, "LftRegister" }, { 1502, "LftSearch" }
+                { 1500, "LftRegister" }, { 1501, "LftUnregister" }, { 1502, "LftSearch" }
             };
 
             for (int index = 0; index < labels.Count; index++)

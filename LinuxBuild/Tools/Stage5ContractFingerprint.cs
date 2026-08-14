@@ -260,17 +260,18 @@ namespace AORebirth.LinuxBuild.Contracts
             Assert(prefix != null && prefix.IsLiteral, "Lft playfield command prefix is not a public constant.");
             Assert(string.Equals((string)prefix.GetRawConstantValue(), "#aorebirth-pf", StringComparison.Ordinal), "Unexpected LFT playfield command prefix.");
 
-            MethodInfo set = GetRequiredMethod(type, "Set", typeof(uint), typeof(int));
+            MethodInfo set = GetRequiredMethod(type, "Set", typeof(uint), typeof(int), typeof(int));
             MethodInfo remove = GetRequiredMethod(type, "Remove", typeof(uint));
             MethodInfo tryGet = GetRequiredMethod(type, "TryGet", typeof(uint), typeof(int).MakeByRefType());
+            MethodInfo tryGetExpansion = GetRequiredMethod(type, "TryGetExpansion", typeof(uint), typeof(int).MakeByRefType());
             const uint first = 0xF5002000;
             for (uint index = 0; index < 24; index++)
             {
                 remove.Invoke(null, new object[] { first + index });
             }
 
-            set.Invoke(null, new object[] { 0u, 123 });
-            set.Invoke(null, new object[] { first, 0 });
+            set.Invoke(null, new object[] { 0u, 123, 1 });
+            set.Invoke(null, new object[] { first, 0, 1 });
             object[] invalidArguments = { first, 0 };
             Assert(!(bool)tryGet.Invoke(null, invalidArguments), "LftPlayfieldRegistry accepted invalid input.");
 
@@ -280,7 +281,7 @@ namespace AORebirth.LinuxBuild.Contracts
                 uint captured = index;
                 tasks.Add(Task.Run(delegate
                 {
-                    set.Invoke(null, new object[] { first + captured, 5000 + (int)captured });
+                    set.Invoke(null, new object[] { first + captured, 5000 + (int)captured, captured % 2 == 0 ? 2 : 1 });
                 }));
             }
 
@@ -290,6 +291,9 @@ namespace AORebirth.LinuxBuild.Contracts
                 object[] arguments = { first + index, 0 };
                 Assert((bool)tryGet.Invoke(null, arguments), "LftPlayfieldRegistry lost a concurrent update.");
                 Assert((int)arguments[1] == 5000 + index, "LftPlayfieldRegistry returned an incorrect playfield.");
+                object[] expansionArguments = { first + index, 0 };
+                Assert((bool)tryGetExpansion.Invoke(null, expansionArguments), "LftPlayfieldRegistry lost a concurrent expansion update.");
+                Assert((int)expansionArguments[1] == (index % 2 == 0 ? 2 : 1), "LftPlayfieldRegistry returned an incorrect expansion.");
             }
 
             for (uint index = 0; index < 24; index++)

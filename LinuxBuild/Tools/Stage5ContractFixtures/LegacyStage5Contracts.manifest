@@ -228,6 +228,7 @@ api|type.constructor\|public instance .ctor()
 api|type.constructor\|public instance .ctor(ChatEngine.CoreServer.ChatServer srvr)
 api|type.property\|public instance ChatEngine.CoreClient.Character Character {get:public;set:public}
 api|type.property\|public instance System.Collections.Generic.List<System.UInt32> KnownClients {get:public;set:none}
+api|type.property\|public instance System.DateTime ChatAuthenticatedUtc {get:public;set:public}
 api|type.property\|public instance System.String ServerSalt {get:public;set:public}
 api|type.field\|System.Boolean\|IsBot\|static=false\|initonly=false\|literal=false\|constant=
 api|type.field\|System.Collections.Generic.HashSet<ChatEngine.Channels.ChannelBase>\|Channels\|static=false\|initonly=false\|literal=false\|constant=
@@ -235,8 +236,10 @@ api|type.method\|public instance ChatEngine.CoreServer.ChatServer ChatServer()
 api|type.method\|public instance System.Void Send(System.Int32 receiver,System.Byte[] packetBytes)
 api|type.method\|public instance special-name ChatEngine.CoreClient.Character get_Character()
 api|type.method\|public instance special-name System.Collections.Generic.List<System.UInt32> get_KnownClients()
+api|type.method\|public instance special-name System.DateTime get_ChatAuthenticatedUtc()
 api|type.method\|public instance special-name System.String get_ServerSalt()
 api|type.method\|public instance special-name System.Void set_Character(ChatEngine.CoreClient.Character value)
+api|type.method\|public instance special-name System.Void set_ChatAuthenticatedUtc(System.DateTime value)
 api|type.method\|public instance special-name System.Void set_ServerSalt(System.String value)
 api|type.end\|ChatEngine.CoreClient.Client
 api|type.begin\|ChatEngine.CoreServer.ChatServer
@@ -266,19 +269,33 @@ api|type.serializable-attribute\|false
 api|type.base\|System.Object
 api|type.field\|System.String\|PlayfieldCommandPrefix\|static=true\|initonly=false\|literal=true\|constant=string:"#aorebirth-pf"
 api|type.method\|public static System.Boolean TryGet(System.UInt32 characterId,out System.Int32 playfieldId)
+api|type.method\|public static System.Boolean TryGetExpansion(System.UInt32 characterId,out System.Int32 expansion)
 api|type.method\|public static System.Void Remove(System.UInt32 characterId)
-api|type.method\|public static System.Void Set(System.UInt32 characterId,System.Int32 playfieldId)
+api|type.method\|public static System.Void Set(System.UInt32 characterId,System.Int32 playfieldId,System.Int32 expansion)
 api|type.end\|ChatEngine.Lists.LftPlayfieldRegistry
 api|type.begin\|ChatEngine.Lists.LftRegistry
 api|type.kind\|class
 api|type.modifiers\|abstract,sealed
 api|type.serializable-attribute\|false
 api|type.base\|System.Object
+api|type.method\|public static ChatEngine.Lists.LftRegistry.ApplyResult Apply(System.UInt32 characterId,System.String comment,System.DateTime chatAuthUtc)
+api|type.method\|public static System.Boolean IsListed(System.UInt32 characterId)
 api|type.method\|public static System.Boolean TryGetComment(System.UInt32 characterId,out System.String comment)
 api|type.method\|public static System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<System.UInt32,System.String>> Snapshot()
 api|type.method\|public static System.Void Remove(System.UInt32 characterId)
 api|type.method\|public static System.Void Upsert(System.UInt32 characterId,System.String comment)
 api|type.end\|ChatEngine.Lists.LftRegistry
+api|type.begin\|ChatEngine.Lists.LftRegistry.ApplyResult
+api|type.kind\|enum
+api|type.modifiers\|sealed
+api|type.serializable-attribute\|not-applicable
+api|type.enum-underlying\|System.Int32
+api|type.enum-flags-attribute\|false
+api|type.enum-value\|IgnoredLoginEcho\|System.Int32:3
+api|type.enum-value\|ListedComment\|System.Int32:0
+api|type.enum-value\|Unlisted\|System.Int32:2
+api|type.enum-value\|UpdatedComment\|System.Int32:1
+api|type.end\|ChatEngine.Lists.LftRegistry.ApplyResult
 api|type.begin\|ChatEngine.Lists.RecentMsgsEntry
 api|type.kind\|class
 api|type.modifiers\|
@@ -360,6 +377,13 @@ api|type.serializable-attribute\|false
 api|type.base\|System.Object
 api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
 api|type.end\|ChatEngine.PacketHandlers.LftSearch
+api|type.begin\|ChatEngine.PacketHandlers.LftUnregister
+api|type.kind\|class
+api|type.modifiers\|abstract,sealed
+api|type.serializable-attribute\|false
+api|type.base\|System.Object
+api|type.method\|public static System.Void Read(ChatEngine.CoreClient.Client client,System.Byte[] packet)
+api|type.end\|ChatEngine.PacketHandlers.LftUnregister
 api|type.begin\|ChatEngine.PacketHandlers.LoginCharacter
 api|type.kind\|class
 api|type.modifiers\|abstract,sealed
