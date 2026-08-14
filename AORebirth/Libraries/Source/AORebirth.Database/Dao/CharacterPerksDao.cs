@@ -81,7 +81,7 @@ namespace AORebirth.Database.Dao
                 {
                     using (IDbConnection conn = Connector.GetConnection())
                     {
-                        int tableCount = conn.QuerySingle<int>(TableExistsSql);
+                        int tableCount = conn.Query<int>(TableExistsSql).Single();
                         if (tableCount <= 0)
                         {
                             throw new InvalidOperationException(

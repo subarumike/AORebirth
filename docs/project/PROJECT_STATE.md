@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-12
+Updated: 2026-08-14
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -75,9 +75,8 @@ completion matrices and dated evidence retain detailed provenance.
   database preflight requiring the expected MySQL database, exact governed
   34-table set, `characters.Online`, and zero online characters. The Linux
   wrapper and Stage 8 smoke pass locally, including child-process validation
-  from the build output; Windows Debug is currently blocked by a stale
-  generated-combat catalog preflight because governed regeneration fails on
-  missing raw-derived SCFU metadata for captured realm 655 provenance.
+  from the build output. Windows Debug passes through the approved build
+  wrapper with the governed generated-combat cohort validated first.
 - Stage 9 publishes ZoneEngine as a self-contained `linux-x64` artifact and
   validates it on native Ubuntu x86_64. Listener-free startup and lifecycle
   modes pass as Linux processes, read-only database preflight passes through
