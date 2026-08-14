@@ -805,7 +805,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.TryCompleteGridTeleportInCurrentPlayfield(dynel, destination, heading, playfield))
+            if (this.TryCompleteLocalTeleportInCurrentPlayfield(dynel, destination, heading, playfield))
             {
                 return;
             }
@@ -928,23 +928,24 @@ namespace AORebirth.Core.Playfields
             // client.Server.DisconnectClient(client);
         }
 
-        private bool TryCompleteGridTeleportInCurrentPlayfield(
+        private bool TryCompleteLocalTeleportInCurrentPlayfield(
             Dynel dynel,
             Coordinate destination,
             IQuaternion heading,
             Identity playfield)
         {
-            if (this.Identity.Instance != GridPlayfield
-                || playfield.Type != this.Identity.Type
+            if (playfield.Type != this.Identity.Type
                 || playfield.Instance != this.Identity.Instance)
             {
                 return false;
             }
 
             ICharacter character = dynel as ICharacter;
-            if (character == null
-                || character.Controller == null
-                || character.Controller.Client == null)
+            ZoneClient client =
+                character == null || character.Controller == null
+                    ? null
+                    : character.Controller.Client as ZoneClient;
+            if (character == null || client == null)
             {
                 return false;
             }
@@ -965,6 +966,7 @@ namespace AORebirth.Core.Playfields
                                        z = destination.z
                                    };
             dynel.RawHeading = new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+            this.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
             this.RefreshCharacterVisibility(character);
             this.PrimeStatelCollisionContacts(character);
 
@@ -972,7 +974,7 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Grid current-playfield teleport completed character={0} playfield={1} fromCoords={2:F1},{3:F1},{4:F1} toCoords={5:F1},{6:F1},{7:F1}",
+                    "Local current-playfield teleport completed character={0} playfield={1} fromCoords={2:F1},{3:F1},{4:F1} toCoords={5:F1},{6:F1},{7:F1}",
                     dynel.Identity.ToString(true),
                     this.Identity.Instance,
                     fromX,

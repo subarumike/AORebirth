@@ -325,6 +325,17 @@ namespace ZoneEngine.Core
                 pooledCharacter = null;
             }
 
+            if (pooledCharacter != null && !pooledCharacter.Parent.Equals(pf.Identity))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Removing stale pooled player parent for " + characterIdentity.ToString(true)
+                    + " parent=" + pooledCharacter.Parent.ToString(true)
+                    + " currentPlayfield=" + pf.Identity.ToString(true) + ".");
+                Pool.Instance.RemoveObject(pooledCharacter);
+                pooledCharacter = null;
+            }
+
             if (pooledCharacter == null)
             {
                 this.Controller.Character = new Character(
