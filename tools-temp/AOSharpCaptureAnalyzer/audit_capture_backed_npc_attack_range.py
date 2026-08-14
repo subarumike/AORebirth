@@ -139,50 +139,17 @@ def distance_xz(
 def iter_top_level_array_objects(path: Path, key: str) -> Iterable[dict[str, Any]]:
     """Yield objects from a named top-level JSON array."""
 
-    marker = ('"' + key + '"').encode("ascii")
-    mapped = path.read_bytes()
-    marker_at = mapped.find(marker)
-    if marker_at < 0:
-        raise ValueError(f"{path}: top-level key {key!r} was not found")
-    colon_at = mapped.find(b":", marker_at + len(marker))
-    array_at = mapped.find(b"[", colon_at + 1)
-    if colon_at < 0 or array_at < 0:
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"{path}: generated inventory JSON is malformed: {error}") from error
+    values = document.get(key)
+    if not isinstance(values, list):
         raise ValueError(f"{path}: top-level key {key!r} is not an array")
-    index = array_at + 1
-    length = len(mapped)
-    while index < length:
-        while index < length and mapped[index] in b" \t\r\n,":
-            index += 1
-        if index >= length or mapped[index] == ord("]"):
-            return
-        if mapped[index] != ord("{"):
-            raise ValueError(f"{path}: expected object in {key!r} at byte {index}")
-        start = index
-        depth = 0
-        in_string = False
-        escaped = False
-        while index < length:
-            byte = mapped[index]
-            if in_string:
-                if escaped:
-                    escaped = False
-                elif byte == ord("\\"):
-                    escaped = True
-                elif byte == ord('"'):
-                    in_string = False
-            elif byte == ord('"'):
-                in_string = True
-            elif byte == ord("{"):
-                depth += 1
-            elif byte == ord("}"):
-                depth -= 1
-                if depth == 0:
-                    index += 1
-                    yield json.loads(mapped[start:index])
-                    break
-            index += 1
-        else:
-            raise ValueError(f"{path}: unterminated object in {key!r}")
+    for index, value in enumerate(values):
+        if not isinstance(value, dict):
+            raise ValueError(f"{path}: expected object in {key!r} at index {index}")
+        yield value
 
 
 def sha256_file(path: Path) -> str:

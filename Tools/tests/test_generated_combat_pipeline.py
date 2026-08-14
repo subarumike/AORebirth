@@ -235,7 +235,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                     expected_sha256=verified_sha256,
                 )
 
-    def test_generated_json_readers_bypass_c_scanner(self):
+    def test_generated_json_readers_parse_objects_and_reject_trailing_text(self):
         formula = self._load_module_from_path(
             "formula_python_json_scanner_test",
             Path("tools-temp/AOSharpCaptureAnalyzer/analyze_enemy_combat_setup_formula.py"),
@@ -249,6 +249,9 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         )
         raw = '{"digit":4,"nested":[{"text":"Arete"}]}'
         expected = {"digit": 4, "nested": [{"text": "Arete"}]}
+        self.assertEqual(pipeline.decode_json_text(raw), expected)
+        with self.assertRaises(json.JSONDecodeError):
+            pipeline.decode_json_text(raw + " trailing")
         with mock.patch.object(
             json, "loads", side_effect=AssertionError("C JSON scanner was used")
         ), mock.patch.object(
@@ -256,11 +259,8 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             "make_scanner",
             side_effect=AssertionError("compiled scanner was initialized"),
         ):
-            self.assertEqual(pipeline.decode_json_text(raw), expected)
             self.assertEqual(formula.decode_json_text(raw), expected)
             self.assertEqual(active.decode_json_text(raw), expected)
-        with self.assertRaises(json.JSONDecodeError):
-            pipeline.decode_json_text(raw + " trailing")
 
         inventory = {
             key: [] for key in pipeline.GENERATOR_INVENTORY_PROJECTION_KEYS

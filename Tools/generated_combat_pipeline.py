@@ -275,27 +275,7 @@ def artifact_descriptor(path: Path, logical_path: PurePosixPath) -> dict[str, An
 
 
 def decode_json_text(raw: str) -> Any:
-    decoder = object.__new__(json.JSONDecoder)
-    decoder.object_hook = None
-    decoder.parse_float = float
-    decoder.parse_int = int
-    decoder.parse_constant = json.decoder._CONSTANTS.__getitem__
-    decoder.strict = True
-    decoder.object_pairs_hook = None
-    decoder.parse_object = json.decoder.JSONObject
-    decoder.parse_array = json.decoder.JSONArray
-    decoder.parse_string = json.decoder.py_scanstring
-    decoder.memo = {}
-    decoder.scan_once = json.scanner.py_make_scanner(decoder)
-    start = 0
-    while start < len(raw) and raw[start] in " \t\r\n":
-        start += 1
-    value, end = decoder.raw_decode(raw, start)
-    while end < len(raw) and raw[end] in " \t\r\n":
-        end += 1
-    if end != len(raw):
-        raise json.JSONDecodeError("Extra data", raw, end)
-    return value
+    return json.loads(raw)
 
 
 def _is_transient_json_decoder_failure(error: BaseException) -> bool:
@@ -1321,9 +1301,6 @@ def revalidate_auxiliary_inputs(snapshot: Any, repo_root: Path) -> None:
 
 
 _ABSOLUTE_WINDOWS_PATH = re.compile(r"^[A-Za-z]:[\\/]")
-_ABSOLUTE_WINDOWS_PATH_IN_TEXT = re.compile(
-    r"(?<![A-Za-z0-9_+.-])[A-Za-z]:[\\/]|\\\\[^\\/\s]+[\\/]"
-)
 _PATH_BOUNDARY_CHARACTERS = frozenset(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_+.-"
 )
@@ -1345,16 +1322,20 @@ _VOLATILE_MANIFEST_KEYS = frozenset(
 
 
 def _contains_absolute_windows_path_text(text: str) -> bool:
-    for index in range(max(0, len(text) - 2)):
-        character = text[index]
-        if (
-            character.isalpha()
-            and text[index + 1] == ":"
-            and text[index + 2] in ("\\", "/")
-            and (index == 0 or text[index - 1] not in _PATH_BOUNDARY_CHARACTERS)
-        ):
-            return True
-    return text.startswith("\\\\") or "\\\\" in text
+    if "\\\\" in text:
+        return True
+    for delimiter in (":\\", ":/"):
+        start = 0
+        while True:
+            index = text.find(delimiter, start)
+            if index < 0:
+                break
+            if index > 0 and text[index - 1].isalpha() and (
+                index == 1 or text[index - 2] not in _PATH_BOUNDARY_CHARACTERS
+            ):
+                return True
+            start = index + len(delimiter)
+    return False
 
 
 def assert_manifest_is_path_independent(value: Any, location: str = "manifest") -> None:

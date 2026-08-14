@@ -4185,8 +4185,14 @@ def compact_packet_evidence(
 
     audit_records = [
         packet_by_id[packet_id]
-        for packet_id in sorted(grouped_packet_ids - full_provenance_packet_ids)
+        for packet_id in grouped_packet_ids - full_provenance_packet_ids
     ]
+    audit_records.sort(
+        key=lambda record: (
+            f"{record.capture}|{record.direction}|{record.sequence}|"
+            f"{record.packet_sha256[:12]}"
+        )
+    )
     artifact_table = sorted({record.canonical_source for record in audit_records})
     artifact_index = {value: index for index, value in enumerate(artifact_table)}
     message_type_table = sorted({record.message_type for record in audit_records})
@@ -4205,8 +4211,6 @@ def compact_packet_evidence(
     }
 
     ledger = []
-    ledger_digest = hashlib.sha256()
-    ledger_digest.update(b"[")
     for record in audit_records:
         member_group_ids = memberships_by_packet_id[record.packet_id]
         if not isinstance(member_group_ids, set):
@@ -4249,11 +4253,7 @@ def compact_packet_evidence(
             else None,
             memberships,
         ]
-        if ledger:
-            ledger_digest.update(b",")
-        ledger_digest.update(_positional_json(row).encode("ascii"))
         ledger.append(row)
-    ledger_digest.update(b"]")
 
     packets = []
     for packet_id in sorted(full_provenance_packet_ids):
@@ -4275,7 +4275,7 @@ def compact_packet_evidence(
         "packetAuditLedgerPacketIdDerivation": (
             PACKET_AUDIT_PACKET_ID_DERIVATION
         ),
-        "packetAuditLedgerSha256": ledger_digest.hexdigest(),
+        "packetAuditLedgerSha256": positional_ledger_sha256(ledger),
         "packetAuditLedger": ledger,
         "lifecycleBoundarySummary": {
             "observationCount": len(lifecycle_packet_ids),
@@ -4529,17 +4529,18 @@ def audit_uncertified_complete_chains(
 def _referenced_packet_ids(
     value: Any, available_packet_ids: set[str], result: set[str]
 ) -> None:
-    if isinstance(value, str):
-        if value in available_packet_ids:
-            result.add(value)
-        return
-    if isinstance(value, dict):
-        for member in value.values():
-            _referenced_packet_ids(member, available_packet_ids, result)
-        return
-    if isinstance(value, (list, tuple)):
-        for member in value:
-            _referenced_packet_ids(member, available_packet_ids, result)
+    stack: list[Any] = [value]
+    while stack:
+        current = stack.pop()
+        if isinstance(current, str):
+            if current in available_packet_ids:
+                result.add(current)
+            continue
+        if isinstance(current, dict):
+            stack.extend(reversed(tuple(current.values())))
+            continue
+        if isinstance(current, (list, tuple)):
+            stack.extend(reversed(current))
 
 
 def _discover_combat_capture_paths() -> list[Path]:
@@ -5089,7 +5090,7 @@ def build_inventory(
             if record.message_type in {"StopFight", "Despawn"}:
                 lifecycle_records.append(record)
                 retained_packet_ids.add(record.packet_id)
-        for packet_id in retained_packet_ids:
+        for packet_id in sorted(retained_packet_ids):
             packet_by_id[packet_id] = local_packet_by_id[packet_id]
 
         del (
