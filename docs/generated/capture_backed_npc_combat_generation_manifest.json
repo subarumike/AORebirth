@@ -40,7 +40,7 @@
       "byteLength": 4081609,
       "path": "docs/generated/capture_backed_npc_secondary_evidence_audit.json",
       "role": "secondaryEvidenceAudit",
-      "sha256": "1ba91097aa2f563acea92a0e3f7458814036fad85dc418c97094d65c8a2af90e"
+      "sha256": "26c1cf3da6f2deeebbaba652db988fa52abd99209159a345ee36f4d892fd6ca0"
     }
   ],
   "counts": {
@@ -59,7 +59,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1499
   },
-  "generationIdentity": "9ef81d9495221227ab391e47318a572aecc2ea49a7358ce4556aae3d029fb336",
+  "generationIdentity": "afafff14e6003f465e2f950b78eb3c1b47d648e45ef2289e9443ca3076f253bb",
   "generators": {
     "activeCoverage": {
       "byteLength": 152823,
@@ -118,12 +118,12 @@
     }
   },
   "inputSnapshot": {
-    "auxiliarySnapshotIdentity": "2d7cb8d1ac7a22ba58c6d15617d8185495858334f5de024de9c9b9d3dc1e5d02",
+    "auxiliarySnapshotIdentity": "2674ec55f800ad5623a75d50b6810fe999d83e1af6c110b380391213bdc5dbf8",
     "captureManifestByteLength": 405345,
     "captureManifestSha256": "9bb962ef07e780d5b86324ae9391a08e2939dca44e6a1fd7b7b783601ae7347c",
     "captureSchemaVersion": 1,
     "captureSnapshotIdentity": "a51b1b45d43b3c70a10a497519bb0379e3db96163d9208eb0d2dd966f5065c0c",
-    "identity": "b0fc5a0b9bdb7a9ae8d8c7fe61c268b736a49cf9a128f9e3102fcb0cf260427c",
+    "identity": "332c81f3d49bd56fcaa6f7b6c0a0862ddffffca1a21a35b92495e2e7e3093785",
     "schemaVersion": 2
   },
   "pipeline": "capture-backed-npc-combat",
