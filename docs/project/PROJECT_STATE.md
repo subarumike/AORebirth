@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-14
+Updated: 2026-08-15
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,41 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- Unified account database/schema phase: live production metadata for `login`
+  and `characters` has been audited read-only against MySQL 8.4.10, normal
+  playable `login.Flags=0` is proven, no nonzero pending flag is approved, and
+  the repository now contains an Account Broker identity schema proposal plus a
+  validation SQL artifact. The identity schema validates against the local
+  Windows development MySQL database with legacy short-username representation
+  preserved. Production database schema, website account routes, Linux
+  deployment, and MyBB remain unchanged.
+- Account Broker foundation: the first internal trusted-side broker library is
+  implemented with an injected database boundary, identity-first idempotent
+  provisioning, existing-account linking by stable `login.Id`, future external
+  mapping support for MyBB UID linkage, split username policy for new
+  registration versus legacy linking, and AO password creation through
+  `LoginEncryption.GeneratePasswordHash()`. Account Broker validation passes
+  28/28 in Debug and Release. No public route or production deployment exists
+  yet.
+- Unified account Windows-local flow: a loopback-only Account Broker HTTP
+  service now exposes health, CSRF, registration, login, current-session,
+  logout, and minimal local register/login/member pages. The service uses the
+  broker as the only account authority; it does not reactivate legacy PHP
+  account pages and does not let website code query `login.Password`. Sessions
+  are server-side random-token sessions with HttpOnly/SameSite cookies, logout
+  invalidation, CSRF protection, and lightweight registration/login rate
+  limiting. Debug and Release unified-flow validation pass 34/34. Production
+  database schema, production website routes, Linux deployment, and MyBB remain
+  unchanged.
+- LoginEngine password authentication: restored after the `f7e9b657`
+  username-only regression. `UserCredentialsHandler` again calls
+  `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the
+  encrypted credential through `LoginEncryption.IsValidLogin()` and
+  `PasswordHash.ValidatePassword()`. Debug and Release validation tool runs pass
+  14/14, LoginEngine Debug/Release builds pass, database preflight passes, and
+  AOtomation messaging passes 1013/1013. No production database, website, Linux,
+  MyBB, or public-registration change was made.
 
 - Complete AOtomation suite: PASS (1003/1003).
 - Arete regular-mob combat uses a scoped forward reconciliation against the

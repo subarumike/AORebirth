@@ -1,18 +1,23 @@
 # AORebirth Unified Account Architecture
 
-Status: Phase 1 inspection and design only (2026-08-12). No production change,
-database mutation, MyBB installation, or service restart was performed.
+Status: Database/schema evidence phase validated locally, LoginEngine password
+authentication restored, first internal Account Broker foundation added, and a
+Windows-local unified account registration/login flow implemented through the
+loopback Account Broker service (2026-08-15). No production database mutation,
+production website route change, MyBB installation, Linux deployment, or
+production service restart was performed.
 
 ## Proven current account behavior
 
 The AO client first sends a username. `UserLoginHandler` stores it on the
 connection, generates a 32-byte per-connection server challenge, and returns
 that challenge. The credentials handler then requires the credential-message
-username to match the connection username case-insensitively, loads the `login`
-row by username, and permits only rows whose `Flags` value is zero. It decrypts
-the AO login key, requires the embedded username and server challenge to match,
-and validates the embedded clear password against `login.Password`. Successful
-authentication loads characters by the account username string.
+username to match the challenged connection username case-insensitively, loads
+the `login` row by username, and permits only rows whose `Flags` value is zero.
+It decrypts the AO login key, requires the embedded username and server
+challenge to match, and validates the embedded clear password against
+`login.Password`. Successful authentication loads characters by the canonical
+account username string.
 
 The persisted game password format is:
 
@@ -23,13 +28,10 @@ must remain unchanged for AO client compatibility. The server-side AO login-key
 decryption private value is hard-coded in source and must not be copied into the
 forum or public web tier.
 
-Critical build boundary: `LoginEncryption.i_Enable` is `false` under `DEBUG`
-and `true` under Release. When it is false, `IsValidLogin` returns true before
-decrypting or checking the password. The approved local workflow builds Debug.
-The production LoginEngine binary/configuration has not been inspected, so
-production password enforcement is not yet proven. Deployment work is blocked
-until the running production binary is identified and this boundary is tested
-without exposing a credential.
+Critical build boundary resolved: `LoginEncryption.i_Enable` is unconditional
+`true` in current source. Debug and Release validation both prove that correct
+passwords pass and incorrect, blank, malformed, salt-mismatched, and
+username-mismatched credentials fail closed.
 
 ## Checked-in account schema
 
@@ -53,6 +55,61 @@ actual `SHOW CREATE TABLE` output, so those production facts remain unverified.
 The repository contains table-creation SQL files but no general versioned
 migration framework.
 
+## Database/schema evidence update
+
+The 2026-08-15 read-only production audit inspected the LoginEngine database
+`aorebirth_chatengine_stage6` through the existing MySQL 8.4.10 container
+client and captured metadata only.
+
+Live `login` facts:
+
+- engine/collation: InnoDB, `latin1_swedish_ci`;
+- primary key: `Id int NOT NULL AUTO_INCREMENT`;
+- username: `Username varchar(32) NOT NULL`, `latin1_swedish_ci`, unique key;
+- password: `Password varchar(100) NOT NULL`, `latin1_swedish_ci`;
+- email: `Email varchar(64) NOT NULL`, `latin1_swedish_ci`;
+- status/privilege fields: `Flags int NOT NULL DEFAULT 0`,
+  `AccountFlags int NOT NULL DEFAULT 0`, `GM int NOT NULL DEFAULT 0`;
+- timestamp: `CreationDate datetime NOT NULL`;
+- foreign keys: none.
+
+Live `characters` facts:
+
+- engine/collation: InnoDB, `latin1_swedish_ci`;
+- primary key: `Id int NOT NULL AUTO_INCREMENT`;
+- owner field: `Username varchar(32) NOT NULL`, `latin1_swedish_ci`;
+- indexes: primary key only;
+- foreign keys: none.
+
+Live aggregate findings:
+
+- 8 `login` rows, 8 distinct usernames, 8 distinct lowercase usernames;
+- only 5 of 8 usernames match the future ASCII alphanumeric 6-32 broker rule;
+- 7 `characters` rows with 3 distinct owner usernames;
+- 0 exact owner orphans and 0 case-only owner/account mismatches;
+- `login.Flags` observed value: only `0`.
+
+Source reconciliation:
+
+- `characters.Username` remains the account-owner field;
+- `CharacterDao.GetAllForUser()` and `CharacterDao.IsCharacterOnAccount()` use
+  username-string equality;
+- `LoginDataDao.GetByCharacterId()` resolves character to account by loading the
+  character row and then querying `login` by `character.Username`;
+- `CheckLogin` permits only `Flags == 0`;
+- `CheckLogin.IsLoginCorrect()` loads `login.Password` and calls
+  `LoginEncryption.IsValidLogin()` after challenge, username, and `Flags`
+  checks.
+
+The repository-backed Account Broker identity schema is now defined in
+`AORebirth/Libraries/Source/AORebirth.Database/SqlTables/aorebirth_identity.sql`
+with validation coverage in
+`Tools/AccountIdentitySchema/validate_account_identity_schema.sql`. It was
+executed successfully against the local Windows development MySQL database
+`cellao_codex_clean` after confirming production was out of scope and Docker was
+not available for a throwaway server. The detailed evidence report is
+`docs/project/UNIFIED_ACCOUNT_SCHEMA_EVIDENCE_20260815.md`.
+
 ## Existing account creation surfaces
 
 LoginEngine exposes an operator console `adduser` command. Its interactive path
@@ -62,13 +119,15 @@ row. The non-interactive parameter validator does not enforce the same username
 or password rules; the database unique username index is the final duplicate
 guard. `setpass` replaces the AO hash using the same algorithm.
 
-The locally imported historical WebCore also contains a PHP registration page.
-It accepts alphanumeric profile/name fields, requires an eight-character
-password, checks duplicate username and email in application code, creates the
-same AO hash, and inserts directly into `login`. It has no CSRF token and is not
-an approved public registration system. The current WebEngine allowlist blocks
-`register.php`, `process-login.php`, and all other authentication/mutation PHP
-routes; WebEngine remains Windows-only, plaintext, development-only software.
+The locally imported historical WebCore also contains PHP account pages.
+`register.php` inserts directly into `login`; `process-login.php` reads
+`login.Password` directly in PHP; the legacy flow has no CSRF protection; and
+`member-profile.php` exposes raw account flags, expansion bits, GM level, and
+internal account ID. These pages are not an approved public registration/login
+system. The current WebEngine allowlist blocks `register.php`,
+`process-login.php`, `member-index.php`, `member-profile.php`, and all other
+authentication/mutation PHP routes; WebEngine remains Windows-only, plaintext,
+development-only software.
 
 ## Public infrastructure observation
 
@@ -86,9 +145,9 @@ present in this repository or the local SSH configuration.
 
 ## Selected identity architecture
 
-Use a new AORebirth Account Broker as the sole public-account authority. Keep
-the existing LoginEngine authentication path and `login.Password` format intact.
-Do not let nginx/PHP/MyBB connect to the AO game database.
+Use the new AORebirth Account Broker as the sole account-provisioning authority.
+Keep the existing LoginEngine authentication path and `login.Password` format
+intact. Do not let nginx/PHP/MyBB connect to the AO game database.
 
 The broker should run on the trusted side of the game-database boundary and own
 a separate, least-privilege identity store. The minimum model is:
@@ -117,13 +176,39 @@ proves only that `Flags == 0` may log in and any other value is rejected; it doe
 not prove which nonzero values are already assigned ban semantics. If that
 proof fails, use an explicit outbox/saga and create the game account last.
 
-Provisioning is idempotent and stateful: reserve identity, provision a
-non-login-capable MyBB row, create/link the game account, then activate all
-mappings. Retries look up the idempotency record and converge on the same IDs.
-Pending forum rows cannot authenticate because their random local credential is
-unknown and the bridge issues no session unless the broker reports `Active`.
-No partial failure may delete or overwrite an existing account automatically;
-recovery is deterministic and operator-visible.
+The 2026-08-15 audit did not prove a safe nonzero pending `login.Flags` value.
+Future registration must not create a playable `Flags=0` game account until the
+broker has validated input, generated `login.Password` through the existing
+AORebirth password implementation, and is ready to complete activation. The
+approved schema therefore supports identity-first provisioning, durable
+idempotent recovery, and stable `login.Id` mapping, with game-account
+creation/linking performed last unless a separate pending-flag policy is
+explicitly approved.
+
+Provisioning is idempotent and stateful. The current internal broker foundation
+reserves identity, creates or links the game account as the final sensitive
+step, stores `login.Password` through `LoginEncryption.GeneratePasswordHash()`,
+and activates the identity/game mapping. Retries look up the idempotency record
+and converge on the same IDs. The future forum step remains represented by
+`account_external_mappings` but no MyBB installation or public route exists in
+this stage. No partial failure may delete or overwrite an existing account
+automatically; recovery is deterministic and operator-visible.
+
+The first usable Windows flow is hosted by
+`AORebirth/Server/AccountBrokerService/AORebirth.AccountBroker.Service.csproj`.
+It binds only to loopback for this stage and exposes:
+
+- `GET /health`;
+- `GET /api/csrf`;
+- `POST /api/register`;
+- `POST /api/login`;
+- `GET /api/session`;
+- `POST /api/logout`;
+- local HTML pages `/register`, `/login`, `/member`, and `/logout`.
+
+The service uses the broker library as the only database-facing account
+authority. The website pages do not query `login.Password`, do not hold game
+database credentials separately, and do not expose administrative mutation.
 
 ## MyBB integration
 
@@ -157,11 +242,32 @@ a six-character minimum, WebCore allows alphanumeric usernames but has no
 explicit username length minimum, the database caps usernames at 32 bytes, and
 login comparisons use case folding while the production collation is unknown.
 
-Adopt ASCII alphanumeric usernames, length 6-32, with invariant ASCII lowercase
-normalization and a unique normalized-username index. Reject Unicode, whitespace,
-lookalikes, case variants, and a reviewed reserved/system-name list before any
-provisioning. Preserve the chosen canonical case for display. AO character names
-remain a separate policy and identifier.
+Adopt split username policy:
+
+- new public registrations: ASCII alphanumeric, length 6-32;
+- legacy existing-account links: ASCII alphanumeric, length 1-32, so the
+  observed short live usernames can remain representable without rewriting game
+  accounts or character ownership.
+
+Both policies use invariant ASCII lowercase normalization and the schema keeps a
+unique normalized-username index. Reject Unicode, whitespace, lookalikes, case
+variants, and a reviewed reserved/system-name list before new provisioning.
+Preserve the chosen canonical case for display. AO character names remain a
+separate policy and identifier.
+
+Website-session policy:
+
+- session tokens are generated from 32 random bytes;
+- session state is stored server-side in the broker process;
+- cookies are `HttpOnly`, `SameSite=Lax`, and `Secure` when HTTPS is used;
+- logout invalidates the server-side token;
+- no password, salt, hash, privilege flag, or raw database ID is stored in the
+  cookie.
+
+The current session and rate-limit stores are intentionally lightweight and
+single-process for the Windows proof. Production Linux deployment must either
+run one broker instance behind the loopback reverse proxy or replace these
+stores with an approved shared backing store before horizontal scaling.
 
 ## Security and deployment gates
 
@@ -184,26 +290,38 @@ Before implementation or installation:
 
 ## Required-report status
 
-1. VPS OS/version: unresolved; VPS access required.
+1. VPS OS/version: unresolved; not required for this schema-only stage.
 2. nginx: public header reports 1.29.8; configuration unresolved.
 3. PHP version: unresolved.
-4. database engine/version: MySQL path proven; server/version unresolved.
+4. database engine/version: production LoginEngine database is MySQL 8.4.10.
 5. AO authentication architecture: proven above.
-6. AO account schema: checked-in schema documented; live DDL unresolved.
+6. AO account schema: live `login` and `characters` metadata documented in
+   `docs/project/UNIFIED_ACCOUNT_SCHEMA_EVIDENCE_20260815.md`.
 7. password algorithm: proven above.
 8. unified identity architecture: Account Broker plus separate identity mapping.
 9. MyBB mechanism: stock core plus AORebirth Identity Bridge and one-time-code SSO.
-10. database/schema changes: none.
-11. files changed: this report and active-task pointer only.
+10. database/schema changes: none in production; repository schema proposal only.
+11. files changed: this report, evidence reports, schema proposal, validation
+    SQL, Account Broker library, Account Broker validation harness,
+    active-task pointer, and project-state summary.
 12. services/configuration changed: none.
 13. MyBB installed: no.
 14. checksum: not applicable; no package downloaded.
 15. domain/TLS: apex HTTPS PASS; forum NXDOMAIN.
-16-21. registration/login/failure/security/regression tests: not run; nothing deployed.
+16-21. registration/login/failure/security/regression tests: registration is
+implemented only in the Windows-local loopback broker service; production
+website routes remain blocked. Identity schema validation passes against the
+local Windows development MySQL target. Unified account flow validation passes
+34/34 in Debug and Release. Account Broker validation passes 28/28 in Debug and
+Release. LoginEngine password-authentication validation passes 14/14 in Debug
+and Release, database preflight passes, and AOtomation messaging passes
+1013/1013.
 22. backup locations: unresolved.
 23. rollback: no production mutation to roll back.
-24. unresolved issues: the production-access, live-DDL, build-mode, topology,
-    backup, and migration approvals listed above.
+24. unresolved issues: production migration approval, backup/restore plan,
+topology/credential separation, production broker hosting/API route, MyBB
+installation/bridge, optional official-client manual password-auth proof, and
+production deployment remain future stages.
 
 ## Source evidence
 
@@ -214,6 +332,13 @@ Before implementation or installation:
 - `AORebirth/Libraries/Source/AORebirth.Core/Encryption/PasswordHash.cs:45-86,99-158`
 - `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/login.sql:1-17`
 - `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/characters.sql:1-26`
+- `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/aorebirth_identity.sql`
+- `AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerService.cs`
+- `AORebirth/Libraries/Source/AORebirth.AccountBroker/UsernamePolicy.cs`
+- `AORebirth/Server/AccountBrokerService/Program.cs`
+- `Tools/UnifiedAccountFlowValidation/Program.cs`
+- `Tools/AccountBrokerValidation/Program.cs`
+- `Tools/AccountIdentitySchema/validate_account_identity_schema.sql`
 - `AORebirth/Libraries/Source/AORebirth.Database/Dao/LoginDataDao.cs:82-84,162-190`
 - `AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterDao.cs:183-185,236-246`
 - `AORebirth/Server/LoginEngine/Program.cs:110-317,539-554,797-828`

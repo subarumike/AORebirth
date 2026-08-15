@@ -76,7 +76,12 @@ namespace LoginEngine.QueryBase
         /// </param>
         public void GetLoginPassword(string recvLogin)
         {
-            this.passwdL = LoginDataDao.Instance.GetByUsername(recvLogin).Password;
+            this.passwdL = null;
+            DBLoginData login = LoginDataDao.Instance.GetByUsername(recvLogin);
+            if (login != null)
+            {
+                this.passwdL = login.Password;
+            }
         }
 
         #endregion
