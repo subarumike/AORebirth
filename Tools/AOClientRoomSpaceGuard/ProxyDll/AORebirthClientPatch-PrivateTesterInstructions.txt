@@ -1,0 +1,95 @@
+AORebirth Client Patch - Private Tester Instructions
+====================================================
+
+Download
+--------
+
+https://ao-rebirth.com/downloads/AORebirthClientPatchSetup-v1.exe
+
+This private test installer patches an official Anarchy Online client install
+so the launcher can show AORebirth and the official Funcom servers in the same
+server dropdown.
+
+Test account
+------------
+
+Username: stage10test
+Password: stage10test
+
+Before installing
+-----------------
+
+1. Use a dedicated AO test installation folder.
+2. Close every Anarchy Online client and launcher window.
+3. Download the installer from the AORebirth test link.
+4. Verify the SHA-256 hash against the current test-build hash posted by the
+   project lead.
+
+Windows Security / Defender notice
+----------------------------------
+
+This private test build is unsigned and installs an AORebirth version.dll proxy
+inside the selected Anarchy Online folder. Some consumer Windows installs may
+flag it as Trojan:Win32/Wacatac.B!ml or a potentially unwanted app.
+
+Only allow it if:
+
+- You downloaded it from the private AORebirth test link.
+- The SHA-256 hash matches the current test-build hash.
+- You are installing it into a dedicated AO test folder.
+
+Preferred private-test allow method
+-----------------------------------
+
+1. Open Windows Security.
+2. Select Virus & threat protection.
+3. Select Manage settings.
+4. Under Exclusions, select Add or remove exclusions.
+5. Select Add an exclusion, then Folder.
+6. Choose the dedicated AO test install folder.
+7. Run AORebirthClientPatchSetup-v1.exe and select that same AO folder.
+
+Alternative exact-file allow method
+-----------------------------------
+
+1. Open Windows Security.
+2. Select Virus & threat protection.
+3. Open Protection history.
+4. Expand the blocked AORebirthClientPatchSetup-v1.exe item.
+5. Confirm the detection and affected path match the current private test build.
+6. Choose Allow on device or Restore/Allow, depending on the Windows version.
+7. Run the installer again.
+
+Do not turn off all antivirus protection. Do not add broad exclusions such as
+Downloads, Desktop, the whole drive, or a user profile folder. Remove the
+installer-file allow entry after testing if you used the exact-file method.
+
+Install steps
+-------------
+
+1. Run AORebirthClientPatchSetup-v1.exe.
+2. Select the main Anarchy Online folder containing AnarchyOnline.exe.
+3. Wait for the success message.
+4. Start Anarchy Online normally.
+5. Choose AORebirth from the launcher server dropdown.
+6. Log in with the test account above.
+
+Expected result
+---------------
+
+- AORebirth appears in the launcher server dropdown.
+- Rubi-Ka and Rubi-Ka 2019 remain selectable.
+- AORebirth login works with the private test account.
+- Official server selection remains available.
+
+What the installer changes
+--------------------------
+
+- Installs AORebirth version.dll into the selected AO folder.
+- Updates DimensionServer.url.
+- Updates AnarchyLauncher.url.
+- Updates cd_image\data\launcher\DimensionServer.url.
+- Updates cd_image\data\launcher\AnarchyLauncher.url.
+- Backs up replaced files using the .AORebirthBackup suffix.
+
+version.dll is not a Funcom game file. It is the AORebirth client patch DLL.

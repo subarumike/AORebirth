@@ -10,6 +10,6 @@ namespace aorf
     };
 
     ClientProfile GetLoadedN3ClientProfile();
-    bool InstallRoomSpaceFix();
-    bool RunRoomSpaceFixSelfTest();
+    bool InstallClientCrashMitigation();
+    bool RunClientCrashMitigationSelfTest();
 }

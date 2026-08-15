@@ -1,97 +1,138 @@
-AO RoomSpace Fix - version.dll proxy
-====================================
+AORebirth Client Patch
+=====================
 
-This package prevents several repeatable Anarchy Online client crashes through
-byte-verified in-memory guards. It also writes an unhandled crash minidump for
-new crash signatures before chaining back to AO's normal crash path. It does
-not replace or modify AnarchyOnline.exe, N3.dll, XML, resources, or shortcuts.
-The installed version.dll is loaded by AO's normal dependency chain and applies
-the repair only in process memory.
+This is the one-download player package for using the official Anarchy Online
+client with AORebirth while still allowing the same client install to connect to
+the official Funcom dimensions.
+
+The package supports the current tested EP2/new-engine client and the tested
+EP1/old-engine client builds.
+
+The installer adds:
+
+- our version.dll proxy binary, added to the AO folder and loaded by the normal
+  AO client dependency chain. The official client does not ship with this file.
+  It changes only the login key used for AORebirth login handlers and skips the
+  key patch for the official Funcom login handlers. The same proxy also restores
+  the byte-verified client crash repairs for the supported old and new clients.
+- DimensionServer.url and cd_image\data\launcher\DimensionServer.url,
+  redirected to the AORebirth-hosted dimensions list.
+- AnarchyLauncher.url and cd_image\data\launcher\AnarchyLauncher.url,
+  redirected to AORebirth launcher news/account/support pages.
+
+It does not replace or modify AnarchyOnline.exe, N3.dll, patcher executables, or
+resource archives. Runtime changes remain build-specific and fail closed when
+the expected module identities, callsites, or instruction bytes do not match.
+
+Windows SmartScreen
+-------------------
+
+Unsigned community builds show "Unknown publisher" and may trigger Microsoft
+Defender SmartScreen. The correct release fix is Authenticode signing with a
+trusted code-signing certificate. The build wrapper supports signed releases:
+
+   set AO_REBIRTH_CODESIGN=1
+   set AO_REBIRTH_CODESIGN_THUMBPRINT=<certificate thumbprint>
+   Build-Package.cmd
+
+or:
+
+   set AO_REBIRTH_CODESIGN=1
+   set AO_REBIRTH_CODESIGN_PFX=C:\path\to\certificate.pfx
+   set AO_REBIRTH_CODESIGN_PFX_PASSWORD=<pfx password>
+   Build-Package.cmd
+
+Do not publish an unsigned installer as a final player release.
+
+Private tester Windows Security allow
+-------------------------------------
+
+This private test build is unsigned and installs an AORebirth version.dll proxy
+inside the selected Anarchy Online folder. Some consumer Windows installs may
+flag the private test package as Trojan:Win32/Wacatac.B!ml or a potentially
+unwanted app.
+
+Only allow the file if all of these are true:
+
+- You downloaded it from the private AORebirth test link.
+- The SHA-256 hash matches the hash posted with the current test build.
+- You are installing into a dedicated AO test client folder.
+
+Preferred private-test allow method:
+
+1. Create or choose a dedicated AO test install folder.
+2. Open Windows Security.
+3. Select Virus & threat protection.
+4. Select Manage settings.
+5. Under Exclusions, select Add or remove exclusions.
+6. Select Add an exclusion, then Folder.
+7. Choose the dedicated AO test install folder.
+8. Run AORebirthClientPatchSetup-v1.exe and select that same AO folder.
+
+Alternative exact-file allow method:
+
+1. Open Windows Security.
+2. Select Virus & threat protection.
+3. Open Protection history.
+4. Expand the blocked AORebirthClientPatchSetup-v1.exe item.
+5. Confirm the detection and affected path match the current private test build.
+6. Choose Allow on device or Restore/Allow, depending on the Windows version.
+7. Run the installer again.
+
+Do not turn off all antivirus protection. Do not add broad exclusions such as
+Downloads, Desktop, the whole drive, or a user profile folder. Remove the
+installer-file allow entry after testing if you used the exact-file method.
 
 INSTALL
 -------
 
 1. Close every AnarchyOnline.exe process.
-2. Run:
+2. Run the one-file installer:
+
+   AORebirthClientPatchSetup-v1.exe
+
+   The installer opens a folder picker. Select the main Anarchy Online folder
+   that contains AnarchyOnline.exe.
+
+   If the installer cannot find AO automatically, run:
+
+   AORebirthClientPatchSetup-v1.exe "C:\path\to\Anarchy Online"
+
+The ZIP package is kept as a manual fallback. To install from the ZIP, extract
+it and run:
+
+   Install.cmd
+
+If the ZIP installer cannot find AO automatically, run:
 
    Install.cmd "C:\path\to\Anarchy Online"
 
 3. Start AO with the same normal shortcut you already use.
 
 The installer supports only the two approved N3.dll hashes. Unknown clients
-are rejected without changing anything. It also refuses to overwrite an
-existing version.dll, including a full AOReloaded installation.
+are rejected without changing anything. If an existing version.dll is present,
+the installer backs it up as version.dll.AORebirthBackup and installs the
+AORebirth version.dll. Invalid or stale AORebirth ownership markers are backed
+up and replaced during repair.
+
+The first install backs up the original launcher URL files beside the originals
+using the .AORebirthBackup suffix. Reinstalling is idempotent when the same
+package is already installed. If a launcher URL file was manually changed after
+installation, uninstall fails closed instead of guessing which copy is correct.
 
 LOG
 ---
 
-%LOCALAPPDATA%\AORoomSpaceFix\AORoomSpaceFix.log
-%LOCALAPPDATA%\AORoomSpaceFix\Dumps
+%LOCALAPPDATA%\AORebirthClientPatch\AORebirthClientPatch.log
+%LOCALAPPDATA%\AORebirthClientPatch\Dumps
 
-For the new graphics client, look for:
+Useful log markers:
 
-PATCH PASS
-READY RoomSpace and new-client GUI draw repairs active
-
-The new-client GUI draw repair skips one bad GUI draw-helper call if the client
-jumps into coordinate data or another non-executable address instead of code.
-
-For the old graphics client, look for:
-
-PATCH PASS
-READY RoomSpace, GUI rectangle, and renderer repairs active
-
-The old-client renderer repair skips one bad randy31 draw-resource call when
-the client passes a low integer instead of a resource pointer. Color-pointer
-guards remain limited to the verified randy31 color-read callsites, including
-the indirect color-sample helper's existing missing-sample path. At the exact
-randy31 +0x25118 entry-pointer fault, the early exception-only guard verifies
-the old-client image and native loop state, then skips the corrupt 16-byte
-render-state vector. The separate +0x2511A guard skips only one entry whose
-state id is impossible.
-
-The repair also guards the one verified old-client DrawIndexedPrimitiveVB call
-that produced the repeated NVIDIA crashes. The fallback accepts only NVIDIA
-driver 32.0.15.9186 and the two exact null-read instructions observed in the
-dumps. During that exact triangle draw, a matching call is unwound and only
-that bad draw is skipped. Other driver versions, instructions, calls, and
-exceptions remain untouched. Because the driver already faulted, continued
-driver operation cannot be guaranteed; this guard contains only the verified
-failure and leaves AO's renderer selection unchanged.
-
-Separate failures can surface while AO locks or fills its next GUI vertex
-buffer. AO does not check a failed/null Lock result. The repair wraps the whole
-verified void GUI batch and skips it for the exact NVIDIA 32.0.15.9186
-read-from-0x14 failure. It also recognizes the verified GUI rep-movsd failure
-where randy converted a null Lock base into a low destination. Both paths run
-AO's conditional vertex-buffer unlock, material reset, and state reset; the
-null-destination path also releases a heap index buffer when needed. These
-scoped guards do not replace AO's selected renderer.
-
-The proxy does not blindly continue every exception. Unknown faults still use
-the normal crash/dump path because resuming without the matching lock and state
-cleanup can corrupt the renderer. Containment requires the exact instruction,
-register, helper-local, batch, viewport, and state-blob evidence.
-
-Normal old-client draws and rectangle operations do not run Windows
-virtual-memory queries. Draw inputs use checked arithmetic and direct endpoint
-probes inside the existing exception boundary, while AO's rectangle call stays
-directly connected to its original Utils helper. Expensive verification runs
-only if one of those operations actually faults.
-
-The old GUI repair also contains the verified tree-lookup crash where GUI was
-given pointer 0x8 instead of a four-byte key. Invalid or unreadable key pointers
-use GUI's existing not-found result; valid keys use the original lookup.
-
-For the verified old-client build, the repair preserves AO's renderer selection.
-Direct3D T&L HAL remains T&L HAL, so hardware transformation and lighting are not
-silently moved into the legacy Direct3D software pipeline. The scoped draw guard
-continues to contain the verified NVIDIA faults without changing the renderer
-chosen in AO's launcher.
-
-The dump handler does not suppress arbitrary access violations, C++
-exceptions, arbitrary driver faults, stack corruption, or unknown callsite failures.
-Only targeted, byte-verified repairs resume execution.
+LOGINKEY policy=Auto
+LOGINKEY patch=applied
+LOGINKEY patch=skipped reason=non_aorebirth_endpoint
+READY loginKeyWorker=started RoomSpace and new-client GUI draw repairs active
+READY loginKeyWorker=started RoomSpace, GUI rectangle, and renderer repairs active
 
 UNINSTALL
 ---------
@@ -101,14 +142,15 @@ Close AO, then run:
 Uninstall.cmd "C:\path\to\Anarchy Online"
 
 The uninstaller removes version.dll only when the ownership marker and current
-DLL hash both match this package.
+DLL hash both match this package. It restores the launcher URL backups when
+they are still owned by this package.
 
 CONFLICTS
 ---------
 
 Only one version.dll proxy can occupy the AO client directory. Do not combine
-this package with AOReloaded or another version.dll proxy unless the RoomSpace
-repair has been intentionally integrated into that proxy's source.
+this package with AOReloaded or another version.dll proxy unless the AORebirth
+login-key patch has been intentionally integrated into that proxy's source.
 
 This is an independent community crash repair, not an official Funcom build.
 See AOReloaded-MIT.txt for the third-party license retained by this derivative.
