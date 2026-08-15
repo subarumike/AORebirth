@@ -28,12 +28,13 @@ namespace AORebirth.AccountBroker.Service
                 return 2;
             }
 
-            if (!prefix.StartsWith("http://127.0.0.1:", StringComparison.OrdinalIgnoreCase)
-                && !prefix.StartsWith("http://localhost:", StringComparison.OrdinalIgnoreCase)
-                && !prefix.StartsWith("https://127.0.0.1:", StringComparison.OrdinalIgnoreCase)
-                && !prefix.StartsWith("https://localhost:", StringComparison.OrdinalIgnoreCase))
+            bool allowPrivateBind = string.Equals(
+                Environment.GetEnvironmentVariable("AOREBIRTH_ACCOUNT_BROKER_ALLOW_PRIVATE_BIND"),
+                "true",
+                StringComparison.OrdinalIgnoreCase);
+            if (!IsAllowedListenPrefix(prefix, allowPrivateBind))
             {
-                Console.Error.WriteLine("Account Broker service is Windows-local by default; use a loopback URL for this stage.");
+                Console.Error.WriteLine("Account Broker service requires a loopback URL unless explicit private-bind mode is enabled.");
                 return 2;
             }
 
@@ -61,6 +62,48 @@ namespace AORebirth.AccountBroker.Service
             }
 
             return null;
+        }
+
+        private static bool IsAllowedListenPrefix(string prefix, bool allowPrivateBind)
+        {
+            Uri uri;
+            if (!Uri.TryCreate(prefix, UriKind.Absolute, out uri))
+            {
+                return false;
+            }
+
+            if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            {
+                return false;
+            }
+
+            string host = uri.Host;
+            if (string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            IPAddress address;
+            if (!IPAddress.TryParse(host, out address))
+            {
+                return false;
+            }
+
+            if (IPAddress.IsLoopback(address))
+            {
+                return true;
+            }
+
+            return allowPrivateBind && IsPrivateIPv4(address);
+        }
+
+        private static bool IsPrivateIPv4(IPAddress address)
+        {
+            byte[] bytes = address.GetAddressBytes();
+            return bytes.Length == 4
+                && (bytes[0] == 10
+                    || (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
+                    || (bytes[0] == 192 && bytes[1] == 168));
         }
     }
 
