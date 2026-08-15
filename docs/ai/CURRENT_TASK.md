@@ -3,8 +3,13 @@
 ## Active
 
 Public unified account flow is enabled on `ao-rebirth.com` through the
-AORebirth Account Broker. Real AO-client acceptance with the generated
-production test account remains the only unproven player-facing gate.
+AORebirth Account Broker. Real LoginEngine protocol acceptance for a
+website-created production account is proven. Stock MyBB 1.8.40 is installed on
+production Linux and integrated through the AORebirth Account Broker forum SSO
+bridge. Public DNS, TLS, forum HTTPS, browser-equivalent SSO, UID reuse,
+expiration/replay rejection, cookie security, navigation, cleanup, backup, and
+service-health acceptance for `https://forum.ao-rebirth.com` passed on
+2026-08-15.
 
 ## Current checkpoint
 
@@ -15,8 +20,8 @@ production test account remains the only unproven player-facing gate.
 - The loopback Account Broker HTTP service now exposes local registration,
   login, current-session, logout, and health endpoints.
 - Windows-local unified account flow validation passes in Debug and Release.
-- Production Account Broker release `9a176f6f` is deployed and healthy on
-  `172.18.0.1:7510`.
+- Production Account Broker release `mybb-sso-20260815-001` is deployed and
+  healthy on `172.18.0.1:7510`.
 - Public `/register`, `/login`, `/account`, and `/logout` are enabled on
   `ao-rebirth.com`.
 - Public registration created a controlled production account through the
@@ -24,19 +29,56 @@ production test account remains the only unproven player-facing gate.
   one linked game mapping, and normal non-GM account flags.
 - Website wrong-password, correct-password, account, logout, duplicate,
   validation, rate-limit, and broker-unavailable failure paths passed.
+- Production LoginEngine protocol acceptance passed for the controlled
+  website-created account: correct password reached `CHARACTER_LIST`, wrong
+  password reached `LOGIN_ERROR`.
+- Exposed MySQL root and `aorebirth_stage6` credentials were rotated, old values
+  were rejected, and ChatEngine/LoginEngine/ZoneEngine/AccountBroker remained
+  healthy after deployment.
+- LoginEngine and ZoneEngine Linux database preflights now allow only the four
+  governed Account Broker extension tables in addition to the 34 governed game
+  tables.
 - Legacy PHP account routes remain blocked.
-- MyBB installation, SSO, and forum provisioning remain out of scope.
+- MyBB 1.8.40 is installed under `/opt/ao-rebirth/forum`, native MyBB
+  registration is disabled, the AORebirth Identity Bridge plugin is active, and
+  controlled SSO E2E passed with Account Broker external mapping.
+- Final cutover-safe production work completed while public DNS remains
+  blocked:
+  - website Forum SSO handoff now posts the one-time code instead of placing it
+    in the callback URL query string;
+  - approved 40-row traditional forum board structure is live;
+  - MyBB cookie domain was narrowed by clearing `cookiedomain`;
+  - controlled acceptance accounts were disabled and game login hashes rotated
+    after zero-character/zero-post proof;
+  - MyBB credential isolation, sensitive path checks, forum-container failure
+    isolation, runtime log scan, and cutover backup passed.
+- Final public production forum acceptance passed:
+  - Hostinger DNS `forum.ao-rebirth.com A 2.24.96.30` TTL `300`;
+  - Let's Encrypt production certificate issued for `forum.ao-rebirth.com`;
+  - public HTTP redirects to HTTPS and public forum homepage returns `200`;
+  - public SSO creates exactly one MyBB UID and one external mapping;
+  - second SSO reuses the same UID/mapping;
+  - replay, expired, malformed, and unknown codes are rejected;
+  - SSO codes do not appear in request URLs or current URL logs;
+  - cookies are Secure/SameSite and session cookies are HttpOnly;
+  - final controlled test accounts were disabled and their game passwords
+    rotated;
+  - final backup exists at
+    `/opt/ao-rebirth/database/backups/mybb-public-acceptance-20260815T094721Z`.
 
 ## Remaining gates
 
-- Perform official AO-client login acceptance with the controlled production
-  test account stored on the VPS at `/tmp/aor_acceptance_identity.txt`, without
-  printing credentials.
-- Rotate affected DB secrets because a diagnostic container-env command printed
-  MySQL secret values into the local task transcript.
-- Commit/push only when explicitly instructed.
-- Next account stage requires explicit approval for MyBB bridge/forum
-  provisioning work.
+- No remaining MyBB/forum infrastructure acceptance gate is open.
+- Repository baseline freeze is in progress under explicit approval. Runtime
+  baseline commits are:
+  - AORebirth:
+    `76258f8fc55a8220d63ef11f9aa039139e2870f6`;
+  - website:
+    `1ecd84fc44457a0ced44b5f0399ead0eeb654ae3`.
+- After the baseline commits are pushed, future account/forum work should stay
+  limited to presentation, content, moderation, email/notification
+  configuration, and launch preparation unless a proven production defect is
+  found.
 
 ## Constraints
 
@@ -45,5 +87,4 @@ production test account remains the only unproven player-facing gate.
 - Do not change character ownership in this stage.
 - Do not perform destructive database operations.
 - Do not enable legacy website registration/login pages.
-- Do not install MyBB.
 - Do not launch the AO client without explicit current authorization.

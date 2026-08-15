@@ -15,8 +15,8 @@ completion matrices and dated evidence retain detailed provenance.
   the repository now contains an Account Broker identity schema proposal plus a
   validation SQL artifact. The identity schema validates against the local
   Windows development MySQL database with legacy short-username representation
-  preserved. Production database schema, website account routes, Linux
-  deployment, and MyBB remain unchanged.
+  preserved. Production website account routes and MyBB forum SSO are now
+  deployed through the Account Broker; public forum HTTPS is pending DNS.
 - Account Broker foundation: the first internal trusted-side broker library is
   implemented with an injected database boundary, identity-first idempotent
   provisioning, existing-account linking by stable `login.Id`, future external
@@ -32,9 +32,9 @@ completion matrices and dated evidence retain detailed provenance.
   account pages and does not let website code query `login.Password`. Sessions
   are server-side random-token sessions with HttpOnly/SameSite cookies, logout
   invalidation, CSRF protection, and lightweight registration/login rate
-  limiting. Debug and Release unified-flow validation pass 34/34. Production
-  public account routes are now promoted through the broker; MyBB remains
-  unchanged.
+  limiting. Debug and Release unified-flow validation pass 41/41. Production
+  public account routes are promoted through the broker; MyBB 1.8.40 is
+  installed as a broker-backed identity consumer.
 - Public unified account flow: `ao-rebirth.com/register`, `/login`, `/account`,
   and `/logout` are enabled through the Linux Account Broker release
   `9a176f6f` on the trusted Docker bridge address `172.18.0.1:7510`. A
@@ -43,9 +43,54 @@ completion matrices and dated evidence retain detailed provenance.
   invalid-input, rate-limit, and broker-unavailable isolation checks pass.
   Database proof shows exactly one identity row, one identity email row, one
   `login` row, one linked game mapping, and normal non-GM account flags for the
-  controlled account. Legacy PHP account endpoints remain blocked. Real
-  official AO-client login with that controlled account remains the outstanding
-  player-facing proof.
+  controlled account. Real LoginEngine protocol acceptance now passes against
+  production `2.24.96.30:7500`: correct credentials reach `CHARACTER_LIST` and
+  wrong credentials reach `LOGIN_ERROR`. Exposed MySQL root and
+  `aorebirth_stage6` credentials were rotated, old values were rejected, and
+  ChatEngine/LoginEngine/ZoneEngine/AccountBroker are active after redeploying
+  LoginEngine and ZoneEngine release `account-gates-20260815-001`. Legacy PHP
+  account endpoints remain blocked. The official GUI client was not launched by
+  this agent. Controlled public/account/forum acceptance identities were later
+  retired after zero-character/zero-post proof by disabling identities and
+  mappings and rotating their game `login.Password` hashes.
+- MyBB forum cutover-safe production state: before Hostinger DNS was added, the
+  production forum vhost/container
+  route works with a host override, HTTP redirects to HTTPS, sensitive MyBB
+  paths are blocked, native MyBB registration remains disabled, the Identity
+  Bridge plugin is active, the approved 40-row traditional board structure is
+  live, forum cookies are no longer configured for the parent
+  `.ao-rebirth.com` domain, MyBB DB credentials are denied game/identity DB
+  access, forum-container failure does not affect the website/account/game
+  services, current forum/proxy/broker logs do not contain `aor_sso` URL
+  `code=` query strings, and cutover backup
+  `/opt/ao-rebirth/database/backups/mybb-cutover-20260815T091336Z` exists.
+  The website Forum SSO entry point now submits the one-time code to MyBB by
+  POST instead of placing it in the callback URL query string.
+- MyBB forum final public production acceptance: PASS on 2026-08-15. Hostinger
+  DNS now resolves `forum.ao-rebirth.com A 2.24.96.30` with TTL `300`; Let's
+  Encrypt production TLS issued for SAN `forum.ao-rebirth.com`; public HTTP
+  redirects to HTTPS; `https://forum.ao-rebirth.com/` returns `200`; CSS, JS,
+  and image assets return `200`; sensitive paths remain `403`/`404`; native
+  MyBB registration remains disabled; public browser-equivalent AORebirth to
+  MyBB SSO creates exactly one UID/mapping and repeat SSO reuses it; replay,
+  expired, malformed, and unknown codes are rejected; current URL logs contain
+  zero `aor_sso` `code=` query entries; MyBB credentials remain denied game and
+  identity DB access; website/forum cookies are Secure/SameSite and session
+  cookies are HttpOnly; final controlled accounts were disabled and game
+  passwords rotated; final backup is
+  `/opt/ao-rebirth/database/backups/mybb-public-acceptance-20260815T094721Z`.
+  Forum/account infrastructure acceptance is complete; next forum work should
+  be presentation, content, moderation policy, and community launch rather than
+  identity-system construction.
+- Frozen unified account/forum baseline: established on 2026-08-15 after the
+  public production acceptance gates. AORebirth runtime/source baseline:
+  `76258f8fc55a8220d63ef11f9aa039139e2870f6`. Website account/forum
+  integration baseline:
+  `1ecd84fc44457a0ced44b5f0399ead0eeb654ae3`. The unified account
+  architecture, MyBB SSO architecture, and public forum infrastructure are now
+  frozen; do not redesign identity/auth/forum SSO unless a proven production
+  defect requires it. Next account/forum work is presentation, content,
+  moderation, email/notification configuration, and launch preparation.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
   `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the

@@ -1,11 +1,14 @@
 # AORebirth Unified Account Architecture
 
 Status: Database/schema evidence phase validated locally, LoginEngine password
-authentication restored, first internal Account Broker foundation added, a
-Windows-local unified account registration/login flow implemented through the
-loopback Account Broker service, and the first public website account flow
-promoted through `https://ao-rebirth.com/register`, `/login`, `/account`, and
-`/logout` (2026-08-15). MyBB/forum provisioning remains out of scope.
+authentication restored, Account Broker foundation added, a Windows-local
+unified account registration/login flow implemented through the loopback Account
+Broker service, and the first public website account flow promoted through
+`https://ao-rebirth.com/register`, `/login`, `/account`, and `/logout`
+(2026-08-15). Production LoginEngine protocol acceptance for a website-created
+account and DB credential rotation are complete. Stock MyBB 1.8.40 is installed
+on production Linux as an Account Broker identity consumer; public forum
+production acceptance for `https://forum.ao-rebirth.com` passed on 2026-08-15.
 
 ## Proven current account behavior
 
@@ -189,9 +192,10 @@ Provisioning is idempotent and stateful. The current internal broker foundation
 reserves identity, creates or links the game account as the final sensitive
 step, stores `login.Password` through `LoginEncryption.GeneratePasswordHash()`,
 and activates the identity/game mapping. Retries look up the idempotency record
-and converge on the same IDs. The future forum step remains represented by
-`account_external_mappings` but no MyBB installation or public route exists in
-this stage. No partial failure may delete or overwrite an existing account
+and converge on the same IDs. MyBB UID linkage is represented by
+`account_external_mappings` with `Provider='mybb'`; the bridge confirms the
+external UID through the broker after MyBB provisioning. No partial failure may
+delete or overwrite an existing account
 automatically; recovery is deterministic and operator-visible.
 
 The first usable Windows flow is hosted by
@@ -217,6 +221,30 @@ runs the Linux Account Broker on the trusted Docker bridge address
 `/api/login`, `/api/session`, and `/api/logout`. Legacy PHP account endpoints
 such as `/register.php` and `/process-login.php` remain blocked.
 
+The production account acceptance and secret-rotation gates are documented in
+`docs/project/PRODUCTION_ACCOUNT_ACCEPTANCE_AND_SECRET_ROTATION_20260815.md`.
+The controlled website-created production account was proven through the real
+LoginEngine protocol: correct credentials reached `CHARACTER_LIST`, and wrong
+credentials reached `LOGIN_ERROR`. The exposed MySQL root and `aorebirth_stage6`
+credentials were rotated; old values were rejected; LoginEngine and ZoneEngine
+were republished with a preflight policy that allows only the four governed
+Account Broker extension tables beside the 34 governed game tables. Forum SSO
+production evidence is recorded in
+`docs/project/MYBB_FORUM_SSO_PRODUCTION_EVIDENCE_20260815.md`.
+
+The 2026-08-15 forum cutover-safe update changed the website handoff from a
+callback URL query code to an auto-submitted POST form. The Account Broker still
+issues the same short-lived one-time code and the MyBB Identity Bridge still
+redeems it through the same server-to-server broker endpoint; the transport
+change prevents normal web access logs from recording `code=` request-line
+queries.
+
+The final public forum acceptance also hardened MyBB cookies for public HTTPS:
+`cookiesecureflag=1`, blank `cookiedomain`, and default `SameSite=lax` emission
+from the MyBB 1.8.40 cookie helper when the MyBB SameSite setting is enabled.
+This preserves separate website/forum session cookies while preventing
+parent-domain forum cookies.
+
 ## MyBB integration
 
 Use a version-controlled `AORebirth Identity Bridge` plugin and stock MyBB core.
@@ -237,10 +265,11 @@ email, username, session, and login-datahandler hooks. The bridge should:
 
 Do not use MyBB password-verification hooks to send a user's AO password through
 forum PHP. Do not place a bearer assertion containing identity claims in a URL;
-the browser carries only a one-time opaque code. MyBB's own security notice
-warns that 1.8.x has known unresolved security weaknesses, reinforcing strict
-database isolation and the rule that a forum compromise must not reach game
-credentials or game-database write access.
+the browser carries only a one-time opaque code, and the approved website
+handoff submits that code by POST to avoid `code=` query strings in ordinary
+request logs. MyBB's own security notice warns that 1.8.x has known unresolved
+security weaknesses, reinforcing strict database isolation and the rule that a
+forum compromise must not reach game credentials or game-database write access.
 
 ## Canonical username policy
 
@@ -312,23 +341,27 @@ Before implementation or installation:
     SQL, Account Broker library, Account Broker validation harness,
     active-task pointer, and project-state summary.
 12. services/configuration changed: none.
-13. MyBB installed: no.
-14. checksum: not applicable; no package downloaded.
-15. domain/TLS: apex HTTPS PASS; forum NXDOMAIN.
+13. MyBB installed: yes, stock MyBB 1.8.40 under `/opt/ao-rebirth/forum`.
+14. checksum: MyBB 1.8.40 package verification passed during installation.
+15. domain/TLS: apex HTTPS PASS; forum HTTPS PASS with Let's Encrypt
+production certificate for `forum.ao-rebirth.com`.
 16-21. registration/login/failure/security/regression tests: registration is
-implemented only in the Windows-local loopback broker service; production
-website routes remain blocked. Identity schema validation passes against the
-local Windows development MySQL target. Unified account flow validation passes
-34/34 in Debug and Release. Account Broker validation passes 28/28 in Debug and
-Release. LoginEngine password-authentication validation passes 14/14 in Debug
-and Release, database preflight passes, and AOtomation messaging passes
-1013/1013.
-22. backup locations: unresolved.
-23. rollback: no production mutation to roll back.
-24. unresolved issues: production migration approval, backup/restore plan,
-topology/credential separation, production broker hosting/API route, MyBB
-installation/bridge, optional official-client manual password-auth proof, and
-production deployment remain future stages.
+implemented on the public website through the production Account Broker.
+Identity schema validation passes against the local Windows development MySQL
+target. Unified account flow validation passes 41/41 in Debug and Release.
+Account Broker validation passes 31/31 in Debug and Release. LoginEngine
+password-authentication validation passes 14/14 in Debug and Release, database
+preflight passes, and AOtomation messaging passes 1013/1013. MyBB internal SSO
+E2E passed, and public forum SSO through `https://forum.ao-rebirth.com` passed.
+22. backup locations:
+`/opt/ao-rebirth/database/backups/mybb-sso-20260815T074821Z` and
+`/opt/ao-rebirth/database/backups/mybb-cutover-20260815T091336Z`.
+23. rollback: disable Forum navigation/SSO entry, stop `ao-rebirth-forum`, and
+restore MyBB DB/files/plugin from the cutover backup if required. Game-server
+rollback is not required for forum rollback.
+24. unresolved issues: no remaining forum/account infrastructure acceptance
+gate is open. Later forum work should focus on presentation, content,
+moderation policy, and community launch.
 
 ## Source evidence
 
