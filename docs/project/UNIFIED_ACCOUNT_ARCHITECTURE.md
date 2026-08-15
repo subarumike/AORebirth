@@ -1,11 +1,11 @@
 # AORebirth Unified Account Architecture
 
 Status: Database/schema evidence phase validated locally, LoginEngine password
-authentication restored, first internal Account Broker foundation added, and a
+authentication restored, first internal Account Broker foundation added, a
 Windows-local unified account registration/login flow implemented through the
-loopback Account Broker service (2026-08-15). No production database mutation,
-production website route change, MyBB installation, Linux deployment, or
-production service restart was performed.
+loopback Account Broker service, and the first public website account flow
+promoted through `https://ao-rebirth.com/register`, `/login`, `/account`, and
+`/logout` (2026-08-15). MyBB/forum provisioning remains out of scope.
 
 ## Proven current account behavior
 
@@ -196,7 +196,7 @@ automatically; recovery is deterministic and operator-visible.
 
 The first usable Windows flow is hosted by
 `AORebirth/Server/AccountBrokerService/AORebirth.AccountBroker.Service.csproj`.
-It binds only to loopback for this stage and exposes:
+It exposes:
 
 - `GET /health`;
 - `GET /api/csrf`;
@@ -209,6 +209,13 @@ It binds only to loopback for this stage and exposes:
 The service uses the broker library as the only database-facing account
 authority. The website pages do not query `login.Password`, do not hold game
 database credentials separately, and do not expose administrative mutation.
+
+The first public website promotion is documented in
+`docs/project/PUBLIC_UNIFIED_ACCOUNT_FLOW_EVIDENCE_20260815.md`. Production now
+runs the Linux Account Broker on the trusted Docker bridge address
+`172.18.0.1:7510`, with public PHP routes calling broker `/api/register`,
+`/api/login`, `/api/session`, and `/api/logout`. Legacy PHP account endpoints
+such as `/register.php` and `/process-login.php` remain blocked.
 
 ## MyBB integration
 
