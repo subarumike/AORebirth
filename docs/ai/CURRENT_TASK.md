@@ -2,14 +2,19 @@
 
 ## Active
 
-Public unified account flow is enabled on `ao-rebirth.com` through the
-AORebirth Account Broker. Real LoginEngine protocol acceptance for a
-website-created production account is proven. Stock MyBB 1.8.40 is installed on
-production Linux and integrated through the AORebirth Account Broker forum SSO
-bridge. Public DNS, TLS, forum HTTPS, browser-equivalent SSO, UID reuse,
-expiration/replay rejection, cookie security, navigation, cleanup, backup, and
-service-health acceptance for `https://forum.ao-rebirth.com` passed on
-2026-08-15.
+Public unified account/forum infrastructure remains frozen and accepted.
+Forum community-launch preparation has been applied on production: restrained
+AORebirth forum CSS, AORebirth header navigation, guest login/register links
+pointing back to AORebirth account routes, final board descriptions, seed
+threads, rules/support/bug-report guidance, official/archive read-only
+permissions for normal users, conservative PM/avatar/signature/attachment
+settings, backup coverage, and registered-user SSO/posting acceptance.
+
+Launch status is currently BLOCKED only on final live moderator acceptance,
+authorized Admin CP acceptance, and production-grade email transport/DNS
+(`SPF`/`DKIM`/`DMARC` plus authenticated SMTP) if email notifications are
+required for launch. Evidence:
+`docs/project/MYBB_FORUM_LAUNCH_READINESS_20260815.md`.
 
 ## Current checkpoint
 
@@ -68,7 +73,15 @@ service-health acceptance for `https://forum.ao-rebirth.com` passed on
 
 ## Remaining gates
 
-- No remaining MyBB/forum infrastructure acceptance gate is open.
+- No remaining MyBB/forum infrastructure architecture gate is open.
+- Forum presentation/content launch prep is applied, but community launch is
+  blocked until:
+  - live moderator sticky/close-open/move/report acceptance passes with a
+    controlled moderator account;
+  - Admin CP user/group/board/plugin/theme management acceptance passes with
+    authorized admin credentials and without exposing secrets;
+  - forum email is either intentionally launched without notifications or
+    reliable SMTP plus SPF/DKIM/DMARC is configured and proven.
 - Repository baseline freeze is in progress under explicit approval. Runtime
   baseline commits are:
   - AORebirth:

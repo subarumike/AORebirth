@@ -1,0 +1,225 @@
+/* AORebirth public forum launch theme layer.
+   Applied by prepare-mybb-public-launch.sh through the MyBB headerinclude
+   template. This is intentionally a restrained classic-forum skin, not a
+   replacement for stock MyBB templates. */
+
+:root {
+  color-scheme: dark;
+  --aor-bg: #071018;
+  --aor-bg-2: #0b1722;
+  --aor-panel: #111e2a;
+  --aor-panel-2: #162738;
+  --aor-border: #24445c;
+  --aor-border-soft: #1d3447;
+  --aor-text: #d7e6ef;
+  --aor-muted: #94a9b7;
+  --aor-link: #69d2ff;
+  --aor-link-hover: #9ce7ff;
+  --aor-accent: #18b8c9;
+  --aor-accent-2: #2b78ff;
+}
+
+html,
+body {
+  background: radial-gradient(circle at top, #122a3a 0, var(--aor-bg) 42%, #03070b 100%);
+  color: var(--aor-text);
+}
+
+a:link,
+a:visited {
+  color: var(--aor-link);
+}
+
+a:hover,
+a:active {
+  color: var(--aor-link-hover);
+}
+
+#container {
+  background: transparent;
+  border: 0;
+  color: var(--aor-text);
+}
+
+.wrapper {
+  max-width: 1180px;
+}
+
+#header {
+  background: linear-gradient(180deg, rgba(14, 35, 51, 0.98), rgba(8, 17, 26, 0.98));
+  border-bottom: 1px solid var(--aor-border);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+#logo {
+  border-bottom: 1px solid var(--aor-border-soft);
+}
+
+#logo img {
+  max-height: 72px;
+  width: auto;
+}
+
+.menu.top_links a,
+.menu.bottom_links a {
+  color: var(--aor-text);
+}
+
+.menu.top_links a:hover,
+.menu.bottom_links a:hover {
+  color: var(--aor-link-hover);
+}
+
+#panel .upper,
+#panel .lower {
+  background: #08131d;
+  border-color: var(--aor-border-soft);
+  color: var(--aor-text);
+}
+
+#content {
+  background: rgba(5, 12, 18, 0.72);
+  border: 1px solid rgba(65, 113, 143, 0.2);
+  box-shadow: 0 0 36px rgba(0, 0, 0, 0.28);
+}
+
+.navigation {
+  color: var(--aor-muted);
+}
+
+.navigation .active {
+  color: var(--aor-text);
+}
+
+.tborder {
+  background: var(--aor-border);
+  border-color: var(--aor-border);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+}
+
+.thead {
+  background: linear-gradient(180deg, #17445e, #0d2535);
+  color: #ffffff;
+  border-bottom: 1px solid var(--aor-accent);
+}
+
+.thead a:link,
+.thead a:visited {
+  color: #ffffff;
+}
+
+.tcat {
+  background: #0c1c29;
+  color: var(--aor-muted);
+  border-color: var(--aor-border-soft);
+}
+
+.trow1,
+.trow2 {
+  background: var(--aor-panel);
+  border-color: var(--aor-border-soft);
+  color: var(--aor-text);
+}
+
+.trow2 {
+  background: var(--aor-panel-2);
+}
+
+.trow1:hover,
+.trow2:hover {
+  background: #1a3144;
+}
+
+.smalltext {
+  color: var(--aor-muted);
+}
+
+.textbox,
+textarea,
+select {
+  background: #07131d;
+  border: 1px solid var(--aor-border);
+  color: var(--aor-text);
+}
+
+.button {
+  background: linear-gradient(180deg, var(--aor-accent), #0d6f88);
+  border: 1px solid #5ee7f7;
+  color: #021017;
+  font-weight: 700;
+}
+
+.button:hover {
+  background: linear-gradient(180deg, var(--aor-link-hover), var(--aor-accent));
+}
+
+.forum_status {
+  filter: hue-rotate(160deg) saturate(1.35) brightness(0.9);
+}
+
+.forum_legend {
+  background: rgba(7, 16, 24, 0.8);
+  border: 1px solid var(--aor-border-soft);
+  padding: 8px 10px;
+}
+
+#footer .upper,
+#footer .lower {
+  background: #050b11;
+  border-color: var(--aor-border-soft);
+  color: var(--aor-muted);
+}
+
+#copyright {
+  color: var(--aor-muted);
+}
+
+.aor-launch-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aor-launch-nav a {
+  display: inline-block;
+  padding: 5px 9px;
+  border: 1px solid var(--aor-border);
+  background: rgba(11, 23, 34, 0.95);
+  border-radius: 3px;
+}
+
+@media (max-width: 760px) {
+  .wrapper {
+    width: auto;
+    margin: 0 8px;
+  }
+
+  #logo img {
+    max-width: 220px;
+    height: auto;
+  }
+
+  .menu.top_links,
+  .aor-launch-nav {
+    float: none;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  #content {
+    padding: 8px;
+  }
+
+  .tborder {
+    font-size: 13px;
+  }
+
+  .tborder td:nth-child(3),
+  .tborder td:nth-child(4),
+  .tborder td:nth-child(5) {
+    display: none;
+  }
+}

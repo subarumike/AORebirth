@@ -91,6 +91,18 @@ completion matrices and dated evidence retain detailed provenance.
   frozen; do not redesign identity/auth/forum SSO unless a proven production
   defect requires it. Next account/forum work is presentation, content,
   moderation, email/notification configuration, and launch preparation.
+- MyBB forum community-launch preparation: applied on 2026-08-15 without
+  changing frozen account/auth/SSO/game architecture. Production now has the
+  AORebirth launch CSS layer, AORebirth header navigation, guest
+  login/register links routed to AORebirth account pages, final descriptions
+  for the approved 40-row board structure, staff seed threads, forum rules,
+  account/support/bug-report guidance, read-only official/archive permissions
+  for normal users, conservative PM/avatar/signature/attachment settings, and
+  launch backups. Guest and registered-user SSO/posting acceptance passed with
+  controlled cleanup. Launch remains BLOCKED on live moderator workflow
+  acceptance, authorized Admin CP acceptance, and production-grade email
+  transport/DNS if notifications are required. Evidence:
+  `docs/project/MYBB_FORUM_LAUNCH_READINESS_20260815.md`.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
   `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the
