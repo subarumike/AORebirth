@@ -33,8 +33,19 @@ completion matrices and dated evidence retain detailed provenance.
   are server-side random-token sessions with HttpOnly/SameSite cookies, logout
   invalidation, CSRF protection, and lightweight registration/login rate
   limiting. Debug and Release unified-flow validation pass 34/34. Production
-  database schema, production website routes, Linux deployment, and MyBB remain
+  public account routes are now promoted through the broker; MyBB remains
   unchanged.
+- Public unified account flow: `ao-rebirth.com/register`, `/login`, `/account`,
+  and `/logout` are enabled through the Linux Account Broker release
+  `9a176f6f` on the trusted Docker bridge address `172.18.0.1:7510`. A
+  controlled production test account was created through public `/register`;
+  website wrong-password, correct-password, account page, logout, duplicate,
+  invalid-input, rate-limit, and broker-unavailable isolation checks pass.
+  Database proof shows exactly one identity row, one identity email row, one
+  `login` row, one linked game mapping, and normal non-GM account flags for the
+  controlled account. Legacy PHP account endpoints remain blocked. Real
+  official AO-client login with that controlled account remains the outstanding
+  player-facing proof.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
   `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the
