@@ -78,6 +78,12 @@ SCFU_ANALYZER_SOURCE = (
     / "Debug"
     / "AOSharpCaptureAnalyzer.exe"
 )
+SCFU_ANALYZER_PROJECT_SOURCE = (
+    REPO_ROOT
+    / "tools-temp"
+    / "AOSharpCaptureAnalyzer"
+    / "AOSharpCaptureAnalyzer.csproj"
+)
 SCFU_ANALYZER_OVERRIDE_ENVIRONMENT = (
     "AO_REBIRTH_GENERATED_COMBAT_PRIMARY_SCFU_ANALYZER"
 )
@@ -4676,7 +4682,7 @@ def _generator_source_descriptors() -> list[dict[str, Any]]:
         / "tools-temp"
         / "AOSharpLiveCapture"
         / "decode_npc_lifecycle_capture.py",
-        SCFU_ANALYZER_SOURCE,
+        SCFU_ANALYZER_PROJECT_SOURCE,
     }
     paths.update(
         REPO_ROOT / provenance["runtimeBindingSource"]
@@ -4690,14 +4696,14 @@ def _generator_source_descriptors() -> list[dict[str, Any]]:
 
 def _stage_short_scfu_analyzer(staging_root: Path) -> Path:
     _reject_symlink_or_reparse(
-        SCFU_ANALYZER_SOURCE.parent,
+        SCFU_ANALYZER.parent,
         "frozen SCFU analyzer directory",
         include_parent=True,
     )
     staging_root = staging_root.resolve(strict=True)
     destination_root = staging_root / "a"
     destination_root.mkdir()
-    source_root = SCFU_ANALYZER_SOURCE.parent.resolve(strict=True)
+    source_root = SCFU_ANALYZER.parent.resolve(strict=True)
     copied = 0
     for source in sorted(source_root.rglob("*"), key=lambda path: path.as_posix()):
         _reject_symlink_or_reparse(source, "frozen SCFU analyzer member")
@@ -4717,7 +4723,7 @@ def _stage_short_scfu_analyzer(staging_root: Path) -> Path:
         ):
             raise RuntimeError(f"short SCFU analyzer snapshot changed: {relative}")
         copied += 1
-    executable = destination_root / SCFU_ANALYZER_SOURCE.name
+    executable = destination_root / SCFU_ANALYZER.name
     if copied == 0 or not executable.is_file():
         raise RuntimeError("short SCFU analyzer snapshot is incomplete")
     return executable

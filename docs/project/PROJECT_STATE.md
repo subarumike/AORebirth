@@ -159,6 +159,12 @@ a non-embedded 64-bit CPython 3.13.14 runtime through
 This avoids the locally installed Python 3.12 runtime whose repeated
 `python312.dll` access violations prevented stable preflight execution. The
 manifest records the selected CPython 3.13.14 binary.
+SCFU analyzer provenance is source-backed and fresh-clone portable: ignored
+`bin`/`obj` executables and PDBs, which embed absolute checkout paths, are not
+published input authority. Current-cohort validation and normal server builds
+require only tracked source; actual regeneration privately freezes the locally
+built analyzer runtime without adding its machine-specific bytes to the
+published generation identity.
 Each mandatory gate holds one read lease across all 13 stages, eliminating the
 former full inventory parse before and after every filtered acceptance wrapper.
 

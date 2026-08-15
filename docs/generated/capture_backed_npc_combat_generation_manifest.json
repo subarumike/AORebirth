@@ -40,7 +40,7 @@
       "byteLength": 4081609,
       "path": "docs/generated/capture_backed_npc_secondary_evidence_audit.json",
       "role": "secondaryEvidenceAudit",
-      "sha256": "26c1cf3da6f2deeebbaba652db988fa52abd99209159a345ee36f4d892fd6ca0"
+      "sha256": "046d44051c7cd1ef2d122b0c5eb9f21b7679c438775f810f2f3006ca45690e1c"
     }
   ],
   "counts": {
@@ -59,7 +59,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1499
   },
-  "generationIdentity": "afafff14e6003f465e2f950b78eb3c1b47d648e45ef2289e9443ca3076f253bb",
+  "generationIdentity": "1d2ed701e0221f4099ec847554103f7ede065f2682a11cd60a7ca441ced2405f",
   "generators": {
     "activeCoverage": {
       "byteLength": 152823,
@@ -82,9 +82,9 @@
       "sha256": "1cac02801c9f50ebe9b3022bf1f1efd3da64486169c5db9048a4535fb194847f"
     },
     "coordinator": {
-      "byteLength": 107859,
+      "byteLength": 112362,
       "path": "Tools/generated_combat_pipeline.py",
-      "sha256": "2cd99c2a965c9904c7176e7ed932d89d90b760a586e6dfd421a04858dd65b44a"
+      "sha256": "3cf4f60854a9b95b5449bfa53945801f12df864c04ac04c499be8922781b227f"
     },
     "formulaDataset": {
       "byteLength": 193710,
@@ -97,14 +97,14 @@
       "sha256": "88281b5e19ec03a554ca03e74628ac657b985bf3625b01d30248bea629784cd7"
     },
     "primary": {
-      "byteLength": 366824,
+      "byteLength": 366948,
       "path": "tools-temp/AOSharpCaptureAnalyzer/extract_capture_backed_npc_combat.py",
-      "sha256": "7b1edeb4dd9fdd17329d3ef94d171b5730cc8f252a35a75ed05e968b54ec7f76"
+      "sha256": "14c02d5c7b1a9c12a5a63150534f56c1b4eec5028b5f044c024e0b2d235d1fe9"
     },
     "scfuAnalyzer": {
-      "byteLength": 202240,
-      "path": "tools-temp/AOSharpCaptureAnalyzer/bin/Debug/AOSharpCaptureAnalyzer.exe",
-      "sha256": "feca7e486031045318d5d60fd05c1bcc67f3a91d1dce4dc17911d25b7dd8f913"
+      "byteLength": 2950,
+      "path": "tools-temp/AOSharpCaptureAnalyzer/AOSharpCaptureAnalyzer.csproj",
+      "sha256": "99bd0db097eb072589203a144f550d17034f79daf1c8b7f6fee76078c85f6329"
     },
     "secondaryEvidenceAudit": {
       "byteLength": 54571,
@@ -118,12 +118,12 @@
     }
   },
   "inputSnapshot": {
-    "auxiliarySnapshotIdentity": "2674ec55f800ad5623a75d50b6810fe999d83e1af6c110b380391213bdc5dbf8",
-    "captureManifestByteLength": 405345,
-    "captureManifestSha256": "9bb962ef07e780d5b86324ae9391a08e2939dca44e6a1fd7b7b783601ae7347c",
+    "auxiliarySnapshotIdentity": "b9451dc8e54c4cca34011c20224c1d27daf5a4df240add8779bfa4d00a99d2fc",
+    "captureManifestByteLength": 405336,
+    "captureManifestSha256": "f51ffab951e279acf617496062236b34fd899567fd46c7776b828e186ef4c642",
     "captureSchemaVersion": 1,
-    "captureSnapshotIdentity": "a51b1b45d43b3c70a10a497519bb0379e3db96163d9208eb0d2dd966f5065c0c",
-    "identity": "332c81f3d49bd56fcaa6f7b6c0a0862ddffffca1a21a35b92495e2e7e3093785",
+    "captureSnapshotIdentity": "e1a970f54d87e60f84393a16e21357308802d109566ff5a3d4ae07ebdf50c7f8",
+    "identity": "37728c99f0513e79689ea80dadb707ba24f29240b36f7498570e7ab748651059",
     "schemaVersion": 2
   },
   "pipeline": "capture-backed-npc-combat",

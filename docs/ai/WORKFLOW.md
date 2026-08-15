@@ -258,6 +258,12 @@ the manifest as one recoverable transaction. The manifest is the commit marker
 and is replaced last. A changed input before publication or before commit aborts
 and preserves or restores the prior complete cohort.
 
+Current-cohort validation and the normal server build use the tracked analyzer
+source identity and do not require ignored `bin`/`obj` output from another
+checkout. Before `--check` or `--write`, build `AOSharpCaptureAnalyzer` with the
+documented command in the Captures section; generation requires the executable,
+while validation of the checked-in cohort does not.
+
 Supported build, AOtomation, and mandatory-gate readers route themselves through
 the shared generated-artifact read lease. Direct active-coverage and formula
 reads of governed inputs do the same and validate a live same-checkout delegated

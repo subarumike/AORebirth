@@ -19,6 +19,7 @@ import os
 import platform
 import re
 import signal
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -66,6 +67,21 @@ SECONDARY_EVIDENCE_AUDIT = Path(
 ITEM_DATABASE = Path("AORebirth/Datafiles/items.dat")
 SCFU_ANALYZER = Path(
     "tools-temp/AOSharpCaptureAnalyzer/bin/Debug/AOSharpCaptureAnalyzer.exe"
+)
+SCFU_ANALYZER_PROJECT = Path(
+    "tools-temp/AOSharpCaptureAnalyzer/AOSharpCaptureAnalyzer.csproj"
+)
+SCFU_ANALYZER_SOURCE_ROOTS = (
+    Path("tools-temp/AOSharpCaptureAnalyzer"),
+    Path("tools-temp/AOSharpCaptureProtocol"),
+    Path("AORebirth/Libraries/Source/AORebirth.Core"),
+    Path("AORebirth/Libraries/Source/AORebirth.Enums"),
+    Path("AORebirth/Libraries/Source/AORebirth.Stats"),
+    Path("AORebirth/Libraries/Source/Utility"),
+    Path("AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono"),
+)
+SCFU_ANALYZER_SOURCE_SUFFIXES = frozenset(
+    {".config", ".cs", ".csproj", ".props", ".resx", ".snk", ".targets"}
 )
 ITEM_TEMPLATE_PROJECTION_SOURCE = Path(
     "tools-temp/AOSharpCaptureAnalyzer/ItemTemplateProjection.cs"
@@ -156,13 +172,16 @@ GENERATOR_PATHS: dict[str, PurePosixPath] = {
     "itemTemplateProjection": PurePosixPath(
         ITEM_TEMPLATE_PROJECTION_SOURCE.as_posix()
     ),
-    "scfuAnalyzer": PurePosixPath(SCFU_ANALYZER.as_posix()),
+    "scfuAnalyzer": PurePosixPath(SCFU_ANALYZER_PROJECT.as_posix()),
 }
 
 LEASE_DELEGATION_ENVIRONMENT = "AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION"
 LEASE_REPO_ROOT_ENVIRONMENT = "AO_REBIRTH_GENERATED_COMBAT_LEASE_REPO_ROOT"
 PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT = (
     "AO_REBIRTH_GENERATED_COMBAT_PRIMARY_CAPTURE_REPO_ROOT"
+)
+PRIMARY_SCFU_ANALYZER_ENVIRONMENT = (
+    "AO_REBIRTH_GENERATED_COMBAT_PRIMARY_SCFU_ANALYZER"
 )
 NPC_COMBAT_AUDIT_REPO_ROOT_ENVIRONMENT = (
     "AO_REBIRTH_NPC_COMBAT_AUDIT_REPO_ROOT"
@@ -1272,12 +1291,23 @@ def auxiliary_input_paths(repo_root: Path) -> tuple[str, ...]:
             source = capture_root / source_name
             if source.is_file():
                 values.add(source.relative_to(repo_root).as_posix())
-    analyzer_directory = repo_root / SCFU_ANALYZER.parent
-    if not analyzer_directory.is_dir():
-        raise PipelineError("SCFU analyzer dependency directory is missing")
-    for source in analyzer_directory.iterdir():
-        if source.is_file() and not source.is_symlink():
-            values.add(source.relative_to(repo_root).as_posix())
+    for logical_root in SCFU_ANALYZER_SOURCE_ROOTS:
+        source_root = repo_root / logical_root
+        if not source_root.is_dir():
+            raise PipelineError(
+                "SCFU analyzer source dependency root is missing: "
+                f"{logical_root.as_posix()}"
+            )
+        for source in source_root.rglob("*"):
+            local_parts = source.relative_to(source_root).parts
+            if any(part.casefold() in {"bin", "obj"} for part in local_parts):
+                continue
+            if (
+                source.is_file()
+                and not source.is_symlink()
+                and source.suffix.casefold() in SCFU_ANALYZER_SOURCE_SUFFIXES
+            ):
+                values.add(source.relative_to(repo_root).as_posix())
     runtime_root = repo_root / "AORebirth" / "Server" / "ZoneEngine" / "Core"
     if not runtime_root.is_dir():
         raise PipelineError("active-coverage runtime source root is missing")
@@ -1298,6 +1328,33 @@ def capture_auxiliary_inputs(lease: Any, repo_root: Path) -> Any:
 
 def revalidate_auxiliary_inputs(snapshot: Any, repo_root: Path) -> None:
     snapshot.revalidate(auxiliary_input_paths(repo_root))
+
+
+def scfu_analyzer_runtime_paths(repo_root: Path) -> tuple[str, ...]:
+    analyzer = repo_root / SCFU_ANALYZER
+    runtime_root = analyzer.parent
+    if not analyzer.is_file() or not runtime_root.is_dir():
+        raise PipelineError(
+            "SCFU analyzer executable is missing; build it with the documented "
+            "AOSharpCaptureAnalyzer MSBuild command before --check or --write"
+        )
+    values = []
+    for source in runtime_root.rglob("*"):
+        if source.is_file() and not source.is_symlink():
+            values.append(source.relative_to(repo_root).as_posix())
+    return tuple(sorted(values))
+
+
+def capture_scfu_analyzer_runtime(lease: Any, repo_root: Path) -> Any:
+    transaction = _load_transaction_module()
+    return transaction.InputSnapshot.capture(
+        lease,
+        scfu_analyzer_runtime_paths(repo_root),
+    )
+
+
+def revalidate_scfu_analyzer_runtime(snapshot: Any, repo_root: Path) -> None:
+    snapshot.revalidate(scfu_analyzer_runtime_paths(repo_root))
 
 
 _ABSOLUTE_WINDOWS_PATH = re.compile(r"^[A-Za-z]:[\\/]")
@@ -1738,10 +1795,36 @@ def _write_round_seed(path: Path, payload: bytes) -> None:
     _write_verified_private_input(path, payload, "active/formula round seed")
 
 
+def _stage_short_scfu_analyzer(analyzer: Path, staging_root: Path) -> Path:
+    source_root = analyzer.parent.resolve(strict=True)
+    destination_root = staging_root.resolve(strict=True) / "a"
+    destination_root.mkdir()
+    copied = 0
+    for source in sorted(source_root.rglob("*"), key=lambda path: path.as_posix()):
+        if source.is_dir():
+            continue
+        if not source.is_file() or source.is_symlink():
+            raise PipelineError("frozen SCFU analyzer member is not regular")
+        destination = destination_root / source.relative_to(source_root)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, destination)
+        if (
+            destination.stat().st_size != source.stat().st_size
+            or sha256_file(destination) != sha256_file(source)
+        ):
+            raise PipelineError("short SCFU analyzer snapshot changed during copy")
+        copied += 1
+    executable = destination_root / analyzer.name
+    if copied == 0 or not executable.is_file():
+        raise PipelineError("short SCFU analyzer snapshot is incomplete")
+    return executable
+
+
 def _build_item_template_projection(
     *,
     repo_root: Path,
     frozen_repo_root: Path,
+    analyzer: Path,
     template_ids: Sequence[int],
     projection_name: str,
     item_database_path: Path,
@@ -1754,26 +1837,35 @@ def _build_item_template_projection(
         raise PipelineError("item-template projection references no templates")
     if not re.fullmatch(r"[a-z0-9-]+", projection_name):
         raise PipelineError("item-template projection name is invalid")
+    if not analyzer.is_file():
+        raise PipelineError(
+            "SCFU analyzer executable is missing; build it with the documented "
+            "AOSharpCaptureAnalyzer MSBuild command before --check or --write"
+        )
     output = (
         frozen_repo_root
         / "_item-template-projection"
         / (projection_name + ".json")
     )
     output.parent.mkdir(exist_ok=True)
-    completed = run_checked(
-        (
-            str(repo_root / SCFU_ANALYZER),
-            "--project-item-templates",
-            str(item_database_path),
-            item_database_sha256,
-            str(item_database_byte_length),
-            ",".join(str(template_id) for template_id in template_ids),
-            str(output),
-        ),
-        repo_root=repo_root,
-        lease=lease,
-        label="item-template projection",
-    )
+    with tempfile.TemporaryDirectory(prefix="aor-scfu-projection-") as runtime_name:
+        staged_analyzer = _stage_short_scfu_analyzer(
+            analyzer, Path(runtime_name)
+        )
+        completed = run_checked(
+            (
+                str(staged_analyzer),
+                "--project-item-templates",
+                str(item_database_path),
+                item_database_sha256,
+                str(item_database_byte_length),
+                ",".join(str(template_id) for template_id in template_ids),
+                str(output),
+            ),
+            repo_root=repo_root,
+            lease=lease,
+            label="item-template projection",
+        )
     if not output.is_file():
         detail = _bounded_process_detail(completed)
         suffix = f": {detail}" if detail else ""
@@ -2019,6 +2111,7 @@ def build_candidate_cohort(
     candidate_root: Path,
     *,
     auxiliary_snapshot: Any,
+    scfu_analyzer_snapshot: Any,
     lease: Any,
     max_rounds: int = DEFAULT_MAX_FIXED_POINT_ROUNDS,
 ) -> CandidateCohort:
@@ -2033,6 +2126,7 @@ def build_candidate_cohort(
     generators_before = generator_descriptors(repo_root)
     runtime_before = runtime_descriptor()
     frozen_repo_root = auxiliary_snapshot.snapshot_root
+    frozen_scfu_analyzer = scfu_analyzer_snapshot.path_for(SCFU_ANALYZER.as_posix())
     item_database_record = next(
         (
             record
@@ -2055,6 +2149,7 @@ def build_candidate_cohort(
     ) = _build_item_template_projection(
         repo_root=repo_root,
         frozen_repo_root=frozen_repo_root,
+        analyzer=frozen_scfu_analyzer,
         template_ids=ARETE_ATTACK_RANGE_ITEM_TEMPLATE_IDS,
         projection_name="arete-attack-range",
         item_database_path=auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
@@ -2110,7 +2205,8 @@ def build_candidate_cohort(
                 lease=lease,
                 label="primary aggregation",
                 environment_overrides={
-                    PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT: str(repo_root)
+                    PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT: str(repo_root),
+                    PRIMARY_SCFU_ANALYZER_ENVIRONMENT: str(frozen_scfu_analyzer),
                 },
                 retry_interpreter_failures=True,
             )
@@ -2189,6 +2285,7 @@ def build_candidate_cohort(
     item_template_projection_payload, _ = _build_item_template_projection(
         repo_root=repo_root,
         frozen_repo_root=frozen_repo_root,
+        analyzer=frozen_scfu_analyzer,
         template_ids=sorted(
             collect_referenced_formula_template_ids(formula_inventory_projection)
         ),
@@ -2743,28 +2840,34 @@ def run_pipeline(
                 raise CohortValidationError(
                     "published cohort auxiliary input snapshot is stale"
                 )
+        scfu_analyzer_inputs = capture_scfu_analyzer_runtime(lease, repo_root)
         candidate_root = lease.new_staging_directory("combat-candidate")
         candidate = build_candidate_cohort(
             repo_root,
             candidate_root,
             auxiliary_snapshot=inputs,
+            scfu_analyzer_snapshot=scfu_analyzer_inputs,
             lease=lease,
             max_rounds=max_rounds,
         )
         revalidate_candidate_inputs(inputs, candidate, repo_root, lease)
+        revalidate_scfu_analyzer_runtime(scfu_analyzer_inputs, repo_root)
         if mode == "check":
             differences = cohort_differences(candidate.root, repo_root)
             if differences:
                 joined = ", ".join(differences)
                 raise PipelineError(f"generated-combat cohort is dirty: {joined}")
             revalidate_candidate_inputs(inputs, candidate, repo_root, lease)
+            revalidate_scfu_analyzer_runtime(scfu_analyzer_inputs, repo_root)
         else:
+            def revalidate_publication_inputs(phase: str) -> None:
+                revalidate_candidate_inputs(inputs, candidate, repo_root, lease)
+                revalidate_scfu_analyzer_runtime(scfu_analyzer_inputs, repo_root)
+
             _shared_publish(
                 lease,
                 candidate,
-                lambda phase: revalidate_candidate_inputs(
-                    inputs, candidate, repo_root, lease
-                ),
+                revalidate_publication_inputs,
             )
             published = validate_cohort(repo_root, verify_toolchain=True)
             if published["generationIdentity"] != candidate.generation_identity:
