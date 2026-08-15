@@ -47,7 +47,7 @@ namespace UnifiedAccountFlowValidation
                 WaitForHealth();
                 RunHttpFlow(connectionString);
                 CleanupFixtures(connectionString);
-                Console.WriteLine("PASS UnifiedAccountFlowValidation " + passed + "/34");
+                Console.WriteLine("PASS UnifiedAccountFlowValidation " + passed + "/41");
                 return 0;
             }
             catch (Exception exception)
@@ -151,6 +151,46 @@ namespace UnifiedAccountFlowValidation
 
             HttpResult session = Get(anonymous, "api/session");
             Pass("session-created", session.StatusCode == 200 && session.Body.Contains("\"username\":\"FlowA1\""));
+            string identityPublicId = ExtractJsonValue(session.Body, "identityPublicId");
+            Pass("session-public-id", !string.IsNullOrEmpty(identityPublicId));
+
+            Pass(
+                "forum-sso-secret-required",
+                Post(anonymous, "api/forum/sso/issue", Form("identityPublicId", identityPublicId)).StatusCode == 403);
+            HttpResult ssoIssue = PostWithSecret(
+                anonymous,
+                "api/forum/sso/issue",
+                Form("identityPublicId", identityPublicId, "returnTo", "https://forum.ao-rebirth.com/"),
+                "local-sso-secret");
+            string ssoCode = ExtractJsonValue(ssoIssue.Body, "code");
+            Pass("forum-sso-issued", ssoIssue.StatusCode == 200 && !string.IsNullOrEmpty(ssoCode) && ssoIssue.Body.Contains("\"expiresInSeconds\":120"));
+            HttpResult ssoRedeem = PostWithSecret(
+                anonymous,
+                "api/forum/sso/redeem",
+                Form("code", ssoCode),
+                "local-sso-secret");
+            Pass("forum-sso-redeemed-once", ssoRedeem.StatusCode == 200 && ssoRedeem.Body.Contains("\"username\":\"FlowA1\"") && ssoRedeem.Body.Contains("\"existingMybbUid\":\"\""));
+            Pass(
+                "forum-sso-replay-rejected",
+                PostWithSecret(anonymous, "api/forum/sso/redeem", Form("code", ssoCode), "local-sso-secret").StatusCode == 400);
+            HttpResult mapping = PostWithSecret(
+                anonymous,
+                "api/forum/mapping/confirm",
+                Form("identityPublicId", identityPublicId, "mybbUid", "77"),
+                "local-sso-secret");
+            Pass("forum-mapping-confirmed", mapping.StatusCode == 200 && mapping.Body.Contains("\"mybbUid\":\"77\""));
+            HttpResult secondIssue = PostWithSecret(
+                anonymous,
+                "api/forum/sso/issue",
+                Form("identityPublicId", identityPublicId),
+                "local-sso-secret");
+            string secondCode = ExtractJsonValue(secondIssue.Body, "code");
+            HttpResult secondRedeem = PostWithSecret(
+                anonymous,
+                "api/forum/sso/redeem",
+                Form("code", secondCode),
+                "local-sso-secret");
+            Pass("forum-sso-existing-mapping", secondRedeem.StatusCode == 200 && secondRedeem.Body.Contains("\"existingMybbUid\":\"77\""));
 
             HttpResult member = Get(anonymous, "member");
             Pass("member-page", member.StatusCode == 200 && member.Body.Contains("Member Account") && member.Body.Contains("FlowA1"));
@@ -228,6 +268,7 @@ namespace UnifiedAccountFlowValidation
             };
             start.EnvironmentVariables["AOREBIRTH_ACCOUNT_BROKER_REGISTER_LIMIT"] = "50";
             start.EnvironmentVariables["AOREBIRTH_ACCOUNT_BROKER_LOGIN_LIMIT"] = "3";
+            start.EnvironmentVariables["AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECRET"] = "local-sso-secret";
             return Process.Start(start);
         }
 
@@ -267,15 +308,30 @@ namespace UnifiedAccountFlowValidation
 
         private static HttpResult Post(CookieContainer cookies, string path, string body)
         {
-            return Request(cookies, "POST", path, body);
+            return Request(cookies, "POST", path, body, null);
+        }
+
+        private static HttpResult PostWithSecret(CookieContainer cookies, string path, string body, string secret)
+        {
+            return Request(cookies, "POST", path, body, secret);
         }
 
         private static HttpResult Request(CookieContainer cookies, string method, string path, string body)
+        {
+            return Request(cookies, method, path, body, null);
+        }
+
+        private static HttpResult Request(CookieContainer cookies, string method, string path, string body, string forumSsoSecret)
         {
             var request = (HttpWebRequest)WebRequest.Create(ServiceUrl + path);
             request.Method = method;
             request.CookieContainer = cookies;
             request.AllowAutoRedirect = false;
+            if (!string.IsNullOrEmpty(forumSsoSecret))
+            {
+                request.Headers["X-AORebirth-Forum-SSO-Secret"] = forumSsoSecret;
+            }
+
             if (body != null)
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(body);
