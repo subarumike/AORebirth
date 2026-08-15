@@ -10,22 +10,52 @@
 #include <string>
 #include <vector>
 
-namespace
+namespace AORebirthClientPatchDeploy
 {
-    constexpr wchar_t ProductName[] = L"AORoomSpaceFix";
+    constexpr wchar_t ProductName[] = L"AORebirthClientPatch";
     constexpr wchar_t ProductVersion[] = L"1";
     constexpr wchar_t ManifestName[] = L"SHA256SUMS.txt";
-    constexpr wchar_t MarkerName[] = L"AORoomSpaceFix.install";
+    constexpr wchar_t MarkerName[] = L"AORebirthClientPatch.install";
     constexpr wchar_t ProxyName[] = L"version.dll";
+    constexpr wchar_t ProxyBackupSuffix[] = L".AORebirthBackup";
+    constexpr wchar_t LauncherBackupSuffix[] = L".AORebirthBackup";
 
     constexpr const wchar_t* PayloadNames[] =
     {
         L"AOReloaded-MIT.txt",
-        L"AORoomSpaceFixDeploy.exe",
+        L"AORebirthClientPatchDeploy.exe",
+        L"AORebirthAnarchyLauncher.url",
+        L"AORebirthDimensionServer.url",
         L"Install.cmd",
         L"README.txt",
         L"Uninstall.cmd",
         L"version.dll"
+    };
+
+    struct LauncherPatch
+    {
+        const wchar_t* payloadName;
+        const wchar_t* targetRelativePath;
+    };
+
+    constexpr LauncherPatch LauncherPatches[] =
+    {
+        {
+            L"AORebirthAnarchyLauncher.url",
+            L"AnarchyLauncher.url"
+        },
+        {
+            L"AORebirthDimensionServer.url",
+            L"DimensionServer.url"
+        },
+        {
+            L"AORebirthAnarchyLauncher.url",
+            L"cd_image\\data\\launcher\\AnarchyLauncher.url"
+        },
+        {
+            L"AORebirthDimensionServer.url",
+            L"cd_image\\data\\launcher\\DimensionServer.url"
+        }
     };
 
     constexpr wchar_t NewClientN3Hash[] =
@@ -145,6 +175,14 @@ namespace
         DWORD attributes = GetFileAttributesW(path.c_str());
         return attributes != INVALID_FILE_ATTRIBUTES &&
                (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0 &&
+               (attributes & FILE_ATTRIBUTE_REPARSE_POINT) == 0;
+    }
+
+    bool IsRegularDirectory(const std::wstring& path)
+    {
+        DWORD attributes = GetFileAttributesW(path.c_str());
+        return attributes != INVALID_FILE_ATTRIBUTES &&
+               (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
                (attributes & FILE_ATTRIBUTE_REPARSE_POINT) == 0;
     }
 
@@ -278,6 +316,55 @@ namespace
 
         result = DigestToHex(digest);
         return true;
+    }
+
+    bool HashesMatch(const std::wstring& first, const std::wstring& second)
+    {
+        std::wstring firstHash;
+        std::wstring secondHash;
+        return HashPath(first, firstHash) &&
+               HashPath(second, secondHash) &&
+               firstHash == secondHash;
+    }
+
+    bool GetParentDirectory(const std::wstring& path, std::wstring& parent)
+    {
+        size_t slash = path.find_last_of(L"\\/");
+        if (slash == std::wstring::npos || slash == 0)
+        {
+            return false;
+        }
+
+        parent = path.substr(0, slash);
+        return true;
+    }
+
+    bool SetDeleteDisposition(HANDLE file, bool remove);
+    bool OpenPinnedFile(const std::wstring& path, UniqueHandle& file);
+
+    bool DeletePinnedRegularFile(const std::wstring& path)
+    {
+        UniqueHandle file;
+        return OpenPinnedFile(path, file) &&
+               SetDeleteDisposition(file.Get(), true);
+    }
+
+    bool CopyVerifiedNoReplace(
+        const std::wstring& sourcePath,
+        const std::wstring& targetPath)
+    {
+        if (!CopyFileW(sourcePath.c_str(), targetPath.c_str(), TRUE))
+        {
+            return false;
+        }
+
+        if (HashesMatch(sourcePath, targetPath))
+        {
+            return true;
+        }
+
+        DeletePinnedRegularFile(targetPath);
+        return false;
     }
 
     bool ReadSmallHandle(HANDLE file, std::string& result)
@@ -452,7 +539,7 @@ namespace
             wchar_t name[160] = {};
             if (swprintf_s(
                     name,
-                    L".AORoomSpaceFix.%lu.%llu.%u.%s.tmp",
+                    L".AORebirthClientPatch.%lu.%llu.%u.%s.tmp",
                     GetCurrentProcessId(),
                     static_cast<unsigned long long>(GetTickCount64()),
                     attempt,
@@ -509,7 +596,7 @@ namespace
         WideToAscii(proxyHash, proxy);
         WideToAscii(n3Hash, n3);
         return
-            "Product=AORoomSpaceFix\r\n"
+            "Product=AORebirthClientPatch\r\n"
             "Version=1\r\n"
             "ProxySha256=" + proxy + "\r\n"
             "N3Sha256=" + n3 + "\r\n";
@@ -531,7 +618,7 @@ namespace
         }
 
         if (lines.size() != 4 ||
-            lines[0] != "Product=AORoomSpaceFix" ||
+            lines[0] != "Product=AORebirthClientPatch" ||
             lines[1] != "Version=1")
         {
             return false;
@@ -694,8 +781,37 @@ namespace
         {
             if (_wcsicmp(entry.szExeFile, L"AnarchyOnline.exe") == 0)
             {
-                running = true;
-                return true;
+                UniqueHandle process(OpenProcess(
+                    SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION,
+                    FALSE,
+                    entry.th32ProcessID));
+                if (!process.IsValid())
+                {
+                    if (GetLastError() == ERROR_INVALID_PARAMETER)
+                    {
+                        continue;
+                    }
+
+                    return false;
+                }
+
+                const DWORD waitResult = WaitForSingleObject(process.Get(), 0);
+                if (waitResult == WAIT_OBJECT_0)
+                {
+                    continue;
+                }
+                DWORD exitCode = STILL_ACTIVE;
+                if (GetExitCodeProcess(process.Get(), &exitCode) && exitCode != STILL_ACTIVE)
+                {
+                    continue;
+                }
+                if (waitResult == WAIT_TIMEOUT)
+                {
+                    running = true;
+                    return true;
+                }
+
+                return false;
             }
         }
         while (Process32NextW(snapshot.Get(), &entry));
@@ -761,9 +877,338 @@ namespace
                marker.n3Hash == currentN3Hash;
     }
 
-    int Install(const std::wstring& clientRoot, const std::wstring& packageRoot)
+    bool VerifyRepairableOwnedInstall(
+        const std::wstring& versionPath,
+        const std::wstring& markerPath,
+        const std::wstring& currentN3Hash)
     {
-        if (!VerifyPackage(packageRoot))
+        UniqueHandle markerFile;
+        UniqueHandle versionFile;
+        if (!OpenPinnedFile(markerPath, markerFile) ||
+            !OpenPinnedFile(versionPath, versionFile))
+        {
+            return false;
+        }
+
+        std::string markerText;
+        Marker marker;
+        return ReadSmallHandle(markerFile.Get(), markerText) &&
+               ParseMarker(markerText, marker) &&
+               marker.n3Hash == currentN3Hash;
+    }
+
+    bool ReplaceRepairableOwnedInstall(
+        const std::wstring& packageRoot,
+        const std::wstring& markerPath,
+        const std::wstring& versionPath,
+        const std::wstring& packageProxyHash,
+        const std::wstring& currentN3Hash)
+    {
+        if (!CopyFileW(Combine(packageRoot, ProxyName).c_str(), versionPath.c_str(), FALSE))
+        {
+            return false;
+        }
+
+        std::wstring installedHash;
+        if (!HashPath(versionPath, installedHash) ||
+            installedHash != packageProxyHash)
+        {
+            return false;
+        }
+
+        UniqueHandle marker(CreateFileW(
+            markerPath.c_str(),
+            GENERIC_WRITE,
+            0,
+            nullptr,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            nullptr));
+        return marker.IsValid() &&
+               WriteAll(marker.Get(), MarkerText(packageProxyHash, currentN3Hash));
+    }
+
+    bool ReplaceExistingProxyWithBackup(
+        const std::wstring& packageRoot,
+        const std::wstring& markerPath,
+        const std::wstring& versionPath,
+        const std::wstring& packageProxyHash,
+        const std::wstring& currentN3Hash)
+    {
+        std::wstring backupPath;
+        for (unsigned int attempt = 0; attempt < 32; ++attempt)
+        {
+            backupPath = versionPath + ProxyBackupSuffix;
+            if (attempt > 0)
+            {
+                backupPath += L".";
+                backupPath += std::to_wstring(attempt);
+            }
+            if (!PathExists(backupPath))
+            {
+                break;
+            }
+            backupPath.clear();
+        }
+        if (backupPath.empty())
+        {
+            std::fwprintf(stderr, L"ERROR could not choose a unique version.dll backup name.\n");
+            return false;
+        }
+
+        if (!MoveFileExW(versionPath.c_str(), backupPath.c_str(), MOVEFILE_WRITE_THROUGH))
+        {
+            std::fwprintf(
+                stderr,
+                L"ERROR existing version.dll could not be backed up. Close anything using the client folder and try again.\n");
+            return false;
+        }
+
+        if (!CopyFileW(Combine(packageRoot, ProxyName).c_str(), versionPath.c_str(), TRUE))
+        {
+            MoveFileExW(backupPath.c_str(), versionPath.c_str(), MOVEFILE_WRITE_THROUGH);
+            std::fwprintf(stderr, L"ERROR package version.dll could not be installed.\n");
+            return false;
+        }
+
+        std::wstring installedHash;
+        if (!HashPath(versionPath, installedHash) ||
+            installedHash != packageProxyHash)
+        {
+            DeletePinnedRegularFile(versionPath);
+            MoveFileExW(backupPath.c_str(), versionPath.c_str(), MOVEFILE_WRITE_THROUGH);
+            std::fwprintf(stderr, L"ERROR installed version.dll hash mismatch.\n");
+            return false;
+        }
+
+        UniqueHandle marker(CreateFileW(
+            markerPath.c_str(),
+            GENERIC_WRITE,
+            0,
+            nullptr,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            nullptr));
+        if (!marker.IsValid() ||
+            !WriteAll(marker.Get(), MarkerText(packageProxyHash, currentN3Hash)))
+        {
+            DeletePinnedRegularFile(versionPath);
+            MoveFileExW(backupPath.c_str(), versionPath.c_str(), MOVEFILE_WRITE_THROUGH);
+            std::fwprintf(stderr, L"ERROR ownership marker could not be written.\n");
+            return false;
+        }
+
+        std::wprintf(
+            L"REPORT backed up existing version.dll: %s\n",
+            backupPath.substr(backupPath.find_last_of(L"\\/") + 1).c_str());
+        std::wprintf(L"REPORT installed AORebirth version.dll\n");
+        return true;
+    }
+
+    bool BackupInvalidMarker(const std::wstring& markerPath)
+    {
+        if (!PathExists(markerPath))
+        {
+            return true;
+        }
+
+        std::wstring backupPath;
+        for (unsigned int attempt = 0; attempt < 32; ++attempt)
+        {
+            backupPath = markerPath + ProxyBackupSuffix;
+            if (attempt > 0)
+            {
+                backupPath += L".";
+                backupPath += std::to_wstring(attempt);
+            }
+            if (!PathExists(backupPath))
+            {
+                break;
+            }
+            backupPath.clear();
+        }
+        if (backupPath.empty())
+        {
+            std::fwprintf(stderr, L"ERROR could not choose a unique ownership marker backup name.\n");
+            return false;
+        }
+
+        if (!MoveFileExW(markerPath.c_str(), backupPath.c_str(), MOVEFILE_WRITE_THROUGH))
+        {
+            std::fwprintf(stderr, L"ERROR invalid ownership marker could not be backed up.\n");
+            return false;
+        }
+
+        std::wprintf(
+            L"REPORT backed up invalid ownership marker: %s\n",
+            backupPath.substr(backupPath.find_last_of(L"\\/") + 1).c_str());
+        return true;
+    }
+
+    bool InstallLauncherFile(
+        const std::wstring& clientRoot,
+        const std::wstring& packageRoot,
+        const LauncherPatch& patch)
+    {
+        const std::wstring sourcePath = Combine(packageRoot, patch.payloadName);
+        const std::wstring targetPath = Combine(clientRoot, patch.targetRelativePath);
+        const std::wstring backupPath = targetPath + LauncherBackupSuffix;
+
+        std::wstring parent;
+        if (!IsRegularFile(sourcePath) ||
+            !GetParentDirectory(targetPath, parent))
+        {
+            return false;
+        }
+        if (!IsRegularDirectory(parent))
+        {
+            std::wprintf(
+                L"REPORT skipped missing launcher layout: %s\n",
+                patch.targetRelativePath);
+            return true;
+        }
+
+        const bool targetExists = PathExists(targetPath);
+        const bool backupExists = PathExists(backupPath);
+        if ((targetExists && !IsRegularFile(targetPath)) ||
+            (backupExists && !IsRegularFile(backupPath)))
+        {
+            return false;
+        }
+
+        if (targetExists && HashesMatch(sourcePath, targetPath))
+        {
+            std::wprintf(
+                L"REPORT already current: %s\n",
+                patch.targetRelativePath);
+            return true;
+        }
+
+        if (backupExists)
+        {
+            return false;
+        }
+
+        if (!targetExists)
+        {
+            if (!CopyVerifiedNoReplace(sourcePath, targetPath))
+            {
+                return false;
+            }
+            std::wprintf(
+                L"REPORT created: %s\n",
+                patch.targetRelativePath);
+            return true;
+        }
+
+        if (!MoveFileExW(targetPath.c_str(), backupPath.c_str(), MOVEFILE_WRITE_THROUGH))
+        {
+            return false;
+        }
+
+        if (CopyVerifiedNoReplace(sourcePath, targetPath))
+        {
+            std::wprintf(
+                L"REPORT patched and backed up original: %s -> %s%s\n",
+                patch.targetRelativePath,
+                patch.targetRelativePath,
+                LauncherBackupSuffix);
+            return true;
+        }
+
+        MoveFileExW(backupPath.c_str(), targetPath.c_str(), MOVEFILE_WRITE_THROUGH);
+        return false;
+    }
+
+    bool UninstallLauncherFile(
+        const std::wstring& clientRoot,
+        const std::wstring& packageRoot,
+        const LauncherPatch& patch);
+
+    bool InstallLauncherFiles(
+        const std::wstring& clientRoot,
+        const std::wstring& packageRoot)
+    {
+        for (size_t index = 0; index < std::size(LauncherPatches); ++index)
+        {
+            if (!InstallLauncherFile(clientRoot, packageRoot, LauncherPatches[index]))
+            {
+                while (index > 0)
+                {
+                    --index;
+                    UninstallLauncherFile(clientRoot, packageRoot, LauncherPatches[index]);
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool UninstallLauncherFile(
+        const std::wstring& clientRoot,
+        const std::wstring& packageRoot,
+        const LauncherPatch& patch)
+    {
+        const std::wstring sourcePath = Combine(packageRoot, patch.payloadName);
+        const std::wstring targetPath = Combine(clientRoot, patch.targetRelativePath);
+        const std::wstring backupPath = targetPath + LauncherBackupSuffix;
+
+        if (!IsRegularFile(sourcePath))
+        {
+            return false;
+        }
+
+        const bool targetExists = PathExists(targetPath);
+        const bool backupExists = PathExists(backupPath);
+        if ((targetExists && !IsRegularFile(targetPath)) ||
+            (backupExists && !IsRegularFile(backupPath)))
+        {
+            return false;
+        }
+
+        if (backupExists)
+        {
+            if (targetExists)
+            {
+                if (!HashesMatch(sourcePath, targetPath) ||
+                    !DeletePinnedRegularFile(targetPath))
+                {
+                    return false;
+                }
+            }
+
+            return MoveFileExW(backupPath.c_str(), targetPath.c_str(), MOVEFILE_WRITE_THROUGH) != FALSE;
+        }
+
+        if (!targetExists)
+        {
+            return true;
+        }
+
+        return HashesMatch(sourcePath, targetPath) &&
+               DeletePinnedRegularFile(targetPath);
+    }
+
+    bool UninstallLauncherFiles(
+        const std::wstring& clientRoot,
+        const std::wstring& packageRoot)
+    {
+        for (auto index = static_cast<int>(std::size(LauncherPatches)); index > 0; --index)
+        {
+            if (!UninstallLauncherFile(clientRoot, packageRoot, LauncherPatches[index - 1]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    int InstallInternal(
+        const std::wstring& clientRoot,
+        const std::wstring& packageRoot,
+        bool verifyPackage)
+    {
+        if (verifyPackage && !VerifyPackage(packageRoot))
         {
             std::fwprintf(stderr, L"ERROR package manifest or payload set is invalid.\n");
             return 1;
@@ -815,14 +1260,71 @@ namespace
                     proxyHash,
                     n3Hash))
             {
-                std::wprintf(L"PASS AORoomSpaceFix is already installed.\n");
+                if (!InstallLauncherFiles(clientRoot, packageRoot))
+                {
+                    std::fwprintf(
+                        stderr,
+                        L"ERROR version.dll is already installed, but launcher URL files could not be patched.\n");
+                    return 1;
+                }
+
+                std::wprintf(L"PASS AORebirth client patch is already installed and launcher files are current.\n");
                 return 0;
             }
 
-            std::fwprintf(
-                stderr,
-                L"ERROR CONFLICT existing version.dll or ownership marker. Nothing was overwritten.\n");
-            return 1;
+            if (versionExists && markerExists &&
+                VerifyRepairableOwnedInstall(versionPath, markerPath, n3Hash))
+            {
+                if (!ReplaceRepairableOwnedInstall(
+                        packageRoot,
+                        markerPath,
+                        versionPath,
+                        proxyHash,
+                        n3Hash) ||
+                    !InstallLauncherFiles(clientRoot, packageRoot))
+                {
+                    std::fwprintf(
+                        stderr,
+                        L"ERROR AORebirth-owned version.dll repair failed. Close AO and try again.\n");
+                    return 1;
+                }
+
+                std::wprintf(L"PASS repaired AORebirth client patch and updated launcher files under \"%s\".\n", clientRoot.c_str());
+                return 0;
+            }
+
+            if (versionExists)
+            {
+                if (!BackupInvalidMarker(markerPath) ||
+                    !ReplaceExistingProxyWithBackup(
+                        packageRoot,
+                        markerPath,
+                        versionPath,
+                        proxyHash,
+                        n3Hash) ||
+                    !InstallLauncherFiles(clientRoot, packageRoot))
+                {
+                    std::fwprintf(
+                        stderr,
+                        L"ERROR existing version.dll replacement failed. Nothing else was changed.\n");
+                    return 1;
+                }
+
+                std::wprintf(L"PASS replaced existing version.dll and installed AORebirth client patch under \"%s\".\n", clientRoot.c_str());
+                return 0;
+            }
+
+            if (!versionExists && markerExists)
+            {
+                if (!BackupInvalidMarker(markerPath))
+                {
+                    std::fwprintf(
+                        stderr,
+                        L"ERROR stale ownership marker repair failed. Nothing was overwritten.\n");
+                    return 1;
+                }
+                std::wprintf(L"REPORT removed stale marker-only install state\n");
+            }
         }
 
         UniqueHandle proxyTemporary;
@@ -869,8 +1371,17 @@ namespace
             return 1;
         }
 
+        if (!InstallLauncherFiles(clientRoot, packageRoot))
+        {
+            SetDeleteDisposition(proxyTemporary.Get(), true);
+            SetDeleteDisposition(markerTemporary.Get(), true);
+            std::fwprintf(stderr, L"ERROR could not patch launcher URL files. Nothing was installed.\n");
+            return 1;
+        }
+
         if (!RenameHandleNoReplace(proxyTemporary.Get(), versionPath))
         {
+            UninstallLauncherFiles(clientRoot, packageRoot);
             SetDeleteDisposition(proxyTemporary.Get(), true);
             SetDeleteDisposition(markerTemporary.Get(), true);
             std::fwprintf(
@@ -883,6 +1394,7 @@ namespace
         {
             const bool rolledBack = SetDeleteDisposition(proxyTemporary.Get(), true);
             SetDeleteDisposition(markerTemporary.Get(), true);
+            UninstallLauncherFiles(clientRoot, packageRoot);
             if (!rolledBack)
             {
                 std::fwprintf(
@@ -898,8 +1410,18 @@ namespace
             return 1;
         }
 
-        std::wprintf(L"PASS installed AORoomSpaceFix under \"%s\".\n", clientRoot.c_str());
+        std::wprintf(L"PASS installed AORebirth client patch under \"%s\".\n", clientRoot.c_str());
         return 0;
+    }
+
+    int Install(const std::wstring& clientRoot, const std::wstring& packageRoot)
+    {
+        return InstallInternal(clientRoot, packageRoot, true);
+    }
+
+    int InstallEmbedded(const std::wstring& clientRoot, const std::wstring& packageRoot)
+    {
+        return InstallInternal(clientRoot, packageRoot, false);
     }
 
     int Uninstall(const std::wstring& clientRoot, const std::wstring& packageRoot)
@@ -958,6 +1480,14 @@ namespace
             return 1;
         }
 
+        if (!UninstallLauncherFiles(clientRoot, packageRoot))
+        {
+            std::fwprintf(
+                stderr,
+                L"ERROR launcher URL ownership verification failed. Nothing was deleted.\n");
+            return 1;
+        }
+
         if (!SetDeleteDisposition(versionFile.Get(), true))
         {
             std::fwprintf(stderr, L"ERROR could not mark version.dll for removal. Nothing was deleted.\n");
@@ -988,7 +1518,7 @@ namespace
             return 1;
         }
 
-        std::wprintf(L"PASS removed AORoomSpaceFix from \"%s\".\n", clientRoot.c_str());
+        std::wprintf(L"PASS removed AORebirth client patch from \"%s\".\n", clientRoot.c_str());
         return 0;
     }
 
@@ -1001,7 +1531,7 @@ namespace
             marker.proxyHash != proxyHash ||
             marker.n3Hash != NewClientN3Hash ||
             ParseMarker(valid + "Extra=1\r\n", marker) ||
-            ParseMarker("Product=AORoomSpaceFix\nVersion=1\n", marker) ||
+            ParseMarker("Product=AORebirthClientPatch\nVersion=1\n", marker) ||
             IsUpperHex64(std::wstring(64, L'a')))
         {
             std::fwprintf(stderr, L"ERROR deployment helper self-test failed.\n");
@@ -1034,7 +1564,7 @@ namespace
         wchar_t exactName[128] = {};
         if (swprintf_s(
                 exactName,
-                L".AORoomSpaceFix.%lu.%llu.rename-exact.tmp",
+                L".AORebirthClientPatch.%lu.%llu.rename-exact.tmp",
                 GetCurrentProcessId(),
                 static_cast<unsigned long long>(GetTickCount64())) < 0)
         {
@@ -1070,6 +1600,9 @@ namespace
         return 0;
     }
 }
+
+#ifndef AO_REBIRTH_CLIENT_PATCH_EMBEDDED
+using namespace AORebirthClientPatchDeploy;
 
 int wmain(int argc, wchar_t** argv)
 {
@@ -1123,10 +1656,11 @@ int wmain(int argc, wchar_t** argv)
     std::fwprintf(
         stderr,
         L"Usage:\n"
-        L"  AORoomSpaceFixDeploy.exe --self-test\n"
-        L"  AORoomSpaceFixDeploy.exe write-manifest <package-root>\n"
-        L"  AORoomSpaceFixDeploy.exe verify-package <package-root>\n"
-        L"  AORoomSpaceFixDeploy.exe install <client-root> <package-root>\n"
-        L"  AORoomSpaceFixDeploy.exe uninstall <client-root> <package-root>\n");
+        L"  AORebirthClientPatchDeploy.exe --self-test\n"
+        L"  AORebirthClientPatchDeploy.exe write-manifest <package-root>\n"
+        L"  AORebirthClientPatchDeploy.exe verify-package <package-root>\n"
+        L"  AORebirthClientPatchDeploy.exe install <client-root> <package-root>\n"
+        L"  AORebirthClientPatchDeploy.exe uninstall <client-root> <package-root>\n");
     return 2;
 }
+#endif

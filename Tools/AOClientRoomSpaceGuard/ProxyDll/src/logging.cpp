@@ -39,7 +39,7 @@ namespace aorf
                 directory,
                 sizeof(directory) / sizeof(directory[0]),
                 _TRUNCATE,
-                L"%s\\AORoomSpaceFix",
+                L"%s\\AORebirthClientPatch",
                 localAppData) < 0)
         {
             return;
@@ -55,7 +55,7 @@ namespace aorf
                 path,
                 sizeof(path) / sizeof(path[0]),
                 _TRUNCATE,
-                L"%s\\AORoomSpaceFix.log",
+                L"%s\\AORebirthClientPatch.log",
                 directory) < 0)
         {
             return;

@@ -208,7 +208,7 @@ family matrices above. A strict export of every raw register/stack word remains
 gap C04 in `UNRESOLVED_EVIDENCE_GAPS.md`; missing words are not reconstructed.
 
 The dump root is
-`C:\Users\Mike\AppData\Local\AORoomSpaceFix\Dumps`. The following manifest
+`C:\Users\Mike\AppData\Local\AORebirthClientPatch\Dumps`. The following manifest
 maps all 19 dumps used in the investigation:
 
 | Canonical/aux ID | Dump file |
@@ -234,7 +234,7 @@ maps all 19 dumps used in the investigation:
 | E44 | `AO-20260715-015702-347-pid2740-exC0000005-at6648314F.dmp` |
 
 The associated runtime log is
-`C:\Users\Mike\AppData\Local\AORoomSpaceFix\AORoomSpaceFix.log`. It supplied
+`C:\Users\Mike\AppData\Local\AORebirthClientPatch\AORebirthClientPatch.log`. It supplied
 the initial E44 address/build record; the dump supplied the exact exception,
 driver identity, registers, modules, and chain.
 

@@ -1,0 +1,7 @@
+# This file contains the AORebirth launcher dimension-list endpoint.
+# The Anarchy Online launcher uses it to populate the server dropdown.
+#
+# AORebirth hosts a dimensions_v3.txt that includes both official Funcom
+# dimensions and AORebirth private test dimensions.
+#
+ao-rebirth.com:80/new-dimensions/dimensions_v3.txt

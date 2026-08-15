@@ -6,10 +6,13 @@ client builds. Windows loads it through the existing dependency chain:
 `AnarchyOnline.exe -> GUI.dll -> Awesomium.dll -> VERSION.dll`
 
 The proxy forwards the complete 17-export Windows `version.dll` surface to the
-real DLL under the 32-bit Windows system directory. A deferred worker then:
+real DLL under the 32-bit Windows system directory. An independent login-key
+worker patches only the verified in-memory key copies when the selected login
+endpoint is AORebirth; official and unknown endpoints retain the Funcom key.
+The crash-mitigation worker then:
 
 1. installs an unhandled-crash dump handler that writes minidumps under
-   `%LOCALAPPDATA%\AORoomSpaceFix\Dumps` and chains back to the client's normal
+   `%LOCALAPPDATA%\AORebirthClientPatch\Dumps` and chains back to the client's normal
    crash path;
 2. waits for `N3.dll` outside loader lock;
 3. hashes the exact file backing the loaded module;
@@ -141,7 +144,7 @@ static CRT, runs an offline byte/ABI self-test for both profiles, verifies the
 PE machine, export surface, and runtime dependencies, and creates the ignored
 artifact:
 
-`artifacts\AORoomSpaceFix-v1.zip`
+`artifacts\AORebirthClientPatch-v1.zip`
 
 The build never launches AO and never installs into a client directory.
 
@@ -162,7 +165,7 @@ handle, revalidated, and rejected unless they are ordinary files.
 
 Runtime logs are written to:
 
-`%LOCALAPPDATA%\AORoomSpaceFix\AORoomSpaceFix.log`
+`%LOCALAPPDATA%\AORebirthClientPatch\AORebirthClientPatch.log`
 
 Do not run the external guarded launcher with this proxy installed. Both
 repairs correctly refuse already-modified callsites rather than chaining.

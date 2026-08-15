@@ -283,7 +283,7 @@ from inside a handler can recurse.
 | Field | Audit |
 |---|---|
 | Mechanism | `SetUnhandledExceptionFilter`, retaining one previous filter |
-| Output | one `MiniDumpNormal | MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory` under `%LOCALAPPDATA%\AORoomSpaceFix\Dumps` |
+| Output | one `MiniDumpNormal | MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory` under `%LOCALAPPDATA%\AORebirthClientPatch\Dumps` |
 | Action | log code/address/access/dump path, invoke prior filter if present, otherwise `EXCEPTION_CONTINUE_SEARCH` |
 | Containment | none; it does not suppress the exception |
 | Lifetime | `DumpInProgress` never resets, so at most one dump/process; filter is not restored on detach; later code may replace it |

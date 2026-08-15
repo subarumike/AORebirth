@@ -2,9 +2,10 @@
 // This RoomSpace-only build deliberately excludes AOReloaded's LAA, XML,
 // settings, camera, input, and UI modifications.
 
-#include "logging.h"
 #include "crash_dump.h"
 #include "gui_rect_fix.h"
+#include "login_key_patch.h"
+#include "logging.h"
 #include "randy_color_fix.h"
 #include "roomspace_fix.h"
 
@@ -41,7 +42,13 @@ namespace
     DWORD WINAPI DeferredInstall(LPVOID)
     {
         aorf::LogInit();
-        aorf::Log("START version=1 pid=%lu", GetCurrentProcessId());
+        aorf::Log("START version=1 mode=combined pid=%lu", GetCurrentProcessId());
+        const bool loginKeyWorkerStarted = aorf::StartLoginKeyPatchWorker();
+        if (!loginKeyWorkerStarted)
+        {
+            aorf::Log("LOGINKEY patch=BLOCKED reason=start_worker");
+        }
+
         if (!aorf::InstallEarlyRandyExceptionGuard())
         {
             aorf::Log("ERROR early randy31 exception guard was not installed");
@@ -64,20 +71,21 @@ namespace
             aorf::Log("ERROR N3.dll did not load within 30 seconds");
             MessageBoxW(
                 nullptr,
-                L"AORoomSpaceFix could not find N3.dll. The client was not protected.",
-                L"AO RoomSpace Fix",
+                L"AORebirth Client Patch could not find N3.dll. "
+                L"The login-key worker may still be active, but the client crash repairs are not.",
+                L"AORebirth Client Patch",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
             return 1;
         }
 
-        if (!aorf::InstallRoomSpaceFix())
+        if (!aorf::InstallClientCrashMitigation())
         {
             aorf::Log("ERROR RoomSpace repair was not installed");
             MessageBoxW(
                 nullptr,
-                L"AORoomSpaceFix could not verify or patch this client. "
-                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
-                L"AO RoomSpace Fix",
+                L"AORebirth Client Patch could not verify or install the client crash repairs. "
+                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                L"AORebirth Client Patch",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
             return 1;
         }
@@ -85,12 +93,12 @@ namespace
         aorf::ClientProfile profile = aorf::GetLoadedN3ClientProfile();
         if (profile == aorf::ClientProfile::Unknown)
         {
-            aorf::Log("ERROR client profile was not available after RoomSpace repair");
+            aorf::Log("ERROR client profile was not available after crash mitigation");
             MessageBoxW(
                 nullptr,
-                L"AORoomSpaceFix could not verify this client profile. "
-                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
-                L"AO RoomSpace Fix",
+                L"AORebirth Client Patch could not verify this client profile. "
+                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                L"AORebirth Client Patch",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
             return 1;
         }
@@ -102,15 +110,17 @@ namespace
                 aorf::Log("ERROR new-client GUI draw repair was not installed");
                 MessageBoxW(
                     nullptr,
-                    L"AORoomSpaceFix could not install the new-client GUI crash repair. "
-                    L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
-                    L"AO RoomSpace Fix",
+                    L"AORebirth Client Patch could not install the new-client GUI crash repair. "
+                    L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                    L"AORebirth Client Patch",
                     MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
                 return 1;
             }
 
             aorf::Log("SKIP old-client-only GUI rectangle and renderer repairs");
-            aorf::Log("READY RoomSpace and new-client GUI draw repairs active");
+            aorf::Log(
+                "READY loginKeyWorker=%s RoomSpace and new-client GUI draw repairs active",
+                loginKeyWorkerStarted ? "started" : "blocked");
             return 0;
         }
 
@@ -119,26 +129,28 @@ namespace
             aorf::Log("ERROR GUI rectangle repair was not installed");
             MessageBoxW(
                 nullptr,
-                L"AORoomSpaceFix could not install the GUI crash repair. "
-                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
-                L"AO RoomSpace Fix",
+                L"AORebirth Client Patch could not install the GUI crash repair. "
+                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                L"AORebirth Client Patch",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
             return 1;
         }
 
         if (!aorf::InstallRandyColorFix())
         {
-            aorf::Log("ERROR randy31 color-pointer repair was not installed");
+            aorf::Log("ERROR randy31 renderer repair was not installed");
             MessageBoxW(
                 nullptr,
-                L"AORoomSpaceFix could not install the renderer crash repair. "
-                L"Close AO and review %LOCALAPPDATA%\\AORoomSpaceFix\\AORoomSpaceFix.log.",
-                L"AO RoomSpace Fix",
+                L"AORebirth Client Patch could not install the renderer crash repair. "
+                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                L"AORebirth Client Patch",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
             return 1;
         }
 
-        aorf::Log("READY RoomSpace, GUI rectangle, and renderer repairs active");
+        aorf::Log(
+            "READY loginKeyWorker=%s RoomSpace, GUI rectangle, and renderer repairs active",
+            loginKeyWorkerStarted ? "started" : "blocked");
         return 0;
     }
 

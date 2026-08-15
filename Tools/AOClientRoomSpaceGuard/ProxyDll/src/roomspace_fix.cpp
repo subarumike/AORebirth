@@ -585,7 +585,7 @@ namespace aorf
         return ClientProfile::Unknown;
     }
 
-    bool InstallRoomSpaceFix()
+    bool InstallClientCrashMitigation()
     {
         HMODULE n3 = GetModuleHandleW(L"N3.dll");
         const PatchProfile* profile = GetLoadedProfile();
@@ -824,7 +824,7 @@ namespace aorf
         return true;
     }
 
-    bool RunRoomSpaceFixSelfTest()
+    bool RunClientCrashMitigationSelfTest()
     {
         constexpr uint32_t SampleModuleBase = 0x60000000;
         constexpr uint32_t SampleWrapperBase = 0x30000000;
