@@ -41,6 +41,8 @@ namespace LoginEngine.Packets
 
         private readonly LoginName ln = new LoginName();
 
+        private readonly LoginPasswd lp = new LoginPasswd();
+
         private const int LoginAllowedFlag = 0;
 
         #endregion
@@ -103,17 +105,10 @@ namespace LoginEngine.Packets
             return false;
         }
 
-        /// <summary>
-        /// Username-only authentication.
-        ///
-        /// The client still sends a credentials/loginKey field,
-        /// but the server deliberately does not validate the password.
-        /// The username must already have passed the authentication
-        /// challenge and must be an allowed account.
-        /// </summary>
         public bool IsLoginCorrect(Client client, string loginKey)
         {
-            if (!client.HasAuthenticationChallenge(client.AccountName))
+            if (!client.HasAuthenticationChallenge(client.AccountName)
+                || string.IsNullOrWhiteSpace(loginKey))
             {
                 return false;
             }
@@ -129,23 +124,43 @@ namespace LoginEngine.Packets
             string serverSalt,
             string loginKey)
         {
-            /*
-             * Username-only login.
-             *
-             * Do NOT call LoginPasswd.GetLoginPassword().
-             * Do NOT call LoginEncryption.IsValidLogin().
-             *
-             * The username has already been validated by
-             * IsLoginAllowed(), and the authentication challenge
-             * was created by TryBeginAuthenticationAttempt().
-             */
             if (string.IsNullOrWhiteSpace(accountName)
-                || string.IsNullOrWhiteSpace(serverSalt))
+                || string.IsNullOrWhiteSpace(serverSalt)
+                || string.IsNullOrWhiteSpace(loginKey))
             {
                 return false;
             }
 
-            return this.IsLoginAllowed(accountName);
+            var le = new LoginEncryption();
+
+            this.lp.GetLoginPassword(accountName);
+
+            return IsLoginCorrect(
+                loginKey,
+                serverSalt,
+                accountName,
+                this.lp.PasswdL);
+        }
+
+        internal static bool IsLoginCorrect(
+            string loginKey,
+            string serverSalt,
+            string accountName,
+            string passwordHash)
+        {
+            if (string.IsNullOrWhiteSpace(accountName)
+                || string.IsNullOrWhiteSpace(serverSalt)
+                || string.IsNullOrWhiteSpace(loginKey))
+            {
+                return false;
+            }
+
+            var le = new LoginEncryption();
+            return le.IsValidLogin(
+                loginKey,
+                serverSalt,
+                accountName,
+                passwordHash);
         }
 
         #endregion

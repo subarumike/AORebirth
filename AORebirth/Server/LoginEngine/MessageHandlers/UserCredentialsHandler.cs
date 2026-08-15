@@ -100,17 +100,21 @@ namespace LoginEngine.MessageHandlers
                 return;
             }
 
-            /*
-             * PASSWORD CHECK REMOVED.
-             *
-             * Login is now allowed using the username only.
-             *
-             * We intentionally do NOT call:
-             *
-             * checkLogin.IsLoginCorrect(...)
-             *
-             * The username is still validated above with IsLoginAllowed().
-             */
+            if (checkLogin.IsLoginCorrect(
+                challengedAccount,
+                challengedServerSalt,
+                userCredentialsMessage.Credentials) == false)
+            {
+                Colouring.Push(ConsoleColor.Green);
+                Console.WriteLine(
+                    "Client '" + Client.ToLogValue(challengedAccount) + "' failed Authentication.");
+
+                client.RejectAuthentication();
+                Colouring.Pop();
+
+                return;
+            }
+
 
             /* This checks your expansions and
                number of characters allowed (num. of chars doesn't work)*/
