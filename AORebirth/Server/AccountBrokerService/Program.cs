@@ -549,10 +549,12 @@ namespace AORebirth.AccountBroker.Service
         private static string IdentityJson(AccountIdentitySnapshot identity)
         {
             return "{\"username\":\"" + Json(identity.CanonicalUsername)
+                + "\",\"email\":\"" + Json(identity.CanonicalEmail)
                 + "\",\"emailVerified\":" + (identity.EmailVerified ? "true" : "false")
                 + ",\"identityStatus\":\"" + Json(identity.IdentityStatus)
                 + "\",\"gameAccountLinked\":" + (identity.GameMappingState == "Linked" ? "true" : "false")
-                + ",\"identityPublicId\":\"" + Json(identity.IdentityPublicId) + "\"}";
+                + ",\"createdAt\":\"" + Json(identity.CreatedAt.ToUniversalTime().ToString("o"))
+                + "\",\"identityPublicId\":\"" + Json(identity.IdentityPublicId) + "\"}";
         }
 
         private static string GetForm(Dictionary<string, string> form, string name)
@@ -665,9 +667,77 @@ namespace AORebirth.AccountBroker.Service
 
         private static string GetRemoteAddress(HttpListenerContext context)
         {
+            string proxyHeader = context.Request.Headers["X-Forwarded-For"];
+            if (IsTrustedProxyRemote(context.Request.RemoteEndPoint == null ? null : context.Request.RemoteEndPoint.Address)
+                && !string.IsNullOrWhiteSpace(proxyHeader))
+            {
+                string candidate = proxyHeader.Split(',')[0].Trim();
+                IPAddress address;
+                if (IPAddress.TryParse(candidate, out address))
+                {
+                    return address.ToString();
+                }
+            }
+
             return context.Request.RemoteEndPoint == null
                 ? "unknown"
                 : context.Request.RemoteEndPoint.Address.ToString();
+        }
+
+        private static bool IsTrustedProxyRemote(IPAddress remoteAddress)
+        {
+            string configured = Environment.GetEnvironmentVariable("AOREBIRTH_ACCOUNT_BROKER_TRUSTED_PROXY_CIDRS");
+            if (remoteAddress == null || string.IsNullOrWhiteSpace(configured))
+            {
+                return false;
+            }
+
+            string[] ranges = configured.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string range in ranges)
+            {
+                if (IsInCidr(remoteAddress, range.Trim()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsInCidr(IPAddress address, string cidr)
+        {
+            string[] parts = cidr.Split('/');
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            IPAddress network;
+            int prefixLength;
+            if (!IPAddress.TryParse(parts[0], out network) || !int.TryParse(parts[1], out prefixLength))
+            {
+                return false;
+            }
+
+            byte[] addressBytes = address.GetAddressBytes();
+            byte[] networkBytes = network.GetAddressBytes();
+            if (addressBytes.Length != 4 || networkBytes.Length != 4 || prefixLength < 0 || prefixLength > 32)
+            {
+                return false;
+            }
+
+            uint addressValue = ToUInt32(addressBytes);
+            uint networkValue = ToUInt32(networkBytes);
+            uint mask = prefixLength == 0 ? 0u : uint.MaxValue << (32 - prefixLength);
+            return (addressValue & mask) == (networkValue & mask);
+        }
+
+        private static uint ToUInt32(byte[] bytes)
+        {
+            return ((uint)bytes[0] << 24)
+                | ((uint)bytes[1] << 16)
+                | ((uint)bytes[2] << 8)
+                | bytes[3];
         }
 
         private static string EnsureTrailingSlash(string prefix)
