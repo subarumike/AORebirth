@@ -68,6 +68,14 @@ canonicalized and bound to the SHA-256 and byte length verified by every formula
 child. The C# reader is the same typed MessagePack path used by the runtime and
 retains support for the repository's legacy `Z_SYNC_FLUSH` slice framing.
 
+The projection reader's governed identity comes from its tracked project,
+source, serialization, and typed-model inputs. Ignored `bin`/`obj` outputs are
+not generator inputs because .NET Framework executables and PDBs embed absolute
+checkout paths and cannot reproduce across developer clones. Current-cohort
+validation and normal server builds therefore require only tracked source.
+Actual `--check` and `--write` generation still fail closed unless the analyzer
+executable has first been built through the documented MSBuild command.
+
 All children run isolated and unbuffered with Python fault handling enabled. A bounded timeout terminates the complete child process tree and reports the stage label and process identity. Verified UTF-8 JSON may receive bounded retry for `JSONDecodeError` and for impossible stdlib `TypeError` or `AttributeError` failures only when the traceback proves `json.decoder`/`json.scanner` ownership. Deterministic validation failures and unrelated exceptions fail closed. Candidate JSON, UTF-8 outputs, descriptors, counts, hashes, identities, and location independence are validated before publication.
 
 Repository-owned generated-combat, acceptance, build, and test wrappers call

@@ -1789,6 +1789,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                         root,
                         candidate_root,
                         auxiliary_snapshot=auxiliary_snapshot,
+                        scfu_analyzer_snapshot=auxiliary_snapshot,
                         lease=object(),
                     )
 
@@ -1803,7 +1804,10 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 {
                     pipeline.PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT: str(
                         root.resolve()
-                    )
+                    ),
+                    pipeline.PRIMARY_SCFU_ANALYZER_ENVIRONMENT: str(
+                        frozen_primary
+                    ),
                 },
                 observed["kwargs"]["environment_overrides"],
             )
@@ -2074,9 +2078,21 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             provider = root / pipeline.FORMULA_STATIC_INPUTS[0]
             provider.parent.mkdir(parents=True)
             provider.write_text('CAPTURE = "20260202-020202"\n', encoding="utf-8")
-            analyzer = root / pipeline.SCFU_ANALYZER
-            analyzer.parent.mkdir(parents=True)
-            analyzer.write_bytes(b"fixture analyzer")
+            expected = []
+            for index, logical_root in enumerate(pipeline.SCFU_ANALYZER_SOURCE_ROOTS):
+                source = root / logical_root / f"Fixture{index}.cs"
+                source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_text("// fixture\n", encoding="utf-8")
+                expected.append(source.relative_to(root).as_posix())
+            ignored_binary = (
+                root
+                / pipeline.SCFU_ANALYZER_SOURCE_ROOTS[0]
+                / "bin"
+                / "Debug"
+                / "Fixture.pdb"
+            )
+            ignored_binary.parent.mkdir(parents=True)
+            ignored_binary.write_bytes(b"machine-specific fixture")
             runtime = (
                 root
                 / "AORebirth"
@@ -2087,7 +2103,6 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             )
             runtime.parent.mkdir(parents=True, exist_ok=True)
             runtime.write_text("// fixture\n", encoding="utf-8")
-            expected = []
             for capture_id in ("20260101-010101", "20260202-020202"):
                 capture = (
                     root
@@ -2108,6 +2123,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
             for relative in expected:
                 self.assertIn(relative, discovered)
+            self.assertNotIn(ignored_binary.relative_to(root).as_posix(), discovered)
 
 
 if __name__ == "__main__":

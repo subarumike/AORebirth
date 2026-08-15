@@ -3950,9 +3950,9 @@
       "discoveryReasons": [
         "semantic-path-token"
       ],
-      "sizeBytes": 12652,
+      "sizeBytes": 13189,
       "hashStatus": "content-sha256",
-      "sha256": "50f735d149f334988a6e120718c46e8c38a4770ef9b1c64b2bf20f00e54c8aee",
+      "sha256": "4f8ff803e797f25d741b84212057af3e0abc1e498ecbc67891b1415461a49c1e",
       "manifestSha256": null,
       "manifestDigestMatches": null,
       "referencedCaptureIds": [],
