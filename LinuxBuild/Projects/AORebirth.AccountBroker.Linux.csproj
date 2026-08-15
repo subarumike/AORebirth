@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>AORebirth.AccountBroker</AssemblyName>
+    <RootNamespace>AORebirth.AccountBroker</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Core.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerException.cs">
+      <Link>AccountBrokerException.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerModels.cs">
+      <Link>AccountBrokerModels.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerService.cs">
+      <Link>AccountBrokerService.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/UsernamePolicy.cs">
+      <Link>UsernamePolicy.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

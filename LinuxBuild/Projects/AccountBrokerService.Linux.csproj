@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>AORebirth.AccountBroker.Service</AssemblyName>
+    <RootNamespace>AORebirth.AccountBroker.Service</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_LINUX</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishAot>false</PublishAot>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <UseAppHost>true</UseAppHost>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.AccountBroker.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Core.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/AccountBrokerService/Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
