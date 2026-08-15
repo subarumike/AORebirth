@@ -81,7 +81,7 @@ namespace AccountBrokerValidation
                 return 1;
             }
 
-            Console.WriteLine("PASS AccountBrokerValidation 28/28");
+            Console.WriteLine("PASS AccountBrokerValidation 31/31");
             return 0;
         }
 
@@ -132,6 +132,12 @@ namespace AccountBrokerValidation
             Expect("retry same identity", created.IdentityId, retry.IdentityId, failures);
             Expect("retry same game account", created.GameAccountId, retry.GameAccountId, failures);
             Expect("one login row after retry", 1, CountLoginRows(connectionString, "BrokerA1"), failures);
+            ForumSsoIdentity activeForumIdentity = broker.GetForumSsoIdentityByPublicId(
+                GetIdentityPublicId(connectionString, created.IdentityId));
+            Expect("forum sso active identity username", "BrokerA1", activeForumIdentity.CanonicalUsername, failures);
+            ExternalMappingResult activeForumMapping = broker.ConfirmForumExternalMapping(activeForumIdentity.IdentityPublicId, "99");
+            Expect("forum confirm active mybb uid", "99", activeForumMapping.ExternalAccountId, failures);
+            Expect("forum sso active existing mybb", "99", broker.GetForumSsoIdentityByPublicId(activeForumIdentity.IdentityPublicId).ExistingMybbUid, failures);
 
             ExpectBrokerException(
                 "case-equivalent duplicate rejected",
@@ -367,6 +373,19 @@ namespace AccountBrokerValidation
                         connection,
                         "SELECT Id FROM login WHERE Username=@username",
                         Parameter("@username", username)));
+            }
+        }
+
+        private static string GetIdentityPublicId(string connectionString, long identityId)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                return Convert.ToString(
+                    Scalar(
+                        connection,
+                        "SELECT IdentityPublicId FROM account_identities WHERE IdentityId=@identityId",
+                        Parameter("@identityId", identityId)));
             }
         }
 

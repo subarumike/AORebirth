@@ -1050,6 +1050,13 @@ namespace ZoneEngine
                     "vendors",
                     "vendortemplate"
                 };
+            string[] allowedExtensionTables =
+                {
+                    "account_external_mappings",
+                    "account_game_mappings",
+                    "account_identities",
+                    "account_provisioning_jobs"
+                };
 
             try
             {
@@ -1101,10 +1108,9 @@ namespace ZoneEngine
                         }
                     }
 
-                    if (actualTables.Count != requiredTables.Length)
-                    {
-                        throw new InvalidDataException("Unexpected database table count: " + actualTables.Count);
-                    }
+                    var allowedTables = new HashSet<string>(
+                        requiredTables.Concat(allowedExtensionTables),
+                        StringComparer.Ordinal);
 
                     foreach (string tableName in requiredTables)
                     {
@@ -1119,6 +1125,14 @@ namespace ZoneEngine
                             using (IDataReader reader = command.ExecuteReader())
                             {
                             }
+                        }
+                    }
+
+                    foreach (string tableName in actualTables)
+                    {
+                        if (!allowedTables.Contains(tableName))
+                        {
+                            throw new InvalidDataException("Unexpected database table: " + tableName);
                         }
                     }
 

@@ -318,6 +318,50 @@ namespace AORebirth.AccountBroker
             }
         }
 
+        public ForumSsoIdentity GetForumSsoIdentityByPublicId(string identityPublicId)
+        {
+            if (string.IsNullOrWhiteSpace(identityPublicId) || identityPublicId.Length > 64)
+            {
+                throw new AccountBrokerException("INVALID_IDENTITY_PUBLIC_ID", "Identity public id is required.");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                AccountIdentitySnapshot identity =
+                    this.GetIdentitySnapshotByPublicId(connection, transaction, identityPublicId);
+                if (identity == null)
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("IDENTITY_NOT_FOUND", "Identity does not exist.");
+                }
+
+                string mybbUid = this.GetExternalAccountIdByIdentityProvider(connection, transaction, identity.IdentityId, "mybb");
+                transaction.Commit();
+                return new ForumSsoIdentity
+                {
+                    IdentityId = identity.IdentityId,
+                    IdentityPublicId = identity.IdentityPublicId,
+                    CanonicalUsername = identity.CanonicalUsername,
+                    CanonicalEmail = identity.CanonicalEmail,
+                    EmailVerified = identity.EmailVerified,
+                    IdentityStatus = identity.IdentityStatus,
+                    ExistingMybbUid = mybbUid
+                };
+            }
+        }
+
+        public ExternalMappingResult ConfirmForumExternalMapping(string identityPublicId, string externalAccountId)
+        {
+            ForumSsoIdentity identity = this.GetForumSsoIdentityByPublicId(identityPublicId);
+            if (!string.Equals(identity.IdentityStatus, "Active", StringComparison.Ordinal))
+            {
+                throw new AccountBrokerException("IDENTITY_NOT_ACTIVE", "Identity is not active.");
+            }
+
+            return this.ReserveExternalMapping(identity.IdentityId, "mybb", externalAccountId);
+        }
+
         public GameAccountSnapshot GetGameAccount(int gameAccountId)
         {
             using (IDbConnection connection = this.OpenConnection())
@@ -692,6 +736,18 @@ namespace AORebirth.AccountBroker
                 transaction,
                 "SELECT i.IdentityId, i.IdentityPublicId, i.CanonicalUsername, i.NormalizedUsername, i.CanonicalEmail, i.EmailVerifiedAt, i.IdentityStatus, m.GameAccountId, m.MappingState, i.CreatedAt FROM account_identities i INNER JOIN account_game_mappings m ON m.IdentityId=i.IdentityId WHERE i.IdentityId=@identityId",
                 Parameter("@identityId", identityId));
+        }
+
+        private AccountIdentitySnapshot GetIdentitySnapshotByPublicId(
+            IDbConnection connection,
+            IDbTransaction transaction,
+            string identityPublicId)
+        {
+            return this.GetSingleIdentitySnapshot(
+                connection,
+                transaction,
+                "SELECT i.IdentityId, i.IdentityPublicId, i.CanonicalUsername, i.NormalizedUsername, i.CanonicalEmail, i.EmailVerifiedAt, i.IdentityStatus, m.GameAccountId, m.MappingState, i.CreatedAt FROM account_identities i INNER JOIN account_game_mappings m ON m.IdentityId=i.IdentityId WHERE i.IdentityPublicId=@identityPublicId",
+                Parameter("@identityPublicId", identityPublicId));
         }
 
         private AccountIdentitySnapshot GetSingleIdentitySnapshot(

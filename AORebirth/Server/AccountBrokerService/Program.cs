@@ -125,6 +125,10 @@ namespace AORebirth.AccountBroker.Service
 
         private readonly FixedWindowRateLimiter registrationLimiter;
 
+        private readonly ForumSsoCodeStore forumSsoCodes;
+
+        private readonly string forumSsoSecret;
+
         private readonly WebSessionStore sessions;
 
         public AccountBrokerHttpHost(string prefix, AccountBrokerService broker)
@@ -132,6 +136,10 @@ namespace AORebirth.AccountBroker.Service
             this.broker = broker;
             this.listener.Prefixes.Add(EnsureTrailingSlash(prefix));
             this.sessions = new WebSessionStore(GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_SESSION_MINUTES", 480));
+            this.forumSsoSecret = GetSecretEnvironment(
+                "AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECRET",
+                "AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECRET_FILE");
+            this.forumSsoCodes = new ForumSsoCodeStore(GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECONDS", 120));
             this.registrationLimiter = new FixedWindowRateLimiter(
                 GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_REGISTER_LIMIT", 5),
                 TimeSpan.FromMinutes(10));
@@ -222,6 +230,24 @@ namespace AORebirth.AccountBroker.Service
             if (context.Request.HttpMethod == "POST" && (path == "/api/logout" || path == "/logout"))
             {
                 this.HandleLogout(context, path == "/api/logout");
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/forum/sso/issue")
+            {
+                this.HandleForumSsoIssue(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/forum/sso/redeem")
+            {
+                this.HandleForumSsoRedeem(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/forum/mapping/confirm")
+            {
+                this.HandleForumMappingConfirm(context);
                 return;
             }
 
@@ -371,6 +397,104 @@ namespace AORebirth.AccountBroker.Service
             }
 
             WriteJson(context.Response, 200, "{\"ok\":true,\"identity\":" + IdentityJson(session.Identity) + "}");
+        }
+
+        private void HandleForumSsoIssue(HttpListenerContext context)
+        {
+            if (!this.ValidateForumSsoSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"SSO_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            string identityPublicId = GetForm(form, "identityPublicId");
+            string returnTo = GetForm(form, "returnTo");
+            try
+            {
+                ForumSsoIdentity identity = this.broker.GetForumSsoIdentityByPublicId(identityPublicId);
+                if (!string.Equals(identity.IdentityStatus, "Active", StringComparison.Ordinal))
+                {
+                    WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"IDENTITY_NOT_ACTIVE\"}");
+                    return;
+                }
+
+                string code = this.forumSsoCodes.Issue(identity.IdentityPublicId, returnTo);
+                WriteJson(
+                    context.Response,
+                    200,
+                    "{\"ok\":true,\"code\":\"" + Json(code)
+                    + "\",\"expiresInSeconds\":" + this.forumSsoCodes.TtlSeconds.ToString()
+                    + "}");
+            }
+            catch (AccountBrokerException exception)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"" + Json(exception.Code) + "\"}");
+            }
+        }
+
+        private void HandleForumSsoRedeem(HttpListenerContext context)
+        {
+            if (!this.ValidateForumSsoSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"SSO_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            ForumSsoCode code = this.forumSsoCodes.Consume(GetForm(form, "code"));
+            if (code == null)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"SSO_CODE_INVALID\"}");
+                return;
+            }
+
+            try
+            {
+                ForumSsoIdentity identity = this.broker.GetForumSsoIdentityByPublicId(code.IdentityPublicId);
+                if (!string.Equals(identity.IdentityStatus, "Active", StringComparison.Ordinal))
+                {
+                    WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"IDENTITY_NOT_ACTIVE\"}");
+                    return;
+                }
+
+                WriteJson(
+                    context.Response,
+                    200,
+                    "{\"ok\":true,\"identity\":" + ForumSsoIdentityJson(identity)
+                    + ",\"returnTo\":\"" + Json(code.ReturnTo) + "\"}");
+            }
+            catch (AccountBrokerException exception)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"" + Json(exception.Code) + "\"}");
+            }
+        }
+
+        private void HandleForumMappingConfirm(HttpListenerContext context)
+        {
+            if (!this.ValidateForumSsoSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"SSO_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            try
+            {
+                ExternalMappingResult mapping = this.broker.ConfirmForumExternalMapping(
+                    GetForm(form, "identityPublicId"),
+                    GetForm(form, "mybbUid"));
+                WriteJson(
+                    context.Response,
+                    200,
+                    "{\"ok\":true,\"provider\":\"" + Json(mapping.Provider)
+                    + "\",\"mybbUid\":\"" + Json(mapping.ExternalAccountId)
+                    + "\",\"mappingState\":\"" + Json(mapping.MappingState) + "\"}");
+            }
+            catch (AccountBrokerException exception)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"" + Json(exception.Code) + "\"}");
+            }
         }
 
         private void WriteRegisterPage(HttpListenerContext context, string error)
@@ -555,6 +679,46 @@ namespace AORebirth.AccountBroker.Service
                 + "\",\"gameAccountLinked\":" + (identity.GameMappingState == "Linked" ? "true" : "false")
                 + ",\"createdAt\":\"" + Json(identity.CreatedAt.ToUniversalTime().ToString("o"))
                 + "\",\"identityPublicId\":\"" + Json(identity.IdentityPublicId) + "\"}";
+        }
+
+        private static string ForumSsoIdentityJson(ForumSsoIdentity identity)
+        {
+            return "{\"identityPublicId\":\"" + Json(identity.IdentityPublicId)
+                + "\",\"username\":\"" + Json(identity.CanonicalUsername)
+                + "\",\"email\":\"" + Json(identity.CanonicalEmail)
+                + "\",\"emailVerified\":" + (identity.EmailVerified ? "true" : "false")
+                + ",\"identityStatus\":\"" + Json(identity.IdentityStatus)
+                + "\",\"existingMybbUid\":\"" + Json(identity.ExistingMybbUid) + "\"}";
+        }
+
+        private bool ValidateForumSsoSecret(HttpListenerContext context)
+        {
+            if (string.IsNullOrEmpty(this.forumSsoSecret))
+            {
+                return false;
+            }
+
+            string provided = context.Request.Headers["X-AORebirth-Forum-SSO-Secret"];
+            return FixedTimeEquals(this.forumSsoSecret, provided);
+        }
+
+        private static bool FixedTimeEquals(string expected, string provided)
+        {
+            if (expected == null || provided == null)
+            {
+                return false;
+            }
+
+            byte[] expectedBytes = Encoding.UTF8.GetBytes(expected);
+            byte[] providedBytes = Encoding.UTF8.GetBytes(provided);
+            int diff = expectedBytes.Length ^ providedBytes.Length;
+            int length = Math.Min(expectedBytes.Length, providedBytes.Length);
+            for (int index = 0; index < length; index++)
+            {
+                diff |= expectedBytes[index] ^ providedBytes[index];
+            }
+
+            return diff == 0;
         }
 
         private static string GetForm(Dictionary<string, string> form, string name)
@@ -751,6 +915,17 @@ namespace AORebirth.AccountBroker.Service
             return int.TryParse(Environment.GetEnvironmentVariable(name), out value) && value > 0 ? value : defaultValue;
         }
 
+        private static string GetSecretEnvironment(string directName, string fileName)
+        {
+            string filePath = Environment.GetEnvironmentVariable(fileName);
+            if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
+            {
+                return File.ReadAllText(filePath).Trim();
+            }
+
+            return Environment.GetEnvironmentVariable(directName);
+        }
+
         private static string NewToken()
         {
             byte[] bytes = new byte[32];
@@ -906,6 +1081,66 @@ namespace AORebirth.AccountBroker.Service
             public string Token { get; set; }
 
             public AccountIdentitySnapshot Identity { get; set; }
+
+            public DateTime ExpiresAt { get; set; }
+        }
+
+        private sealed class ForumSsoCodeStore
+        {
+            private readonly Dictionary<string, ForumSsoCode> codes = new Dictionary<string, ForumSsoCode>(StringComparer.Ordinal);
+
+            private readonly object sync = new object();
+
+            private readonly TimeSpan ttl;
+
+            public ForumSsoCodeStore(int ttlSeconds)
+            {
+                this.TtlSeconds = ttlSeconds;
+                this.ttl = TimeSpan.FromSeconds(ttlSeconds);
+            }
+
+            public int TtlSeconds { get; private set; }
+
+            public string Issue(string identityPublicId, string returnTo)
+            {
+                string code = NewToken();
+                lock (this.sync)
+                {
+                    this.codes[code] = new ForumSsoCode
+                    {
+                        Code = code,
+                        IdentityPublicId = identityPublicId,
+                        ReturnTo = returnTo ?? string.Empty,
+                        ExpiresAt = DateTime.UtcNow.Add(this.ttl)
+                    };
+                }
+
+                return code;
+            }
+
+            public ForumSsoCode Consume(string code)
+            {
+                lock (this.sync)
+                {
+                    ForumSsoCode stored;
+                    if (string.IsNullOrEmpty(code) || !this.codes.TryGetValue(code, out stored))
+                    {
+                        return null;
+                    }
+
+                    this.codes.Remove(code);
+                    return stored.ExpiresAt < DateTime.UtcNow ? null : stored;
+                }
+            }
+        }
+
+        private sealed class ForumSsoCode
+        {
+            public string Code { get; set; }
+
+            public string IdentityPublicId { get; set; }
+
+            public string ReturnTo { get; set; }
 
             public DateTime ExpiresAt { get; set; }
         }

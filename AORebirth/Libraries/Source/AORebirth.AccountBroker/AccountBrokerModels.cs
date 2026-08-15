@@ -67,6 +67,23 @@ namespace AORebirth.AccountBroker
         public string MappingState { get; set; }
     }
 
+    public sealed class ForumSsoIdentity
+    {
+        public long IdentityId { get; set; }
+
+        public string IdentityPublicId { get; set; }
+
+        public string CanonicalUsername { get; set; }
+
+        public string CanonicalEmail { get; set; }
+
+        public bool EmailVerified { get; set; }
+
+        public string IdentityStatus { get; set; }
+
+        public string ExistingMybbUid { get; set; }
+    }
+
     public sealed class ProvisioningStatus
     {
         public string State { get; set; }

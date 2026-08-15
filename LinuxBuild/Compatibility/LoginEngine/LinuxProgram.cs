@@ -63,6 +63,14 @@ namespace LoginEngine
             "vendortemplate"
         };
 
+        private static readonly string[] AllowedExtensionTables =
+        {
+            "account_external_mappings",
+            "account_game_mappings",
+            "account_identities",
+            "account_provisioning_jobs"
+        };
+
         private static volatile bool exited;
 
         private static int cleanupStarted;
@@ -464,10 +472,13 @@ namespace LoginEngine
                         }
                     }
 
-                    if (actualTables.Count != RequiredTables.Length)
+                    var allowedTables = new HashSet<string>(
+                        RequiredTables.Concat(AllowedExtensionTables),
+                        StringComparer.Ordinal);
+                    string unexpectedTable = actualTables.FirstOrDefault(tableName => !allowedTables.Contains(tableName));
+                    if (!string.IsNullOrEmpty(unexpectedTable))
                     {
-                        throw new InvalidDataException(
-                            "The active database does not contain the exact governed table set.");
+                        throw new InvalidDataException("Unexpected database table is present: " + unexpectedTable);
                     }
 
                     foreach (string tableName in RequiredTables)
