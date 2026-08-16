@@ -1,0 +1,462 @@
+manifest_version: 1
+generated_utc: 2026-08-16T00:00:00Z
+project: AORebirth
+captures:  - capture_id: 20260531-023030
+    file_count: 2
+    confidence: low
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260604-235530
+    file_count: 2
+    confidence: low
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260607-202610
+    file_count: 4
+    confidence: low
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260610-185759
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260610-214233
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260610-232330
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260610-233143
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260611-005202
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260611-015456
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260611-031405
+    file_count: 5
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260623-012720
+    file_count: 13
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260623-015602
+    file_count: 12
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260623-021643
+    file_count: 12
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260623-040642
+    file_count: 12
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260623-042326
+    file_count: 12
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260623-081344
+    file_count: 12
+    confidence: medium
+    priority: P2
+    evidence:
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260716-222007
+    file_count: 32
+    confidence: medium
+    priority: P2
+    evidence:
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260717-214751
+    file_count: 32
+    confidence: medium
+    priority: P2
+    evidence:
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260717-215250
+    file_count: 31
+    confidence: medium
+    priority: P2
+    evidence:
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260717-220340
+    file_count: 32
+    confidence: medium
+    priority: P2
+    evidence:
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260722-104809
+    file_count: 30
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260722-152454
+    file_count: 30
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-001044
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-003410
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-005042
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-010220
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-010846
+    file_count: 29
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-012547
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-231938
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260728-233312
+    file_count: 31
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - mission-flow.replay.log
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260729-000735
+    file_count: 28
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260731-030702
+    file_count: 30
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260731-035230
+    file_count: 30
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260814-014647
+    file_count: 28
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: 20260814-015856
+    file_count: 28
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true
+  - capture_id: BrandonThornCapture
+    file_count: 28
+    confidence: high
+    priority: P1
+    evidence:
+      - mission-flow.log
+      - raw-packets.csv
+      - events.log
+      - packets.hex.log
+      - enemy-state.csv
+      - enemy-state.json
+      - npc-lifecycle.csv
+      - movement-summary.json
+    applicable_behaviors:
+      - derive_from_logs: true

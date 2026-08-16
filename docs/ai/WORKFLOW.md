@@ -577,3 +577,19 @@ Use this source order:
 4. Local code facts.
 
 Do not patch packet-sensitive behavior from visual symptoms alone.
+
+## Capture Evidence Fixtures
+
+Tracked capture fixtures are derived evidence packages under
+`docs/reference/captures`. They intentionally do not vendor the ignored raw
+capture folders.
+
+Validate the tracked fixture set before using it as the basis for a gameplay
+change:
+
+```cmd
+cmd /d /c tools\validate_capture_evidence_fixtures.cmd
+```
+
+This is a Windows-lane gate. After it passes, the same tracked fixture files can
+be reconciled into the Linux branch before any gameplay code is promoted.
