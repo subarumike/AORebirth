@@ -187,9 +187,10 @@ validated in
 email configuration evidence is recorded in
 `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`: self-hosted
 VPS mail is selected, the production broker/schema/mail-server prerequisites
-are deployed fail-closed, and forum notifications remain blocked until
-Hostinger DNS is added, MyBB SMTP is configured, and received-message
-SPF/DKIM/DMARC headers are proven.
+are deployed, Hostinger DNS resolves, MyBB SMTP is configured through
+`forum@ao-rebirth.com`, and a controlled MyBB notification was accepted by
+Gmail. Forum email remains blocked only until received-message SPF/DKIM/DMARC
+headers are proven from the mailbox side.
 
 ## Backup / restore / upgrade
 
@@ -279,9 +280,8 @@ Forum health is not a dependency for AO game service health.
   username/password plus the configured secret PIN. Admin credentials were not
   used or exposed in this stage, so full Admin CP user/group/board management
   was not browser-tested.
-- Email transport: BLOCKED for production notification use until Hostinger
-  MX/SPF/DKIM/DMARC DNS, authenticated SMTP app configuration, MyBB SMTP
-  configuration, and received-message SPF/DKIM/DMARC proof are complete.
+- Email transport: BLOCKED for production notification use until
+  received-message SPF/DKIM/DMARC proof is confirmed from the mailbox side.
 - SSO replay/expiry/DB-isolation regression: not modified in this stage; frozen
   production evidence remains
   `docs/project/MYBB_FORUM_SSO_PRODUCTION_EVIDENCE_20260815.md`.

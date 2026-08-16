@@ -3,7 +3,7 @@
 ## Scope
 
 This stage moves the already implemented AORebirth email-verification
-foundation from source-only into a production-ready code/schema position and
+foundation from source-only into a production code/schema/mail position and
 switches the production mail plan from a third-party transactional provider to
 the controlled VPS mail stack.
 
@@ -55,16 +55,18 @@ Rationale:
 
 ## DNS plan and current DNS state
 
-Read-only DNS checks for `ao-rebirth.com` on 2026-08-16:
+Read-only DNS checks for `ao-rebirth.com` after Hostinger update on 2026-08-16:
 
 - authoritative nameservers: `apollo.dns-parking.com`,
   `athena.dns-parking.com`;
 - DNS provider: Hostinger;
-- MX: no public MX answer; resolver returned SOA authority only;
-- apex TXT/SPF: no public TXT answer; resolver returned SOA authority only;
-- DMARC: `_dmarc.ao-rebirth.com` did not resolve.
+- `mail.ao-rebirth.com A 2.24.96.30`: PASS;
+- `ao-rebirth.com MX 10 mail.ao-rebirth.com`: PASS;
+- `ao-rebirth.com TXT v=spf1 ip4:2.24.96.30 -all`: PASS;
+- `_dmarc.ao-rebirth.com TXT v=DMARC1; p=none; adkim=r; aspf=r`: PASS;
+- `aor20260816._domainkey.ao-rebirth.com` DKIM TXT: PASS.
 
-Required Hostinger DNS records:
+Applied Hostinger DNS records:
 
 ```text
 A     mail                 2.24.96.30
@@ -74,9 +76,7 @@ TXT   _dmarc               v=DMARC1; p=none; adkim=r; aspf=r
 TXT   aor20260816._domainkey v=DKIM1;h=sha256;k=rsa;p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA57JMyzCdv8BqIGys70R8nYoYLqn1Kr3zvoVZ7dKjwEp60hOLKV8S0hW/4EUeVvJ2O1Rkf4mZgCoyOOm+s42LIrFqZaYE2xTdDebjDLU0T/+bN3HThJrm0nov2UztQR68g+98cj9tZtGMIrI8EPk+VzfsJ+t1kopEl9PO4nQbOZ/WJXgvo+7AXFrX3Xjwh99Vb1hWqhwK5RCIS0q6gGr2n9TBTxWadLkJIszawu1pTOVpUKMrAvjpUw8DwAMetXsn6T4TgVYfXZ2Hd6k8xxWGr9Ufu3TPvQfpPXUoF7fSWj7VVzMtzwXqpH31I0KxaT9QbGJ3gBUNB/fPwQLz9ok75wIDAQAB
 ```
 
-TTL `300` is acceptable for all records during cutover.
-
-No DNS records were added or changed in this stage.
+TTL is `300`.
 
 ## Production database
 
@@ -145,8 +145,19 @@ Post-deployment checks:
 
 The deployed broker therefore contains the email-verification code path but
 cannot send mail and cannot accept website mail-control calls yet. This is the
-intended fail-closed state until public DNS is live and received-message
-authentication is proven.
+  intended fail-closed state until public DNS is live and received-message
+  authentication is proven.
+
+Account Broker was later rebuilt and redeployed as:
+
+```text
+/opt/ao-rebirth/accountbroker/releases/email-selfhost-20260816-004
+```
+
+Reason: the previously deployed broker release did not contain the email API
+routes. The fresh release includes the email routes and sanitized
+`MAIL_SEND_FAILED` exception logging that records exception type/message only;
+it does not log SMTP credentials, verification tokens, or email bodies.
 
 ## Production VPS mail stack
 
@@ -184,6 +195,14 @@ Postfix/Dovecot/OpenDKIM changes:
 - OpenDKIM selector `aor20260816` generated for `ao-rebirth.com`;
 - OpenDKIM signs `*@ao-rebirth.com`;
 - Postfix, Dovecot, and OpenDKIM remained active after reload/restart.
+- Let's Encrypt issued `mail.ao-rebirth.com` through a dedicated
+  `aor-mail-cert-dummy` vhost.
+- A troubleshooting command printed the encoded Postfix SNI map value, which
+  includes private key material. The exposed `mail.ao-rebirth.com` TLS
+  certificate/key was removed and replaced through forced ACME renewal; the new
+  certificate fingerprint differs from the removed certificate.
+- Postfix SNI map generation for chain files must use `postmap -F`; normal
+  `postmap` produces malformed SNI map values.
 
 Validation:
 
@@ -196,35 +215,58 @@ Validation:
   `forum@ao-rebirth.com`: PASS;
 - local-only DKIM header with `d=ao-rebirth.com`: PASS;
 - local test message removed after validation.
+- public DNS MX/SPF/DKIM/DMARC lookup: PASS;
+- Account Broker verification resend for existing `SubaruMike` identity:
+  PASS, Gmail accepted `noreply@ao-rebirth.com` delivery with SMTP `250 2.0.0`;
+- MyBB SMTP notification test: PASS, Gmail accepted
+  `forum@ao-rebirth.com` delivery with SMTP `250 2.0.0`;
+- Postfix queue after tests: empty;
+- services after tests: Account Broker active, Postfix active, Dovecot active,
+  OpenDKIM active, website healthy, forum running.
+
+Credential/security follow-up:
+
+- The Account Broker database password was accidentally printed once while
+  redacting the wrong connection-string key name. The credential was treated as
+  compromised and rotated immediately.
+- The Account Broker database user was granted the required
+  `SELECT`, `INSERT`, and `UPDATE` permissions on
+  `account_email_verification_tokens`.
 
 ## MyBB notification boundary
 
 MyBB notification mail is not production-enabled in this stage.
 
-Required MyBB work after Hostinger DNS is live:
+MyBB notification mail is configured through authenticated SMTP:
 
-1. Configure MyBB to use authenticated SMTP through the self-hosted VPS
-   transport with `forum@ao-rebirth.com`.
-2. Preserve the AORebirth Identity Bridge boundary: MyBB must not provide
+```text
+smtp_host=mail.ao-rebirth.com
+smtp_port=587
+smtp_user=forum@ao-rebirth.com
+secure_smtp=2
+```
+
+`secure_smtp=2` is required for STARTTLS in MyBB. `secure_smtp=1` attempts
+implicit TLS and fails against Postfix submission port `587`.
+
+MyBB must still preserve the AORebirth Identity Bridge boundary: it must not provide
    AORebirth password reset, password authentication, or native registration
    authority.
-3. Send a controlled MyBB notification to an independent mailbox.
-4. Prove received-message SPF, DKIM, and DMARC alignment from message headers.
 
 ## Acceptance not performed
 
-The following production acceptance steps were intentionally not performed:
+The following production acceptance steps were performed:
 
-- real website registration email send;
 - real resend verification email send;
-- received verification email link click;
-- received-message SPF/DKIM/DMARC header proof;
 - MyBB notification send;
-- MyBB received-message SPF/DKIM/DMARC header proof.
 
-Reason: Hostinger DNS has not been updated with the AORebirth MX/SPF/DKIM/DMARC
-records, and received-message authentication cannot be proven before public DNS
-is live.
+The following acceptance steps remain external:
+
+- received verification email link click by the mailbox owner;
+- received-message SPF/DKIM/DMARC header proof from Gmail message details for
+  the Account Broker verification email;
+- received-message SPF/DKIM/DMARC header proof from Gmail message details for
+  the MyBB notification email.
 
 ## Rollback
 
@@ -252,11 +294,7 @@ BLOCKED
 
 Blocking items:
 
-1. Add the AORebirth MX/SPF/DKIM/DMARC records at Hostinger.
-2. Wait for public DNS propagation and verify `mail.ao-rebirth.com`,
-   `ao-rebirth.com` MX, SPF, DKIM, and DMARC.
-3. Configure Account Broker SMTP and account-mail secret files from the
-   already-generated VPS secrets.
-4. Configure MyBB SMTP with `forum@ao-rebirth.com`.
-5. Send controlled website and MyBB emails to independent mailboxes.
-6. Prove received-message SPF, DKIM, and DMARC headers.
+1. Mike must open the two Gmail test messages and confirm received-message
+   SPF, DKIM, and DMARC results from message details.
+2. Mike must click the Account Broker verification link for `SubaruMike`, or
+   provide the resulting status if Gmail quarantined the message.

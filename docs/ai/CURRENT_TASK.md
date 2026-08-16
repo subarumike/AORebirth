@@ -19,9 +19,11 @@ self-hosted VPS mail is selected, the production token-table migration is
 applied after a backup, Account Broker release `email-foundation-20260816-002`
 is deployed and healthy without SMTP/account-mail app configuration, and the
 VPS Postfix/Dovecot/OpenDKIM stack is configured for `ao-rebirth.com`. Email
-remains BLOCKED until Hostinger DNS, Account Broker/MyBB SMTP app
-configuration, and received-message SPF/DKIM/DMARC header proof are complete.
-Evidence:
+now sends through the self-hosted VPS mail stack: Hostinger MX/SPF/DKIM/DMARC
+records resolve, Account Broker verification resend to Gmail passed, and MyBB
+SMTP notification to Gmail passed. Email remains BLOCKED only on mailbox-owner
+received-header SPF/DKIM/DMARC proof and clicking/confirming the verification
+link. Evidence:
 `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
 
 Launch status is currently BLOCKED only on final live moderator acceptance,
@@ -92,9 +94,10 @@ required for launch. Evidence:
 
 - No remaining MyBB/forum infrastructure architecture gate is open.
 - Email provider selection is complete with self-hosted VPS mail, and the
-  production broker/schema/mail-server prerequisites are in place, but
-  production email remains blocked on Hostinger DNS, Account Broker/MyBB SMTP
-  app configuration, and received-message SPF/DKIM/DMARC proof.
+  production broker/schema/mail-server/app configuration is in place. Broker
+  verification email and MyBB notification email were accepted by Gmail.
+  Production email remains blocked only on received-message SPF/DKIM/DMARC
+  header proof and mailbox-owner verification-link confirmation.
 - Forum presentation/content launch prep is applied, but community launch is
   blocked until:
   - live moderator sticky/close-open/move/report acceptance passes with a
