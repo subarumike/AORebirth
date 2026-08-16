@@ -181,7 +181,14 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 		TeamRequestInvite = 0x0000001A,
 
         /// <summary>
-        /// Server→inviter ack after TeamRequestInvite. Capture 20260728-232300 (Action=0xA9).
+        /// Server→inviter TooLow Yes/No warn. Capture 20260815-222131 (Bluehot 200 →
+        /// Nediraj / Nicoldoc): after OUT 0x1A p2=0, Action=0xA8 Target=invitee.
+        /// Yes is OUT 0x1A p2=1. Same layout as TooHigh 0xA9.
+        /// </summary>
+        TeamInviteTooLow = 0x000000A8,
+
+        /// <summary>
+        /// Server→inviter TooHigh Yes/No warn. Capture 20260815-194517 Action=0xA9.
         /// Same Target as the invite; parameters 0.
         /// </summary>
         TeamInviteAck = 0x000000A9,

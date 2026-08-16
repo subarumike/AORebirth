@@ -300,15 +300,22 @@ client.Controller.Character.Playfield.Identity,
                             client.Controller.Character);
                     }
 
+                    bool isPlayfieldTransfer =
+                        CombatXpRuntimeService.IsPlayfieldTransferLogin(client);
+
                     CombatXpRuntimeService.LogXpWireSnapshot(
                         client.Controller.Character,
                         "ClientConnected",
-                        "zone-login-before-prepare");
-                    CombatXpRuntimeService.PrepareXpStatsForLogin(client.Controller.Character);
+                        isPlayfieldTransfer ? "zone-transfer-before-prepare" : "zone-login-before-prepare");
+                    CombatXpRuntimeService.PrepareXpStatsForLogin(
+                        client.Controller.Character,
+                        isPlayfieldTransfer);
                     CombatXpRuntimeService.LogXpWireSnapshot(
                         client.Controller.Character,
                         "ClientConnected",
-                        "zone-login-after-prepare-before-fullchar");
+                        isPlayfieldTransfer
+                            ? "zone-transfer-after-prepare-before-fullchar"
+                            : "zone-login-after-prepare-before-fullchar");
                     FullCharacterMessageHandler.Default.Send(client.Controller.Character);
                     // Client often never sends CharInPlay after login; bag UI stays empty until
                     // zone hop. Push InventoryUpdate immediately (and delayed) after FullCharacter.
@@ -318,11 +325,22 @@ client.Controller.Character.Playfield.Identity,
                     // StatMessage, not from the FullCharacter bulk. Re-send floor stats
                     // (Unknown=1, no cumulative XP, no feedback) so the bar shows progress
                     // instead of the raw cumulative XP after zone/relog.
-                    CombatXpRuntimeService.SyncXpBarStatsOnLogin(client.Controller.Character);
+                    CombatXpRuntimeService.SyncXpBarStatsOnLogin(
+                        client.Controller.Character,
+                        isPlayfieldTransfer);
                     CombatXpRuntimeService.LogXpWireSnapshot(
                         client.Controller.Character,
                         "ClientConnected",
-                        "zone-login-after-fullchar");
+                        isPlayfieldTransfer ? "zone-transfer-after-fullchar" : "zone-login-after-fullchar");
+
+                    if (isPlayfieldTransfer)
+                    {
+                        var transferDynel = client.Controller.Character as Dynel;
+                        if (transferDynel != null)
+                        {
+                            transferDynel.IsTeleporting = false;
+                        }
+                    }
 
                     // Stuck hoverboard/yalm: MonsterData/IsVehicle can persist after NCU cancel
                     // or unequip if MorphState was lost on reboot.

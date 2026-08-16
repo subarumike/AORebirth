@@ -351,13 +351,18 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static byte ResolveInfoLevel(ICharacter character)
         {
-            uint raw = character.Stats[StatIds.level].BaseValue;
-            if (raw == 0 || raw == 1234567890U || raw > 200)
+            int level = CombatXpRuntimeService.ResolveWireLevel(character);
+            if (level < 1)
             {
                 return 1;
             }
 
-            return (byte)raw;
+            if (level > 220)
+            {
+                return 220;
+            }
+
+            return (byte)level;
         }
 
         private static byte ResolveMonsterInfoLevel(ICharacter character)

@@ -1113,6 +1113,7 @@ namespace AORebirth.Core.Playfields
                 character,
                 this.SendVisibilityMessage,
                 this.SendVisibilityLeave);
+            CombatXpRuntimeService.AnnounceLevelStatToPlayfield(character);
         }
 
         #endregion

@@ -1075,10 +1075,7 @@ namespace ZoneEngine.Core.Controllers
         /// </exception>
         public bool TeamJoinRequest(Identity target)
         {
-            // Procedure:
-            // 1. Send target the invite
-
-            return TeamRuntime.Invite(this.Character, target);
+            return TeamRuntime.Invite(this.Character, target, 0);
         }
 
         /// <summary>
@@ -1199,6 +1196,15 @@ namespace ZoneEngine.Core.Controllers
 
         public static bool Invite(ICharacter inviter, Identity targetIdentity)
         {
+            return Invite(inviter, targetIdentity, 0);
+        }
+
+        /// <param name="parameter2">
+        /// Live 20260815-194517: first click is TeamRequestInvite p2=0; Yes on TooHigh
+        /// is p2=1. Invite the target only after Yes (or when levels are in range).
+        /// </param>
+        public static bool Invite(ICharacter inviter, Identity targetIdentity, int parameter2)
+        {
             ICharacter target = FindInviteTarget(inviter, targetIdentity);
 
             if (target == null || target.Identity.Equals(inviter.Identity))
@@ -1210,10 +1216,38 @@ namespace ZoneEngine.Core.Controllers
                 return false;
             }
 
-            // Do NOT re-check XP window here. LFT already filters by TeamLevelRanges.
-            // A second gate false-blocked invites when levels were stale/wrong after GM set.
-            // Live client may still show TooHigh/TooLow on Recruit (GUI) — server cannot clear that.
-            // Out-of-range same-PF Recruit can still deliver a popup on private (unlike live).
+            int targetLevel = CombatXpRuntimeService.ResolveWireLevel(target);
+
+            // Live TooHigh 20260815-194517: OUT 0x1A p2=0 → IN 0xA9, invite only after p2=1.
+            // Live TooLow 20260815-222131: OUT 0x1A p2=0 → IN 0xA8, invite only after p2=1.
+            // Every current team member must be in XP range with the invitee.
+            if (parameter2 != 1)
+            {
+                ICharacter conflictMember;
+                bool tooHigh;
+                if (TryFindTeamXpConflict(inviter, target, targetLevel, out conflictMember, out tooHigh))
+                {
+                    string conflictName = conflictMember != null && !string.IsNullOrEmpty(conflictMember.Name)
+                        ? conflictMember.Name
+                        : "the team";
+                    if (tooHigh)
+                    {
+                        CharacterActionMessageHandler.Default.SendTeamInviteAck(inviter, target);
+                        ChatTextMessageHandler.Default.Send(
+                            inviter,
+                            target.Name + " is too high for " + conflictName + ".");
+                    }
+                    else
+                    {
+                        CharacterActionMessageHandler.Default.SendTeamInviteTooLow(inviter, target);
+                        ChatTextMessageHandler.Default.Send(
+                            inviter,
+                            target.Name + " is too low for " + conflictName + ".");
+                    }
+
+                    return true;
+                }
+            }
 
             lock (Sync)
             {
@@ -1241,10 +1275,8 @@ namespace ZoneEngine.Core.Controllers
                 PendingInvites[target.Identity.Instance] = inviter.Identity;
             }
 
-            // Cross-PF LFT: seed name/dynel on inviter BEFORE 0x1A so first click works
-            // (missing name → NoName / first click silent / second click warn).
-            if (LftInviteClientPresence.IsRemoteFrom(inviter, target)
-                || LftInviteArm.IsArmedTarget(inviter, target.Identity))
+            // Seed name/level on inviter before 0x1A (capture 20260815-194517: InfoRequest + LookAt
+            // pre-wire level; same-PF Recruit needs it too or client false TooHigh).
             {
                 string armedName;
                 LftInviteArm.TryGetArmedName(inviter, target.Identity, out armedName);
@@ -1262,7 +1294,6 @@ namespace ZoneEngine.Core.Controllers
             }
 
             CharacterActionMessageHandler.Default.SendTeamInviteRequest(target, inviter);
-            CharacterActionMessageHandler.Default.SendTeamInviteAck(inviter, target);
 
             ChatTextMessageHandler.Default.Send(inviter, "Team invite sent to " + target.Name + ".");
             ChatTextMessageHandler.Default.Send(
@@ -1635,6 +1666,92 @@ namespace ZoneEngine.Core.Controllers
                     SendTeamStatSingle(member, StatIds.socialstatus, social);
                 }
             }
+        }
+
+        /// <summary>
+        /// Invitee must be in XP range of every current team member (solo = inviter).
+        /// TooHigh uses the lowest conflicting member; TooLow uses the highest.
+        /// </summary>
+        private static bool TryFindTeamXpConflict(
+            ICharacter inviter,
+            ICharacter invitee,
+            int inviteeLevel,
+            out ICharacter conflictMember,
+            out bool tooHigh)
+        {
+            conflictMember = null;
+            tooHigh = false;
+            if (inviter == null || invitee == null)
+            {
+                return false;
+            }
+
+            List<ICharacter> roster = new List<ICharacter>();
+            roster.Add(inviter);
+
+            List<Identity> ids;
+            if (TryGetTeamMembers(inviter, out ids) && ids != null)
+            {
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    if (ids[i].Instance == inviter.Identity.Instance)
+                    {
+                        continue;
+                    }
+
+                    ICharacter member = ResolveOnlineCharacter(inviter, ids[i])
+                                        ?? FindOnlineCharacterByInstance(ids[i].Instance);
+                    if (member == null || member.Identity.Instance == invitee.Identity.Instance)
+                    {
+                        continue;
+                    }
+
+                    roster.Add(member);
+                }
+            }
+
+            ICharacter tooHighMember = null;
+            int tooHighMemberLevel = int.MaxValue;
+            ICharacter tooLowMember = null;
+            int tooLowMemberLevel = int.MinValue;
+
+            for (int i = 0; i < roster.Count; i++)
+            {
+                ICharacter member = roster[i];
+                int memberLevel = CombatXpRuntimeService.ResolveWireLevel(member);
+                if (TeamXpShareWindow.IsTooHighForXpShare(memberLevel, inviteeLevel))
+                {
+                    if (memberLevel < tooHighMemberLevel)
+                    {
+                        tooHighMember = member;
+                        tooHighMemberLevel = memberLevel;
+                    }
+                }
+                else if (TeamXpShareWindow.IsTooLowForXpShare(memberLevel, inviteeLevel))
+                {
+                    if (memberLevel > tooLowMemberLevel)
+                    {
+                        tooLowMember = member;
+                        tooLowMemberLevel = memberLevel;
+                    }
+                }
+            }
+
+            if (tooHighMember != null)
+            {
+                conflictMember = tooHighMember;
+                tooHigh = true;
+                return true;
+            }
+
+            if (tooLowMember != null)
+            {
+                conflictMember = tooLowMember;
+                tooHigh = false;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

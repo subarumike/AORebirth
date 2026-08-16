@@ -80,6 +80,12 @@ namespace ZoneEngine.Core
         public bool PreserveLogoutSitOnConnect { get; set; }
 
         /// <summary>
+        /// True when this session resumed a pooled character after cross-zone redirect
+        /// (new TCP session — lifecycle PhaseHistory does not contain Zoning).
+        /// </summary>
+        public bool IsPlayfieldTransferLogin { get; private set; }
+
+        /// <summary>
         /// Real (UTC) time we last sent this client a <c>GameTimeMessage</c>. The client anchors its
         /// mission/quest countdown clock to that message (a fixed server epoch) and advances it in real
         /// time from there, re-anchoring on every login and zone-in. Mission expiry timestamps must be
@@ -306,6 +312,7 @@ namespace ZoneEngine.Core
             }
 
             bool isZoningReload = this.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning;
+            this.IsPlayfieldTransferLogin = false;
             this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
 
             // TODO: Save playfield type into Character table and use it accordingly
@@ -325,7 +332,11 @@ namespace ZoneEngine.Core
                 pooledCharacter = null;
             }
 
-            if (pooledCharacter != null && !pooledCharacter.Parent.Equals(pf.Identity))
+            // Cross-zone transfer updates Playfield on the dynel but Parent can still reference
+            // the source playfield until reconnect. IsTeleporting marks an active transfer.
+            if (pooledCharacter != null
+                && !pooledCharacter.IsTeleporting
+                && !pooledCharacter.Parent.Equals(pf.Identity))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
@@ -348,6 +359,7 @@ namespace ZoneEngine.Core
             {
                 this.Controller.Character = pooledCharacter;
                 this.Controller.Character.Reconnect(this);
+                this.IsPlayfieldTransferLogin = true;
                 LogUtil.Debug(DebugInfoDetail.Engine, "Reconnected to Character " + charId);
             }
 
@@ -374,6 +386,7 @@ namespace ZoneEngine.Core
             this.Controller.Character.Playfield = pf;
             this.Playfield = pf;
             this.Controller.Character.Stats.Read();
+            CombatXpRuntimeService.NormalizeLevelStatBaseValue(this.Controller.Character);
             if (pooledCharacter == null)
             {
                 MissionRuntime.ReloadForLogin(charId);

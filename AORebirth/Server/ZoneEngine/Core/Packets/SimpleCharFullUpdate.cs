@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.Packets
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Subway.Quests;
@@ -206,11 +207,7 @@ namespace ZoneEngine.Core.Packets
                 lastName = character.LastName;
                 orgNameLength = character.OrganizationName.Length;
                 orgName = character.OrganizationName;
-                levelValue = (int)character.Stats[StatIds.level].BaseValue;
-                if (levelValue <= 0)
-                {
-                    levelValue = 1;
-                }
+                levelValue = CombatXpRuntimeService.ResolveWireLevel(character);
                 healthValue = character.Stats[StatIds.life].Value;
 
                 monsterData = character.Stats[StatIds.monsterdata].Value;
