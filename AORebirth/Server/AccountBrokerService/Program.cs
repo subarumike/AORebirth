@@ -525,12 +525,18 @@ namespace AORebirth.AccountBroker.Service
             {
                 return new EmailDeliveryResult { Sent = false, Status = exception.Code };
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 if (token != null)
                 {
                     this.broker.CancelEmailVerificationToken(token.Token);
                 }
+
+                Console.Error.WriteLine(
+                    "AORebirth Account Broker email verification send failed: "
+                    + exception.GetType().FullName
+                    + ": "
+                    + exception.Message);
 
                 return new EmailDeliveryResult { Sent = false, Status = "MAIL_SEND_FAILED" };
             }
