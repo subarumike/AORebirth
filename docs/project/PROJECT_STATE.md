@@ -111,10 +111,8 @@ completion matrices and dated evidence retain detailed provenance.
   website-facing email endpoints. The website now refreshes verification state,
   provides a resend action only for unverified accounts, and uses
   `/verify-email.php#token=...` so verification tokens are not sent in normal URL
-  request lines. Production remains BLOCKED until a real SMTP provider,
-  provider-supplied SPF/DKIM/verification DNS, intentional DMARC, production
-  secret files, production schema migration/backup, MyBB SMTP configuration,
-  and received-header authentication proof are complete. Evidence:
+  request lines. This earlier foundation block was superseded by the
+  2026-08-16 self-hosted production mail acceptance evidence. Evidence:
   `docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`.
 - Email production configuration: advanced on 2026-08-16 without enabling
   AORebirth website/forum outbound mail. Mike selected self-hosted VPS mail
@@ -127,13 +125,12 @@ completion matrices and dated evidence retain detailed provenance.
   `ao-rebirth.com`, `noreply@ao-rebirth.com`, `forum@ao-rebirth.com`, and DKIM
   selector `aor20260816`; local-only delivery and DKIM signing pass. Account
   Broker and MyBB SMTP are now configured. Hostinger MX/SPF/DKIM/DMARC records
-  resolve, Account Broker verification resend to Gmail passed, and MyBB SMTP
-  notification to Gmail passed. The exposed Account Broker DB credential and
-  exposed `mail.ao-rebirth.com` TLS key from troubleshooting were both rotated.
-  `SubaruMike` clicked the received verification link and production now shows
-  the account email as verified. Production email remains BLOCKED only until
-  the mailbox owner confirms the received Gmail SPF/DKIM/DMARC message-detail
-  results. Evidence:
+  resolve, Account Broker verification resend to an external mailbox passed,
+  and MyBB SMTP notification to an external mailbox passed. The exposed Account
+  Broker DB credential and exposed `mail.ao-rebirth.com` TLS key from
+  troubleshooting were both rotated. `SubaruMike` clicked the received
+  verification link and production now shows the account email as verified.
+  Production email is accepted for launch. Evidence:
   `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls

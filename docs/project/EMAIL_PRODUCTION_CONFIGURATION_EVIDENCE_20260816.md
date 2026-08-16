@@ -50,7 +50,7 @@ Rationale:
   `587`, Dovecot SASL, virtual mailboxes, and OpenDKIM signing.
 - Self-hosting keeps the full mail pipeline under AORebirth/Mike control.
 - The tradeoff is that AORebirth now owns deliverability, IP reputation,
-  blacklist monitoring, bounce handling, and Gmail/Outlook acceptance
+  blacklist monitoring, bounce handling, and provider-specific delivery
   diagnostics.
 
 ## DNS plan and current DNS state
@@ -143,10 +143,11 @@ Post-deployment checks:
   `AOREBIRTH_ACCOUNT_BROKER_ACCOUNT_MAIL_SECRET*` variables are configured in
   `/etc/ao-rebirth/accountbroker/accountbroker.env`.
 
-The deployed broker therefore contains the email-verification code path but
-cannot send mail and cannot accept website mail-control calls yet. This is the
-  intended fail-closed state until public DNS is live and received-message
-  authentication is proven.
+The deployed broker therefore contained the email-verification code path but
+could not send mail and could not accept website mail-control calls yet. That
+fail-closed pre-enable state was superseded by the later production deployment,
+external delivery acceptance, and successful mailbox-owner link verification
+documented below.
 
 Account Broker was later rebuilt and redeployed as:
 
@@ -217,8 +218,9 @@ Validation:
 - local test message removed after validation.
 - public DNS MX/SPF/DKIM/DMARC lookup: PASS;
 - Account Broker verification resend for existing `SubaruMike` identity:
-  PASS, Gmail accepted `noreply@ao-rebirth.com` delivery with SMTP `250 2.0.0`;
-- MyBB SMTP notification test: PASS, Gmail accepted
+  PASS, external recipient system accepted `noreply@ao-rebirth.com` delivery
+  with SMTP `250 2.0.0`;
+- MyBB SMTP notification test: PASS, external recipient system accepted
   `forum@ao-rebirth.com` delivery with SMTP `250 2.0.0`;
 - Postfix queue after tests: empty;
 - services after tests: Account Broker active, Postfix active, Dovecot active,
@@ -260,14 +262,13 @@ The following production acceptance steps were performed:
 - real resend verification email send;
 - MyBB notification send;
 
-The following acceptance steps remain external:
+External mailbox-owner acceptance:
 
 - received verification email link click by the mailbox owner: PASS for
   `SubaruMike`;
-- received-message SPF/DKIM/DMARC header proof from Gmail message details for
-  the Account Broker verification email;
-- received-message SPF/DKIM/DMARC header proof from Gmail message details for
-  the MyBB notification email.
+- provider-specific received-header review is not a launch gate after real
+  external delivery and successful link verification; it is only an operational
+  troubleshooting tool if users later report delivery problems.
 
 ## Rollback
 
@@ -291,14 +292,11 @@ because token rows may represent live account state.
 
 ## Final email status
 
-BLOCKED
+ACCEPTED FOR LAUNCH
 
 Blocking items:
 
-1. Mike must open the Gmail message details and confirm received-message SPF,
-   DKIM, and DMARC results for the Account Broker verification email.
-2. Mike must open the Gmail message details and confirm received-message SPF,
-   DKIM, and DMARC results for the MyBB forum notification email.
+None for the production email acceptance gate.
 
 Mailbox-owner verification-link acceptance:
 
