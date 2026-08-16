@@ -181,6 +181,13 @@ Email notifications are intentionally blocked/limited for launch until
 SPF/DKIM/DMARC and a reliable authenticated transport are configured. MyBB must
 not become the AORebirth password-reset authority.
 
+Source-side AORebirth email verification plumbing was later prepared and
+validated in
+`docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`, but production
+forum notifications remain blocked until a real SMTP provider is selected,
+provider-supplied DNS is added, MyBB SMTP is configured, and received-message
+SPF/DKIM/DMARC headers are proven.
+
 ## Backup / restore / upgrade
 
 Current backup coverage for launch includes:

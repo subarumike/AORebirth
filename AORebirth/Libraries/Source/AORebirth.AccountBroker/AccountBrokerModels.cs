@@ -21,6 +21,8 @@ namespace AORebirth.AccountBroker
     {
         public long IdentityId { get; set; }
 
+        public string IdentityPublicId { get; set; }
+
         public int GameAccountId { get; set; }
 
         public string CanonicalUsername { get; set; }
@@ -127,5 +129,29 @@ namespace AORebirth.AccountBroker
         public string GameMappingState { get; set; }
 
         public DateTime CreatedAt { get; set; }
+    }
+
+    public sealed class EmailVerificationTokenResult
+    {
+        public string Token { get; set; }
+
+        public string IdentityPublicId { get; set; }
+
+        public string CanonicalUsername { get; set; }
+
+        public string CanonicalEmail { get; set; }
+
+        public DateTime ExpiresAt { get; set; }
+    }
+
+    public sealed class EmailVerificationResult
+    {
+        public bool Verified { get; set; }
+
+        public string Status { get; set; }
+
+        public string CanonicalUsername { get; set; }
+
+        public string CanonicalEmail { get; set; }
     }
 }

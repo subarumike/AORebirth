@@ -11,9 +11,12 @@
 DROP PROCEDURE IF EXISTS `ExpectDuplicateUsernameRejected`;
 DROP PROCEDURE IF EXISTS `ExpectDuplicateGameMappingRejected`;
 DROP PROCEDURE IF EXISTS `ExpectDuplicateExternalMappingRejected`;
+DROP PROCEDURE IF EXISTS `ExpectDuplicateEmailVerificationTokenRejected`;
+DROP PROCEDURE IF EXISTS `ExpectInvalidEmailVerificationTokenStateRejected`;
 DROP PROCEDURE IF EXISTS `ExpectInvalidProvisioningStateRejected`;
 
 DROP TABLE IF EXISTS `account_provisioning_jobs`;
+DROP TABLE IF EXISTS `account_email_verification_tokens`;
 DROP TABLE IF EXISTS `account_external_mappings`;
 DROP TABLE IF EXISTS `account_game_mappings`;
 DROP TABLE IF EXISTS `account_identities`;
@@ -82,6 +85,36 @@ BEGIN
   END IF;
 END//
 
+CREATE PROCEDURE `ExpectDuplicateEmailVerificationTokenRejected`()
+BEGIN
+  DECLARE rejected bool DEFAULT FALSE;
+  DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET rejected = TRUE;
+
+  INSERT INTO `account_email_verification_tokens`
+    (`IdentityId`, `TokenHash`, `ExpiresAt`)
+  VALUES
+    (2, UNHEX(SHA2('email-token', 256)), TIMESTAMPADD(MINUTE, 30, CURRENT_TIMESTAMP(6)));
+
+  IF rejected = FALSE THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'duplicate email verification token hash was accepted';
+  END IF;
+END//
+
+CREATE PROCEDURE `ExpectInvalidEmailVerificationTokenStateRejected`()
+BEGIN
+  DECLARE rejected bool DEFAULT FALSE;
+  DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET rejected = TRUE;
+
+  INSERT INTO `account_email_verification_tokens`
+    (`IdentityId`, `TokenHash`, `TokenState`, `ExpiresAt`, `UsedAt`)
+  VALUES
+    (1, UNHEX(SHA2('bad-used-state', 256)), 'Used', TIMESTAMPADD(MINUTE, 30, CURRENT_TIMESTAMP(6)), NULL);
+
+  IF rejected = FALSE THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'used email verification token without UsedAt was accepted';
+  END IF;
+END//
+
 DELIMITER ;
 
 INSERT INTO `account_identities`
@@ -106,6 +139,14 @@ VALUES
   (1, 'mybb', '42', 'Linked', CURRENT_TIMESTAMP(6));
 
 CALL `ExpectDuplicateExternalMappingRejected`();
+
+INSERT INTO `account_email_verification_tokens`
+  (`IdentityId`, `TokenHash`, `ExpiresAt`)
+VALUES
+  (1, UNHEX(SHA2('email-token', 256)), TIMESTAMPADD(MINUTE, 30, CURRENT_TIMESTAMP(6)));
+
+CALL `ExpectDuplicateEmailVerificationTokenRejected`();
+CALL `ExpectInvalidEmailVerificationTokenStateRejected`();
 
 INSERT INTO `account_provisioning_jobs`
   (`IdempotencyKeyHash`, `IdentityId`, `RequestedNormalizedUsername`, `RequestedNormalizedEmail`, `RequestedGameAccountId`, `ProvisioningState`, `ProvisioningStep`)
@@ -132,4 +173,5 @@ SELECT
   (SELECT COUNT(*) FROM `account_identities`) AS `IdentityRows`,
   (SELECT COUNT(*) FROM `account_game_mappings`) AS `GameMappingRows`,
   (SELECT COUNT(*) FROM `account_external_mappings`) AS `ExternalMappingRows`,
+  (SELECT COUNT(*) FROM `account_email_verification_tokens`) AS `EmailVerificationTokenRows`,
   (SELECT `ProvisioningState` FROM `account_provisioning_jobs` WHERE `ProvisioningJobId` = 1) AS `ProvisioningState`;

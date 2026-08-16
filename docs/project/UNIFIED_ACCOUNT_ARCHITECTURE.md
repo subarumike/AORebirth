@@ -305,6 +305,26 @@ single-process for the Windows proof. Production Linux deployment must either
 run one broker instance behind the loopback reverse proxy or replace these
 stores with an approved shared backing store before horizontal scaling.
 
+Email verification policy:
+
+- Account Broker owns verification state and the only write path to
+  `account_identities.EmailVerifiedAt`;
+- website PHP may request resend/verify through internal broker endpoints but
+  must not write identity verification state directly;
+- public verification tokens are cryptographically random and stored only as
+  SHA-256 hashes in `account_email_verification_tokens`;
+- resend supersedes prior active tokens for the identity;
+- valid verification is single-use, expired tokens fail closed, and malformed
+  or unknown tokens do not disclose unrelated account existence;
+- verification links use the website fragment form
+  `https://ao-rebirth.com/verify-email.php#token=...` so the token is not sent in
+  normal HTTP request URLs;
+- SMTP credentials and broker mail authorization secrets live only in
+  production secret files/environment, never source, web root, MyBB files, or
+  Git;
+- MyBB may use the approved SMTP transport for notifications, but it must not
+  become an AORebirth password reset or password authentication authority.
+
 ## Security and deployment gates
 
 Before implementation or installation:

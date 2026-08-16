@@ -98,6 +98,214 @@ namespace AORebirth.AccountBroker
             }
         }
 
+        public AccountIdentitySnapshot GetIdentityByPublicId(string identityPublicId)
+        {
+            if (string.IsNullOrWhiteSpace(identityPublicId) || identityPublicId.Length > 64)
+            {
+                throw new AccountBrokerException("INVALID_IDENTITY_PUBLIC_ID", "Identity public id is required.");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            {
+                AccountIdentitySnapshot identity = this.GetIdentitySnapshotByPublicId(connection, null, identityPublicId);
+                if (identity == null)
+                {
+                    throw new AccountBrokerException("IDENTITY_NOT_FOUND", "Identity does not exist.");
+                }
+
+                return identity;
+            }
+        }
+
+        public EmailVerificationTokenResult CreateEmailVerificationToken(string identityPublicId, int ttlMinutes)
+        {
+            if (ttlMinutes < 5 || ttlMinutes > 1440)
+            {
+                throw new AccountBrokerException("INVALID_EMAIL_TOKEN_TTL", "Email verification token TTL is invalid.");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                AccountIdentitySnapshot identity =
+                    this.GetIdentitySnapshotByPublicId(connection, transaction, identityPublicId);
+                if (identity == null)
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("IDENTITY_NOT_FOUND", "Identity does not exist.");
+                }
+
+                if (!string.Equals(identity.IdentityStatus, "Active", StringComparison.Ordinal)
+                    || !string.Equals(identity.GameMappingState, "Linked", StringComparison.Ordinal))
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("IDENTITY_NOT_ACTIVE", "Identity is not active.");
+                }
+
+                if (string.IsNullOrWhiteSpace(identity.CanonicalEmail))
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("EMAIL_MISSING", "Identity does not have an email address.");
+                }
+
+                if (identity.EmailVerified)
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("EMAIL_ALREADY_VERIFIED", "Identity email is already verified.");
+                }
+
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_email_verification_tokens SET TokenState='Superseded' WHERE IdentityId=@identityId AND TokenState='Active'",
+                    Parameter("@identityId", identity.IdentityId));
+
+                string token = NewPublicToken();
+                DateTime expiresAt = DateTime.UtcNow.AddMinutes(ttlMinutes);
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "INSERT INTO account_email_verification_tokens (IdentityId, TokenHash, ExpiresAt) VALUES (@identityId, @tokenHash, @expiresAt)",
+                    Parameter("@identityId", identity.IdentityId),
+                    Parameter("@tokenHash", HashToken(token)),
+                    Parameter("@expiresAt", expiresAt));
+
+                transaction.Commit();
+                return new EmailVerificationTokenResult
+                {
+                    Token = token,
+                    IdentityPublicId = identity.IdentityPublicId,
+                    CanonicalUsername = identity.CanonicalUsername,
+                    CanonicalEmail = identity.CanonicalEmail,
+                    ExpiresAt = expiresAt
+                };
+            }
+        }
+
+        public void CancelEmailVerificationToken(string token)
+        {
+            if (!IsValidPublicTokenShape(token))
+            {
+                return;
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_email_verification_tokens SET TokenState='Superseded' WHERE TokenHash=@tokenHash AND TokenState='Active'",
+                    Parameter("@tokenHash", HashToken(token)));
+                transaction.Commit();
+            }
+        }
+
+        public EmailVerificationResult VerifyEmailToken(string token)
+        {
+            if (!IsValidPublicTokenShape(token))
+            {
+                return FailedEmailVerification("INVALID");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (IDbCommand command = CreateCommand(
+                connection,
+                transaction,
+                "SELECT t.EmailVerificationTokenId, t.IdentityId, t.TokenState, t.ExpiresAt, i.CanonicalUsername, i.CanonicalEmail, i.EmailVerifiedAt, i.IdentityStatus FROM account_email_verification_tokens t INNER JOIN account_identities i ON i.IdentityId=t.IdentityId WHERE t.TokenHash=@tokenHash FOR UPDATE",
+                Parameter("@tokenHash", HashToken(token))))
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (!reader.Read())
+                {
+                    transaction.Commit();
+                    return FailedEmailVerification("INVALID");
+                }
+
+                long tokenId = Convert.ToInt64(reader["EmailVerificationTokenId"]);
+                long identityId = Convert.ToInt64(reader["IdentityId"]);
+                string tokenState = Convert.ToString(reader["TokenState"]);
+                DateTime expiresAt = Convert.ToDateTime(reader["ExpiresAt"]);
+                string username = Convert.ToString(reader["CanonicalUsername"]);
+                string email = Convert.ToString(reader["CanonicalEmail"]);
+                bool alreadyVerified = reader["EmailVerifiedAt"] != DBNull.Value;
+                string identityStatus = Convert.ToString(reader["IdentityStatus"]);
+                reader.Close();
+
+                if (!string.Equals(tokenState, "Active", StringComparison.Ordinal))
+                {
+                    transaction.Commit();
+                    return new EmailVerificationResult
+                    {
+                        Verified = false,
+                        Status = tokenState,
+                        CanonicalUsername = username,
+                        CanonicalEmail = email
+                    };
+                }
+
+                if (expiresAt < DateTime.UtcNow)
+                {
+                    this.ExecuteNonQuery(
+                        connection,
+                        transaction,
+                        "UPDATE account_email_verification_tokens SET TokenState='Expired' WHERE EmailVerificationTokenId=@tokenId AND TokenState='Active'",
+                        Parameter("@tokenId", tokenId));
+                    transaction.Commit();
+                    return new EmailVerificationResult
+                    {
+                        Verified = false,
+                        Status = "Expired",
+                        CanonicalUsername = username,
+                        CanonicalEmail = email
+                    };
+                }
+
+                if (!string.Equals(identityStatus, "Active", StringComparison.Ordinal))
+                {
+                    transaction.Commit();
+                    return new EmailVerificationResult
+                    {
+                        Verified = false,
+                        Status = "IdentityInactive",
+                        CanonicalUsername = username,
+                        CanonicalEmail = email
+                    };
+                }
+
+                if (!alreadyVerified)
+                {
+                    this.ExecuteNonQuery(
+                        connection,
+                        transaction,
+                        "UPDATE account_identities SET EmailVerifiedAt=CURRENT_TIMESTAMP(6) WHERE IdentityId=@identityId AND EmailVerifiedAt IS NULL",
+                        Parameter("@identityId", identityId));
+                }
+
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_email_verification_tokens SET TokenState='Used', UsedAt=CURRENT_TIMESTAMP(6) WHERE EmailVerificationTokenId=@tokenId AND TokenState='Active'",
+                    Parameter("@tokenId", tokenId));
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_email_verification_tokens SET TokenState='Superseded' WHERE IdentityId=@identityId AND TokenState='Active' AND EmailVerificationTokenId<>@tokenId",
+                    Parameter("@identityId", identityId),
+                    Parameter("@tokenId", tokenId));
+
+                transaction.Commit();
+                return new EmailVerificationResult
+                {
+                    Verified = !alreadyVerified,
+                    Status = alreadyVerified ? "AlreadyVerified" : "Verified",
+                    CanonicalUsername = username,
+                    CanonicalEmail = email
+                };
+            }
+        }
+
         public AccountProvisioningResult CreateGameAccount(CreateAccountRequest request)
         {
             if (request == null)
@@ -432,6 +640,7 @@ namespace AORebirth.AccountBroker
                 return new AccountProvisioningResult
                 {
                     IdentityId = identityId,
+                    IdentityPublicId = this.GetIdentityPublicIdByIdentity(connection, transaction, identityId),
                     GameAccountId = existingGameAccountId.Value,
                     CanonicalUsername = request.Username,
                     NormalizedUsername = normalizedUsername,
@@ -520,6 +729,7 @@ namespace AORebirth.AccountBroker
             return new AccountProvisioningResult
             {
                 IdentityId = identityId,
+                IdentityPublicId = this.GetIdentityPublicIdByIdentity(connection, transaction, identityId),
                 GameAccountId = gameAccountId,
                 CanonicalUsername = request.Username,
                 NormalizedUsername = normalizedUsername,
@@ -626,6 +836,16 @@ namespace AORebirth.AccountBroker
                     transaction,
                     "SELECT GameAccountId FROM account_game_mappings WHERE IdentityId=@identityId",
                     Parameter("@identityId", identityId)));
+        }
+
+        private string GetIdentityPublicIdByIdentity(IDbConnection connection, IDbTransaction transaction, long identityId)
+        {
+            object value = this.ExecuteScalar(
+                connection,
+                transaction,
+                "SELECT IdentityPublicId FROM account_identities WHERE IdentityId=@identityId",
+                Parameter("@identityId", identityId));
+            return value == null || value == DBNull.Value ? null : Convert.ToString(value);
         }
 
         private long? GetIdentityIdByNormalizedEmail(
@@ -905,12 +1125,63 @@ namespace AORebirth.AccountBroker
             }
         }
 
+        private static byte[] HashToken(string token)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                return sha.ComputeHash(Encoding.UTF8.GetBytes(token ?? string.Empty));
+            }
+        }
+
+        private static string NewPublicToken()
+        {
+            byte[] bytes = new byte[32];
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(bytes);
+            }
+
+            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        }
+
+        private static bool IsValidPublicTokenShape(string token)
+        {
+            if (string.IsNullOrEmpty(token) || token.Length < 32 || token.Length > 128)
+            {
+                return false;
+            }
+
+            for (int index = 0; index < token.Length; index++)
+            {
+                char c = token[index];
+                if (!((c >= 'A' && c <= 'Z')
+                    || (c >= 'a' && c <= 'z')
+                    || (c >= '0' && c <= '9')
+                    || c == '-'
+                    || c == '_'))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private static WebsiteAuthenticationResult FailedAuthentication(string code)
         {
             return new WebsiteAuthenticationResult
             {
                 IsAuthenticated = false,
                 FailureCode = code
+            };
+        }
+
+        private static EmailVerificationResult FailedEmailVerification(string status)
+        {
+            return new EmailVerificationResult
+            {
+                Verified = false,
+                Status = status
             };
         }
 

@@ -125,9 +125,19 @@ namespace AORebirth.AccountBroker.Service
 
         private readonly FixedWindowRateLimiter registrationLimiter;
 
+        private readonly FixedWindowRateLimiter emailVerificationLimiter;
+
+        private readonly AccountEmailSender emailSender;
+
         private readonly ForumSsoCodeStore forumSsoCodes;
 
         private readonly string forumSsoSecret;
+
+        private readonly string accountMailSecret;
+
+        private readonly string publicBaseUrl;
+
+        private readonly int emailVerificationTtlMinutes;
 
         private readonly WebSessionStore sessions;
 
@@ -139,6 +149,12 @@ namespace AORebirth.AccountBroker.Service
             this.forumSsoSecret = GetSecretEnvironment(
                 "AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECRET",
                 "AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECRET_FILE");
+            this.accountMailSecret = GetSecretEnvironment(
+                "AOREBIRTH_ACCOUNT_BROKER_ACCOUNT_MAIL_SECRET",
+                "AOREBIRTH_ACCOUNT_BROKER_ACCOUNT_MAIL_SECRET_FILE");
+            this.publicBaseUrl = GetEnvironment("AOREBIRTH_PUBLIC_BASE_URL", "https://ao-rebirth.com").TrimEnd('/');
+            this.emailVerificationTtlMinutes = GetIntEnvironment("AOREBIRTH_EMAIL_VERIFICATION_TOKEN_MINUTES", 120);
+            this.emailSender = AccountEmailSender.FromEnvironment();
             this.forumSsoCodes = new ForumSsoCodeStore(GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECONDS", 120));
             this.registrationLimiter = new FixedWindowRateLimiter(
                 GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_REGISTER_LIMIT", 5),
@@ -146,6 +162,9 @@ namespace AORebirth.AccountBroker.Service
             this.loginLimiter = new FixedWindowRateLimiter(
                 GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_LOGIN_LIMIT", 5),
                 TimeSpan.FromMinutes(5));
+            this.emailVerificationLimiter = new FixedWindowRateLimiter(
+                GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_EMAIL_VERIFY_LIMIT", 3),
+                TimeSpan.FromMinutes(15));
         }
 
         public void Run()
@@ -215,6 +234,12 @@ namespace AORebirth.AccountBroker.Service
                 return;
             }
 
+            if (context.Request.HttpMethod == "POST" && path == "/api/account/identity")
+            {
+                this.HandleAccountIdentity(context);
+                return;
+            }
+
             if (context.Request.HttpMethod == "POST" && (path == "/api/register" || path == "/register"))
             {
                 this.HandleRegister(context, path == "/api/register");
@@ -230,6 +255,18 @@ namespace AORebirth.AccountBroker.Service
             if (context.Request.HttpMethod == "POST" && (path == "/api/logout" || path == "/logout"))
             {
                 this.HandleLogout(context, path == "/api/logout");
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/email/verification/resend")
+            {
+                this.HandleEmailVerificationResend(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/email/verification/verify")
+            {
+                this.HandleEmailVerificationVerify(context);
                 return;
             }
 
@@ -293,6 +330,7 @@ namespace AORebirth.AccountBroker.Service
                         FirstName = string.Empty,
                         LastName = string.Empty
                     });
+                EmailDeliveryResult emailResult = this.SendVerificationEmail(result.IdentityPublicId);
                 if (api)
                 {
                     WriteJson(
@@ -300,11 +338,13 @@ namespace AORebirth.AccountBroker.Service
                         201,
                         "{\"ok\":true,\"username\":\"" + Json(result.CanonicalUsername)
                         + "\",\"identityStatus\":\"" + Json(result.ProvisioningState)
-                        + "\",\"gameAccountLinked\":true}");
+                        + "\",\"gameAccountLinked\":true"
+                        + ",\"emailVerificationSent\":" + (emailResult.Sent ? "true" : "false")
+                        + ",\"emailVerificationStatus\":\"" + Json(emailResult.Status) + "\"}");
                 }
                 else
                 {
-                    Redirect(context.Response, "/login?registered=1");
+                    Redirect(context.Response, emailResult.Sent ? "/login?registered=1&verifyEmailSent=1" : "/login?registered=1");
                 }
             }
             catch (AccountBrokerException exception)
@@ -397,6 +437,103 @@ namespace AORebirth.AccountBroker.Service
             }
 
             WriteJson(context.Response, 200, "{\"ok\":true,\"identity\":" + IdentityJson(session.Identity) + "}");
+        }
+
+        private void HandleAccountIdentity(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            try
+            {
+                AccountIdentitySnapshot identity = this.broker.GetIdentityByPublicId(GetForm(form, "identityPublicId"));
+                WriteJson(context.Response, 200, "{\"ok\":true,\"identity\":" + IdentityJson(identity) + "}");
+            }
+            catch (AccountBrokerException exception)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"" + Json(exception.Code) + "\"}");
+            }
+        }
+
+        private void HandleEmailVerificationResend(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            string identityPublicId = GetForm(form, "identityPublicId");
+            string limiterKey = "email-verification:" + GetRemoteAddress(context) + ":" + (identityPublicId ?? string.Empty);
+            if (!this.emailVerificationLimiter.Allow(limiterKey))
+            {
+                WriteJson(context.Response, 429, "{\"ok\":false,\"error\":\"RATE_LIMITED\"}");
+                return;
+            }
+
+            EmailDeliveryResult result = this.SendVerificationEmail(identityPublicId);
+            if (!result.Sent)
+            {
+                int status = result.Status == "MAIL_NOT_CONFIGURED" ? 503 : 400;
+                WriteJson(context.Response, status, "{\"ok\":false,\"error\":\"" + Json(result.Status) + "\"}");
+                return;
+            }
+
+            WriteJson(context.Response, 200, "{\"ok\":true,\"emailVerificationSent\":true}");
+        }
+
+        private void HandleEmailVerificationVerify(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            EmailVerificationResult result = this.broker.VerifyEmailToken(GetForm(form, "token"));
+            WriteJson(
+                context.Response,
+                result.Status == "Verified" || result.Status == "AlreadyVerified" ? 200 : 400,
+                "{\"ok\":" + (result.Status == "Verified" || result.Status == "AlreadyVerified" ? "true" : "false")
+                + ",\"verified\":" + (result.Verified ? "true" : "false")
+                + ",\"status\":\"" + Json(result.Status)
+                + "\",\"username\":\"" + Json(result.CanonicalUsername)
+                + "\",\"email\":\"" + Json(result.CanonicalEmail) + "\"}");
+        }
+
+        private EmailDeliveryResult SendVerificationEmail(string identityPublicId)
+        {
+            if (!this.emailSender.IsConfigured)
+            {
+                return new EmailDeliveryResult { Sent = false, Status = "MAIL_NOT_CONFIGURED" };
+            }
+
+            EmailVerificationTokenResult token = null;
+            try
+            {
+                token = this.broker.CreateEmailVerificationToken(identityPublicId, this.emailVerificationTtlMinutes);
+                this.emailSender.SendVerification(token, this.publicBaseUrl);
+                return new EmailDeliveryResult { Sent = true, Status = "SENT" };
+            }
+            catch (AccountBrokerException exception)
+            {
+                return new EmailDeliveryResult { Sent = false, Status = exception.Code };
+            }
+            catch (Exception)
+            {
+                if (token != null)
+                {
+                    this.broker.CancelEmailVerificationToken(token.Token);
+                }
+
+                return new EmailDeliveryResult { Sent = false, Status = "MAIL_SEND_FAILED" };
+            }
         }
 
         private void HandleForumSsoIssue(HttpListenerContext context)
@@ -702,6 +839,17 @@ namespace AORebirth.AccountBroker.Service
             return FixedTimeEquals(this.forumSsoSecret, provided);
         }
 
+        private bool ValidateAccountMailSecret(HttpListenerContext context)
+        {
+            if (string.IsNullOrEmpty(this.accountMailSecret))
+            {
+                return false;
+            }
+
+            string provided = context.Request.Headers["X-AORebirth-Account-Mail-Secret"];
+            return FixedTimeEquals(this.accountMailSecret, provided);
+        }
+
         private static bool FixedTimeEquals(string expected, string provided)
         {
             if (expected == null || provided == null)
@@ -915,6 +1063,12 @@ namespace AORebirth.AccountBroker.Service
             return int.TryParse(Environment.GetEnvironmentVariable(name), out value) && value > 0 ? value : defaultValue;
         }
 
+        private static string GetEnvironment(string name, string defaultValue)
+        {
+            string value = Environment.GetEnvironmentVariable(name);
+            return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
+        }
+
         private static string GetSecretEnvironment(string directName, string fileName)
         {
             string filePath = Environment.GetEnvironmentVariable(fileName);
@@ -935,6 +1089,112 @@ namespace AORebirth.AccountBroker.Service
             }
 
             return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        }
+
+        private sealed class EmailDeliveryResult
+        {
+            public bool Sent { get; set; }
+
+            public string Status { get; set; }
+        }
+
+        private sealed class AccountEmailSender
+        {
+            private readonly string fromAddress;
+
+            private readonly string fromName;
+
+            private readonly string host;
+
+            private readonly string password;
+
+            private readonly int port;
+
+            private readonly bool requireTls;
+
+            private readonly string username;
+
+            private AccountEmailSender(
+                string host,
+                int port,
+                bool requireTls,
+                string username,
+                string password,
+                string fromAddress,
+                string fromName)
+            {
+                this.host = host;
+                this.port = port;
+                this.requireTls = requireTls;
+                this.username = username;
+                this.password = password;
+                this.fromAddress = fromAddress;
+                this.fromName = string.IsNullOrWhiteSpace(fromName) ? "AORebirth" : fromName;
+            }
+
+            public bool IsConfigured
+            {
+                get
+                {
+                    return !string.IsNullOrWhiteSpace(this.host)
+                        && !string.IsNullOrWhiteSpace(this.username)
+                        && !string.IsNullOrWhiteSpace(this.password)
+                        && !string.IsNullOrWhiteSpace(this.fromAddress);
+                }
+            }
+
+            public static AccountEmailSender FromEnvironment()
+            {
+                string tlsMode = GetEnvironment("AOREBIRTH_MAIL_SMTP_TLS", "StartTls");
+                bool requireTls = !string.Equals(tlsMode, "None", StringComparison.OrdinalIgnoreCase);
+                return new AccountEmailSender(
+                    Environment.GetEnvironmentVariable("AOREBIRTH_MAIL_SMTP_HOST"),
+                    GetIntEnvironment("AOREBIRTH_MAIL_SMTP_PORT", 587),
+                    requireTls,
+                    Environment.GetEnvironmentVariable("AOREBIRTH_MAIL_SMTP_USERNAME"),
+                    GetSecretEnvironment("AOREBIRTH_MAIL_SMTP_PASSWORD", "AOREBIRTH_MAIL_SMTP_PASSWORD_FILE"),
+                    Environment.GetEnvironmentVariable("AOREBIRTH_MAIL_FROM_ADDRESS"),
+                    GetEnvironment("AOREBIRTH_MAIL_FROM_NAME", "AORebirth"));
+            }
+
+            public void SendVerification(EmailVerificationTokenResult verification, string publicBaseUrl)
+            {
+                if (!this.IsConfigured)
+                {
+                    throw new InvalidOperationException("Mail sender is not configured.");
+                }
+
+                string link = publicBaseUrl.TrimEnd('/') + "/verify-email.php#token=" + Uri.EscapeDataString(verification.Token);
+                using (var message = new MailMessage())
+                {
+                    message.From = new MailAddress(this.fromAddress, this.fromName, Encoding.UTF8);
+                    message.To.Add(new MailAddress(verification.CanonicalEmail));
+                    message.Subject = "Verify your AORebirth account email";
+                    message.BodyEncoding = Encoding.UTF8;
+                    message.SubjectEncoding = Encoding.UTF8;
+                    message.Body =
+                        "AORebirth account email verification" + Environment.NewLine
+                        + Environment.NewLine
+                        + "Account: " + verification.CanonicalUsername + Environment.NewLine
+                        + Environment.NewLine
+                        + "Open this link to verify your email address:" + Environment.NewLine
+                        + link + Environment.NewLine
+                        + Environment.NewLine
+                        + "This verification link expires at "
+                        + verification.ExpiresAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
+                        + " UTC." + Environment.NewLine
+                        + Environment.NewLine
+                        + "If you did not create this AORebirth account, ignore this message.";
+
+                    using (var client = new SmtpClient(this.host, this.port))
+                    {
+                        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        client.EnableSsl = this.requireTls;
+                        client.Credentials = new NetworkCredential(this.username, this.password);
+                        client.Send(message);
+                    }
+                }
+            }
         }
 
         private sealed class CsrfTokenStore

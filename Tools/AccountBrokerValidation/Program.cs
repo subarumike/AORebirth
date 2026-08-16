@@ -34,6 +34,8 @@ namespace AccountBrokerValidation
             "BrokerC1",
             "BrokerD1",
             "BrokerE1",
+            "BrokerF1",
+            "BrokerG1",
             "Old5",
             "Old6"
         };
@@ -81,7 +83,7 @@ namespace AccountBrokerValidation
                 return 1;
             }
 
-            Console.WriteLine("PASS AccountBrokerValidation 31/31");
+            Console.WriteLine("PASS AccountBrokerValidation 41/41");
             return 0;
         }
 
@@ -138,6 +140,17 @@ namespace AccountBrokerValidation
             ExternalMappingResult activeForumMapping = broker.ConfirmForumExternalMapping(activeForumIdentity.IdentityPublicId, "99");
             Expect("forum confirm active mybb uid", "99", activeForumMapping.ExternalAccountId, failures);
             Expect("forum sso active existing mybb", "99", broker.GetForumSsoIdentityByPublicId(activeForumIdentity.IdentityPublicId).ExistingMybbUid, failures);
+
+            EmailVerificationTokenResult verificationToken =
+                broker.CreateEmailVerificationToken(activeForumIdentity.IdentityPublicId, 30);
+            Expect("verification token email", "BrokerA1@example.com", verificationToken.CanonicalEmail, failures);
+            EmailVerificationResult verificationResult = broker.VerifyEmailToken(verificationToken.Token);
+            Expect("verification token verifies", true, verificationResult.Verified, failures);
+            Expect("verification token status", "Verified", verificationResult.Status, failures);
+            Expect("identity email verified after token", true, broker.GetIdentity(created.IdentityId).EmailVerified, failures);
+            EmailVerificationResult verificationReplay = broker.VerifyEmailToken(verificationToken.Token);
+            Expect("verification token replay not verified", false, verificationReplay.Verified, failures);
+            Expect("verification token replay status", "Used", verificationReplay.Status, failures);
 
             ExpectBrokerException(
                 "case-equivalent duplicate rejected",
@@ -240,6 +253,33 @@ namespace AccountBrokerValidation
             Expect("resume after mapping active", "Active", resumedMapping.ProvisioningState, failures);
 
             Expect("active cannot regress silently", 60, broker.GetProvisioningStatus("interrupted-after-mapping").Step, failures);
+
+            AccountProvisioningResult resendAccount = broker.CreateGameAccount(
+                new CreateAccountRequest
+                {
+                    IdempotencyKey = "resend-account",
+                    Username = "BrokerF1",
+                    Password = password,
+                    Email = "BrokerF1@example.com"
+                });
+            EmailVerificationTokenResult oldToken =
+                broker.CreateEmailVerificationToken(resendAccount.IdentityPublicId, 30);
+            EmailVerificationTokenResult newToken =
+                broker.CreateEmailVerificationToken(resendAccount.IdentityPublicId, 30);
+            Expect("superseded verification token rejected", "Superseded", broker.VerifyEmailToken(oldToken.Token).Status, failures);
+            Expect("new verification token accepted", "Verified", broker.VerifyEmailToken(newToken.Token).Status, failures);
+
+            AccountProvisioningResult expiredAccount = broker.CreateGameAccount(
+                new CreateAccountRequest
+                {
+                    IdempotencyKey = "expired-account",
+                    Username = "BrokerG1",
+                    Password = password,
+                    Email = "BrokerG1@example.com"
+                });
+            string expiredToken = InsertExpiredEmailVerificationToken(connectionString, expiredAccount.IdentityId);
+            Expect("expired verification token rejected", "Expired", broker.VerifyEmailToken(expiredToken).Status, failures);
+            Expect("malformed verification token rejected", "INVALID", broker.VerifyEmailToken("bad token").Status, failures);
         }
 
         private static void Cleanup(string connectionString)
@@ -248,11 +288,12 @@ namespace AccountBrokerValidation
             {
                 connection.Open();
                 Execute(connection, "DELETE FROM account_external_mappings");
+                Execute(connection, "DELETE FROM account_email_verification_tokens");
                 Execute(connection, "DELETE FROM account_game_mappings");
                 Execute(connection, "DELETE FROM account_provisioning_jobs");
                 Execute(connection, "DELETE FROM account_identities");
-                Execute(connection, "DELETE FROM characters WHERE Username IN ('BrokerA1','BrokerB1','BrokerC1','BrokerD1','BrokerE1','Old5','Old6')");
-                Execute(connection, "DELETE FROM login WHERE Username IN ('BrokerA1','BrokerB1','BrokerC1','BrokerD1','BrokerE1','Old5','Old6')");
+                Execute(connection, "DELETE FROM characters WHERE Username IN ('BrokerA1','BrokerB1','BrokerC1','BrokerD1','BrokerE1','BrokerF1','BrokerG1','Old5','Old6')");
+                Execute(connection, "DELETE FROM login WHERE Username IN ('BrokerA1','BrokerB1','BrokerC1','BrokerD1','BrokerE1','BrokerF1','BrokerG1','Old5','Old6')");
             }
         }
 
@@ -415,6 +456,22 @@ namespace AccountBrokerValidation
             }
         }
 
+        private static string InsertExpiredEmailVerificationToken(string connectionString, long identityId)
+        {
+            string token = NewPublicToken();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                Execute(
+                    connection,
+                    "INSERT INTO account_email_verification_tokens (IdentityId, TokenHash, CreatedAt, ExpiresAt) VALUES (@identityId, @tokenHash, TIMESTAMPADD(MINUTE, -60, CURRENT_TIMESTAMP(6)), TIMESTAMPADD(MINUTE, -30, CURRENT_TIMESTAMP(6)))",
+                    Parameter("@identityId", identityId),
+                    Parameter("@tokenHash", HashToken(token)));
+            }
+
+            return token;
+        }
+
         private static bool ValidatePassword(string account, string password, string storedHash)
         {
             string loginKey = CreateLoginKey(account, password, ServerSalt);
@@ -486,6 +543,25 @@ namespace AccountBrokerValidation
             {
                 return sha.ComputeHash(Encoding.UTF8.GetBytes(idempotencyKey));
             }
+        }
+
+        private static byte[] HashToken(string token)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                return sha.ComputeHash(Encoding.UTF8.GetBytes(token));
+            }
+        }
+
+        private static string NewPublicToken()
+        {
+            byte[] bytes = new byte[32];
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(bytes);
+            }
+
+            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
         private static string CreateLoginKey(string username, string password, string serverSalt)

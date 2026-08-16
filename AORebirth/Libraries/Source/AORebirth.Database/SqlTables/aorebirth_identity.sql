@@ -62,6 +62,22 @@ CREATE TABLE `account_external_mappings` (
   CONSTRAINT `CK_account_external_mappings_linked_at` CHECK ((`MappingState` = 'Linked' AND `LinkedAt` IS NOT NULL) OR (`MappingState` <> 'Linked'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `account_email_verification_tokens` (
+  `EmailVerificationTokenId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `IdentityId` bigint unsigned NOT NULL,
+  `TokenHash` binary(32) NOT NULL,
+  `TokenState` enum('Active','Superseded','Used','Expired') CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'Active',
+  `CreatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `ExpiresAt` datetime(6) NOT NULL,
+  `UsedAt` datetime(6) NULL,
+  PRIMARY KEY (`EmailVerificationTokenId`),
+  UNIQUE KEY `UX_account_email_verification_tokens_hash` (`TokenHash`),
+  KEY `IX_account_email_verification_tokens_identity_state` (`IdentityId`, `TokenState`, `ExpiresAt`),
+  CONSTRAINT `FK_account_email_verification_tokens_identity` FOREIGN KEY (`IdentityId`) REFERENCES `account_identities` (`IdentityId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `CK_account_email_verification_tokens_expires` CHECK (`ExpiresAt` > `CreatedAt`),
+  CONSTRAINT `CK_account_email_verification_tokens_used_at` CHECK ((`TokenState` = 'Used' AND `UsedAt` IS NOT NULL) OR (`TokenState` <> 'Used' AND `UsedAt` IS NULL))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `account_provisioning_jobs` (
   `ProvisioningJobId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `IdempotencyKeyHash` binary(32) NOT NULL,

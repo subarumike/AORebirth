@@ -103,6 +103,19 @@ completion matrices and dated evidence retain detailed provenance.
   acceptance, authorized Admin CP acceptance, and production-grade email
   transport/DNS if notifications are required. Evidence:
   `docs/project/MYBB_FORUM_LAUNCH_READINESS_20260815.md`.
+- Email verification source foundation: prepared on 2026-08-15 without
+  changing LoginEngine authentication, Account Broker password semantics, AO
+  game login behavior, MyBB SSO, or the MyBB password authority boundary. The
+  Account Broker now owns hashed email verification tokens, resend superseding,
+  token verification, inert authenticated-SMTP configuration, and internal
+  website-facing email endpoints. The website now refreshes verification state,
+  provides a resend action only for unverified accounts, and uses
+  `/verify-email.php#token=...` so verification tokens are not sent in normal URL
+  request lines. Production remains BLOCKED until a real SMTP provider,
+  provider-supplied SPF/DKIM/verification DNS, intentional DMARC, production
+  secret files, production schema migration/backup, MyBB SMTP configuration,
+  and received-header authentication proof are complete. Evidence:
+  `docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
   `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the

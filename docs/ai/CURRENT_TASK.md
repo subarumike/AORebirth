@@ -9,6 +9,11 @@ pointing back to AORebirth account routes, final board descriptions, seed
 threads, rules/support/bug-report guidance, official/archive read-only
 permissions for normal users, conservative PM/avatar/signature/attachment
 settings, backup coverage, and registered-user SSO/posting acceptance.
+Source-side email verification plumbing is prepared but not production-enabled:
+the Account Broker owns hashed one-time verification tokens, SMTP-backed send
+configuration, resend, and verify endpoints; the website has accurate resend
+and fragment-based verify pages. Evidence:
+`docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`.
 
 Launch status is currently BLOCKED only on final live moderator acceptance,
 authorized Admin CP acceptance, and production-grade email transport/DNS
