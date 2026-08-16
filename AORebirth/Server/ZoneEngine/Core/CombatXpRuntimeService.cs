@@ -471,7 +471,126 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            int level = GetCurrentLevel(character);
+            int level = ResolveWireLevel(character);
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.level, (uint)level);
+        }
+
+        /// <summary>
+        /// Authoritative level for SCFU, InfoPacket, and recruit checks. Prefers live
+        /// <see cref="StatIds.level"/> Value; falls back to BaseValue when Value is unset.
+        /// </summary>
+        internal static int ResolveWireLevel(ICharacter character)
+        {
+            if (character == null)
+            {
+                return 1;
+            }
+
+            int level = 1;
+            try
+            {
+                level = character.Stats[StatIds.level].Value;
+            }
+            catch
+            {
+                level = 1;
+            }
+
+            if (IsValidWireLevel(level))
+            {
+                return level;
+            }
+
+            uint raw = 0;
+            try
+            {
+                raw = character.Stats[StatIds.level].BaseValue;
+            }
+            catch
+            {
+                raw = 0;
+            }
+
+            if (raw >= 1 && raw <= MaxLevel && raw != UnsetStatSentinel)
+            {
+                return (int)raw;
+            }
+
+            return 1;
+        }
+
+        private static bool IsValidWireLevel(int level)
+        {
+            return level >= 1 && level <= MaxLevel && level != UnsetStatSentinel;
+        }
+
+        /// <summary>
+        /// Fix unset level BaseValue (1234567890) before SCFU/stat wire. Legacy chars may
+        /// have correct XP floors but never persisted stat 54 — cast to short yields 722.
+        /// </summary>
+        internal static void NormalizeLevelStatBaseValue(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (character.Stats[StatIds.npcfamily].Value != 0)
+                {
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            uint raw = character.Stats[StatIds.level].BaseValue;
+            if (raw >= 1 && raw <= MaxLevel && raw != UnsetStatSentinel)
+            {
+                return;
+            }
+
+            int inferred = InferLevelFromXpStats(character);
+            if (inferred < 1)
+            {
+                inferred = 1;
+            }
+
+            character.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)inferred);
+            LogXpTrace(
+                character,
+                "level-base-normalize",
+                "raw=" + raw.ToString(CultureInfo.InvariantCulture)
+                + " inferred=" + inferred.ToString(CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// Stat 54 is not playfield-announced by default — push level to other clients
+        /// whenever a player becomes visible (Recruit TooHigh reads dynel stat 54).
+        /// </summary>
+        internal static void AnnounceLevelStatToPlayfield(ICharacter character)
+        {
+            if (character == null || character.Playfield == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (character.Stats[StatIds.npcfamily].Value != 0)
+                {
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            int level = ResolveWireLevel(character);
             if (level < 1)
             {
                 level = 1;
@@ -481,8 +600,98 @@ namespace ZoneEngine.Core
                 level = MaxLevel;
             }
 
-            SendManualLevelNewLevelMessage(client, character, level);
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.level, (uint)level);
+            try
+            {
+                character.Playfield.AnnounceOthers(
+                    new StatMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        Stats = new[]
+                                  {
+                                      new GameTuple<CharacterStat, uint>
+                                      {
+                                          Value1 = (CharacterStat)(int)StatIds.level,
+                                          Value2 = (uint)level
+                                      }
+                                  }
+                    },
+                    character.Identity);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Level stat playfield announce failed char=" + character.Identity.ToString(true)
+                    + " err=" + ex.Message);
+            }
+        }
+
+        private static int InferLevelFromXpStats(ICharacter character)
+        {
+            uint lastSave = NormalizeStatValue(character.Stats[StatIds.lastsavexp].BaseValue);
+            if (lastSave > 0)
+            {
+                int fromLastSave = InferLevelFromCumulativeXp(lastSave);
+                if (fromLastSave > 0)
+                {
+                    return fromLastSave;
+                }
+            }
+
+            uint saved = NormalizeStatValue(character.Stats[StatIds.savedxp].BaseValue);
+            if (saved > 0)
+            {
+                int fromSaved = InferLevelFromCumulativeXp(saved);
+                if (fromSaved > 0)
+                {
+                    return fromSaved;
+                }
+            }
+
+            uint xp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
+            if (xp > 0)
+            {
+                int fromXp = InferLevelFromCumulativeXp(xp);
+                if (fromXp > 0)
+                {
+                    return fromXp;
+                }
+            }
+
+            uint sk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
+            if (sk > 0)
+            {
+                return InferLevelFromSk(sk);
+            }
+
+            return 1;
+        }
+
+        private static int InferLevelFromCumulativeXp(uint cumulativeXp)
+        {
+            for (int level = MaxRubikaLevel; level >= 1; level--)
+            {
+                if (GetCumulativeXpForLevelStart(level) <= cumulativeXp)
+                {
+                    return level;
+                }
+            }
+
+            return 1;
+        }
+
+        private static int InferLevelFromSk(uint sk)
+        {
+            for (int level = MaxLevel; level >= ShadowLevelFloor; level--)
+            {
+                if (GetCumulativeSkForLevelStart(level) <= sk)
+                {
+                    return level;
+                }
+            }
+
+            return ShadowLevelFloor;
         }
 
         /// <summary>
@@ -766,14 +975,26 @@ namespace ZoneEngine.Core
                 savedXp);
         }
 
-        internal static void PrepareXpStatsForLogin(ICharacter character)
+        internal static void PrepareXpStatsForLogin(ICharacter character, bool isPlayfieldTransfer = false)
         {
             if (character == null || !(character.Controller is Controllers.PlayerController))
             {
                 return;
             }
 
-            LogXpWireSnapshot(character, "CombatXpRuntimeService", "login-prepare-before");
+            LogXpWireSnapshot(
+                character,
+                "CombatXpRuntimeService",
+                isPlayfieldTransfer ? "zone-transfer-prepare-before" : "login-prepare-before");
+
+            if (isPlayfieldTransfer)
+            {
+                LogXpWireSnapshot(
+                    character,
+                    "CombatXpRuntimeService",
+                    "zone-transfer-prepare-skipped");
+                return;
+            }
 
             int levelBefore = GetCurrentLevel(character);
             NormalizeXpStatsFromPersistedLevel(character);
@@ -792,9 +1013,16 @@ namespace ZoneEngine.Core
                 PersistLevelStat(character);
             }
 
-            WriteXpStatsToDb(character, "login-complete");
-            AlienXpRuntimeService.TryApplyBankedAlienLevelUps(character);
-            LogXpWireSnapshot(character, "CombatXpRuntimeService", "login-prepare-after");
+            WriteXpStatsToDb(character, isPlayfieldTransfer ? "zone-transfer-complete" : "login-complete");
+            if (!isPlayfieldTransfer)
+            {
+                AlienXpRuntimeService.TryApplyBankedAlienLevelUps(character);
+            }
+
+            LogXpWireSnapshot(
+                character,
+                "CombatXpRuntimeService",
+                isPlayfieldTransfer ? "zone-transfer-prepare-after" : "login-prepare-after");
         }
 
         internal static bool ReconcilePersistedMissionXpRewardState(ICharacter character, int levelBefore)
@@ -869,7 +1097,7 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        internal static void SendLoginXpBarSync(ICharacter character)
+        internal static void SendLoginXpBarSync(ICharacter character, bool suppressNewLevelReplay = false)
         {
             if (character == null || character.Controller?.Client == null)
             {
@@ -893,7 +1121,11 @@ namespace ZoneEngine.Core
                 ClearStatChangedFlag(character, StatIds.sk);
                 ClearStatChangedFlag(character, StatIds.nextsk);
                 ClearStatChangedFlag(character, StatIds.lastsk);
-                SendManualLevelNewLevelMessage(client, character, level);
+                if (!suppressNewLevelReplay)
+                {
+                    SendManualLevelNewLevelMessage(client, character, level);
+                }
+
                 LogXpTrace(
                     character,
                     "login-bar-sync-sk",
@@ -901,7 +1133,7 @@ namespace ZoneEngine.Core
                     + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue)
                         .ToString(CultureInfo.InvariantCulture)
                     + " nextSk=" + GetNextSkRequiredForLevel(level).ToString(CultureInfo.InvariantCulture)
-                    + " newLevelReplay=true");
+                    + " newLevelReplay=" + (!suppressNewLevelReplay).ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
                 return;
             }
 
@@ -911,8 +1143,16 @@ namespace ZoneEngine.Core
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextsk, 0);
                 ClearStatChangedFlag(character, StatIds.nextxp);
                 ClearStatChangedFlag(character, StatIds.nextsk);
-                SendManualLevelNewLevelMessage(client, character, level);
-                LogXpTrace(character, "login-bar-sync-max", "level=220 nextXp=0 nextSk=0 newLevelReplay=true");
+                if (!suppressNewLevelReplay)
+                {
+                    SendManualLevelNewLevelMessage(client, character, level);
+                }
+
+                LogXpTrace(
+                    character,
+                    "login-bar-sync-max",
+                    "level=220 nextXp=0 nextSk=0 newLevelReplay="
+                    + (!suppressNewLevelReplay).ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
                 return;
             }
 
@@ -934,25 +1174,29 @@ namespace ZoneEngine.Core
             uint nextLevelCumulative = level >= MaxRubikaLevel
                 ? 0
                 : GetCumulativeXpForLevelStart(level + 1);
-            var loginNewLevelMessage = new NewLevelMessage
-                                       {
-                                           Identity = character.Identity,
-                                           Unknown = 0,
-                                           Level = level,
-                                           Ip = Math.Max(0, character.Stats[StatIds.ip].Value),
-                                           Xp = (int)cumulative,
-                                           LastSaveXp = (int)floorXp,
-                                           NextLevelXp = (int)nextLevelCumulative,
-                                           Unknown1 = 0,
-                                           Unknown2 = CapturedNewLevelUnknown2,
-                                           LastXp = Math.Max(0, character.Stats[StatIds.lastxp].Value)
-                                       };
-            LogXpWireNewLevel(
-                "CombatXpRuntimeService",
-                "login-bar-sync-newlevel",
-                character,
-                loginNewLevelMessage);
-            client.SendCompressed(loginNewLevelMessage);
+            if (!suppressNewLevelReplay)
+            {
+                var loginNewLevelMessage = new NewLevelMessage
+                                           {
+                                               Identity = character.Identity,
+                                               Unknown = 0,
+                                               Level = level,
+                                               Ip = Math.Max(0, character.Stats[StatIds.ip].Value),
+                                               Xp = (int)cumulative,
+                                               LastSaveXp = (int)floorXp,
+                                               NextLevelXp = (int)nextLevelCumulative,
+                                               Unknown1 = 0,
+                                               Unknown2 = CapturedNewLevelUnknown2,
+                                               LastXp = Math.Max(0, character.Stats[StatIds.lastxp].Value)
+                                           };
+                LogXpWireNewLevel(
+                    "CombatXpRuntimeService",
+                    "login-bar-sync-newlevel",
+                    character,
+                    loginNewLevelMessage);
+                client.SendCompressed(loginNewLevelMessage);
+            }
+
             SendClientStatWithUnknown(
                 client,
                 character,
@@ -976,7 +1220,8 @@ namespace ZoneEngine.Core
                 + " progress=" + progress.ToString(CultureInfo.InvariantCulture)
                 + " next=" + nextXp.ToString(CultureInfo.InvariantCulture)
                 + " level=" + level.ToString(CultureInfo.InvariantCulture)
-                + " newLevelReplay=true feedback=none");
+                + " newLevelReplay=" + (!suppressNewLevelReplay).ToString(CultureInfo.InvariantCulture).ToLowerInvariant()
+                + " feedback=none");
         }
 
         /// <summary>
@@ -999,9 +1244,39 @@ namespace ZoneEngine.Core
             }
         }
 
-        internal static void SyncXpBarStatsOnLogin(ICharacter character)
+        internal static bool IsPlayfieldTransferLogin(ZoneClient client)
         {
-            SendLoginXpBarSync(character);
+            if (client == null)
+            {
+                return false;
+            }
+
+            if (client.IsPlayfieldTransferLogin)
+            {
+                return true;
+            }
+
+            if (client.SessionLifecycle != null
+                && client.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning)
+            {
+                return true;
+            }
+
+            var dynel = client.Controller != null ? client.Controller.Character as Dynel : null;
+            if (dynel != null && dynel.IsTeleporting)
+            {
+                return true;
+            }
+
+            ICharacter character = client.Controller != null ? client.Controller.Character : null;
+            return character != null
+                   && ActiveNanoRuntimeService.Default.HasZoneTransferStash(
+                       character.Identity.Instance);
+        }
+
+        internal static void SyncXpBarStatsOnLogin(ICharacter character, bool isPlayfieldTransfer = false)
+        {
+            SendLoginXpBarSync(character, suppressNewLevelReplay: isPlayfieldTransfer);
         }
 
         private static int CalculateCombatXpReward(ICharacter attacker, ICharacter target)
@@ -1861,13 +2136,7 @@ namespace ZoneEngine.Core
 
         private static int GetCurrentLevel(ICharacter character)
         {
-            uint raw = character.Stats[StatIds.level].BaseValue;
-            if (raw == UnsetStatSentinel || raw == 0 || raw > MaxLevel)
-            {
-                return 1;
-            }
-
-            return (int)raw;
+            return ResolveWireLevel(character);
         }
 
         private static uint AddClamped(uint value, int delta)

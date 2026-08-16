@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using Utility;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.PacketHandlers;
@@ -139,20 +140,18 @@ namespace ZoneEngine.Core.MessageHandlers
                         message.Target);
                     if (infoTarget != null)
                     {
-                        if (LftInviteClientPresence.IsRemoteFrom(
+                        string armedName;
+                        LftInviteArm.TryGetArmedName(
                             client.Controller.Character,
-                            infoTarget))
-                        {
-                            string armedName;
-                            LftInviteArm.TryGetArmedName(
-                                client.Controller.Character,
-                                message.Target,
-                                out armedName);
-                            LftInviteClientPresence.SeedForInviteLookup(
-                                client.Controller.Character,
-                                infoTarget,
-                                armedName);
-                        }
+                            message.Target,
+                            out armedName);
+                        LftInviteClientPresence.SeedForInviteLookup(
+                            client.Controller.Character,
+                            infoTarget,
+                            armedName);
+                        LftInviteClientPresence.WireInviteLevelStatToViewer(
+                            client.Controller.Character,
+                            infoTarget);
 
                         CharacterInfoPacketMessageHandler.Default.Send(
                             client.Controller.Character,
@@ -296,10 +295,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 case CharacterActionType.TeamRequestInvite:
                 {
-                    // Team invite from Recruit / LFT list (Action=0x1A).
-                    // AOSharp.Core Team.Invite sends Target=player, Parameter1=1 (flag, not char id).
-                    // LFT list invites may use a non-CanbeAffected Target type or put the
-                    // character id in Parameter2 — always resolve to CanbeAffected + char instance.
+                    // Live TooHigh 20260815-194517: OUT 0x1A p2=0 → IN 0xA9; Yes = p2=1.
+                    // Live TooLow 20260815-222131: OUT 0x1A p2=0 → IN 0xA8; Yes = p2=1.
                     int charId = 0;
                     if (message.Target.Type == IdentityType.CanbeAffected && message.Target.Instance != 0)
                     {
@@ -311,7 +308,6 @@ namespace ZoneEngine.Core.MessageHandlers
                     }
                     else if (message.Parameter1 > 1)
                     {
-                        // Parameter1==1 is the AOSharp invite flag; real char ids are > 1.
                         charId = message.Parameter1;
                     }
                     else if (message.Target.Instance != 0)
@@ -325,7 +321,19 @@ namespace ZoneEngine.Core.MessageHandlers
                         Instance = charId
                     };
 
-                    client.Controller.TeamJoinRequest(inviteTarget);
+                    ICharacter inviter = client.Controller.Character;
+                    ICharacter invitee = LftInviteClientPresence.ResolveOnlinePlayer(inviter, inviteTarget);
+                    if (invitee != null)
+                    {
+                        string armedName;
+                        LftInviteArm.TryGetArmedName(inviter, inviteTarget, out armedName);
+                        LftInviteClientPresence.SeedForInviteLookup(inviter, invitee, armedName);
+                    }
+
+                    TeamRuntime.Invite(
+                        client.Controller.Character,
+                        inviteTarget,
+                        message.Parameter2);
                 }
 
                     break;
@@ -551,9 +559,28 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         /// <summary>
-        /// Capture 20260728-232300: server→inviter Action=0xA9 after OUT TeamRequestInvite.
+        /// Server→inviter Action=0xA9 (TeamInviteAck) = TooHigh Yes/No warn.
+        /// Live 20260815-194517 (64 vs 200): after OUT 0x1A p2=0, before any invite
+        /// popup. In-range must not send this hex.
         /// </summary>
         public void SendTeamInviteAck(ICharacter inviter, ICharacter invitee)
+        {
+            this.SendTeamInviteRangeWarn(inviter, invitee, CharacterActionType.TeamInviteAck);
+        }
+
+        /// <summary>
+        /// Server→inviter Action=0xA8 = TooLow Yes/No warn.
+        /// Live 20260815-222131 (200 vs 64 / Nicoldoc): after OUT 0x1A p2=0.
+        /// </summary>
+        public void SendTeamInviteTooLow(ICharacter inviter, ICharacter invitee)
+        {
+            this.SendTeamInviteRangeWarn(inviter, invitee, CharacterActionType.TeamInviteTooLow);
+        }
+
+        private void SendTeamInviteRangeWarn(
+            ICharacter inviter,
+            ICharacter invitee,
+            CharacterActionType action)
         {
             if (inviter == null || invitee == null)
             {
@@ -566,7 +593,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                     x.Identity = inviter.Identity;
                     x.Unknown = 0;
-                    x.Action = CharacterActionType.TeamInviteAck;
+                    x.Action = action;
                     x.Unknown1 = 0;
                     x.Target = invitee.Identity;
                     x.Parameter1 = 0;

@@ -86,6 +86,17 @@ namespace ZoneEngine.Core.MessageHandlers
                     client.Controller.Character,
                     message.Target);
 
+                ICharacter lookTarget = LftInviteClientPresence.ResolveOnlinePlayer(
+                    client.Controller.Character,
+                    message.Target);
+                if (lookTarget != null
+                    && lookTarget.Identity.Instance != client.Controller.Character.Identity.Instance)
+                {
+                    LftInviteClientPresence.WireInviteLevelStatToViewer(
+                        client.Controller.Character,
+                        lookTarget);
+                }
+
                 if (message.ReturnInfo != 1)
                 {
                     CharacterInfoPacketMessageHandler.Default.Send(

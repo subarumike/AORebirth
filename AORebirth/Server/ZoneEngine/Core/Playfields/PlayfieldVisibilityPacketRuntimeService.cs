@@ -8,6 +8,7 @@ namespace ZoneEngine.Core.Playfields
     using System.Linq;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Enums;
     using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -223,6 +224,25 @@ namespace ZoneEngine.Core.Playfields
                             0))
                         {
                             sendVisibilityMessage(simpleCharFullUpdate);
+                        }
+
+                        if (temp.Stats[StatIds.npcfamily].Value == 0)
+                        {
+                            int wireLevel = CombatXpRuntimeService.ResolveWireLevel(temp);
+                            sendVisibilityMessage(
+                                new StatMessage
+                                {
+                                    Identity = temp.Identity,
+                                    Unknown = 0,
+                                    Stats = new[]
+                                              {
+                                                  new GameTuple<CharacterStat, uint>
+                                                  {
+                                                      Value1 = (CharacterStat)(int)StatIds.level,
+                                                      Value2 = (uint)wireLevel
+                                                  }
+                                              }
+                                });
                         }
 
                         this.SendWeaponDefinitionsForVisibility(

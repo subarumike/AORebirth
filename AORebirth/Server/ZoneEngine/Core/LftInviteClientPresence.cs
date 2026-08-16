@@ -4,6 +4,7 @@ namespace ZoneEngine.Core
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Vector;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
 
@@ -13,6 +14,7 @@ namespace ZoneEngine.Core
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
 
@@ -21,14 +23,16 @@ namespace ZoneEngine.Core
     /// <summary>
     /// Cross-zone LFT Invite: client needs id→name dynel or it shows "NoName" and first
     /// Invite click often sends nothing. Seed viewer-only off-map SCFU + classic InfoPacket.
+    /// HP/NP via CharacterInfoPacket only within 20m on the same playfield — never whole-zone.
     /// No Despawn, no ExchangeOnline ghosts, no InfoPacket Unknown=1 hacks.
-    /// Same-PF: skip (real dynel already present). LFT already filters XP window.
+    /// Same-PF: skip SCFU seed (real dynel already present). LFT already filters XP window.
     /// </summary>
     public static class LftInviteClientPresence
     {
         public const string LftSeedCommandPrefix = "#aorebirth-lft-seed";
 
         private const float OffMapY = -250000f;
+        private const double VitalVisibilityRangeMeters = 20.0;
 
         public static ICharacter ResolveOnlinePlayer(ICharacter requester, Identity targetIdentity)
         {
@@ -113,6 +117,40 @@ namespace ZoneEngine.Core
             return !target.Playfield.Identity.Equals(requester.Playfield.Identity);
         }
 
+        /// <summary>
+        /// LFT invite HP/NP: same playfield and within live-AO ~20m visibility — not whole zone.
+        /// </summary>
+        public static bool IsWithinVitalVisibilityRange(ICharacter viewer, ICharacter subject)
+        {
+            if (viewer == null || subject == null || IsRemoteFrom(viewer, subject))
+            {
+                return false;
+            }
+
+            var viewerDynel = viewer as Dynel;
+            var subjectDynel = subject as Dynel;
+            if (viewerDynel == null || subjectDynel == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                Coordinate viewerPos = viewerDynel.Coordinates();
+                Coordinate subjectPos = subjectDynel.Coordinates();
+                if (viewerPos == null || subjectPos == null)
+                {
+                    return false;
+                }
+
+                return Coordinate.Distance2D(viewerPos, subjectPos) <= VitalVisibilityRangeMeters;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public static void ExchangeOnlinePresence(ICharacter character)
         {
             // Intentionally empty — login SCFU exchange caused visible doubles.
@@ -180,6 +218,55 @@ namespace ZoneEngine.Core
             }
         }
 
+        /// <summary>
+        /// Client Recruit/LFT TooHigh reads target level from dynel stat 54 (see AOSharp
+        /// SimpleChar.Level → GetStat(Stat.Level)). Level is not playfield-announced in bulk
+        /// stat sync — wire it whenever we seed invite visibility.
+        /// </summary>
+        public static void WireInviteLevelStatToViewer(ICharacter viewer, ICharacter subject)
+        {
+            if (viewer == null || subject == null || viewer.Identity.Instance == subject.Identity.Instance)
+            {
+                return;
+            }
+
+            int level = CombatXpRuntimeService.ResolveWireLevel(subject);
+            if (level < 1)
+            {
+                level = 1;
+            }
+            else if (level > 220)
+            {
+                level = 220;
+            }
+
+            try
+            {
+                SendToRequester(
+                    viewer,
+                    new StatMessage
+                    {
+                        Identity = subject.Identity,
+                        Unknown = 0,
+                        Stats = new[]
+                                  {
+                                      new GameTuple<CharacterStat, uint>
+                                      {
+                                          Value1 = (CharacterStat)(int)StatIds.level,
+                                          Value2 = (uint)level
+                                      }
+                                  }
+                    });
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "LFT level-stat wire failed subject=" + subject.Identity.ToString(true)
+                    + " err=" + ex.Message);
+            }
+        }
+
         public static void SeedForInviteLookup(ICharacter requester, ICharacter remote)
         {
             SeedNameAndLevelOnly(requester, remote, null);
@@ -191,9 +278,8 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
-        /// Remote only: name via off-map SCFU + classic InfoPacket. Prefer real level when
-        /// already inside searcher's XP window (LFT filtered); else use searcher level so
-        /// the client does not open TooHigh/TooLow. No Despawn.
+        /// Cross-PF: name via off-map SCFU (no HP/NP). Same-PF: CharacterInfoPacket with
+        /// real level for Recruit/LFT (always). HP/NP only meaningful within ~20m on live AO.
         /// </summary>
         public static void SeedNameAndLevelOnly(ICharacter requester, ICharacter remote, string nameOverride)
         {
@@ -208,22 +294,8 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            if (!IsRemoteFrom(requester, remote))
-            {
-                return;
-            }
-
-            var remoteChar = remote as Character;
-            if (remoteChar == null)
-            {
-                return;
-            }
-
-            int requesterLevel = ReadLevel(requester);
             int remoteLevel = ReadLevel(remote);
-            int infoLevel = TeamXpShareWindow.IsCompatible(requesterLevel, remoteLevel)
-                                ? remoteLevel
-                                : requesterLevel;
+            int infoLevel = remoteLevel;
 
             string displayName = nameOverride;
             if (string.IsNullOrWhiteSpace(displayName))
@@ -241,6 +313,21 @@ namespace ZoneEngine.Core
                 displayName = "Player";
             }
 
+            bool crossPlayfield = IsRemoteFrom(requester, remote);
+            WireInviteLevelStatToViewer(requester, remote);
+            if (!crossPlayfield)
+            {
+                SendTeamInviteVitals(requester, remote, displayName, infoLevel);
+                SendSamePlayfieldScfuLevelPatch(requester, remote, displayName, infoLevel);
+                return;
+            }
+
+            var remoteChar = remote as Character;
+            if (remoteChar == null)
+            {
+                return;
+            }
+
             try
             {
                 SimpleCharFullUpdateMessage scfu = SimpleCharFullUpdate.ConstructMessage(remoteChar);
@@ -249,7 +336,10 @@ namespace ZoneEngine.Core
                     Type = IdentityType.CanbeAffected,
                     Instance = remote.Identity.Instance
                 };
-                scfu.PlayfieldId = requester.Playfield.Identity.Instance;
+                scfu.PlayfieldId = remote.Playfield != null
+                        ? remote.Playfield.Identity.Instance
+                        : requester.Playfield.Identity.Instance;
+
                 scfu.Level = (short)infoLevel;
                 scfu.Name = displayName;
                 scfu.CharacterFlags |= CharacterFlags.HasVisibleName;
@@ -267,12 +357,6 @@ namespace ZoneEngine.Core
                     requester,
                     new CharInPlayMessage { Identity = scfu.Identity, Unknown = 0x00 });
 
-                CharacterInfoPacketMessageHandler.Default.SendForTeamInvite(
-                    requester,
-                    remote,
-                    displayName,
-                    infoLevel);
-
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     "LFT seed name=" + displayName
@@ -288,6 +372,56 @@ namespace ZoneEngine.Core
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "LFT name seed failed name=" + displayName + " err=" + ex.Message);
+            }
+        }
+
+        private static void SendSamePlayfieldScfuLevelPatch(
+            ICharacter requester,
+            ICharacter remote,
+            string displayName,
+            int level)
+        {
+            var remoteChar = remote as Character;
+            if (remoteChar == null || requester == null)
+            {
+                return;
+            }
+
+            try
+            {
+                SimpleCharFullUpdateMessage scfu = SimpleCharFullUpdate.ConstructMessage(remoteChar);
+                scfu.Level = (short)level;
+                scfu.Name = displayName;
+                scfu.CharacterFlags |= CharacterFlags.HasVisibleName;
+                SendToRequester(requester, scfu);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "LFT same-PF level patch failed name=" + displayName + " err=" + ex.Message);
+            }
+        }
+
+        private static void SendTeamInviteVitals(
+            ICharacter requester,
+            ICharacter remote,
+            string displayName,
+            int infoLevel)
+        {
+            try
+            {
+                CharacterInfoPacketMessageHandler.Default.SendForTeamInvite(
+                    requester,
+                    remote,
+                    displayName,
+                    infoLevel);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "LFT vital seed failed name=" + displayName + " err=" + ex.Message);
             }
         }
 
@@ -348,27 +482,7 @@ namespace ZoneEngine.Core
 
         private static int ReadLevel(ICharacter character)
         {
-            int level = 1;
-            try
-            {
-                level = character.Stats[StatIds.level].Value;
-            }
-            catch (Exception)
-            {
-                level = 1;
-            }
-
-            if (level < 1)
-            {
-                return 1;
-            }
-
-            if (level > 220)
-            {
-                return 220;
-            }
-
-            return level;
+            return CombatXpRuntimeService.ResolveWireLevel(character);
         }
     }
 }
