@@ -322,10 +322,10 @@ Email verification policy:
 - SMTP credentials and broker mail authorization secrets live only in
   production secret files/environment, never source, web root, MyBB files, or
   Git;
-- production transactional email provider is Postmark for the first public
-  verification/notification flow; broker release
-  `email-foundation-20260816-002` is deployed fail-closed until Postmark DNS
-  and SMTP secrets are installed;
+- production transactional email provider is the self-hosted VPS
+  Postfix/Dovecot/OpenDKIM stack for the first public verification/notification
+  flow; broker release `email-foundation-20260816-002` is deployed fail-closed
+  until Hostinger DNS and SMTP app configuration are complete;
 - MyBB may use the approved SMTP transport for notifications, but it must not
   become an AORebirth password reset or password authentication authority.
 
@@ -389,10 +389,10 @@ E2E passed, and public forum SSO through `https://forum.ao-rebirth.com` passed.
 restore MyBB DB/files/plugin from the cutover backup if required. Game-server
 rollback is not required for forum rollback.
 24. unresolved issues: no remaining forum/account infrastructure acceptance
-gate is open. Production email remains blocked on Postmark DNS/credentials,
-MyBB SMTP configuration, and received-message SPF/DKIM/DMARC proof. Later forum
-work should focus on presentation, content, moderation policy, email
-notification completion, and community launch.
+gate is open. Production email remains blocked on Hostinger MX/SPF/DKIM/DMARC
+DNS, Account Broker/MyBB SMTP configuration, and received-message
+SPF/DKIM/DMARC proof. Later forum work should focus on presentation, content,
+moderation policy, email notification completion, and community launch.
 
 ## Source evidence
 

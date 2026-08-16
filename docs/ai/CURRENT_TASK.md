@@ -15,11 +15,13 @@ configuration, resend, and verify endpoints; the website has accurate resend
 and fragment-based verify pages. Evidence:
 `docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`.
 Production email provider selection and fail-closed deployment are now recorded:
-Postmark is selected, the production token-table migration is applied after a
-backup, and Account Broker release `email-foundation-20260816-002` is deployed
-and healthy without SMTP/account-mail secrets. Email remains BLOCKED until
-Postmark DNS, credentials, MyBB SMTP, and received-message SPF/DKIM/DMARC header
-proof are complete. Evidence:
+self-hosted VPS mail is selected, the production token-table migration is
+applied after a backup, Account Broker release `email-foundation-20260816-002`
+is deployed and healthy without SMTP/account-mail app configuration, and the
+VPS Postfix/Dovecot/OpenDKIM stack is configured for `ao-rebirth.com`. Email
+remains BLOCKED until Hostinger DNS, Account Broker/MyBB SMTP app
+configuration, and received-message SPF/DKIM/DMARC header proof are complete.
+Evidence:
 `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
 
 Launch status is currently BLOCKED only on final live moderator acceptance,
@@ -89,10 +91,10 @@ required for launch. Evidence:
 ## Remaining gates
 
 - No remaining MyBB/forum infrastructure architecture gate is open.
-- Email provider selection is complete with Postmark, and the production
-  broker/schema prerequisites are in place, but production email remains blocked
-  on provider-supplied DNS, SMTP credentials, MyBB SMTP configuration, and
-  received-message SPF/DKIM/DMARC proof.
+- Email provider selection is complete with self-hosted VPS mail, and the
+  production broker/schema/mail-server prerequisites are in place, but
+  production email remains blocked on Hostinger DNS, Account Broker/MyBB SMTP
+  app configuration, and received-message SPF/DKIM/DMARC proof.
 - Forum presentation/content launch prep is applied, but community launch is
   blocked until:
   - live moderator sticky/close-open/move/report acceptance passes with a

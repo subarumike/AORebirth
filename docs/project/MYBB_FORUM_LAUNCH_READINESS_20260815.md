@@ -185,11 +185,11 @@ Source-side AORebirth email verification plumbing was later prepared and
 validated in
 `docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`. Production
 email configuration evidence is recorded in
-`docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`: Postmark is
-selected, the production broker/schema prerequisites are deployed fail-closed,
-and forum notifications remain blocked until provider-supplied DNS is added,
-MyBB SMTP is configured, and received-message SPF/DKIM/DMARC headers are
-proven.
+`docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`: self-hosted
+VPS mail is selected, the production broker/schema/mail-server prerequisites
+are deployed fail-closed, and forum notifications remain blocked until
+Hostinger DNS is added, MyBB SMTP is configured, and received-message
+SPF/DKIM/DMARC headers are proven.
 
 ## Backup / restore / upgrade
 
@@ -279,9 +279,9 @@ Forum health is not a dependency for AO game service health.
   username/password plus the configured secret PIN. Admin credentials were not
   used or exposed in this stage, so full Admin CP user/group/board management
   was not browser-tested.
-- Email transport: BLOCKED for production notification use until Postmark DNS,
-  authenticated SMTP credentials, MyBB SMTP configuration, and received-message
-  SPF/DKIM/DMARC proof are complete.
+- Email transport: BLOCKED for production notification use until Hostinger
+  MX/SPF/DKIM/DMARC DNS, authenticated SMTP app configuration, MyBB SMTP
+  configuration, and received-message SPF/DKIM/DMARC proof are complete.
 - SSO replay/expiry/DB-isolation regression: not modified in this stage; frozen
   production evidence remains
   `docs/project/MYBB_FORUM_SSO_PRODUCTION_EVIDENCE_20260815.md`.
@@ -309,5 +309,5 @@ Remaining concrete blockers:
 2. Complete full Admin CP acceptance with authorized admin credentials without
    exposing secrets.
 3. Configure and prove reliable forum email transport if launch requires email
-   notifications: Postmark authenticated SMTP plus SPF, DKIM, and DMARC for
-   `ao-rebirth.com`.
+   notifications: self-hosted VPS authenticated SMTP plus SPF, DKIM, and DMARC
+   for `ao-rebirth.com`.
