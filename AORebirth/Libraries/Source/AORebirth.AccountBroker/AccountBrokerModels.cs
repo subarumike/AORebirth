@@ -131,6 +131,27 @@ namespace AORebirth.AccountBroker
         public DateTime CreatedAt { get; set; }
     }
 
+    public sealed class AccountCharacterSnapshot
+    {
+        public string Name { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public int Playfield { get; set; }
+
+        public string PlayfieldName { get; set; }
+
+        public bool Online { get; set; }
+
+        public double X { get; set; }
+
+        public double Y { get; set; }
+
+        public double Z { get; set; }
+    }
+
     public sealed class EmailVerificationTokenResult
     {
         public string Token { get; set; }

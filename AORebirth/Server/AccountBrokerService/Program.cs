@@ -3,6 +3,7 @@ namespace AORebirth.AccountBroker.Service
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Net.Mail;
@@ -240,6 +241,12 @@ namespace AORebirth.AccountBroker.Service
                 return;
             }
 
+            if (context.Request.HttpMethod == "POST" && path == "/api/account/characters")
+            {
+                this.HandleAccountCharacters(context);
+                return;
+            }
+
             if (context.Request.HttpMethod == "POST" && (path == "/api/register" || path == "/register"))
             {
                 this.HandleRegister(context, path == "/api/register");
@@ -452,6 +459,26 @@ namespace AORebirth.AccountBroker.Service
             {
                 AccountIdentitySnapshot identity = this.broker.GetIdentityByPublicId(GetForm(form, "identityPublicId"));
                 WriteJson(context.Response, 200, "{\"ok\":true,\"identity\":" + IdentityJson(identity) + "}");
+            }
+            catch (AccountBrokerException exception)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"" + Json(exception.Code) + "\"}");
+            }
+        }
+
+        private void HandleAccountCharacters(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            try
+            {
+                AccountCharacterSnapshot[] characters = this.broker.GetCharactersByIdentityPublicId(GetForm(form, "identityPublicId"));
+                WriteJson(context.Response, 200, "{\"ok\":true,\"characters\":" + CharactersJson(characters) + "}");
             }
             catch (AccountBrokerException exception)
             {
@@ -822,6 +849,39 @@ namespace AORebirth.AccountBroker.Service
                 + "\",\"gameAccountLinked\":" + (identity.GameMappingState == "Linked" ? "true" : "false")
                 + ",\"createdAt\":\"" + Json(identity.CreatedAt.ToUniversalTime().ToString("o"))
                 + "\",\"identityPublicId\":\"" + Json(identity.IdentityPublicId) + "\"}";
+        }
+
+        private static string CharactersJson(AccountCharacterSnapshot[] characters)
+        {
+            if (characters == null || characters.Length == 0)
+            {
+                return "[]";
+            }
+
+            StringBuilder builder = new StringBuilder();
+            builder.Append("[");
+            for (int index = 0; index < characters.Length; index++)
+            {
+                AccountCharacterSnapshot character = characters[index];
+                if (index > 0)
+                {
+                    builder.Append(",");
+                }
+
+                builder.Append("{\"name\":\"").Append(Json(character.Name))
+                    .Append("\",\"firstName\":\"").Append(Json(character.FirstName))
+                    .Append("\",\"lastName\":\"").Append(Json(character.LastName))
+                    .Append("\",\"playfield\":").Append(character.Playfield.ToString(CultureInfo.InvariantCulture))
+                    .Append(",\"playfieldName\":\"").Append(Json(character.PlayfieldName))
+                    .Append("\",\"online\":").Append(character.Online ? "true" : "false")
+                    .Append(",\"x\":").Append(character.X.ToString(CultureInfo.InvariantCulture))
+                    .Append(",\"y\":").Append(character.Y.ToString(CultureInfo.InvariantCulture))
+                    .Append(",\"z\":").Append(character.Z.ToString(CultureInfo.InvariantCulture))
+                    .Append("}");
+            }
+
+            builder.Append("]");
+            return builder.ToString();
         }
 
         private static string ForumSsoIdentityJson(ForumSsoIdentity identity)
