@@ -262,7 +262,8 @@ The following production acceptance steps were performed:
 
 The following acceptance steps remain external:
 
-- received verification email link click by the mailbox owner;
+- received verification email link click by the mailbox owner: PASS for
+  `SubaruMike`;
 - received-message SPF/DKIM/DMARC header proof from Gmail message details for
   the Account Broker verification email;
 - received-message SPF/DKIM/DMARC header proof from Gmail message details for
@@ -294,7 +295,13 @@ BLOCKED
 
 Blocking items:
 
-1. Mike must open the two Gmail test messages and confirm received-message
-   SPF, DKIM, and DMARC results from message details.
-2. Mike must click the Account Broker verification link for `SubaruMike`, or
-   provide the resulting status if Gmail quarantined the message.
+1. Mike must open the Gmail message details and confirm received-message SPF,
+   DKIM, and DMARC results for the Account Broker verification email.
+2. Mike must open the Gmail message details and confirm received-message SPF,
+   DKIM, and DMARC results for the MyBB forum notification email.
+
+Mailbox-owner verification-link acceptance:
+
+- `SubaruMike` clicked the received verification link.
+- Production database shows `SubaruMike` email status `Verified` with
+  `EmailVerifiedAt=2026-08-16 01:50:54.919937`.

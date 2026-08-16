@@ -130,9 +130,10 @@ completion matrices and dated evidence retain detailed provenance.
   resolve, Account Broker verification resend to Gmail passed, and MyBB SMTP
   notification to Gmail passed. The exposed Account Broker DB credential and
   exposed `mail.ao-rebirth.com` TLS key from troubleshooting were both rotated.
-  Production email remains BLOCKED only until the mailbox owner confirms the
-  received Gmail SPF/DKIM/DMARC message-detail results and clicks/confirms the
-  verification link. Evidence:
+  `SubaruMike` clicked the received verification link and production now shows
+  the account email as verified. Production email remains BLOCKED only until
+  the mailbox owner confirms the received Gmail SPF/DKIM/DMARC message-detail
+  results. Evidence:
   `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
