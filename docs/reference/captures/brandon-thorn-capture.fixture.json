@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "fixture_id": "brandon-thorn-capture-pilot",
+  "capture_id": "BrandonThornCapture",
+  "source_capture_alias": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/BrandonThornCapture",
+  "source_capture_observed_path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015956",
+  "purpose": "Pilot fixture proving the capture evidence workflow can be validated from tracked derived data before gameplay code changes.",
+  "confidence": "high",
+  "required_for_windows_lane": true,
+  "linux_reconciliation_policy": "The Linux branch consumes this tracked fixture only after the Windows validation wrapper passes.",
+  "source_files": [
+    {
+      "path": "mission-flow.log",
+      "sha256": "d5c57b929f2a461065bc03061caa7d905cda26eaf4e004a79e309631f1e1ced0",
+      "bytes": 47440,
+      "line_count": 74,
+      "role": "mission flow transcript"
+    },
+    {
+      "path": "raw-packets.csv",
+      "sha256": "5e68155ba84196cf19f4a61992941b31a2a037bcba5d0f6032213b19004cdfdf",
+      "bytes": 324732,
+      "line_count": 1175,
+      "data_row_count": 1174,
+      "role": "raw packet timeline"
+    },
+    {
+      "path": "enemy-combat.csv",
+      "sha256": "df601629dfa171c3e723533c634bd9f6f5b9e45c74c0d1e9fb23a18532793e8d",
+      "bytes": 47688,
+      "line_count": 149,
+      "data_row_count": 148,
+      "role": "combat event projection"
+    },
+    {
+      "path": "npc-lifecycle.csv",
+      "sha256": "90da23d132dac6571755745970462ca73d4e3d4fbd19a82b884b1fc3357fe370",
+      "bytes": 50283,
+      "line_count": 129,
+      "data_row_count": 128,
+      "role": "npc lifecycle projection"
+    },
+    {
+      "path": "movement-summary.json",
+      "sha256": "5673bcdad50d92cf0b2ca957f0334b3c41a49a88d8c5c6f79bf69d122454346b",
+      "bytes": 469,
+      "line_count": 13,
+      "role": "movement summary"
+    },
+    {
+      "path": "enemy-state.json",
+      "sha256": "295a210cc624042d2c5cdccff7d624dce8b11d88ea654268f7595c6c386cb49e",
+      "bytes": 3346962,
+      "line_count": 10655,
+      "role": "enemy state projection"
+    },
+    {
+      "path": "inventory-updates.csv",
+      "sha256": "884b7f395bead39bac89d8f422f52d41359749ede9cb2994c8f982a6d86c011c",
+      "bytes": 649,
+      "line_count": 5,
+      "data_row_count": 4,
+      "role": "inventory update projection"
+    },
+    {
+      "path": "shop-updates.csv",
+      "sha256": "bef49ea7cc8797c900093b253203a53bd718e4e9c3801ac572e7f23f705c3fd4",
+      "bytes": 78,
+      "line_count": 1,
+      "data_row_count": 0,
+      "role": "shop update projection"
+    }
+  ],
+  "packet_summary": {
+    "directions": {
+      "IN": 984,
+      "OUT": 190
+    },
+    "top_n3_types": [
+      {
+        "name": "CharDCMove",
+        "count": 587
+      },
+      {
+        "name": "FollowTarget",
+        "count": 111
+      },
+      {
+        "name": "Stat",
+        "count": 60
+      },
+      {
+        "name": "CharacterAction",
+        "count": 41
+      },
+      {
+        "name": "KnubotAppendText",
+        "count": 38
+      },
+      {
+        "name": "Despawn",
+        "count": 29
+      },
+      {
+        "name": "LookAt",
+        "count": 29
+      },
+      {
+        "name": "StopFight",
+        "count": 27
+      },
+      {
+        "name": "SimpleCharFullUpdate",
+        "count": 18
+      },
+      {
+        "name": "KnubotAnswerList",
+        "count": 18
+      }
+    ]
+  },
+  "combat_summary": {
+    "total_rows": 148,
+    "actions": {
+      "": 107,
+      "59": 11,
+      "InfoRequest": 10,
+      "Death": 6,
+      "StandUp": 5,
+      "ChangeAnimationAndStance": 2,
+      "Equip": 2,
+      "SpecialAvailable": 2,
+      "SpecialUsed": 2,
+      "142": 1
+    }
+  },
+  "npc_lifecycle_summary": {
+    "total_rows": 128,
+    "phases": {
+      "character-seen": 67,
+      "character-gone": 21,
+      "loot-move-result": 8,
+      "corpse-full-update": 6,
+      "corpse-seen": 6,
+      "death-action": 6,
+      "corpse-use": 5,
+      "enemy-despawn": 4,
+      "corpse-despawn": 3,
+      "loot-move-request": 2
+    }
+  },
+  "promotion_gate": {
+    "windows_first": true,
+    "requires_fixture_validator": "cmd /d /c tools\\validate_capture_evidence_fixtures.cmd",
+    "requires_gameplay_code_change": false,
+    "next_allowed_step": "Use this fixture to build one capture-backed behavior assertion after Windows validation passes."
+  }
+}
