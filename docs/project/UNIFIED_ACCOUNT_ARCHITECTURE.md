@@ -322,6 +322,10 @@ Email verification policy:
 - SMTP credentials and broker mail authorization secrets live only in
   production secret files/environment, never source, web root, MyBB files, or
   Git;
+- production transactional email provider is Postmark for the first public
+  verification/notification flow; broker release
+  `email-foundation-20260816-002` is deployed fail-closed until Postmark DNS
+  and SMTP secrets are installed;
 - MyBB may use the approved SMTP transport for notifications, but it must not
   become an AORebirth password reset or password authentication authority.
 
@@ -356,11 +360,16 @@ Before implementation or installation:
 7. password algorithm: proven above.
 8. unified identity architecture: Account Broker plus separate identity mapping.
 9. MyBB mechanism: stock core plus AORebirth Identity Bridge and one-time-code SSO.
-10. database/schema changes: none in production; repository schema proposal only.
+10. database/schema changes: production now includes
+`account_email_verification_tokens` from migration
+`20260816_account_email_verification_tokens.sql`; no password, login,
+character, MyBB, or mapping table was modified.
 11. files changed: this report, evidence reports, schema proposal, validation
     SQL, Account Broker library, Account Broker validation harness,
     active-task pointer, and project-state summary.
-12. services/configuration changed: none.
+12. services/configuration changed: Account Broker release
+`email-foundation-20260816-002` is deployed and healthy; SMTP/account-mail
+secret configuration remains absent, so outbound mail is disabled.
 13. MyBB installed: yes, stock MyBB 1.8.40 under `/opt/ao-rebirth/forum`.
 14. checksum: MyBB 1.8.40 package verification passed during installation.
 15. domain/TLS: apex HTTPS PASS; forum HTTPS PASS with Let's Encrypt
@@ -380,8 +389,10 @@ E2E passed, and public forum SSO through `https://forum.ao-rebirth.com` passed.
 restore MyBB DB/files/plugin from the cutover backup if required. Game-server
 rollback is not required for forum rollback.
 24. unresolved issues: no remaining forum/account infrastructure acceptance
-gate is open. Later forum work should focus on presentation, content,
-moderation policy, and community launch.
+gate is open. Production email remains blocked on Postmark DNS/credentials,
+MyBB SMTP configuration, and received-message SPF/DKIM/DMARC proof. Later forum
+work should focus on presentation, content, moderation policy, email
+notification completion, and community launch.
 
 ## Source evidence
 

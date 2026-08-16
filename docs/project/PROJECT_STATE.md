@@ -116,6 +116,17 @@ completion matrices and dated evidence retain detailed provenance.
   secret files, production schema migration/backup, MyBB SMTP configuration,
   and received-header authentication proof are complete. Evidence:
   `docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`.
+- Email production configuration: advanced on 2026-08-16 without enabling
+  outbound mail. Postmark is selected as the production transactional provider,
+  the production database was backed up at
+  `/opt/ao-rebirth/database/backups/email-production-20260816T002205Z`, the
+  `account_email_verification_tokens` migration was applied and verified, and
+  Account Broker release `email-foundation-20260816-002` is deployed and
+  healthy on `172.18.0.1:7510`. SMTP/account-mail secrets are intentionally
+  absent, MyBB SMTP is not configured, and production email remains BLOCKED
+  until Postmark DKIM/Return-Path DNS, DMARC, credentials, controlled sends, and
+  received-message SPF/DKIM/DMARC header proof are complete. Evidence:
+  `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
   `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the
