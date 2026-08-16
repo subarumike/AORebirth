@@ -132,6 +132,22 @@ completion matrices and dated evidence retain detailed provenance.
   verification link and production now shows the account email as verified.
   Production email is accepted for launch. Evidence:
   `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
+- Unified account character display: accepted on 2026-08-16. Account Broker
+  release `account-characters-20260816-001` is deployed and healthy on
+  `172.18.0.1:7510`. The website `/account` page now shows a read-only My
+  Characters section using only the authenticated unified `AOR_IDENTITY`
+  session. Website code calls the broker's internal `/api/account/characters`
+  endpoint; the broker resolves the identity public ID, validates the active
+  linked identity, and queries the live Stage6 `characters` table with
+  `characters.Username = CanonicalUsername`. Stage6 has no `playfields` lookup
+  table available to the broker, so the page displays playfield IDs rather than
+  hardcoding an incomplete catalog. `SubaruMike` route acceptance showed one
+  live character, a controlled zero-character identity rendered the empty
+  state, no-secret broker access returned `403`, username-tampering input was
+  ignored, unauthenticated `/account` redirected, and `/member-index.php`
+  remained blocked at the Apache boundary. No schema, character rows,
+  LoginEngine behavior, game authentication, or identity/SSO architecture was
+  changed.
 - LoginEngine password authentication: restored after the `f7e9b657`
   username-only regression. `UserCredentialsHandler` again calls
   `CheckLogin.IsLoginCorrect()`, which loads `login.Password` and validates the

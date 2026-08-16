@@ -26,6 +26,15 @@ email is accepted for launch: `SubaruMike` received the verification email,
 clicked the link, and production now shows the account email as verified.
 Evidence:
 `docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
+Unified account character display is now integrated on production through the
+Account Broker. Release `account-characters-20260816-001` is deployed and
+healthy on `172.18.0.1:7510`; `/account` renders a read-only My Characters
+section from the authenticated unified `AOR_IDENTITY` session, and the broker
+queries the live Stage6 `characters` table with
+`characters.Username = CanonicalUsername`. `SubaruMike` route acceptance shows
+one live character, a controlled zero-character identity renders the empty
+state, unauthenticated `/account` redirects, posted username tampering is
+ignored, and `/member-index.php` remains blocked at the Apache boundary.
 
 Launch status is currently BLOCKED only on final live moderator acceptance,
 authorized Admin CP acceptance, and production-grade email transport/DNS
@@ -49,6 +58,9 @@ required for launch. Evidence:
   absent, so mail remains fail-closed.
 - Public `/register`, `/login`, `/account`, and `/logout` are enabled on
   `ao-rebirth.com`.
+- Public `/account` now includes read-only My Characters display backed by the
+  Account Broker and live Stage6 character data. No character schema, character
+  rows, LoginEngine behavior, or game authentication was changed.
 - Public registration created a controlled production account through the
   broker only; database proof shows one identity row, one linked `login` row,
   one linked game mapping, and normal non-GM account flags.

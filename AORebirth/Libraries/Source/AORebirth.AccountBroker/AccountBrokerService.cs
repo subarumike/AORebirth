@@ -1,6 +1,7 @@
 namespace AORebirth.AccountBroker
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Security.Cryptography;
     using System.Text;
@@ -114,6 +115,56 @@ namespace AORebirth.AccountBroker
                 }
 
                 return identity;
+            }
+        }
+
+        public AccountCharacterSnapshot[] GetCharactersByIdentityPublicId(string identityPublicId)
+        {
+            if (string.IsNullOrWhiteSpace(identityPublicId) || identityPublicId.Length > 64)
+            {
+                throw new AccountBrokerException("INVALID_IDENTITY_PUBLIC_ID", "Identity public id is required.");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            {
+                AccountIdentitySnapshot identity = this.GetIdentitySnapshotByPublicId(connection, null, identityPublicId);
+                if (identity == null)
+                {
+                    throw new AccountBrokerException("IDENTITY_NOT_FOUND", "Identity does not exist.");
+                }
+
+                if (!string.Equals(identity.IdentityStatus, "Active", StringComparison.Ordinal)
+                    || !string.Equals(identity.GameMappingState, "Linked", StringComparison.Ordinal))
+                {
+                    throw new AccountBrokerException("IDENTITY_NOT_ACTIVE", "Identity is not active.");
+                }
+
+                List<AccountCharacterSnapshot> characters = new List<AccountCharacterSnapshot>();
+                using (IDbCommand command = CreateCommand(
+                    connection,
+                    null,
+                    "SELECT c.Name, c.FirstName, c.LastName, c.playfield, c.Online, c.X, c.Y, c.Z FROM characters c WHERE c.Username=@username ORDER BY c.Name ASC",
+                    Parameter("@username", identity.CanonicalUsername)))
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        characters.Add(new AccountCharacterSnapshot
+                        {
+                            Name = Convert.ToString(reader["Name"]),
+                            FirstName = reader["FirstName"] == DBNull.Value ? string.Empty : Convert.ToString(reader["FirstName"]),
+                            LastName = reader["LastName"] == DBNull.Value ? string.Empty : Convert.ToString(reader["LastName"]),
+                            Playfield = Convert.ToInt32(reader["playfield"]),
+                            PlayfieldName = string.Empty,
+                            Online = Convert.ToInt32(reader["Online"]) != 0,
+                            X = Convert.ToDouble(reader["X"]),
+                            Y = Convert.ToDouble(reader["Y"]),
+                            Z = Convert.ToDouble(reader["Z"])
+                        });
+                    }
+                }
+
+                return characters.ToArray();
             }
         }
 
