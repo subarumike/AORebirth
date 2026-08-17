@@ -25,6 +25,10 @@ namespace aorf
             (2ul << 24) | (24ul << 16) | (96ul << 8) | 30ul;
         constexpr unsigned long AoRebirthLoginIpClientArgumentOrder =
             (30ul << 24) | (96ul << 16) | (24ul << 8) | 2ul;
+        constexpr unsigned long AoRebirthLocalIpHostOrder =
+            (127ul << 24) | 1ul;
+        constexpr unsigned long AoRebirthLocalIpClientArgumentOrder =
+            (1ul << 24) | 127ul;
         constexpr unsigned long AoRebirthLoginPort = 7500;
 
         enum class Policy
@@ -274,7 +278,9 @@ namespace aorf
             return endpoint.hasIp &&
                 endpoint.hasPort &&
                 (endpoint.ip == AoRebirthLoginIpHostOrder ||
-                 endpoint.ip == AoRebirthLoginIpClientArgumentOrder) &&
+                 endpoint.ip == AoRebirthLoginIpClientArgumentOrder ||
+                 endpoint.ip == AoRebirthLocalIpHostOrder ||
+                 endpoint.ip == AoRebirthLocalIpClientArgumentOrder) &&
                 endpoint.port == AoRebirthLoginPort;
         }
 
@@ -698,7 +704,39 @@ namespace aorf
                 return false;
             }
 
+            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA127.0.0.1 IP7500 DUprivate", endpoint) ||
+                !IsAoRebirthEndpoint(endpoint) ||
+                !endpoint.dottedIp)
+            {
+                return false;
+            }
+
+            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2130706433 IP7500 DUprivate", endpoint) ||
+                !IsAoRebirthEndpoint(endpoint) ||
+                endpoint.dottedIp)
+            {
+                return false;
+            }
+
             if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA35151902 IP80 DUprivate", endpoint) ||
+                IsAoRebirthEndpoint(endpoint))
+            {
+                return false;
+            }
+
+            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7505 DUofficial", endpoint) ||
+                IsAoRebirthEndpoint(endpoint))
+            {
+                return false;
+            }
+
+            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7506 DUofficial", endpoint) ||
+                IsAoRebirthEndpoint(endpoint))
+            {
+                return false;
+            }
+
+            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA127.0.0.1 IP80 DUunknown", endpoint) ||
                 IsAoRebirthEndpoint(endpoint))
             {
                 return false;
