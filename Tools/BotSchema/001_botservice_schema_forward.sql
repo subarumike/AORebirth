@@ -1,18 +1,7 @@
-# BOT SCHEMA PROPOSAL — NOT APPLIED
+-- AORebirth BotService schema migration 001.
+-- Approved schema with only the documented normalization and UUID constraint corrections.
+-- This file is never executed by application startup.
 
-Status: review-only. This Markdown file is deliberately non-executable. No migration, startup schema mutation, deployment, or production bot row is included.
-
-## Placement and conventions
-
-- Target the dedicated AORebirth identity database that owns `account_identities`.
-- `OwningIdentityId` references the stable `account_identities.IdentityId` key, not legacy `login.Id`.
-- `OrganizationId` stores the stable unsigned `organizations.Id` value. It intentionally has no database foreign key because organizations are owned by the game database, outside the identity database boundary. AccountBroker must validate organization authority against the authoritative organization service before assignment.
-- Tables use InnoDB, `utf8mb4`, `utf8mb4_0900_ai_ci`, ASCII binary collation for identifiers and policy names, `datetime(6)` UTC timestamps, explicit state enums, restrictive deletes, named keys, and named checks.
-- Bot principals are retained and disabled rather than deleted. Audit rows are append-only. Credential plaintext is never stored.
-
-## Exact proposed DDL
-
-```sql
 CREATE TABLE `bot_principals` (
   `BotId` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `OwningIdentityId` bigint unsigned NOT NULL,
@@ -99,33 +88,3 @@ CREATE TABLE `bot_audit_events` (
   CONSTRAINT `CK_bot_audit_session_id` CHECK (`SessionId` IS NULL OR `SessionId` REGEXP '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'),
   CONSTRAINT `CK_bot_audit_org` CHECK (`OrganizationId` IS NULL OR `OrganizationId` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-```
-
-## Migration plan
-
-1. Obtain explicit schema approval and schedule a BotService-disabled maintenance window.
-2. Back up the identity database and record its schema fingerprint.
-3. Apply the approved DDL manually to an empty disposable MySQL 8 validation database.
-4. Run structural, constraint, transaction rollback, credential rotation, scope replacement, and audit append validation there.
-5. Apply the approved DDL manually to the identity database with `AO_REBIRTH_BOT_SERVICE_ENABLED=false`.
-6. Re-run read-only structural validation, then deploy the host and AccountBroker feature gate while still disabled.
-7. Configure the root-readable loopback key and connection environment, enable the feature, then create the first bot through authenticated AccountBroker management.
-
-## Rollback plan
-
-- Before any bot row exists, disable BotService and drop tables in this order: `bot_audit_events`, `bot_scopes`, `bot_credentials`, `bot_principals`.
-- After any bot row exists, do not use destructive rollback. Disable BotService and AccountBroker bot management, retain all rows and audit history, restore the application version, and use an approved forward migration.
-- Rotation, revoke, and scope replacement are single `READ COMMITTED` transactions. Application failures roll back the entire operation.
-
-## Backfill plan
-
-No backfill is required or permitted. Existing player accounts and organizations remain unchanged. Bot principals are created only after approval through authenticated management, and the raw credential is returned only by create or rotate.
-
-## APPROVED SCHEMA CORRECTION
-
-Disposable MySQL 8 validation proved two constraint defects in the originally approved text:
-
-- `utf8mb4_0900_ai_ci` makes a plain normalized-name equality comparison case-insensitive, so a case-only mismatch could pass. The corrected check uses binary comparison while retaining the approved column collation and unique-name behavior.
-- `^[0-9a-fA-F-]{36}$` accepts noncanonical 36-character values with missing or misplaced hyphens. The principal and nullable audit UUID checks now require the canonical 8-4-4-4-12 form.
-
-No table, column, key, relationship, state, or storage model was redesigned. The executable governed migration is `Tools/BotSchema/001_botservice_schema_forward.sql`.

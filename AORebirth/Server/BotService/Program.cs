@@ -29,6 +29,7 @@ namespace AORebirth.BotService.Host
 
                 IPersistentBotRepository repository = new AdoNetBotRepository(
                     () => CreateConnection(configuration.ProviderType, configuration.ConnectionString));
+                ((IPersistentBotSchemaValidator)repository).ValidateSchema();
                 IHostedBotChatGateway gateway = new PrivateTcpHostedBotChatGateway(
                     new IPEndPoint(configuration.ChatAddress, configuration.ChatPort),
                     configuration.ServiceKey);

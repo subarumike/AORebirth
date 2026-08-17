@@ -32,6 +32,11 @@ namespace AORebirth.BotService
         void AppendAudit(BotAuditEvent auditEvent);
     }
 
+    public interface IPersistentBotSchemaValidator
+    {
+        void ValidateSchema();
+    }
+
     public sealed class PersistentBotCredentialIssuer
     {
         public const int DefaultIterations = 120000;
@@ -384,13 +389,53 @@ namespace AORebirth.BotService
         }
     }
 
-    public sealed class AdoNetBotRepository : IPersistentBotRepository
+    public sealed class AdoNetBotRepository : IPersistentBotRepository, IPersistentBotSchemaValidator
     {
         private readonly Func<IDbConnection> connectionFactory;
 
         public AdoNetBotRepository(Func<IDbConnection> connectionFactory)
         {
             this.connectionFactory = connectionFactory ?? throw new ArgumentNullException("connectionFactory");
+        }
+
+        public void ValidateSchema()
+        {
+            using (IDbConnection connection = this.OpenConnection())
+            {
+                RequireSchemaCount(
+                    connection,
+                    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() "
+                    + "AND table_type='BASE TABLE' AND table_name IN ('bot_principals','bot_credentials','bot_scopes','bot_audit_events')",
+                    4,
+                    "The four BotService tables are missing or incomplete.");
+                RequireSchemaCount(
+                    connection,
+                    "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND ((table_name='account_identities' "
+                    + "AND column_name='IdentityId' AND column_type='bigint unsigned' AND is_nullable='NO') OR (table_name='bot_credentials' "
+                    + "AND column_name='Salt' AND column_type='binary(16)') OR (table_name='bot_credentials' AND column_name='Verifier' "
+                    + "AND column_type='binary(32)') OR (table_name='bot_principals' AND column_name='BotId' AND column_type='char(36)'))",
+                    4,
+                    "BotService storage column metadata is incompatible.");
+                RequireSchemaCount(
+                    connection,
+                    "SELECT COUNT(DISTINCT constraint_name) FROM information_schema.table_constraints WHERE constraint_schema=DATABASE() "
+                    + "AND constraint_name IN ('FK_bot_principals_owner','FK_bot_credentials_bot','FK_bot_scopes_bot','FK_bot_scopes_granted_by',"
+                    + "'FK_bot_audit_bot','FK_bot_audit_actor','CK_bot_principals_id','CK_bot_principals_org','CK_bot_principals_name',"
+                    + "'CK_bot_principals_name_normalization','CK_bot_principals_version','CK_bot_principals_disabled_at',"
+                    + "'CK_bot_credentials_public_id','CK_bot_credentials_iterations','CK_bot_credentials_version',"
+                    + "'CK_bot_credentials_revocation','CK_bot_scopes_name','CK_bot_audit_bot_id','CK_bot_audit_session_id','CK_bot_audit_org')",
+                    20,
+                    "BotService storage constraints are incompatible.");
+                RequireSchemaCount(
+                    connection,
+                    "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics WHERE table_schema=DATABASE() "
+                    + "AND index_name IN ('UX_bot_principals_normalized_display_name','IX_bot_principals_owner_status',"
+                    + "'IX_bot_principals_organization_status','UX_bot_credentials_public_id','UX_bot_credentials_bot_version',"
+                    + "'IX_bot_credentials_bot_state','IX_bot_scopes_scope_bot','IX_bot_scopes_granted_by','IX_bot_audit_bot_created',"
+                    + "'IX_bot_audit_actor_created','IX_bot_audit_org_created','IX_bot_audit_event_created')",
+                    12,
+                    "BotService storage indexes are incompatible.");
+            }
         }
 
         public BotPrincipal FindPrincipal(Guid botId)
@@ -881,6 +926,22 @@ namespace AORebirth.BotService
             parameter.ParameterName = name;
             parameter.Value = value ?? DBNull.Value;
             command.Parameters.Add(parameter);
+        }
+
+        private static void RequireSchemaCount(
+            IDbConnection connection,
+            string sql,
+            long expected,
+            string failureMessage)
+        {
+            using (IDbCommand command = CreateCommand(connection, null, sql))
+            {
+                long actual = Convert.ToInt64(command.ExecuteScalar(), CultureInfo.InvariantCulture);
+                if (actual != expected)
+                {
+                    throw new InvalidOperationException(failureMessage);
+                }
+            }
         }
 
         private static long? ParseNullableInt64(object value)
