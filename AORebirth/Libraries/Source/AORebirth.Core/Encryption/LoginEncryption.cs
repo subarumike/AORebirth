@@ -191,9 +191,12 @@ namespace AO.Core.Encryption
             {
                 this.DecryptLoginKey(LoginKey, out ClientUserName, out ClientServerSalt, out ClientPassword);
             }
-            catch
+            catch (Exception exception)
             {
-                Console.WriteLine("Invalid password...");
+                Console.WriteLine(
+                    "Chat login key decrypt failed: type="
+                    + exception.GetType().Name
+                    + ".");
                 return false;
             }
 

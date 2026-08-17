@@ -83,6 +83,7 @@ namespace ChatEngine.CoreClient
             : base(srvr)
         {
             this.Character = new Character(0, null);
+            this.AuthenticatedUsername = string.Empty;
             this.ServerSalt = string.Empty;
             this.knownClients = new List<uint>();
         }
@@ -104,6 +105,11 @@ namespace ChatEngine.CoreClient
         /// The character.
         /// </summary>
         public Character Character { get; set; }
+
+        /// <summary>
+        /// Account username proven by the encrypted chat login request.
+        /// </summary>
+        internal string AuthenticatedUsername { get; set; }
 
         /// <summary>
         /// The known clients.

@@ -258,6 +258,48 @@ namespace AORebirth.LinuxBuild.Contracts
             {
                 RequireFile(Path.Combine(root, ToNativePath(source)), "ChatEngine compile source");
             }
+
+            string chatServer = File.ReadAllText(
+                RequireFile(
+                    Path.Combine(root, "AORebirth", "Server", "ChatEngine", "CoreServer", "ChatServer.cs"),
+                    "ChatEngine server source"));
+            Assert(
+                chatServer.Contains(
+                    "client1.ServerSalt = FormatServerSalt(Encoding.ASCII.GetBytes(wireServerSalt));",
+                    StringComparison.Ordinal),
+                "ChatEngine must derive the validation salt from the original wire server salt.");
+            Assert(
+                chatServer.Contains(
+                    "client1.Send(AuthenticationSeed.Create(wireServerSalt));",
+                    StringComparison.Ordinal),
+                "ChatEngine packet 0 must send the original 32-character wire server salt.");
+            Assert(
+                !chatServer.Contains(
+                    "client1.Send(AuthenticationSeed.Create(client1.ServerSalt));",
+                    StringComparison.Ordinal),
+                "ChatEngine packet 0 must not send the 64-character validation salt.");
+
+            string authenticateBot = File.ReadAllText(
+                RequireFile(
+                    Path.Combine(root, "AORebirth", "Server", "ChatEngine", "PacketHandlers", "AuthenticateBot.cs"),
+                    "ChatEngine bot authentication source"));
+            string loginCharacter = File.ReadAllText(
+                RequireFile(
+                    Path.Combine(root, "AORebirth", "Server", "ChatEngine", "PacketHandlers", "LoginCharacter.cs"),
+                    "ChatEngine character login source"));
+            Assert(
+                authenticateBot.Contains("client.AuthenticatedUsername = userName;", StringComparison.Ordinal),
+                "ChatEngine must retain the username proven by encrypted bot authentication.");
+            Assert(
+                loginCharacter.Contains("CharacterDao.Instance.IsCharacterOnAccount(client.AuthenticatedUsername, playerId)", StringComparison.Ordinal),
+                "ChatEngine must bind character selection to the authenticated account.");
+            int loginOkIndex = loginCharacter.IndexOf("client.Send(LoginOk.Create());", StringComparison.Ordinal);
+            int channelBootstrapIndex = loginCharacter.IndexOf(
+                "client.ChatServer().AddClientToChannels(client);",
+                StringComparison.Ordinal);
+            Assert(
+                loginOkIndex >= 0 && channelBootstrapIndex > loginOkIndex,
+                "ChatEngine must send Login OK before channel bootstrap.");
         }
 
         private static void VerifyDeploymentFiles(string root)

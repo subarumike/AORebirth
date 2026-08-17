@@ -62,6 +62,7 @@ namespace AORebirth.LinuxBuild.Contracts
             Create(chatEngineAssembly, authenticationAssembly);
             VerifyAuthenticationAssemblyShape(authenticationAssembly);
             VerifyPasswordFixture(authenticationAssembly, CreatePasswordFixtureLine(authenticationAssembly));
+            VerifyFocusedPacketCompatibility(chatEngineAssembly);
         }
 
         private static string Create(Assembly chatEngineAssembly, Assembly authenticationAssembly)
@@ -544,6 +545,89 @@ namespace AORebirth.LinuxBuild.Contracts
         {
             MethodInfo method = GetRequiredMethod(GetRequiredType(assembly, typeName), methodName, parameterTypes);
             return (byte[])method.Invoke(null, arguments);
+        }
+
+        private static void VerifyFocusedPacketCompatibility(Assembly assembly)
+        {
+            Type serverType = GetRequiredType(assembly, "ChatEngine.CoreServer.ChatServer");
+            MethodInfo formatServerSalt = GetRequiredMethod(serverType, "FormatServerSalt", typeof(byte[]));
+            MethodInfo createWireServerSalt = GetRequiredMethod(serverType, "CreateWireServerSalt", typeof(Random));
+
+            string generatedWireSalt = (string)createWireServerSalt.Invoke(null, new object[] { new Random(17082026) });
+            Assert(generatedWireSalt.Length == 32, "ChatEngine wire server salt must contain exactly 32 characters.");
+            Assert(
+                generatedWireSalt.All(
+                    character => (character >= 'a' && character <= 'z')
+                                 || (character >= 'A' && character <= 'Z')
+                                 || (character >= '0' && character <= '9')),
+                "ChatEngine wire server salt must remain legacy-safe ASCII alphanumeric text.");
+
+            const string wireSalt = "0123456789abcdefghijklmnopqrstuv";
+            const string expectedValidationSalt = "303132333435363738396162636465666768696a6b6c6d6e6f70717273747576";
+            string validationSalt = (string)formatServerSalt.Invoke(
+                null,
+                new object[] { Encoding.ASCII.GetBytes(wireSalt) });
+            Assert(validationSalt.Length == 64, "ChatEngine validation salt must contain exactly 64 hexadecimal characters.");
+            Assert(
+                string.Equals(validationSalt, expectedValidationSalt, StringComparison.Ordinal),
+                "ChatEngine validation salt must be the hexadecimal representation of the wire server salt.");
+
+            byte[] authenticationSeed = InvokeBytes(
+                assembly,
+                "ChatEngine.Packets.AuthenticationSeed",
+                "Create",
+                new[] { typeof(string) },
+                new object[] { wireSalt });
+            Assert(authenticationSeed.Length == 38, "Authentication seed packet length changed.");
+            Assert(authenticationSeed[0] == 0x00 && authenticationSeed[1] == 0x00, "Authentication seed packet type changed.");
+            Assert(authenticationSeed[2] == 0x00 && authenticationSeed[3] == 0x22, "Authentication seed payload length changed.");
+            Assert(authenticationSeed[4] == 0x00 && authenticationSeed[5] == 0x20, "Authentication seed string framing changed.");
+            Assert(
+                string.Equals(ReadPacketString(authenticationSeed, 0), wireSalt, StringComparison.Ordinal),
+                "Authentication seed packet must contain the original 32-character wire salt.");
+            Assert(
+                !string.Equals(ReadPacketString(authenticationSeed, 0), validationSalt, StringComparison.Ordinal),
+                "Authentication seed packet must not expose the 64-character validation salt.");
+
+            byte[] loginOk = InvokeBytes(assembly, "ChatEngine.Packets.LoginOk", "Create", Type.EmptyTypes, new object[0]);
+            Assert(
+                loginOk.SequenceEqual(new byte[] { 0x00, 0x05, 0x00, 0x00 }),
+                "Login OK packet must remain the empty type-5 legacy acknowledgement.");
+
+            byte[] loginError = CreateLoginErrorPacket(assembly, "Invalid login");
+            Assert(loginError.Length > 6, "Login error packet must include a string payload.");
+            Assert(loginError[0] == 0x00 && loginError[1] == 0x06, "Login error packet type changed.");
+            Assert(string.Equals(ReadPacketString(loginError, 6), "Invalid login", StringComparison.Ordinal), "Login error packet payload changed.");
+        }
+
+        private static byte[] CreateLoginErrorPacket(Assembly assembly, string message)
+        {
+            Type loginErrorType = GetRequiredType(assembly, "ChatEngine.Packets.LoginError");
+            MethodInfo method = loginErrorType.GetMethod(
+                "Create",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
+                null,
+                new[] { typeof(string) },
+                null);
+            if (method != null)
+            {
+                return (byte[])method.Invoke(null, new object[] { message });
+            }
+
+            return InvokeBytes(assembly, "ChatEngine.Packets.LoginError", "Create", Type.EmptyTypes, new object[0]);
+        }
+
+        private static string ReadPacketString(byte[] packet, ushort expectedType)
+        {
+            Assert(packet != null && packet.Length >= 6, "Packet is too short for string framing.");
+            ushort packetType = (ushort)((packet[0] << 8) | packet[1]);
+            Assert(packetType == expectedType, "Unexpected packet type.");
+            ushort payloadLength = (ushort)((packet[2] << 8) | packet[3]);
+            Assert(payloadLength == packet.Length - 4, "Packet payload length header is incorrect.");
+            ushort stringLength = (ushort)((packet[4] << 8) | packet[5]);
+            Assert(stringLength > 0, "Packet string payload must not be empty.");
+            Assert(packet.Length == stringLength + 6, "Packet string framing is incorrect.");
+            return Encoding.ASCII.GetString(packet, 6, stringLength);
         }
 
         private static void AddPacket(IDictionary<string, byte[]> fixtures, string name, byte[] bytes)

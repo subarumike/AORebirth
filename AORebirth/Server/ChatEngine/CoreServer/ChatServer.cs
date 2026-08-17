@@ -37,6 +37,7 @@ namespace ChatEngine.CoreServer
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
+    using System.Text;
 
     using Cell.Core;
 
@@ -302,35 +303,50 @@ namespace ChatEngine.CoreServer
         {
             Client client1 = (Client)client;
 
-            byte[] welcomePacket = new byte[]
-                                   {
-                                       0x00, 0x00, 0x00, 0x22, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-                                       // Server Salt (32 Bytes)
-                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                                   };
-
-            byte[] salt = new byte[0x20];
             Random rand = new Random();
+            string wireServerSalt = CreateWireServerSalt(rand);
 
-            rand.NextBytes(salt);
+            client1.ServerSalt = FormatServerSalt(Encoding.ASCII.GetBytes(wireServerSalt));
+            client1.Send(AuthenticationSeed.Create(wireServerSalt));
+        }
 
-            client1.ServerSalt = string.Empty;
-
-            for (int i = 0; i < 32; i++)
+        internal static string FormatServerSalt(byte[] salt)
+        {
+            if (salt == null)
             {
-                // 0x00 Breaks Things
-                if (salt[i] == 0)
-                {
-                    salt[i] = 42; // So we change it to something nicer
-                }
-
-                welcomePacket[6 + i] = salt[i];
-
-                client1.ServerSalt += string.Format("{0:x2}", salt[i]);
+                throw new ArgumentNullException("salt");
             }
 
-            client1.Send(welcomePacket);
+            var builder = new StringBuilder(salt.Length * 2);
+            for (int i = 0; i < salt.Length; i++)
+            {
+                byte current = salt[i];
+                if (current == 0)
+                {
+                    current = 42;
+                }
+
+                builder.AppendFormat("{0:x2}", current);
+            }
+
+            return builder.ToString();
+        }
+
+        internal static string CreateWireServerSalt(Random rand)
+        {
+            if (rand == null)
+            {
+                throw new ArgumentNullException("rand");
+            }
+
+            const string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            char[] salt = new char[0x20];
+            for (int i = 0; i < salt.Length; i++)
+            {
+                salt[i] = alphabet[rand.Next(alphabet.Length)];
+            }
+
+            return new string(salt);
         }
 
         /// <summary>

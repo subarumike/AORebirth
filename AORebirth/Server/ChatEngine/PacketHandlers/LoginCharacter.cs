@@ -77,6 +77,14 @@ namespace ChatEngine.PacketHandlers
                 playerId);
             reader.Finish();
 
+            if (string.IsNullOrWhiteSpace(client.AuthenticatedUsername)
+                || !CharacterDao.Instance.IsCharacterOnAccount(client.AuthenticatedUsername, playerId))
+            {
+                client.Send(LoginError.Create("Invalid login"));
+                client.Server.DisconnectClient(client);
+                return;
+            }
+
             if (client.IsBot)
             {
                 CharacterDao.Instance.SetOnline((int)playerId);
@@ -90,6 +98,7 @@ namespace ChatEngine.PacketHandlers
             client.Character.characterLastName = character.LastName;
             client.ChatAuthenticatedUtc = DateTime.UtcNow;
 
+            client.Send(LoginOk.Create());
             client.ChatServer().AddClientToChannels(client);
 
             if (client.IsBot)

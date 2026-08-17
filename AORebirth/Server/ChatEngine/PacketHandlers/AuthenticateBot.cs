@@ -81,6 +81,7 @@ namespace ChatEngine.PacketHandlers
             if (loginEncryption.IsValidLogin(loginKey, client.ServerSalt, userName))
             {
                 client.IsBot = true;
+                client.AuthenticatedUsername = userName;
                 byte[] chars = AccountCharacterList.Create(userName);
                 LogUtil.Debug(DebugInfoDetail.Network, "\r\nReceived:\r\n" + HexOutput.Output(chars));
 
@@ -88,7 +89,8 @@ namespace ChatEngine.PacketHandlers
             }
             else
             {
-                byte[] loginerr = LoginError.Create();
+                LogUtil.Debug(DebugInfoDetail.Network, "Chat bot authentication failed for '" + userName + "'.");
+                byte[] loginerr = LoginError.Create("Invalid login");
                 client.Send(loginerr);
                 client.Server.DisconnectClient(client);
             }

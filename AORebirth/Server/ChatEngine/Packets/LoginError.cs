@@ -49,6 +49,13 @@ namespace ChatEngine.Packets
             return writer.Finish();
         }
 
+        internal static byte[] Create(string message)
+        {
+            PacketWriter writer = new PacketWriter(6);
+            writer.WriteString(message);
+            return writer.Finish();
+        }
+
         #endregion
     }
 }
