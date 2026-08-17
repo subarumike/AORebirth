@@ -69,6 +69,7 @@
     <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="DailyLoginPathContractTests.cs" />
     <Compile Include="EngineBindPolicyTests.cs" />
+    <Compile Include="LinuxZoneEngineDeploymentPermissionTests.cs" />
     <Compile Include="..\..\..\..\Utility\Network\EngineBindPolicy.cs">
       <Link>EngineBindPolicy.cs</Link>
     </Compile>
