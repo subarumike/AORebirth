@@ -1053,6 +1053,7 @@ namespace ZoneEngine
             string[] allowedExtensionTables =
                 {
                     "account_external_mappings",
+                    "account_email_verification_tokens",
                     "account_game_mappings",
                     "account_identities",
                     "account_provisioning_jobs"
