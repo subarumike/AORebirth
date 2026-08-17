@@ -30,7 +30,7 @@ namespace
                 root,
                 sizeof(root) / sizeof(root[0]),
                 _TRUNCATE,
-                L"%s\\AORoomSpaceFix",
+                L"%s\\AORebirthClientPatch",
                 localAppData) < 0)
         {
             return false;
