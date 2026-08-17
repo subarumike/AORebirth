@@ -2124,6 +2124,50 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             for relative in expected:
                 self.assertIn(relative, discovered)
             self.assertNotIn(ignored_binary.relative_to(root).as_posix(), discovered)
+            self.assertNotIn(runtime.relative_to(root).as_posix(), discovered)
+
+    def test_auxiliary_snapshot_does_not_fingerprint_unrelated_zone_runtime_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            formula = root / pipeline.FORMULA_GENERATOR
+            formula.parent.mkdir(parents=True)
+            formula.write_text('FORMULA = "no capture reference"\n', encoding="utf-8")
+            for logical_root in pipeline.SCFU_ANALYZER_SOURCE_ROOTS:
+                source = root / logical_root / "Fixture.cs"
+                source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_text("// fixture\n", encoding="utf-8")
+            unrelated = (
+                root
+                / "AORebirth"
+                / "Server"
+                / "ZoneEngine"
+                / "Core"
+                / "Missions"
+                / "MissionStateDirectory.cs"
+            )
+            unrelated.parent.mkdir(parents=True, exist_ok=True)
+            unrelated.write_text("// unrelated runtime source\n", encoding="utf-8")
+
+            discovered = pipeline.auxiliary_input_paths(root)
+
+            self.assertNotIn(unrelated.relative_to(root).as_posix(), discovered)
+
+    def test_explicit_generation_reports_missing_required_capture_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            formula = root / pipeline.FORMULA_GENERATOR
+            formula.parent.mkdir(parents=True)
+            formula.write_text('FORMULA = "20260101-010101"\n', encoding="utf-8")
+            for logical_root in pipeline.SCFU_ANALYZER_SOURCE_ROOTS:
+                source = root / logical_root / "Fixture.cs"
+                source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_text("// fixture\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(
+                pipeline.PipelineError,
+                "Required capture evidence is unavailable",
+            ):
+                pipeline.auxiliary_input_paths(root, require_capture_evidence=True)
 
 
 if __name__ == "__main__":

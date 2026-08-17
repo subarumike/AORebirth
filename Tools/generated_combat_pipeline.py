@@ -1254,7 +1254,9 @@ def generator_descriptors(repo_root: Path) -> dict[str, dict[str, Any]]:
     return descriptors
 
 
-def auxiliary_input_paths(repo_root: Path) -> tuple[str, ...]:
+def auxiliary_input_paths(
+    repo_root: Path, *, require_capture_evidence: bool = False
+) -> tuple[str, ...]:
     excluded = {
         relative.as_posix().casefold()
         for relative in ARTIFACT_RELATIVE_PATHS.values()
@@ -1277,6 +1279,7 @@ def auxiliary_input_paths(repo_root: Path) -> tuple[str, ...]:
             r"\b20[0-9]{6}-[0-9]{6}\b", "\n".join(formula_source_texts)
         )
     )
+    missing_capture_roots: list[str] = []
     for capture_id in sorted(capture_ids):
         capture_root = (
             repo_root
@@ -1287,10 +1290,19 @@ def auxiliary_input_paths(repo_root: Path) -> tuple[str, ...]:
             / "captures"
             / capture_id
         )
+        found_capture_source = False
         for source_name in FORMULA_CAPTURE_SOURCE_NAMES:
             source = capture_root / source_name
             if source.is_file():
+                found_capture_source = True
                 values.add(source.relative_to(repo_root).as_posix())
+        if require_capture_evidence and not found_capture_source:
+            missing_capture_roots.append(capture_root.relative_to(repo_root).as_posix())
+    if missing_capture_roots:
+        raise PipelineError(
+            "Required capture evidence is unavailable: "
+            + ", ".join(missing_capture_roots)
+        )
     for logical_root in SCFU_ANALYZER_SOURCE_ROOTS:
         source_root = repo_root / logical_root
         if not source_root.is_dir():
@@ -1308,26 +1320,29 @@ def auxiliary_input_paths(repo_root: Path) -> tuple[str, ...]:
                 and source.suffix.casefold() in SCFU_ANALYZER_SOURCE_SUFFIXES
             ):
                 values.add(source.relative_to(repo_root).as_posix())
-    runtime_root = repo_root / "AORebirth" / "Server" / "ZoneEngine" / "Core"
-    if not runtime_root.is_dir():
-        raise PipelineError("active-coverage runtime source root is missing")
-    for path in runtime_root.rglob("*.cs"):
-        relative = path.relative_to(repo_root).as_posix()
-        if relative.casefold() not in excluded:
-            values.add(relative)
     return tuple(sorted(values))
 
 
-def capture_auxiliary_inputs(lease: Any, repo_root: Path) -> Any:
+def capture_auxiliary_inputs(
+    lease: Any, repo_root: Path, *, require_capture_evidence: bool = False
+) -> Any:
     transaction = _load_transaction_module()
     return transaction.InputSnapshot.capture(
         lease,
-        auxiliary_input_paths(repo_root),
+        auxiliary_input_paths(
+            repo_root, require_capture_evidence=require_capture_evidence
+        ),
     )
 
 
-def revalidate_auxiliary_inputs(snapshot: Any, repo_root: Path) -> None:
-    snapshot.revalidate(auxiliary_input_paths(repo_root))
+def revalidate_auxiliary_inputs(
+    snapshot: Any, repo_root: Path, *, require_capture_evidence: bool = False
+) -> None:
+    snapshot.revalidate(
+        auxiliary_input_paths(
+            repo_root, require_capture_evidence=require_capture_evidence
+        )
+    )
 
 
 def scfu_analyzer_runtime_paths(repo_root: Path) -> tuple[str, ...]:
@@ -2796,7 +2811,9 @@ def run_pipeline(
         return 0
     if mode == "validate":
         with _shared_lease(repo_root, "read") as lease:
-            inputs = capture_auxiliary_inputs(lease, repo_root)
+            inputs = capture_auxiliary_inputs(
+                lease, repo_root, require_capture_evidence=True
+            )
             manifest = validate_cohort(repo_root, verify_toolchain=True)
             if (
                 manifest["inputSnapshot"]["auxiliarySnapshotIdentity"]
@@ -2805,7 +2822,9 @@ def run_pipeline(
                 raise CohortValidationError(
                     "published cohort auxiliary input snapshot is stale"
                 )
-            revalidate_auxiliary_inputs(inputs, repo_root)
+            revalidate_auxiliary_inputs(
+                inputs, repo_root, require_capture_evidence=True
+            )
         print(f"generated-combat cohort PASS identity={manifest['generationIdentity']}")
         return 0
     if mode == "run-read-lease":
@@ -2830,7 +2849,9 @@ def run_pipeline(
 
     lease_mode = "read" if mode == "check" else "write"
     with _shared_lease(repo_root, lease_mode) as lease:
-        inputs = capture_auxiliary_inputs(lease, repo_root)
+        inputs = capture_auxiliary_inputs(
+            lease, repo_root, require_capture_evidence=True
+        )
         if mode == "check":
             published_manifest = validate_cohort(repo_root, verify_toolchain=True)
             if (
