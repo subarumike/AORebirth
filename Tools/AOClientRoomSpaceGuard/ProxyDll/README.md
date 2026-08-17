@@ -144,7 +144,7 @@ static CRT, runs an offline byte/ABI self-test for both profiles, verifies the
 PE machine, export surface, and runtime dependencies, and creates the ignored
 artifact:
 
-`artifacts\AORebirthClientPatch-v1.zip`
+`artifacts\AORebirthClientPatch-v2.zip`
 
 The build never launches AO and never installs into a client directory.
 

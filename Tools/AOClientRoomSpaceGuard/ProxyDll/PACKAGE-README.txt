@@ -67,14 +67,14 @@ Preferred private-test allow method:
 5. Under Exclusions, select Add or remove exclusions.
 6. Select Add an exclusion, then Folder.
 7. Choose the dedicated AO test install folder.
-8. Run AORebirthClientPatchSetup-v1.exe and select that same AO folder.
+8. Run AORebirthClientPatchSetup-v2.exe and select that same AO folder.
 
 Alternative exact-file allow method:
 
 1. Open Windows Security.
 2. Select Virus & threat protection.
 3. Open Protection history.
-4. Expand the blocked AORebirthClientPatchSetup-v1.exe item.
+4. Expand the blocked AORebirthClientPatchSetup-v2.exe item.
 5. Confirm the detection and affected path match the current private test build.
 6. Choose Allow on device or Restore/Allow, depending on the Windows version.
 7. Run the installer again.
@@ -89,14 +89,14 @@ INSTALL
 1. Close every AnarchyOnline.exe process.
 2. Run the one-file installer:
 
-   AORebirthClientPatchSetup-v1.exe
+   AORebirthClientPatchSetup-v2.exe
 
    The installer opens a folder picker. Select the main Anarchy Online folder
    that contains AnarchyOnline.exe.
 
    If the installer cannot find AO automatically, run:
 
-   AORebirthClientPatchSetup-v1.exe "C:\path\to\Anarchy Online"
+   AORebirthClientPatchSetup-v2.exe "C:\path\to\Anarchy Online"
 
 The ZIP package is kept as a manual fallback. To install from the ZIP, extract
 it and run:

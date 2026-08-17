@@ -3,6 +3,7 @@
 // settings, camera, input, and UI modifications.
 
 #include "crash_dump.h"
+#include "build_info.h"
 #include "gui_rect_fix.h"
 #include "login_key_patch.h"
 #include "logging.h"
@@ -42,7 +43,11 @@ namespace
     DWORD WINAPI DeferredInstall(LPVOID)
     {
         aorf::LogInit();
-        aorf::Log("START version=1 mode=combined pid=%lu", GetCurrentProcessId());
+        aorf::Log(
+            "START product=AORebirthClientPatch version=%s source=%s mode=combined pid=%lu",
+            aorf::ClientPatchVersion,
+            aorf::ClientPatchSourceSha,
+            GetCurrentProcessId());
         const bool loginKeyWorkerStarted = aorf::StartLoginKeyPatchWorker();
         if (!loginKeyWorkerStarted)
         {

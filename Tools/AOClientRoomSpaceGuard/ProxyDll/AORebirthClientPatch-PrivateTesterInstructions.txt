@@ -4,7 +4,7 @@ AORebirth Client Patch - Private Tester Instructions
 Download
 --------
 
-https://ao-rebirth.com/downloads/AORebirthClientPatchSetup-v1.exe
+https://ao-rebirth.com/downloads/AORebirthClientPatchSetup-v2.exe
 
 This private test installer patches an official Anarchy Online client install
 so the launcher can show AORebirth and the official Funcom servers in the same
@@ -47,7 +47,7 @@ Preferred private-test allow method
 4. Under Exclusions, select Add or remove exclusions.
 5. Select Add an exclusion, then Folder.
 6. Choose the dedicated AO test install folder.
-7. Run AORebirthClientPatchSetup-v1.exe and select that same AO folder.
+7. Run AORebirthClientPatchSetup-v2.exe and select that same AO folder.
 
 Alternative exact-file allow method
 -----------------------------------
@@ -55,7 +55,7 @@ Alternative exact-file allow method
 1. Open Windows Security.
 2. Select Virus & threat protection.
 3. Open Protection history.
-4. Expand the blocked AORebirthClientPatchSetup-v1.exe item.
+4. Expand the blocked AORebirthClientPatchSetup-v2.exe item.
 5. Confirm the detection and affected path match the current private test build.
 6. Choose Allow on device or Restore/Allow, depending on the Windows version.
 7. Run the installer again.
@@ -67,7 +67,7 @@ installer-file allow entry after testing if you used the exact-file method.
 Install steps
 -------------
 
-1. Run AORebirthClientPatchSetup-v1.exe.
+1. Run AORebirthClientPatchSetup-v2.exe.
 2. Select the main Anarchy Online folder containing AnarchyOnline.exe.
 3. Wait for the success message.
 4. Start Anarchy Online normally.
