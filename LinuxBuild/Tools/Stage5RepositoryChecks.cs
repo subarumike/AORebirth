@@ -422,7 +422,13 @@ namespace AORebirth.LinuxBuild.Contracts
 
             string authenticate = File.ReadAllText(Path.Combine(root, "AORebirth", "Server", "ChatEngine", "PacketHandlers", "Authenticate.cs"));
             string authenticateBot = File.ReadAllText(Path.Combine(root, "AORebirth", "Server", "ChatEngine", "PacketHandlers", "AuthenticateBot.cs"));
-            Assert(authenticate.Contains("new LoginEncryption()") && authenticate.Contains("IsValidLogin") && authenticate.Contains("IsCharacterOnAccount"), "Authenticate.cs is no longer bound to the legacy login implementation.");
+            Assert(authenticate.Contains("LoginDataDao.Instance.GetByUsername")
+                && authenticate.Contains("CharacterDao.Instance.IsCharacterOnAccount")
+                && authenticate.Contains("LoginOk.Create()")
+                && authenticate.Contains("m_reader.ReadBytes(loginKeyLength)")
+                && !authenticate.Contains("new LoginEncryption()")
+                && !authenticate.Contains("IsValidLogin"),
+                "Authenticate.cs is no longer bound to the username/account/character ownership login implementation.");
             Assert(authenticateBot.Contains("new LoginEncryption()") && authenticateBot.Contains("IsValidLogin"), "AuthenticateBot.cs is no longer bound to the legacy login implementation.");
         }
 
