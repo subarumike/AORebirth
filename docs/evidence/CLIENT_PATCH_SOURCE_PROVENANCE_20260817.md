@@ -465,3 +465,224 @@ DAILYLOGIN CLIENT ROUTING UNBLOCKED
 Meaning: the client patch source exists and can be built. Deployment remains
 blocked until source reconciliation decides which branch/artifact becomes
 authoritative.
+
+## 2026-08-17 combined v2 package preparation
+
+Combined package status: prepared, not deployed.
+
+Final status for this stage:
+
+`BLOCKED - COMBINED PATCH NOT YET SAFE TO DEPLOY`
+
+Reason: the authoritative source now builds one combined `version.dll` containing
+both crash-repair/RoomSpace protection and endpoint-aware AORebirth login-key
+handling, but real interactive client acceptance has not been completed in a
+disposable client process across AORebirth, Rubi-Ka, RK2019, dimension
+switching, and crash-regression scenarios.
+
+### Source commits
+
+- `a4d8ed1b Reconcile AORebirth client patch source`
+- `dc3d2744 Version combined client patch package`
+- `b60b7ca6 Cover local AORebirth login endpoint`
+
+The combined patch source remains authoritative at:
+
+`Tools\AOClientRoomSpaceGuard\ProxyDll`
+
+### Combined source structure
+
+Crash/RoomSpace lineage:
+
+- `src\crash_dump.cpp` / `src\crash_dump.h`: installs the unhandled dump filter
+  and writes dumps under `%LOCALAPPDATA%\AORebirthClientPatch\Dumps`.
+- `src\roomspace_fix.cpp` / `src\roomspace_fix.h`: identifies approved `N3.dll`
+  hashes, installs the RoomSpace wrapper, and runs offline crash-mitigation
+  self-tests.
+- `src\gui_rect_fix.cpp` / `src\gui_rect_fix.h`: installs new-client GUI draw
+  and old-client rectangle guards.
+- `src\randy_color_fix.cpp` / `src\randy_color_fix.h`: installs old-client
+  renderer/color/driver guards and the early render-state exception guard.
+
+Login-key lineage:
+
+- `src\login_key_patch.cpp` / `src\login_key_patch.h`: parses `IA` and `IP`
+  launch tokens, arms only for AORebirth endpoints on port `7500`, patches only
+  verified in-memory key copies, and skips official or unknown endpoints.
+
+Shared/proxy lineage:
+
+- `src\version_proxy.cpp`, `src\version_proxy.def`, and
+  `src\proxy_self_test.cpp`: preserve the 17-export Windows `version.dll`
+  forwarding surface.
+- `src\dllmain.cpp`: one `DllMain`, one process-attach gate, one deferred
+  worker outside loader lock. The worker starts login-key support, then installs
+  the crash dump handler, waits for `N3.dll`, installs RoomSpace, and selects
+  the new-client or old-client crash guard path.
+- `src\build_info.h`: embeds non-secret package version and source SHA.
+- `src\deploy_tool.cpp` and `src\setup_tool.cpp`: install, repair, uninstall,
+  package-verify, setup extraction, and marker handling.
+
+### Combined DLL
+
+Built from source commit:
+
+`b60b7ca6`
+
+Package version:
+
+`2`
+
+Direct built DLL:
+
+- Path:
+  `Tools\AOClientRoomSpaceGuard\ProxyDll\artifacts\AORebirthClientPatch-v2\version.dll`
+- Size: `173,568`
+- Architecture: PE32 x86 / machine `0x014C`
+- SHA-256:
+  `07cd2c1bbcfb92793b1f816b02dbb761df1472531143fee6c74243e7c0b1df1c`
+- Inspectable strings include:
+  `AORebirthClientPatch`, version `2`, source `b60b7ca63539`,
+  `START product=AORebirthClientPatch`, `LOGINKEY patch=ARMED`, and crash guard
+  readiness markers.
+
+### Installer/package
+
+Built outputs:
+
+- `Tools\AOClientRoomSpaceGuard\ProxyDll\artifacts\AORebirthClientPatch-v2.zip`
+- `Tools\AOClientRoomSpaceGuard\ProxyDll\artifacts\AORebirthClientPatch-v2`
+- `Tools\AOClientRoomSpaceGuard\ProxyDll\artifacts\AORebirthClientPatchSetup-v2.exe`
+
+Hashes:
+
+- setup EXE:
+  `e2f2311527dc8d778438bd8c0e14541564e4dd6d9899226141e9dd36ba7a0d35`
+- ZIP:
+  `44dd5344e4877df09ca0c0469e5dbb512786893944ef6f8802c3920ed111abdc`
+- deploy helper:
+  `f022da9438d022daa5c68fd2f9b0a837cad52c371b71a71e53d63d962bb54ab6`
+
+Extracted `AORebirthClientPatchSetup-v2.exe` payload:
+
+- `AORebirthAnarchyLauncher.url`:
+  `abc2e5fc40e30be4acbd3110250364c2ca27e6e6ca8738c3d8d9c39d4a3f7ddb`
+- `AORebirthDimensionServer.url`:
+  `6cb9844f770e9204c4fb07c63c2863824c44d22bfea01ac99d1a65fff277bcc7`
+- embedded `version.dll`:
+  `07cd2c1bbcfb92793b1f816b02dbb761df1472531143fee6c74243e7c0b1df1c`
+
+Conclusion: the v2 installer embeds exactly the combined v2 DLL.
+
+### Automated validation
+
+Command:
+
+```cmd
+cmd.exe /d /c Tools\AOClientRoomSpaceGuard\ProxyDll\Build-Package.cmd
+```
+
+Result: PASS.
+
+Covered by the build:
+
+- x86 static-CRT proxy build.
+- crash-mitigation self-test.
+- login-key endpoint/memory-scan self-test.
+- proxy forwarding self-test: `exports=17 functional=4`.
+- deployment helper self-test.
+- PE32 x86 header check.
+- 17 export name/function checks.
+- dynamic CRT dependency rejection.
+- package manifest generation.
+- package verification.
+- ZIP extraction verification.
+- setup EXE build.
+
+Endpoint self-test coverage now includes:
+
+- AORebirth public: `2.24.96.30:7500`.
+- AORebirth local: `127.0.0.1:7500`.
+- AORebirth numeric command-line forms.
+- official-port preservation on `7505` and `7506`.
+- unknown endpoint fail-open/original.
+
+### Disposable clean install/uninstall
+
+Target:
+
+`C:\Users\Mike\AppData\Local\Temp\AORebirthClientPatchCleanV2-001`
+
+Result:
+
+- install PASS;
+- all four launcher URL files backed up and patched;
+- installed DLL hash:
+  `07cd2c1bbcfb92793b1f816b02dbb761df1472531143fee6c74243e7c0b1df1c`;
+- marker written:
+  `Product=AORebirthClientPatch`, `Version=2`,
+  `SourceSha=b60b7ca63539`;
+- uninstall PASS;
+- `version.dll` removed;
+- original disposable launcher URL files restored.
+
+### Disposable upgrade from old installed/published patch
+
+Old fixture DLL:
+
+`fd3da14ae9d2584a7713b498a1b76ab7974a831d33f032c330e6ef47525de5a2`
+
+Upgrade target with old marker and `.AORebirthBackup` URL files:
+
+`C:\Users\Mike\AppData\Local\Temp\AORebirthClientPatchUpgradeV2-002`
+
+Result:
+
+- repair/upgrade PASS;
+- old DLL replaced with v2 combined DLL;
+- marker updated to `Version=2` and `SourceSha=b60b7ca63539`;
+- uninstall PASS;
+- v2 DLL removed;
+- original disposable launcher URL files restored.
+
+A separate incomplete fixture without backup files proved only that missing
+backup files prevent URL restoration; it is not the accepted upgrade model.
+
+### Current installed client
+
+Not modified.
+
+Current installed DLL remains:
+
+`D:\Funcom\Anarchy Online\version.dll`
+
+SHA-256:
+
+`fd3da14ae9d2584a7713b498a1b76ab7974a831d33f032c330e6ef47525de5a2`
+
+### Website package
+
+Not published.
+
+Current website installer remains:
+
+`E:\AORebirthWebsite\ao\downloads\AORebirthClientPatchSetup-v1.exe`
+
+SHA-256:
+
+`c1d1b66008298435c0b3cf8720da9ff5701edf61e20d2c8820b6e1e7c02a9ae8`
+
+### Remaining acceptance blocker
+
+The following required evidence is still missing:
+
+- actual disposable-client AORebirth launch/login/post-login acceptance with the
+  same v2 DLL installed;
+- actual official Rubi-Ka/RK2019 preservation check with the same v2 DLL
+  installed;
+- dimension-switching state-reset check;
+- repeated launch/exit check;
+- exact historical crash-regression route in a live client process;
+- performance/FPS comparison for the combined patch.
+
+Do not deploy v2 to the real installed client or website until those pass.
