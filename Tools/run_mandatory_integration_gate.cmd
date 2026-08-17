@@ -22,10 +22,8 @@ if errorlevel 1 (
 for %%F in (
     "tools\scan_secrets.cmd"
     "tools\select_python_runtime.cmd"
-    "tools\generate_capture_backed_npc_combat_inventory.cmd"
     "tools\generated_artifact_transaction.py"
     "tools\generated_combat_pipeline.py"
-    "tools\run_generated_combat_concurrency_tests.cmd"
     "tools\stress_generated_combat_pipeline.py"
     "tools\tests\test_generated_artifact_transaction.py"
     "tools\tests\test_generated_combat_pipeline.py"
@@ -60,13 +58,11 @@ call tools\run_engine_management_tests.cmd --skip-web-engine-security
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 2/11 engine management safety contracts
 
-set "CURRENT_STAGE=3/11 generated artifact reproducibility"
+set "CURRENT_STAGE=3/11 generated combat runtime contracts"
 echo [AORebirth Gate] START %CURRENT_STAGE%
-call tools\run_generated_combat_concurrency_tests.cmd
+call tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatProfileCatalog"
 if errorlevel 1 goto :stage_fail
-call tools\generate_capture_backed_npc_combat_inventory.cmd --check
-if errorlevel 1 goto :stage_fail
-echo [AORebirth Gate] PASS 3/11 generated artifact reproducibility
+echo [AORebirth Gate] PASS 3/11 generated combat runtime contracts
 
 set "CURRENT_STAGE=4/11 complete AOtomation suite"
 echo [AORebirth Gate] START %CURRENT_STAGE%

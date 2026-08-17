@@ -33,6 +33,15 @@ def main():
     validator = read("AORebirth/Server/WebEngine/PhpRuntimeValidator.cs")
     handler = read("AORebirth/Server/WebEngine/Handlers/PHPHandler.cs")
     program = read("AORebirth/Server/WebEngine/Program.cs")
+    mandatory_gate = read("tools/run_mandatory_integration_gate.cmd")
+    build_cmd = read("tools/build_aorebirth_debug.cmd")
+    preflight_cmd = read("preflight-database.cmd")
+    linux_publish_scripts = {
+        "LinuxBuild/build-linux.cmd": read("LinuxBuild/build-linux.cmd"),
+        "LinuxBuild/publish-zoneengine.cmd": read("LinuxBuild/publish-zoneengine.cmd"),
+        "LinuxBuild/publish-loginengine.cmd": read("LinuxBuild/publish-loginengine.cmd"),
+        "LinuxBuild/publish-chatengine.cmd": read("LinuxBuild/publish-chatengine.cmd"),
+    }
 
     ordered(start_cmd, "preflight-database.cmd", "start-engines.ps1")
     require("-WebOnly" not in start_cmd and "-WithWeb" not in start_cmd,
@@ -91,6 +100,40 @@ def main():
     ordered(program, "/self-test-php-runtime", "/validate-php-runtime", "bool headless")
     ordered(program, "/self-test-webcore-assets", "/validate-webcore-assets", "bool headless")
     ordered(program, "/import-webcore-assets", "bool headless")
+
+    normal_gate_sources = {
+        "mandatory gate": mandatory_gate,
+        "debug build": build_cmd,
+        "database preflight": preflight_cmd,
+        "start-engines.cmd": start_cmd,
+        "start-engines.ps1": start_ps,
+        "restart-engines.cmd": restart_cmd,
+        **linux_publish_scripts,
+    }
+    forbidden_capture_gate_tokens = (
+        "AOSharpLiveCapture",
+        "tools\\generate_capture_backed_npc_combat_inventory.cmd",
+        "Tools\\generate_capture_backed_npc_combat_inventory.cmd",
+        "run_generated_combat_concurrency_tests.cmd",
+        "capture_backed_npc_combat_generation_manifest",
+    )
+    for name, source in normal_gate_sources.items():
+        for token in forbidden_capture_gate_tokens:
+            require(token not in source,
+                    name + " must not depend on raw capture tooling: " + token)
+
+    ordered(
+        mandatory_gate,
+        "generated combat runtime contracts",
+        "run_aotomation_messaging_tests.cmd",
+        "CapturedEnemyCombatProfileCatalog",
+    )
+
+    explicit_capture_tool = read("tools/generate_capture_backed_npc_combat_inventory.cmd")
+    require("generated_combat_pipeline.py" in explicit_capture_tool,
+            "explicit capture-backed combat generation tool must remain available")
+    require("extract_capture_backed_npc_combat.py --self-test" in explicit_capture_tool,
+            "explicit capture analyzer self-test must remain available")
 
     print("[Engine Management Contracts] PASS")
     return 0
