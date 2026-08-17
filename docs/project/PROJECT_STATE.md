@@ -15,10 +15,12 @@ completion matrices and dated evidence retain detailed provenance.
   official AO browser/VGTP path. A global hosts/DNS override is rejected because
   it would hijack official Rubi-Ka/RK2019 DailyLogin traffic. The correct fix is
   process-local, dimension-aware routing in the private client patch /
-  `version.dll` layer, but the authoritative AORebirth tree does not currently
-  contain that patch source or installer project. Implementation is blocked
-  until that source and the exact VGTP interception point are available.
-  Evidence: `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
+  `version.dll` layer. The newer AORebirth private client patch source has been
+  located in the parallel Linux build tree, while current `master` still carries
+  an older RoomSpace-branded proxy variant. Implementation is blocked on source
+  reconciliation and the exact VGTP interception point, not source availability.
+  Evidence: `docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
+  `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
 - Linux login/inventory follow-up: after live validation of
   `login-hydration-b1c61405`, the DailyLogin runtime path issue was corrected
   in shared Windows-authoritative source by deriving claim roots from

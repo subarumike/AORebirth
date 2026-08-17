@@ -2,6 +2,28 @@
 
 Date: 2026-08-17
 
+## 2026-08-17 correction: client patch source located
+
+The earlier source-availability finding in this document is superseded by
+`docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md`.
+
+The private client patch source exists in the parallel Linux build tree:
+
+`D:\AO_Rebirth_Linux_Build\Tools\AOClientRoomSpaceGuard\ProxyDll`
+
+That tree contains the AORebirth-branded `version.dll` proxy source,
+`setup_tool.cpp`, `deploy_tool.cpp`, `login_key_patch.cpp`, installer resource
+embedding, and launcher URL patching. A temporary-copy build passed and produced
+`AORebirthClientPatch-v1.zip`, `version.dll`, and
+`AORebirthClientPatchSetup-v1.exe`.
+
+The current `master` checkout still contains an older RoomSpace-branded proxy
+tree. The exact source snapshot for the currently published website installer
+and installed client DLL is not yet proven by hash. DailyLogin client routing is
+therefore engineering-unblocked, but should not be implemented or deployed until
+the D-tree client patch source is reconciled into the authoritative repository
+branch.
+
 ## Scope
 
 This investigation covers the required routing contract:
@@ -359,8 +381,8 @@ network change or an official-dimension regression.
 
 Before implementation:
 
-1. Add or provide the private client patch source and installer project to the
-   authoritative AORebirth workflow.
+1. Reconcile the located private client patch source from the parallel Linux
+   build tree into the authoritative AORebirth workflow.
 2. Identify how `version.dll` records or observes the selected dimension.
 3. Prove the URL stage where `vgtp://uwg.daily.icc-rk/index.app` can be
    transformed or intercepted.
