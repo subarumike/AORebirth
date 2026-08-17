@@ -2,6 +2,18 @@
 
 ## Active
 
+DailyLogin web/VGTP routing is now scoped as a client-patch investigation, not
+a Linux server rewrite. The AORebirth website serves the DailyLogin app and
+`/daily/claim.php` returns live account board state, but the in-game client
+opens `vgtp://uwg.daily.icc-rk/index.app` through the AO browser layer. The
+current authoritative tree does not contain the private `version.dll` client
+patch source or installer project, so dimension-aware routing cannot be safely
+implemented yet. Global hosts/DNS overrides and server-side proxying remain
+forbidden because they would hijack official Rubi-Ka/RK2019 traffic. Evidence:
+`docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
+
+## Prior active checkpoint
+
 Linux login/inventory follow-up after `login-hydration-b1c61405` is now source
 validated. DailyLogin no longer uses Windows XAMPP claim/reward paths
 unconditionally on Linux; claim roots resolve through

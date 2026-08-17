@@ -9,6 +9,16 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- DailyLogin VGTP routing audit: the AORebirth website now hosts the DailyLogin
+  web app and its claim endpoint returns live account board state, but the
+  in-game client still opens `vgtp://uwg.daily.icc-rk/index.app` through the
+  official AO browser/VGTP path. A global hosts/DNS override is rejected because
+  it would hijack official Rubi-Ka/RK2019 DailyLogin traffic. The correct fix is
+  process-local, dimension-aware routing in the private client patch /
+  `version.dll` layer, but the authoritative AORebirth tree does not currently
+  contain that patch source or installer project. Implementation is blocked
+  until that source and the exact VGTP interception point are available.
+  Evidence: `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
 - Linux login/inventory follow-up: after live validation of
   `login-hydration-b1c61405`, the DailyLogin runtime path issue was corrected
   in shared Windows-authoritative source by deriving claim roots from
