@@ -118,7 +118,7 @@ namespace ChatEngine.PacketHandlers
 
             if (string.IsNullOrWhiteSpace(userName))
             {
-                client.Send(LoginError.Create());
+                client.Send(LoginError.Create("Invalid login"));
                 client.Server.DisconnectClient(client);
                 return;
             }
@@ -132,7 +132,7 @@ namespace ChatEngine.PacketHandlers
             if (loginData == null
                 || string.IsNullOrWhiteSpace(loginData.Username))
             {
-                client.Send(LoginError.Create());
+                client.Send(LoginError.Create("Invalid login"));
                 client.Server.DisconnectClient(client);
                 return;
             }
@@ -147,7 +147,7 @@ namespace ChatEngine.PacketHandlers
 
             if (!characterBelongsToAccount)
             {
-                client.Send(LoginError.Create());
+                client.Send(LoginError.Create("Invalid login"));
                 client.Server.DisconnectClient(client);
                 return;
             }
