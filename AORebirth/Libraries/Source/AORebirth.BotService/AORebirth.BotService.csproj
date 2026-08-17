@@ -37,11 +37,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Security" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotContracts.cs" />
     <Compile Include="BotCredentials.cs" />
+    <Compile Include="BotHostedRuntime.cs" />
+    <Compile Include="BotInboundEvents.cs" />
+    <Compile Include="BotPersistence.cs" />
     <Compile Include="BotPrivateProtocol.cs" />
     <Compile Include="BotRuntime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

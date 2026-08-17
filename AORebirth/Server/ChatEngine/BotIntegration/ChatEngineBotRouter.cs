@@ -21,6 +21,7 @@ namespace ChatEngine.BotIntegration
         private readonly Dictionary<uint, string> botNames = new Dictionary<uint, string>();
         private readonly Dictionary<Guid, HashSet<string>> channelSubscriptions =
             new Dictionary<Guid, HashSet<string>>();
+        private readonly BotInboundDeliveryQueue inbound = new BotInboundDeliveryQueue();
         private uint nextWireId = FirstBotWireId;
 
         public ChatEngineBotRouter(ChatServer server)
@@ -30,13 +31,24 @@ namespace ChatEngine.BotIntegration
 
         public BotOperationResult Handle(BotSession session, BotChatRequest request)
         {
+            if (session == null || request == null)
+            {
+                return BotOperationResult.Denied("AUTHORIZATION_CONTEXT_MISSING");
+            }
+
+            uint wireId = this.GetOrCreateWireId(session.BotId, session.DisplayName);
+            this.inbound.Register(session, wireId);
+            if (request.Operation == BotOperation.EventPoll)
+            {
+                return this.inbound.Poll(session);
+            }
+
             BotAuthorizationResult decision = this.authorization.Authorize(session, request);
             if (!decision.Allowed)
             {
                 return BotOperationResult.Denied(decision.ReasonCode);
             }
 
-            uint wireId = this.GetOrCreateWireId(session.BotId, session.DisplayName);
             switch (request.Operation)
             {
                 case BotOperation.TellSend:
@@ -72,6 +84,28 @@ namespace ChatEngine.BotIntegration
 
             wireId = uint.MaxValue;
             return false;
+        }
+
+        public bool TryPublishTell(uint targetWireId, uint senderCharacterId, string senderName, string text)
+        {
+            return this.inbound.TryPublishTell(targetWireId, senderCharacterId, senderName, text, DateTime.UtcNow);
+        }
+
+        public int PublishChannelMessage(
+            byte channelType,
+            uint channelId,
+            uint senderCharacterId,
+            string senderName,
+            string text)
+        {
+            return this.inbound.PublishChannel(
+                channelType,
+                channelId,
+                senderCharacterId,
+                senderName,
+                text,
+                DateTime.UtcNow,
+                (byte)ChannelType.Organization);
         }
 
         private BotOperationResult SendTell(uint wireId, string displayName, BotChatRequest request)
@@ -115,14 +149,16 @@ namespace ChatEngine.BotIntegration
             lock (this.sync)
             {
                 HashSet<string> subscriptions;
-                if (!this.channelSubscriptions.TryGetValue(session.SessionId, out subscriptions))
+                if (!this.channelSubscriptions.TryGetValue(session.BotId, out subscriptions))
                 {
                     subscriptions = new HashSet<string>(StringComparer.Ordinal);
-                    this.channelSubscriptions[session.SessionId] = subscriptions;
+                    this.channelSubscriptions[session.BotId] = subscriptions;
                 }
 
                 subscriptions.Add(ChannelKey(request.ChannelType, request.ChannelId));
             }
+
+            this.inbound.Subscribe(session, request.ChannelType, request.ChannelId);
 
             return BotOperationResult.Allowed("CHANNEL_JOINED");
         }
@@ -132,11 +168,13 @@ namespace ChatEngine.BotIntegration
             lock (this.sync)
             {
                 HashSet<string> subscriptions;
-                if (this.channelSubscriptions.TryGetValue(session.SessionId, out subscriptions))
+                if (this.channelSubscriptions.TryGetValue(session.BotId, out subscriptions))
                 {
                     subscriptions.Remove(ChannelKey(request.ChannelType, request.ChannelId));
                 }
             }
+
+            this.inbound.Unsubscribe(session, request.ChannelType, request.ChannelId);
 
             return BotOperationResult.Allowed("CHANNEL_LEFT");
         }
@@ -146,7 +184,7 @@ namespace ChatEngine.BotIntegration
             lock (this.sync)
             {
                 HashSet<string> subscriptions;
-                if (!this.channelSubscriptions.TryGetValue(session.SessionId, out subscriptions)
+                if (!this.channelSubscriptions.TryGetValue(session.BotId, out subscriptions)
                     || !subscriptions.Contains(ChannelKey(request.ChannelType, request.ChannelId)))
                 {
                     return BotOperationResult.Denied("CHANNEL_NOT_JOINED");

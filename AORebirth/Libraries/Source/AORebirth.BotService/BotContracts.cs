@@ -33,7 +33,8 @@ namespace AORebirth.BotService
         ChannelSend = 8,
         RosterRead = 9,
         CommandReceive = 10,
-        CommandExecute = 11
+        CommandExecute = 11,
+        EventPoll = 12
     }
 
     public enum BotAuthenticationFailure
@@ -59,7 +60,15 @@ namespace AORebirth.BotService
         ChannelLeave,
         ChannelRead,
         ChannelSend,
-        RateLimitViolation
+        RateLimitViolation,
+        PrincipalCreated,
+        PrincipalEnabled,
+        PrincipalDisabled,
+        CredentialRotated,
+        CredentialRevoked,
+        ScopesReplaced,
+        OrganizationAssigned,
+        InboundEventDelivered
     }
 
     public sealed class BotPrincipal

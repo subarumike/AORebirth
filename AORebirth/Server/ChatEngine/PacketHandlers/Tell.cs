@@ -66,6 +66,16 @@ namespace ChatEngine.PacketHandlers
             string message = reader.ReadString();
             client.Server.Debug(client, "{0} >> Tell: PlayerId: {1}", client.Character.characterName, playerId);
             reader.Finish();
+            if (client.ChatServer().BotRouter != null
+                && client.ChatServer().BotRouter.TryPublishTell(
+                    playerId,
+                    client.Character.CharacterId,
+                    client.Character.characterName,
+                    message))
+            {
+                return;
+            }
+
             if (client.ChatServer().ConnectedClients.ContainsKey(playerId))
             {
                 Client tellClient = (Client)client.ChatServer().ConnectedClients[playerId];
