@@ -99,5 +99,47 @@ LinuxBuild\publish-zoneengine.cmd linux-x64 true: PASS
 Stage 8 offline ZoneEngine smoke: PASS
 ```
 
-Linux production promotion evidence is recorded separately if the validated
-candidate is deployed.
+## Linux production promotion
+
+Validated source commit:
+
+```text
+360b3002 Fix DailyLogin Linux paths and document inventory mapping
+```
+
+Production release:
+
+```text
+/opt/ao-rebirth/zoneengine/releases/dailylogin-path-360b3002
+/opt/ao-rebirth/zoneengine/current -> dailylogin-path-360b3002
+```
+
+Pre-deploy guard:
+
+```text
+online_count 0
+previous current release login-hydration-b1c61405
+```
+
+Deployment note:
+
+```text
+Initial systemd start failed with status=203/EXEC because the uploaded
+ZoneEngine apphost lacked executable mode after archive transfer.
+No source or database change was required.
+The deployed release file mode was corrected with chmod 750 ZoneEngine.
+```
+
+Post-deploy validation:
+
+```text
+ao-rebirth-zoneengine.service active
+ZoneEngine --validate-startup PASS through systemd ExecStartPre
+ZoneEngine --validate-database PASS through systemd ExecStartPre
+ZoneEngine listener 0.0.0.0:7501 active
+LoginEngine listener 0.0.0.0:7500 remained active
+```
+
+Immediate post-deploy journal scan did not show new DailyLogin read-only path
+errors. A live client login remains the final exercise of the DailyLogin publish
+path because DailyLogin board writes occur during character login.

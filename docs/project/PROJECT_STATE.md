@@ -19,8 +19,10 @@ completion matrices and dated evidence retain detailed provenance.
   column: startup inventory rows are keyed by `ContainerType=39` and normal
   inventory page `ContainerInstance=104`, not by `ContainerInstance=39`.
   Focused DailyLogin validation passed, the Windows debug build passed,
-  AOtomation messaging passed 1018/1018, and Linux ZoneEngine publish plus
-  offline smoke passed. Evidence:
+  AOtomation messaging passed 1018/1018, Linux ZoneEngine publish plus offline
+  smoke passed, and production ZoneEngine is now deployed as
+  `dailylogin-path-360b3002` with startup/database preflights passing and port
+  `7501` active. Evidence:
   `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`.
 - Unified account database/schema phase: live production metadata for `login`
   and `characters` has been audited read-only against MySQL 8.4.10, normal

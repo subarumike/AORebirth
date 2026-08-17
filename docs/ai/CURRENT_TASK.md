@@ -12,7 +12,9 @@ proved visible startup inventory persists under `ContainerType=39` and normal
 inventory page `ContainerInstance=104`; the earlier
 `ContainerInstance=39` query was looking at the wrong column. Validation:
 focused DailyLogin contract PASS, Windows debug build PASS, AOtomation
-messaging PASS 1018/1018, Linux ZoneEngine publish/offline smoke PASS.
+messaging PASS 1018/1018, Linux ZoneEngine publish/offline smoke PASS,
+production ZoneEngine release `dailylogin-path-360b3002` active with
+startup/database preflight PASS and port `7501` listening.
 Evidence: `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`.
 
 ## Prior carried state
