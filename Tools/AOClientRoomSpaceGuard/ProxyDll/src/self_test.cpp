@@ -1,5 +1,6 @@
 #include "login_key_patch.h"
 #include "roomspace_fix.h"
+#include "build_info.h"
 
 #include <cstdio>
 
@@ -17,6 +18,9 @@ int main()
         return 1;
     }
 
-    std::printf("AORebirthClientPatch self-test passed: loginkey=memory-scan crash-repairs=enabled.\n");
+    std::printf(
+        "AORebirthClientPatch self-test passed: version=%s source=%s loginkey=memory-scan crash-repairs=enabled.\n",
+        aorf::ClientPatchVersion,
+        aorf::ClientPatchSourceSha);
     return 0;
 }

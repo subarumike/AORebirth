@@ -2,6 +2,8 @@
 #include <tlhelp32.h>
 #include <bcrypt.h>
 
+#include "build_info.h"
+
 #include <array>
 #include <cstddef>
 #include <cstdio>
@@ -13,7 +15,8 @@
 namespace AORebirthClientPatchDeploy
 {
     constexpr wchar_t ProductName[] = L"AORebirthClientPatch";
-    constexpr wchar_t ProductVersion[] = L"1";
+    constexpr const wchar_t* ProductVersion = aorf::ClientPatchVersionW;
+    constexpr const wchar_t* ProductSourceSha = aorf::ClientPatchSourceShaW;
     constexpr wchar_t ManifestName[] = L"SHA256SUMS.txt";
     constexpr wchar_t MarkerName[] = L"AORebirthClientPatch.install";
     constexpr wchar_t ProxyName[] = L"version.dll";
@@ -101,8 +104,10 @@ namespace AORebirthClientPatchDeploy
 
     struct Marker
     {
+        std::wstring version;
         std::wstring proxyHash;
         std::wstring n3Hash;
+        std::wstring sourceSha;
     };
 
     bool IsApprovedN3Hash(const std::wstring& hash)
@@ -591,15 +596,20 @@ namespace AORebirthClientPatchDeploy
         const std::wstring& proxyHash,
         const std::wstring& n3Hash)
     {
+        std::string version;
+        std::string sourceSha;
         std::string proxy;
         std::string n3;
+        WideToAscii(ProductVersion, version);
+        WideToAscii(ProductSourceSha, sourceSha);
         WideToAscii(proxyHash, proxy);
         WideToAscii(n3Hash, n3);
         return
             "Product=AORebirthClientPatch\r\n"
-            "Version=1\r\n"
+            "Version=" + version + "\r\n"
             "ProxySha256=" + proxy + "\r\n"
-            "N3Sha256=" + n3 + "\r\n";
+            "N3Sha256=" + n3 + "\r\n"
+            "SourceSha=" + sourceSha + "\r\n";
     }
 
     bool ParseMarker(const std::string& text, Marker& marker)
@@ -617,9 +627,10 @@ namespace AORebirthClientPatchDeploy
             offset = end + 2;
         }
 
-        if (lines.size() != 4 ||
+        if ((lines.size() != 4 && lines.size() != 5) ||
             lines[0] != "Product=AORebirthClientPatch" ||
-            lines[1] != "Version=1")
+            lines[1].compare(0, 8, "Version=") != 0 ||
+            lines[1].size() == 8)
         {
             return false;
         }
@@ -634,8 +645,21 @@ namespace AORebirthClientPatchDeploy
 
         std::string proxy = lines[2].substr(sizeof(ProxyPrefix) - 1);
         std::string n3 = lines[3].substr(sizeof(N3Prefix) - 1);
+        marker.version.assign(lines[1].begin() + 8, lines[1].end());
         marker.proxyHash.assign(proxy.begin(), proxy.end());
         marker.n3Hash.assign(n3.begin(), n3.end());
+        if (lines.size() == 5)
+        {
+            constexpr char SourcePrefix[] = "SourceSha=";
+            if (lines[4].compare(0, sizeof(SourcePrefix) - 1, SourcePrefix) != 0 ||
+                lines[4].size() == sizeof(SourcePrefix) - 1 ||
+                lines[4].size() > sizeof(SourcePrefix) - 1 + 40)
+            {
+                return false;
+            }
+            std::string sourceSha = lines[4].substr(sizeof(SourcePrefix) - 1);
+            marker.sourceSha.assign(sourceSha.begin(), sourceSha.end());
+        }
         return IsUpperHex64(marker.proxyHash) &&
                IsUpperHex64(marker.n3Hash) &&
                IsApprovedN3Hash(marker.n3Hash);
@@ -1531,7 +1555,7 @@ namespace AORebirthClientPatchDeploy
             marker.proxyHash != proxyHash ||
             marker.n3Hash != NewClientN3Hash ||
             ParseMarker(valid + "Extra=1\r\n", marker) ||
-            ParseMarker("Product=AORebirthClientPatch\nVersion=1\n", marker) ||
+            ParseMarker("Product=AORebirthClientPatch\nVersion=2\n", marker) ||
             IsUpperHex64(std::wstring(64, L'a')))
         {
             std::fwprintf(stderr, L"ERROR deployment helper self-test failed.\n");

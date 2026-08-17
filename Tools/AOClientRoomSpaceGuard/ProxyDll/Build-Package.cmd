@@ -3,6 +3,12 @@ setlocal EnableExtensions DisableDelayedExpansion
 
 set "ROOT=%~dp0"
 set "SRC=%ROOT%src"
+set "PATCH_VERSION=2"
+set "SOURCE_SHA=unknown"
+set "GITRESULT=%TEMP%\AORebirthClientPatch-git-%RANDOM%-%RANDOM%.txt"
+git -C "%ROOT%..\..\.." rev-parse --short=12 HEAD > "%GITRESULT%" 2>nul
+if not errorlevel 1 set /p SOURCE_SHA=<"%GITRESULT%"
+del /Q "%GITRESULT%" >nul 2>nul
 set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if not exist "%VSWHERE%" (
   echo [AORebirthClientPatch] ERROR vswhere.exe not found.
@@ -49,6 +55,8 @@ echo [AORebirthClientPatch] Building x86 static-CRT proxy...
 pushd "%BUILD_ROOT%"
 cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
+  /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
+  /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
   /I"%SRC%" /LD ^
   "%SRC%\crash_dump.cpp" ^
   "%SRC%\dllmain.cpp" ^
@@ -70,6 +78,8 @@ if errorlevel 1 (
 echo [AORebirthClientPatch] Building and running offline wrapper self-test...
 cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
+  /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
+  /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
   /I"%SRC%" ^
   "%SRC%\logging.cpp" ^
   "%SRC%\login_key_patch.cpp" ^
@@ -110,6 +120,8 @@ if errorlevel 1 (
 echo [AORebirthClientPatch] Building and running deployment helper self-test...
 cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
+  /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
+  /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
   "%SRC%\deploy_tool.cpp" ^
   /link /MACHINE:X86 /LTCG /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ^
   /guard:cf /Brepro /MANIFEST:EMBED /MANIFESTINPUT:"%SRC%\deploy_tool.manifest" ^
@@ -212,7 +224,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-set "TEMP_ZIP=%BUILD_ROOT%\AORebirthClientPatch-v1.zip"
+set "TEMP_ZIP=%BUILD_ROOT%\AORebirthClientPatch-v%PATCH_VERSION%.zip"
 tar.exe -a -c -f "%TEMP_ZIP%" -C "%STAGE%" AOReloaded-MIT.txt AORebirthClientPatchDeploy.exe AORebirthAnarchyLauncher.url AORebirthDimensionServer.url Install.cmd README.txt SHA256SUMS.txt Uninstall.cmd version.dll
 if errorlevel 1 (
   echo [AORebirthClientPatch] ERROR package ZIP creation failed.
@@ -241,15 +253,15 @@ if errorlevel 1 (
   echo [AORebirthClientPatch] ERROR could not create artifacts directory.
   exit /b 1
 )
-set "ZIP=%ARTIFACT_ROOT%\AORebirthClientPatch-v1.zip"
+set "ZIP=%ARTIFACT_ROOT%\AORebirthClientPatch-v%PATCH_VERSION%.zip"
 copy /B /Y "%TEMP_ZIP%" "%ZIP%" >nul
 if errorlevel 1 (
   echo [AORebirthClientPatch] ERROR could not publish the verified package ZIP.
   exit /b 1
 )
 
-set "PUBLISHED_DIR=%ARTIFACT_ROOT%\AORebirthClientPatch-v1"
-set "PUBLISHED_TMP=%ARTIFACT_ROOT%\AORebirthClientPatch-v1.tmp"
+set "PUBLISHED_DIR=%ARTIFACT_ROOT%\AORebirthClientPatch-v%PATCH_VERSION%"
+set "PUBLISHED_TMP=%ARTIFACT_ROOT%\AORebirthClientPatch-v%PATCH_VERSION%.tmp"
 if exist "%PUBLISHED_TMP%" rmdir /S /Q "%PUBLISHED_TMP%"
 if exist "%PUBLISHED_TMP%" (
   echo [AORebirthClientPatch] ERROR could not clear stale extracted package staging.
@@ -283,8 +295,8 @@ if errorlevel 1 (
 
 set "SETUP_RC=%BUILD_ROOT%\AORebirthClientPatchSetup.rc"
 set "SETUP_RES=%BUILD_ROOT%\AORebirthClientPatchSetup.res"
-set "SETUP_TEMP=%BUILD_ROOT%\AORebirthClientPatchSetup-v1.exe"
-set "SETUP_EXE=%ARTIFACT_ROOT%\AORebirthClientPatchSetup-v1.exe"
+set "SETUP_TEMP=%BUILD_ROOT%\AORebirthClientPatchSetup-v%PATCH_VERSION%.exe"
+set "SETUP_EXE=%ARTIFACT_ROOT%\AORebirthClientPatchSetup-v%PATCH_VERSION%.exe"
 set "SETUP_SRC=%SRC:\=/%"
 set "SETUP_STAGE=%STAGE:\=/%"
 (
@@ -302,6 +314,8 @@ if errorlevel 1 (
 
 cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX /DAO_REBIRTH_CLIENT_PATCH_EMBEDDED ^
+  /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
+  /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
   "%SRC%\setup_tool.cpp" "%SRC%\deploy_tool.cpp" "%SETUP_RES%" ^
   /link /SUBSYSTEM:WINDOWS /MACHINE:X86 /LTCG /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ^
   /guard:cf /Brepro /OUT:"%SETUP_TEMP%" shell32.lib ole32.lib user32.lib bcrypt.lib
