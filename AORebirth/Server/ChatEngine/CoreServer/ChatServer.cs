@@ -45,6 +45,7 @@ namespace ChatEngine.CoreServer
     using AORebirth.Database.Dao;
 
     using ChatEngine.Channels;
+    using ChatEngine.BotIntegration;
     using ChatEngine.CoreClient;
     using ChatEngine.Lists;
     using ChatEngine.Packets;
@@ -74,6 +75,11 @@ namespace ChatEngine.CoreServer
         /// <summary>
         /// </summary>
         public string MessageOfTheDay = string.Empty;
+
+        /// <summary>
+        /// Optional first-party bot adapter. It is distinct from normal chat clients and ISCom peers.
+        /// </summary>
+        internal ChatEngineBotRouter BotRouter;
 
         #endregion
 

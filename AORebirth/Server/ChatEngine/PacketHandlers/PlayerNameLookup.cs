@@ -84,6 +84,10 @@ namespace ChatEngine.PacketHandlers
             {
                 playerId = (uint)character.Id;
             }
+            else if (client.ChatServer().BotRouter != null)
+            {
+                client.ChatServer().BotRouter.TryResolveBotName(playerName, out playerId);
+            }
 
             byte[] namelookup = NameLookupResult.Create(playerId, playerName);
             client.Send(namelookup);

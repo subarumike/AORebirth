@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{16BE639B-0C36-4C30-A47C-71B282D7D4D2}</ProjectGuid>
+    <ProjectGuid>{90D75B37-7DA2-4C26-9BB5-7BFF79A618C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AORebirth.AccountBroker</RootNamespace>
-    <AssemblyName>AORebirth.AccountBroker</AssemblyName>
+    <RootNamespace>AORebirth.BotService</RootNamespace>
+    <AssemblyName>AORebirth.BotService</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
@@ -30,29 +30,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\AOtomation\AOtomation.Messaging\src\SmokeLounge.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Security" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountBrokerException.cs" />
-    <Compile Include="AccountBrokerService.cs" />
-    <Compile Include="AccountBrokerModels.cs" />
-    <Compile Include="BotManagementContracts.cs" />
+    <Compile Include="BotContracts.cs" />
+    <Compile Include="BotCredentials.cs" />
+    <Compile Include="BotPrivateProtocol.cs" />
+    <Compile Include="BotRuntime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UsernamePolicy.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AORebirth.BotService\AORebirth.BotService.csproj">
-      <Project>{90d75b37-7da2-4c26-9bb5-7bff79a618c4}</Project>
-      <Name>AORebirth.BotService</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AORebirth.Core\AORebirth.Core.csproj">
-      <Project>{8aef23b2-9e44-40a1-a74e-cf7348b45b62}</Project>
-      <Name>AORebirth.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

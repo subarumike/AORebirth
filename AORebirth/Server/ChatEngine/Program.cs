@@ -45,7 +45,9 @@ namespace ChatEngine
     using AORebirth.Database;
     using AORebirth.Communication.ISComV2Server;
     using AORebirth.Communication.Messages;
+    using AORebirth.BotService;
 
+    using ChatEngine.BotIntegration;
     using ChatEngine.CoreServer;
 
     using locales;
@@ -77,6 +79,8 @@ namespace ChatEngine
         /// <summary>
         /// </summary>
         private static ChatServer chatServer;
+
+        private static BotPrivateTcpServer botServiceServer;
 
         /// <summary>
         /// </summary>
@@ -441,6 +445,18 @@ namespace ChatEngine
         {
             exited = true;
 
+            if (botServiceServer != null)
+            {
+                try
+                {
+                    botServiceServer.Stop();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("BotService private listener shutdown failed: " + e.Message);
+                }
+            }
+
             if (chatServer != null)
             {
                 try
@@ -578,6 +594,11 @@ namespace ChatEngine
                     return false;
                 }
 
+                if (!InitializeBotService())
+                {
+                    return false;
+                }
+
                 if (!InitializeConsoleCommands())
                 {
                     return false;
@@ -592,6 +613,49 @@ namespace ChatEngine
             }
 
             return true;
+        }
+
+        private static bool InitializeBotService()
+        {
+            string portText = Environment.GetEnvironmentVariable("AO_REBIRTH_BOT_CHAT_PORT");
+            if (string.IsNullOrWhiteSpace(portText))
+            {
+                return true;
+            }
+
+            try
+            {
+                int port;
+                if (!int.TryParse(portText, out port) || port < 1 || port > 65535)
+                {
+                    throw new InvalidDataException("AO_REBIRTH_BOT_CHAT_PORT must be a valid TCP port.");
+                }
+
+                string encodedKey = Environment.GetEnvironmentVariable("AO_REBIRTH_BOT_CHAT_KEY");
+                byte[] serviceKey;
+                try
+                {
+                    serviceKey = Convert.FromBase64String(encodedKey ?? string.Empty);
+                }
+                catch (FormatException)
+                {
+                    throw new InvalidDataException("AO_REBIRTH_BOT_CHAT_KEY must be valid base64.");
+                }
+
+                ChatEngineBotRouter router = new ChatEngineBotRouter(chatServer);
+                botServiceServer = new BotPrivateTcpServer(
+                    new IPEndPoint(IPAddress.Loopback, port),
+                    serviceKey,
+                    router);
+                chatServer.BotRouter = router;
+                botServiceServer.Start();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("BotService private listener initialization failed: " + e.Message);
+                return false;
+            }
         }
 
         /// <summary>

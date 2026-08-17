@@ -88,6 +88,7 @@
     <Compile Include="Channels\RaidChannel.cs" />
     <Compile Include="Channels\TeamChannel.cs" />
     <Compile Include="ChatLogger.cs" />
+    <Compile Include="BotIntegration\ChatEngineBotRouter.cs" />
     <Compile Include="CoreClient\Character.cs" />
     <Compile Include="CoreClient\CharacterBase.cs" />
     <Compile Include="CoreClient\Client.cs" />
@@ -151,6 +152,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.BotService\AORebirth.BotService.csproj">
+      <Project>{90d75b37-7da2-4c26-9bb5-7bff79a618c4}</Project>
+      <Name>AORebirth.BotService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
       <Project>{3ceac898-bfca-45ea-bf34-c4bbb85d2da4}</Project>
       <Name>SmokeLounge.AOtomation.Messaging</Name>
