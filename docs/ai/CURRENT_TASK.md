@@ -6,14 +6,14 @@ DailyLogin web/VGTP routing is now scoped as client-patch work, not a Linux
 server rewrite. The AORebirth website serves the DailyLogin app and
 `/daily/claim.php` returns live account board state, but the in-game client
 opens `vgtp://uwg.daily.icc-rk/index.app` through the AO browser layer. The
-newer AORebirth private client patch source has been located in the parallel
-Linux build tree at
-`D:\AO_Rebirth_Linux_Build\Tools\AOClientRoomSpaceGuard\ProxyDll`; current
-`master` still contains an older RoomSpace-branded proxy variant. Global
-hosts/DNS overrides and server-side proxying remain forbidden because they would
-hijack official Rubi-Ka/RK2019 traffic. Next step is source reconciliation before
-DailyLogin routing implementation. Evidence:
-`docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
+newer AORebirth private client patch source from the parallel Linux build tree
+has been reconciled into authoritative Windows `master` at
+`Tools\AOClientRoomSpaceGuard\ProxyDll`. Global hosts/DNS overrides and
+server-side proxying remain forbidden because they would hijack official
+Rubi-Ka/RK2019 traffic. Next step is implementing narrow, process-local
+DailyLogin routing in the canonical client-patch path without replacing the
+currently installed DLL or website installer until a separate deployment stage.
+Evidence: `docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
 `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
 
 ## Prior active checkpoint

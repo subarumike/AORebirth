@@ -16,9 +16,11 @@ completion matrices and dated evidence retain detailed provenance.
   it would hijack official Rubi-Ka/RK2019 DailyLogin traffic. The correct fix is
   process-local, dimension-aware routing in the private client patch /
   `version.dll` layer. The newer AORebirth private client patch source has been
-  located in the parallel Linux build tree, while current `master` still carries
-  an older RoomSpace-branded proxy variant. Implementation is blocked on source
-  reconciliation and the exact VGTP interception point, not source availability.
+  reconciled into authoritative Windows `master` at
+  `Tools\AOClientRoomSpaceGuard\ProxyDll`. The currently published installer and
+  installed local DLL remain the earlier accepted lineage and were not replaced.
+  DailyLogin routing should now be implemented only in the canonical
+  client-patch path and still requires the exact VGTP interception point.
   Evidence: `docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
   `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
 - Linux login/inventory follow-up: after live validation of

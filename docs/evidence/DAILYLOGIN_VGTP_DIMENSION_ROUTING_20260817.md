@@ -24,6 +24,25 @@ therefore engineering-unblocked, but should not be implemented or deployed until
 the D-tree client patch source is reconciled into the authoritative repository
 branch.
 
+## 2026-08-17 reconciliation update
+
+The newer client patch source has now been reconciled into authoritative
+Windows `master` at:
+
+`Tools\AOClientRoomSpaceGuard\ProxyDll`
+
+DailyLogin VGTP routing is still not implemented. The next routing change must
+be made in this canonical client-patch path and must preserve the proven
+dimension coexistence rule:
+
+```text
+AORebirth endpoint + DailyLogin VGTP host -> AORebirth routing
+official/unknown endpoint -> original client behavior
+```
+
+The current published installer and local installed DLL remain the earlier
+lineage and were not replaced during reconciliation.
+
 ## Scope
 
 This investigation covers the required routing contract:

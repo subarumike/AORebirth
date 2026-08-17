@@ -1,15 +1,22 @@
+#include "login_key_patch.h"
 #include "roomspace_fix.h"
 
 #include <cstdio>
 
 int main()
 {
-    if (!aorf::RunRoomSpaceFixSelfTest())
+    if (!aorf::RunClientCrashMitigationSelfTest())
     {
-        std::fprintf(stderr, "AORoomSpaceFix self-test failed.\n");
+        std::fprintf(stderr, "AO client crash-mitigation self-test failed.\n");
         return 1;
     }
 
-    std::printf("AORoomSpaceFix self-test passed: profiles=2 callsites=5 wrapper=86.\n");
+    if (!aorf::RunLoginKeyPatchSelfTest())
+    {
+        std::fprintf(stderr, "AO login-key patch self-test failed.\n");
+        return 1;
+    }
+
+    std::printf("AORebirthClientPatch self-test passed: loginkey=memory-scan crash-repairs=enabled.\n");
     return 0;
 }

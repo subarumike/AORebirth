@@ -1,6 +1,187 @@
 # AORebirth Client Patch Source Provenance - 2026-08-17
 
-## Result
+## 2026-08-17 reconciliation update
+
+Reconciliation result: CLIENT PATCH AUTHORITATIVE SOURCE RECONCILED
+
+The newer AORebirth private client patch source from
+`origin/codex/linux-parallel-build` was reconciled into the authoritative
+Windows `master` source tree at the canonical path:
+
+`Tools\AOClientRoomSpaceGuard\ProxyDll`
+
+The reconciled source revision is the client-patch state from:
+
+`e1d60e74 Combine client key and crash repairs`
+
+This keeps the existing project path and avoids a duplicate client-patch tree.
+Generated package artifacts remain build outputs and are not tracked in Git.
+
+### Reconciled source scope
+
+The reconciled tracked changes are limited to the client patch/proxy tree:
+
+- AORebirth launcher URL resources.
+- AORebirth dimension URL resource.
+- `setup_tool.cpp` and setup manifest.
+- expanded `deploy_tool.cpp` and deploy manifest.
+- `login_key_patch.cpp` / `login_key_patch.h`.
+- combined `dllmain.cpp` startup path.
+- crash dump, RoomSpace, GUI rectangle, renderer guard updates.
+- package/install/uninstall/readme updates.
+
+No Linux server source, production deployment files, website package, or
+installed AO client files were changed.
+
+### Source tree comparison
+
+Current `master` before reconciliation was the older `AORoomSpaceFix` lineage.
+The D-tree branch adds the AORebirth client patch lineage:
+
+- RoomSpace/runtime guard changes: retained and updated through the branch's
+  crash-repair commits.
+- Login-key patch changes: added endpoint-aware login-key worker and tests.
+- Endpoint/dimension coexistence: preserved; AORebirth endpoint arms the patch,
+  official and unknown endpoints keep original/Funcom behavior.
+- Installer changes: added setup EXE source and embedded resource payload.
+- Launcher URL changes: added AORebirth `AnarchyLauncher.url` and
+  `DimensionServer.url` resources.
+- Deployment/package changes: deploy helper now validates, installs, backs up,
+  repairs, and uninstalls the AORebirth package.
+- Linux-build-only changes: not merged; reconciliation is limited to the
+  client patch tree.
+
+### Git history
+
+Relevant source history exists on `origin/codex/linux-parallel-build`.
+The most important commits in this lineage are:
+
+- `a26f1912 Add distributable AO RoomSpace proxy repair`
+- `490f00b9 Add AO client crash dump handler`
+- `59c1d778 Guard old-client randy draw-resource crashes`
+- `03ac9441 Publish refreshed AO crash-fix package folder`
+- `582ca899 Fix client proxy renderer performance`
+- `eff1a2a0 Prevent GUI rectangle crash before exception dispatch`
+- `e1d60e74 Combine client key and crash repairs`
+
+The final reconciliation uses the branch's tracked client patch tree state rather
+than merging unrelated Linux branch work.
+
+### Artifact lineage
+
+Lineage A applies to the currently published and installed patch:
+
+- Published installer:
+  `E:\AORebirthWebsite\ao\downloads\AORebirthClientPatchSetup-v1.exe`
+- Published installer SHA-256:
+  `c1d1b66008298435c0b3cf8720da9ff5701edf61e20d2c8820b6e1e7c02a9ae8`
+- Extracted published installer `version.dll` SHA-256:
+  `fd3da14ae9d2584a7713b498a1b76ab7974a831d33f032c330e6ef47525de5a2`
+- Installed client DLL:
+  `D:\Funcom\Anarchy Online\version.dll`
+- Installed client DLL SHA-256:
+  `fd3da14ae9d2584a7713b498a1b76ab7974a831d33f032c330e6ef47525de5a2`
+
+Conclusion: the website installer embeds the exact DLL currently installed in
+the local AO client.
+
+Lineage C applies to the reconciled authoritative source:
+
+- Authoritative rebuilt `version.dll` SHA-256:
+  `c79b3cca50e88c5ad0d900f38197381017e9256e8e20cbb983ea64561ea7e057`
+- Authoritative rebuilt setup EXE SHA-256:
+  `671a94f477ac1b1bccf6ac8027d0966b3a7a6c384aa552680c3bcde5361b78c9`
+- Authoritative rebuilt package ZIP SHA-256:
+  `2f79396f32546402b562767632fd7132a09953783b703f027b34e3da1f224ddc`
+- Authoritative rebuilt deploy helper SHA-256:
+  `39bfe20d12e3b029d896aef1b4559c8849c094505f42f61610fea8c322ef33c2`
+
+Conclusion: the reconciled source is newer than the published/installed patch
+and includes combined crash-repair plus endpoint-aware login-key behavior.
+
+### Hash mismatch explanation
+
+The published installer hash mismatch is expected because it is a different,
+earlier artifact lineage. Static resource extraction proves the published
+installer embeds the installed `fd3da14a...` DLL, not the newer `c79b3cca...`
+DLL.
+
+The setup EXE itself is not byte-reproducible across build locations. The
+authoritative setup EXE hash differs from the D-tree setup EXE hash even though
+the embedded payload resources are the expected files. The payload resources are
+the stable provenance target:
+
+- `AORebirthAnarchyLauncher.url`:
+  `abc2e5fc40e30be4acbd3110250364c2ca27e6e6ca8738c3d8d9c39d4a3f7ddb`
+- `AORebirthDimensionServer.url`:
+  `6cb9844f770e9204c4fb07c63c2863824c44d22bfea01ac99d1a65fff277bcc7`
+- embedded authoritative `version.dll`:
+  `c79b3cca50e88c5ad0d900f38197381017e9256e8e20cbb983ea64561ea7e057`
+
+PE timestamps are deterministic-linker values, not reliable wall-clock build
+times.
+
+### Behavior preservation
+
+The reconciled build preserves endpoint-aware coexistence:
+
+- AORebirth endpoint / port `7500`: login-key patch may arm.
+- Rubi-Ka official endpoint: original/Funcom key behavior is retained.
+- RK2019 official endpoint: original/Funcom key behavior is retained.
+- Unknown endpoint: original behavior is retained.
+
+The build ran the client patch self-tests, including endpoint parsing and
+login-key policy cases, through `Build-Package.cmd`.
+
+RoomSpace/proxy behavior remains covered by:
+
+- offline wrapper self-test;
+- proxy forwarding self-test;
+- deployment helper self-test;
+- package verification.
+
+### Installer dry-run
+
+Disposable target:
+
+`C:\Users\Mike\AppData\Local\Temp\AORebirthClientPatchDryRun-20260817`
+
+The dry-run target used copied `AnarchyOnline.exe` and `N3.dll` from the local
+client folder plus disposable launcher URL files. The real installed client was
+not modified.
+
+Install result:
+
+- URL files were backed up.
+- root launcher URL files were patched.
+- `cd_image\data\launcher` URL files were patched.
+- `version.dll` was installed.
+- ownership marker was written.
+- installed temp `version.dll` hash:
+  `c79b3cca50e88c5ad0d900f38197381017e9256e8e20cbb983ea64561ea7e057`
+
+Uninstall result:
+
+- temp `version.dll` was removed.
+- original disposable root URL files were restored.
+- original disposable `cd_image\data\launcher` URL files were restored.
+
+The setup EXE itself is interactive in this shell context, so the dry-run used
+the setup-built `AORebirthClientPatchDeploy.exe` helper directly against the
+same package payload.
+
+### Deployment recommendation
+
+Do not replace the installed `D:\Funcom\Anarchy Online\version.dll` yet.
+
+Do not replace the website
+`E:\AORebirthWebsite\ao\downloads\AORebirthClientPatchSetup-v1.exe` yet.
+
+The next deployment stage should intentionally decide whether to publish the
+newer authoritative installer/package and replace the installed DLL. That stage
+must be separate from this source reconciliation stage.
+
+## Result before reconciliation
 
 Provenance classification: LIKELY SOURCE - MORE EVIDENCE REQUIRED
 
