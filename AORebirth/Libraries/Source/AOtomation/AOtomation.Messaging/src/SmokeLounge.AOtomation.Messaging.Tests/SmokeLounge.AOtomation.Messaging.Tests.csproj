@@ -68,6 +68,7 @@
     <Compile Include="DebuggingSerializerTests.cs" />
     <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="DailyLoginPathContractTests.cs" />
+    <Compile Include="BotServiceFoundationTests.cs" />
     <Compile Include="EngineBindPolicyTests.cs" />
     <Compile Include="LinuxZoneEngineDeploymentPermissionTests.cs" />
     <Compile Include="..\..\..\..\Utility\Network\EngineBindPolicy.cs">
@@ -584,6 +585,10 @@
     <ProjectReference Include="..\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
       <Project>{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}</Project>
       <Name>SmokeLounge.AOtomation.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AORebirth.BotService\AORebirth.BotService.csproj">
+      <Project>{90D75B37-7DA2-4C26-9BB5-7BFF79A618C4}</Project>
+      <Name>AORebirth.BotService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

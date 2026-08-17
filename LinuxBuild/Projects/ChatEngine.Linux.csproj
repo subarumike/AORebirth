@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="AORebirth.BotService.Linux.csproj" />
     <ProjectReference Include="AORebirth.Chat.Authentication.Linux.csproj" />
     <ProjectReference Include="AORebirth.Communication.Linux.csproj" />
     <ProjectReference Include="AORebirth.Database.Linux.csproj" />

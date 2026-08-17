@@ -9,6 +9,15 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- First-party bot service foundation: AORebirth now has a storage-neutral bot principal,
+  versioned service credential, scoped authorization, revocation-aware session, structured
+  audit, and per-bot rate-limit model. A dedicated versioned HMAC-authenticated loopback TCP
+  boundary connects BotService contracts to a narrow ChatEngine adapter for tells,
+  organization chat, and channels without using player passwords, legacy Funcom auth,
+  public chat framing, or ISCom. Account Broker additions are contracts only; no bot schema,
+  persistence endpoint, deployment, or public WebSocket gateway exists yet. Port `6996`
+  remains semantically and operationally dedicated to ZoneEngine ISCom.
+
 - DailyLogin VGTP routing audit: the AORebirth website now hosts the DailyLogin
   web app and its claim endpoint returns live account board state, but the
   in-game client still opens `vgtp://uwg.daily.icc-rk/index.app` through the

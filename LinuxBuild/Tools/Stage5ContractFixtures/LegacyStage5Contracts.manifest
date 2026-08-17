@@ -813,6 +813,7 @@ auth.member|AORebirth.Core.Encryption.PasswordHash|field public static System.In
 auth.member|AORebirth.Core.Encryption.PasswordHash|field public static System.Int32 SaltSize initonly=false literal=true constant=30
 auth.member|AORebirth.Core.Encryption.PasswordHash|method public static System.Boolean ValidatePassword(System.String password,System.String correctHash) virtual=false abstract=false final=false
 auth.member|AORebirth.Core.Encryption.PasswordHash|method public static System.String CreateHash(System.String password) virtual=false abstract=false final=false
+reference|AORebirth.BotService|1.0.0.0|366f6caa557bb5ed
 reference|AORebirth.Communication|1.0.0.0|
 reference|AORebirth.Core|1.0.0.0|
 reference|AORebirth.Database|1.0.0.0|
@@ -1092,4 +1093,4 @@ parser.mode|source-mapped-only|handlers-not-invoked
 unsafe.excluded|AccountCharacterList.Create
 unsafe.excluded|Authenticate/AuthenticateBot handlers
 unsafe.excluded|ChatServer.Start/Parser.Parse/DAO/Connector.Open
-auth.password-fixture|Stage5-Password-μ|1232:PHKY9NF3XsgM7tRXXo0RratPXMTqLxNY3SCP3Cb2:BBtKq/V25/4OGWICqnL8cQrBLzboj3mtVyzT334b
+auth.password-fixture|Stage5-Password-μ|1268:NkoZPh18NQTNRAjipJYK42vjbue1RVAx3kzqt77T:0hjQnQVZjzLm0SgqerfqqqZXOO2Qo5TBP0u91iWD

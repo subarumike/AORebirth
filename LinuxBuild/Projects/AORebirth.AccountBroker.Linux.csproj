@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="AORebirth.BotService.Linux.csproj" />
     <ProjectReference Include="AORebirth.Core.Linux.csproj" />
   </ItemGroup>
 
@@ -28,6 +29,9 @@
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerModels.cs">
       <Link>AccountBrokerModels.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/BotManagementContracts.cs">
+      <Link>BotManagementContracts.cs</Link>
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerService.cs">
       <Link>AccountBrokerService.cs</Link>

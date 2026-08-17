@@ -197,6 +197,33 @@ namespace ChatEngine.Channels
         }
 
         /// <summary>
+        /// Delivers a first-party bot message without constructing a player character or client session.
+        /// The bot wire id is an isolated ChatEngine protocol adapter identity.
+        /// </summary>
+        internal void BotMessage(uint botWireId, string botName, string text)
+        {
+            IClient[] recipients;
+            lock (this.clients)
+            {
+                recipients = new IClient[this.clients.Count];
+                this.clients.CopyTo(recipients);
+            }
+
+            byte[] message = Packets.ChannelMessage.Create(this, botWireId, text ?? string.Empty, string.Empty);
+            foreach (IClient recipient in recipients)
+            {
+                Client client = (Client)recipient;
+                if (!client.KnownClients.Contains(botWireId))
+                {
+                    client.Send(NameLookupResult.Create(botWireId, botName ?? "AORebirth Bot"));
+                    client.KnownClients.Add(botWireId);
+                }
+
+                client.Send(message);
+            }
+        }
+
+        /// <summary>
         /// </summary>
         public void CloseChannel()
         {

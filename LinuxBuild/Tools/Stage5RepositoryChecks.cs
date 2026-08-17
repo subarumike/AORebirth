@@ -14,6 +14,7 @@ namespace AORebirth.LinuxBuild.Contracts
     {
         private static readonly string[] ExpectedChatProjectReferences =
         {
+            "AORebirth.BotService.Linux.csproj",
             "AORebirth.Chat.Authentication.Linux.csproj",
             "AORebirth.Communication.Linux.csproj",
             "AORebirth.Database.Linux.csproj",
@@ -34,6 +35,7 @@ namespace AORebirth.LinuxBuild.Contracts
 
         private static readonly string[] RequiredPublishAssemblies =
         {
+            "AORebirth.BotService.dll",
             "AORebirth.Chat.Authentication.dll",
             "AORebirth.Communication.dll",
             "AORebirth.Database.dll",
@@ -251,8 +253,8 @@ namespace AORebirth.LinuxBuild.Contracts
                 .Select(element => NormalizeInventoryInclude(RequireAttribute(element, "Include")))
                 .ToArray();
 
-            Assert(legacySources.Length == 75, "Legacy ChatEngine compile inventory must contain exactly 75 items.");
-            Assert(linuxSources.Length == 75, "Linux ChatEngine compile inventory must contain exactly 75 items.");
+            Assert(legacySources.Length == 76, "Legacy ChatEngine compile inventory must contain exactly 76 items.");
+            Assert(linuxSources.Length == 76, "Linux ChatEngine compile inventory must contain exactly 76 items.");
             VerifySequence(legacySources, linuxSources, "ChatEngine compile inventory");
             foreach (string source in linuxSources)
             {
