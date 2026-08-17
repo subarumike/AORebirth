@@ -2,6 +2,21 @@
 
 ## Active
 
+Linux login/inventory follow-up after `login-hydration-b1c61405` is now source
+validated. DailyLogin no longer uses Windows XAMPP claim/reward paths
+unconditionally on Linux; claim roots resolve through
+`AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS`, then
+`AO_REBIRTH_ZONE_STATE_DIR/daily-login/claims`, with legacy XAMPP roots retained
+only for Windows runtime compatibility. Live read-only SQL for `Nanotechnica`
+proved visible startup inventory persists under `ContainerType=39` and normal
+inventory page `ContainerInstance=104`; the earlier
+`ContainerInstance=39` query was looking at the wrong column. Validation:
+focused DailyLogin contract PASS, Windows debug build PASS, AOtomation
+messaging PASS 1018/1018, Linux ZoneEngine publish/offline smoke PASS.
+Evidence: `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`.
+
+## Prior carried state
+
 Public unified account/forum infrastructure remains frozen and accepted.
 Forum community-launch preparation has been applied on production: restrained
 AORebirth forum CSS, AORebirth header navigation, guest login/register links

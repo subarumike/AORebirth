@@ -9,6 +9,19 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Linux login/inventory follow-up: after live validation of
+  `login-hydration-b1c61405`, the DailyLogin runtime path issue was corrected
+  in shared Windows-authoritative source by deriving claim roots from
+  `AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS` or
+  `AO_REBIRTH_ZONE_STATE_DIR/daily-login/claims`, while retaining legacy XAMPP
+  roots only for Windows runtime compatibility. Live read-only SQL for
+  `Nanotechnica` proved the previous zero-row inventory query used the wrong
+  column: startup inventory rows are keyed by `ContainerType=39` and normal
+  inventory page `ContainerInstance=104`, not by `ContainerInstance=39`.
+  Focused DailyLogin validation passed, the Windows debug build passed,
+  AOtomation messaging passed 1018/1018, and Linux ZoneEngine publish plus
+  offline smoke passed. Evidence:
+  `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`.
 - Unified account database/schema phase: live production metadata for `login`
   and `characters` has been audited read-only against MySQL 8.4.10, normal
   playable `login.Flags=0` is proven, no nonzero pending flag is approved, and
