@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 //
@@ -75,13 +75,17 @@ namespace ZoneEngine.Core
                 270646, 288796, 273469, 270996, 270994, 270992, 270987, 270985, 270983
             };
 
-        private static readonly string[] ClaimRoots =
+        private const string ClaimRootsEnvironmentVariableName = "AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS";
+        private const string RewardsJsonEnvironmentVariableName = "AO_REBIRTH_DAILY_LOGIN_REWARDS_JSON";
+        private const string ZoneStateEnvironmentVariableName = "AO_REBIRTH_ZONE_STATE_DIR";
+
+        private static readonly string[] LegacyWindowsClaimRoots =
             {
                 @"C:\xampp\htdocs\daily\data\claims",
                 @"C:\xampp\htdocs\uwg.daily.icc-rk\data\claims"
             };
 
-        private static readonly string[] RewardsJsonPaths =
+        private static readonly string[] LegacyWindowsRewardsJsonPaths =
             {
                 @"C:\xampp\htdocs\uwg.daily.icc-rk\rewards.json",
                 @"C:\xampp\htdocs\daily\rewards.json"
@@ -124,7 +128,7 @@ namespace ZoneEngine.Core
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 string json = serializer.Serialize(row);
-                foreach (string root in ClaimRoots)
+                foreach (string root in GetClaimRoots())
                 {
                     try
                     {
@@ -515,7 +519,7 @@ namespace ZoneEngine.Core
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             string json = serializer.Serialize(row);
             string fileName = "result-" + token + ".json";
-            foreach (string root in ClaimRoots)
+            foreach (string root in GetClaimRoots())
             {
                 try
                 {
@@ -708,7 +712,7 @@ namespace ZoneEngine.Core
 
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             string line = serializer.Serialize(row);
-            foreach (string root in ClaimRoots)
+            foreach (string root in GetClaimRoots())
             {
                 try
                 {
@@ -761,7 +765,7 @@ namespace ZoneEngine.Core
 
         private static PendingClaim TryReadPending(string name)
         {
-            foreach (string root in ClaimRoots)
+            foreach (string root in GetClaimRoots())
             {
                 string path = Path.Combine(root, name);
                 if (!File.Exists(path))
@@ -792,7 +796,7 @@ namespace ZoneEngine.Core
                     "pending-latest.json"
                 };
 
-            foreach (string root in ClaimRoots)
+            foreach (string root in GetClaimRoots())
             {
                 foreach (string name in names)
                 {
@@ -822,10 +826,91 @@ namespace ZoneEngine.Core
             return safe.Trim().ToLowerInvariant();
         }
 
+        private static string[] GetClaimRoots()
+        {
+            var roots = new List<string>();
+            AddConfiguredPaths(roots, Environment.GetEnvironmentVariable(ClaimRootsEnvironmentVariableName));
+
+            string zoneStateRoot = Environment.GetEnvironmentVariable(ZoneStateEnvironmentVariableName);
+            if (!string.IsNullOrWhiteSpace(zoneStateRoot))
+            {
+                AddPath(roots, Path.Combine(zoneStateRoot.Trim(), "daily-login", "claims"));
+            }
+
+            if (IsWindowsRuntime())
+            {
+                foreach (string root in LegacyWindowsClaimRoots)
+                {
+                    AddPath(roots, root);
+                }
+            }
+
+            return roots.ToArray();
+        }
+
+        private static string[] GetRewardsJsonPaths()
+        {
+            var paths = new List<string>();
+            AddConfiguredPaths(paths, Environment.GetEnvironmentVariable(RewardsJsonEnvironmentVariableName));
+            AddPath(paths, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "Daily", "rewards.json"));
+            AddPath(paths, Path.Combine(Environment.CurrentDirectory, "Content", "Daily", "rewards.json"));
+
+            if (IsWindowsRuntime())
+            {
+                foreach (string path in LegacyWindowsRewardsJsonPaths)
+                {
+                    AddPath(paths, path);
+                }
+            }
+
+            return paths.ToArray();
+        }
+
+        private static void AddConfiguredPaths(List<string> paths, string configured)
+        {
+            if (string.IsNullOrWhiteSpace(configured))
+            {
+                return;
+            }
+
+            string[] parts = configured.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string part in parts)
+            {
+                AddPath(paths, part);
+            }
+        }
+
+        private static void AddPath(List<string> paths, string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            string trimmed = path.Trim();
+            for (int i = 0; i < paths.Count; i++)
+            {
+                if (string.Equals(paths[i], trimmed, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+
+            paths.Add(trimmed);
+        }
+
+        private static bool IsWindowsRuntime()
+        {
+            PlatformID platform = Environment.OSVersion.Platform;
+            return platform == PlatformID.Win32NT
+                   || platform == PlatformID.Win32S
+                   || platform == PlatformID.Win32Windows
+                   || platform == PlatformID.WinCE;
+        }
         private static RewardsConfig LoadRewardsConfig()
         {
             var config = new RewardsConfig { FreeTestMode = false, Days = new Dictionary<string, DayReward>() };
-            foreach (string path in RewardsJsonPaths)
+            foreach (string path in GetRewardsJsonPaths())
             {
                 if (!File.Exists(path))
                 {
@@ -1822,7 +1907,7 @@ namespace ZoneEngine.Core
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             string json = serializer.Serialize(state);
-            foreach (string root in ClaimRoots)
+            foreach (string root in GetClaimRoots())
             {
                 try
                 {
@@ -1844,7 +1929,7 @@ namespace ZoneEngine.Core
         private static string FindExistingStatePath(string accountKey)
         {
             string name = AccountFileName(accountKey);
-            foreach (string root in ClaimRoots)
+            foreach (string root in GetClaimRoots())
             {
                 string path = Path.Combine(root, name);
                 if (File.Exists(path))
