@@ -36,6 +36,9 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerService.cs">
       <Link>AccountBrokerService.cs</Link>
     </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/BotAccountManagement.cs">
+      <Link>BotAccountManagement.cs</Link>
+    </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.AccountBroker/UsernamePolicy.cs">
       <Link>UsernamePolicy.cs</Link>
     </Compile>

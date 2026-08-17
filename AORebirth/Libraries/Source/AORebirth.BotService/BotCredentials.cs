@@ -140,6 +140,14 @@ namespace AORebirth.BotService
                 + version.ToString(CultureInfo.InvariantCulture)
                 + ":"
                 + secret;
+#if AOREBIRTH_LINUX
+            return Rfc2898DeriveBytes.Pbkdf2(
+                Encoding.UTF8.GetBytes(boundSecret),
+                salt,
+                iterations,
+                HashAlgorithmName.SHA256,
+                32);
+#else
             using (Rfc2898DeriveBytes derivation = new Rfc2898DeriveBytes(
                 Encoding.UTF8.GetBytes(boundSecret),
                 salt,
@@ -148,6 +156,7 @@ namespace AORebirth.BotService
             {
                 return derivation.GetBytes(32);
             }
+#endif
         }
 
         internal static bool FixedTimeEquals(byte[] left, byte[] right)

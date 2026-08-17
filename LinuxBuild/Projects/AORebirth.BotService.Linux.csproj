@@ -22,6 +22,15 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.BotService/BotCredentials.cs">
       <Link>BotCredentials.cs</Link>
     </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.BotService/BotHostedRuntime.cs">
+      <Link>BotHostedRuntime.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.BotService/BotInboundEvents.cs">
+      <Link>BotInboundEvents.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.BotService/BotPersistence.cs">
+      <Link>BotPersistence.cs</Link>
+    </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.BotService/BotPrivateProtocol.cs">
       <Link>BotPrivateProtocol.cs</Link>
     </Compile>

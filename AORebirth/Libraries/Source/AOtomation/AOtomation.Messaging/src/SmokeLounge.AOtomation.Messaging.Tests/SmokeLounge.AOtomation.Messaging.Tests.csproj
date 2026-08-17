@@ -69,6 +69,10 @@
     <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="DailyLoginPathContractTests.cs" />
     <Compile Include="BotServiceFoundationTests.cs" />
+    <Compile Include="BotServicePersistenceTests.cs" />
+    <Compile Include="..\..\..\..\AORebirth.AccountBroker\BotAccountManagement.cs">
+      <Link>BotAccountManagement.cs</Link>
+    </Compile>
     <Compile Include="EngineBindPolicyTests.cs" />
     <Compile Include="LinuxZoneEngineDeploymentPermissionTests.cs" />
     <Compile Include="..\..\..\..\Utility\Network\EngineBindPolicy.cs">

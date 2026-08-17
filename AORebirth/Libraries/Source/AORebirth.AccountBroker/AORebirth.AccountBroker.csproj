@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="AccountBrokerException.cs" />
     <Compile Include="AccountBrokerService.cs" />
+    <Compile Include="BotAccountManagement.cs" />
     <Compile Include="AccountBrokerModels.cs" />
     <Compile Include="BotManagementContracts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -97,6 +97,16 @@ namespace ChatEngine.PacketHandlers
                         recipient.Send(newpacket);
                     }
                 }
+
+                if (client.ChatServer().BotRouter != null)
+                {
+                    client.ChatServer().BotRouter.PublishChannelMessage(
+                        (byte)channel.channelType,
+                        channel.ChannelId,
+                        client.Character.CharacterId,
+                        client.Character.characterName,
+                        text);
+                }
             }
 
             ChatLogger.WriteString(channelName, text, client.Character.characterName);
