@@ -43,6 +43,16 @@ official/unknown endpoint -> original client behavior
 The current published installer and local installed DLL remain the earlier
 lineage and were not replaced during reconciliation.
 
+## 2026-08-17 combined patch boundary
+
+The authoritative client patch now builds a versioned v2 combined binary from
+`b60b7ca6` that contains both crash-repair/RoomSpace protection and
+endpoint-aware AORebirth login-key behavior. DailyLogin VGTP routing is still
+not implemented and must wait until the combined v2 patch passes real
+disposable-client acceptance.
+
+Do not add DailyLogin routing to the older installed/published v1 lineage.
+
 ## Scope
 
 This investigation covers the required routing contract:

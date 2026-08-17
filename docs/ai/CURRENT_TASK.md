@@ -8,12 +8,15 @@ server rewrite. The AORebirth website serves the DailyLogin app and
 opens `vgtp://uwg.daily.icc-rk/index.app` through the AO browser layer. The
 newer AORebirth private client patch source from the parallel Linux build tree
 has been reconciled into authoritative Windows `master` at
-`Tools\AOClientRoomSpaceGuard\ProxyDll`. Global hosts/DNS overrides and
-server-side proxying remain forbidden because they would hijack official
-Rubi-Ka/RK2019 traffic. Next step is implementing narrow, process-local
-DailyLogin routing in the canonical client-patch path without replacing the
-currently installed DLL or website installer until a separate deployment stage.
-Evidence: `docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
+`Tools\AOClientRoomSpaceGuard\ProxyDll`. It now builds a versioned v2 combined
+DLL from source commit `b60b7ca6` with both crash-repair/RoomSpace protection
+and endpoint-aware login-key behavior, including AORebirth public and local
+endpoint self-tests. Global hosts/DNS overrides and server-side proxying remain
+forbidden because they would hijack official Rubi-Ka/RK2019 traffic. Next step
+is real disposable-client acceptance for the combined v2 patch before any
+installed-client or website deployment. DailyLogin routing remains out of scope
+until that combined patch is accepted. Evidence:
+`docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
 `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
 
 ## Prior active checkpoint

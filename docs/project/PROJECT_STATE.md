@@ -17,10 +17,13 @@ completion matrices and dated evidence retain detailed provenance.
   process-local, dimension-aware routing in the private client patch /
   `version.dll` layer. The newer AORebirth private client patch source has been
   reconciled into authoritative Windows `master` at
-  `Tools\AOClientRoomSpaceGuard\ProxyDll`. The currently published installer and
-  installed local DLL remain the earlier accepted lineage and were not replaced.
-  DailyLogin routing should now be implemented only in the canonical
-  client-patch path and still requires the exact VGTP interception point.
+  `Tools\AOClientRoomSpaceGuard\ProxyDll`. Source commit `b60b7ca6` builds a
+  versioned v2 combined patch containing both crash-repair/RoomSpace protection
+  and endpoint-aware AORebirth login-key behavior. The currently published
+  installer and installed local DLL remain the earlier accepted v1 lineage and
+  were not replaced. DailyLogin routing must wait until v2 passes real
+  disposable-client acceptance, then be implemented only in the canonical
+  client-patch path with the exact VGTP interception point.
   Evidence: `docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
   `docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
 - Linux login/inventory follow-up: after live validation of
