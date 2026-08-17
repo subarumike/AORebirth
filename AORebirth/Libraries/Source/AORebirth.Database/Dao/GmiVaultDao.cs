@@ -21,6 +21,10 @@ namespace AORebirth.Database.Dao
     /// </summary>
     public static class GmiVaultDao
     {
+        private static bool? schemaAvailable;
+
+        private static bool missingSchemaLogged;
+
         public sealed class VaultItemRow
         {
             public int LowId { get; set; }
@@ -63,6 +67,11 @@ namespace AORebirth.Database.Dao
                 return snap;
             }
 
+            if (!CanUseVaultSchema())
+            {
+                return snap;
+            }
+
             try
             {
                 using (IDbConnection conn = Connector.GetConnection())
@@ -90,8 +99,13 @@ namespace AORebirth.Database.Dao
             }
             catch (Exception e)
             {
-                LogUtil.ErrorException(e);
-                return snap;
+                if (IsMissingOptionalGmiTable(e))
+                {
+                    MarkSchemaUnavailable();
+                    return snap;
+                }
+
+                throw;
             }
         }
 
@@ -110,6 +124,11 @@ namespace AORebirth.Database.Dao
             if (items == null)
             {
                 items = new List<VaultItemRow>();
+            }
+
+            if (!CanUseVaultSchema())
+            {
+                return false;
             }
 
             try
@@ -164,9 +183,89 @@ namespace AORebirth.Database.Dao
             }
             catch (Exception e)
             {
-                LogUtil.ErrorException(e);
+                if (IsMissingOptionalGmiTable(e))
+                {
+                    MarkSchemaUnavailable();
+                    return false;
+                }
+
+                throw;
+            }
+        }
+
+        public static bool CanUseVaultSchema()
+        {
+            if (schemaAvailable.HasValue)
+            {
+                return schemaAvailable.Value;
+            }
+
+            try
+            {
+                using (IDbConnection conn = Connector.GetConnection())
+                {
+                    int tableCount = conn.Query<int>(
+                        @"SELECT COUNT(*)
+                          FROM information_schema.tables
+                          WHERE table_schema = DATABASE()
+                            AND table_name IN ('gmi_vault', 'gmi_vault_item')").FirstOrDefault();
+                    schemaAvailable = tableCount == 2;
+                    if (!schemaAvailable.Value)
+                    {
+                        LogMissingSchemaOnce();
+                    }
+
+                    return schemaAvailable.Value;
+                }
+            }
+            catch (Exception e)
+            {
+                if (IsMissingOptionalGmiTable(e))
+                {
+                    MarkSchemaUnavailable();
+                    return false;
+                }
+
+                throw;
+            }
+        }
+
+        private static void MarkSchemaUnavailable()
+        {
+            schemaAvailable = false;
+            LogMissingSchemaOnce();
+        }
+
+        private static void LogMissingSchemaOnce()
+        {
+            if (missingSchemaLogged)
+            {
+                return;
+            }
+
+            missingSchemaLogged = true;
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                "GMI optional schema unavailable; skipping GMI vault and pending-withdrawal processing.");
+        }
+
+        private static bool IsMissingOptionalGmiTable(Exception e)
+        {
+            if (e == null)
+            {
                 return false;
             }
+
+            string message = e.Message ?? string.Empty;
+            bool namesGmiTable =
+                message.IndexOf("gmi_vault", StringComparison.OrdinalIgnoreCase) >= 0
+                || message.IndexOf("gmi_vault_item", StringComparison.OrdinalIgnoreCase) >= 0;
+            bool missingTable =
+                message.IndexOf("doesn't exist", StringComparison.OrdinalIgnoreCase) >= 0
+                || message.IndexOf("does not exist", StringComparison.OrdinalIgnoreCase) >= 0
+                || message.IndexOf("no such table", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            return namesGmiTable && missingTable;
         }
     }
 }

@@ -44,6 +44,17 @@ namespace AORebirth.Core.Inventory
 
     #endregion
 
+    public enum InventoryHydrationState
+    {
+        NotLoaded = 0,
+
+        Loading = 1,
+
+        Hydrated = 2,
+
+        Failed = 3
+    }
+
     /// <summary>
     /// </summary>
     public interface IInventoryPage : IEntity
@@ -65,6 +76,10 @@ namespace AORebirth.Core.Inventory
         /// <summary>
         /// </summary>
         int Page { get; }
+
+        InventoryHydrationState HydrationState { get; }
+
+        bool IsHydrated { get; }
 
         #endregion
 
@@ -115,6 +130,10 @@ namespace AORebirth.Core.Inventory
         /// <returns>
         /// </returns>
         bool Read();
+
+        void MarkHydrated();
+
+        void MarkHydrationFailed();
 
         /// <summary>
         /// </summary>

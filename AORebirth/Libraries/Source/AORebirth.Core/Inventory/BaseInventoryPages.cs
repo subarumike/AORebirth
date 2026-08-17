@@ -44,6 +44,8 @@ namespace AORebirth.Core.Inventory
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using Utility;
+
     #endregion
 
     /// <summary>
@@ -98,6 +100,16 @@ namespace AORebirth.Core.Inventory
         /// <summary>
         /// </summary>
         public int StandardPage { get; set; }
+
+        public InventoryHydrationState HydrationState { get; private set; }
+
+        public bool IsHydrated
+        {
+            get
+            {
+                return this.HydrationState == InventoryHydrationState.Hydrated;
+            }
+        }
 
         #endregion
 
@@ -372,12 +384,57 @@ namespace AORebirth.Core.Inventory
         /// </returns>
         public bool Read()
         {
+            this.HydrationState = InventoryHydrationState.Loading;
+            try
+            {
+                foreach (IInventoryPage inventoryPage in this.Pages.Values)
+                {
+                    inventoryPage.Read();
+                    if (!inventoryPage.IsHydrated)
+                    {
+                        this.MarkHydrationFailed();
+                        return false;
+                    }
+                }
+
+                this.MarkHydrated();
+                return true;
+            }
+            catch
+            {
+                this.MarkHydrationFailed();
+                throw;
+            }
+        }
+
+        public void MarkHydrated()
+        {
             foreach (IInventoryPage inventoryPage in this.Pages.Values)
             {
-                inventoryPage.Read();
+                inventoryPage.MarkHydrated();
             }
 
-            return true;
+            foreach (IInventoryPage inventoryPage in this.backpackPages.Values)
+            {
+                inventoryPage.MarkHydrated();
+            }
+
+            this.HydrationState = InventoryHydrationState.Hydrated;
+        }
+
+        public void MarkHydrationFailed()
+        {
+            foreach (IInventoryPage inventoryPage in this.Pages.Values)
+            {
+                inventoryPage.MarkHydrationFailed();
+            }
+
+            foreach (IInventoryPage inventoryPage in this.backpackPages.Values)
+            {
+                inventoryPage.MarkHydrationFailed();
+            }
+
+            this.HydrationState = InventoryHydrationState.Failed;
         }
 
         /// <summary>
@@ -453,14 +510,29 @@ namespace AORebirth.Core.Inventory
         /// </returns>
         public bool Write()
         {
+            if (!this.IsHydrated)
+            {
+                LogUtil.ErrorException(
+                    new InvalidOperationException(
+                        "Inventory persistence blocked because aggregate hydration is not trusted: state="
+                        + this.HydrationState));
+                return false;
+            }
+
             foreach (IInventoryPage inventoryPage in this.Pages.Values)
             {
-                inventoryPage.Write();
+                if (!inventoryPage.Write())
+                {
+                    return false;
+                }
             }
 
             foreach (IInventoryPage inventoryPage in this.backpackPages.Values)
             {
-                inventoryPage.Write();
+                if (!inventoryPage.Write())
+                {
+                    return false;
+                }
             }
 
             return true;

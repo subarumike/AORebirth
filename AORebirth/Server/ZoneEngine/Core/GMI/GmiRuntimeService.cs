@@ -101,7 +101,7 @@ namespace ZoneEngine.Core.GMI
         private static GmiVault CreateVaultFromDisk(string characterName, int characterInstance)
         {
             var vault = new GmiVault();
-            if (characterInstance != 0)
+            if (characterInstance != 0 && GmiVaultDao.CanUseVaultSchema())
             {
                 ApplyDbSnapshot(GmiVaultDao.Load(characterInstance), vault);
             }
@@ -156,6 +156,11 @@ namespace ZoneEngine.Core.GMI
                 return;
             }
 
+            if (!GmiVaultDao.CanUseVaultSchema())
+            {
+                return;
+            }
+
             ApplyDbSnapshot(GmiVaultDao.Load(character.Identity.Instance), vault);
             EnrichVaultItems(vault);
         }
@@ -172,6 +177,12 @@ namespace ZoneEngine.Core.GMI
             if (credits <= 0)
             {
                 failureReason = "Credits must be positive.";
+                return false;
+            }
+
+            if (!GmiVaultDao.CanUseVaultSchema())
+            {
+                failureReason = "Market vault unavailable.";
                 return false;
             }
 
@@ -218,6 +229,12 @@ namespace ZoneEngine.Core.GMI
             if (placement < 0)
             {
                 failureReason = "Invalid item deposit.";
+                return false;
+            }
+
+            if (!GmiVaultDao.CanUseVaultSchema())
+            {
+                failureReason = "Market vault unavailable.";
                 return false;
             }
 
@@ -344,6 +361,11 @@ namespace ZoneEngine.Core.GMI
         public static int ProcessPendingWithdrawals(ICharacter character)
         {
             if (character == null || string.IsNullOrEmpty(character.Name))
+            {
+                return 0;
+            }
+
+            if (!GmiVaultDao.CanUseVaultSchema())
             {
                 return 0;
             }
@@ -499,6 +521,12 @@ namespace ZoneEngine.Core.GMI
                 return false;
             }
 
+            if (!GmiVaultDao.CanUseVaultSchema())
+            {
+                failureReason = "Market vault unavailable.";
+                return false;
+            }
+
             GmiVault vault = GetOrCreate(character);
             ReloadVaultFromDatabase(character, vault);
             if (vault.Credits < credits)
@@ -542,6 +570,12 @@ namespace ZoneEngine.Core.GMI
             if (character == null)
             {
                 failureReason = "No character.";
+                return false;
+            }
+
+            if (!GmiVaultDao.CanUseVaultSchema())
+            {
+                failureReason = "Market vault unavailable.";
                 return false;
             }
 
