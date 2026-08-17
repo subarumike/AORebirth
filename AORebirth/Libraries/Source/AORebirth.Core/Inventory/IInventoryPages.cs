@@ -62,6 +62,10 @@ namespace AORebirth.Core.Inventory
         /// </summary>
         int StandardPage { get; set; }
 
+        InventoryHydrationState HydrationState { get; }
+
+        bool IsHydrated { get; }
+
         #endregion
 
         #region Public Indexers
@@ -183,6 +187,10 @@ namespace AORebirth.Core.Inventory
         /// <returns>
         /// </returns>
         bool Read();
+
+        void MarkHydrated();
+
+        void MarkHydrationFailed();
 
         /// <summary>
         /// </summary>

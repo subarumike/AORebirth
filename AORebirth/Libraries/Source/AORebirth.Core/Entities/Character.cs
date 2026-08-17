@@ -511,7 +511,16 @@ namespace AORebirth.Core.Entities
             {
                 return true;
             }
-            this.BaseInventory.Write();
+
+            if (this.BaseInventory != null && !this.BaseInventory.Write())
+            {
+                LogUtil.ErrorException(
+                    new InvalidOperationException(
+                        "Character save blocked before character persistence because inventory hydration is not trusted: "
+                        + this.Identity));
+                return false;
+            }
+
             DBCharacter temp = this.GetDBCharacter();
             LogUtil.Debug(
                 DebugInfoDetail.Database,

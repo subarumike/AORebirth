@@ -332,11 +332,9 @@ namespace ZoneEngine.Core
                 pooledCharacter = null;
             }
 
-            // Cross-zone transfer updates Playfield on the dynel but Parent can still reference
-            // the source playfield until reconnect. IsTeleporting marks an active transfer.
-            if (pooledCharacter != null
-                && !pooledCharacter.IsTeleporting
-                && !pooledCharacter.Parent.Equals(pf.Identity))
+            // Parent is immutable identity ownership; a mismatch means the pooled character belongs
+            // to a stale playfield session and must not be reused for this login/reconnect.
+            if (pooledCharacter != null && !pooledCharacter.Parent.Equals(pf.Identity))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,

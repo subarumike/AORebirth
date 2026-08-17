@@ -47,6 +47,8 @@ namespace AORebirth.Core.Inventory
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using Utility;
+
     #endregion
 
     /// <summary>
@@ -125,6 +127,16 @@ namespace AORebirth.Core.Inventory
             {
                 this.Identity.Type = (IdentityType)value;
             }*/
+        }
+
+        public InventoryHydrationState HydrationState { get; private set; }
+
+        public bool IsHydrated
+        {
+            get
+            {
+                return this.HydrationState == InventoryHydrationState.Hydrated;
+            }
         }
 
         #endregion
@@ -229,56 +241,80 @@ namespace AORebirth.Core.Inventory
         public virtual bool Read()
         {
             int containerType = (int)this.Identity.Type;
+            var hydratedContent = new Dictionary<int, IItem>();
+            this.HydrationState = InventoryHydrationState.Loading;
 
-            // omg, i forgot to clear before read... - Algorithman
-            this.Content.Clear();
-
-            foreach (DBItem item in ItemDao.Instance.GetAllInContainer(containerType, this.Identity.Instance))
+            try
             {
-                Item newItem = new Item(item.quality, item.lowid, item.highid);
-                newItem.SetAttribute(412, item.multiplecount);
-                this.Content.Add(item.containerplacement, newItem);
-
-                // Make item visible
-                // TODO: Other flags must be set too
-                newItem.Flags |= 0x1;
-            }
-
-            foreach (
-                DBInstancedItem item in
-                    InstancedItemDao.Instance.GetAll(
-                        new { containertype = containerType, containerinstance = this.Identity.Instance }))
-            {
-                Item newItem = new Item(item.quality, item.lowid, item.highid);
-                newItem.SetAttribute(412, item.multiplecount);
-                Identity temp = new Identity();
-                temp.Type = (IdentityType)item.itemtype;
-                temp.Instance = item.Id;
-                newItem.Identity = temp;
-
-                byte[] binaryStats = item.stats.ToArray();
-                for (int i = 0; i < binaryStats.Length / 8; i++)
+                foreach (DBItem item in ItemDao.Instance.GetAllInContainer(containerType, this.Identity.Instance))
                 {
-                    int statid = BitConverter.ToInt32(binaryStats, i * 8);
-                    int statvalue = BitConverter.ToInt32(binaryStats, i * 8 + 4);
-                    newItem.SetAttribute(statid, statvalue);
+                    Item newItem = new Item(item.quality, item.lowid, item.highid);
+                    newItem.SetAttribute(412, item.multiplecount);
+                    hydratedContent.Add(item.containerplacement, newItem);
+
+                    // Make item visible
+                    // TODO: Other flags must be set too
+                    newItem.Flags |= 0x1;
                 }
 
-                // Make item visible
-                // TODO: Other flags must be set too
-                // Anything ->    =0x01
-                // Containers ->  =0x02
-                // ????? ->       |0x20
-                // ????? ->       |0x80 (maybe unique)
+                foreach (
+                    DBInstancedItem item in
+                        InstancedItemDao.Instance.GetAll(
+                            new { containertype = containerType, containerinstance = this.Identity.Instance }))
+                {
+                    Item newItem = new Item(item.quality, item.lowid, item.highid);
+                    newItem.SetAttribute(412, item.multiplecount);
+                    Identity temp = new Identity();
+                    temp.Type = (IdentityType)item.itemtype;
+                    temp.Instance = item.Id;
+                    newItem.Identity = temp;
 
-                // Found online: 0xa1 for nano instruction disc
-                // 0x02 for any bag
-                // 0x81 for unique totw rings
-                newItem.Flags |= 0x1;
-                this.Content[item.containerplacement] = newItem;
+                    byte[] binaryStats = item.stats.ToArray();
+                    for (int i = 0; i < binaryStats.Length / 8; i++)
+                    {
+                        int statid = BitConverter.ToInt32(binaryStats, i * 8);
+                        int statvalue = BitConverter.ToInt32(binaryStats, i * 8 + 4);
+                        newItem.SetAttribute(statid, statvalue);
+                    }
+
+                    // Make item visible
+                    // TODO: Other flags must be set too
+                    // Anything ->    =0x01
+                    // Containers ->  =0x02
+                    // ????? ->       |0x20
+                    // ????? ->       |0x80 (maybe unique)
+
+                    // Found online: 0xa1 for nano instruction disc
+                    // 0x02 for any bag
+                    // 0x81 for unique totw rings
+                    newItem.Flags |= 0x1;
+                    hydratedContent[item.containerplacement] = newItem;
+                }
+
+                this.Content.Clear();
+                foreach (KeyValuePair<int, IItem> item in hydratedContent)
+                {
+                    this.Content[item.Key] = item.Value;
+                }
+
+                this.MarkHydrated();
+                return true;
             }
+            catch
+            {
+                this.MarkHydrationFailed();
+                throw;
+            }
+        }
 
-            return true;
+        public void MarkHydrated()
+        {
+            this.HydrationState = InventoryHydrationState.Hydrated;
+        }
+
+        public void MarkHydrationFailed()
+        {
+            this.HydrationState = InventoryHydrationState.Failed;
         }
 
         /// <summary>
@@ -375,6 +411,15 @@ namespace AORebirth.Core.Inventory
         /// </returns>
         public virtual bool Write()
         {
+            if (!this.IsHydrated)
+            {
+                LogUtil.ErrorException(
+                    new InvalidOperationException(
+                        "Inventory page persistence blocked because hydration is not trusted: "
+                        + this.Identity.Type + ":" + this.Identity.Instance + " state=" + this.HydrationState));
+                return false;
+            }
+
             List<DBInstancedItem> DBinstanced = new List<DBInstancedItem>();
             List<DBItem> DBuninstanced = new List<DBItem>();
             foreach (KeyValuePair<int, IItem> kv in this.Content)
