@@ -59,6 +59,7 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
   /I"%SRC%" /LD ^
   "%SRC%\crash_dump.cpp" ^
+  "%SRC%\daily_login_routing.cpp" ^
   "%SRC%\dllmain.cpp" ^
   "%SRC%\gui_rect_fix.cpp" ^
   "%SRC%\logging.cpp" ^
@@ -81,6 +82,7 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
   /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
   /I"%SRC%" ^
+  "%SRC%\daily_login_routing.cpp" ^
   "%SRC%\logging.cpp" ^
   "%SRC%\login_key_patch.cpp" ^
   "%SRC%\roomspace_fix.cpp" ^

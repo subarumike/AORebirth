@@ -4,6 +4,7 @@
 
 #include "crash_dump.h"
 #include "build_info.h"
+#include "daily_login_routing.h"
 #include "gui_rect_fix.h"
 #include "login_key_patch.h"
 #include "logging.h"
@@ -52,6 +53,11 @@ namespace
         if (!loginKeyWorkerStarted)
         {
             aorf::Log("LOGINKEY patch=BLOCKED reason=start_worker");
+        }
+        const bool dailyLoginWorkerStarted = aorf::StartDailyLoginRoutingWorker();
+        if (!dailyLoginWorkerStarted)
+        {
+            aorf::Log("DAILYLOGIN route=BLOCKED reason=start_worker");
         }
 
         if (!aorf::InstallEarlyRandyExceptionGuard())
@@ -124,8 +130,9 @@ namespace
 
             aorf::Log("SKIP old-client-only GUI rectangle and renderer repairs");
             aorf::Log(
-                "READY loginKeyWorker=%s RoomSpace and new-client GUI draw repairs active",
-                loginKeyWorkerStarted ? "started" : "blocked");
+                "READY loginKeyWorker=%s dailyLoginWorker=%s RoomSpace and new-client GUI draw repairs active",
+                loginKeyWorkerStarted ? "started" : "blocked",
+                dailyLoginWorkerStarted ? "started" : "blocked");
             return 0;
         }
 
@@ -154,8 +161,9 @@ namespace
         }
 
         aorf::Log(
-            "READY loginKeyWorker=%s RoomSpace, GUI rectangle, and renderer repairs active",
-            loginKeyWorkerStarted ? "started" : "blocked");
+            "READY loginKeyWorker=%s dailyLoginWorker=%s RoomSpace, GUI rectangle, and renderer repairs active",
+            loginKeyWorkerStarted ? "started" : "blocked",
+            dailyLoginWorkerStarted ? "started" : "blocked");
         return 0;
     }
 
