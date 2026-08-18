@@ -318,6 +318,10 @@ namespace aorf
                 "host: " + RightPaddedHostReplacement());
             changed |= ReplaceAll(
                 request,
+                "http://dailyrewards.anarchy-online.com",
+                "http://" + std::string(AoRebirthDailyLoginHost));
+            changed |= ReplaceAll(
+                request,
                 "www.daily.icc-rk",
                 AoRebirthDailyLoginHost);
 
@@ -335,6 +339,53 @@ namespace aorf
                 static_cast<unsigned long>(length),
                 static_cast<unsigned long>(rewritten.size()));
             return true;
+        }
+
+        bool RewriteDailyLoginHttpRequestFromWsabufs(
+            LPWSABUF buffers,
+            DWORD bufferCount,
+            std::vector<char>& rewritten)
+        {
+            if (!buffers || bufferCount == 0)
+            {
+                return false;
+            }
+
+            if (bufferCount == 1)
+            {
+                return RewriteDailyLoginHttpRequest(
+                    buffers[0].buf,
+                    static_cast<int>(buffers[0].len),
+                    rewritten);
+            }
+
+            DWORD totalLength = 0;
+            for (DWORD index = 0; index < bufferCount; ++index)
+            {
+                if (!buffers[index].buf ||
+                    buffers[index].len > 65536 ||
+                    totalLength > 65536 - buffers[index].len)
+                {
+                    return false;
+                }
+
+                totalLength += buffers[index].len;
+            }
+
+            std::vector<char> combined;
+            combined.reserve(totalLength);
+            for (DWORD index = 0; index < bufferCount; ++index)
+            {
+                combined.insert(
+                    combined.end(),
+                    buffers[index].buf,
+                    buffers[index].buf + buffers[index].len);
+            }
+
+            return RewriteDailyLoginHttpRequest(
+                combined.data(),
+                static_cast<int>(combined.size()),
+                rewritten);
         }
 
         FARPROC ResolveWs2(const char* name)
@@ -726,12 +777,7 @@ namespace aorf
             WSABUF replacement = {};
             if (RoutingEnabled &&
                 overlapped == nullptr &&
-                bufferCount == 1 &&
-                buffers &&
-                RewriteDailyLoginHttpRequest(
-                    buffers[0].buf,
-                    static_cast<int>(buffers[0].len),
-                    rewritten))
+                RewriteDailyLoginHttpRequestFromWsabufs(buffers, bufferCount, rewritten))
             {
                 replacement.buf = rewritten.data();
                 replacement.len = static_cast<ULONG>(rewritten.size());
