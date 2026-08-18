@@ -593,3 +593,24 @@ cmd /d /c tools\validate_capture_evidence_fixtures.cmd
 
 This is a Windows-lane gate. After it passes, the same tracked fixture files can
 be reconciled into the Linux branch before any gameplay code is promoted.
+
+## Windows/Linux server repair parity
+
+Server repairs are Windows-authoritative first and Linux-deployed second.
+
+Required workflow for every server repair or gameplay/runtime source change:
+
+1. Land the repair in Windows `master` as committed source.
+2. Deploy Linux server binaries only from an exact committed Windows `master`
+   SHA.
+3. Record the deployed Linux release name and exact source SHA in repository
+   evidence or project-state documentation.
+4. Before starting the next server repair, compare the current Windows
+   `master` server-source delta against the active Linux release source SHA.
+5. If Windows contains server-code commits that are not represented in the
+   active Linux release, reconcile/deploy that delta before using live Linux
+   behavior as acceptance evidence for the next repair.
+
+Client-patch-only and docs-only commits after a deployed server SHA do not
+require a Linux server redeploy, but they must be explicitly identified as
+non-server changes before declaring Windows/Linux server parity.
