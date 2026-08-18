@@ -84,6 +84,46 @@ namespace
             return 1;
         }
 
+        aorf::ClientProfile profile = aorf::GetLoadedN3ClientProfile();
+        if (profile == aorf::ClientProfile::Unknown)
+        {
+            aorf::Log("ERROR client profile was not available before crash mitigation");
+            MessageBoxW(
+                nullptr,
+                L"AORebirth Client Patch could not verify this client profile. "
+                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                L"AORebirth Client Patch",
+                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+            return 1;
+        }
+
+        if (profile == aorf::ClientProfile::OldClient)
+        {
+            if (!aorf::InstallGuiRectFix())
+            {
+                aorf::Log("ERROR GUI rectangle repair was not installed");
+                MessageBoxW(
+                    nullptr,
+                    L"AORebirth Client Patch could not install the GUI crash repair. "
+                    L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                    L"AORebirth Client Patch",
+                    MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+                return 1;
+            }
+
+            if (!aorf::InstallRandyColorFix())
+            {
+                aorf::Log("ERROR randy31 renderer repair was not installed");
+                MessageBoxW(
+                    nullptr,
+                    L"AORebirth Client Patch could not install the renderer crash repair. "
+                    L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
+                    L"AORebirth Client Patch",
+                    MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+                return 1;
+            }
+        }
+
         bool clientCrashMitigationInstalled = false;
         for (int attempt = 0; attempt < 10; ++attempt)
         {
@@ -118,19 +158,6 @@ namespace
             aorf::Log("DAILYLOGIN route=BLOCKED reason=start_worker");
         }
 
-        aorf::ClientProfile profile = aorf::GetLoadedN3ClientProfile();
-        if (profile == aorf::ClientProfile::Unknown)
-        {
-            aorf::Log("ERROR client profile was not available after crash mitigation");
-            MessageBoxW(
-                nullptr,
-                L"AORebirth Client Patch could not verify this client profile. "
-                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
-                L"AORebirth Client Patch",
-                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
-            return 1;
-        }
-
         if (profile == aorf::ClientProfile::NewClient)
         {
             if (!aorf::InstallNewClientGuiDrawFix())
@@ -151,30 +178,6 @@ namespace
                 loginKeyWorkerStarted ? "started" : "blocked",
                 dailyLoginWorkerStarted ? "started" : "blocked");
             return 0;
-        }
-
-        if (!aorf::InstallGuiRectFix())
-        {
-            aorf::Log("ERROR GUI rectangle repair was not installed");
-            MessageBoxW(
-                nullptr,
-                L"AORebirth Client Patch could not install the GUI crash repair. "
-                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
-                L"AORebirth Client Patch",
-                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
-            return 1;
-        }
-
-        if (!aorf::InstallRandyColorFix())
-        {
-            aorf::Log("ERROR randy31 renderer repair was not installed");
-            MessageBoxW(
-                nullptr,
-                L"AORebirth Client Patch could not install the renderer crash repair. "
-                L"Close AO and review %LOCALAPPDATA%\\AORebirthClientPatch\\AORebirthClientPatch.log.",
-                L"AORebirth Client Patch",
-                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
-            return 1;
         }
 
         aorf::Log(
