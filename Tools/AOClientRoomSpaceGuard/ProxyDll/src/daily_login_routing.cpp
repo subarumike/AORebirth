@@ -776,9 +776,37 @@ namespace aorf
             std::vector<char> rewritten;
             WSABUF replacement = {};
             if (RoutingEnabled &&
-                overlapped == nullptr &&
                 RewriteDailyLoginHttpRequestFromWsabufs(buffers, bufferCount, rewritten))
             {
+                if (overlapped)
+                {
+                    char* heapBuffer = reinterpret_cast<char*>(
+                        HeapAlloc(GetProcessHeap(), 0, rewritten.size()));
+                    if (!heapBuffer)
+                    {
+                        return RealWSASend(
+                            socket,
+                            buffers,
+                            bufferCount,
+                            bytesSent,
+                            flags,
+                            overlapped,
+                            completionRoutine);
+                    }
+
+                    std::memcpy(heapBuffer, rewritten.data(), rewritten.size());
+                    replacement.buf = heapBuffer;
+                    replacement.len = static_cast<ULONG>(rewritten.size());
+                    return RealWSASend(
+                        socket,
+                        &replacement,
+                        1,
+                        bytesSent,
+                        flags,
+                        overlapped,
+                        completionRoutine);
+                }
+
                 replacement.buf = rewritten.data();
                 replacement.len = static_cast<ULONG>(rewritten.size());
                 return RealWSASend(
