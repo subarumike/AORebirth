@@ -78,6 +78,12 @@ namespace AORebirth.Core.Entities
         /// </summary>
         private Timer logoutTimer = null;
 
+        private readonly object logoutTimerSync = new object();
+
+        private int logoutTimerGeneration = 0;
+
+        private bool logoutTimerDisposeInProgress = false;
+
         /// <summary>
         /// </summary>
         private MoveDirections moveDirection;
@@ -565,10 +571,7 @@ namespace AORebirth.Core.Entities
                         this.Controller.Dispose();
                     }
 
-                    if (this.logoutTimer != null)
-                    {
-                        this.logoutTimer.Dispose();
-                    }
+                    this.StopLogoutTimer();
 
                     CharacterDao.Instance.SetOffline(charId);
                 }
@@ -1228,6 +1231,56 @@ namespace AORebirth.Core.Entities
             this.Controller.Client = client;
         }
 
+        public bool TryClaimReconnectOwnership(out bool preserveLogoutSitPosture)
+        {
+            preserveLogoutSitPosture = false;
+            Timer timerToDispose = null;
+
+            lock (this.logoutTimerSync)
+            {
+                if (this.disposed || this.logoutTimerDisposeInProgress)
+                {
+                    return false;
+                }
+
+                preserveLogoutSitPosture =
+                    this.logoutTimer != null
+                    && this.MoveMode == MoveModes.Sit;
+
+                this.logoutTimerGeneration++;
+                timerToDispose = this.logoutTimer;
+                this.logoutTimer = null;
+            }
+
+            if (timerToDispose != null)
+            {
+                timerToDispose.Dispose();
+            }
+
+            return true;
+        }
+
+        public bool WaitForLogoutTimerDisposalToComplete(int timeoutMilliseconds)
+        {
+            DateTime deadline = DateTime.UtcNow.AddMilliseconds(timeoutMilliseconds);
+
+            lock (this.logoutTimerSync)
+            {
+                while (this.logoutTimerDisposeInProgress)
+                {
+                    TimeSpan remaining = deadline - DateTime.UtcNow;
+                    if (remaining <= TimeSpan.Zero)
+                    {
+                        return false;
+                    }
+
+                    Monitor.Wait(this.logoutTimerSync, remaining);
+                }
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="nano">
@@ -1261,19 +1314,45 @@ namespace AORebirth.Core.Entities
         /// </summary>
         public void StartLogoutTimer(int time = 30000)
         {
-            this.logoutTimer = new Timer(this.LogoutTimerCallback, null, time, 0);
+            Timer oldTimer = null;
+            int timerGeneration;
+
+            lock (this.logoutTimerSync)
+            {
+                if (this.disposed || this.logoutTimerDisposeInProgress)
+                {
+                    return;
+                }
+
+                oldTimer = this.logoutTimer;
+                this.logoutTimerGeneration++;
+                timerGeneration = this.logoutTimerGeneration;
+                this.logoutTimer = new Timer(this.LogoutTimerCallback, timerGeneration, time, Timeout.Infinite);
+            }
+
+            if (oldTimer != null)
+            {
+                oldTimer.Dispose();
+            }
         }
 
         /// <summary>
         /// </summary>
         public void StopLogoutTimer()
         {
-            if (this.logoutTimer != null)
+            Timer timerToDispose = null;
+
+            lock (this.logoutTimerSync)
             {
-                this.logoutTimer.Dispose();
+                this.logoutTimerGeneration++;
+                timerToDispose = this.logoutTimer;
+                this.logoutTimer = null;
             }
 
-            this.logoutTimer = null;
+            if (timerToDispose != null)
+            {
+                timerToDispose.Dispose();
+            }
         }
 
         /// <summary>
@@ -1282,7 +1361,10 @@ namespace AORebirth.Core.Entities
         /// </returns>
         public bool InLogoutTimerPeriod()
         {
-            return this.logoutTimer != null;
+            lock (this.logoutTimerSync)
+            {
+                return this.logoutTimer != null;
+            }
         }
 
         /// <summary>
@@ -1304,15 +1386,41 @@ namespace AORebirth.Core.Entities
         /// </param>
         public void LogoutTimerCallback(object sender)
         {
-            if (this.logoutTimer == null)
+            int callbackGeneration = sender is int ? (int)sender : 0;
+            Timer timerToDispose = null;
+
+            lock (this.logoutTimerSync)
             {
-                // Logout Timer has been cancelled
-                return;
+                if (this.disposed
+                    || this.logoutTimerDisposeInProgress
+                    || this.logoutTimer == null
+                    || callbackGeneration != this.logoutTimerGeneration)
+                {
+                    return;
+                }
+
+                timerToDispose = this.logoutTimer;
+                this.logoutTimer = null;
+                this.logoutTimerDisposeInProgress = true;
             }
 
-            this.logoutTimer.Dispose();
-            this.logoutTimer = null;
-            this.Dispose();
+            try
+            {
+                if (timerToDispose != null)
+                {
+                    timerToDispose.Dispose();
+                }
+
+                this.Dispose();
+            }
+            finally
+            {
+                lock (this.logoutTimerSync)
+                {
+                    this.logoutTimerDisposeInProgress = false;
+                    Monitor.PulseAll(this.logoutTimerSync);
+                }
+            }
         }
 
         #endregion

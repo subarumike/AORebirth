@@ -76,6 +76,51 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(connected, "InitializeActionableState(client);", "SendActionableState(client);");
         }
 
+        [TestMethod]
+        public void CrashReconnectCancelsLogoutTimerBeforeInventoryReloadAndRejectsZombieInventory()
+        {
+            string zoneClient = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs");
+            string createCharacter = zoneClient.Substring(
+                zoneClient.IndexOf("public void CreateCharacter(int charId)", StringComparison.Ordinal));
+            string character = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs");
+
+            AssertTextBefore(
+                createCharacter,
+                "pooledCharacter.TryClaimReconnectOwnership(out preserveLogoutSitOnConnect)",
+                "this.Controller.Character.Reconnect(this);");
+            AssertTextBefore(
+                createCharacter,
+                "pooledCharacter.TryClaimReconnectOwnership(out preserveLogoutSitOnConnect)",
+                "inventoryReadSucceeded = playerCharacter.BaseInventory.Read();");
+            AssertTextBefore(
+                createCharacter,
+                "pooledCharacter.WaitForLogoutTimerDisposalToComplete(2000)",
+                "this.Controller.Character = new Character(");
+            StringAssert.Contains(createCharacter, "Reconnect refused because the pending logout timer still owns");
+            StringAssert.Contains(createCharacter, "pending logout timer disposal already claimed ownership");
+            StringAssert.Contains(createCharacter, "HasRequiredPlayerInventoryPages(playerCharacter)");
+            StringAssert.Contains(createCharacter, "DiscardUntrustedPooledCharacter(pooledCharacter");
+            StringAssert.Contains(createCharacter, "this.IsPlayfieldTransferLogin = false;");
+            StringAssert.Contains(createCharacter, "this.Controller.Character = new Character(");
+            StringAssert.Contains(zoneClient, "private static bool HasRequiredPlayerInventoryPages(Character character)");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.Inventory");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.WeaponPage");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.ArmorPage");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.ImplantPage");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.SocialPage");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.Bank");
+            StringAssert.Contains(zoneClient, "|| !page.IsHydrated");
+            StringAssert.Contains(character, "public bool TryClaimReconnectOwnership(out bool preserveLogoutSitPosture)");
+            StringAssert.Contains(character, "public bool WaitForLogoutTimerDisposalToComplete(int timeoutMilliseconds)");
+            StringAssert.Contains(character, "this.logoutTimerDisposeInProgress");
+            StringAssert.Contains(character, "this.logoutTimerGeneration++");
+            StringAssert.Contains(character, "callbackGeneration != this.logoutTimerGeneration");
+            AssertTextBefore(
+                character,
+                "this.logoutTimer = null;",
+                "this.logoutTimerDisposeInProgress = true;");
+        }
+
         private static string ReadRepositoryFile(string relativePath)
         {
             string root = FindRepositoryRoot();
