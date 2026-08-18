@@ -42,3 +42,29 @@ then the guarded promotion completed successfully.
 
 Official-client acceptance is still required: claim day 28 once and confirm
 that the granted fixed Phasefront item appears in character `39` inventory.
+
+## Shared claim bridge repair
+
+The first post-deployment claim exposed two production configuration defects:
+
+- web-created pending files were `www-data:www-data` mode `660`, so the
+  `aorebirth` ZoneEngine process could not read them;
+- the live service did not set `AO_REBIRTH_DAILY_LOGIN_REWARDS_JSON`, and the
+  Linux package did not contain `Content/Daily/rewards.json`.
+
+The failed placeholder claim token `c2026081823341538e9e1ed` was moved out of
+the active claims directory into the root-only Daily Login quarantine. The
+account ledger did not advance and remained at days `1` through `27` taken.
+
+The bounded live repair:
+
+- made the exact claims directory `aorebirth:aorebirth` mode `2770`;
+- added a default ACL for the website container's `www-data` user;
+- configured the supported rewards JSON environment variable to the live
+  AORebirth Daily Login catalog;
+- restarted only `ao-rebirth-zoneengine.service`.
+
+Post-restart verification passed: ZoneEngine was active with restart count
+`0`, owned `0.0.0.0:7501`, had the exact rewards environment assignment, could
+read the catalog, had no active pending claim, and both server and public web
+state reported `nextDay: 28` with `claimedToday: false`.
