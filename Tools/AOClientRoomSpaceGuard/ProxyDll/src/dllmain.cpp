@@ -54,11 +54,6 @@ namespace
         {
             aorf::Log("LOGINKEY patch=BLOCKED reason=start_worker");
         }
-        const bool dailyLoginWorkerStarted = aorf::StartDailyLoginRoutingWorker();
-        if (!dailyLoginWorkerStarted)
-        {
-            aorf::Log("DAILYLOGIN route=BLOCKED reason=start_worker");
-        }
 
         if (!aorf::InstallEarlyRandyExceptionGuard())
         {
@@ -89,7 +84,23 @@ namespace
             return 1;
         }
 
-        if (!aorf::InstallClientCrashMitigation())
+        bool clientCrashMitigationInstalled = false;
+        for (int attempt = 0; attempt < 10; ++attempt)
+        {
+            if (aorf::InstallClientCrashMitigation())
+            {
+                clientCrashMitigationInstalled = true;
+                break;
+            }
+
+            aorf::Log(
+                "WARN RoomSpace repair attempt failed attempt=%d retry=%s",
+                attempt + 1,
+                attempt + 1 < 10 ? "true" : "false");
+            Sleep(250);
+        }
+
+        if (!clientCrashMitigationInstalled)
         {
             aorf::Log("ERROR RoomSpace repair was not installed");
             MessageBoxW(
@@ -99,6 +110,12 @@ namespace
                 L"AORebirth Client Patch",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
             return 1;
+        }
+
+        const bool dailyLoginWorkerStarted = aorf::StartDailyLoginRoutingWorker();
+        if (!dailyLoginWorkerStarted)
+        {
+            aorf::Log("DAILYLOGIN route=BLOCKED reason=start_worker");
         }
 
         aorf::ClientProfile profile = aorf::GetLoadedN3ClientProfile();
