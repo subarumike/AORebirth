@@ -50,6 +50,17 @@ completion matrices and dated evidence retain detailed provenance.
   `dailylogin-path-360b3002` with startup/database preflights passing and port
   `7501` active. Evidence:
   `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`.
+- Crash-reconnect zombie-session fix: Windows-authoritative source commit
+  `fe6617b3bcd1d3806eddd4dbbb91e9c6680ef499` was validated locally, published
+  through the governed Linux ZoneEngine path, deployed as immutable production
+  release `reconnect-fe6617b3`, and accepted with live official-client testing.
+  The first reconnect under 30 seconds was immediately playable without an extra
+  relog, the old timer deadline had no effect, reconnect after the timeout
+  passed, fast reconnect repeated 3/3, ZoneEngine had no restart, and final
+  `ONLINE_COUNT=0`. Later Windows `master` commit
+  `5d0a84960df961e504f8761da46521d9968b8cd8` only adds client-patch changes and
+  does not require a ZoneEngine redeploy. Evidence:
+  `docs/evidence/CRASH_RECONNECT_LIVE_ACCEPTANCE_20260818.md`.
 - Unified account database/schema phase: live production metadata for `login`
   and `characters` has been audited read-only against MySQL 8.4.10, normal
   playable `login.Flags=0` is proven, no nonzero pending flag is approved, and

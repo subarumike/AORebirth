@@ -21,6 +21,16 @@ until that combined patch is accepted. Evidence:
 
 ## Prior active checkpoint
 
+Crash-reconnect zombie-session fix is production accepted. Windows-authoritative
+source commit `fe6617b3bcd1d3806eddd4dbbb91e9c6680ef499` deployed to Linux
+ZoneEngine release `reconnect-fe6617b3` and passed live official-client
+acceptance: first fast reconnect under 30 seconds was immediately playable,
+old timer deadline had no effect, reconnect after timeout passed, fast reconnect
+repeat was 3/3, no ZoneEngine restart occurred, and final `ONLINE_COUNT=0`.
+Later Windows `master` commit `5d0a84960df961e504f8761da46521d9968b8cd8`
+contains client-patch-only work and does not require a ZoneEngine redeploy.
+Evidence: `docs/evidence/CRASH_RECONNECT_LIVE_ACCEPTANCE_20260818.md`.
+
 Linux login/inventory follow-up after `login-hydration-b1c61405` is now source
 validated. DailyLogin no longer uses Windows XAMPP claim/reward paths
 unconditionally on Linux; claim roots resolve through
