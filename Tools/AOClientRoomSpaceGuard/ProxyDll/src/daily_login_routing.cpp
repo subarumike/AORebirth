@@ -34,6 +34,7 @@ namespace aorf
         using FnGetAddrInfoW = int(WSAAPI*)(PCWSTR, PCWSTR, const ADDRINFOW*, PADDRINFOW*);
         using FnGetHostByName = hostent*(WSAAPI*)(const char*);
         using FnSend = int(WSAAPI*)(SOCKET, const char*, int, int);
+        using FnGetProcAddress = FARPROC(WINAPI*)(HMODULE, LPCSTR);
         using FnWSASend = int(WSAAPI*)(
             SOCKET,
             LPWSABUF,
@@ -60,6 +61,8 @@ namespace aorf
         FnGetHostByName RealGetHostByName = nullptr;
         FnSend RealSend = nullptr;
         FnWSASend RealWSASend = nullptr;
+        FnGetProcAddress RealGetProcAddressKernel32 = nullptr;
+        FnGetProcAddress RealGetProcAddressKernelBase = nullptr;
 
         int WSAAPI HookGetAddrInfoA(
             PCSTR nodeName,
@@ -73,6 +76,7 @@ namespace aorf
             PADDRINFOW* result);
         hostent* WSAAPI HookGetHostByName(const char* name);
         int WSAAPI HookSend(SOCKET socket, const char* buffer, int length, int flags);
+        FARPROC WINAPI HookGetProcAddress(HMODULE module, LPCSTR procName);
         int WSAAPI HookWSASend(
             SOCKET socket,
             LPWSABUF buffers,
@@ -235,6 +239,18 @@ namespace aorf
                 lower == "www.daily.icc-rk";
         }
 
+        bool IsOrdinalProcedureName(LPCSTR procName)
+        {
+            return !procName ||
+                ((reinterpret_cast<uintptr_t>(procName) & ~static_cast<uintptr_t>(0xffff)) == 0);
+        }
+
+        bool IsWs2Module(HMODULE module)
+        {
+            return module &&
+                (module == Ws2 || module == GetModuleHandleW(L"ws2_32.dll"));
+        }
+
         bool IsHttpRequestPrefix(const std::string& value)
         {
             return value.rfind("GET ", 0) == 0 ||
@@ -328,11 +344,41 @@ namespace aorf
                 Ws2 = LoadLibraryW(L"ws2_32.dll");
             }
 
-            return Ws2 ? GetProcAddress(Ws2, name) : nullptr;
+            if (!Ws2)
+            {
+                return nullptr;
+            }
+
+            if (RealGetProcAddressKernel32)
+            {
+                return RealGetProcAddressKernel32(Ws2, name);
+            }
+
+            return GetProcAddress(Ws2, name);
+        }
+
+        bool ResolveKernelFunctions()
+        {
+            HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+            HMODULE kernelBase = GetModuleHandleW(L"kernelbase.dll");
+
+            RealGetProcAddressKernel32 = kernel32
+                ? reinterpret_cast<FnGetProcAddress>(GetProcAddress(kernel32, "GetProcAddress"))
+                : nullptr;
+            RealGetProcAddressKernelBase = kernelBase
+                ? reinterpret_cast<FnGetProcAddress>(GetProcAddress(kernelBase, "GetProcAddress"))
+                : nullptr;
+
+            return RealGetProcAddressKernel32 != nullptr;
         }
 
         bool ResolveWs2Functions()
         {
+            if (!ResolveKernelFunctions())
+            {
+                return false;
+            }
+
             RealGetAddrInfoA = reinterpret_cast<FnGetAddrInfoA>(ResolveWs2("getaddrinfo"));
             RealGetAddrInfoW = reinterpret_cast<FnGetAddrInfoW>(ResolveWs2("GetAddrInfoW"));
             RealGetHostByName = reinterpret_cast<FnGetHostByName>(ResolveWs2("gethostbyname"));
@@ -463,6 +509,8 @@ namespace aorf
                     patched += PatchImport(entry.hModule, "WS2_32.dll", "gethostbyname", RealGetHostByName, reinterpret_cast<void*>(HookGetHostByName)) ? 1ul : 0ul;
                     patched += PatchImport(entry.hModule, "WS2_32.dll", "send", RealSend, reinterpret_cast<void*>(HookSend)) ? 1ul : 0ul;
                     patched += PatchImport(entry.hModule, "WS2_32.dll", "WSASend", RealWSASend, reinterpret_cast<void*>(HookWSASend)) ? 1ul : 0ul;
+                    patched += PatchImport(entry.hModule, "KERNEL32.dll", "GetProcAddress", RealGetProcAddressKernel32, reinterpret_cast<void*>(HookGetProcAddress)) ? 1ul : 0ul;
+                    patched += PatchImport(entry.hModule, "KERNELBASE.dll", "GetProcAddress", RealGetProcAddressKernelBase, reinterpret_cast<void*>(HookGetProcAddress)) ? 1ul : 0ul;
                 }
                 while (Module32NextW(snapshot, &entry));
             }
@@ -623,6 +671,46 @@ namespace aorf
             }
 
             return RealSend(socket, buffer, length, flags);
+        }
+
+        FARPROC WINAPI HookGetProcAddress(HMODULE module, LPCSTR procName)
+        {
+            if (RoutingEnabled && IsWs2Module(module) && !IsOrdinalProcedureName(procName))
+            {
+                if (std::strcmp(procName, "getaddrinfo") == 0)
+                {
+                    Log("DAILYLOGIN route=getproc name=getaddrinfo");
+                    return reinterpret_cast<FARPROC>(HookGetAddrInfoA);
+                }
+
+                if (std::strcmp(procName, "GetAddrInfoW") == 0)
+                {
+                    Log("DAILYLOGIN route=getproc name=GetAddrInfoW");
+                    return reinterpret_cast<FARPROC>(HookGetAddrInfoW);
+                }
+
+                if (std::strcmp(procName, "gethostbyname") == 0)
+                {
+                    Log("DAILYLOGIN route=getproc name=gethostbyname");
+                    return reinterpret_cast<FARPROC>(HookGetHostByName);
+                }
+
+                if (std::strcmp(procName, "send") == 0)
+                {
+                    Log("DAILYLOGIN route=getproc name=send");
+                    return reinterpret_cast<FARPROC>(HookSend);
+                }
+
+                if (std::strcmp(procName, "WSASend") == 0)
+                {
+                    Log("DAILYLOGIN route=getproc name=WSASend");
+                    return reinterpret_cast<FARPROC>(HookWSASend);
+                }
+            }
+
+            return RealGetProcAddressKernel32
+                ? RealGetProcAddressKernel32(module, procName)
+                : nullptr;
         }
 
         int WSAAPI HookWSASend(
