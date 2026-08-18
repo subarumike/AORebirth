@@ -343,95 +343,102 @@ namespace aorf
 
         bool PatchImport(HMODULE module, const char* importModule, const char* name, void* original, void* replacement)
         {
-            if (!module || !original || !replacement)
+            __try
             {
-                return false;
-            }
-
-            auto* base = reinterpret_cast<unsigned char*>(module);
-            auto* dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
-            if (dos->e_magic != IMAGE_DOS_SIGNATURE)
-            {
-                return false;
-            }
-
-            auto* nt = reinterpret_cast<IMAGE_NT_HEADERS*>(base + dos->e_lfanew);
-            if (nt->Signature != IMAGE_NT_SIGNATURE)
-            {
-                return false;
-            }
-
-            IMAGE_DATA_DIRECTORY importDirectory =
-                nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
-            if (importDirectory.VirtualAddress == 0)
-            {
-                return false;
-            }
-
-            auto* descriptor = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(
-                base + importDirectory.VirtualAddress);
-            bool patched = false;
-            for (; descriptor->Name; ++descriptor)
-            {
-                const char* moduleName = reinterpret_cast<const char*>(base + descriptor->Name);
-                if (_stricmp(moduleName, importModule) != 0)
+                if (!module || !original || !replacement)
                 {
-                    continue;
+                    return false;
                 }
 
-                auto* thunk = reinterpret_cast<IMAGE_THUNK_DATA*>(
-                    base + descriptor->FirstThunk);
-                auto* originalThunk = descriptor->OriginalFirstThunk
-                    ? reinterpret_cast<IMAGE_THUNK_DATA*>(base + descriptor->OriginalFirstThunk)
-                    : nullptr;
-                for (; thunk->u1.Function; ++thunk)
+                auto* base = reinterpret_cast<unsigned char*>(module);
+                auto* dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
+                if (dos->e_magic != IMAGE_DOS_SIGNATURE)
                 {
-                    if (originalThunk &&
-                        (originalThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG))
+                    return false;
+                }
+
+                auto* nt = reinterpret_cast<IMAGE_NT_HEADERS*>(base + dos->e_lfanew);
+                if (nt->Signature != IMAGE_NT_SIGNATURE)
+                {
+                    return false;
+                }
+
+                IMAGE_DATA_DIRECTORY importDirectory =
+                    nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+                if (importDirectory.VirtualAddress == 0)
+                {
+                    return false;
+                }
+
+                auto* descriptor = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(
+                    base + importDirectory.VirtualAddress);
+                bool patched = false;
+                for (; descriptor->Name; ++descriptor)
+                {
+                    const char* moduleName = reinterpret_cast<const char*>(base + descriptor->Name);
+                    if (_stricmp(moduleName, importModule) != 0)
                     {
-                        ++originalThunk;
                         continue;
                     }
 
-                    if (originalThunk)
+                    auto* thunk = reinterpret_cast<IMAGE_THUNK_DATA*>(
+                        base + descriptor->FirstThunk);
+                    auto* originalThunk = descriptor->OriginalFirstThunk
+                        ? reinterpret_cast<IMAGE_THUNK_DATA*>(base + descriptor->OriginalFirstThunk)
+                        : nullptr;
+                    for (; thunk->u1.Function; ++thunk)
                     {
-                        auto* importByName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(
-                            base + originalThunk->u1.AddressOfData);
-                        if (std::strcmp(reinterpret_cast<const char*>(importByName->Name), name) != 0)
+                        if (originalThunk &&
+                            (originalThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG))
                         {
                             ++originalThunk;
                             continue;
                         }
-                        ++originalThunk;
-                    }
 
-                    if (reinterpret_cast<void*>(thunk->u1.Function) != original)
-                    {
-                        continue;
-                    }
+                        if (originalThunk)
+                        {
+                            auto* importByName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(
+                                base + originalThunk->u1.AddressOfData);
+                            if (std::strcmp(reinterpret_cast<const char*>(importByName->Name), name) != 0)
+                            {
+                                ++originalThunk;
+                                continue;
+                            }
+                            ++originalThunk;
+                        }
 
-                    DWORD oldProtection = 0;
-                    if (!VirtualProtect(
+                        if (reinterpret_cast<void*>(thunk->u1.Function) != original)
+                        {
+                            continue;
+                        }
+
+                        DWORD oldProtection = 0;
+                        if (!VirtualProtect(
+                                &thunk->u1.Function,
+                                sizeof(thunk->u1.Function),
+                                PAGE_READWRITE,
+                                &oldProtection))
+                        {
+                            continue;
+                        }
+
+                        thunk->u1.Function = reinterpret_cast<ULONG_PTR>(replacement);
+                        DWORD ignored = 0;
+                        VirtualProtect(
                             &thunk->u1.Function,
                             sizeof(thunk->u1.Function),
-                            PAGE_READWRITE,
-                            &oldProtection))
-                    {
-                        continue;
+                            oldProtection,
+                            &ignored);
+                        patched = true;
                     }
-
-                    thunk->u1.Function = reinterpret_cast<ULONG_PTR>(replacement);
-                    DWORD ignored = 0;
-                    VirtualProtect(
-                        &thunk->u1.Function,
-                        sizeof(thunk->u1.Function),
-                        oldProtection,
-                        &ignored);
-                    patched = true;
                 }
-            }
 
-            return patched;
+                return patched;
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                return false;
+            }
         }
 
         unsigned long PatchAllLoadedModules()
