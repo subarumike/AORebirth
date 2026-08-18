@@ -88,7 +88,8 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   "%SRC%\roomspace_fix.cpp" ^
   "%SRC%\self_test.cpp" ^
   /link /MACHINE:X86 /LTCG /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ^
-  /guard:cf /Brepro /OUT:"%BUILD_ROOT%\AORebirthClientPatchSelfTest.exe" bcrypt.lib
+  /guard:cf /Brepro /MANIFEST:EMBED /MANIFESTINPUT:"%SRC%\self_test.manifest" ^
+  /OUT:"%BUILD_ROOT%\AORebirthClientPatchSelfTest.exe" bcrypt.lib
 if errorlevel 1 (
   popd
   echo [AORebirthClientPatch] ERROR self-test build failed.
