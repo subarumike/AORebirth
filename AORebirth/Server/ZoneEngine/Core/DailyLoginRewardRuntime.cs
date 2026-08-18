@@ -291,8 +291,12 @@ namespace ZoneEngine.Core
                     Item grantItem;
                     try
                     {
+                        if (IsFixedPhasefrontRandomRewardDay(day))
+                        {
+                            grantItem = new Item(quality, itemId, itemId) { MultipleCount = stackCount };
+                        }
                         // Day 10 crystals are fixed-QL templates; do not remap via Relations.
-                        if (day == 10
+                        else if (day == 10
                             || (dayReward != null
                                 && string.Equals(
                                     dayReward.QualityMode,
@@ -1334,6 +1338,11 @@ namespace ZoneEngine.Core
                 + " qlFinal="
                 + item.Quality);
             return item;
+        }
+
+        private static bool IsFixedPhasefrontRandomRewardDay(int day)
+        {
+            return day == 1 || day == 28;
         }
 
         private static bool TryResolveScalePair(

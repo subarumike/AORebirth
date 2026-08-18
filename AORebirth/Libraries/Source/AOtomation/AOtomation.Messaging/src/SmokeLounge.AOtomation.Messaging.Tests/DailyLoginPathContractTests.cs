@@ -30,6 +30,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "DailyLogin rewards JSON reads must resolve platform-scoped paths.");
         }
 
+        [TestMethod]
+        public void FixedPhasefrontRandomRewardsDoNotUseScaleRelations()
+        {
+            string source = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\DailyLoginRewardRuntime.cs");
+
+            StringAssert.Contains(source, "private static bool IsFixedPhasefrontRandomRewardDay(int day)");
+            StringAssert.Contains(source, "return day == 1 || day == 28;");
+            StringAssert.Contains(source, "if (IsFixedPhasefrontRandomRewardDay(day))");
+            StringAssert.Contains(source, "grantItem = new Item(quality, itemId, itemId) { MultipleCount = stackCount };");
+            StringAssert.Contains(source, "else if (day == 10");
+        }
+
         private static string ReadRepositoryFile(string relativePath)
         {
             return File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath));
