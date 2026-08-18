@@ -44,6 +44,7 @@ namespace ZoneEngine.Core
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Inventory;
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
     using AORebirth.Database.Dao;
@@ -345,6 +346,25 @@ namespace ZoneEngine.Core
                 pooledCharacter = null;
             }
 
+            bool preserveLogoutSitOnConnect = false;
+            if (pooledCharacter != null
+                && !pooledCharacter.TryClaimReconnectOwnership(out preserveLogoutSitOnConnect))
+            {
+                if (!pooledCharacter.WaitForLogoutTimerDisposalToComplete(2000))
+                {
+                    throw new InvalidOperationException(
+                        "Reconnect refused because the pending logout timer still owns "
+                        + characterIdentity.ToString(true)
+                        + ".");
+                }
+
+                DiscardUntrustedPooledCharacter(
+                    pooledCharacter,
+                    "pending logout timer disposal already claimed ownership");
+                pooledCharacter = null;
+                preserveLogoutSitOnConnect = false;
+            }
+
             if (pooledCharacter == null)
             {
                 this.Controller.Character = new Character(
@@ -368,18 +388,48 @@ namespace ZoneEngine.Core
             {
                 playerCharacter.ReloadTrainedPerksFromDatabase();
                 // True reconnect (not zone hop): reload bags from DB. Zone hops keep memory.
-                if (pooledCharacter != null && !isZoningReload && playerCharacter.BaseInventory != null)
+                if (pooledCharacter != null && !isZoningReload)
                 {
-                    playerCharacter.BaseInventory.Read();
+                    bool inventoryReadSucceeded = false;
+                    if (playerCharacter.BaseInventory != null)
+                    {
+                        try
+                        {
+                            inventoryReadSucceeded = playerCharacter.BaseInventory.Read();
+                        }
+                        catch (Exception exception)
+                        {
+                            LogUtil.Debug(
+                                DebugInfoDetail.Error,
+                                "Reconnect inventory hydration threw for "
+                                + characterIdentity.ToString(true)
+                                + ": "
+                                + exception.Message);
+                            LogUtil.ErrorException(exception);
+                        }
+                    }
+
+                    if (!inventoryReadSucceeded || !HasRequiredPlayerInventoryPages(playerCharacter))
+                    {
+                        DiscardUntrustedPooledCharacter(pooledCharacter, "inventory hydration was incomplete");
+                        pooledCharacter = null;
+                        this.IsPlayfieldTransferLogin = false;
+                        preserveLogoutSitOnConnect = false;
+                        this.Controller.Character = new Character(
+                            pf.Identity,
+                            characterIdentity,
+                            this.Controller);
+                        this.controller.Character.Read();
+                        playerCharacter = this.Controller.Character as Character;
+                        if (playerCharacter != null)
+                        {
+                            playerCharacter.ReloadTrainedPerksFromDatabase();
+                        }
+                    }
                 }
             }
 
-            this.PreserveLogoutSitOnConnect =
-                this.Controller.Character.InLogoutTimerPeriod()
-                && (this.Controller.Character.MoveMode == MoveModes.Sit);
-
-            // Stop pending logouts
-            this.Controller.Character.StopLogoutTimer();
+            this.PreserveLogoutSitOnConnect = preserveLogoutSitOnConnect;
 
             this.Controller.Character.Playfield = pf;
             this.Playfield = pf;
@@ -400,6 +450,67 @@ namespace ZoneEngine.Core
 
             ActiveNanoRuntimeService.Default.TryRestoreZoneTransferStats(this.Controller.Character);
             this.controller.Character.Stats[StatIds.visualprofession].BaseValue = (uint)this.controller.Character.Stats[StatIds.profession].Value;
+        }
+
+        private static bool HasRequiredPlayerInventoryPages(Character character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            int[] requiredPages =
+                {
+                    (int)IdentityType.Inventory,
+                    (int)IdentityType.WeaponPage,
+                    (int)IdentityType.ArmorPage,
+                    (int)IdentityType.ImplantPage,
+                    (int)IdentityType.SocialPage,
+                    (int)IdentityType.Bank
+                };
+
+            for (int i = 0; i < requiredPages.Length; i++)
+            {
+                IInventoryPage page;
+                if (!character.BaseInventory.Pages.TryGetValue(requiredPages[i], out page)
+                    || page == null
+                    || !page.IsHydrated)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static void DiscardUntrustedPooledCharacter(Character pooledCharacter, string reason)
+        {
+            if (pooledCharacter == null)
+            {
+                return;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                "Discarding pooled player "
+                + pooledCharacter.Identity.ToString(true)
+                + " because "
+                + reason
+                + ".");
+
+            try
+            {
+                Pool.Instance.RemoveObject(pooledCharacter);
+            }
+            catch (Exception exception)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Pooled player discard could not remove object "
+                    + pooledCharacter.Identity.ToString(true)
+                    + ": "
+                    + exception.Message);
+            }
         }
 
         public void EnqueueOutboundCompressedBuffer(byte[] buffer)
