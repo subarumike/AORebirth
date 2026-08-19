@@ -3201,12 +3201,12 @@ def _governance_identity_hex(value: Any) -> str | None:
     text = str(value).strip()
     if re.search(r"\([A-Za-z]+:", text) and "SimpleChar:" not in text:
         return None
-    match = re.search(r"SimpleChar:([0-9A-Fa-f]{8})", text)
+    match = re.search(r"SimpleChar:([0-9A-Fa-f]{1,8})", text)
     if match:
-        return match.group(1).upper()
-    match = re.search(r"\b0x([0-9A-Fa-f]{8})\b", text)
+        return f"{int(match.group(1), 16):08X}"
+    match = re.search(r"\b0x([0-9A-Fa-f]{1,8})\b", text)
     if match:
-        return match.group(1).upper()
+        return f"{int(match.group(1), 16):08X}"
     match = re.search(r"\b([0-9A-Fa-f]{8})\b", text)
     if match and re.search(r"[A-Fa-f]", match.group(1)):
         return match.group(1).upper()
@@ -4166,6 +4166,10 @@ def self_test_governance() -> int:
     vendor["vendorEvidence"] = 1
     if _governance_classify_cohort(vendor) != GOVERNANCE_CATEGORY_VENDOR_NONCOMBAT:
         raise PipelineError("governance vendor exclusion self-test failed")
+    if _governance_identity_hex("(SimpleChar:11CE48)") != "0011CE48":
+        raise PipelineError("governance short SimpleChar identity self-test failed")
+    if _governance_identity_hex("0xF574E") != "000F574E":
+        raise PipelineError("governance short hex identity self-test failed")
     combat = _governance_new_cohort("Combat", "4", "17655")
     combat["identities"].add("79F40001")
     combat["directCombatRows"] = 1
