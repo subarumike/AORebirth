@@ -215,6 +215,7 @@ namespace ZoneEngine.Core
                 return;
             }
 
+            character.DoNotDoTimers = false;
             sourcePlayfield.Teleport(
                 dynel,
                 new Coordinate(IccShuttleportX, IccShuttleportY, IccShuttleportZ),

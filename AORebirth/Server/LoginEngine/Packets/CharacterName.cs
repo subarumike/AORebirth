@@ -243,12 +243,6 @@ namespace LoginEngine.Packets
                 y = 52.4f;
                 z = 785.7f;
             }
-           // {
-           //     playfield = 4582;
-          //      x = 939;
-           //     y = 20;
-          //      z = 732;
-          //  }
 
             DBCharacter character = CharacterDao.Instance.Get(charid);
             if (character != null)

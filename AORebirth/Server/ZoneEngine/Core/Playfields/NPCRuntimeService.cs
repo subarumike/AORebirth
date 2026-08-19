@@ -183,6 +183,7 @@ namespace AORebirth.Core.Playfields
             this.corpseDespawnTicks.Clear();
             AndromedaIccHqIdleGestureRuntime.Clear();
             AndromedaIccHqSpawn.ClearPlayfield(this.playfield.Identity.Instance);
+            IccShuttleportSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteLandingSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteIccPeacekeeperPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             MarcusPadAmbientCombat.ClearPlayfield(this.playfield.Identity.Instance);
@@ -260,6 +261,7 @@ namespace AORebirth.Core.Playfields
             ThrakOmniGardenSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             RomeBlueCitySpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             AndromedaIccHqSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            IccShuttleportSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             try
             {
                 AreteLandingSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);

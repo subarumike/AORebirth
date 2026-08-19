@@ -39,6 +39,10 @@ namespace AOSharpCaptureAnalyzer
         private const string TerminalOneByteSpecialAttackUnknown6PacketHex =
             "975A000A0001014D00000DAD78CB984B271B3A6B0000C35078D30B0B003A0A2B6F4B00074B504579FBE53C23D70A4427896200000000BF291CB1800000003F4030B60000A6281353414E4453544F524D204D61726175646572001008120100000000640000000007028A00000461F1005E001F000000001CC0D62D813EEB24C83F5BC9590302010100010001000100000002000001F40000C35078D45949000003F10000C35078D30B0B000000024579FBE53C23D70A442789624576D8E73F7453A94427957F000017A60000000000040DAC000000000000000100040DA8000000000000000200040DAA000000000000000300040DB0000000000000000400040DAE00000000000007E20000040E30000000000200000FC40003F81C0003F81D49444C5949444C590003F8190003F81A5146434B5146434B0003F8160003F8174251494F4251494F0000000000";
 
+        // Capture 20260816-174359 / PF 4582, packets.hex.log sequence 1016.
+        private const string IccShuttleportTerminalScfuUnknown4PacketHex =
+            "0460000A0001011E00000DB106E4F490271B3A6B0000C35079F44553003A022A4F43001B8089445F32B04212D169444EFEBA000000003F4E424D000000003F17A29C0000A4CB1353636F7574202D204A6161782753696E7568001008120100000000DC000000000A00C83B0003D786005F001F000000001C00000000000000008000000003010001000100010001000000020000F00000C35079F4453A000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F100000FC40003D7150003D71644585A4A44585A4A0003D7120003D71348465253484652530003D70F0003D71055475051554750510000000000";
+
         private static int Main(string[] args)
         {
             Console.WriteLine(
@@ -1325,6 +1329,26 @@ namespace AOSharpCaptureAnalyzer
                     0,
                     terminalOneByteUnknown6.SpecialAttacks[2].Unknown6,
                     "Terminal one-byte special-attack Unknown6 value");
+
+                RawSimpleCharFullUpdate iccShuttleportTerminalUnknown4 =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(
+                        FromHex(IccShuttleportTerminalScfuUnknown4PacketHex));
+                Assert(
+                    iccShuttleportTerminalUnknown4.DecodeFullyConsumed,
+                    "ICC Shuttleport terminal ScfuUnknown4 fully decoded");
+                AssertEqual(
+                    "Scout - Jaax'Sinuh",
+                    iccShuttleportTerminalUnknown4.Name,
+                    "ICC Shuttleport terminal ScfuUnknown4 fixture name");
+                AssertEqual(
+                    0x00000FC4,
+                    iccShuttleportTerminalUnknown4.Flags2,
+                    "ICC Shuttleport terminal special-attack Unknown6 flags2");
+                AssertEqual(
+                    0,
+                    iccShuttleportTerminalUnknown4.SpecialAttacks[
+                        iccShuttleportTerminalUnknown4.SpecialAttacks.Length - 1].Unknown6,
+                    "ICC Shuttleport terminal special-attack Unknown6 value");
 
                 var truncated = new byte[infectorPacket.Length - 1];
                 Buffer.BlockCopy(infectorPacket, 0, truncated, 0, truncated.Length);

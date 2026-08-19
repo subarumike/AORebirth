@@ -133,6 +133,7 @@ namespace ZoneEngine.Core.Playfields
                 new ThrakOmniGardenContentModule(),
                 new RomeBlueCityContentModule(),
                 new AndromedaIccHqContentModule(),
+                new IccShuttleportContentModule(),
                 new HoloDeckContentModule(),
                 new MissionInstanceContentModule(),
                 new PrivateCityContentModule());

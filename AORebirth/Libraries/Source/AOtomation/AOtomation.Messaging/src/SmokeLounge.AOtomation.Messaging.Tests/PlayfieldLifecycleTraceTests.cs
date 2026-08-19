@@ -328,6 +328,69 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void IccShuttleportBasicCombatPromotesOnlyCaptureBackedIslandReet()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string contractText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+            string npcCombatTickText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string spatialPolicyText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatSpatialPolicy.cs"));
+            string profileCatalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.cs"));
+            string catalogText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportBasicCombatCatalog.g.cs"));
+            string spawnText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportSpawn.cs"));
+
+            Assert.IsTrue(
+                contractText.Contains("BasicCaptureBackedOrdinary")
+                && contractText.Contains("CapturedBasicCombatFieldAuthority.Captured")
+                && contractText.Contains("CapturedBasicCombatFieldAuthority.GovernedDerived")
+                && contractText.Contains("CapturedBasicCombatFieldAuthority.GenericRuntimePolicy")
+                && contractText.Contains("CapturedBasicCombatFieldAuthority.OptionalPositiveBehavior"),
+                "Basic captured ordinary combat must be an explicit contract model with field authorities.");
+            Assert.IsTrue(
+                npcCombatTickText.Contains("ProcessBasicCaptureBackedOrdinaryAttackTicks")
+                && npcCombatTickText.Contains("nextBasicCaptureBackedAttackTicks")
+                && npcCombatTickText.Contains("SelectBasicDamageObservation")
+                && npcCombatTickText.Contains("observation.AttackInfoDamageTypeWire")
+                && npcCombatTickText.Contains("NpcCombatSpatialPolicy.GenericBasicMeleeAttackRange"),
+                "Basic captured ordinary combat must use independent stream clocks, per-observation damage type, and generic melee spatial policy.");
+            Assert.IsTrue(
+                profileCatalogText.Contains("current.AttackModel == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary")
+                && profileCatalogText.Contains("resolved = current;"),
+                "Direct-certified basic captured ordinary combat must not be replaced by an older canonical profile.");
+            Assert.IsTrue(
+                spatialPolicyText.Contains("GenericBasicMeleeAttackRange")
+                && spatialPolicyText.Contains("NpcCombatAttackRules.MaxMeleeCombatDistance"),
+                "Basic captured ordinary combat range must be explicit generic runtime policy, not captured attack range.");
+            Assert.IsTrue(
+                catalogText.Contains("Island Reet")
+                && catalogText.Contains("ICC Shuttleport [PF 4582] - 20260819-014109")
+                && catalogText.Contains("ICC Shuttleport [PF 4582] - 20260819-015104")
+                && catalogText.Contains("980e878a61bea869f03009a6657e3f15134b9d0b2a46cf98685842a24d543c6f")
+                && catalogText.Contains("new CapturedBasicCombatDamageObservation(6, 4")
+                && catalogText.Contains("new CapturedBasicCombatStreamDefinition("),
+                "Island Reet production combat must be backed by the two finalized PF4582 Reet captures, preserve the mixed damage-type observation, and expose stream data.");
+            Assert.IsTrue(
+                spawnText.Contains("Name = \"Island Reet\"")
+                && spawnText.Contains("CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet")
+                && spawnText.Contains("CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady("),
+                "PF4582 Island Reet spawn must attach the generated basic combat contract and fail closed if it is not runtime-ready.");
+            Assert.IsFalse(
+                catalogText.Contains("CapturedFixedPacketSequence")
+                || catalogText.Contains("FixedAttackInfo")
+                || catalogText.Contains("MinDamage")
+                || catalogText.Contains("MaxDamage")
+                || catalogText.Contains("RechargeSeconds")
+                || catalogText.Contains("CapturedAttackRange")
+                || catalogText.Contains("1234567890"),
+                "Island Reet basic combat data must not be promoted through legacy fixed/min-max/range/recharge sentinel fields.");
+        }
+
+        [TestMethod]
         public void NpcCorpseLifecycleRulesPreserveCapturedCleaningRobotDeathTimings()
         {
             Assert.AreEqual(
