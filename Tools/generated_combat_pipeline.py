@@ -2781,6 +2781,42 @@ GOVERNANCE_RUNTIME_FIELD_CLASSES = {
     **{field: "OPTIONAL_OBSERVATION" for field in GOVERNANCE_OPTIONAL_OBSERVATION_FIELDS},
     **{field: "SEPARATE_SPAWN_CONCERN" for field in GOVERNANCE_SEPARATE_SPAWN_CONCERN_FIELDS},
 }
+GOVERNANCE_FIELD_RESOLUTION_DIRECT_CAPTURE = "DIRECTLY_PROVABLE_FROM_CAPTURE"
+GOVERNANCE_FIELD_RESOLUTION_DERIVED_RULE = "DERIVABLE_BY_GOVERNED_RULE"
+GOVERNANCE_FIELD_RESOLUTION_NOT_REQUIRED = "NOT_REQUIRED_FOR_BASIC_RUNTIME_COMBAT"
+GOVERNANCE_FIELD_RESOLUTION_REQUIRED_NOT_PROTOCOL_PROVEN = (
+    "REQUIRED_BUT_NOT_PROTOCOL_PROVEN"
+)
+GOVERNANCE_FINAL_STATUS_PROVEN = "PROVEN"
+GOVERNANCE_FINAL_STATUS_DERIVED_GOVERNED = "DERIVED_GOVERNED"
+GOVERNANCE_FINAL_STATUS_NOT_REQUIRED = "NOT_REQUIRED"
+GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN = "NOT_PROTOCOL_PROVEN"
+GOVERNANCE_FINAL_STATUS_MISSING_PROTOCOL_PROVABLE = "MISSING_PROTOCOL_PROVABLE"
+GOVERNANCE_FINAL_AUTHORITY_DIRECT_PACKET = "DIRECT_PACKET"
+GOVERNANCE_FINAL_AUTHORITY_DERIVED_GOVERNED = "DERIVED_GOVERNED"
+GOVERNANCE_FINAL_AUTHORITY_NOT_REQUIRED = "NOT_REQUIRED_BASIC_COMBAT"
+GOVERNANCE_FINAL_AUTHORITY_REQUIRED_NOT_PROTOCOL_PROVEN = (
+    "REQUIRED_NOT_PROTOCOL_PROVEN"
+)
+GOVERNANCE_FINAL_AUTHORITY_MORE_CAPTURE = (
+    "REQUIRED_PROTOCOL_PROVABLE_NEEDS_MORE_CAPTURE"
+)
+GOVERNANCE_REQUIRED_NOT_PROTOCOL_PROVEN_FIELDS = frozenset(
+    {
+        "attackDelay",
+        "attackRange",
+        "naturalOrWeaponMode",
+        "rechargeDelay",
+    }
+)
+GOVERNANCE_OBSERVED_DAMAGE_BASIC_MODEL_FIELDS = frozenset(
+    {
+        "maxDamage",
+        "minDamage",
+    }
+)
+GOVERNANCE_DIRECT_ATTACK_INFO_PACKET_TYPE = 0x46002F16
+GOVERNANCE_SIMPLE_CHAR_TYPE = 50000
 GOVERNANCE_CAPTURE_READINESS = (
     {
         "field": "attackDelay",
@@ -3328,6 +3364,62 @@ def _governance_row_or_detail_value(
     return None
 
 
+def _governance_u32_be(payload: bytes, offset: int) -> int:
+    return int.from_bytes(payload[offset : offset + 4], "big", signed=False)
+
+
+def _governance_i32_be(payload: bytes, offset: int) -> int:
+    return int.from_bytes(payload[offset : offset + 4], "big", signed=True)
+
+
+def _governance_decode_raw_attack_info(
+    row: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    type_name = str(
+        _governance_casefold_lookup(row, "N3TypeName")
+        or _governance_casefold_lookup(row, "MessageType")
+        or ""
+    ).casefold()
+    type_value = _governance_int(_governance_casefold_lookup(row, "N3TypeValue"))
+    if (
+        type_name != "attackinfo"
+        and type_value != GOVERNANCE_DIRECT_ATTACK_INFO_PACKET_TYPE
+    ):
+        return None
+    raw_hex = _governance_casefold_lookup(row, "RawHex")
+    if raw_hex in (None, ""):
+        return None
+    cleaned = re.sub(r"[^0-9A-Fa-f]", "", str(raw_hex))
+    if len(cleaned) < 122 or len(cleaned) % 2:
+        return None
+    try:
+        payload = bytes.fromhex(cleaned)
+    except ValueError:
+        return None
+    if len(payload) < 61:
+        return None
+    message_type = _governance_u32_be(payload, 16)
+    if message_type != GOVERNANCE_DIRECT_ATTACK_INFO_PACKET_TYPE:
+        return None
+    source_type = _governance_u32_be(payload, 20)
+    target_type = _governance_u32_be(payload, 41)
+    if source_type != GOVERNANCE_SIMPLE_CHAR_TYPE or target_type != GOVERNANCE_SIMPLE_CHAR_TYPE:
+        return None
+    source_identity = _governance_u32_be(payload, 24)
+    target_identity = _governance_u32_be(payload, 45)
+    return {
+        "sourceIdentity": f"{source_identity:08X}",
+        "targetIdentity": f"{target_identity:08X}",
+        "n3Unknown": payload[28],
+        "amount": _governance_i32_be(payload, 29),
+        "ammoCount": _governance_i32_be(payload, 33),
+        "weaponSlot": _governance_i32_be(payload, 37),
+        "damageTypeWire": _governance_i32_be(payload, 49),
+        "hitTypeWire": _governance_i32_be(payload, 53),
+        "weaponInstance": _governance_i32_be(payload, 57),
+    }
+
+
 def _governance_sorted_evidence_values(values: Any) -> list[str]:
     return sorted({str(value) for value in values}, key=str.casefold)
 
@@ -3523,6 +3615,74 @@ def _governance_contract_field_statuses(cohort: Mapping[str, Any]) -> dict[str, 
     return statuses
 
 
+def _governance_field_resolution_reason(
+    field: str,
+    final_status: str,
+) -> str:
+    if field == "damageType" and final_status == GOVERNANCE_FINAL_STATUS_PROVEN:
+        return "decoded raw AttackInfo.damageTypeWire for the attacking NPC"
+    if field in {"hitType", "attackSlot"} and final_status == GOVERNANCE_FINAL_STATUS_PROVEN:
+        return "decoded or projected raw AttackInfo combat field for the attacking NPC"
+    if final_status == GOVERNANCE_FINAL_STATUS_DERIVED_GOVERNED:
+        return "governed derivation is allowed only after the required packet field is proven"
+    if field in GOVERNANCE_OBSERVED_DAMAGE_BASIC_MODEL_FIELDS:
+        return "basic captured combat can replay positive observed damage amounts without treating observed extrema as authoritative min/max stats"
+    if field == "attackDelay":
+        return "passive ordinary timing does not expose an authoritative NPC attack-delay stat or governed timing model"
+    if field == "rechargeDelay":
+        return "passive ordinary timing does not expose an authoritative NPC recharge-delay stat or governed timing model"
+    if field == "attackRange":
+        return "observed hit, chase, and follow distances are lower bounds, not the maximum legal attack envelope"
+    if field == "naturalOrWeaponMode":
+        return "slot values without governed ownership/equipment context do not prove natural versus weapon mode"
+    if final_status == GOVERNANCE_FINAL_STATUS_NOT_REQUIRED:
+        return "field is outside the basic runtime combat contract for this audit"
+    return "field is protocol-provable but missing from the selected capture projection"
+
+
+def _governance_final_field_resolutions(
+    cohort: Mapping[str, Any],
+    field_statuses: Mapping[str, str],
+) -> dict[str, dict[str, str]]:
+    resolutions: dict[str, dict[str, str]] = {}
+    for field in GOVERNANCE_RUNTIME_REQUIRED_FIELDS:
+        status = field_statuses.get(field, "MISSING")
+        if status.startswith("PROVEN_"):
+            final_status = GOVERNANCE_FINAL_STATUS_PROVEN
+            resolution_class = GOVERNANCE_FIELD_RESOLUTION_DIRECT_CAPTURE
+            authority = GOVERNANCE_FINAL_AUTHORITY_DIRECT_PACKET
+        elif status == "DERIVABLE_BY_EXISTING_GOVERNED_RULE":
+            final_status = GOVERNANCE_FINAL_STATUS_DERIVED_GOVERNED
+            resolution_class = GOVERNANCE_FIELD_RESOLUTION_DERIVED_RULE
+            authority = GOVERNANCE_FINAL_AUTHORITY_DERIVED_GOVERNED
+        elif status.startswith("OPTIONAL_") or status.startswith("SEPARATE_"):
+            final_status = GOVERNANCE_FINAL_STATUS_NOT_REQUIRED
+            resolution_class = GOVERNANCE_FIELD_RESOLUTION_NOT_REQUIRED
+            authority = GOVERNANCE_FINAL_AUTHORITY_NOT_REQUIRED
+        elif (
+            field in GOVERNANCE_OBSERVED_DAMAGE_BASIC_MODEL_FIELDS
+            and _governance_truthy_count(cohort.get("damageEvents")) > 0
+        ):
+            final_status = GOVERNANCE_FINAL_STATUS_NOT_REQUIRED
+            resolution_class = GOVERNANCE_FIELD_RESOLUTION_NOT_REQUIRED
+            authority = GOVERNANCE_FINAL_AUTHORITY_NOT_REQUIRED
+        elif field in GOVERNANCE_REQUIRED_NOT_PROTOCOL_PROVEN_FIELDS:
+            final_status = GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+            resolution_class = GOVERNANCE_FIELD_RESOLUTION_REQUIRED_NOT_PROTOCOL_PROVEN
+            authority = GOVERNANCE_FINAL_AUTHORITY_REQUIRED_NOT_PROTOCOL_PROVEN
+        else:
+            final_status = GOVERNANCE_FINAL_STATUS_MISSING_PROTOCOL_PROVABLE
+            resolution_class = GOVERNANCE_FIELD_RESOLUTION_DIRECT_CAPTURE
+            authority = GOVERNANCE_FINAL_AUTHORITY_MORE_CAPTURE
+        resolutions[field] = {
+            "status": final_status,
+            "resolutionClass": resolution_class,
+            "authority": authority,
+            "reason": _governance_field_resolution_reason(field, final_status),
+        }
+    return resolutions
+
+
 def _governance_classify_cohort(cohort: Mapping[str, Any]) -> str:
     if cohort["ambiguousReasons"]:
         return GOVERNANCE_CATEGORY_AMBIGUOUS
@@ -3541,9 +3701,69 @@ def _governance_classify_cohort(cohort: Mapping[str, Any]) -> str:
     return GOVERNANCE_CATEGORY_NO_COMBAT
 
 
-def _governance_capture_action(cohort: Mapping[str, Any], unresolved: Sequence[str]) -> str:
+def _governance_capture_action(
+    cohort: Mapping[str, Any],
+    unresolved: Sequence[str],
+    field_final_statuses: Mapping[str, str] | None = None,
+) -> str:
     if not cohort["directCombatRows"]:
         return "No ordinary combat capture needed unless this entity is intentionally tested for aggression."
+    if field_final_statuses is not None:
+        missing_protocol_fields = [
+            field
+            for field in unresolved
+            if field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_MISSING_PROTOCOL_PROVABLE
+        ]
+        not_protocol_proven_fields = [
+            field
+            for field in unresolved
+            if field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+        ]
+        actions: list[str] = []
+        if any(field in missing_protocol_fields for field in ("hitType", "attackSlot")):
+            actions.append(
+                "project named AttackInfo HitType and WeaponSlot from decoded columns or Detail text"
+            )
+        if "damageType" in missing_protocol_fields:
+            actions.append(
+                "decode/project existing raw AttackInfo.damageTypeWire; capture more only if raw AttackInfo is absent"
+            )
+        if "defaultAttackType" in missing_protocol_fields:
+            actions.append(
+                "require a governed normal-hit AttackInfo contract before deriving the runtime default"
+            )
+        if "followChaseBehavior" in missing_protocol_fields:
+            actions.append("start outside melee range and capture chase/follow into first attack")
+        if "maxHealth" in missing_protocol_fields:
+            actions.append("capture full health state before first damage and through death")
+        remaining_missing = [
+            field
+            for field in missing_protocol_fields
+            if field
+            not in {
+                "attackSlot",
+                "damageType",
+                "defaultAttackType",
+                "followChaseBehavior",
+                "hitType",
+                "maxHealth",
+            }
+        ]
+        if remaining_missing:
+            actions.append(
+                "capture or project protocol-provable fields: "
+                + ",".join(sorted(remaining_missing))
+            )
+        if not_protocol_proven_fields:
+            actions.append(
+                "no additional ordinary hit-count capture requested; required-but-not-protocol-proven fields need governed runtime/analyzer rules: "
+                + ",".join(sorted(not_protocol_proven_fields))
+            )
+        if not actions:
+            actions.append("capture full death to corpse to respawn cycle for lifecycle confirmation")
+        return "; ".join(dict.fromkeys(actions))
     actions: list[str] = []
     if any(field in unresolved for field in ("hitType", "attackSlot")):
         actions.append("project named AttackInfo HitType and WeaponSlot from decoded columns or Detail text")
@@ -3617,8 +3837,30 @@ def _governance_load_dossier_rows(capture_root: Path) -> list[dict[str, Any]]:
         return _governance_collect_dossier_rows(json.load(handle))
 
 
+def _governance_load_focused_enemy_identities(capture_root: Path) -> set[str]:
+    path = capture_root / "capture_info.json"
+    if not path.is_file():
+        return set()
+    with path.open("r", encoding="utf-8-sig") as handle:
+        value = json.load(handle)
+    if not isinstance(value, Mapping):
+        return set()
+    identities = value.get("focusedEnemyIdentities")
+    if not isinstance(identities, list):
+        return set()
+    return {
+        identity
+        for identity in (
+            _governance_identity_hex(raw_identity)
+            for raw_identity in identities
+        )
+        if identity is not None
+    }
+
+
 def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
     cohorts_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
+    focused_enemy_identities = _governance_load_focused_enemy_identities(capture_root)
 
     def ensure_cohort(
         row: Mapping[str, Any] | None,
@@ -3813,11 +4055,16 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
         if cohort is not None:
             cohort["interactionEvidence"] += 1
 
+    local_player_identities: set[str] = set()
     for row in _governance_csv_rows(capture_root / "enemy-combat.csv"):
         source_role = str(_governance_casefold_lookup(row, "SourceRole") or "").casefold()
         target_role = str(_governance_casefold_lookup(row, "TargetRole") or "").casefold()
         source_identity = _governance_row_identity(row, "SourceIdentity", "AttackerIdentity")
         target_identity = _governance_row_identity(row, "TargetIdentity", "DefenderIdentity")
+        if source_role == "local-player" and source_identity is not None:
+            local_player_identities.add(source_identity)
+        if target_role == "local-player" and target_identity is not None:
+            local_player_identities.add(target_identity)
         source_cohort = ensure_identity(source_identity) if source_role == "enemy" else None
         target_cohort = ensure_identity(target_identity) if target_role == "enemy" else None
         if source_cohort is not None:
@@ -3846,6 +4093,27 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
         if target_cohort is not None and target_cohort is not source_cohort:
             target_cohort["enemyCombatRows"] += 1
             target_cohort["targetOnlyCombatRows"] += 1
+
+    for row in _governance_csv_rows(capture_root / "raw-packets.csv"):
+        attack_info = _governance_decode_raw_attack_info(row)
+        if attack_info is None:
+            continue
+        if (
+            focused_enemy_identities
+            and str(attack_info["sourceIdentity"]) not in focused_enemy_identities
+        ):
+            continue
+        if str(attack_info["sourceIdentity"]) in local_player_identities:
+            continue
+        if (
+            local_player_identities
+            and str(attack_info["targetIdentity"]) not in local_player_identities
+        ):
+            continue
+        source_cohort = identity_to_cohort.get(str(attack_info["sourceIdentity"]))
+        if source_cohort is None:
+            continue
+        source_cohort["damageTypes"].add(str(attack_info["damageTypeWire"]))
 
     for identity in ambiguous_identities:
         cohort = identity_to_cohort.get(identity)
@@ -3885,6 +4153,23 @@ def _governance_finalize_cohort(
 ) -> dict[str, Any]:
     category = _governance_classify_cohort(cohort)
     field_statuses = _governance_contract_field_statuses(cohort)
+    final_resolutions = _governance_final_field_resolutions(cohort, field_statuses)
+    field_final_statuses = {
+        field: resolution["status"]
+        for field, resolution in final_resolutions.items()
+    }
+    field_resolution_classes = {
+        field: resolution["resolutionClass"]
+        for field, resolution in final_resolutions.items()
+    }
+    field_final_authorities = {
+        field: resolution["authority"]
+        for field, resolution in final_resolutions.items()
+    }
+    field_resolution_reasons = {
+        field: resolution["reason"]
+        for field, resolution in final_resolutions.items()
+    }
     unresolved = _governance_unresolved_required_fields(field_statuses)
     combat_candidate = category in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
     runtime_ready = combat_candidate and not unresolved
@@ -3932,6 +4217,10 @@ def _governance_finalize_cohort(
         "ambiguousReasons": sorted(cohort["ambiguousReasons"]),
         "fieldStatuses": field_statuses,
         "fieldClassifications": dict(GOVERNANCE_RUNTIME_FIELD_CLASSES),
+        "fieldFinalStatuses": field_final_statuses,
+        "fieldResolutionClasses": field_resolution_classes,
+        "fieldFinalAuthorities": field_final_authorities,
+        "fieldResolutionReasons": field_resolution_reasons,
         "provenFields": sorted(
             field
             for field, status in field_statuses.items()
@@ -3939,7 +4228,28 @@ def _governance_finalize_cohort(
             or status == "DERIVABLE_BY_EXISTING_GOVERNED_RULE"
         ),
         "unresolvedRequiredFields": unresolved,
-        "captureAction": _governance_capture_action(cohort, unresolved),
+        "missingProtocolProvableFields": sorted(
+            field
+            for field in unresolved
+            if field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_MISSING_PROTOCOL_PROVABLE
+        ),
+        "notProtocolProvenFields": sorted(
+            field
+            for field in unresolved
+            if field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+        ),
+        "notRequiredBasicCombatFields": sorted(
+            field
+            for field, status in field_final_statuses.items()
+            if status == GOVERNANCE_FINAL_STATUS_NOT_REQUIRED
+        ),
+        "captureAction": _governance_capture_action(
+            cohort,
+            unresolved,
+            field_final_statuses,
+        ),
     }
 
 
@@ -4074,10 +4384,16 @@ def _governance_print_scoped_cohort(
         f"specialOrNanoRows={cohort['specialOrNanoRows']}|"
         f"provenFields={','.join(cohort['provenFields'])}|"
         f"unresolvedRequiredFields={','.join(cohort['unresolvedRequiredFields'])}|"
+        f"missingProtocolProvableFields={','.join(cohort['missingProtocolProvableFields'])}|"
+        f"notProtocolProvenFields={','.join(cohort['notProtocolProvenFields'])}|"
+        f"notRequiredBasicCombatFields={','.join(cohort['notRequiredBasicCombatFields'])}|"
         f"sentinelFields={','.join(cohort['sentinelFields'])}|"
         f"ambiguousReasons={','.join(cohort['ambiguousReasons'])}|"
         f"fieldStatuses={_governance_join_mapping(cohort['fieldStatuses'])}|"
         f"fieldClassifications={_governance_join_mapping(cohort['fieldClassifications'])}|"
+        f"fieldFinalStatuses={_governance_join_mapping(cohort['fieldFinalStatuses'])}|"
+        f"fieldResolutionClasses={_governance_join_mapping(cohort['fieldResolutionClasses'])}|"
+        f"fieldFinalAuthorities={_governance_join_mapping(cohort['fieldFinalAuthorities'])}|"
         f"captureAction={cohort['captureAction']}"
     )
 
@@ -4204,6 +4520,16 @@ def audit_scoped_raw_captures(
             for cohort in cohorts
             if cohort["combatCandidate"] and not cohort["runtimeReady"]
         ]
+        missing_protocol_provable_cohorts = [
+            cohort
+            for cohort in blocked_cohorts
+            if cohort["missingProtocolProvableFields"]
+        ]
+        not_protocol_proven_cohorts = [
+            cohort
+            for cohort in blocked_cohorts
+            if cohort["notProtocolProvenFields"]
+        ]
         combat_candidate_cohorts = [
             cohort for cohort in cohorts if cohort["combatCandidate"]
         ]
@@ -4259,6 +4585,8 @@ def audit_scoped_raw_captures(
                 "runtimeReadyRows": runtime_rows,
                 "readyCohorts": len(ready_cohorts),
                 "blockedCohorts": len(blocked_cohorts),
+                "missingProtocolProvableCohorts": len(missing_protocol_provable_cohorts),
+                "notProtocolProvenCohorts": len(not_protocol_proven_cohorts),
                 "allCohorts": len(cohorts),
                 "combatCandidateCohorts": len(combat_candidate_cohorts),
                 "ordinaryHostileCohorts": len(ordinary_hostile_cohorts),
@@ -4281,6 +4609,16 @@ def audit_scoped_raw_captures(
         for cohort in aggregate_cohorts
         if cohort["combatCandidate"] and not cohort["runtimeReady"]
     ]
+    aggregate_missing_protocol_provable_cohorts = [
+        cohort
+        for cohort in aggregate_blocked_cohorts
+        if cohort["missingProtocolProvableFields"]
+    ]
+    aggregate_not_protocol_proven_cohorts = [
+        cohort
+        for cohort in aggregate_blocked_cohorts
+        if cohort["notProtocolProvenFields"]
+    ]
     aggregate_next_capture_targets = sorted(
         aggregate_blocked_cohorts,
         key=_governance_next_capture_priority,
@@ -4296,6 +4634,10 @@ def audit_scoped_raw_captures(
         "compatibleAggregatedCohorts": len(aggregate_cohorts),
         "readyCohorts": len(aggregate_ready_cohorts),
         "blockedCohorts": len(aggregate_blocked_cohorts),
+        "missingProtocolProvableCohorts": len(
+            aggregate_missing_protocol_provable_cohorts
+        ),
+        "notProtocolProvenCohorts": len(aggregate_not_protocol_proven_cohorts),
         "cohorts": aggregate_cohorts,
         "nextCaptureTargetCohorts": aggregate_next_capture_targets,
     }
@@ -4313,6 +4655,8 @@ def audit_scoped_raw_captures(
             f"runtimeReadyRows={capture['runtimeReadyRows']}|"
             f"readyCohorts={capture['readyCohorts']}|"
             f"blockedCohorts={capture['blockedCohorts']}|"
+            f"missingProtocolProvableCohorts={capture['missingProtocolProvableCohorts']}|"
+            f"notProtocolProvenCohorts={capture['notProtocolProvenCohorts']}|"
             f"allCohorts={capture['allCohorts']}|"
             f"combatCandidateCohorts={capture['combatCandidateCohorts']}|"
             f"ordinaryHostileCohorts={capture['ordinaryHostileCohorts']}|"
@@ -4345,6 +4689,8 @@ def audit_scoped_raw_captures(
         f"compatibleAggregatedCohorts={aggregate['compatibleAggregatedCohorts']}|"
         f"readyCohorts={aggregate['readyCohorts']}|"
         f"blockedCohorts={aggregate['blockedCohorts']}|"
+        f"missingProtocolProvableCohorts={aggregate['missingProtocolProvableCohorts']}|"
+        f"notProtocolProvenCohorts={aggregate['notProtocolProvenCohorts']}|"
         f"nextCaptureTargets={len(aggregate['nextCaptureTargetCohorts'])}"
     )
     for cohort in aggregate["cohorts"]:
@@ -4457,6 +4803,27 @@ def self_test_governance() -> int:
         raise PipelineError("governance AttackInfo HitType projection self-test failed")
     if _governance_row_or_detail_value(attack_info_detail, ("DamageType", "DamageTypeWire")) is not None:
         raise PipelineError("governance AttackInfo Unk damageType rejection self-test failed")
+    decoded_attack_info = _governance_decode_raw_attack_info(
+        {
+            "N3TypeName": "AttackInfo",
+            "RawHex": (
+                "11AF000A0001003D0011CE480000725446002F160000C350"
+                "0011CE480000000004FFFFFFFF000000010000C35000007254"
+                "000000000000000300000000"
+            ),
+        }
+    )
+    if decoded_attack_info is None:
+        raise PipelineError("governance raw AttackInfo decode self-test failed")
+    if (
+        decoded_attack_info["sourceIdentity"] != "0011CE48"
+        or decoded_attack_info["targetIdentity"] != "00007254"
+        or decoded_attack_info["amount"] != 4
+        or decoded_attack_info["weaponSlot"] != 1
+        or decoded_attack_info["damageTypeWire"] != 0
+        or decoded_attack_info["hitTypeWire"] != 3
+    ):
+        raise PipelineError("governance raw AttackInfo field mapping self-test failed")
     combat = _governance_new_cohort("Combat", "4", "17655")
     combat["identities"].add("79F40001")
     combat["directCombatRows"] = 1
@@ -4481,10 +4848,15 @@ def self_test_governance() -> int:
     reet_a["attackHits"] = 7
     reet_a["followChaseRows"] = 4577
     reet_a["maxHealthObserved"] = 12
+    reet_a["damageTypes"].add("0")
     reet_a["hitTypes"].add("Normal")
     reet_a["attackSlots"].add("1")
     reet_a["sentinelFields"].add("defaultAttackType")
     reet_statuses = _governance_contract_field_statuses(reet_a)
+    reet_final_resolutions = _governance_final_field_resolutions(
+        reet_a,
+        reet_statuses,
+    )
     reet_unresolved = _governance_unresolved_required_fields(reet_statuses)
     if reet_statuses["hitType"] != "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK":
         raise PipelineError("governance HitType projection contract self-test failed")
@@ -4492,8 +4864,33 @@ def self_test_governance() -> int:
         raise PipelineError("governance attackSlot projection contract self-test failed")
     if reet_statuses["defaultAttackType"] != "DERIVABLE_BY_EXISTING_GOVERNED_RULE":
         raise PipelineError("governance normal-hit default attack self-test failed")
-    if "damageType" not in reet_unresolved:
-        raise PipelineError("governance damageType must remain unresolved without decoded field")
+    if reet_statuses["damageType"] != "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK":
+        raise PipelineError("governance damageType raw projection self-test failed")
+    if "damageType" in reet_unresolved:
+        raise PipelineError("governance damageType must resolve from raw AttackInfo")
+    if (
+        reet_final_resolutions["damageType"]["status"]
+        != GOVERNANCE_FINAL_STATUS_PROVEN
+    ):
+        raise PipelineError("governance final damageType status self-test failed")
+    if (
+        reet_final_resolutions["minDamage"]["status"]
+        != GOVERNANCE_FINAL_STATUS_NOT_REQUIRED
+        or reet_final_resolutions["maxDamage"]["status"]
+        != GOVERNANCE_FINAL_STATUS_NOT_REQUIRED
+    ):
+        raise PipelineError("governance final observed-damage status self-test failed")
+    if (
+        reet_final_resolutions["attackDelay"]["status"]
+        != GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+        or reet_final_resolutions["attackRange"]["status"]
+        != GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+        or reet_final_resolutions["naturalOrWeaponMode"]["status"]
+        != GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+        or reet_final_resolutions["rechargeDelay"]["status"]
+        != GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+    ):
+        raise PipelineError("governance final non-protocol status self-test failed")
     if "catMesh" in reet_unresolved or "nanoOrSpecialBehavior" in reet_unresolved:
         raise PipelineError("governance optional/spawn fields must not block basic combat")
     reet_b = _governance_new_cohort("Island Reet", "1", "30365")
@@ -4503,6 +4900,7 @@ def self_test_governance() -> int:
     reet_b["attackHits"] = 8
     reet_b["followChaseRows"] = 3892
     reet_b["maxHealthObserved"] = 12
+    reet_b["damageTypes"].add("0")
     reet_b["hitTypes"].add("Normal")
     reet_b["attackSlots"].add("0")
     aggregate = _governance_aggregate_scoped_cohorts(
