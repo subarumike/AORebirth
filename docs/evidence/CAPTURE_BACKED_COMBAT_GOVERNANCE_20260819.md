@@ -81,6 +81,30 @@ Use the audit command for dry-run reports. Use `--require-promotable-captures`
 for promotion gating; it returns a nonzero result if any selected capture is
 `BLOCKED_INSUFFICIENT_EVIDENCE`.
 
+Scoped classification uses identity-linked event evidence:
+
+- `ORDINARY_HOSTILE_COMBAT_OBSERVED`: source/attacker `SimpleChar` identity is
+  linked to the cohort and has combat action evidence, with follow/chase
+  evidence and no vendor/dialogue conflict.
+- `GUARD_COMBAT_OBSERVED`: reserved for direct combat plus explicit
+  guard/static-security role evidence. Names alone do not qualify.
+- `COMBAT_CAPABLE_ROLE_UNRESOLVED`: direct combat exists, but behavior or role
+  cannot be safely reduced to ordinary hostile combat.
+- `NONCOMBAT_SOCIAL_OBSERVED`: dialogue or NPC interaction evidence exists and
+  no direct source/attacker combat is attributable to the cohort.
+- `VENDOR_NONCOMBAT_OBSERVED`: vending-machine ownership or shop evidence links
+  to the NPC and no direct source/attacker combat is attributable to the cohort.
+- `NO_COMBAT_EVIDENCE`: population/lifecycle evidence exists without direct
+  combat, vendor, or social evidence. This is not a permanent non-hostility
+  claim.
+- `AMBIGUOUS`: identity linkage conflicts or cannot be tied safely to one
+  cohort. Ambiguous combat evidence fails closed.
+
+The scoped audit joins evidence by authoritative identity first. It ignores
+non-`SimpleChar` identities for NPC cohorts unless a vending machine is linked
+back to its `SimpleChar` owner. It treats target-only combat rows as evidence
+that an NPC was acted on, not proof that the NPC attacks.
+
 For ICC Shuttleport / PF 4582, the current capture remains dry-run only. The
 visual spawn evidence can be used separately, but combat promotion is blocked
 while enemy dossier fields such as `minDamage`, `maxDamage`,
