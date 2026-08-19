@@ -1103,6 +1103,13 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (current.AttackModel == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary
+                && current.IsCombatReady)
+            {
+                resolved = current;
+                return true;
+            }
+
             if (!string.IsNullOrWhiteSpace(current.EvidenceProfileSelectorHint))
             {
                 CapturedEnemyCombatProfileDefinition[] selectorMatches = Profiles.Where(

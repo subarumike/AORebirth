@@ -49,6 +49,11 @@ namespace AORebirth.Core.Playfields
 
         private readonly HashSet<int> startedCapturedParallelAttackClocks = new HashSet<int>();
 
+        private readonly Dictionary<int, DateTime[]> nextBasicCaptureBackedAttackTicks =
+            new Dictionary<int, DateTime[]>();
+
+        private readonly HashSet<int> startedBasicCaptureBackedAttackClocks = new HashSet<int>();
+
         private readonly Dictionary<int, DateTime> nextLineOfSightRetryTicks =
             new Dictionary<int, DateTime>();
 
@@ -69,6 +74,15 @@ namespace AORebirth.Core.Playfields
 
         private readonly Dictionary<int, int> nextCapturedLandedIntervalObservationIndexes =
             new Dictionary<int, int>();
+
+        private readonly Dictionary<int, int[]> nextBasicInitialDelayObservationIndexes =
+            new Dictionary<int, int[]>();
+
+        private readonly Dictionary<int, int[]> nextBasicDamageObservationIndexes =
+            new Dictionary<int, int[]>();
+
+        private readonly Dictionary<int, int[]> nextBasicLandedIntervalObservationIndexes =
+            new Dictionary<int, int[]>();
 
         private readonly Playfield playfield;
 
@@ -103,6 +117,21 @@ namespace AORebirth.Core.Playfields
             }
 
             bool hasCapturedContract = hasRegisteredCapturedContract && capturedContract.IsCombatReady;
+            if (hasCapturedContract
+                && capturedContract.AttackModel
+                   == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary)
+            {
+                this.pendingCapturedAttackStarts.Remove(attacker.Identity.Instance);
+                this.pendingCapturedMovementTransitions.Remove(attacker.Identity.Instance);
+                this.lastNpcSpecialAttackWeaponTargets.Remove(attacker.Identity.Instance);
+                this.completedCapturedOpeningAttacks.Remove(attacker.Identity.Instance);
+                this.StartBasicCaptureBackedAttackClocks(
+                    attacker.Identity.Instance,
+                    capturedContract.BasicCombat,
+                    DateTime.UtcNow);
+                return;
+            }
+
             CombatAttackSource capturedAttackSource =
                 hasCapturedContract ? this.GetCombatAttackSource(attacker) : null;
             if (hasCapturedContract && capturedAttackSource == null)
@@ -245,12 +274,17 @@ namespace AORebirth.Core.Playfields
             this.pendingCapturedMovementTransitions.Remove(identity.Instance);
             this.nextCapturedParallelAttackTicks.Remove(identity.Instance);
             this.startedCapturedParallelAttackClocks.Remove(identity.Instance);
+            this.nextBasicCaptureBackedAttackTicks.Remove(identity.Instance);
+            this.startedBasicCaptureBackedAttackClocks.Remove(identity.Instance);
             this.nextLineOfSightRetryTicks.Remove(identity.Instance);
             this.nextLineOfSightDiagnosticTicks.Remove(identity.Instance);
             this.capturedDamageObservationCursor.Clear(identity.Instance);
             this.nextCapturedAttackStartDelayObservationIndexes.Remove(identity.Instance);
             this.nextCapturedFirstHitDelayObservationIndexes.Remove(identity.Instance);
             this.nextCapturedLandedIntervalObservationIndexes.Remove(identity.Instance);
+            this.nextBasicInitialDelayObservationIndexes.Remove(identity.Instance);
+            this.nextBasicDamageObservationIndexes.Remove(identity.Instance);
+            this.nextBasicLandedIntervalObservationIndexes.Remove(identity.Instance);
         }
 
         internal void ClearRuntimeState()
@@ -264,6 +298,8 @@ namespace AORebirth.Core.Playfields
             this.pendingCapturedMovementTransitions.Clear();
             this.nextCapturedParallelAttackTicks.Clear();
             this.startedCapturedParallelAttackClocks.Clear();
+            this.nextBasicCaptureBackedAttackTicks.Clear();
+            this.startedBasicCaptureBackedAttackClocks.Clear();
             this.nextLineOfSightRetryTicks.Clear();
             this.nextLineOfSightDiagnosticTicks.Clear();
             this.capturedDamageObservationCursor.ClearAll();
@@ -271,6 +307,9 @@ namespace AORebirth.Core.Playfields
             this.nextCapturedAttackStartDelayObservationIndexes.Clear();
             this.nextCapturedFirstHitDelayObservationIndexes.Clear();
             this.nextCapturedLandedIntervalObservationIndexes.Clear();
+            this.nextBasicInitialDelayObservationIndexes.Clear();
+            this.nextBasicDamageObservationIndexes.Clear();
+            this.nextBasicLandedIntervalObservationIndexes.Clear();
         }
 
         internal void ProcessCombatTick(ICharacter attacker)
@@ -446,6 +485,21 @@ namespace AORebirth.Core.Playfields
             }
 
             CapturedEnemyCombatContract parallelContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    attacker.Identity.Instance,
+                    out parallelContract)
+                && parallelContract.IsCombatReady
+                && parallelContract.AttackModel
+                   == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary
+                && parallelContract.BasicCombat != null)
+            {
+                this.ProcessBasicCaptureBackedOrdinaryAttackTicks(
+                    attacker,
+                    target,
+                    parallelContract);
+                return;
+            }
+
             if (CapturedEnemyCombatRuntimeRegistry.TryGet(
                     attacker.Identity.Instance,
                     out parallelContract)
@@ -1087,6 +1141,253 @@ namespace AORebirth.Core.Playfields
                 .Select(value => attackStartedAt + TimeSpan.FromSeconds(value.InitialDelaySeconds))
                 .ToArray();
             this.startedCapturedParallelAttackClocks.Add(attackerInstance);
+        }
+
+        private void StartBasicCaptureBackedAttackClocks(
+            int attackerInstance,
+            CapturedBasicCombatContractDefinition basicCombat,
+            DateTime attackStartedAt)
+        {
+            if (basicCombat == null || !basicCombat.IsValid)
+            {
+                return;
+            }
+
+            if (this.startedBasicCaptureBackedAttackClocks.Contains(attackerInstance))
+            {
+                return;
+            }
+
+            CapturedBasicCombatStreamDefinition[] streams = basicCombat.Streams;
+            DateTime[] nextTicks = new DateTime[streams.Length];
+            for (int index = 0; index < streams.Length; index++)
+            {
+                nextTicks[index] = attackStartedAt + TimeSpan.FromSeconds(
+                    this.SelectBasicInitialDelayObservation(
+                        attackerInstance,
+                        index,
+                        streams[index],
+                        streams.Length));
+            }
+
+            this.nextBasicCaptureBackedAttackTicks[attackerInstance] = nextTicks;
+            this.startedBasicCaptureBackedAttackClocks.Add(attackerInstance);
+        }
+
+        private void ProcessBasicCaptureBackedOrdinaryAttackTicks(
+            ICharacter attacker,
+            ICharacter target,
+            CapturedEnemyCombatContract contract)
+        {
+            CapturedBasicCombatContractDefinition basicCombat = contract.BasicCombat;
+            if (basicCombat == null || !basicCombat.IsValid)
+            {
+                CapturedEnemyCombatRuntimeRegistry.QuarantineRuntime(
+                    attacker,
+                    "basic captured ordinary combat contract is unavailable at runtime");
+                this.ClearTracking(attacker.Identity);
+                return;
+            }
+
+            CapturedBasicCombatStreamDefinition[] streams = basicCombat.Streams;
+            DateTime now = DateTime.UtcNow;
+            double attackRange = NpcCombatSpatialPolicy.GenericBasicMeleeAttackRange;
+            if (!IsResolvedAttackRange(attackRange))
+            {
+                CapturedEnemyCombatRuntimeRegistry.QuarantineRuntime(
+                    attacker,
+                    "generic basic melee spatial policy did not resolve a valid attack range");
+                this.ClearTracking(attacker.Identity);
+                return;
+            }
+
+            if (!this.playfield.IsInCombatRange(attacker, target, attackRange))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackRange);
+                return;
+            }
+
+            if (!this.CanApplyNpcDamage(attacker, target, contract, now))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackRange);
+                return;
+            }
+
+            this.playfield.HoldNpcAtCombatPosition(attacker, target);
+            this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackRange);
+
+            DateTime[] nextTicks;
+            if (!this.startedBasicCaptureBackedAttackClocks.Contains(attacker.Identity.Instance)
+                || !this.nextBasicCaptureBackedAttackTicks.TryGetValue(
+                    attacker.Identity.Instance,
+                    out nextTicks)
+                || nextTicks.Length != streams.Length)
+            {
+                this.StartBasicCaptureBackedAttackClocks(
+                    attacker.Identity.Instance,
+                    basicCombat,
+                    now);
+                if (!this.nextBasicCaptureBackedAttackTicks.TryGetValue(
+                        attacker.Identity.Instance,
+                        out nextTicks)
+                    || nextTicks.Length != streams.Length)
+                {
+                    return;
+                }
+            }
+
+            int dueIndex = -1;
+            DateTime dueAt = DateTime.MaxValue;
+            for (int index = 0; index < nextTicks.Length; index++)
+            {
+                if (nextTicks[index] <= now && nextTicks[index] < dueAt)
+                {
+                    dueIndex = index;
+                    dueAt = nextTicks[index];
+                }
+            }
+
+            if (dueIndex < 0)
+            {
+                return;
+            }
+
+            CapturedBasicCombatStreamDefinition stream = streams[dueIndex];
+            CapturedBasicCombatDamageObservation observation =
+                this.SelectBasicDamageObservation(
+                    attacker.Identity.Instance,
+                    dueIndex,
+                    stream,
+                    streams.Length);
+            var attackSource = new CombatAttackSource
+            {
+                MinDamage = observation.Amount,
+                MaxDamage = observation.Amount,
+                DamageBonus = 0,
+                Range = attackRange,
+                RechargeSeconds = 0.0d,
+                UsesEquippedWeapon = false,
+                AttackInfoAmmoCount = stream.AttackInfoAmmoCount,
+                AttackInfoWeaponSlot = stream.AttackInfoWeaponSlot,
+                AttackInfoUnk1 = observation.AttackInfoDamageTypeWire,
+                AttackInfoHitType = stream.AttackInfoHitTypeWire,
+                AttackInfoWeaponInstance = stream.AttackInfoWeaponInstance,
+                AttackInfoN3Unknown = stream.AttackInfoN3Byte,
+                SendAttackInfo = true
+            };
+
+            int currentHealth = target.Stats[StatIds.health].Value;
+            int damage = this.CalculateCombatDamage(attacker, attackSource);
+            int newHealth = Math.Max(0, currentHealth - damage);
+            this.AnnounceCombatDamage(
+                attacker,
+                target,
+                damage,
+                attackSource,
+                CombatDamageSource.BasicCaptureBackedOrdinaryAutoAttack);
+            target.Stats[StatIds.health].Value = newHealth;
+            target.SendChangedStats();
+            this.playfield.NotifyNpcCombatDamage(target);
+            nextTicks[dueIndex] = now + TimeSpan.FromSeconds(
+                this.SelectBasicLandedIntervalObservation(
+                    attacker.Identity.Instance,
+                    dueIndex,
+                    stream,
+                    streams.Length));
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Combat basic capture-backed hit attacker={0} target={1} stream={2} slot={3} damage={4} damageTypeWire={5} health={6}/{7}",
+                    attacker.Identity,
+                    target.Identity,
+                    stream.StreamId,
+                    stream.AttackInfoWeaponSlot,
+                    damage,
+                    observation.AttackInfoDamageTypeWire,
+                    newHealth,
+                    target.Stats[StatIds.life].Value));
+
+            if (newHealth == 0)
+            {
+                this.playfield.HandleCombatKillingHit(attacker, target);
+            }
+        }
+
+        private double SelectBasicInitialDelayObservation(
+            int attackerInstance,
+            int streamIndex,
+            CapturedBasicCombatStreamDefinition stream,
+            int streamCount)
+        {
+            return SelectBasicDoubleObservation(
+                this.nextBasicInitialDelayObservationIndexes,
+                attackerInstance,
+                streamIndex,
+                streamCount,
+                stream.InitialDelayObservationsSeconds);
+        }
+
+        private CapturedBasicCombatDamageObservation SelectBasicDamageObservation(
+            int attackerInstance,
+            int streamIndex,
+            CapturedBasicCombatStreamDefinition stream,
+            int streamCount)
+        {
+            int[] indexes = ResolveBasicObservationIndexes(
+                this.nextBasicDamageObservationIndexes,
+                attackerInstance,
+                streamCount);
+            int selected = indexes[streamIndex];
+            indexes[streamIndex] = (selected + 1) % stream.DamageObservations.Length;
+            return stream.DamageObservations[selected];
+        }
+
+        private double SelectBasicLandedIntervalObservation(
+            int attackerInstance,
+            int streamIndex,
+            CapturedBasicCombatStreamDefinition stream,
+            int streamCount)
+        {
+            return SelectBasicDoubleObservation(
+                this.nextBasicLandedIntervalObservationIndexes,
+                attackerInstance,
+                streamIndex,
+                streamCount,
+                stream.LandedIntervalObservationsSeconds);
+        }
+
+        private static double SelectBasicDoubleObservation(
+            Dictionary<int, int[]> observationIndexes,
+            int attackerInstance,
+            int streamIndex,
+            int streamCount,
+            double[] observations)
+        {
+            int[] indexes = ResolveBasicObservationIndexes(
+                observationIndexes,
+                attackerInstance,
+                streamCount);
+            int selected = indexes[streamIndex];
+            indexes[streamIndex] = (selected + 1) % observations.Length;
+            return observations[selected];
+        }
+
+        private static int[] ResolveBasicObservationIndexes(
+            Dictionary<int, int[]> observationIndexes,
+            int attackerInstance,
+            int streamCount)
+        {
+            int[] indexes;
+            if (!observationIndexes.TryGetValue(attackerInstance, out indexes)
+                || indexes.Length != streamCount)
+            {
+                indexes = new int[streamCount];
+                observationIndexes[attackerInstance] = indexes;
+            }
+
+            return indexes;
         }
 
         private void ProcessCapturedParallelAttackTicks(
@@ -2023,6 +2324,7 @@ namespace AORebirth.Core.Playfields
         {
             WeaponAutoAttack,
             UnarmedAutoAttack,
+            BasicCaptureBackedOrdinaryAutoAttack,
             DamageOverTime,
             HealOverTime,
             Nano,

@@ -59,6 +59,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "IccShuttleportZ = 732.0f");
             AssertTextBefore(
                 runtime,
+                "character.DoNotDoTimers = false;",
+                "sourcePlayfield.Teleport(");
+            AssertTextBefore(
+                runtime,
                 "NewCharacterStartAreaSelectionDao.TryComplete",
                 "TeleportToIccShuttleport(character)");
         }

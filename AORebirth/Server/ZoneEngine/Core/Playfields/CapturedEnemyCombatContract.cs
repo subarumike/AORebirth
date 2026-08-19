@@ -23,7 +23,16 @@ namespace AORebirth.Core.Playfields
         Unresolved,
         FixedAttackInfo,
         EquippedWeapon,
-        Specialized
+        Specialized,
+        BasicCaptureBackedOrdinary
+    }
+
+    internal enum CapturedBasicCombatFieldAuthority
+    {
+        Captured,
+        GovernedDerived,
+        GenericRuntimePolicy,
+        OptionalPositiveBehavior
     }
 
     internal sealed class CapturedEnemyWeaponStatDefinition
@@ -550,6 +559,269 @@ namespace AORebirth.Core.Playfields
         }
     }
 
+    internal sealed class CapturedBasicCombatDamageObservation
+    {
+        internal CapturedBasicCombatDamageObservation(
+            int amount,
+            int attackInfoDamageTypeWire,
+            string evidence)
+        {
+            this.Amount = amount;
+            this.AttackInfoDamageTypeWire = attackInfoDamageTypeWire;
+            this.Evidence = evidence ?? string.Empty;
+        }
+
+        internal int Amount { get; private set; }
+
+        internal int AttackInfoDamageTypeWire { get; private set; }
+
+        internal string Evidence { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.Amount > 0
+                       && this.AttackInfoDamageTypeWire >= 0
+                       && !string.IsNullOrWhiteSpace(this.Evidence);
+            }
+        }
+    }
+
+    internal sealed class CapturedBasicCombatStreamDefinition
+    {
+        internal CapturedBasicCombatStreamDefinition(
+            int streamId,
+            int attackInfoWeaponSlot,
+            int attackInfoAmmoCount,
+            int attackInfoHitTypeWire,
+            int attackInfoWeaponInstance,
+            byte attackInfoN3Byte,
+            double[] initialDelayObservationsSeconds,
+            double[] landedIntervalObservationsSeconds,
+            CapturedBasicCombatDamageObservation[] damageObservations)
+        {
+            this.StreamId = streamId;
+            this.AttackInfoWeaponSlot = attackInfoWeaponSlot;
+            this.AttackInfoAmmoCount = attackInfoAmmoCount;
+            this.AttackInfoHitTypeWire = attackInfoHitTypeWire;
+            this.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            this.AttackInfoN3Byte = attackInfoN3Byte;
+            this.InitialDelayObservationsSeconds =
+                initialDelayObservationsSeconds == null
+                    ? new double[0]
+                    : initialDelayObservationsSeconds.ToArray();
+            this.LandedIntervalObservationsSeconds =
+                landedIntervalObservationsSeconds == null
+                    ? new double[0]
+                    : landedIntervalObservationsSeconds.ToArray();
+            this.DamageObservations = damageObservations == null
+                                          ? new CapturedBasicCombatDamageObservation[0]
+                                          : damageObservations.ToArray();
+        }
+
+        internal int StreamId { get; private set; }
+
+        internal int AttackInfoWeaponSlot { get; private set; }
+
+        internal int AttackInfoAmmoCount { get; private set; }
+
+        internal int AttackInfoHitTypeWire { get; private set; }
+
+        internal int AttackInfoWeaponInstance { get; private set; }
+
+        internal byte AttackInfoN3Byte { get; private set; }
+
+        internal double[] InitialDelayObservationsSeconds { get; private set; }
+
+        internal double[] LandedIntervalObservationsSeconds { get; private set; }
+
+        internal CapturedBasicCombatDamageObservation[] DamageObservations { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                return this.StreamId >= 0
+                       && this.AttackInfoWeaponSlot >= 0
+                       && (this.AttackInfoAmmoCount == -1 || this.AttackInfoAmmoCount >= 0)
+                       && this.AttackInfoHitTypeWire > 0
+                       && this.AttackInfoWeaponInstance >= 0
+                       && this.InitialDelayObservationsSeconds.Length > 0
+                       && this.InitialDelayObservationsSeconds.All(IsFiniteNonNegative)
+                       && this.LandedIntervalObservationsSeconds.Length > 0
+                       && this.LandedIntervalObservationsSeconds.All(IsFinitePositive)
+                       && this.DamageObservations.Length > 0
+                       && this.DamageObservations.All(value => value != null && value.IsValid);
+            }
+        }
+
+        private static bool IsFiniteNonNegative(double value)
+        {
+            return value >= 0.0d && !double.IsNaN(value) && !double.IsInfinity(value);
+        }
+
+        private static bool IsFinitePositive(double value)
+        {
+            return value > 0.0d && !double.IsNaN(value) && !double.IsInfinity(value);
+        }
+    }
+
+    internal sealed class CapturedBasicCombatContractDefinition
+    {
+        internal CapturedBasicCombatContractDefinition(
+            string cohortName,
+            int playfieldId,
+            int monsterData,
+            int level,
+            string aggregateAuditSha256,
+            string[] sourceCaptures,
+            int directCombatRows,
+            int attackHits,
+            int damageEvents,
+            int ordinaryAttackInfoObservationCount,
+            int ordinaryCadenceStreamCount,
+            int ordinaryCadenceIntervalCount,
+            bool usesGenericBasicMeleeSpatialPolicy,
+            CapturedBasicCombatFieldAuthority damageObservationAuthority,
+            CapturedBasicCombatFieldAuthority attackInfoPacketFieldAuthority,
+            CapturedBasicCombatFieldAuthority initialDelayAuthority,
+            CapturedBasicCombatFieldAuthority cadenceAuthority,
+            CapturedBasicCombatFieldAuthority attackRangeAuthority,
+            CapturedBasicCombatFieldAuthority spawnAttachmentAuthority,
+            CapturedBasicCombatStreamDefinition[] streams)
+        {
+            this.CohortName = cohortName ?? string.Empty;
+            this.PlayfieldId = playfieldId;
+            this.MonsterData = monsterData;
+            this.Level = level;
+            this.AggregateAuditSha256 = aggregateAuditSha256 ?? string.Empty;
+            this.SourceCaptures = sourceCaptures == null
+                                      ? new string[0]
+                                      : sourceCaptures.ToArray();
+            this.DirectCombatRows = directCombatRows;
+            this.AttackHits = attackHits;
+            this.DamageEvents = damageEvents;
+            this.OrdinaryAttackInfoObservationCount = ordinaryAttackInfoObservationCount;
+            this.OrdinaryCadenceStreamCount = ordinaryCadenceStreamCount;
+            this.OrdinaryCadenceIntervalCount = ordinaryCadenceIntervalCount;
+            this.UsesGenericBasicMeleeSpatialPolicy = usesGenericBasicMeleeSpatialPolicy;
+            this.DamageObservationAuthority = damageObservationAuthority;
+            this.AttackInfoPacketFieldAuthority = attackInfoPacketFieldAuthority;
+            this.InitialDelayAuthority = initialDelayAuthority;
+            this.CadenceAuthority = cadenceAuthority;
+            this.AttackRangeAuthority = attackRangeAuthority;
+            this.SpawnAttachmentAuthority = spawnAttachmentAuthority;
+            this.Streams = streams == null
+                               ? new CapturedBasicCombatStreamDefinition[0]
+                               : streams.ToArray();
+        }
+
+        internal string CohortName { get; private set; }
+
+        internal int PlayfieldId { get; private set; }
+
+        internal int MonsterData { get; private set; }
+
+        internal int Level { get; private set; }
+
+        internal string AggregateAuditSha256 { get; private set; }
+
+        internal string[] SourceCaptures { get; private set; }
+
+        internal int DirectCombatRows { get; private set; }
+
+        internal int AttackHits { get; private set; }
+
+        internal int DamageEvents { get; private set; }
+
+        internal int OrdinaryAttackInfoObservationCount { get; private set; }
+
+        internal int OrdinaryCadenceStreamCount { get; private set; }
+
+        internal int OrdinaryCadenceIntervalCount { get; private set; }
+
+        internal bool UsesGenericBasicMeleeSpatialPolicy { get; private set; }
+
+        internal CapturedBasicCombatFieldAuthority DamageObservationAuthority { get; private set; }
+
+        internal CapturedBasicCombatFieldAuthority AttackInfoPacketFieldAuthority { get; private set; }
+
+        internal CapturedBasicCombatFieldAuthority InitialDelayAuthority { get; private set; }
+
+        internal CapturedBasicCombatFieldAuthority CadenceAuthority { get; private set; }
+
+        internal CapturedBasicCombatFieldAuthority AttackRangeAuthority { get; private set; }
+
+        internal CapturedBasicCombatFieldAuthority SpawnAttachmentAuthority { get; private set; }
+
+        internal CapturedBasicCombatStreamDefinition[] Streams { get; private set; }
+
+        internal bool IsValid
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(this.CohortName)
+                    || this.PlayfieldId <= 0
+                    || this.MonsterData <= 0
+                    || this.Level <= 0
+                    || string.IsNullOrWhiteSpace(this.AggregateAuditSha256)
+                    || this.SourceCaptures.Length == 0
+                    || this.SourceCaptures.Any(string.IsNullOrWhiteSpace)
+                    || this.Streams.Length == 0
+                    || this.Streams.Any(stream => stream == null || !stream.IsValid))
+                {
+                    return false;
+                }
+
+                int observedDamageCount = this.Streams.Sum(
+                    stream => stream.DamageObservations.Length);
+                int observedCadenceStreamCount = this.Streams.Length;
+                int observedCadenceIntervalCount = this.Streams.Sum(
+                    stream => stream.LandedIntervalObservationsSeconds.Length);
+                return this.DirectCombatRows > 0
+                       && this.AttackHits >= this.DamageEvents
+                       && this.DamageEvents == observedDamageCount
+                       && this.OrdinaryAttackInfoObservationCount == observedDamageCount
+                       && this.OrdinaryCadenceStreamCount == observedCadenceStreamCount
+                       && this.OrdinaryCadenceIntervalCount == observedCadenceIntervalCount
+                       && this.UsesGenericBasicMeleeSpatialPolicy
+                       && this.DamageObservationAuthority == CapturedBasicCombatFieldAuthority.Captured
+                       && this.AttackInfoPacketFieldAuthority == CapturedBasicCombatFieldAuthority.Captured
+                       && this.InitialDelayAuthority == CapturedBasicCombatFieldAuthority.Captured
+                       && this.CadenceAuthority == CapturedBasicCombatFieldAuthority.GovernedDerived
+                       && this.AttackRangeAuthority == CapturedBasicCombatFieldAuthority.GenericRuntimePolicy
+                       && this.SpawnAttachmentAuthority
+                          == CapturedBasicCombatFieldAuthority.OptionalPositiveBehavior;
+            }
+        }
+
+        internal string QuarantineReason
+        {
+            get
+            {
+                if (this.Streams == null || this.Streams.Length == 0)
+                {
+                    return "basic captured ordinary combat streams are missing";
+                }
+
+                if (this.Streams.Any(stream => stream == null || !stream.IsValid))
+                {
+                    return "basic captured ordinary combat stream evidence is incomplete";
+                }
+
+                if (!this.UsesGenericBasicMeleeSpatialPolicy
+                    || this.AttackRangeAuthority
+                       != CapturedBasicCombatFieldAuthority.GenericRuntimePolicy)
+                {
+                    return "basic captured ordinary combat is missing generic melee spatial policy authority";
+                }
+
+                return "basic captured ordinary combat contract is incomplete";
+            }
+        }
+    }
+
     internal sealed class CapturedEnemyCombatContract
     {
         private CapturedEnemyCombatContract()
@@ -682,6 +954,8 @@ namespace AORebirth.Core.Playfields
 
         internal CapturedEnemyParallelAttackSequenceDefinition ParallelAttackSequence { get; private set; }
 
+        internal CapturedBasicCombatContractDefinition BasicCombat { get; private set; }
+
         internal bool IsCombatReady
         {
             get
@@ -746,6 +1020,10 @@ namespace AORebirth.Core.Playfields
                         return this.EvidenceSourceIdentity > 0
                                && (this.HasCompleteSpecialAttackSequence()
                                    || this.HasCompleteParallelAttackSequence());
+                    case CapturedEnemyAttackModel.BasicCaptureBackedOrdinary:
+                        return this.EvidenceSourceIdentity > 0
+                               && this.BasicCombat != null
+                               && this.BasicCombat.IsValid;
                     default:
                         return false;
                 }
@@ -769,6 +1047,26 @@ namespace AORebirth.Core.Playfields
                 if (this.AttackModel == CapturedEnemyAttackModel.Unresolved)
                 {
                     return "captured attack contract is unresolved";
+                }
+
+                if (this.AttackModel == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary)
+                {
+                    if (this.EvidenceSourceIdentity <= 0)
+                    {
+                        return "basic captured ordinary packet source identity is missing";
+                    }
+
+                    if (this.BasicCombat == null)
+                    {
+                        return "basic captured ordinary combat contract is missing";
+                    }
+
+                    if (!this.BasicCombat.IsValid)
+                    {
+                        return this.BasicCombat.QuarantineReason;
+                    }
+
+                    return "basic captured ordinary combat contract is incomplete";
                 }
 
                 if (this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
@@ -1286,6 +1584,11 @@ namespace AORebirth.Core.Playfields
 
         private bool RequiresPhysicalWeaponDefinition()
         {
+            if (this.AttackModel == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary)
+            {
+                return false;
+            }
+
             if (this.AttackModel == CapturedEnemyAttackModel.EquippedWeapon)
             {
                 return true;
@@ -1776,6 +2079,27 @@ namespace AORebirth.Core.Playfields
             }
 
             return ranges[0];
+        }
+
+        internal static CapturedEnemyCombatContract CapturedBasicOrdinaryCombat(
+            string evidence,
+            int evidenceSourceIdentity,
+            CapturedBasicCombatContractDefinition basicCombat,
+            bool requiresDamageLineOfSight = false,
+            NpcAiProfile aiProfile = NpcAiProfile.Passive)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                Evidence = evidence ?? string.Empty,
+                EvidenceSourceIdentity = evidenceSourceIdentity,
+                Retaliates = true,
+                AiProfile = aiProfile,
+                AttackModel = CapturedEnemyAttackModel.BasicCaptureBackedOrdinary,
+                BasicCombat = basicCombat,
+                HasCapturedRequiredPacketFields = true,
+                SendCapturedAttackInfo = true,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
+            };
         }
 
         internal static CapturedEnemyCombatContract CapturedProfileSelector(

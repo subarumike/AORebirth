@@ -12,7 +12,8 @@ namespace AORebirth.Core.Playfields
         Unresolved = 0,
         FixedAttackInfo = 1,
         EquippedWeapon = 2,
-        Specialized = 3
+        Specialized = 3,
+        BasicCaptureBackedOrdinary = 4
     }
 
     internal sealed class CapturedEnemyWeaponStatDefinition

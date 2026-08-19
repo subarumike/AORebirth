@@ -582,6 +582,19 @@ namespace AORebirth.CaptureProtocol
             int index,
             int count)
         {
+            if (index == count - 1
+                && reader.Remaining == 1
+                && reader.PeekByte(0) == 0)
+            {
+                if (Has(result.Flags2, Flags2Unknown1))
+                {
+                    return 0;
+                }
+
+                reader.ReadByte("TerminalSpecialAttackUnknown6");
+                return 0;
+            }
+
             if (result.Flags2 == 0x00000FC4
                 && Has(result.Flags, IsNpc)
                 && Has(result.Flags, IsPet)
@@ -608,7 +621,16 @@ namespace AORebirth.CaptureProtocol
                     && reader.RemainingEquals(PetFlags2Bd3OpaqueExtension))
                 || (result.Flags2 == 0x000007E2
                     && Has(result.Flags, IsPet)
-                    && reader.RemainingEquals(PetFlags27e2OpaqueExtension));
+                    && reader.RemainingEquals(PetFlags27e2OpaqueExtension))
+                || (result.Flags2 == 0x00000BD3
+                    && !Has(result.Flags, IsPet)
+                    && reader.RemainingEquals(FromHex("DA0001D8DB524F5731524F57310000000000")))
+                || (result.Flags2 == 0x000013B5
+                    && reader.RemainingEquals(FromHex("03D1EA48564A5048564A500003D1E60003D1E756514857565148570003D1E30003D1E44B4C475A4B4C475A0003D1E00003D1E150514541505145410000000000")))
+                || (result.Flags2 == 0x000017A6
+                    && reader.RemainingEquals(FromHex("D4544E4D4C4B4E4D4C4B0003D4500003D45152444D5552444D550003D44D0003D44E44474755444747550003D44A0003D44B445A5447445A54470003D4470003D44854535A5354535A530000000000")))
+                || (result.Flags2 == 0x000017A6
+                    && reader.RemainingEquals(FromHex("D46353485951534859510003D45F0003D460434E4859434E48590003D45C0003D45D4F494E444F494E440003D4590003D45A4D41434A4D41434A0003D4560003D45742444542424445420000000000")));
             return observedFamily ? reader.ReadRemaining() : new byte[0];
         }
 
@@ -638,6 +660,22 @@ namespace AORebirth.CaptureProtocol
         private static bool Has(int value, int flag)
         {
             return (value & flag) == flag;
+        }
+
+        private static byte[] FromHex(string hex)
+        {
+            if (string.IsNullOrEmpty(hex))
+            {
+                return new byte[0];
+            }
+
+            var bytes = new byte[hex.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+            }
+
+            return bytes;
         }
 
         private static byte[] Copy(byte[] value, int offset, int count)

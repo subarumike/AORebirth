@@ -12,6 +12,11 @@ namespace ZoneEngine.Core.Playfields
 
         private const double LegacyMeleeFollowHoldDistance = 3.0;
 
+        internal static double GenericBasicMeleeAttackRange
+        {
+            get { return NpcCombatAttackRules.MaxMeleeCombatDistance; }
+        }
+
         internal static bool IsWithinAttackEnvelope(double distance, double attackRange)
         {
             return IsFiniteNonNegative(distance)
