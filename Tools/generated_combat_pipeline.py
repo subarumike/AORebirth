@@ -2756,6 +2756,31 @@ GOVERNANCE_RUNTIME_REQUIRED_FIELDS = (
     "naturalOrWeaponMode",
     "archetypeLinkage",
 )
+GOVERNANCE_BASIC_COMBAT_REQUIRED_FIELDS = (
+    "actorIdentity",
+    "monsterData",
+    "level",
+    "maxHealth",
+    "minDamage",
+    "maxDamage",
+    "damageType",
+    "defaultAttackType",
+    "attackDelay",
+    "rechargeDelay",
+    "attackRange",
+    "followChaseBehavior",
+    "hitType",
+    "attackSlot",
+    "naturalOrWeaponMode",
+    "archetypeLinkage",
+)
+GOVERNANCE_OPTIONAL_OBSERVATION_FIELDS = ("nanoOrSpecialBehavior",)
+GOVERNANCE_SEPARATE_SPAWN_CONCERN_FIELDS = ("catMesh", "factionAlignment")
+GOVERNANCE_RUNTIME_FIELD_CLASSES = {
+    **{field: "BASIC_COMBAT_REQUIRED" for field in GOVERNANCE_BASIC_COMBAT_REQUIRED_FIELDS},
+    **{field: "OPTIONAL_OBSERVATION" for field in GOVERNANCE_OPTIONAL_OBSERVATION_FIELDS},
+    **{field: "SEPARATE_SPAWN_CONCERN" for field in GOVERNANCE_SEPARATE_SPAWN_CONCERN_FIELDS},
+}
 GOVERNANCE_CAPTURE_READINESS = (
     {
         "field": "attackDelay",
@@ -3271,6 +3296,55 @@ def _governance_truthy_count(value: Any) -> int:
     return 0 if count is None else count
 
 
+def _governance_detail_value(row: Mapping[str, Any], field_name: str) -> str | None:
+    detail = _governance_casefold_lookup(row, "Detail")
+    if detail in (None, ""):
+        return None
+    match = re.search(
+        rf"\b{re.escape(field_name)}=([^,\s}}]+)",
+        str(detail),
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return None
+    value = match.group(1).strip()
+    return value or None
+
+
+def _governance_row_or_detail_value(
+    row: Mapping[str, Any],
+    field_names: Sequence[str],
+) -> str | None:
+    for field_name in field_names:
+        value = _governance_casefold_lookup(row, field_name)
+        if value not in (None, ""):
+            text = str(value).strip()
+            if text:
+                return text
+    for field_name in field_names:
+        value = _governance_detail_value(row, field_name)
+        if value not in (None, ""):
+            return value
+    return None
+
+
+def _governance_sorted_evidence_values(values: Any) -> list[str]:
+    return sorted({str(value) for value in values}, key=str.casefold)
+
+
+def _governance_is_special_or_nano_action(row: Mapping[str, Any]) -> bool:
+    text = " ".join(
+        str(_governance_casefold_lookup(row, key) or "")
+        for key in ("MessageType", "Action", "Detail", "eventType")
+    ).casefold()
+    return (
+        "specialattack" in text
+        or "castnanospell" in text
+        or "castnano" in text
+        or "nano" in text
+    )
+
+
 def _governance_new_cohort(
     name: str,
     level: str,
@@ -3306,6 +3380,7 @@ def _governance_new_cohort(
         "damageTypes": set(),
         "hitTypes": set(),
         "attackSlots": set(),
+        "specialOrNanoRows": 0,
         "sentinelFields": set(),
         "ambiguousReasons": set(),
     }
@@ -3402,6 +3477,10 @@ def _governance_increment_identity_count(
 
 def _governance_contract_field_statuses(cohort: Mapping[str, Any]) -> dict[str, str]:
     statuses = {field: "MISSING" for field in GOVERNANCE_RUNTIME_REQUIRED_FIELDS}
+    for field in GOVERNANCE_OPTIONAL_OBSERVATION_FIELDS:
+        statuses[field] = "OPTIONAL_NOT_OBSERVED"
+    for field in GOVERNANCE_SEPARATE_SPAWN_CONCERN_FIELDS:
+        statuses[field] = "SEPARATE_SPAWN_CONCERN"
     if cohort["identities"]:
         statuses["actorIdentity"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
     if cohort["monsterData"] != "unknown":
@@ -3410,30 +3489,34 @@ def _governance_contract_field_statuses(cohort: Mapping[str, Any]) -> dict[str, 
         statuses["level"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
     if cohort["maxHealthObserved"]:
         statuses["maxHealth"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
-    if cohort["damageEvents"]:
-        statuses["damageType"] = (
-            "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
-            if cohort["damageTypes"]
-            else "MISSING"
-        )
-        statuses["hitType"] = (
-            "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
-            if cohort["hitTypes"]
-            else "MISSING"
-        )
-        statuses["attackSlot"] = (
-            "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
-            if cohort["attackSlots"]
-            else "MISSING"
-        )
+    if cohort["damageTypes"]:
+        statuses["damageType"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
+    if cohort["hitTypes"]:
+        statuses["hitType"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
+    if cohort["attackSlots"]:
+        statuses["attackSlot"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
+    hit_type_values = {str(value).casefold() for value in cohort["hitTypes"]}
+    if hit_type_values and hit_type_values <= {"normal", "0"}:
+        statuses["defaultAttackType"] = "DERIVABLE_BY_EXISTING_GOVERNED_RULE"
     if cohort["followChaseRows"]:
         statuses["followChaseBehavior"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
     if cohort["directCombatRows"]:
         statuses["archetypeLinkage"] = "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK"
+    if cohort["specialOrNanoRows"]:
+        statuses["nanoOrSpecialBehavior"] = "OPTIONAL_OBSERVED"
     for field in cohort["sentinelFields"]:
         normalized = field[:1].lower() + field[1:]
         if normalized in statuses:
-            statuses[normalized] = "SENTINEL"
+            if statuses[normalized].startswith("PROVEN_") or statuses[normalized] == (
+                "DERIVABLE_BY_EXISTING_GOVERNED_RULE"
+            ):
+                continue
+            if normalized in GOVERNANCE_SEPARATE_SPAWN_CONCERN_FIELDS:
+                statuses[normalized] = "SEPARATE_SPAWN_CONCERN_SENTINEL"
+            elif normalized in GOVERNANCE_OPTIONAL_OBSERVATION_FIELDS:
+                statuses[normalized] = "OPTIONAL_SENTINEL"
+            else:
+                statuses[normalized] = "SENTINEL"
     if cohort["ambiguousReasons"]:
         for field in ("actorIdentity", "archetypeLinkage"):
             statuses[field] = "AMBIGUOUS"
@@ -3462,20 +3545,24 @@ def _governance_capture_action(cohort: Mapping[str, Any], unresolved: Sequence[s
     if not cohort["directCombatRows"]:
         return "No ordinary combat capture needed unless this entity is intentionally tested for aggression."
     actions: list[str] = []
-    if any(field in unresolved for field in ("minDamage", "maxDamage", "damageType", "hitType", "attackSlot")):
-        actions.append("observe 10+ attributable ordinary attacks with source and target visible")
-    if any(field in unresolved for field in ("attackDelay", "rechargeDelay", "defaultAttackType")):
-        actions.append("capture repeated attack cycles with timestamps from target acquisition through hits")
-    if any(field in unresolved for field in ("attackRange", "followChaseBehavior")):
+    if any(field in unresolved for field in ("hitType", "attackSlot")):
+        actions.append("project named AttackInfo HitType and WeaponSlot from decoded columns or Detail text")
+    if "damageType" in unresolved:
+        actions.append("require an authoritative decoded AttackInfo damageTypeWire field; do not infer from Unknown or Unk fields")
+    if any(field in unresolved for field in ("minDamage", "maxDamage")):
+        actions.append("require authoritative stat or formula evidence; ordinary-hit samples are observations, not min/max damage")
+    if any(field in unresolved for field in ("attackDelay", "rechargeDelay")):
+        actions.append("require authoritative attack/recharge stat evidence or a governed timing model; passive hit intervals alone are insufficient")
+    if "defaultAttackType" in unresolved:
+        actions.append("require a governed normal-hit AttackInfo contract before deriving the runtime default")
+    if "attackRange" in unresolved:
+        actions.append("require authoritative range stat or governed reach rule; chase/follow only proves behavior")
+    if "followChaseBehavior" in unresolved:
         actions.append("start outside melee range and capture chase/follow into first attack")
-    if any(field in unresolved for field in ("catMesh", "naturalOrWeaponMode")):
-        actions.append("capture full SCFU and weapon/CAT state before and during combat")
+    if "naturalOrWeaponMode" in unresolved:
+        actions.append("require governed equipment/weapon ownership or visual-mode evidence; unarmed appearance alone is insufficient")
     if "maxHealth" in unresolved:
         actions.append("capture full health state before first damage and through death")
-    if "nanoOrSpecialBehavior" in unresolved:
-        actions.append("continue combat long enough to observe or exclude special/nano packets by evidence")
-    if "factionAlignment" in unresolved:
-        actions.append("capture target acquisition and retaliation context from a neutral baseline")
     if not actions:
         actions.append("capture full death to corpse to respawn cycle for lifecycle confirmation")
     return "; ".join(dict.fromkeys(actions))
@@ -3741,7 +3828,7 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
                     source_cohort["attackStarts"] += 1
                 if _governance_is_attack_hit(row):
                     source_cohort["attackHits"] += 1
-                amount = _governance_int(_governance_casefold_lookup(row, "Amount"))
+                amount = _governance_int(_governance_row_or_detail_value(row, ("Amount",)))
                 if amount is not None and amount > 0:
                     source_cohort["damageEvents"] += 1
                 for field_names, target_set in (
@@ -3749,13 +3836,11 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
                     (("HitType", "HitTypeWire"), "hitTypes"),
                     (("WeaponSlot", "AttackInfoWeaponSlot"), "attackSlots"),
                 ):
-                    for field_name in field_names:
-                        value = _governance_int(
-                            _governance_casefold_lookup(row, field_name)
-                        )
-                        if value is not None:
-                            source_cohort[target_set].add(value)
-                            break
+                    value = _governance_row_or_detail_value(row, field_names)
+                    if value is not None:
+                        source_cohort[target_set].add(value)
+                if _governance_is_special_or_nano_action(row):
+                    source_cohort["specialOrNanoRows"] += 1
             if _governance_is_target_change(row):
                 source_cohort["targetChanges"] += 1
         if target_cohort is not None and target_cohort is not source_cohort:
@@ -3769,62 +3854,7 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
 
     cohorts: list[dict[str, Any]] = []
     for cohort in cohorts_by_key.values():
-        category = _governance_classify_cohort(cohort)
-        field_statuses = _governance_contract_field_statuses(cohort)
-        unresolved = sorted(
-            field
-            for field, status in field_statuses.items()
-            if status in {"AMBIGUOUS", "MISSING", "SENTINEL"}
-        )
-        combat_candidate = category in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
-        runtime_ready = combat_candidate and not unresolved
-        state = (
-            GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
-            if combat_candidate and not runtime_ready
-            else GOVERNANCE_STATE_NEW_RAW_VERIFIED
-        )
-        cohorts.append(
-            {
-                "name": cohort["name"],
-                "level": cohort["level"],
-                "monsterData": cohort["monsterData"],
-                "state": state,
-                "category": category,
-                "combatCandidate": combat_candidate,
-                "runtimeReady": runtime_ready,
-                "identityCount": len(cohort["identities"]),
-                "identities": sorted(cohort["identities"]),
-                "scfuRows": cohort["scfuRows"],
-                "enemyFullUpdateRows": cohort["enemyFullUpdateRows"],
-                "enemyStateRows": cohort["enemyStateRows"],
-                "enemyCombatRows": cohort["enemyCombatRows"],
-                "directCombatRows": cohort["directCombatRows"],
-                "targetOnlyCombatRows": cohort["targetOnlyCombatRows"],
-                "lifecycleRows": cohort["lifecycleRows"],
-                "deathCount": cohort["deathCount"],
-                "damageEvents": cohort["damageEvents"],
-                "attackStarts": cohort["attackStarts"],
-                "attackHits": cohort["attackHits"],
-                "targetChanges": cohort["targetChanges"],
-                "followChaseRows": cohort["followChaseRows"],
-                "vendorEvidence": cohort["vendorEvidence"],
-                "shopEvidence": cohort["shopEvidence"],
-                "dialogueEvidence": cohort["dialogueEvidence"],
-                "interactionEvidence": cohort["interactionEvidence"],
-                "guardStaticEvidence": cohort["guardStaticEvidence"],
-                "sentinelFields": sorted(cohort["sentinelFields"]),
-                "ambiguousReasons": sorted(cohort["ambiguousReasons"]),
-                "fieldStatuses": field_statuses,
-                "provenFields": sorted(
-                    field
-                    for field, status in field_statuses.items()
-                    if status.startswith("PROVEN_")
-                    or status == "DERIVABLE_BY_EXISTING_GOVERNED_RULE"
-                ),
-                "unresolvedRequiredFields": unresolved,
-                "captureAction": _governance_capture_action(cohort, unresolved),
-            }
-        )
+        cohorts.append(_governance_finalize_cohort(cohort))
     cohorts.sort(
         key=lambda row: (
             not row["combatCandidate"],
@@ -3835,6 +3865,221 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
         )
     )
     return cohorts
+
+
+def _governance_unresolved_required_fields(
+    field_statuses: Mapping[str, str],
+) -> list[str]:
+    return sorted(
+        field
+        for field in GOVERNANCE_BASIC_COMBAT_REQUIRED_FIELDS
+        if field_statuses.get(field) in {"AMBIGUOUS", "MISSING", "SENTINEL"}
+    )
+
+
+def _governance_finalize_cohort(
+    cohort: Mapping[str, Any],
+    *,
+    source_capture_ids: Sequence[str] = (),
+    source_paths: Sequence[str] = (),
+) -> dict[str, Any]:
+    category = _governance_classify_cohort(cohort)
+    field_statuses = _governance_contract_field_statuses(cohort)
+    unresolved = _governance_unresolved_required_fields(field_statuses)
+    combat_candidate = category in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
+    runtime_ready = combat_candidate and not unresolved
+    state = (
+        GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+        if combat_candidate and not runtime_ready
+        else GOVERNANCE_STATE_NEW_RAW_VERIFIED
+    )
+    return {
+        "name": cohort["name"],
+        "level": cohort["level"],
+        "monsterData": cohort["monsterData"],
+        "state": state,
+        "category": category,
+        "combatCandidate": combat_candidate,
+        "runtimeReady": runtime_ready,
+        "identityCount": len(cohort["identities"]),
+        "identities": sorted(cohort["identities"]),
+        "sourceCaptureIds": sorted(source_capture_ids),
+        "sourcePaths": sorted(source_paths),
+        "scfuRows": cohort["scfuRows"],
+        "enemyFullUpdateRows": cohort["enemyFullUpdateRows"],
+        "enemyStateRows": cohort["enemyStateRows"],
+        "enemyCombatRows": cohort["enemyCombatRows"],
+        "directCombatRows": cohort["directCombatRows"],
+        "targetOnlyCombatRows": cohort["targetOnlyCombatRows"],
+        "lifecycleRows": cohort["lifecycleRows"],
+        "deathCount": cohort["deathCount"],
+        "damageEvents": cohort["damageEvents"],
+        "attackStarts": cohort["attackStarts"],
+        "attackHits": cohort["attackHits"],
+        "targetChanges": cohort["targetChanges"],
+        "followChaseRows": cohort["followChaseRows"],
+        "vendorEvidence": cohort["vendorEvidence"],
+        "shopEvidence": cohort["shopEvidence"],
+        "dialogueEvidence": cohort["dialogueEvidence"],
+        "interactionEvidence": cohort["interactionEvidence"],
+        "guardStaticEvidence": cohort["guardStaticEvidence"],
+        "maxHealthObserved": cohort["maxHealthObserved"],
+        "damageTypes": _governance_sorted_evidence_values(cohort["damageTypes"]),
+        "hitTypes": _governance_sorted_evidence_values(cohort["hitTypes"]),
+        "attackSlots": _governance_sorted_evidence_values(cohort["attackSlots"]),
+        "specialOrNanoRows": cohort["specialOrNanoRows"],
+        "sentinelFields": sorted(cohort["sentinelFields"]),
+        "ambiguousReasons": sorted(cohort["ambiguousReasons"]),
+        "fieldStatuses": field_statuses,
+        "fieldClassifications": dict(GOVERNANCE_RUNTIME_FIELD_CLASSES),
+        "provenFields": sorted(
+            field
+            for field, status in field_statuses.items()
+            if status.startswith("PROVEN_")
+            or status == "DERIVABLE_BY_EXISTING_GOVERNED_RULE"
+        ),
+        "unresolvedRequiredFields": unresolved,
+        "captureAction": _governance_capture_action(cohort, unresolved),
+    }
+
+
+def _governance_aggregate_key(cohort: Mapping[str, Any]) -> tuple[str, str, str] | None:
+    key = (str(cohort["name"]), str(cohort["level"]), str(cohort["monsterData"]))
+    if any(value == "unknown" or value.startswith("unknown-0x") for value in key):
+        return None
+    if cohort["ambiguousReasons"]:
+        return None
+    return key
+
+
+def _governance_aggregate_scoped_cohorts(
+    captures: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    counters = (
+        "scfuRows",
+        "enemyFullUpdateRows",
+        "enemyStateRows",
+        "enemyCombatRows",
+        "directCombatRows",
+        "targetOnlyCombatRows",
+        "lifecycleRows",
+        "deathCount",
+        "damageEvents",
+        "attackStarts",
+        "attackHits",
+        "targetChanges",
+        "followChaseRows",
+        "vendorEvidence",
+        "shopEvidence",
+        "dialogueEvidence",
+        "interactionEvidence",
+        "guardStaticEvidence",
+        "specialOrNanoRows",
+    )
+    aggregates: dict[tuple[str, str, str], dict[str, Any]] = {}
+    source_capture_ids: dict[tuple[str, str, str], set[str]] = {}
+    source_paths: dict[tuple[str, str, str], set[str]] = {}
+    for capture in captures:
+        for cohort in capture["cohorts"]:
+            key = _governance_aggregate_key(cohort)
+            if key is None:
+                continue
+            aggregate = aggregates.setdefault(
+                key,
+                _governance_new_cohort(key[0], key[1], key[2]),
+            )
+            for counter in counters:
+                aggregate[counter] += _governance_truthy_count(cohort.get(counter))
+            aggregate["maxHealthObserved"] = max(
+                aggregate["maxHealthObserved"],
+                _governance_truthy_count(cohort.get("maxHealthObserved")),
+            )
+            for field in ("identities", "damageTypes", "hitTypes", "attackSlots"):
+                aggregate[field].update(str(value) for value in cohort.get(field, ()))
+            aggregate["sentinelFields"].update(cohort.get("sentinelFields", ()))
+            aggregate["ambiguousReasons"].update(cohort.get("ambiguousReasons", ()))
+            source_capture_ids.setdefault(key, set()).add(str(capture["captureId"]))
+            source_paths.setdefault(key, set()).add(str(capture["path"]))
+    finalized = [
+        _governance_finalize_cohort(
+            aggregate,
+            source_capture_ids=source_capture_ids[key],
+            source_paths=source_paths[key],
+        )
+        for key, aggregate in aggregates.items()
+        if len(source_capture_ids[key]) > 1
+    ]
+    finalized.sort(
+        key=lambda row: (
+            not row["combatCandidate"],
+            row["category"],
+            str(row["name"]).casefold(),
+            str(row["level"]),
+            str(row["monsterData"]),
+        )
+    )
+    return finalized
+
+
+def _governance_join_mapping(mapping: Mapping[str, Any]) -> str:
+    return ",".join(f"{key}:{mapping[key]}" for key in sorted(mapping))
+
+
+def _governance_print_scoped_cohort(
+    prefix: str,
+    cohort: Mapping[str, Any],
+    *,
+    capture_id: str | None = None,
+) -> None:
+    capture_part = f"captureId={capture_id}|" if capture_id is not None else ""
+    source_capture_part = (
+        f"sourceCaptureIds={','.join(cohort['sourceCaptureIds'])}|"
+        if cohort["sourceCaptureIds"]
+        else ""
+    )
+    print(
+        f"{prefix}|"
+        f"{capture_part}"
+        f"{source_capture_part}"
+        f"state={cohort['state']}|"
+        f"category={cohort['category']}|"
+        f"combatCandidate={str(cohort['combatCandidate']).lower()}|"
+        f"runtimeReady={str(cohort['runtimeReady']).lower()}|"
+        f"name={cohort['name']}|"
+        f"level={cohort['level']}|"
+        f"monsterData={cohort['monsterData']}|"
+        f"identityCount={cohort['identityCount']}|"
+        f"scfuRows={cohort['scfuRows']}|"
+        f"enemyFullUpdateRows={cohort['enemyFullUpdateRows']}|"
+        f"enemyStateRows={cohort['enemyStateRows']}|"
+        f"enemyCombatRows={cohort['enemyCombatRows']}|"
+        f"directCombatRows={cohort['directCombatRows']}|"
+        f"targetOnlyCombatRows={cohort['targetOnlyCombatRows']}|"
+        f"lifecycleRows={cohort['lifecycleRows']}|"
+        f"deathCount={cohort['deathCount']}|"
+        f"damageEvents={cohort['damageEvents']}|"
+        f"attackStarts={cohort['attackStarts']}|"
+        f"attackHits={cohort['attackHits']}|"
+        f"targetChanges={cohort['targetChanges']}|"
+        f"followChaseRows={cohort['followChaseRows']}|"
+        f"vendorEvidence={cohort['vendorEvidence']}|"
+        f"shopEvidence={cohort['shopEvidence']}|"
+        f"dialogueEvidence={cohort['dialogueEvidence']}|"
+        f"interactionEvidence={cohort['interactionEvidence']}|"
+        f"guardStaticEvidence={cohort['guardStaticEvidence']}|"
+        f"maxHealthObserved={cohort['maxHealthObserved']}|"
+        f"damageTypes={','.join(cohort['damageTypes'])}|"
+        f"hitTypes={','.join(cohort['hitTypes'])}|"
+        f"attackSlots={','.join(cohort['attackSlots'])}|"
+        f"specialOrNanoRows={cohort['specialOrNanoRows']}|"
+        f"provenFields={','.join(cohort['provenFields'])}|"
+        f"unresolvedRequiredFields={','.join(cohort['unresolvedRequiredFields'])}|"
+        f"sentinelFields={','.join(cohort['sentinelFields'])}|"
+        f"ambiguousReasons={','.join(cohort['ambiguousReasons'])}|"
+        f"fieldStatuses={_governance_join_mapping(cohort['fieldStatuses'])}|"
+        f"fieldClassifications={_governance_join_mapping(cohort['fieldClassifications'])}|"
+        f"captureAction={cohort['captureAction']}"
+    )
 
 
 def validate_legacy_governance_baseline(repo_root: Path) -> int:
@@ -3923,6 +4168,15 @@ def audit_scoped_raw_captures(
         "mode": "audit-scoped-raw-captures",
         "historicalRawDependency": "not evaluated",
         "captureRoots": [],
+        "aggregate": {
+            "state": GOVERNANCE_STATE_NEW_RAW_VERIFIED,
+            "sourceCaptures": 0,
+            "compatibleAggregatedCohorts": 0,
+            "readyCohorts": 0,
+            "blockedCohorts": 0,
+            "cohorts": [],
+            "nextCaptureTargetCohorts": [],
+        },
     }
     any_missing = False
     total_ready = 0
@@ -4016,6 +4270,35 @@ def audit_scoped_raw_captures(
                 "nextCaptureTargetCohorts": next_capture_targets,
             }
         )
+    aggregate_cohorts = _governance_aggregate_scoped_cohorts(report["captureRoots"])
+    aggregate_ready_cohorts = [
+        cohort
+        for cohort in aggregate_cohorts
+        if cohort["combatCandidate"] and cohort["runtimeReady"]
+    ]
+    aggregate_blocked_cohorts = [
+        cohort
+        for cohort in aggregate_cohorts
+        if cohort["combatCandidate"] and not cohort["runtimeReady"]
+    ]
+    aggregate_next_capture_targets = sorted(
+        aggregate_blocked_cohorts,
+        key=_governance_next_capture_priority,
+    )[:12]
+    aggregate_state = (
+        GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+        if aggregate_blocked_cohorts
+        else GOVERNANCE_STATE_NEW_RAW_VERIFIED
+    )
+    report["aggregate"] = {
+        "state": aggregate_state,
+        "sourceCaptures": len(report["captureRoots"]),
+        "compatibleAggregatedCohorts": len(aggregate_cohorts),
+        "readyCohorts": len(aggregate_ready_cohorts),
+        "blockedCohorts": len(aggregate_blocked_cohorts),
+        "cohorts": aggregate_cohorts,
+        "nextCaptureTargetCohorts": aggregate_next_capture_targets,
+    }
     payload = canonical_json_bytes(report)
     if payload != canonical_json_bytes(json.loads(payload.decode("utf-8"))):
         raise PipelineError("scoped raw capture audit is not deterministic")
@@ -4039,40 +4322,10 @@ def audit_scoped_raw_captures(
             f"nextCaptureTargets={capture['nextCaptureTargets']}"
         )
         for cohort in capture["cohorts"]:
-            print(
-                "SCOPED_COHORT|"
-                f"captureId={capture['captureId']}|"
-                f"state={cohort['state']}|"
-                f"category={cohort['category']}|"
-                f"combatCandidate={str(cohort['combatCandidate']).lower()}|"
-                f"runtimeReady={str(cohort['runtimeReady']).lower()}|"
-                f"name={cohort['name']}|"
-                f"level={cohort['level']}|"
-                f"monsterData={cohort['monsterData']}|"
-                f"identityCount={cohort['identityCount']}|"
-                f"scfuRows={cohort['scfuRows']}|"
-                f"enemyFullUpdateRows={cohort['enemyFullUpdateRows']}|"
-                f"enemyStateRows={cohort['enemyStateRows']}|"
-                f"enemyCombatRows={cohort['enemyCombatRows']}|"
-                f"directCombatRows={cohort['directCombatRows']}|"
-                f"targetOnlyCombatRows={cohort['targetOnlyCombatRows']}|"
-                f"lifecycleRows={cohort['lifecycleRows']}|"
-                f"deathCount={cohort['deathCount']}|"
-                f"damageEvents={cohort['damageEvents']}|"
-                f"attackStarts={cohort['attackStarts']}|"
-                f"attackHits={cohort['attackHits']}|"
-                f"targetChanges={cohort['targetChanges']}|"
-                f"followChaseRows={cohort['followChaseRows']}|"
-                f"vendorEvidence={cohort['vendorEvidence']}|"
-                f"shopEvidence={cohort['shopEvidence']}|"
-                f"dialogueEvidence={cohort['dialogueEvidence']}|"
-                f"interactionEvidence={cohort['interactionEvidence']}|"
-                f"guardStaticEvidence={cohort['guardStaticEvidence']}|"
-                f"provenFields={','.join(cohort['provenFields'])}|"
-                f"unresolvedRequiredFields={','.join(cohort['unresolvedRequiredFields'])}|"
-                f"sentinelFields={','.join(cohort['sentinelFields'])}|"
-                f"ambiguousReasons={','.join(cohort['ambiguousReasons'])}|"
-                f"captureAction={cohort['captureAction']}"
+            _governance_print_scoped_cohort(
+                "SCOPED_COHORT",
+                cohort,
+                capture_id=str(capture["captureId"]),
             )
         for index, cohort in enumerate(capture["nextCaptureTargetCohorts"], start=1):
             print(
@@ -4084,6 +4337,28 @@ def audit_scoped_raw_captures(
                 f"monsterData={cohort['monsterData']}|"
                 f"objective={cohort['captureAction']}"
             )
+    aggregate = report["aggregate"]
+    print(
+        "SCOPED_AGGREGATE|"
+        f"state={aggregate['state']}|"
+        f"sourceCaptures={aggregate['sourceCaptures']}|"
+        f"compatibleAggregatedCohorts={aggregate['compatibleAggregatedCohorts']}|"
+        f"readyCohorts={aggregate['readyCohorts']}|"
+        f"blockedCohorts={aggregate['blockedCohorts']}|"
+        f"nextCaptureTargets={len(aggregate['nextCaptureTargetCohorts'])}"
+    )
+    for cohort in aggregate["cohorts"]:
+        _governance_print_scoped_cohort("SCOPED_AGGREGATE_COHORT", cohort)
+    for index, cohort in enumerate(aggregate["nextCaptureTargetCohorts"], start=1):
+        print(
+            "SCOPED_AGGREGATE_NEXT_CAPTURE|"
+            f"priority={index}|"
+            f"sourceCaptureIds={','.join(cohort['sourceCaptureIds'])}|"
+            f"name={cohort['name']}|"
+            f"level={cohort['level']}|"
+            f"monsterData={cohort['monsterData']}|"
+            f"objective={cohort['captureAction']}"
+        )
     if any_missing:
         raise PipelineError("scoped raw capture audit failed: missing validator-grade raw files")
     if require_promotable:
@@ -4170,6 +4445,18 @@ def self_test_governance() -> int:
         raise PipelineError("governance short SimpleChar identity self-test failed")
     if _governance_identity_hex("0xF574E") != "000F574E":
         raise PipelineError("governance short hex identity self-test failed")
+    attack_info_detail = {
+        "Detail": (
+            "AttackInfoMessage { Amount=2 AmmoCount=-1 WeaponSlot=1 "
+            "Unk1=4 HitType=Normal WeaponInstance=0 }"
+        )
+    }
+    if _governance_row_or_detail_value(attack_info_detail, ("WeaponSlot",)) != "1":
+        raise PipelineError("governance AttackInfo WeaponSlot projection self-test failed")
+    if _governance_row_or_detail_value(attack_info_detail, ("HitType",)) != "Normal":
+        raise PipelineError("governance AttackInfo HitType projection self-test failed")
+    if _governance_row_or_detail_value(attack_info_detail, ("DamageType", "DamageTypeWire")) is not None:
+        raise PipelineError("governance AttackInfo Unk damageType rejection self-test failed")
     combat = _governance_new_cohort("Combat", "4", "17655")
     combat["identities"].add("79F40001")
     combat["directCombatRows"] = 1
@@ -4187,6 +4474,73 @@ def self_test_governance() -> int:
     statuses = _governance_contract_field_statuses(combat)
     if statuses["minDamage"] != "SENTINEL" or statuses["attackDelay"] != "SENTINEL":
         raise PipelineError("governance sentinel contract-field self-test failed")
+    reet_a = _governance_new_cohort("Island Reet", "1", "30365")
+    reet_a["identities"].add("0011CE48")
+    reet_a["directCombatRows"] = 13
+    reet_a["damageEvents"] = 6
+    reet_a["attackHits"] = 7
+    reet_a["followChaseRows"] = 4577
+    reet_a["maxHealthObserved"] = 12
+    reet_a["hitTypes"].add("Normal")
+    reet_a["attackSlots"].add("1")
+    reet_a["sentinelFields"].add("defaultAttackType")
+    reet_statuses = _governance_contract_field_statuses(reet_a)
+    reet_unresolved = _governance_unresolved_required_fields(reet_statuses)
+    if reet_statuses["hitType"] != "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK":
+        raise PipelineError("governance HitType projection contract self-test failed")
+    if reet_statuses["attackSlot"] != "PROVEN_FROM_DERIVED_CAPTURE_WITH_RAW_LINK":
+        raise PipelineError("governance attackSlot projection contract self-test failed")
+    if reet_statuses["defaultAttackType"] != "DERIVABLE_BY_EXISTING_GOVERNED_RULE":
+        raise PipelineError("governance normal-hit default attack self-test failed")
+    if "damageType" not in reet_unresolved:
+        raise PipelineError("governance damageType must remain unresolved without decoded field")
+    if "catMesh" in reet_unresolved or "nanoOrSpecialBehavior" in reet_unresolved:
+        raise PipelineError("governance optional/spawn fields must not block basic combat")
+    reet_b = _governance_new_cohort("Island Reet", "1", "30365")
+    reet_b["identities"].add("0011CE49")
+    reet_b["directCombatRows"] = 15
+    reet_b["damageEvents"] = 6
+    reet_b["attackHits"] = 8
+    reet_b["followChaseRows"] = 3892
+    reet_b["maxHealthObserved"] = 12
+    reet_b["hitTypes"].add("Normal")
+    reet_b["attackSlots"].add("0")
+    aggregate = _governance_aggregate_scoped_cohorts(
+        (
+            {
+                "captureId": "20260819-014109",
+                "path": "capture-a",
+                "cohorts": [_governance_finalize_cohort(reet_a)],
+            },
+            {
+                "captureId": "20260819-015104",
+                "path": "capture-b",
+                "cohorts": [_governance_finalize_cohort(reet_b)],
+            },
+        )
+    )
+    if len(aggregate) != 1 or aggregate[0]["directCombatRows"] != 28:
+        raise PipelineError("governance cross-capture aggregation self-test failed")
+    incompatible_aggregate = _governance_aggregate_scoped_cohorts(
+        (
+            {
+                "captureId": "20260819-014109",
+                "path": "capture-a",
+                "cohorts": [_governance_finalize_cohort(reet_a)],
+            },
+            {
+                "captureId": "incompatible",
+                "path": "capture-c",
+                "cohorts": [
+                    _governance_finalize_cohort(
+                        _governance_new_cohort("Island Reet", "2", "30365")
+                    )
+                ],
+            },
+        )
+    )
+    if incompatible_aggregate:
+        raise PipelineError("governance strict aggregation compatibility self-test failed")
     missing_dossier = _governance_new_cohort("unknown-0x79F40002", "unknown", "unknown")
     missing_dossier["identities"].add("79F40002")
     missing_dossier["directCombatRows"] = 1
@@ -4195,6 +4549,8 @@ def self_test_governance() -> int:
         not in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
     ):
         raise PipelineError("governance missing-dossier combat retention self-test failed")
+    if set(GOVERNANCE_RUNTIME_FIELD_CLASSES) != set(GOVERNANCE_RUNTIME_REQUIRED_FIELDS):
+        raise PipelineError("governance field classification coverage self-test failed")
     readiness_fields = {row["field"] for row in GOVERNANCE_CAPTURE_READINESS}
     required_readiness_fields = set(GOVERNANCE_RUNTIME_REQUIRED_FIELDS) - {
         "actorIdentity",
@@ -4441,6 +4797,7 @@ def run_pipeline(
 
 
 def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    argv_list = list(sys.argv[1:] if argv is None else argv)
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true")
@@ -4485,8 +4842,11 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
             "blocked by missing raw files or sentinel combat fields."
         ),
     )
-    parser.add_argument("command", nargs=argparse.REMAINDER)
-    return parser.parse_args(argv)
+    if "--run-read-lease" in argv_list:
+        parser.add_argument("command", nargs=argparse.REMAINDER)
+    else:
+        parser.set_defaults(command=[])
+    return parser.parse_args(argv_list)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
