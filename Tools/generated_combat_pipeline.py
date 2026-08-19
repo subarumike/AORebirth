@@ -2809,6 +2809,55 @@ GOVERNANCE_REQUIRED_NOT_PROTOCOL_PROVEN_FIELDS = frozenset(
         "rechargeDelay",
     }
 )
+GOVERNANCE_NORMAL_HIT_TYPE_WIRE = 3
+GOVERNANCE_BASIC_COMBAT_MODEL = "CAPTURE_BACKED_BASIC_ORDINARY_MELEE_DRY_RUN"
+GOVERNANCE_BASIC_COMBAT_PROTOCOL_FIELDS = (
+    "actorIdentity",
+    "monsterData",
+    "level",
+    "maxHealth",
+    "damageType",
+    "defaultAttackType",
+    "followChaseBehavior",
+    "hitType",
+    "attackSlot",
+    "archetypeLinkage",
+)
+GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED = "RUNTIME_EXECUTION_REQUIRED"
+GOVERNANCE_FIELD_LEGACY_GENERATOR_REQUIRED_ONLY = (
+    "LEGACY_GENERATOR_REQUIRED_ONLY"
+)
+GOVERNANCE_FIELD_OPTIONAL = "OPTIONAL"
+GOVERNANCE_FIELD_DERIVABLE_FROM_OTHER_PROVEN_RUNTIME_STATE = (
+    "DERIVABLE_FROM_OTHER_PROVEN_RUNTIME_STATE"
+)
+GOVERNANCE_FIELD_NOT_ACTUALLY_USED = "NOT_ACTUALLY_USED"
+GOVERNANCE_FIELD_RUNTIME_EXECUTION_CLASSIFICATIONS = {
+    "actorIdentity": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "monsterData": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "level": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "maxHealth": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "minDamage": GOVERNANCE_FIELD_NOT_ACTUALLY_USED,
+    "maxDamage": GOVERNANCE_FIELD_NOT_ACTUALLY_USED,
+    "damageType": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "defaultAttackType": GOVERNANCE_FIELD_DERIVABLE_FROM_OTHER_PROVEN_RUNTIME_STATE,
+    "attackDelay": GOVERNANCE_FIELD_LEGACY_GENERATOR_REQUIRED_ONLY,
+    "rechargeDelay": GOVERNANCE_FIELD_DERIVABLE_FROM_OTHER_PROVEN_RUNTIME_STATE,
+    "attackRange": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "followChaseBehavior": GOVERNANCE_FIELD_DERIVABLE_FROM_OTHER_PROVEN_RUNTIME_STATE,
+    "catMesh": GOVERNANCE_FIELD_OPTIONAL,
+    "hitType": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "attackSlot": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+    "nanoOrSpecialBehavior": GOVERNANCE_FIELD_OPTIONAL,
+    "factionAlignment": GOVERNANCE_FIELD_OPTIONAL,
+    "naturalOrWeaponMode": GOVERNANCE_FIELD_NOT_ACTUALLY_USED,
+    "archetypeLinkage": GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED,
+}
+GOVERNANCE_FIX_GUIDANCE_CAPTURE_MORE = "CAPTURE_MORE"
+GOVERNANCE_FIX_GUIDANCE_ENGINEERING_REQUIRED = "ENGINEERING_REQUIRED"
+GOVERNANCE_FIX_GUIDANCE_OPTIONAL = "OPTIONAL"
+GOVERNANCE_FIX_GUIDANCE_RUNTIME_POLICY = "RUNTIME_POLICY"
+GOVERNANCE_FIX_GUIDANCE_RESOLVED = "RESOLVED"
 GOVERNANCE_OBSERVED_DAMAGE_BASIC_MODEL_FIELDS = frozenset(
     {
         "maxDamage",
@@ -3437,6 +3486,353 @@ def _governance_is_special_or_nano_action(row: Mapping[str, Any]) -> bool:
     )
 
 
+def _governance_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    try:
+        parsed = float(text)
+    except ValueError:
+        return None
+    if parsed != parsed or parsed in {float("inf"), float("-inf")}:
+        return None
+    return parsed
+
+
+def _governance_cadence_stream_key(event: Mapping[str, Any]) -> tuple[str, ...]:
+    return (
+        str(event.get("attackInfoWeaponSlot", "")),
+        str(event.get("attackInfoHitTypeWire", "")),
+        str(event.get("attackInfoWeaponInstance", "")),
+        str(event.get("attackInfoAmmoCount", "")),
+        str(event.get("attackInfoN3Unknown", "")),
+    )
+
+
+def _governance_cadence_stream_label(stream_key: Sequence[str]) -> str:
+    return (
+        "slot="
+        + str(stream_key[0])
+        + ";hitTypeWire="
+        + str(stream_key[1])
+        + ";weaponInstance="
+        + str(stream_key[2])
+        + ";ammo="
+        + str(stream_key[3])
+        + ";n3="
+        + str(stream_key[4])
+    )
+
+
+def _governance_add_raw_ordinary_attack_info_event(
+    cohort: dict[str, Any],
+    capture_id: str,
+    row: Mapping[str, Any],
+    attack_info: Mapping[str, Any],
+) -> None:
+    amount = _governance_int(attack_info.get("amount"))
+    hit_type_wire = _governance_int(attack_info.get("hitTypeWire"))
+    elapsed_milliseconds = _governance_float(
+        _governance_casefold_lookup(row, "ElapsedMilliseconds")
+    )
+    if (
+        amount is None
+        or amount <= 0
+        or hit_type_wire != GOVERNANCE_NORMAL_HIT_TYPE_WIRE
+        or elapsed_milliseconds is None
+    ):
+        return
+    cohort["_rawOrdinaryAttackInfoEvents"].append(
+        {
+            "captureId": str(capture_id),
+            "capturedUtc": str(_governance_casefold_lookup(row, "CapturedUtc") or ""),
+            "sourceIdentity": str(attack_info["sourceIdentity"]),
+            "targetIdentity": str(attack_info["targetIdentity"]),
+            "sequence": _governance_int(_governance_casefold_lookup(row, "Sequence"))
+            or 0,
+            "elapsedMilliseconds": round(elapsed_milliseconds, 3),
+            "amount": amount,
+            "damageTypeWire": _governance_int(attack_info.get("damageTypeWire")) or 0,
+            "attackInfoAmmoCount": _governance_int(attack_info.get("ammoCount")) or 0,
+            "attackInfoWeaponSlot": _governance_int(attack_info.get("weaponSlot"))
+            or 0,
+            "attackInfoHitTypeWire": hit_type_wire,
+            "attackInfoWeaponInstance": _governance_int(
+                attack_info.get("weaponInstance")
+            )
+            or 0,
+            "attackInfoN3Unknown": _governance_int(attack_info.get("n3Unknown")) or 0,
+        }
+    )
+
+
+def _governance_normalize_observed_cadence_streams(
+    streams: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    merged: dict[tuple[str, ...], dict[str, Any]] = {}
+    for stream in streams:
+        stream_key = (
+            str(stream.get("attackInfoWeaponSlot", "")),
+            str(stream.get("attackInfoHitTypeWire", "")),
+            str(stream.get("attackInfoWeaponInstance", "")),
+            str(stream.get("attackInfoAmmoCount", "")),
+            str(stream.get("attackInfoN3Unknown", "")),
+        )
+        current = merged.setdefault(
+            stream_key,
+            {
+                "streamKey": _governance_cadence_stream_label(stream_key),
+                "attackInfoWeaponSlot": _governance_int(stream_key[0]) or 0,
+                "attackInfoHitTypeWire": _governance_int(stream_key[1]) or 0,
+                "attackInfoWeaponInstance": _governance_int(stream_key[2]) or 0,
+                "attackInfoAmmoCount": _governance_int(stream_key[3]) or 0,
+                "attackInfoN3Unknown": _governance_int(stream_key[4]) or 0,
+                "sourceCaptureIds": set(),
+                "sourceIdentities": set(),
+                "targetIdentities": set(),
+                "damageTypes": set(),
+                "attackInfoObservationCount": 0,
+                "landedIntervalsSeconds": [],
+                "intervalProvenance": [],
+            },
+        )
+        for field in ("sourceCaptureIds", "sourceIdentities", "targetIdentities"):
+            current[field].update(str(value) for value in stream.get(field, ()))
+        current["damageTypes"].update(str(value) for value in stream.get("damageTypes", ()))
+        current["attackInfoObservationCount"] += _governance_truthy_count(
+            stream.get("attackInfoObservationCount")
+        )
+        for value in stream.get("landedIntervalsSeconds", ()):
+            parsed = _governance_float(value)
+            if parsed is not None and parsed > 0.0:
+                current["landedIntervalsSeconds"].append(round(parsed, 6))
+        for value in stream.get("intervalProvenance", ()):
+            if isinstance(value, Mapping):
+                current["intervalProvenance"].append(dict(value))
+    normalized: list[dict[str, Any]] = []
+    for stream_key in sorted(merged):
+        stream = merged[stream_key]
+        provenance = sorted(
+            stream["intervalProvenance"],
+            key=lambda row: (
+                str(row.get("captureId", "")),
+                str(row.get("sourceIdentity", "")),
+                str(row.get("targetIdentity", "")),
+                _governance_truthy_count(row.get("fromSequence")),
+                _governance_truthy_count(row.get("toSequence")),
+            ),
+        )
+        intervals = [
+            round(_governance_float(row.get("seconds")) or 0.0, 6)
+            for row in provenance
+        ]
+        if not intervals:
+            intervals = sorted(stream["landedIntervalsSeconds"])
+        normalized.append(
+            {
+                "streamKey": stream["streamKey"],
+                "attackInfoAmmoCount": stream["attackInfoAmmoCount"],
+                "attackInfoWeaponSlot": stream["attackInfoWeaponSlot"],
+                "attackInfoHitTypeWire": stream["attackInfoHitTypeWire"],
+                "attackInfoWeaponInstance": stream["attackInfoWeaponInstance"],
+                "attackInfoN3Unknown": stream["attackInfoN3Unknown"],
+                "sourceCaptureIds": sorted(stream["sourceCaptureIds"]),
+                "sourceIdentities": sorted(stream["sourceIdentities"]),
+                "targetIdentities": sorted(stream["targetIdentities"]),
+                "damageTypes": sorted(stream["damageTypes"], key=str.casefold),
+                "attackInfoObservationCount": stream["attackInfoObservationCount"],
+                "landedIntervalCount": len(intervals),
+                "landedIntervalsSeconds": intervals,
+                "intervalProvenance": provenance,
+            }
+        )
+    return normalized
+
+
+def _governance_observed_cadence_streams_from_events(
+    events: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, ...], list[Mapping[str, Any]]] = {}
+    for event in events:
+        group_key = (
+            str(event.get("captureId", "")),
+            str(event.get("sourceIdentity", "")),
+            str(event.get("targetIdentity", "")),
+            *_governance_cadence_stream_key(event),
+        )
+        grouped.setdefault(group_key, []).append(event)
+    stream_summaries: dict[tuple[str, ...], dict[str, Any]] = {}
+    for group_key in sorted(grouped):
+        ordered_events = sorted(
+            grouped[group_key],
+            key=lambda row: (
+                _governance_float(row.get("elapsedMilliseconds")) or 0.0,
+                _governance_truthy_count(row.get("sequence")),
+            ),
+        )
+        stream_key = group_key[3:]
+        summary = stream_summaries.setdefault(
+            stream_key,
+            {
+                "streamKey": _governance_cadence_stream_label(stream_key),
+                "attackInfoWeaponSlot": _governance_int(stream_key[0]) or 0,
+                "attackInfoHitTypeWire": _governance_int(stream_key[1]) or 0,
+                "attackInfoWeaponInstance": _governance_int(stream_key[2]) or 0,
+                "attackInfoAmmoCount": _governance_int(stream_key[3]) or 0,
+                "attackInfoN3Unknown": _governance_int(stream_key[4]) or 0,
+                "sourceCaptureIds": set(),
+                "sourceIdentities": set(),
+                "targetIdentities": set(),
+                "damageTypes": set(),
+                "attackInfoObservationCount": 0,
+                "landedIntervalsSeconds": [],
+                "intervalProvenance": [],
+            },
+        )
+        for event in ordered_events:
+            summary["sourceCaptureIds"].add(str(event.get("captureId", "")))
+            summary["sourceIdentities"].add(str(event.get("sourceIdentity", "")))
+            summary["targetIdentities"].add(str(event.get("targetIdentity", "")))
+            summary["damageTypes"].add(str(event.get("damageTypeWire", "")))
+            summary["attackInfoObservationCount"] += 1
+        for previous, current in zip(ordered_events, ordered_events[1:]):
+            previous_elapsed = _governance_float(previous.get("elapsedMilliseconds"))
+            current_elapsed = _governance_float(current.get("elapsedMilliseconds"))
+            if previous_elapsed is None or current_elapsed is None:
+                continue
+            interval_seconds = round((current_elapsed - previous_elapsed) / 1000.0, 6)
+            if interval_seconds <= 0.0:
+                continue
+            summary["landedIntervalsSeconds"].append(interval_seconds)
+            summary["intervalProvenance"].append(
+                {
+                    "captureId": str(current.get("captureId", "")),
+                    "sourceIdentity": str(current.get("sourceIdentity", "")),
+                    "targetIdentity": str(current.get("targetIdentity", "")),
+                    "fromSequence": _governance_truthy_count(
+                        previous.get("sequence")
+                    ),
+                    "toSequence": _governance_truthy_count(current.get("sequence")),
+                    "fromElapsedMilliseconds": round(previous_elapsed, 3),
+                    "toElapsedMilliseconds": round(current_elapsed, 3),
+                    "seconds": interval_seconds,
+                }
+            )
+    return _governance_normalize_observed_cadence_streams(
+        list(stream_summaries.values())
+    )
+
+
+def _governance_observed_cadence_counts(
+    streams: Sequence[Mapping[str, Any]],
+) -> dict[str, int]:
+    return {
+        "attackInfoObservationCount": sum(
+            _governance_truthy_count(stream.get("attackInfoObservationCount"))
+            for stream in streams
+        ),
+        "landedStreamCount": sum(
+            1
+            for stream in streams
+            if _governance_truthy_count(stream.get("landedIntervalCount")) > 0
+        ),
+        "landedIntervalCount": sum(
+            _governance_truthy_count(stream.get("landedIntervalCount"))
+            for stream in streams
+        ),
+    }
+
+
+def _governance_basic_combat_blockers(
+    cohort: Mapping[str, Any],
+    field_statuses: Mapping[str, str],
+    category: str,
+    cadence_counts: Mapping[str, int],
+) -> list[str]:
+    if category != GOVERNANCE_CATEGORY_ORDINARY_HOSTILE:
+        return (
+            ["ordinaryHostileCategory"]
+            if category in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
+            else []
+        )
+    blockers = [
+        field
+        for field in GOVERNANCE_BASIC_COMBAT_PROTOCOL_FIELDS
+        if field_statuses.get(field) in {"AMBIGUOUS", "MISSING", "SENTINEL"}
+    ]
+    if _governance_truthy_count(cohort.get("damageEvents")) <= 0:
+        blockers.append("observedDamage")
+    if _governance_truthy_count(cadence_counts.get("landedIntervalCount")) <= 0:
+        blockers.append("observedOrdinaryCadence")
+    return sorted(dict.fromkeys(blockers))
+
+
+def _governance_field_fix_guidance_categories(
+    field_final_statuses: Mapping[str, str],
+    basic_blockers: Sequence[str],
+    cadence_counts: Mapping[str, int],
+) -> dict[str, str]:
+    blocker_set = set(basic_blockers)
+    guidance: dict[str, str] = {}
+    for field in GOVERNANCE_RUNTIME_REQUIRED_FIELDS:
+        if field in {"catMesh", "factionAlignment", "nanoOrSpecialBehavior"}:
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_OPTIONAL
+        elif field == "attackRange":
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_RUNTIME_POLICY
+        elif field == "attackDelay":
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_RESOLVED
+        elif field == "naturalOrWeaponMode":
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_RESOLVED
+        elif field == "rechargeDelay":
+            guidance[field] = (
+                GOVERNANCE_FIX_GUIDANCE_RESOLVED
+                if _governance_truthy_count(
+                    cadence_counts.get("landedIntervalCount")
+                )
+                > 0
+                else GOVERNANCE_FIX_GUIDANCE_CAPTURE_MORE
+            )
+        elif field in blocker_set:
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_CAPTURE_MORE
+        elif (
+            field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_MISSING_PROTOCOL_PROVABLE
+        ):
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_CAPTURE_MORE
+        elif (
+            field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
+        ):
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_ENGINEERING_REQUIRED
+        elif (
+            field_final_statuses.get(field)
+            == GOVERNANCE_FINAL_STATUS_NOT_REQUIRED
+        ):
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_OPTIONAL
+        else:
+            guidance[field] = GOVERNANCE_FIX_GUIDANCE_RESOLVED
+    return guidance
+
+
+def _governance_basic_dry_run_contract(
+    cohort: Mapping[str, Any],
+    cadence_streams: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "model": GOVERNANCE_BASIC_COMBAT_MODEL,
+        "productionEligible": False,
+        "promotionPolicy": "dry-run evidence only; legacy production gates remain unchanged",
+        "damageModel": "replay captured positive ordinary AttackInfo amounts",
+        "timingModel": "replay captured landed-interval observations",
+        "rangeModel": "generic melee runtime policy",
+        "attackPresentation": "explicit raw AttackInfo packet fields",
+        "sourceIdentities": sorted(cohort.get("identities", ())),
+        "cadenceStreams": cadence_streams,
+    }
+
+
 def _governance_new_cohort(
     name: str,
     level: str,
@@ -3475,6 +3871,8 @@ def _governance_new_cohort(
         "specialOrNanoRows": 0,
         "sentinelFields": set(),
         "ambiguousReasons": set(),
+        "_rawOrdinaryAttackInfoEvents": [],
+        "observedOrdinaryCadenceStreams": [],
     }
 
 
@@ -4114,6 +4512,12 @@ def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
         if source_cohort is None:
             continue
         source_cohort["damageTypes"].add(str(attack_info["damageTypeWire"]))
+        _governance_add_raw_ordinary_attack_info_event(
+            source_cohort,
+            capture_id=_governance_capture_id(capture_root) or capture_root.name,
+            row=row,
+            attack_info=attack_info,
+        )
 
     for identity in ambiguous_identities:
         cohort = identity_to_cohort.get(identity)
@@ -4170,9 +4574,33 @@ def _governance_finalize_cohort(
         field: resolution["reason"]
         for field, resolution in final_resolutions.items()
     }
+    observed_cadence_streams = _governance_normalize_observed_cadence_streams(
+        [
+            *cohort.get("observedOrdinaryCadenceStreams", ()),
+            *_governance_observed_cadence_streams_from_events(
+                cohort.get("_rawOrdinaryAttackInfoEvents", ())
+            ),
+        ]
+    )
+    observed_cadence_counts = _governance_observed_cadence_counts(
+        observed_cadence_streams
+    )
     unresolved = _governance_unresolved_required_fields(field_statuses)
     combat_candidate = category in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
     runtime_ready = combat_candidate and not unresolved
+    basic_combat_candidate = category == GOVERNANCE_CATEGORY_ORDINARY_HOSTILE
+    basic_combat_blockers = _governance_basic_combat_blockers(
+        cohort,
+        field_statuses,
+        category,
+        observed_cadence_counts,
+    )
+    basic_combat_ready = basic_combat_candidate and not basic_combat_blockers
+    field_fix_guidance_categories = _governance_field_fix_guidance_categories(
+        field_final_statuses,
+        basic_combat_blockers,
+        observed_cadence_counts,
+    )
     state = (
         GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
         if combat_candidate and not runtime_ready
@@ -4186,6 +4614,15 @@ def _governance_finalize_cohort(
         "category": category,
         "combatCandidate": combat_candidate,
         "runtimeReady": runtime_ready,
+        "basicCombatCandidate": basic_combat_candidate,
+        "basicCombatReady": basic_combat_ready,
+        "basicCombatModel": GOVERNANCE_BASIC_COMBAT_MODEL
+        if basic_combat_ready
+        else "",
+        "basicCombatPromotion": "DRY_RUN_ONLY"
+        if basic_combat_ready
+        else "BLOCKED",
+        "basicCombatBlockers": basic_combat_blockers,
         "identityCount": len(cohort["identities"]),
         "identities": sorted(cohort["identities"]),
         "sourceCaptureIds": sorted(source_capture_ids),
@@ -4213,14 +4650,34 @@ def _governance_finalize_cohort(
         "hitTypes": _governance_sorted_evidence_values(cohort["hitTypes"]),
         "attackSlots": _governance_sorted_evidence_values(cohort["attackSlots"]),
         "specialOrNanoRows": cohort["specialOrNanoRows"],
+        "observedOrdinaryAttackInfoObservationCount": observed_cadence_counts[
+            "attackInfoObservationCount"
+        ],
+        "observedOrdinaryCadenceStreamCount": observed_cadence_counts[
+            "landedStreamCount"
+        ],
+        "observedOrdinaryCadenceIntervalCount": observed_cadence_counts[
+            "landedIntervalCount"
+        ],
+        "observedOrdinaryCadenceStreams": observed_cadence_streams,
         "sentinelFields": sorted(cohort["sentinelFields"]),
         "ambiguousReasons": sorted(cohort["ambiguousReasons"]),
         "fieldStatuses": field_statuses,
         "fieldClassifications": dict(GOVERNANCE_RUNTIME_FIELD_CLASSES),
+        "fieldRuntimeExecutionClassifications": dict(
+            GOVERNANCE_FIELD_RUNTIME_EXECUTION_CLASSIFICATIONS
+        ),
         "fieldFinalStatuses": field_final_statuses,
         "fieldResolutionClasses": field_resolution_classes,
         "fieldFinalAuthorities": field_final_authorities,
         "fieldResolutionReasons": field_resolution_reasons,
+        "fieldFixGuidanceCategories": field_fix_guidance_categories,
+        "basicCombatDryRunContract": _governance_basic_dry_run_contract(
+            cohort,
+            observed_cadence_streams,
+        )
+        if basic_combat_ready
+        else None,
         "provenFields": sorted(
             field
             for field, status in field_statuses.items()
@@ -4306,6 +4763,9 @@ def _governance_aggregate_scoped_cohorts(
             )
             for field in ("identities", "damageTypes", "hitTypes", "attackSlots"):
                 aggregate[field].update(str(value) for value in cohort.get(field, ()))
+            aggregate["observedOrdinaryCadenceStreams"].extend(
+                cohort.get("observedOrdinaryCadenceStreams", ())
+            )
             aggregate["sentinelFields"].update(cohort.get("sentinelFields", ()))
             aggregate["ambiguousReasons"].update(cohort.get("ambiguousReasons", ()))
             source_capture_ids.setdefault(key, set()).add(str(capture["captureId"]))
@@ -4355,6 +4815,11 @@ def _governance_print_scoped_cohort(
         f"category={cohort['category']}|"
         f"combatCandidate={str(cohort['combatCandidate']).lower()}|"
         f"runtimeReady={str(cohort['runtimeReady']).lower()}|"
+        f"basicCombatCandidate={str(cohort['basicCombatCandidate']).lower()}|"
+        f"basicCombatReady={str(cohort['basicCombatReady']).lower()}|"
+        f"basicCombatModel={cohort['basicCombatModel']}|"
+        f"basicCombatPromotion={cohort['basicCombatPromotion']}|"
+        f"basicCombatBlockers={','.join(cohort['basicCombatBlockers'])}|"
         f"name={cohort['name']}|"
         f"level={cohort['level']}|"
         f"monsterData={cohort['monsterData']}|"
@@ -4382,6 +4847,9 @@ def _governance_print_scoped_cohort(
         f"hitTypes={','.join(cohort['hitTypes'])}|"
         f"attackSlots={','.join(cohort['attackSlots'])}|"
         f"specialOrNanoRows={cohort['specialOrNanoRows']}|"
+        f"observedOrdinaryAttackInfoObservationCount={cohort['observedOrdinaryAttackInfoObservationCount']}|"
+        f"observedOrdinaryCadenceStreamCount={cohort['observedOrdinaryCadenceStreamCount']}|"
+        f"observedOrdinaryCadenceIntervalCount={cohort['observedOrdinaryCadenceIntervalCount']}|"
         f"provenFields={','.join(cohort['provenFields'])}|"
         f"unresolvedRequiredFields={','.join(cohort['unresolvedRequiredFields'])}|"
         f"missingProtocolProvableFields={','.join(cohort['missingProtocolProvableFields'])}|"
@@ -4391,9 +4859,11 @@ def _governance_print_scoped_cohort(
         f"ambiguousReasons={','.join(cohort['ambiguousReasons'])}|"
         f"fieldStatuses={_governance_join_mapping(cohort['fieldStatuses'])}|"
         f"fieldClassifications={_governance_join_mapping(cohort['fieldClassifications'])}|"
+        f"fieldRuntimeExecutionClassifications={_governance_join_mapping(cohort['fieldRuntimeExecutionClassifications'])}|"
         f"fieldFinalStatuses={_governance_join_mapping(cohort['fieldFinalStatuses'])}|"
         f"fieldResolutionClasses={_governance_join_mapping(cohort['fieldResolutionClasses'])}|"
         f"fieldFinalAuthorities={_governance_join_mapping(cohort['fieldFinalAuthorities'])}|"
+        f"fieldFixGuidanceCategories={_governance_join_mapping(cohort['fieldFixGuidanceCategories'])}|"
         f"captureAction={cohort['captureAction']}"
     )
 
@@ -4490,6 +4960,8 @@ def audit_scoped_raw_captures(
             "compatibleAggregatedCohorts": 0,
             "readyCohorts": 0,
             "blockedCohorts": 0,
+            "basicReadyCohorts": 0,
+            "basicBlockedCohorts": 0,
             "cohorts": [],
             "nextCaptureTargetCohorts": [],
         },
@@ -4497,6 +4969,8 @@ def audit_scoped_raw_captures(
     any_missing = False
     total_ready = 0
     total_blocked = 0
+    total_basic_ready = 0
+    total_basic_blocked = 0
     for capture_root in capture_roots:
         resolved_root = capture_root
         if not resolved_root.is_absolute():
@@ -4519,6 +4993,16 @@ def audit_scoped_raw_captures(
             cohort
             for cohort in cohorts
             if cohort["combatCandidate"] and not cohort["runtimeReady"]
+        ]
+        basic_ready_cohorts = [
+            cohort
+            for cohort in cohorts
+            if cohort["basicCombatCandidate"] and cohort["basicCombatReady"]
+        ]
+        basic_blocked_cohorts = [
+            cohort
+            for cohort in cohorts
+            if cohort["basicCombatCandidate"] and not cohort["basicCombatReady"]
         ]
         missing_protocol_provable_cohorts = [
             cohort
@@ -4585,6 +5069,8 @@ def audit_scoped_raw_captures(
                 "runtimeReadyRows": runtime_rows,
                 "readyCohorts": len(ready_cohorts),
                 "blockedCohorts": len(blocked_cohorts),
+                "basicReadyCohorts": len(basic_ready_cohorts),
+                "basicBlockedCohorts": len(basic_blocked_cohorts),
                 "missingProtocolProvableCohorts": len(missing_protocol_provable_cohorts),
                 "notProtocolProvenCohorts": len(not_protocol_proven_cohorts),
                 "allCohorts": len(cohorts),
@@ -4598,6 +5084,8 @@ def audit_scoped_raw_captures(
                 "nextCaptureTargetCohorts": next_capture_targets,
             }
         )
+        total_basic_ready += len(basic_ready_cohorts)
+        total_basic_blocked += len(basic_blocked_cohorts)
     aggregate_cohorts = _governance_aggregate_scoped_cohorts(report["captureRoots"])
     aggregate_ready_cohorts = [
         cohort
@@ -4608,6 +5096,16 @@ def audit_scoped_raw_captures(
         cohort
         for cohort in aggregate_cohorts
         if cohort["combatCandidate"] and not cohort["runtimeReady"]
+    ]
+    aggregate_basic_ready_cohorts = [
+        cohort
+        for cohort in aggregate_cohorts
+        if cohort["basicCombatCandidate"] and cohort["basicCombatReady"]
+    ]
+    aggregate_basic_blocked_cohorts = [
+        cohort
+        for cohort in aggregate_cohorts
+        if cohort["basicCombatCandidate"] and not cohort["basicCombatReady"]
     ]
     aggregate_missing_protocol_provable_cohorts = [
         cohort
@@ -4634,6 +5132,8 @@ def audit_scoped_raw_captures(
         "compatibleAggregatedCohorts": len(aggregate_cohorts),
         "readyCohorts": len(aggregate_ready_cohorts),
         "blockedCohorts": len(aggregate_blocked_cohorts),
+        "basicReadyCohorts": len(aggregate_basic_ready_cohorts),
+        "basicBlockedCohorts": len(aggregate_basic_blocked_cohorts),
         "missingProtocolProvableCohorts": len(
             aggregate_missing_protocol_provable_cohorts
         ),
@@ -4655,6 +5155,8 @@ def audit_scoped_raw_captures(
             f"runtimeReadyRows={capture['runtimeReadyRows']}|"
             f"readyCohorts={capture['readyCohorts']}|"
             f"blockedCohorts={capture['blockedCohorts']}|"
+            f"basicReadyCohorts={capture['basicReadyCohorts']}|"
+            f"basicBlockedCohorts={capture['basicBlockedCohorts']}|"
             f"missingProtocolProvableCohorts={capture['missingProtocolProvableCohorts']}|"
             f"notProtocolProvenCohorts={capture['notProtocolProvenCohorts']}|"
             f"allCohorts={capture['allCohorts']}|"
@@ -4689,6 +5191,8 @@ def audit_scoped_raw_captures(
         f"compatibleAggregatedCohorts={aggregate['compatibleAggregatedCohorts']}|"
         f"readyCohorts={aggregate['readyCohorts']}|"
         f"blockedCohorts={aggregate['blockedCohorts']}|"
+        f"basicReadyCohorts={aggregate['basicReadyCohorts']}|"
+        f"basicBlockedCohorts={aggregate['basicBlockedCohorts']}|"
         f"missingProtocolProvableCohorts={aggregate['missingProtocolProvableCohorts']}|"
         f"notProtocolProvenCohorts={aggregate['notProtocolProvenCohorts']}|"
         f"nextCaptureTargets={len(aggregate['nextCaptureTargetCohorts'])}"
@@ -4723,6 +5227,8 @@ def audit_scoped_raw_captures(
         f"historicalRawDependency={report['historicalRawDependency']} "
         f"readyCohorts={total_ready} "
         f"blockedCohorts={total_blocked} "
+        f"basicReadyCohorts={total_basic_ready} "
+        f"basicBlockedCohorts={total_basic_blocked} "
         f"auditSha256={audit_sha256}"
     )
     return 0
@@ -4852,6 +5358,40 @@ def self_test_governance() -> int:
     reet_a["hitTypes"].add("Normal")
     reet_a["attackSlots"].add("1")
     reet_a["sentinelFields"].add("defaultAttackType")
+    reet_a["_rawOrdinaryAttackInfoEvents"].extend(
+        [
+            {
+                "captureId": "20260819-014109",
+                "capturedUtc": "2026-08-19T06:41:40.5508403Z",
+                "sourceIdentity": "0011CE48",
+                "targetIdentity": "00007254",
+                "sequence": 2022,
+                "elapsedMilliseconds": 30581.525,
+                "amount": 4,
+                "damageTypeWire": 0,
+                "attackInfoAmmoCount": -1,
+                "attackInfoWeaponSlot": 1,
+                "attackInfoHitTypeWire": GOVERNANCE_NORMAL_HIT_TYPE_WIRE,
+                "attackInfoWeaponInstance": 0,
+                "attackInfoN3Unknown": 0,
+            },
+            {
+                "captureId": "20260819-014109",
+                "capturedUtc": "2026-08-19T06:41:51.7488630Z",
+                "sourceIdentity": "0011CE48",
+                "targetIdentity": "00007254",
+                "sequence": 2830,
+                "elapsedMilliseconds": 41779.452,
+                "amount": 8,
+                "damageTypeWire": 0,
+                "attackInfoAmmoCount": -1,
+                "attackInfoWeaponSlot": 1,
+                "attackInfoHitTypeWire": GOVERNANCE_NORMAL_HIT_TYPE_WIRE,
+                "attackInfoWeaponInstance": 0,
+                "attackInfoN3Unknown": 0,
+            },
+        ]
+    )
     reet_statuses = _governance_contract_field_statuses(reet_a)
     reet_final_resolutions = _governance_final_field_resolutions(
         reet_a,
@@ -4891,6 +5431,35 @@ def self_test_governance() -> int:
         != GOVERNANCE_FINAL_STATUS_NOT_PROTOCOL_PROVEN
     ):
         raise PipelineError("governance final non-protocol status self-test failed")
+    finalized_reet_a = _governance_finalize_cohort(reet_a)
+    if not finalized_reet_a["basicCombatReady"]:
+        raise PipelineError("governance basic Reet combat readiness self-test failed")
+    if finalized_reet_a["observedOrdinaryCadenceIntervalCount"] != 1:
+        raise PipelineError("governance observed cadence self-test failed")
+    reet_runtime_classes = finalized_reet_a[
+        "fieldRuntimeExecutionClassifications"
+    ]
+    if (
+        reet_runtime_classes["attackDelay"]
+        != GOVERNANCE_FIELD_LEGACY_GENERATOR_REQUIRED_ONLY
+        or reet_runtime_classes["attackRange"]
+        != GOVERNANCE_FIELD_RUNTIME_EXECUTION_REQUIRED
+        or reet_runtime_classes["naturalOrWeaponMode"]
+        != GOVERNANCE_FIELD_NOT_ACTUALLY_USED
+        or reet_runtime_classes["rechargeDelay"]
+        != GOVERNANCE_FIELD_DERIVABLE_FROM_OTHER_PROVEN_RUNTIME_STATE
+    ):
+        raise PipelineError("governance Reet blocker classification self-test failed")
+    reet_fix_guidance = finalized_reet_a["fieldFixGuidanceCategories"]
+    if (
+        reet_fix_guidance["attackDelay"] != GOVERNANCE_FIX_GUIDANCE_RESOLVED
+        or reet_fix_guidance["attackRange"]
+        != GOVERNANCE_FIX_GUIDANCE_RUNTIME_POLICY
+        or reet_fix_guidance["naturalOrWeaponMode"]
+        != GOVERNANCE_FIX_GUIDANCE_RESOLVED
+        or reet_fix_guidance["rechargeDelay"] != GOVERNANCE_FIX_GUIDANCE_RESOLVED
+    ):
+        raise PipelineError("governance Reet blocker guidance self-test failed")
     if "catMesh" in reet_unresolved or "nanoOrSpecialBehavior" in reet_unresolved:
         raise PipelineError("governance optional/spawn fields must not block basic combat")
     reet_b = _governance_new_cohort("Island Reet", "1", "30365")
@@ -4919,6 +5488,8 @@ def self_test_governance() -> int:
     )
     if len(aggregate) != 1 or aggregate[0]["directCombatRows"] != 28:
         raise PipelineError("governance cross-capture aggregation self-test failed")
+    if not aggregate[0]["basicCombatReady"]:
+        raise PipelineError("governance aggregate basic readiness self-test failed")
     incompatible_aggregate = _governance_aggregate_scoped_cohorts(
         (
             {
@@ -4949,6 +5520,10 @@ def self_test_governance() -> int:
         raise PipelineError("governance missing-dossier combat retention self-test failed")
     if set(GOVERNANCE_RUNTIME_FIELD_CLASSES) != set(GOVERNANCE_RUNTIME_REQUIRED_FIELDS):
         raise PipelineError("governance field classification coverage self-test failed")
+    if set(GOVERNANCE_FIELD_RUNTIME_EXECUTION_CLASSIFICATIONS) != set(
+        GOVERNANCE_RUNTIME_REQUIRED_FIELDS
+    ):
+        raise PipelineError("governance runtime execution classification coverage self-test failed")
     readiness_fields = {row["field"] for row in GOVERNANCE_CAPTURE_READINESS}
     required_readiness_fields = set(GOVERNANCE_RUNTIME_REQUIRED_FIELDS) - {
         "actorIdentity",
