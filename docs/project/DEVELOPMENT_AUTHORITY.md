@@ -103,6 +103,78 @@ Every production deployment must originate from Windows-validated source.
 Linux deployment verification may block promotion, but it does not supersede
 the Windows acceptance result.
 
+## High-concurrency source synchronization
+
+AORebirth uses one source history for Windows and Linux. Developers may work on
+many short-lived branches, but Linux synchronization consumes integrated
+`master` commits, not developer workspaces and not copied directories.
+
+The required source identity chain is:
+
+```text
+developer branch
+        |
+        v
+Windows validation and review
+        |
+        v
+master integration commit
+        |
+        v
+exact source SHA
+        |
+        v
+controlled Linux build workspace
+        |
+        v
+Linux acceptance artifact
+        |
+        v
+SHA-gated deployment
+```
+
+The invariant for any cross-platform acceptance event is:
+
+```text
+WINDOWS_ACCEPTED_SHA == LINUX_BUILD_SHA == LINUX_DEPLOY_ARTIFACT_SHA
+```
+
+Linux acceptance workspaces may perform destructive checkout cleanup only when
+they are explicitly controlled build workspaces. Normal Windows developer
+worktrees must never be reset or cleaned by synchronization tooling.
+
+Production Linux source mutation is forbidden. Production consumes an accepted
+artifact with provenance and an exact source SHA; it is not a development
+workstation and must not become the authority for source edits.
+
+Generated source remains governed by its explicit ownership model. Committed
+generated artifacts are accepted as source only after their repository-owned
+generator and validation workflow has produced the checked-in output. Linux
+consumes those committed generated files from the exact Git SHA. Generated
+artifacts that are intentionally produced during a build must be deterministic
+from tracked inputs and must be covered by the relevant build provenance.
+
+If Linux exposes a platform-specific defect, the repair path is:
+
+```text
+Linux finding
+        |
+        v
+normal Windows source repair
+        |
+        v
+Windows validation
+        |
+        v
+master integration commit
+        |
+        v
+Linux consumes new exact SHA
+```
+
+Direct source edits on Linux followed by later copy-back are not an accepted
+synchronization model.
+
 ## Permanent rules
 
 1. Windows is the authoritative development platform.
@@ -128,6 +200,13 @@ the Windows acceptance result.
 15. A Linux deployment issue that requires source changes must be corrected in
     the authoritative Windows source tree first.
 16. AORebirth shall retain exactly one authoritative codebase.
+17. Linux build and deployment tooling must use explicit source SHAs, not
+    implicit moving branch tips.
+18. Deployment must refuse new production artifacts whose accepted Linux
+    provenance does not match the requested source SHA.
+19. Destructive checkout/reset/clean operations are permitted only inside
+    controlled Linux acceptance workspaces, never arbitrary developer
+    worktrees.
 
 Platform-specific adapters are permitted only when required by the operating
 system. They must implement the same shared contracts and preserve observable
