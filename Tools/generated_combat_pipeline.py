@@ -10,6 +10,8 @@ lease and publication transaction to ``generated_artifact_transaction``.
 from __future__ import annotations
 
 import argparse
+import csv
+from collections.abc import Mapping
 import contextlib
 import dataclasses
 import hashlib
@@ -2713,6 +2715,582 @@ def _shared_publish(
     )
 
 
+GOVERNANCE_STATE_LEGACY_ACCEPTED_RAW_UNAVAILABLE = "LEGACY_ACCEPTED_RAW_UNAVAILABLE"
+GOVERNANCE_STATE_RAW_REVALIDATABLE = "RAW_REVALIDATABLE"
+GOVERNANCE_STATE_NEW_RAW_VERIFIED = "NEW_RAW_VERIFIED"
+GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE = "BLOCKED_INSUFFICIENT_EVIDENCE"
+
+GOVERNANCE_REQUIRED_RAW_FILES = (
+    "capture_info.json",
+    "packets.hex.log",
+    "raw-packets.csv",
+    "scfu-appearance.csv",
+)
+GOVERNANCE_SENTINEL_TEXT = "1234567890"
+GOVERNANCE_SENTINEL_FIELDS = (
+    "attackDelay",
+    "catMesh",
+    "defaultAttackType",
+    "maxDamage",
+    "minDamage",
+    "rechargeDelay",
+)
+GOVERNANCE_LEGACY_GENERATION_IDENTITY = (
+    "1d2ed701e0221f4099ec847554103f7ede065f2682a11cd60a7ca441ced2405f"
+)
+GOVERNANCE_LEGACY_ARTIFACTS = {
+    "inventory": {
+        "byteLength": 124999078,
+        "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404",
+    },
+    "catalog": {
+        "byteLength": 1026255,
+        "sha256": "405ec3eb7b13b094032b284f8f6d660382b982652517d161780ff3d5c9ed2921",
+    },
+    "fixtures": {
+        "byteLength": 2112018,
+        "sha256": "26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793",
+    },
+    "activeCoverage": {
+        "byteLength": 11270299,
+        "sha256": "56bf3c7b58dab3cea3c6d00242164ac15a3a610acff6ca5734f0ed55240a5fd0",
+    },
+    "formulaDataset": {
+        "byteLength": 9000177,
+        "sha256": "55b91bc84a958a3b2e131fee6754393730a361510367efa62fc54ea3a6dee6ea",
+    },
+    "attackRangeAudit": {
+        "byteLength": 3801456,
+        "sha256": "a6460852f25011d417e286118f27d987ed7ebfb0106cb7c8efd926b8ed18a66d",
+    },
+    "secondaryEvidenceAudit": {
+        "byteLength": 4081609,
+        "sha256": "046d44051c7cd1ef2d122b0c5eb9f21b7679c438775f810f2f3006ca45690e1c",
+    },
+}
+GOVERNANCE_LEGACY_EXPECTED_COUNTS = {
+    "captureSessionsDiscovered": 383,
+    "runtimeReadyProfiles": 96,
+    "runtimeReadyGeneratedSemanticDefinitions": 101,
+    "legacyRuntimeVariantRows": 114,
+    "legacyFullyRawRevalidatableRows": 21,
+    "legacyRawUnavailableRows": 93,
+    "requiredHistoricalCaptureRoots": 65,
+    "presentHistoricalCaptureRoots": 3,
+    "missingHistoricalCaptureRoots": 62,
+}
+GOVERNANCE_CAPTURE_ID_PATTERN = re.compile(r"20\d{6}-\d{6}")
+GOVERNANCE_LEGACY_CAPTURE_ROOT = Path(
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures"
+)
+
+
+def _governance_manifest_artifacts(manifest: Mapping[str, Any]) -> dict[str, Any]:
+    artifacts: dict[str, Any] = {}
+    for artifact in manifest.get("artifacts", []):
+        role = artifact.get("role")
+        if isinstance(role, str):
+            artifacts[role] = artifact
+    return artifacts
+
+
+def _governance_capture_id(value: object) -> str | None:
+    match = GOVERNANCE_CAPTURE_ID_PATTERN.search(str(value))
+    if match:
+        return match.group(0)
+    return None
+
+
+def _governance_required_capture_ids(repo_root: Path) -> list[str]:
+    source_paths = [FORMULA_GENERATOR, *FORMULA_STATIC_INPUTS]
+    capture_ids: set[str] = set()
+    for source_path in source_paths:
+        text = (repo_root / source_path).read_text(encoding="utf-8")
+        capture_ids.update(GOVERNANCE_CAPTURE_ID_PATTERN.findall(text))
+    return sorted(capture_ids)
+
+
+def _governance_missing_raw_files(capture_root: Path) -> list[str]:
+    return [
+        file_name
+        for file_name in GOVERNANCE_REQUIRED_RAW_FILES
+        if not (capture_root / file_name).is_file()
+    ]
+
+
+def _governance_raw_file_descriptors(capture_root: Path) -> list[dict[str, Any]]:
+    descriptors: list[dict[str, Any]] = []
+    for file_name in GOVERNANCE_REQUIRED_RAW_FILES:
+        path = capture_root / file_name
+        descriptors.append(
+            {
+                "path": str(path),
+                "byteLength": path.stat().st_size,
+                "sha256": sha256_file(path),
+            }
+        )
+    return descriptors
+
+
+def _governance_load_inventory(repo_root: Path) -> dict[str, Any]:
+    return load_json_object(
+        repo_root / ARTIFACT_RELATIVE_PATHS["inventory"],
+        "capture-backed NPC combat inventory",
+    )
+
+
+def _governance_profile_items(inventory: Mapping[str, Any]) -> list[tuple[str, Any]]:
+    profiles = inventory.get("profiles")
+    if isinstance(profiles, Mapping):
+        return [(str(key), value) for key, value in profiles.items()]
+    if isinstance(profiles, list):
+        items: list[tuple[str, Any]] = []
+        for index, profile in enumerate(profiles):
+            key = f"index={index}"
+            if isinstance(profile, Mapping):
+                for key_name in ("profileKey", "key", "identity"):
+                    candidate = profile.get(key_name)
+                    if isinstance(candidate, str) and candidate:
+                        key = candidate
+                        break
+            items.append((key, profile))
+        return items
+    return []
+
+
+def _governance_mentions_capture(value: Any, capture_id: str) -> bool:
+    if isinstance(value, str):
+        return capture_id in value
+    if isinstance(value, Mapping):
+        return any(_governance_mentions_capture(child, capture_id) for child in value.values())
+    if isinstance(value, list):
+        return any(_governance_mentions_capture(child, capture_id) for child in value)
+    return False
+
+
+def _governance_runtime_variant_count(profile: Any) -> int:
+    if not isinstance(profile, Mapping):
+        return 0
+    for key in (
+        "runtimeReadyVariantCount",
+        "runtimeReadyVariants",
+        "runtimeGeneratedSemanticDefinitionCount",
+    ):
+        value = profile.get(key)
+        if isinstance(value, int) and value > 0:
+            return value
+        if isinstance(value, list):
+            return len(value)
+    value = profile.get("runtimeReady")
+    if isinstance(value, bool) and value:
+        return 1
+    value = profile.get("runtimeEnabled")
+    if isinstance(value, bool) and value:
+        return 1
+    return 0
+
+
+def _governance_capture_runtime_rows(
+    inventory: Mapping[str, Any], capture_id: str
+) -> tuple[int, int]:
+    profiles = 0
+    rows = 0
+    for _profile_key, profile in _governance_profile_items(inventory):
+        if not _governance_mentions_capture(profile, capture_id):
+            continue
+        variant_count = _governance_runtime_variant_count(profile)
+        if variant_count <= 0:
+            continue
+        profiles += 1
+        rows += variant_count
+    return profiles, rows
+
+
+def _governance_casefold_lookup(mapping: Mapping[str, Any], key: str) -> Any:
+    wanted = key.casefold()
+    for actual_key, value in mapping.items():
+        if str(actual_key).casefold() == wanted:
+            return value
+    return None
+
+
+def _governance_is_sentinel(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int):
+        return value == int(GOVERNANCE_SENTINEL_TEXT)
+    if isinstance(value, float):
+        return value == float(GOVERNANCE_SENTINEL_TEXT)
+    return str(value).strip() == GOVERNANCE_SENTINEL_TEXT
+
+
+def _governance_sentinel_fields(value: Any) -> list[str]:
+    found: set[str] = set()
+    canonical_by_folded = {
+        field.casefold(): field for field in GOVERNANCE_SENTINEL_FIELDS
+    }
+
+    def visit(node: Any) -> None:
+        if isinstance(node, Mapping):
+            for key, child in node.items():
+                folded = str(key).casefold()
+                canonical = canonical_by_folded.get(folded)
+                if canonical is not None and _governance_is_sentinel(child):
+                    found.add(canonical)
+                visit(child)
+        elif isinstance(node, list):
+            for child in node:
+                visit(child)
+
+    visit(value)
+    return sorted(found)
+
+
+def _governance_csv_rows(path: Path) -> list[dict[str, str]]:
+    if not path.is_file():
+        return []
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _governance_row_name(row: Mapping[str, Any]) -> str:
+    for key in ("name", "Name", "mobName", "MobName", "characterName", "CharacterName"):
+        value = _governance_casefold_lookup(row, key)
+        if value not in (None, ""):
+            return str(value)
+    return "unknown"
+
+
+def _governance_row_field(row: Mapping[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = _governance_casefold_lookup(row, key)
+        if value not in (None, ""):
+            return str(value)
+    return "unknown"
+
+
+def _governance_collect_dossier_rows(value: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+
+    def visit(node: Any) -> None:
+        if isinstance(node, Mapping):
+            if _governance_sentinel_fields(node) and (
+                _governance_casefold_lookup(node, "name") is not None
+                or _governance_casefold_lookup(node, "identity") is not None
+                or _governance_casefold_lookup(node, "sourceIdentity") is not None
+            ):
+                rows.append(dict(node))
+                return
+            for child in node.values():
+                visit(child)
+        elif isinstance(node, list):
+            for child in node:
+                visit(child)
+
+    visit(value)
+    return rows
+
+
+def _governance_load_dossier_rows(capture_root: Path) -> list[dict[str, Any]]:
+    path = capture_root / "enemy-dossier.json"
+    if not path.is_file():
+        return []
+    with path.open("r", encoding="utf-8-sig") as handle:
+        return _governance_collect_dossier_rows(json.load(handle))
+
+
+def _governance_scoped_cohorts(capture_root: Path) -> list[dict[str, Any]]:
+    dossier_rows = _governance_load_dossier_rows(capture_root)
+    combat_rows = _governance_csv_rows(capture_root / "enemy-combat.csv")
+    combat_identities = {
+        str(
+            _governance_casefold_lookup(row, "identity")
+            or _governance_casefold_lookup(row, "sourceIdentity")
+            or _governance_casefold_lookup(row, "source")
+            or ""
+        ).strip()
+        for row in combat_rows
+    }
+    grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in dossier_rows:
+        key = (
+            _governance_row_name(row),
+            _governance_row_field(row, "level"),
+            _governance_row_field(row, "monsterData", "monsterDataId", "monsterDataTemplate"),
+        )
+        entry = grouped.setdefault(
+            key,
+            {
+                "name": key[0],
+                "level": key[1],
+                "monsterData": key[2],
+                "observedActors": 0,
+                "combatRows": 0,
+                "sentinelFields": set(),
+            },
+        )
+        entry["observedActors"] += 1
+        entry["sentinelFields"].update(_governance_sentinel_fields(row))
+        identity = str(
+            _governance_casefold_lookup(row, "identity")
+            or _governance_casefold_lookup(row, "sourceIdentity")
+            or ""
+        ).strip()
+        if identity and identity in combat_identities:
+            entry["combatRows"] += 1
+    cohorts: list[dict[str, Any]] = []
+    for entry in grouped.values():
+        sentinel_fields = sorted(entry.pop("sentinelFields"))
+        state = (
+            GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+            if sentinel_fields
+            else GOVERNANCE_STATE_NEW_RAW_VERIFIED
+        )
+        cohorts.append(
+            {
+                **entry,
+                "state": state,
+                "sentinelFields": sentinel_fields,
+            }
+        )
+    cohorts.sort(
+        key=lambda row: (
+            row["state"],
+            str(row["name"]).casefold(),
+            str(row["level"]),
+            str(row["monsterData"]),
+        )
+    )
+    return cohorts
+
+
+def validate_legacy_governance_baseline(repo_root: Path) -> int:
+    repo_root = repo_root.resolve(strict=True)
+    manifest = validate_cohort(repo_root, verify_toolchain=False)
+    inventory = _governance_load_inventory(repo_root)
+    summary = inventory.get("summary", {})
+    artifacts = _governance_manifest_artifacts(manifest)
+    mismatches: list[str] = []
+    if manifest.get("generationIdentity") != GOVERNANCE_LEGACY_GENERATION_IDENTITY:
+        mismatches.append("generationIdentity")
+    for role, expected in GOVERNANCE_LEGACY_ARTIFACTS.items():
+        actual = artifacts.get(role)
+        if not isinstance(actual, Mapping):
+            mismatches.append(f"{role}:missing")
+            continue
+        if actual.get("sha256") != expected["sha256"]:
+            mismatches.append(f"{role}:sha256")
+        if actual.get("byteLength") != expected["byteLength"]:
+            mismatches.append(f"{role}:byteLength")
+    for key in (
+        "captureSessionsDiscovered",
+        "runtimeReadyProfiles",
+        "runtimeReadyGeneratedSemanticDefinitions",
+    ):
+        if summary.get(key) != GOVERNANCE_LEGACY_EXPECTED_COUNTS[key]:
+            mismatches.append(key)
+    capture_ids = _governance_required_capture_ids(repo_root)
+    present_ids = [
+        capture_id
+        for capture_id in capture_ids
+        if not _governance_missing_raw_files(
+            repo_root / GOVERNANCE_LEGACY_CAPTURE_ROOT / capture_id
+        )
+    ]
+    missing_ids = sorted(set(capture_ids) - set(present_ids))
+    if len(capture_ids) != GOVERNANCE_LEGACY_EXPECTED_COUNTS["requiredHistoricalCaptureRoots"]:
+        mismatches.append("requiredHistoricalCaptureRoots")
+    if len(present_ids) != GOVERNANCE_LEGACY_EXPECTED_COUNTS["presentHistoricalCaptureRoots"]:
+        mismatches.append("presentHistoricalCaptureRoots")
+    if len(missing_ids) != GOVERNANCE_LEGACY_EXPECTED_COUNTS["missingHistoricalCaptureRoots"]:
+        mismatches.append("missingHistoricalCaptureRoots")
+    if mismatches:
+        raise PipelineError(
+            "generated-combat legacy governance baseline drift: "
+            + ", ".join(mismatches)
+        )
+    print(
+        "generated-combat legacy baseline PASS "
+        f"state={GOVERNANCE_STATE_LEGACY_ACCEPTED_RAW_UNAVAILABLE} "
+        f"identity={GOVERNANCE_LEGACY_GENERATION_IDENTITY} "
+        f"artifacts={len(GOVERNANCE_LEGACY_ARTIFACTS)} "
+        f"runtimeReadyProfiles={summary['runtimeReadyProfiles']} "
+        "legacyRuntimeVariantRows="
+        f"{GOVERNANCE_LEGACY_EXPECTED_COUNTS['legacyRuntimeVariantRows']} "
+        "legacyFullyRawRevalidatableRows="
+        f"{GOVERNANCE_LEGACY_EXPECTED_COUNTS['legacyFullyRawRevalidatableRows']} "
+        "legacyRawUnavailableRows="
+        f"{GOVERNANCE_LEGACY_EXPECTED_COUNTS['legacyRawUnavailableRows']} "
+        f"requiredHistoricalRaw={len(capture_ids)} "
+        f"presentHistoricalRaw={len(present_ids)} "
+        f"missingHistoricalRaw={len(missing_ids)}"
+    )
+    for role in sorted(GOVERNANCE_LEGACY_ARTIFACTS):
+        expected = GOVERNANCE_LEGACY_ARTIFACTS[role]
+        print(
+            "LEGACY_ARTIFACT|"
+            f"role={role}|sha256={expected['sha256']}|byteLength={expected['byteLength']}"
+        )
+    return 0
+
+
+def audit_scoped_raw_captures(
+    repo_root: Path,
+    capture_roots: Sequence[Path],
+    *,
+    require_promotable: bool = False,
+) -> int:
+    repo_root = repo_root.resolve(strict=True)
+    if not capture_roots:
+        raise PipelineError("--audit-scoped-raw-captures requires --capture-root")
+    inventory = _governance_load_inventory(repo_root)
+    report: dict[str, Any] = {
+        "schemaVersion": 1,
+        "pipeline": PIPELINE_NAME,
+        "mode": "audit-scoped-raw-captures",
+        "historicalRawDependency": "not evaluated",
+        "captureRoots": [],
+    }
+    any_missing = False
+    total_ready = 0
+    total_blocked = 0
+    for capture_root in capture_roots:
+        resolved_root = capture_root
+        if not resolved_root.is_absolute():
+            resolved_root = repo_root / resolved_root
+        resolved_root = resolved_root.resolve(strict=True)
+        capture_id = _governance_capture_id(resolved_root) or resolved_root.name
+        missing_raw_files = _governance_missing_raw_files(resolved_root)
+        if missing_raw_files:
+            any_missing = True
+        runtime_profiles, runtime_rows = _governance_capture_runtime_rows(
+            inventory, capture_id
+        )
+        cohorts = [] if missing_raw_files else _governance_scoped_cohorts(resolved_root)
+        ready_cohorts = [
+            cohort
+            for cohort in cohorts
+            if cohort["state"] == GOVERNANCE_STATE_NEW_RAW_VERIFIED
+        ]
+        blocked_cohorts = [
+            cohort
+            for cohort in cohorts
+            if cohort["state"] == GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+        ]
+        if missing_raw_files:
+            state = GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+        elif runtime_rows > 0:
+            state = GOVERNANCE_STATE_RAW_REVALIDATABLE
+        elif blocked_cohorts:
+            state = GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+        else:
+            state = GOVERNANCE_STATE_NEW_RAW_VERIFIED
+        total_ready += len(ready_cohorts)
+        total_blocked += len(blocked_cohorts)
+        report["captureRoots"].append(
+            {
+                "captureId": capture_id,
+                "path": str(resolved_root),
+                "state": state,
+                "missingRawFiles": missing_raw_files,
+                "requiredRawFiles": list(GOVERNANCE_REQUIRED_RAW_FILES),
+                "rawFiles": []
+                if missing_raw_files
+                else _governance_raw_file_descriptors(resolved_root),
+                "runtimeReadyProfiles": runtime_profiles,
+                "runtimeReadyRows": runtime_rows,
+                "readyCohorts": len(ready_cohorts),
+                "blockedCohorts": len(blocked_cohorts),
+                "cohorts": cohorts,
+            }
+        )
+    payload = canonical_json_bytes(report)
+    if payload != canonical_json_bytes(json.loads(payload.decode("utf-8"))):
+        raise PipelineError("scoped raw capture audit is not deterministic")
+    audit_sha256 = sha256_bytes(payload)
+    for capture in report["captureRoots"]:
+        print(
+            "SCOPED_CAPTURE|"
+            f"captureId={capture['captureId']}|"
+            f"state={capture['state']}|"
+            f"missingRawFiles={len(capture['missingRawFiles'])}|"
+            f"runtimeReadyProfiles={capture['runtimeReadyProfiles']}|"
+            f"runtimeReadyRows={capture['runtimeReadyRows']}|"
+            f"readyCohorts={capture['readyCohorts']}|"
+            f"blockedCohorts={capture['blockedCohorts']}"
+        )
+        for cohort in capture["cohorts"]:
+            print(
+                "SCOPED_COHORT|"
+                f"captureId={capture['captureId']}|"
+                f"state={cohort['state']}|"
+                f"name={cohort['name']}|"
+                f"level={cohort['level']}|"
+                f"monsterData={cohort['monsterData']}|"
+                f"observedActors={cohort['observedActors']}|"
+                f"combatRows={cohort['combatRows']}|"
+                f"sentinelFields={','.join(cohort['sentinelFields'])}"
+            )
+    if any_missing:
+        raise PipelineError("scoped raw capture audit failed: missing validator-grade raw files")
+    if require_promotable:
+        blocked = [
+            str(capture["captureId"])
+            for capture in report["captureRoots"]
+            if capture["state"] == GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE
+            or capture["blockedCohorts"]
+        ]
+        if blocked:
+            raise PipelineError(
+                "scoped raw capture promotion blocked: " + ", ".join(blocked)
+            )
+    print(
+        "generated-combat scoped raw audit PASS "
+        f"captures={len(report['captureRoots'])} "
+        f"historicalRawDependency={report['historicalRawDependency']} "
+        f"readyCohorts={total_ready} "
+        f"blockedCohorts={total_blocked} "
+        f"auditSha256={audit_sha256}"
+    )
+    return 0
+
+
+def self_test_governance() -> int:
+    sentinel_row = {
+        "minDamage": GOVERNANCE_SENTINEL_TEXT,
+        "maxDamage": GOVERNANCE_SENTINEL_TEXT,
+        "defaultAttackType": GOVERNANCE_SENTINEL_TEXT,
+        "attackDelay": GOVERNANCE_SENTINEL_TEXT,
+        "rechargeDelay": GOVERNANCE_SENTINEL_TEXT,
+        "catMesh": GOVERNANCE_SENTINEL_TEXT,
+    }
+    expected_fields = sorted(GOVERNANCE_SENTINEL_FIELDS)
+    if _governance_sentinel_fields(sentinel_row) != expected_fields:
+        raise PipelineError("governance sentinel rejection self-test failed")
+    if _governance_sentinel_fields({"minDamage": 1, "maxDamage": 2}):
+        raise PipelineError("governance sentinel false-positive self-test failed")
+    payload = {
+        "states": [
+            GOVERNANCE_STATE_LEGACY_ACCEPTED_RAW_UNAVAILABLE,
+            GOVERNANCE_STATE_RAW_REVALIDATABLE,
+            GOVERNANCE_STATE_NEW_RAW_VERIFIED,
+            GOVERNANCE_STATE_BLOCKED_INSUFFICIENT_EVIDENCE,
+        ],
+        "sentinelFields": expected_fields,
+        "requiredRawFiles": list(GOVERNANCE_REQUIRED_RAW_FILES),
+    }
+    serialized = canonical_json_bytes(payload)
+    if serialized != canonical_json_bytes(json.loads(serialized.decode("utf-8"))):
+        raise PipelineError("governance deterministic serialization self-test failed")
+    print(
+        "generated-combat governance self-test PASS "
+        "states=4 sentinelRejected=true scopedDeterministic=true"
+    )
+    return 0
+
+
 def _run_supervised_command(
     command: Sequence[str],
     repo_root: Path,
@@ -2796,6 +3374,7 @@ def run_pipeline(
     max_rounds: int,
     command: Sequence[str] = (),
     read_lease_command_timeout_seconds: int = CHILD_PROCESS_TIMEOUT_SECONDS,
+    require_promotable_captures: bool = False,
 ) -> int:
     repo_root = repo_root.resolve(strict=True)
     if mode == "validate-read-delegation":
@@ -2827,6 +3406,16 @@ def run_pipeline(
             )
         print(f"generated-combat cohort PASS identity={manifest['generationIdentity']}")
         return 0
+    if mode == "validate-legacy-baseline":
+        return validate_legacy_governance_baseline(repo_root)
+    if mode == "audit-scoped-raw-captures":
+        return audit_scoped_raw_captures(
+            repo_root,
+            command,
+            require_promotable=require_promotable_captures,
+        )
+    if mode == "self-test-governance":
+        return self_test_governance()
     if mode == "run-read-lease":
         with _shared_lease(repo_root, "read") as lease:
             identity = _run_supervised_delegated_cohort_validation(
@@ -2908,6 +3497,9 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--write", action="store_true")
     mode.add_argument("--validate-current", action="store_true")
+    mode.add_argument("--validate-legacy-baseline", action="store_true")
+    mode.add_argument("--audit-scoped-raw-captures", action="store_true")
+    mode.add_argument("--self-test-governance", action="store_true")
     mode.add_argument("--run-read-lease", action="store_true")
     mode.add_argument(
         "--_validate-read-delegation", action="store_true", help=argparse.SUPPRESS
@@ -2928,6 +3520,21 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=int,
         default=CHILD_PROCESS_TIMEOUT_SECONDS,
     )
+    parser.add_argument(
+        "--capture-root",
+        type=Path,
+        action="append",
+        default=[],
+        help="Explicit capture root for --audit-scoped-raw-captures.",
+    )
+    parser.add_argument(
+        "--require-promotable-captures",
+        action="store_true",
+        help=(
+            "With --audit-scoped-raw-captures, fail if selected evidence is "
+            "blocked by missing raw files or sentinel combat fields."
+        ),
+    )
     parser.add_argument("command", nargs=argparse.REMAINDER)
     return parser.parse_args(argv)
 
@@ -2940,6 +3547,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         mode = "write"
     elif arguments.validate_current:
         mode = "validate"
+    elif arguments.validate_legacy_baseline:
+        mode = "validate-legacy-baseline"
+    elif arguments.audit_scoped_raw_captures:
+        mode = "audit-scoped-raw-captures"
+    elif arguments.self_test_governance:
+        mode = "self-test-governance"
     elif arguments.run_read_lease:
         mode = "run-read-lease"
     elif arguments._validate_cohort_read_delegation:
@@ -2948,6 +3561,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         mode = "validate-read-delegation"
     if mode != "run-read-lease" and arguments.command:
         raise PipelineError("a trailing command is valid only with --run-read-lease")
+    if mode == "audit-scoped-raw-captures":
+        command = arguments.capture_root
+    else:
+        command = arguments.command
+    if mode != "audit-scoped-raw-captures" and arguments.capture_root:
+        raise PipelineError("--capture-root is valid only with --audit-scoped-raw-captures")
+    if mode != "audit-scoped-raw-captures" and arguments.require_promotable_captures:
+        raise PipelineError(
+            "--require-promotable-captures is valid only with --audit-scoped-raw-captures"
+        )
     if not (
         1
         <= arguments.read_lease_command_timeout_seconds
@@ -2969,10 +3592,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         repo_root=arguments.repo_root,
         mode=mode,
         max_rounds=arguments.max_fixed_point_rounds,
-        command=arguments.command,
+        command=command,
         read_lease_command_timeout_seconds=(
             arguments.read_lease_command_timeout_seconds
         ),
+        require_promotable_captures=arguments.require_promotable_captures,
     )
 
 
