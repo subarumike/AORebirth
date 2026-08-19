@@ -38,7 +38,7 @@ $failures = [System.Collections.Generic.List[string]]::new()
 
 $injectorExe = Join-Path $RepoRoot "tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector.exe"
 $captureDll = Join-Path $RepoRoot "tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.dll"
-$captureOutputRoot = Join-Path $RepoRoot "tools-temp\AOSharpLiveCapture\bin\Debug\captures"
+$captureOutputRoot = Join-Path $RepoRoot "Captures"
 $verificationScript = Join-Path $RepoRoot "tools-temp\current-client-data-verification\Invoke-CurrentClientDataVerification.ps1"
 $collectorRoot = Join-Path $RepoRoot "tools-temp\live-data-collector"
 

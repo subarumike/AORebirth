@@ -107,7 +107,26 @@ namespace AOSharpLiveCapture
             error = string.Empty;
             try
             {
-                string sessionDirectory = CreateSessionDirectory(pluginDirectory);
+                string captureId = CaptureSessionLayout.CreateCaptureId(DateTime.Now);
+                string areaName;
+                int resourcePlayfieldId;
+                try
+                {
+                    areaName = Playfield.Name;
+                    resourcePlayfieldId = Playfield.ModelIdentity.Instance;
+                }
+                catch
+                {
+                    areaName = "Subway";
+                    resourcePlayfieldId = ResourcePlayfieldId;
+                }
+
+                string sessionDirectory = CaptureSessionLayout.CreateSessionDirectory(
+                    pluginDirectory,
+                    areaName,
+                    resourcePlayfieldId,
+                    captureId,
+                    "Geometry");
                 capture = new MinimalPf127Capture(sessionDirectory);
                 return true;
             }
@@ -431,34 +450,6 @@ namespace AOSharpLiveCapture
                             + (message ?? string.Empty).Replace("\r", " ").Replace("\n", " | "));
                     }
                 });
-        }
-
-        private static string CreateSessionDirectory(string pluginDirectory)
-        {
-            if (string.IsNullOrWhiteSpace(pluginDirectory))
-            {
-                throw new ArgumentException("Plugin directory is required.", "pluginDirectory");
-            }
-
-            string captureRoot = Path.Combine(pluginDirectory, "captures");
-            Directory.CreateDirectory(captureRoot);
-            string prefix = DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
-            for (int suffix = 0; suffix < 1000; suffix++)
-            {
-                string name = suffix == 0
-                                  ? prefix
-                                  : prefix + "-" + suffix.ToString("000", CultureInfo.InvariantCulture);
-                string candidate = Path.Combine(captureRoot, name);
-                if (Directory.Exists(candidate))
-                {
-                    continue;
-                }
-
-                Directory.CreateDirectory(candidate);
-                return candidate;
-            }
-
-            throw new IOException("Could not allocate a unique PF127 geometry-only capture directory.");
         }
 
         private static void AppendStringArray(StringBuilder json, IList<string> values)

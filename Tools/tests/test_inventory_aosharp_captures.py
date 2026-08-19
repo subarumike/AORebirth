@@ -73,6 +73,24 @@ class AOSharpCaptureInventoryTests(unittest.TestCase):
         self.assertEqual(1, packets_rows)
         self.assertEqual(1, csv_rows)
 
+    def test_human_readable_capture_folder_retains_machine_capture_id(self) -> None:
+        human_capture = (
+            self.repo_root
+            / "Captures"
+            / "ICC Shuttleport [PF 4582] - 20260818-143201"
+        )
+        human_capture.mkdir(parents=True)
+        (human_capture / "capture_info.json").write_text(
+            json.dumps({"playfieldId": 4582}) + "\n",
+            encoding="utf-8",
+        )
+
+        captures = inventory.discover_capture_directories(self.repo_root)
+        row = inventory.inspect_capture(self.repo_root, human_capture, {}, {})
+
+        self.assertIn(human_capture, captures)
+        self.assertEqual("20260818-143201", row["capture_id"])
+
     def test_official_pf127_start_only_capture_is_subway_without_raw(self) -> None:
         (self.capture / "capture_info.json").write_text(
             json.dumps(

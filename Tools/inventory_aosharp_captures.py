@@ -207,10 +207,15 @@ def discover_capture_directories(repo_root: Path) -> list[Path]:
     for current, directories, files in os.walk(repo_root):
         path = Path(current)
         directories[:] = [name for name in directories if name not in ignored]
-        if CAPTURE_ID.match(path.name) and CAPTURE_MARKERS.intersection(files):
+        if capture_id_from_directory_name(path.name) and CAPTURE_MARKERS.intersection(files):
             captures.append(path)
             directories[:] = []
     return sorted(captures, key=lambda path: path.relative_to(repo_root).as_posix())
+
+
+def capture_id_from_directory_name(directory_name: str) -> str:
+    match = CAPTURE_ID_IN_TEXT.search(directory_name)
+    return match.group(0) if match else ""
 
 
 def collect_repository_references(repo_root: Path) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
@@ -396,7 +401,7 @@ def inspect_capture(
     documented: dict[str, set[str]],
     indexed: dict[str, set[str]],
 ) -> dict[str, object]:
-    capture_id = capture_path.name
+    capture_id = capture_id_from_directory_name(capture_path.name) or capture_path.name
     session = load_json(capture_path / "capture-session.json")
     info = load_json(capture_path / "capture_info.json")
     health = load_json(capture_path / "capture-health.json")

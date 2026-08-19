@@ -434,6 +434,8 @@ cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>" 
 
 This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client. Before target selection it runs a fail-closed capture-safe contract check against the deployed injector and Bootstrap pair. A stale or unsafe binary cannot proceed to injection.
 
+New captures are stored in the repository-level `Captures` folder. The live AO playfield name and resource ID lead each human-readable session folder, while the final compact timestamp remains the unique analyzer-facing capture ID. Example: `Captures\ICC Shuttleport [PF 4582] - 20260818-143201`. The launcher writes the absolute capture root contract before injection. Direct plugin loads without that contract retain the legacy plugin-local `captures` fallback.
+
 Build the capture plugin after capture-tool source changes with:
 
 ```cmd

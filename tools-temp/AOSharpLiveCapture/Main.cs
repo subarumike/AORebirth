@@ -118,6 +118,9 @@ namespace AOSharpLiveCapture
         };
 
         private string sessionDirectory;
+        private string captureId;
+        private string captureAreaName;
+        private string captureResourcePlayfieldId;
         private string pluginDirectory;
         private StreamWriter eventsLog;
         private StreamWriter packetsLog;
@@ -5118,6 +5121,15 @@ namespace AOSharpLiveCapture
                     json.Append("  \"captureFolderPath\": ");
                     json.Append(Json(this.sessionDirectory));
                     json.AppendLine(",");
+                    json.Append("  \"captureId\": ");
+                    json.Append(Json(this.captureId));
+                    json.AppendLine(",");
+                    json.Append("  \"areaName\": ");
+                    json.Append(Json(this.captureAreaName));
+                    json.AppendLine(",");
+                    json.Append("  \"resourcePlayfieldId\": ");
+                    json.Append(Json(this.captureResourcePlayfieldId));
+                    json.AppendLine(",");
                     json.AppendLine("  \"aoClientProcess\": {");
                     json.Append("    \"id\": ");
                     json.Append(process.Id.ToString(CultureInfo.InvariantCulture));
@@ -6192,6 +6204,15 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("  \"captureFolderPath\": ");
                 json.Append(Json(this.sessionDirectory));
+                json.AppendLine(",");
+                json.Append("  \"captureId\": ");
+                json.Append(Json(this.captureId));
+                json.AppendLine(",");
+                json.Append("  \"areaName\": ");
+                json.Append(Json(this.captureAreaName));
+                json.AppendLine(",");
+                json.Append("  \"resourcePlayfieldId\": ");
+                json.Append(Json(this.captureResourcePlayfieldId));
                 json.AppendLine(",");
                 json.Append("  \"rawPacketLogPath\": ");
                 json.Append(Json(Path.Combine(this.sessionDirectory, "packets.hex.log")));
@@ -7518,7 +7539,19 @@ namespace AOSharpLiveCapture
 
             this.ApplyExternalCaptureRequest(pluginDir);
 
-            this.sessionDirectory = CreateSessionDirectory(pluginDir);
+            DateTime sessionStartLocal = DateTime.Now;
+            int resourcePlayfieldId = GetCurrentResourcePlayfieldIdNoThrow();
+            this.captureId = CaptureSessionLayout.CreateCaptureId(sessionStartLocal);
+            this.captureAreaName = CaptureSessionLayout.NormalizeAreaName(GetCurrentAreaNameNoThrow());
+            this.captureResourcePlayfieldId = resourcePlayfieldId > 0
+                                                  ? resourcePlayfieldId.ToString(CultureInfo.InvariantCulture)
+                                                  : string.Empty;
+            this.sessionDirectory = CaptureSessionLayout.CreateSessionDirectory(
+                pluginDir,
+                this.captureAreaName,
+                resourcePlayfieldId,
+                this.captureId,
+                string.Empty);
             this.callbackBoundary.BeginSession(
                 Path.Combine(this.sessionDirectory, "capture-callback-errors.log"),
                 GetCallbackErrorFallbackPath(pluginDir));
@@ -7843,23 +7876,28 @@ namespace AOSharpLiveCapture
             };
         }
 
-        private static string CreateSessionDirectory(string pluginDir)
+        private static string GetCurrentAreaNameNoThrow()
         {
-            string baseDirectory = string.IsNullOrWhiteSpace(pluginDir) ? Directory.GetCurrentDirectory() : pluginDir;
-            string capturesDirectory = Path.Combine(baseDirectory, "captures");
-            string stem = DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
-            string directory = Path.Combine(capturesDirectory, stem);
-            int suffix = 1;
-            while (Directory.Exists(directory))
+            try
             {
-                directory = Path.Combine(
-                    capturesDirectory,
-                    stem + "-" + suffix.ToString("00", CultureInfo.InvariantCulture));
-                suffix++;
+                return Playfield.Name;
             }
+            catch
+            {
+                return string.Empty;
+            }
+        }
 
-            Directory.CreateDirectory(directory);
-            return directory;
+        private static int GetCurrentResourcePlayfieldIdNoThrow()
+        {
+            try
+            {
+                return Playfield.ModelIdentity.Instance;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         private static string Safe(Func<string> func)
