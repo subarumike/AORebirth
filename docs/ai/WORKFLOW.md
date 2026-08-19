@@ -639,3 +639,87 @@ Required workflow for every server repair or gameplay/runtime source change:
 Client-patch-only and docs-only commits after a deployed server SHA do not
 require a Linux server redeploy, but they must be explicitly identified as
 non-server changes before declaring Windows/Linux server parity.
+
+## SHA-gated Windows/Linux synchronization
+
+AORebirth has one authoritative source history. Windows remains the development
+and acceptance platform; `master` is the integrated source authority; Linux
+consumes exact accepted SHAs from controlled build workspaces.
+
+For Windows integration evidence after a commit is on the intended integration
+line, run:
+
+```cmd
+cmd /d /c Tools\accept_windows_source.cmd --expected-sha <sha>
+```
+
+Add `--mandatory-gate` only when the full mandatory integration gate is required
+for that acceptance event. The wrapper fails closed on a source SHA mismatch,
+tracked-source dirt, `git diff --check`, build failure, or mandatory-gate
+failure. It writes non-secret evidence under ignored `build-verify`.
+
+For Linux acceptance, use a controlled disposable or dedicated build workspace,
+not a normal developer checkout and not the production runtime directory:
+
+```bash
+LinuxBuild/accept-linux-sha.sh --expected-sha <sha> --workspace /srv/ao-rebirth-linux-acceptance
+```
+
+The Linux wrapper fetches origin, checks out the exact SHA detached, resets and
+cleans only the sentinel-marked controlled workspace, verifies:
+
+```text
+AO_REBIRTH_SOURCE_SHA=<sha>
+EXPECTED_SOURCE_SHA=<sha>
+SOURCE_SHA_MATCH=PASS
+TRACKED_SOURCE_CLEAN=PASS
+RESTORE=PASS
+BUILD=PASS
+TESTS=PASS
+PUBLISH=PASS
+LINUX_ACCEPTANCE=PASS
+```
+
+It then writes `SOURCE_SHA`, `BUILD_PROVENANCE.env`, and
+`LINUX_ACCEPTANCE.env` into the published ZoneEngine artifact. These files must
+not contain secrets, usernames, tokens, private host addresses, database
+credentials, or operational configuration.
+
+The normal ZoneEngine Linux publish wrappers still exist:
+
+```cmd
+cmd /d /c LinuxBuild\publish-zoneengine.cmd linux-x64 true
+```
+
+```bash
+LinuxBuild/publish-zoneengine.sh linux-x64 true
+```
+
+They continue to perform source-inventory validation, restore, build, publish,
+and Stage 8 offline smoke validation. They also write non-secret publish
+provenance with `ACCEPTANCE_RESULT=UNVERIFIED`. A direct publish is build
+evidence, not deployment acceptance.
+
+Deploy ZoneEngine only from a Linux-accepted artifact whose provenance matches
+the intended source SHA:
+
+```bash
+bash upgrade-live-service.sh <verified-publish-dir> <release-id> <expected-source-sha>
+```
+
+The deployment gate refuses promotion when `SOURCE_SHA`,
+`BUILD_PROVENANCE.env`, or `LINUX_ACCEPTANCE.env` is missing or mismatched, when
+`SOURCE_SHA_MATCH`, `TRACKED_SOURCE_CLEAN`, or `LINUX_ACCEPTANCE` is not `PASS`,
+when the online-character guard fails, when runtime validation fails, or when
+rollback validation fails.
+
+To validate artifact provenance without touching production, use:
+
+```bash
+bash upgrade-live-service.sh --validate-artifact-provenance <verified-publish-dir> <expected-source-sha>
+```
+
+Do not deploy an implicit branch tip. Do not copy source files between Windows
+and Linux. Do not edit production source. If Linux finds a compatibility defect,
+repair it through the Windows source tree, validate on Windows, merge to
+`master`, then run Linux acceptance on the new exact SHA.

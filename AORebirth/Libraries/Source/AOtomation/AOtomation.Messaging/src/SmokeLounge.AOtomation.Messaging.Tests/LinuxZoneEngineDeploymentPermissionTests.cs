@@ -21,6 +21,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(source, "validate_release_runtime \"${rollback_target}\"");
             StringAssert.Contains(source, "runuser -u \"${SERVICE_USER}\" -g \"${SERVICE_GROUP}\" -- test -x \"${apphost}\"");
             StringAssert.Contains(source, "verify_no_online_characters");
+            StringAssert.Contains(source, "require_artifact_provenance");
+            StringAssert.Contains(source, "SOURCE_SHA_MATCH=PASS");
+            StringAssert.Contains(source, "TRACKED_SOURCE_CLEAN=PASS");
+            StringAssert.Contains(source, "LINUX_ACCEPTANCE=PASS");
+            StringAssert.Contains(source, "usage: upgrade-live-service.sh <publish-dir> <release-id> <expected-source-sha>");
+            StringAssert.Contains(source, "--validate-artifact-provenance");
+            StringAssert.Contains(source, "PASS: artifact provenance matches expected source SHA.");
             StringAssert.Contains(source, "mv -fT -- \"${current_swap}\" \"${CURRENT_LINK}\"");
             StringAssert.Contains(source, "new ${SERVICE_NAME} release failed to start; rollback target restored");
         }

@@ -57,3 +57,26 @@ else
     --repository-root .. \
     --zone-output "artifacts/zoneengine/${runtime_id}/${package_kind}"
 fi
+
+source_sha="$(git -C .. rev-parse HEAD)"
+tracked_source_clean="PASS"
+if ! git -C .. diff --quiet -- || ! git -C .. diff --cached --quiet --; then
+  tracked_source_clean="FAIL"
+fi
+publish_dir="artifacts/zoneengine/${runtime_id}/${package_kind}"
+dotnet_sdk_version="$(dotnet --version)"
+build_timestamp_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+printf '%s\n' "${source_sha}" > "${publish_dir}/SOURCE_SHA"
+cat > "${publish_dir}/BUILD_PROVENANCE.env" <<EOF
+REPOSITORY=AORebirth
+COMMIT_SHA=${source_sha}
+BUILD_PLATFORM=linux
+RUNTIME_IDENTIFIER=${runtime_id}
+CONFIGURATION=Release
+SELF_CONTAINED=${self_contained}
+DOTNET_SDK_VERSION=${dotnet_sdk_version}
+TRACKED_SOURCE_CLEAN=${tracked_source_clean}
+BUILD_TIMESTAMP_UTC=${build_timestamp_utc}
+ACCEPTANCE_RESULT=UNVERIFIED
+EOF

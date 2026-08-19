@@ -47,6 +47,36 @@ require_publish_tree()
     require_file "${publish_dir}/XML Data/Playfields.xml"
 }
 
+read_source_sha_file()
+{
+    local path="$1"
+    tr -d '\r\n\t ' < "${path}"
+}
+
+require_artifact_provenance()
+{
+    local artifact_dir="$1"
+    require_file "${artifact_dir}/SOURCE_SHA"
+    require_file "${artifact_dir}/BUILD_PROVENANCE.env"
+    require_file "${artifact_dir}/LINUX_ACCEPTANCE.env"
+    local actual_source_sha
+    actual_source_sha="$(read_source_sha_file "${artifact_dir}/SOURCE_SHA")"
+    [[ "${actual_source_sha}" == "${expected_source_sha}" ]] \
+        || fail "artifact source SHA mismatch: expected ${expected_source_sha}, actual ${actual_source_sha}"
+    grep -Fx "COMMIT_SHA=${expected_source_sha}" "${artifact_dir}/BUILD_PROVENANCE.env" >/dev/null \
+        || fail "build provenance commit does not match expected source SHA"
+    grep -Fx "AO_REBIRTH_SOURCE_SHA=${expected_source_sha}" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "Linux acceptance source SHA does not match expected source SHA"
+    grep -Fx "EXPECTED_SOURCE_SHA=${expected_source_sha}" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "Linux acceptance expected SHA does not match deployment SHA"
+    grep -Fx "SOURCE_SHA_MATCH=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "Linux acceptance did not pass source SHA match"
+    grep -Fx "TRACKED_SOURCE_CLEAN=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "Linux acceptance did not prove tracked source clean"
+    grep -Fx "LINUX_ACCEPTANCE=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "Linux acceptance marker is missing or not PASS"
+}
+
 require_identity()
 {
     getent group "${SERVICE_GROUP}" >/dev/null || fail "missing service group ${SERVICE_GROUP}"
@@ -156,12 +186,14 @@ stage_release()
     install -d -o root -g "${SERVICE_GROUP}" -m "0${DIRECTORY_MODE}" "${release_staging}"
     cp -a -- "${publish_dir}/." "${release_staging}/"
     apply_release_permissions "${release_staging}"
+    require_artifact_provenance "${release_staging}"
     validate_release_runtime "${release_staging}"
 }
 
 promote_release()
 {
     mv -T -- "${release_staging}" "${release_target}"
+    require_artifact_provenance "${release_target}"
     validate_release_runtime "${release_target}"
     rollback_target="${old_release_target}"
     validate_release_runtime "${rollback_target}"
@@ -181,6 +213,18 @@ promote_release()
         || fail "${SERVICE_NAME} is not active after promotion"
 }
 
+validate_artifact_provenance_command()
+{
+    [[ "$#" -eq 2 ]] || fail "usage: upgrade-live-service.sh --validate-artifact-provenance <publish-dir> <expected-source-sha>"
+    local publish_dir
+    publish_dir="$(realpath -e -- "$1")"
+    expected_source_sha="$2"
+    [[ "${expected_source_sha}" =~ ^[0-9a-fA-F]{40}$ ]] || fail "invalid expected source SHA"
+    require_publish_tree "${publish_dir}"
+    require_artifact_provenance "${publish_dir}"
+    echo "PASS: artifact provenance matches expected source SHA."
+}
+
 cleanup()
 {
     if [[ -n "${release_staging:-}" && -e "${release_staging}" && ! -e "${release_target:-}" ]]; then
@@ -193,14 +237,23 @@ cleanup()
 
 main()
 {
+    if [[ "${1:-}" == "--validate-artifact-provenance" ]]; then
+        shift
+        validate_artifact_provenance_command "$@"
+        return
+    fi
+
     require_root
-    [[ "$#" -eq 2 ]] || fail "usage: upgrade-live-service.sh <publish-dir> <release-id>"
+    [[ "$#" -eq 3 ]] || fail "usage: upgrade-live-service.sh <publish-dir> <release-id> <expected-source-sha>"
     local publish_dir
     publish_dir="$(realpath -e -- "$1")"
     release_name="$2"
+    expected_source_sha="$3"
+    [[ "${expected_source_sha}" =~ ^[0-9a-fA-F]{40}$ ]] || fail "invalid expected source SHA"
     require_safe_release_name "${release_name}"
     require_identity
     require_publish_tree "${publish_dir}"
+    require_artifact_provenance "${publish_dir}"
 
     release_target="${RELEASES_DIRECTORY}/${release_name}"
     current_swap="${INSTALL_ROOT}/.current-upgrade-${release_name}"

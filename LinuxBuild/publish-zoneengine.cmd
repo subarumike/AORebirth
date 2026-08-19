@@ -46,6 +46,26 @@ if "%SELF_CONTAINED%"=="true" (
 )
 if errorlevel 1 goto :failed
 
+for /f "usebackq delims=" %%I in (`git -C .. rev-parse HEAD`) do set SOURCE_SHA=%%I
+for /f "usebackq delims=" %%I in (`dotnet --version`) do set DOTNET_SDK_VERSION=%%I
+set TRACKED_SOURCE_CLEAN=PASS
+git -C .. diff --quiet --
+if errorlevel 1 set TRACKED_SOURCE_CLEAN=FAIL
+git -C .. diff --cached --quiet --
+if errorlevel 1 set TRACKED_SOURCE_CLEAN=FAIL
+set PUBLISH_DIR=artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%
+> "%PUBLISH_DIR%\SOURCE_SHA" echo %SOURCE_SHA%
+> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo REPOSITORY=AORebirth
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo COMMIT_SHA=%SOURCE_SHA%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo BUILD_PLATFORM=windows-hosted-linux-publish
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo RUNTIME_IDENTIFIER=%RUNTIME_ID%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo CONFIGURATION=Release
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo SELF_CONTAINED=%SELF_CONTAINED%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo DOTNET_SDK_VERSION=%DOTNET_SDK_VERSION%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo TRACKED_SOURCE_CLEAN=%TRACKED_SOURCE_CLEAN%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo BUILD_TIMESTAMP_LOCAL=%DATE% %TIME%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo ACCEPTANCE_RESULT=UNVERIFIED
+
 popd
 endlocal
 exit /b 0
