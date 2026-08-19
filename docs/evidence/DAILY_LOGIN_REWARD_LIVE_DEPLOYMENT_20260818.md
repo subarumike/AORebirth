@@ -68,3 +68,40 @@ Post-restart verification passed: ZoneEngine was active with restart count
 `0`, owned `0.0.0.0:7501`, had the exact rewards environment assignment, could
 read the catalog, had no active pending claim, and both server and public web
 state reported `nextDay: 28` with `claimedToday: false`.
+
+## Post-claim incident and rollback
+
+The next official-client claim resolved day `28`, selected item `270996`
+(`Phasefront Banshee - Red`), persisted it to character `39`, and advanced the
+account ledger. The live client did not display the grant immediately. After a
+relogin, inventory appeared empty and attack was unavailable while sit still
+worked.
+
+Read-only database inspection showed that character `39` still had twelve
+normal inventory rows and one instanced row; there was no mass database wipe.
+The Banshee row was present. A root-only incident snapshot was preserved at:
+
+```text
+/root/aorebirth-recovery/20260819-character39-dailylogin-270996
+```
+
+ZoneEngine was rolled back atomically from:
+
+```text
+/opt/ao-rebirth/zoneengine/releases/dailyreward-676c2d56
+```
+
+to the last live-accepted reconnect release:
+
+```text
+/opt/ao-rebirth/zoneengine/releases/reconnect-fe6617b3
+```
+
+After the rollback restart and a cold login, the complete inventory was visible,
+the Banshee was present, and both attack and sit passed. LoginEngine and
+ChatEngine remained active throughout.
+
+Current production status: `reconnect-fe6617b3` is active. The Daily Login
+release is not live-accepted and must not be described as deployed production
+parity. The unresolved defect is the post-claim live client/session refresh
+path, not reward persistence or inventory data loss.
