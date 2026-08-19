@@ -42,6 +42,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(source, "else if (day == 10");
         }
 
+        [TestMethod]
+        public void DailyLoginClaimRefreshesAuthoritativeInventoryWithoutSyntheticOverflowMove()
+        {
+            string runtime = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\DailyLoginRewardRuntime.cs");
+            int grantIndex = runtime.IndexOf(
+                "TryGrantQuestRewardItem(source, grantItem)",
+                StringComparison.Ordinal);
+            int refreshIndex = runtime.IndexOf(
+                "TrySendInventoryUpdate(source);",
+                StringComparison.Ordinal);
+
+            Assert.IsTrue(grantIndex >= 0, "Daily Login must use the authoritative persisted grant path.");
+            Assert.IsTrue(
+                refreshIndex > grantIndex,
+                "Daily Login must refresh the standard inventory after the persisted grant succeeds.");
+            Assert.IsFalse(runtime.Contains("SendOverflowPackets(source, grantItem);"));
+            Assert.IsFalse(runtime.Contains("private static void SendOverflowPackets"));
+        }
+
         private static string ReadRepositoryFile(string relativePath)
         {
             return File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath));
