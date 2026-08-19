@@ -495,3 +495,7 @@ migrations; details and exact source references are recorded in
   database, binary, PHP runtime, and WebCore assets before launch. Stop it with
   `stop-web-engine.cmd`.
 - Do not launch the AO client unless Mike explicitly requests it.
+- The approved AOSharp launcher writes new evidence to repository-level
+  `Captures` folders named `<area> [PF <resource id>] - <capture id>`; the
+  timestamp suffix remains the stable analyzer-facing ID, and historical
+  plugin-local captures are not moved automatically.

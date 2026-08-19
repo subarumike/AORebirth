@@ -6,7 +6,8 @@ for %%I in ("%SCRIPT_DIR%..") do set "REPO_ROOT=%%~fI"
 
 set "INJECTOR_EXE=%REPO_ROOT%\tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector.exe"
 set "PLUGIN_DLL=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.dll"
-set "CAPTURE_ROOT=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\captures"
+set "CAPTURE_ROOT=%REPO_ROOT%\Captures"
+set "CAPTURE_ROOT_CONFIG=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\capture-root.path"
 set "LOOT_CAPTURE_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\loot-10.request"
 set "PF127_GEOMETRY_ONLY_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\pf127-geometry-only.request"
 set "EXTERNAL_CONTROL_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.control"
@@ -90,6 +91,12 @@ set "SELF_TEST_MATCH=!ERRORLEVEL!"
 del /q "%SELF_TEST_OUTPUT%" >nul 2>nul
 if not "!SELF_TEST_EXIT!"=="0" goto unsafe_injector
 if not "!SELF_TEST_MATCH!"=="0" goto unsafe_injector
+
+> "%CAPTURE_ROOT_CONFIG%" echo %CAPTURE_ROOT%
+if not exist "%CAPTURE_ROOT_CONFIG%" (
+    echo FAILED: capture root configuration could not be written: "%CAPTURE_ROOT_CONFIG%"
+    exit /b 1
+)
 
 if not exist "%CAPTURE_ROOT%" mkdir "%CAPTURE_ROOT%" >nul 2>nul
 if not exist "%CAPTURE_ROOT%" (

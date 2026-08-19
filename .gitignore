@@ -140,6 +140,8 @@ tools-temp/db-backups/
 /diagnostics/
 /tools-temp/ProcDump/
 /tools-temp/_tmp*
+/Captures/*
+!/Captures/README.md
 /AORebirth/Cursor/
 *.dmp
 __pycache__/

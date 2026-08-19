@@ -50,6 +50,7 @@
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
     <Compile Include="CombatLootSmoke.cs" />
+    <Compile Include="CaptureSessionLayout.cs" />
     <Compile Include="CaptureRuntimeSafety.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MinimalPf127Capture.cs" />

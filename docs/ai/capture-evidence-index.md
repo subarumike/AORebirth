@@ -3,8 +3,13 @@
 Status date: 2026-08-16
 
 ## Source of Evidence
-All retained capture artifacts are now in:
+Historical retained capture artifacts are in:
 C:\Users\Mike\Documents\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures
+
+New captures created by the approved launcher are stored in:
+C:\Users\Mike\Documents\AORebirth\Captures
+
+New session folder names use `<area> [PF <resource id>] - <capture id>` so a person can identify the location immediately while analyzers retain the compact timestamp capture ID.
 
 The keep set was narrowed to 36 folders and contains mission-backed and reference-backed sessions we can use for implementation and verification.
 
