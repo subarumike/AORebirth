@@ -2756,6 +2756,176 @@ GOVERNANCE_RUNTIME_REQUIRED_FIELDS = (
     "naturalOrWeaponMode",
     "archetypeLinkage",
 )
+GOVERNANCE_CAPTURE_READINESS = (
+    {
+        "field": "attackDelay",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "SCFU_STAT",
+        "evidencePath": (
+            "owner-linked WeaponItemFullUpdate stat 294 is accepted for equipped "
+            "weapon contracts only; passive hit timing remains observation data, "
+            "not an NPC stat source"
+        ),
+    },
+    {
+        "field": "attackRange",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "SCFU_STAT",
+        "evidencePath": (
+            "accepted historical path is ItemDb/WeaponItemFullUpdate AttackRange "
+            "stat 287 with template authority; chase, follow, and attack-start "
+            "distance are explicitly not attackRange evidence"
+        ),
+    },
+    {
+        "field": "attackSlot",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "DIRECT_PACKET_FIELD",
+        "evidencePath": (
+            "AttackInfo.weaponSlot decoded from raw AttackInfo packet and "
+            "cross-linked to owner WeaponItemFullUpdate where equipped weapon "
+            "contracts are accepted"
+        ),
+    },
+    {
+        "field": "catMesh",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "SCFU_STAT",
+        "evidencePath": (
+            "SCFU/corpse visual decoding can prove corpse cat mesh when a "
+            "non-sentinel visual id is captured; sentinel 1234567890 remains "
+            "promotion-blocking"
+        ),
+    },
+    {
+        "field": "damageType",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "DIRECT_PACKET_FIELD",
+        "evidencePath": (
+            "AttackInfo.damageTypeWire decoded from raw AttackInfo packet; "
+            "Unknown1/Unknown2/Unknown3 CSV columns are not contract evidence"
+        ),
+    },
+    {
+        "field": "defaultAttackType",
+        "runtimeStatus": "DERIVABLE",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "KNOWN_GENERATOR_CONSTANT_WITH_PROVEN_SCOPE",
+        "evidencePath": (
+            "runtime uses the governed normal AttackInfo hit type constant only "
+            "inside already proven normal-hit packet contracts; sentinel dossier "
+            "values are not evidence"
+        ),
+    },
+    {
+        "field": "factionAlignment",
+        "runtimeStatus": "NOT_PROTOCOL_PROVEN",
+        "captureStatus": "NOT_PROTOCOL_PROVEN",
+        "analyzerStatus": "NOT_PROTOCOL_PROVEN",
+        "historicalProvenance": "UNRESOLVED_HISTORICAL_ASSUMPTION",
+        "evidencePath": (
+            "current audited capture outputs prove behavior and identity, not "
+            "authoritative faction/alignment semantics; names, species, location, "
+            "or hostility are not accepted"
+        ),
+    },
+    {
+        "field": "followChaseBehavior",
+        "runtimeStatus": "DERIVABLE",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "OBSERVED_EVENT_VALUE",
+        "evidencePath": (
+            "enemy movement and target/follow rows prove follow/chase behavior "
+            "for classification only; the value is intentionally separate from "
+            "attackRange"
+        ),
+    },
+    {
+        "field": "hitType",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "DIRECT_PACKET_FIELD",
+        "evidencePath": (
+            "AttackInfo.hitTypeWire decoded from raw AttackInfo packet and "
+            "accepted only when the packet contract is otherwise complete"
+        ),
+    },
+    {
+        "field": "maxDamage",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "SCFU_STAT",
+        "evidencePath": (
+            "owner-linked WeaponItemFullUpdate weapon max-damage stat is accepted "
+            "for equipped weapon contracts; observed maximum hit is only an "
+            "observation and is not authoritative maxDamage"
+        ),
+    },
+    {
+        "field": "minDamage",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "SCFU_STAT",
+        "evidencePath": (
+            "owner-linked WeaponItemFullUpdate weapon min-damage stat is accepted "
+            "for equipped weapon contracts; observed minimum hit is only an "
+            "observation and is not authoritative minDamage"
+        ),
+    },
+    {
+        "field": "nanoOrSpecialBehavior",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "DIRECT_PACKET_FIELD",
+        "evidencePath": (
+            "positive SpecialAttackWeapon, CastNanoSpell, alternate AttackInfo, "
+            "and related action packets are observable; absence remains "
+            "NOT_OBSERVED unless a separate governed coverage rule exists"
+        ),
+    },
+    {
+        "field": "naturalOrWeaponMode",
+        "runtimeStatus": "DERIVABLE",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "MULTI_EVENT_DERIVATION",
+        "evidencePath": (
+            "mode is derived only from packet-complete attack chains and "
+            "owner-linked WeaponItemFullUpdate evidence; visual unarmed "
+            "appearance alone is not evidence"
+        ),
+    },
+    {
+        "field": "rechargeDelay",
+        "runtimeStatus": "DIRECTLY_CAPTURED",
+        "captureStatus": "CAPTURE_READY",
+        "analyzerStatus": "ANALYZER_READY",
+        "historicalProvenance": "SCFU_STAT",
+        "evidencePath": (
+            "owner-linked WeaponItemFullUpdate stat 210 is accepted for equipped "
+            "weapon contracts only; repeated hit interval is not authoritative "
+            "rechargeDelay"
+        ),
+    },
+)
+GOVERNANCE_CAPTURE_READY_STATUSES = frozenset({"CAPTURE_READY"})
+GOVERNANCE_ANALYZER_READY_STATUSES = frozenset({"ANALYZER_READY"})
 
 GOVERNANCE_REQUIRED_RAW_FILES = (
     "capture_info.json",
@@ -3937,6 +4107,47 @@ def audit_scoped_raw_captures(
     return 0
 
 
+def audit_combat_capture_readiness(repo_root: Path) -> int:
+    del repo_root
+    ready_fields = [
+        row
+        for row in GOVERNANCE_CAPTURE_READINESS
+        if row["captureStatus"] in GOVERNANCE_CAPTURE_READY_STATUSES
+        and row["analyzerStatus"] in GOVERNANCE_ANALYZER_READY_STATUSES
+        and row["runtimeStatus"] != "NOT_PROTOCOL_PROVEN"
+    ]
+    not_protocol_proven = [
+        row
+        for row in GOVERNANCE_CAPTURE_READINESS
+        if row["runtimeStatus"] == "NOT_PROTOCOL_PROVEN"
+        or row["captureStatus"] == "NOT_PROTOCOL_PROVEN"
+        or row["analyzerStatus"] == "NOT_PROTOCOL_PROVEN"
+    ]
+    pipeline_ready = len(not_protocol_proven) == 0
+    analyzer_ready = all(
+        row["analyzerStatus"] in GOVERNANCE_ANALYZER_READY_STATUSES
+        for row in GOVERNANCE_CAPTURE_READINESS
+    )
+    print(
+        "COMBAT_CAPTURE_READINESS|"
+        + f"pipelineReady={'true' if pipeline_ready else 'false'}|"
+        + f"analyzerReady={'true' if analyzer_ready else 'false'}|"
+        + f"requiredFieldsCaptureProvable={len(ready_fields)}|"
+        + f"requiredFieldsNotProtocolProven={len(not_protocol_proven)}"
+    )
+    for row in GOVERNANCE_CAPTURE_READINESS:
+        print(
+            "COMBAT_CAPTURE_FIELD|"
+            + f"field={row['field']}|"
+            + f"runtimeStatus={row['runtimeStatus']}|"
+            + f"captureStatus={row['captureStatus']}|"
+            + f"analyzerStatus={row['analyzerStatus']}|"
+            + f"historicalProvenance={row['historicalProvenance']}|"
+            + f"evidencePath={row['evidencePath']}"
+        )
+    return 0
+
+
 def self_test_governance() -> int:
     sentinel_row = {
         "minDamage": GOVERNANCE_SENTINEL_TEXT,
@@ -3980,6 +4191,28 @@ def self_test_governance() -> int:
         not in GOVERNANCE_COMBAT_CANDIDATE_CATEGORIES
     ):
         raise PipelineError("governance missing-dossier combat retention self-test failed")
+    readiness_fields = {row["field"] for row in GOVERNANCE_CAPTURE_READINESS}
+    required_readiness_fields = set(GOVERNANCE_RUNTIME_REQUIRED_FIELDS) - {
+        "actorIdentity",
+        "monsterData",
+        "level",
+        "maxHealth",
+        "archetypeLinkage",
+    }
+    if readiness_fields != required_readiness_fields:
+        raise PipelineError("governance self-test failed: readiness field coverage drifted")
+    if any(
+        row["field"] == "factionAlignment"
+        and row["runtimeStatus"] != "NOT_PROTOCOL_PROVEN"
+        for row in GOVERNANCE_CAPTURE_READINESS
+    ):
+        raise PipelineError("governance self-test failed: faction readiness must fail closed")
+    if any(
+        row["field"] == "attackRange"
+        and row["historicalProvenance"] == "SPATIAL_DERIVATION"
+        for row in GOVERNANCE_CAPTURE_READINESS
+    ):
+        raise PipelineError("governance self-test failed: attackRange cannot use spatial derivation")
     payload = {
         "states": [
             GOVERNANCE_STATE_LEGACY_ACCEPTED_RAW_UNAVAILABLE,
@@ -4124,6 +4357,8 @@ def run_pipeline(
             command,
             require_promotable=require_promotable_captures,
         )
+    if mode == "audit-combat-capture-readiness":
+        return audit_combat_capture_readiness(repo_root)
     if mode == "self-test-governance":
         return self_test_governance()
     if mode == "run-read-lease":
@@ -4209,6 +4444,7 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--validate-current", action="store_true")
     mode.add_argument("--validate-legacy-baseline", action="store_true")
     mode.add_argument("--audit-scoped-raw-captures", action="store_true")
+    mode.add_argument("--audit-combat-capture-readiness", action="store_true")
     mode.add_argument("--self-test-governance", action="store_true")
     mode.add_argument("--run-read-lease", action="store_true")
     mode.add_argument(
@@ -4261,6 +4497,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         mode = "validate-legacy-baseline"
     elif arguments.audit_scoped_raw_captures:
         mode = "audit-scoped-raw-captures"
+    elif arguments.audit_combat_capture_readiness:
+        mode = "audit-combat-capture-readiness"
     elif arguments.self_test_governance:
         mode = "self-test-governance"
     elif arguments.run_read_lease:
