@@ -248,6 +248,10 @@ against its governed output. Use the coordinator wrapper:
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --check
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --write
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --validate-current
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --validate-legacy-baseline
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --audit-scoped-raw-captures --capture-root "<capture-folder>"
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --audit-scoped-raw-captures --capture-root "<capture-folder>" --require-promotable-captures
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --self-test-governance
 ```
 
 With no argument, the wrapper performs `--check`. `--write` takes the exclusive
@@ -257,6 +261,18 @@ validates every byte/hash/count/identity, then publishes all five artifacts and
 the manifest as one recoverable transaction. The manifest is the commit marker
 and is replaced last. A changed input before publication or before commit aborts
 and preserves or restores the prior complete cohort.
+
+`--validate-current` remains the strict historical raw validator and must not be
+weakened to pass when required capture roots are unavailable. Use
+`--validate-legacy-baseline` to prove that the accepted generated artifact cohort
+has not drifted while historical raw is missing. Use
+`--audit-scoped-raw-captures` only with explicit capture roots; it validates the
+selected roots, requires validator-grade raw files, rejects sentinel combat
+fields, reports `RAW_REVALIDATABLE`, `NEW_RAW_VERIFIED`, or
+`BLOCKED_INSUFFICIENT_EVIDENCE`, and does not mutate the legacy cohort. Add
+`--require-promotable-captures` when a scoped run is intended to gate promotion;
+that flag fails closed on any blocked selected capture. See
+`docs/evidence/CAPTURE_BACKED_COMBAT_GOVERNANCE_20260819.md`.
 
 Current-cohort validation and the normal server build use the tracked analyzer
 source identity and do not require ignored `bin`/`obj` output from another
