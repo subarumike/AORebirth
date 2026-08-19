@@ -81,6 +81,32 @@ Use the audit command for dry-run reports. Use `--require-promotable-captures`
 for promotion gating; it returns a nonzero result if any selected capture is
 `BLOCKED_INSUFFICIENT_EVIDENCE`.
 
+## Combat capture readiness
+
+Run:
+
+```cmd
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --audit-combat-capture-readiness
+```
+
+This non-mutating audit reports whether the current capture and analyzer path can
+prove each runtime-required combat evidence class in a future capture. It is not
+a promotion gate and it does not claim that a value has been captured before the
+capture exists.
+
+Field readiness must use these meanings:
+
+| Status | Meaning |
+| --- | --- |
+| `CAPTURE_READY` | The official-client capture path records raw packets/events that can carry positive evidence for the field. |
+| `ANALYZER_READY` | Existing governed analyzer/generator semantics can project the field without inventing values. |
+| `NOT_PROTOCOL_PROVEN` | Current audited protocol evidence is insufficient; the value must remain unresolved even after a clean capture. |
+
+Attack range must not be derived from observed chase, follow, or attack-start
+distance. Timing fields must not be derived from hit intervals unless a governed
+packet/stat semantic exists. Observed minimum or maximum hit values are not
+authoritative NPC `minDamage` or `maxDamage`.
+
 Scoped classification uses identity-linked event evidence:
 
 - `ORDINARY_HOSTILE_COMBAT_OBSERVED`: source/attacker `SimpleChar` identity is

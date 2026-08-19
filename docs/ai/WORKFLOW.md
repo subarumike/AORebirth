@@ -251,6 +251,7 @@ cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --validate-curr
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --validate-legacy-baseline
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --audit-scoped-raw-captures --capture-root "<capture-folder>"
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --audit-scoped-raw-captures --capture-root "<capture-folder>" --require-promotable-captures
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --audit-combat-capture-readiness
 cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --self-test-governance
 ```
 
@@ -266,6 +267,10 @@ and preserves or restores the prior complete cohort.
 weakened to pass when required capture roots are unavailable. Use
 `--validate-legacy-baseline` to prove that the accepted generated artifact cohort
 has not drifted while historical raw is missing. Use
+`--audit-combat-capture-readiness` before new combat recapture planning; it is a
+non-mutating instrumentation readiness report and must distinguish
+`CAPTURE_READY`, `ANALYZER_READY`, and `NOT_PROTOCOL_PROVEN` without claiming a
+future capture has already proven values. Use
 `--audit-scoped-raw-captures` only with explicit capture roots; it validates the
 selected roots, requires validator-grade raw files, rejects sentinel combat
 fields, reports `RAW_REVALIDATABLE`, `NEW_RAW_VERIFIED`, or
