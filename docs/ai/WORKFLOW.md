@@ -271,7 +271,9 @@ selected roots, requires validator-grade raw files, rejects sentinel combat
 fields, reports `RAW_REVALIDATABLE`, `NEW_RAW_VERIFIED`, or
 `BLOCKED_INSUFFICIENT_EVIDENCE`, and does not mutate the legacy cohort. Add
 `--require-promotable-captures` when a scoped run is intended to gate promotion;
-that flag fails closed on any blocked selected capture. See
+that flag fails closed on any blocked selected combat candidate. The scoped
+audit reports all observed cohorts separately from combat promotion candidates
+and does not treat social/vendor-only evidence as ordinary enemy combat. See
 `docs/evidence/CAPTURE_BACKED_COMBAT_GOVERNANCE_20260819.md`.
 
 Current-cohort validation and the normal server build use the tracked analyzer
