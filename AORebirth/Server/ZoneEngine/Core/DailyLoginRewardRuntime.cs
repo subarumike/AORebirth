@@ -357,7 +357,10 @@ namespace ZoneEngine.Core
 
                     // Client inspect uses Low/High/QL from overflow — must match scaled item,
                     // not the high-endpoint seed alone (e.g. 293297 QL400 → looks maxed).
-                    SendOverflowPackets(source, grantItem);
+                    // TryGrantQuestRewardItem inserts and persists this item on the
+                    // standard inventory page. Do not advertise a synthetic overflow
+                    // move: that gives the client a container identity which does not
+                    // match the authoritative in-memory and persisted placement.
                     TrySendInventoryUpdate(source);
                     itemId = grantItem.LowID > 0 ? grantItem.LowID : itemId;
                     quality = grantItem.Quality;
@@ -570,43 +573,6 @@ namespace ZoneEngine.Core
             }
 
             return "Item #" + itemId.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static void SendOverflowPackets(ICharacter source, Item item)
-        {
-            if (item == null)
-            {
-                return;
-            }
-
-            source.Send(
-                new TemplateActionMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    ItemLowId = item.LowID,
-                    ItemHighId = item.HighID,
-                    Quality = item.Quality,
-                    Unknown1 = CapturedTemplateActionUnknown1,
-                    Unknown2 = CapturedTemplateActionUnknown2,
-                    Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Unknown3 = 0,
-                    Unknown4 = 0
-                });
-            source.Send(
-                new ContainerAddItemMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Target =
-                        new Identity
-                        {
-                            Type = IdentityType.OverflowWindow,
-                            Instance = source.Identity.Instance
-                        },
-                    TargetPlacement = CapturedOverflowNextFreeSlot
-                });
         }
 
         private static void TrySendInventoryUpdate(ICharacter source)
