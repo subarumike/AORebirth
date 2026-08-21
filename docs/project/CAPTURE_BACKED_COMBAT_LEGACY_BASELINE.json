@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "activeCoverage": {
+      "byteLength": 11275523,
+      "sha256": "b4fc71031c4cee54202072e2f07a7d35bdfdd817fe46716808fe62b3e7e60b2f"
+    },
+    "attackRangeAudit": {
+      "byteLength": 3801456,
+      "sha256": "a6460852f25011d417e286118f27d987ed7ebfb0106cb7c8efd926b8ed18a66d"
+    },
+    "catalog": {
+      "byteLength": 1026255,
+      "sha256": "405ec3eb7b13b094032b284f8f6d660382b982652517d161780ff3d5c9ed2921"
+    },
+    "fixtures": {
+      "byteLength": 2112018,
+      "sha256": "26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793"
+    },
+    "formulaDataset": {
+      "byteLength": 9000177,
+      "sha256": "55b91bc84a958a3b2e131fee6754393730a361510367efa62fc54ea3a6dee6ea"
+    },
+    "inventory": {
+      "byteLength": 124999078,
+      "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404"
+    },
+    "secondaryEvidenceAudit": {
+      "byteLength": 4081609,
+      "sha256": "046d44051c7cd1ef2d122b0c5eb9f21b7679c438775f810f2f3006ca45690e1c"
+    }
+  },
+  "expectedCounts": {
+    "captureSessionsDiscovered": 383,
+    "legacyFullyRawRevalidatableRows": 21,
+    "legacyRawUnavailableRows": 93,
+    "legacyRuntimeVariantRows": 114,
+    "requiredHistoricalCaptureRoots": 65,
+    "runtimeReadyGeneratedSemanticDefinitions": 101,
+    "runtimeReadyProfiles": 96
+  },
+  "generationIdentity": "b1feea8240c49b33dc0cfba63e19ac6e31e5bd61f6fdc14480f648adc738a2a8"
+}

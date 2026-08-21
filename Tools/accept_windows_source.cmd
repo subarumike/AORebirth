@@ -61,6 +61,15 @@ if errorlevel 1 (
 )
 echo GIT_DIFF_CHECK=PASS
 
+call Tools\generate_capture_backed_npc_combat_inventory.cmd --check
+if errorlevel 1 (
+    echo GENERATED_COMBAT_INTEGRITY=FAIL
+    echo WINDOWS_ACCEPTANCE=FAIL
+    popd
+    exit /b 13
+)
+echo GENERATED_COMBAT_INTEGRITY=PASS
+
 set "BUILD_RESULT=NOT_RUN"
 if "%RUN_BUILD%"=="1" (
     call Tools\build_aorebirth_debug.cmd
@@ -95,6 +104,7 @@ set "EVIDENCE=build-verify\windows-acceptance-%SHORT_SHA%.env"
 >> "%EVIDENCE%" echo SOURCE_SHA_MATCH=PASS
 >> "%EVIDENCE%" echo TRACKED_SOURCE_CLEAN=PASS
 >> "%EVIDENCE%" echo GIT_DIFF_CHECK=PASS
+>> "%EVIDENCE%" echo GENERATED_COMBAT_INTEGRITY=PASS
 >> "%EVIDENCE%" echo BUILD=%BUILD_RESULT%
 >> "%EVIDENCE%" echo TESTS=%TEST_RESULT%
 >> "%EVIDENCE%" echo BUILD_PLATFORM=windows

@@ -34,6 +34,7 @@ def main():
     handler = read("AORebirth/Server/WebEngine/Handlers/PHPHandler.cs")
     program = read("AORebirth/Server/WebEngine/Program.cs")
     mandatory_gate = read("tools/run_mandatory_integration_gate.cmd")
+    windows_acceptance = read("Tools/accept_windows_source.cmd")
     build_cmd = read("tools/build_aorebirth_debug.cmd")
     preflight_cmd = read("preflight-database.cmd")
     linux_publish_scripts = {
@@ -134,6 +135,15 @@ def main():
             "explicit capture-backed combat generation tool must remain available")
     require("extract_capture_backed_npc_combat.py --self-test" in explicit_capture_tool,
             "explicit capture analyzer self-test must remain available")
+    require(
+        "call Tools\\generate_capture_backed_npc_combat_inventory.cmd --check"
+        in windows_acceptance,
+        "Windows acceptance must validate raw-independent generated-combat integrity",
+    )
+    require(
+        "validate-current" not in windows_acceptance,
+        "Windows acceptance must not require unavailable historical raw capture roots",
+    )
 
     print("[Engine Management Contracts] PASS")
     return 0

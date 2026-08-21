@@ -841,8 +841,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
             Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
             Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(19, discovered.Count);
-            Assert.AreEqual(21, discovered.Values.Sum());
+            Assert.AreEqual(20, discovered.Count);
+            Assert.AreEqual(22, discovered.Values.Sum());
             foreach (KeyValuePair<string, int> entryPoint in discovered)
             {
                 Dictionary<string, object> record = recorded[entryPoint.Key];
@@ -858,7 +858,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 string auditKind = StringMember(record, "auditKind");
                 Assert.IsTrue(
                     auditKind == "fixed-denominator-surfaces"
-                    || auditKind == "non-denominator-audit",
+                    || auditKind == "non-denominator-audit"
+                    || auditKind == "active-evidence",
                     entryPoint.Key);
             }
 

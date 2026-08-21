@@ -263,10 +263,14 @@ the manifest as one recoverable transaction. The manifest is the commit marker
 and is replaced last. A changed input before publication or before commit aborts
 and preserves or restores the prior complete cohort.
 
-`--validate-current` remains the strict historical raw validator and must not be
-weakened to pass when required capture roots are unavailable. Use
-`--validate-legacy-baseline` to prove that the accepted generated artifact cohort
-has not drifted while historical raw is missing. Use
+`--check` validates the committed accepted generated-combat artifacts without
+reading historical raw captures. `--write` regenerates and publishes generated
+artifacts from capture evidence. `--validate-current` remains the strict
+historical raw validator and must not be weakened to pass when required capture
+roots are unavailable. Use `--validate-legacy-baseline` only as a forensic audit
+of the immutable legacy cohort; it may run with zero, some, or all historical
+raw roots present and reports the observed availability.
+Use
 `--audit-combat-capture-readiness` before new combat recapture planning; it is a
 non-mutating instrumentation readiness report and must distinguish
 `CAPTURE_READY`, `ANALYZER_READY`, and `NOT_PROTOCOL_PROVEN` without claiming a
@@ -657,6 +661,8 @@ Add `--mandatory-gate` only when the full mandatory integration gate is required
 for that acceptance event. The wrapper fails closed on a source SHA mismatch,
 tracked-source dirt, `git diff --check`, build failure, or mandatory-gate
 failure. It writes non-secret evidence under ignored `build-verify`.
+The wrapper also validates raw-independent accepted generated-combat integrity
+with `--check`; it must not call the strict historical `--validate-current` gate.
 
 For Linux acceptance, use a controlled disposable or dedicated build workspace,
 not a normal developer checkout and not the production runtime directory:

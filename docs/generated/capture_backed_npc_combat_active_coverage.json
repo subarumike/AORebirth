@@ -39786,12 +39786,12 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-      "sha256": "e3626497824dc15ee2dff2ed570142a13294c2db2b42bcce9018445906669f39"
+      "sha256": "1882eea5e3d90e491688149e1ff19f2c9de6031ea1960c1678041ed25ef85a14"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-      "sha256": "700221d43eb7f95aa657fd15f0b861ceab36f9ba5c7dd6f3253d1112449938ce"
+      "sha256": "9b480e1b8504a3ac61b8365f98db67e6b0894c7d432a286f0047609f3c745e7a"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40325,6 +40325,165 @@
     "attack-immune Lolly the Crazed"
   ],
   "generator": "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py",
+  "iccShuttleportEntryGovernance": {
+    "acceptedEntries": 1,
+    "activeEvidenceEntries": 24,
+    "blockedUnauditedEntries": 0,
+    "entries": [
+      {
+        "coverageKey": "icc-shuttleport-island-reet-basic-combat",
+        "name": "Island Reet",
+        "ordinal": 0,
+        "state": "ACCEPTED_RUNTIME_CONTENT"
+      },
+      {
+        "coverageKey": null,
+        "name": "Clan Equipment Vendor",
+        "ordinal": 1,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Clan Recruiter",
+        "ordinal": 2,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Adri Afeli",
+        "ordinal": 3,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Omni-Trans Equipment Vendor",
+        "ordinal": 4,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Vendor Antonio Stacklund",
+        "ordinal": 5,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Omni-Tek Recruitment Officer",
+        "ordinal": 6,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Neutral Observer",
+        "ordinal": 7,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 8,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 9,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Omni Unicorn Squadleader Fixx",
+        "ordinal": 10,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Clan Field Surgeon Elsa Oosta",
+        "ordinal": 11,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 12,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 13,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 14,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 15,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 16,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 17,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 18,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 19,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Brandon Thorn",
+        "ordinal": 20,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Bio-Inspector",
+        "ordinal": 21,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "Manager Travis Molen",
+        "ordinal": 22,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 23,
+        "state": "ACTIVE_EVIDENCE"
+      },
+      {
+        "coverageKey": null,
+        "name": "ICC Shuttle Guard",
+        "ordinal": 24,
+        "state": "ACTIVE_EVIDENCE"
+      }
+    ],
+    "playfield": 4582,
+    "source": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs"
+  },
   "migrationSummary": {
     "captureCertifiedCorpusProfileCount": 260,
     "captureCertifiedSemanticDefinitionCount": 309,
@@ -223704,12 +223863,15 @@
     }
   ],
   "runtimePrepareAudit": {
+    "acceptedCoverageEntryPointCount": 21,
+    "activeEvidenceEntryPointCount": 1,
     "entries": [
       {
         "auditKind": "non-denominator-audit",
         "auditReferences": [
           "dynamic-mission-mobs"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceMobCombat.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223721,6 +223883,7 @@
         "auditReferences": [
           "arete-family"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223732,6 +223895,7 @@
         "auditReferences": [
           "arete-additional-captured-actors"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223743,6 +223907,7 @@
         "auditReferences": [
           "arete-additional-captured-actors"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223754,6 +223919,7 @@
         "auditReferences": [
           "arete-additional-captured-actors"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223765,6 +223931,7 @@
         "auditReferences": [
           "arete-family"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223776,6 +223943,7 @@
         "auditReferences": [
           "subway-initial-encounters"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223787,6 +223955,7 @@
         "auditReferences": [
           "subway-merchants"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223799,6 +223968,7 @@
           "temple-named-encounters",
           "temple-reanimated-corpse-adds"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223810,6 +223980,7 @@
         "auditReferences": [
           "elysium-east-captured-population"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223817,10 +223988,23 @@
         ]
       },
       {
+        "auditKind": "active-evidence",
+        "auditReferences": [
+          "icc-shuttleport-entry-governance"
+        ],
+        "governanceState": "ACTIVE_EVIDENCE",
+        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
+        "prepareCallCount": 1,
+        "prepareCallSourceLines": [
+          502
+        ]
+      },
+      {
         "auditKind": "non-denominator-audit",
         "auditReferences": [
           "cleaning-robots"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223832,6 +224016,7 @@
         "auditReferences": [
           "arete-family"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
         "prepareCallCount": 2,
         "prepareCallSourceLines": [
@@ -223844,6 +224029,7 @@
         "auditReferences": [
           "arete-family"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
         "prepareCallCount": 2,
         "prepareCallSourceLines": [
@@ -223856,6 +224042,7 @@
         "auditReferences": [
           "nascence-core-hecklers"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerSpawnOrchestrator.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223867,6 +224054,7 @@
         "auditReferences": [
           "nascence-life"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223879,6 +224067,7 @@
           "subway-ordinary",
           "temple-ordinary"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223890,6 +224079,7 @@
         "auditReferences": [
           "rome-blue-city"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/RomeBlueCitySpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223901,6 +224091,7 @@
         "auditReferences": [
           "thrak-omni-garden"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223912,6 +224103,7 @@
         "auditReferences": [
           "scripted-hostiles"
         ],
+        "governanceState": "ACCEPTED_COVERAGE",
         "path": "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
@@ -223919,8 +224111,8 @@
         ]
       }
     ],
-    "entryPointCount": 21,
-    "entryPointFileCount": 19,
+    "entryPointCount": 22,
+    "entryPointFileCount": 20,
     "prepareCallPattern": "\\bCapturedEnemyCombatRuntime\\s*\\.\\s*Prepare\\s*\\(",
     "productionRoot": "AORebirth/Server/ZoneEngine/Core"
   },
