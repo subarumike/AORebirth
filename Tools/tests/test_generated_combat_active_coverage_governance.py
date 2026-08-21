@@ -84,6 +84,26 @@ class GeneratedCombatActiveCoverageGovernanceTests(unittest.TestCase):
         self.assertEqual(governance["activeEvidenceEntries"], 24)
         self.assertEqual(governance["blockedUnauditedEntries"], 0)
 
+    def test_external_staging_output_path_does_not_require_worktree_containment(self):
+        output_path = (
+            REPO_ROOT.parent
+            / ".git"
+            / "worktrees"
+            / "linked"
+            / "staging"
+            / "capture_backed_npc_combat_active_coverage.json"
+        )
+
+        rendered = self.generator.format_generated_output_path(
+            output_path, REPO_ROOT
+        )
+
+        self.assertEqual(
+            rendered,
+            "<external-staging>/capture_backed_npc_combat_active_coverage.json",
+        )
+        self.assertNotIn(str(REPO_ROOT), rendered)
+
 
 if __name__ == "__main__":
     unittest.main()

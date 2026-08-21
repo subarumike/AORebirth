@@ -3816,7 +3816,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         output_path.write_text(rendered, encoding="utf-8", newline="\n")
         print(
             "WROTE "
-            f"{output_path.relative_to(repo_root)} actors={document['totals']['initialActorCount']} "
+            f"{format_generated_output_path(output_path, repo_root)} actors={document['totals']['initialActorCount']} "
             f"certified={document['totals']['certified']} unresolved={document['totals']['unresolved']} "
             f"ICC_ACCEPTED_ENTRIES={document['iccShuttleportEntryGovernance']['acceptedEntries']} "
             f"ICC_ACTIVE_EVIDENCE_ENTRIES={document['iccShuttleportEntryGovernance']['activeEvidenceEntries']} "
@@ -3843,6 +3843,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         f"ICC_BLOCKED_UNAUDITED_ENTRIES={document['iccShuttleportEntryGovernance']['blockedUnauditedEntries']}"
     )
     return 0
+
+
+def format_generated_output_path(output_path: Path, repo_root: Path) -> str:
+    """Render diagnostics without assuming staging is inside the worktree."""
+    try:
+        return output_path.relative_to(repo_root).as_posix()
+    except ValueError:
+        return "<external-staging>/" + output_path.name
 
 
 if __name__ == "__main__":
