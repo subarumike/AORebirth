@@ -6,12 +6,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
 using AORebirth.CaptureProtocol;
 using AOSharp.Common.GameData;
 using AOSharp.Core;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.UI;
 
 using SmokeLounge.AOtomation.Messaging.Messages;
@@ -29,6 +31,7 @@ namespace AOSharpLiveCapture
         private const int RawCaptureGateOpen = 0;
         private const int RawCaptureGateTentative = 1;
         private const int RawCaptureGateClosed = 2;
+        private const string PlayerCombatSchemaVersion = "2";
         private static Main activeInstance;
 
         private readonly object syncRoot = new object();
@@ -140,6 +143,9 @@ namespace AOSharpLiveCapture
         private StreamWriter movementPacketsLog;
         private StreamWriter enemyStatUpdatesLog;
         private StreamWriter enemyFightEventsLog;
+        private StreamWriter playerCombatLog;
+        private StreamWriter playerCombatStateLog;
+        private StreamWriter playerCombatEventsLog;
         private StreamWriter corpseFullUpdatesLog;
         private StreamWriter npcLifecycleLog;
         private bool enabled;
@@ -196,6 +202,12 @@ namespace AOSharpLiveCapture
         private int enemyPositionUpdateCount;
         private int enemyFullUpdateRowCount;
         private int enemyCombatRowCount;
+        private int playerCombatRowCount;
+        private int playerCombatStateRowCount;
+        private int playerCombatEventRowCount;
+        private long playerCombatSnapshotOrdinal;
+        private string lastPlayerCombatSnapshotId = string.Empty;
+        private string lastPlayerCombatFingerprint = string.Empty;
         private int enemyMovementRowCount;
         private int movementPacketRowCount;
         private int movementFollowTargetPacketCount;
@@ -1409,6 +1421,12 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            if (DynelManager.LocalPlayer != null
+                && character.Identity == DynelManager.LocalPlayer.Identity)
+            {
+                this.EnsurePlayerCombatStateSnapshot("player-recreated", "DynelManager.CharInPlay", "AOSharp runtime event");
+            }
+
             this.LogEvent("CHAR-IN-PLAY", this.DescribeCharacter(character));
             this.TrackEnemyFromCharacter(character, "spawn", "CHAR-IN-PLAY");
         }
@@ -1499,6 +1517,11 @@ namespace AOSharpLiveCapture
             }
 
             this.combatLootSmoke?.Update(deltaTime);
+
+            if (now >= this.nextSnapshotUtc)
+            {
+                this.EnsurePlayerCombatStateSnapshot("runtime-check", "Game.OnUpdate", "AOSharp runtime state edge detection");
+            }
 
             Pf127GeometryCapture geometryCapture = this.pf127GeometryCapture;
             if (geometryCapture != null
@@ -1770,6 +1793,7 @@ namespace AOSharpLiveCapture
                 }
 
                 this.RunFinalizationStage("capture-health", () => this.WriteCaptureHealth(validation));
+                this.RunFinalizationStage("player-profile", () => this.WritePlayerProfileSnapshot("capture-end"));
                 this.RunFinalizationStage("capture-info", () => this.WriteCaptureInfo(finalizedUtc, validation));
                 this.LogEvent(
                     "CAPTURE-VALIDATION",
@@ -3603,6 +3627,8 @@ namespace AOSharpLiveCapture
 
         private void ExportEnemyN3Evidence(string direction, int sequence, N3Message message)
         {
+            this.CapturePlayerCombatStateForMessage(direction, sequence, message);
+
             SimpleCharFullUpdateMessage simpleCharFullUpdate = message as SimpleCharFullUpdateMessage;
             if (simpleCharFullUpdate != null)
             {
@@ -3691,6 +3717,679 @@ namespace AOSharpLiveCapture
 
                 this.ExportEnemyCombat(direction, sequence, message, target, aux1, aux2);
             }
+
+            this.ExportPlayerCombatEvidence(direction, sequence, message);
+        }
+
+        private void ExportPlayerCombatEvidence(string direction, int sequence, N3Message message)
+        {
+            string messageName = message.N3MessageType.ToString();
+            string playerIdentity = this.GetLocalPlayerIdentityString();
+            string sourceIdentity = FormatIdentityValue(message.Identity);
+            if (string.IsNullOrWhiteSpace(playerIdentity)
+                || !string.Equals(sourceIdentity, playerIdentity, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            object target = null;
+            string attackKind = string.Empty;
+            string amount = string.Empty;
+            string hitType = string.Empty;
+            string statName = string.Empty;
+            string weaponSlot = string.Empty;
+            string weaponInstance = string.Empty;
+            string ammoCount = string.Empty;
+            string eventPhase = string.Empty;
+
+            bool isAttackInitiation = string.Equals(messageName, "Attack", StringComparison.OrdinalIgnoreCase);
+            bool isSpecialInitiation = string.Equals(messageName, "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "CharSecSpecAttack", StringComparison.OrdinalIgnoreCase);
+
+            AttackInfoMessage attackInfo = message as AttackInfoMessage;
+            if (attackInfo != null)
+            {
+                target = attackInfo.Target;
+                attackKind = "Normal";
+                eventPhase = "hit";
+                amount = GetMemberString(message, "Amount");
+                hitType = GetMemberString(message, "HitType");
+                weaponSlot = FirstNonEmpty(GetMemberString(message, "WeaponSlot"), GetMemberString(message, "Unknown3"));
+                weaponInstance = GetMemberString(message, "WeaponInstance");
+                ammoCount = GetMemberString(message, "AmmoCount");
+            }
+            else
+            {
+                SpecialAttackInfoMessage specialAttackInfo = message as SpecialAttackInfoMessage;
+                if (specialAttackInfo != null)
+                {
+                    target = specialAttackInfo.Target;
+                    statName = GetMemberString(message, "Stat");
+                    attackKind = string.Equals(statName, "Brawl", StringComparison.OrdinalIgnoreCase)
+                        ? "Brawl"
+                        : "Special";
+                    eventPhase = "hit";
+                    amount = GetMemberString(message, "Amount");
+                    weaponSlot = FirstNonEmpty(GetMemberString(message, "EquipSlot"), GetMemberString(message, "WeaponSlot"));
+                    ammoCount = GetMemberString(message, "AmmoCount");
+                }
+                else if (isAttackInitiation || isSpecialInitiation)
+                {
+                    target = GetMemberValue(message, "Target") ?? DynelManager.LocalPlayer?.FightingTarget;
+                    attackKind = isAttackInitiation ? "Normal" : "Special";
+                    eventPhase = "initiation";
+                    statName = GetMemberString(message, "Stat");
+                    weaponSlot = FirstNonEmpty(GetMemberString(message, "EquipSlot"), GetMemberString(message, "WeaponSlot"));
+                    weaponInstance = GetMemberString(message, "WeaponInstance");
+                    ammoCount = GetMemberString(message, "AmmoCount");
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            string targetRole;
+            string targetIdentity;
+            this.DescribeIdentityForEnemyOutput(target, out targetRole, out targetIdentity);
+            LocalPlayer localPlayer = DynelManager.LocalPlayer;
+            string snapshotId = this.EnsurePlayerCombatStateSnapshot(
+                "combat-event",
+                messageName,
+                "AOSharp decoded protocol message");
+            string playerX;
+            string playerY;
+            string playerZ;
+            Main.GetDynelPosition(localPlayer, out playerX, out playerY, out playerZ);
+            string targetX;
+            string targetY;
+            string targetZ;
+            Main.GetDynelPosition(target, out targetX, out targetY, out targetZ);
+            string damageType = GetPlayerCombatStatEvidence(localPlayer, "DamageType1");
+            string damageTypeSource = GetPlayerCombatStatSource(localPlayer, "DamageType1");
+            string activeWeaponCorrelation = Main.GetActiveWeaponCorrelation(localPlayer, weaponSlot);
+            long monotonicTicks = Stopwatch.GetTimestamp();
+
+            lock (this.syncRoot)
+            {
+                this.playerCombatRowCount++;
+                this.playerCombatLog.WriteLine(
+                        string.Join(
+                        ",",
+                        Csv(PlayerCombatSchemaVersion),
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        monotonicTicks.ToString(CultureInfo.InvariantCulture),
+                        Stopwatch.Frequency.ToString(CultureInfo.InvariantCulture),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(message.N3MessageType.ToString()),
+                        Csv(eventPhase),
+                        Csv("local-player"),
+                        Csv(playerIdentity),
+                        Csv(targetRole),
+                        Csv(targetIdentity),
+                        Csv(attackKind),
+                        Csv(amount),
+                        Csv(hitType),
+                        Csv(damageType),
+                        Csv(damageTypeSource),
+                        Csv(statName),
+                        Csv(weaponSlot),
+                        Csv(weaponInstance),
+                        Csv(ammoCount),
+                        Csv(snapshotId),
+                        Csv(activeWeaponCorrelation),
+                        Csv(playerX),
+                        Csv(playerY),
+                        Csv(playerZ),
+                        Csv(targetX),
+                        Csv(targetY),
+                        Csv(targetZ),
+                        Csv("direct-protocol-message"),
+                        Csv(this.DescribeObject(message))));
+                this.playerCombatLog.Flush();
+            }
+        }
+
+        private void CapturePlayerCombatStateForMessage(string direction, int sequence, N3Message message)
+        {
+            string messageName = message.N3MessageType.ToString();
+            bool relevant = string.Equals(messageName, "InventoryUpdate", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "InventoryUpdated", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "SimpleItemFullUpdate", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "WeaponItemFullUpdate", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "Stat", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "CharInPlay", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "Despawn", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "SetPos", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "CharDCMove", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "Attack", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "AttackInfo", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "SpecialAttackWeapon", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "SpecialAttackInfo", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "CharSecSpecAttack", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "NewLevel", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "N3Teleport", StringComparison.OrdinalIgnoreCase);
+            if (!relevant)
+            {
+                return;
+            }
+
+            string snapshotId = this.EnsurePlayerCombatStateSnapshot(
+                "message-observation",
+                messageName,
+                "AOSharp decoded message/state edge");
+            this.WritePlayerCombatEvent(
+                direction,
+                sequence,
+                messageName,
+                GetPlayerCombatEventKind(messageName),
+                snapshotId,
+                "AOSharp decoded message; state snapshot is emitted on fingerprint change",
+                this.DescribeObject(message));
+        }
+
+        private static string GetPlayerCombatEventKind(string messageName)
+        {
+            if (string.Equals(messageName, "InventoryUpdate", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "InventoryUpdated", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "SimpleItemFullUpdate", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "WeaponItemFullUpdate", StringComparison.OrdinalIgnoreCase))
+            {
+                return "equipment-or-inventory-state";
+            }
+
+            if (string.Equals(messageName, "Stat", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "NewLevel", StringComparison.OrdinalIgnoreCase))
+            {
+                return "player-stat-state";
+            }
+
+            if (string.Equals(messageName, "CharInPlay", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "N3Teleport", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "Despawn", StringComparison.OrdinalIgnoreCase))
+            {
+                return "player-lifecycle-or-zone";
+            }
+
+            if (string.Equals(messageName, "SetPos", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(messageName, "CharDCMove", StringComparison.OrdinalIgnoreCase))
+            {
+                return "position-state";
+            }
+
+            return "combat-state";
+        }
+
+        private void WritePlayerCombatEvent(
+            string direction,
+            int sequence,
+            string messageName,
+            string eventKind,
+            string snapshotId,
+            string provenance,
+            string detail)
+        {
+            if (this.playerCombatEventsLog == null)
+            {
+                return;
+            }
+
+            lock (this.syncRoot)
+            {
+                this.playerCombatEventRowCount++;
+                this.playerCombatEventsLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(PlayerCombatSchemaVersion),
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Stopwatch.GetTimestamp().ToString(CultureInfo.InvariantCulture),
+                        Stopwatch.Frequency.ToString(CultureInfo.InvariantCulture),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(messageName),
+                        Csv(eventKind),
+                        Csv(snapshotId),
+                        Csv(this.GetLocalPlayerIdentityString()),
+                        Csv(snapshotId.Length == 0 ? "no-local-player-snapshot" : "observed"),
+                        Csv(provenance),
+                        Csv(detail)));
+                this.playerCombatEventsLog.Flush();
+            }
+        }
+
+        private string EnsurePlayerCombatStateSnapshot(string phase, string trigger, string provenance)
+        {
+            LocalPlayer localPlayer = DynelManager.LocalPlayer;
+            if (localPlayer == null || this.playerCombatStateLog == null)
+            {
+                return this.lastPlayerCombatSnapshotId;
+            }
+
+            string statsJson = BuildCombatStatJson(
+                stat => localPlayer.GetStat(stat),
+                "AOSharp.Dynel.GetStat->N3EngineClientAnarchy_t.GetSkill");
+            string skillMaxJson = BuildPlayerSkillMaxJson(localPlayer);
+            string activeWeaponsJson;
+            string equipmentItemsJson;
+            string equipmentFingerprint;
+            BuildPlayerEquipmentJson(localPlayer, out activeWeaponsJson, out equipmentItemsJson, out equipmentFingerprint);
+            string targetIdentity = Safe(() => localPlayer.FightingTarget == null ? string.Empty : localPlayer.FightingTarget.Identity.ToString());
+            string naturalMode = Safe(() => localPlayer.Weapons == null || localPlayer.Weapons.Count == 0
+                ? "natural-unarmed-runtime-no-equipped-weapons"
+                : "armed-runtime-equipped-weapons");
+            string naturalSpecialAttacks = Safe(() => string.Join("|", localPlayer.SpecialAttacks.Select(x => x.ToString()).ToArray()));
+            string martialArts = GetCharacterStatByName(localPlayer, "MartialArts");
+            string unarmedTemplate = GetCharacterStatByName(localPlayer, "UnarmedTemplateInstance");
+            string fingerprintInput = string.Join(
+                "|",
+                Safe(() => localPlayer.Identity.ToString()),
+                GetCharacterStatByName(localPlayer, "Level"),
+                GetCharacterStatByName(localPlayer, "Breed"),
+                GetCharacterStatByName(localPlayer, "Profession"),
+                targetIdentity,
+                naturalMode,
+                naturalSpecialAttacks,
+                martialArts,
+                unarmedTemplate,
+                statsJson,
+                skillMaxJson,
+                activeWeaponsJson,
+                equipmentItemsJson);
+            string fingerprint = ComputeSha256(fingerprintInput);
+
+            lock (this.syncRoot)
+            {
+                if (string.Equals(fingerprint, this.lastPlayerCombatFingerprint, StringComparison.Ordinal)
+                    && !string.IsNullOrWhiteSpace(this.lastPlayerCombatSnapshotId))
+                {
+                    return this.lastPlayerCombatSnapshotId;
+                }
+
+                this.playerCombatSnapshotOrdinal++;
+                string snapshotId = "PCS-"
+                    + this.playerCombatSnapshotOrdinal.ToString("D6", CultureInfo.InvariantCulture);
+                string playerX;
+                string playerY;
+                string playerZ;
+                Main.GetDynelPosition(localPlayer, out playerX, out playerY, out playerZ);
+                string targetX;
+                string targetY;
+                string targetZ;
+                Main.GetDynelPosition(localPlayer.FightingTarget, out targetX, out targetY, out targetZ);
+                string attackRange = SafeFloat(() => localPlayer.AttackRange).ToString("R", CultureInfo.InvariantCulture);
+
+                this.playerCombatStateRowCount++;
+                this.playerCombatStateLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(PlayerCombatSchemaVersion),
+                        Csv(snapshotId),
+                        Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                        Stopwatch.GetTimestamp().ToString(CultureInfo.InvariantCulture),
+                        Stopwatch.Frequency.ToString(CultureInfo.InvariantCulture),
+                        Csv(phase),
+                        Csv(trigger),
+                        Csv(provenance),
+                        Csv(Safe(() => localPlayer.Identity.ToString())),
+                        Csv(Safe(() => localPlayer.Name)),
+                        Csv(GetCharacterStatByName(localPlayer, "Level")),
+                        Csv(GetCharacterStatByName(localPlayer, "Breed")),
+                        Csv(GetCharacterStatByName(localPlayer, "Profession")),
+                        Csv(playerX),
+                        Csv(playerY),
+                        Csv(playerZ),
+                        Csv(targetIdentity),
+                        Csv(targetX),
+                        Csv(targetY),
+                        Csv(targetZ),
+                        Csv(attackRange),
+                        Csv("AOSharp.LocalPlayer.AttackRange"),
+                        Csv(naturalMode),
+                        Csv(naturalSpecialAttacks),
+                        Csv(martialArts),
+                        Csv(unarmedTemplate),
+                        Csv(statsJson),
+                        Csv(skillMaxJson),
+                        Csv(activeWeaponsJson),
+                        Csv(equipmentItemsJson),
+                        Csv(equipmentFingerprint),
+                        Csv(string.Empty)));
+                this.playerCombatStateLog.Flush();
+                this.lastPlayerCombatSnapshotId = snapshotId;
+                this.lastPlayerCombatFingerprint = fingerprint;
+                return snapshotId;
+            }
+        }
+
+        private static string BuildPlayerSkillMaxJson(LocalPlayer character)
+        {
+            string[] skillNames = { "MartialArts", "Brawl", "MeleeInit", "RangedInit", "PhysicalInit", "AMS" };
+            StringBuilder json = new StringBuilder("{");
+            bool first = true;
+            foreach (string skillName in skillNames)
+            {
+                Stat stat;
+                if (!Enum.TryParse(skillName, true, out stat))
+                {
+                    continue;
+                }
+
+                string value = string.Empty;
+                string error = string.Empty;
+                try
+                {
+                    value = character.GetSkillMax(stat).ToString(CultureInfo.InvariantCulture);
+                }
+                catch (Exception ex)
+                {
+                    error = ex.GetType().Name;
+                }
+
+                if (!first)
+                {
+                    json.Append(",");
+                }
+
+                first = false;
+                json.Append(JsonQuote(skillName));
+                json.Append(":");
+                json.Append(JsonQuote(value));
+                if (error.Length > 0)
+                {
+                    json.Append(",");
+                    json.Append(JsonQuote(skillName + "Source"));
+                    json.Append(":");
+                    json.Append(JsonQuote("GetSkillMax-error:" + error));
+                }
+            }
+
+            json.Append("}");
+            return json.ToString();
+        }
+
+        private static string BuildCombatStatJson(Func<Stat, int> reader, string source)
+        {
+            string[] statNames =
+            {
+                "MinDamage", "MaxDamage", "CriticalBonus", "AttackDelay", "RechargeDelay",
+                "AttackRange", "DefaultAttackType", "DamageType1", "DamageType2", "AttackSkill",
+                "ItemOpposedSkill", "AmmoType", "ClipSize", "MartialArts", "UnarmedTemplateInstance",
+                "AMS", "MeleeInit", "RangedInit", "PhysicalInit", "Brawl"
+            };
+            StringBuilder json = new StringBuilder("{");
+            bool first = true;
+            foreach (string statName in statNames)
+            {
+                Stat stat;
+                string value = string.Empty;
+                string status = "unavailable-enum";
+                string statSource = source;
+                if (Enum.TryParse(statName, true, out stat))
+                {
+                    try
+                    {
+                        value = reader(stat).ToString(CultureInfo.InvariantCulture);
+                        status = IsMissingOrSentinel(value) ? "sentinel-or-default" : "observed";
+                    }
+                    catch (Exception ex)
+                    {
+                        status = "read-error:" + ex.GetType().Name;
+                    }
+                }
+                else if (string.Equals(statName, "AttackSkill", StringComparison.Ordinal))
+                {
+                    statSource = "no-accessible-AOSharp-Stat-enum-member";
+                }
+
+                if (!first)
+                {
+                    json.Append(",");
+                }
+
+                first = false;
+                json.Append(JsonQuote(statName));
+                json.Append(":{");
+                json.Append(JsonQuote("rawValue"));
+                json.Append(":");
+                json.Append(JsonQuote(value));
+                json.Append(",");
+                json.Append(JsonQuote("status"));
+                json.Append(":");
+                json.Append(JsonQuote(status));
+                json.Append(",");
+                json.Append(JsonQuote("source"));
+                json.Append(":");
+                json.Append(JsonQuote(statSource));
+                json.Append("}");
+            }
+
+            json.Append("}");
+            return json.ToString();
+        }
+
+        private static void BuildPlayerEquipmentJson(
+            LocalPlayer localPlayer,
+            out string activeWeaponsJson,
+            out string equipmentItemsJson,
+            out string equipmentFingerprint)
+        {
+            StringBuilder weapons = new StringBuilder("[");
+            StringBuilder items = new StringBuilder("[");
+            bool firstWeapon = true;
+            bool firstItem = true;
+            try
+            {
+                foreach (KeyValuePair<EquipSlot, WeaponItem> entry in localPlayer.Weapons.OrderBy(x => x.Key.ToString()))
+                {
+                    if (!firstWeapon)
+                    {
+                        weapons.Append(",");
+                    }
+
+                    firstWeapon = false;
+                    WeaponItem weapon = entry.Value;
+                    weapons.Append("{");
+                    AppendJsonProperty(weapons, "slot", entry.Key.ToString(), true);
+                    AppendJsonProperty(weapons, "identity", Safe(() => weapon.Identity.ToString()), false);
+                    AppendJsonProperty(weapons, "name", Safe(() => weapon.Name), false);
+                    AppendJsonProperty(weapons, "templateId", Safe(() => weapon.GetStat(Stat.ACGItemTemplateID).ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(weapons, "templateId2", Safe(() => weapon.GetStat(Stat.ACGItemTemplateID2).ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(weapons, "qualityLevel", Safe(() => weapon.GetStat(Stat.ACGItemLevel).ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(weapons, "canFlags", Safe(() => weapon.GetStat(Stat.Can).ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(
+                        weapons,
+                        "specialAttacks",
+                        Safe(() => string.Join("|", weapon.SpecialAttacks.Select(x => x.ToString()).ToArray())),
+                        false);
+                    AppendJsonProperty(
+                        weapons,
+                        "templateStats",
+                        BuildCombatStatJson(stat => weapon.GetStat(stat), "AOSharp.WeaponItem/DummyItem.GetStat"),
+                        false,
+                        true);
+                    weapons.Append("}");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!firstWeapon)
+                {
+                    weapons.Append(",");
+                }
+
+                weapons.Append(JsonQuote("equipment-read-error:" + ex.GetType().Name));
+            }
+
+            try
+            {
+                foreach (Item item in Inventory.Items.OrderBy(x => x.Slot.ToString()))
+                {
+                    if (!firstItem)
+                    {
+                        items.Append(",");
+                    }
+
+                    firstItem = false;
+                    items.Append("{");
+                    AppendJsonProperty(items, "inventorySlot", Safe(() => item.Slot.ToString()), true);
+                    AppendJsonProperty(items, "uniqueIdentity", Safe(() => item.UniqueIdentity.ToString()), false);
+                    AppendJsonProperty(items, "name", Safe(() => item.Name), false);
+                    AppendJsonProperty(items, "templateId", Safe(() => item.Id.ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(items, "templateId2", Safe(() => item.HighId.ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(items, "qualityLevel", Safe(() => item.QualityLevel.ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(items, "itemClass", Safe(() => item.GetStat(Stat.ItemClass).ToString(CultureInfo.InvariantCulture)), false);
+                    AppendJsonProperty(
+                        items,
+                        "equipSlots",
+                        Safe(() => string.Join("|", item.EquipSlots.Select(x => x.ToString()).ToArray())),
+                        false);
+                    AppendJsonProperty(
+                        items,
+                        "templateStats",
+                        BuildCombatStatJson(stat => item.GetStat(stat), "AOSharp.Inventory.Item/ACGItem.GetStat"),
+                        false,
+                        true);
+                    items.Append("}");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!firstItem)
+                {
+                    items.Append(",");
+                }
+
+                items.Append(JsonQuote("inventory-read-error:" + ex.GetType().Name));
+            }
+
+            weapons.Append("]");
+            items.Append("]");
+            activeWeaponsJson = weapons.ToString();
+            equipmentItemsJson = items.ToString();
+            equipmentFingerprint = ComputeSha256(activeWeaponsJson + "|" + equipmentItemsJson);
+        }
+
+        private static void AppendJsonProperty(
+            StringBuilder json,
+            string name,
+            string value,
+            bool first,
+            bool rawJson = false)
+        {
+            if (!first)
+            {
+                json.Append(",");
+            }
+
+            json.Append(JsonQuote(name));
+            json.Append(":");
+            json.Append(rawJson ? (value ?? "null") : JsonQuote(value));
+        }
+
+        private static string JsonQuote(string value)
+        {
+            if (value == null)
+            {
+                return "\"\"";
+            }
+
+            return "\""
+                + value.Replace("\\", "\\\\")
+                    .Replace("\"", "\\\"")
+                    .Replace("\r", "\\r")
+                    .Replace("\n", "\\n")
+                + "\"";
+        }
+
+        private static string ComputeSha256(string value)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(value ?? string.Empty));
+                return string.Concat(bytes.Select(x => x.ToString("x2", CultureInfo.InvariantCulture)).ToArray());
+            }
+        }
+
+        private static void GetDynelPosition(object value, out string x, out string y, out string z)
+        {
+            Dynel dynel = ResolveDynel(value);
+            if (dynel == null)
+            {
+                x = string.Empty;
+                y = string.Empty;
+                z = string.Empty;
+                return;
+            }
+
+            x = Safe(() => dynel.Position.X.ToString("R", CultureInfo.InvariantCulture));
+            y = Safe(() => dynel.Position.Y.ToString("R", CultureInfo.InvariantCulture));
+            z = Safe(() => dynel.Position.Z.ToString("R", CultureInfo.InvariantCulture));
+        }
+
+        private static Dynel ResolveDynel(object value)
+        {
+            Dynel dynel = value as Dynel;
+            if (dynel != null)
+            {
+                return dynel;
+            }
+
+            Identity identity;
+            if (value is Identity)
+            {
+                identity = (Identity)value;
+                return DynelManager.GetDynel(identity);
+            }
+
+            object nestedIdentity = GetMemberValue(value, "Identity");
+            if (nestedIdentity is Identity)
+            {
+                identity = (Identity)nestedIdentity;
+                return DynelManager.GetDynel(identity);
+            }
+
+            return null;
+        }
+
+        private static string GetActiveWeaponCorrelation(LocalPlayer localPlayer, string weaponSlot)
+        {
+            if (localPlayer == null)
+            {
+                return "no-local-player";
+            }
+
+            try
+            {
+                foreach (KeyValuePair<EquipSlot, WeaponItem> entry in localPlayer.Weapons)
+                {
+                    if (!string.IsNullOrWhiteSpace(weaponSlot)
+                        && !string.Equals(entry.Key.ToString(), weaponSlot, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(((int)entry.Key).ToString(CultureInfo.InvariantCulture), weaponSlot, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    WeaponItem weapon = entry.Value;
+                    return string.Join(
+                        ";",
+                        "source=LocalPlayer.Weapons",
+                        "slot=" + entry.Key,
+                        "identity=" + Safe(() => weapon.Identity.ToString()),
+                        "templateId=" + Safe(() => weapon.GetStat(Stat.ACGItemTemplateID).ToString(CultureInfo.InvariantCulture)),
+                        "templateId2=" + Safe(() => weapon.GetStat(Stat.ACGItemTemplateID2).ToString(CultureInfo.InvariantCulture)),
+                        "ql=" + Safe(() => weapon.GetStat(Stat.ACGItemLevel).ToString(CultureInfo.InvariantCulture)),
+                        "name=" + Safe(() => weapon.Name));
+                }
+            }
+            catch (Exception ex)
+            {
+                return "LocalPlayer.Weapons-error:" + ex.GetType().Name;
+            }
+
+            return string.IsNullOrWhiteSpace(weaponSlot)
+                ? "no-active-weapon-slot-correlated"
+                : "weapon-slot-not-present=" + weaponSlot;
         }
 
         private void CacheEnemyFullUpdate(string direction, int sequence, N3Message message)
@@ -6226,6 +6925,9 @@ namespace AOSharpLiveCapture
                 json.Append("  \"characterName\": ");
                 json.Append(Json(this.GetLocalCharacterName()));
                 json.AppendLine(",");
+                json.Append("  \"playerProfilePath\": ");
+                json.Append(Json(Path.Combine(this.sessionDirectory, "player-profile.csv")));
+                json.AppendLine(",");
                 json.Append("  \"playfieldId\": ");
                 json.Append(Json(this.GetDetectedPlayfieldId()));
                 json.AppendLine(",");
@@ -6556,6 +7258,165 @@ namespace AOSharpLiveCapture
         private string GetLocalCharacterName()
         {
             return Safe(() => DynelManager.LocalPlayer == null ? string.Empty : DynelManager.LocalPlayer.Name);
+        }
+
+        private void WritePlayerProfileSnapshot(string phase)
+        {
+            try
+            {
+                LocalPlayer localPlayer = DynelManager.LocalPlayer;
+                string path = Path.Combine(this.sessionDirectory, "player-profile.csv");
+                string statsJson = localPlayer == null ? "{}" : BuildCharacterStatsJson(localPlayer);
+
+                lock (this.syncRoot)
+                {
+                    bool writeHeader = !File.Exists(path) || new FileInfo(path).Length == 0;
+                    using (StreamWriter writer = new StreamWriter(path, true, Encoding.UTF8))
+                    {
+                        if (writeHeader)
+                        {
+                            writer.WriteLine(
+                                "CapturedUtc,Phase,Identity,Name,IsPlayer,IsInPlay,IsAlive,Level,XP,Breed,Profession,Gender,Sex,Race,Side,Faction,Health,MaxHealth,HealthPercent,ComputerLiteracy,MinDamage,MaxDamage,MinDamageSource,MaxDamageSource,DefaultAttackType,DamageType1,DamageType2,AttackDelay,RechargeDelay,AttackDelaySource,RechargeDelaySource,AttackRange,AttackRangeSource,EquippedWeapons,EquippedWeaponsSource,AttackMode,Position,FightingTarget,StatsJson,Error");
+                        }
+
+                        writer.WriteLine(
+                            string.Join(
+                                ",",
+                                Csv(DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)),
+                                Csv(phase),
+                                Csv(Safe(() => localPlayer == null ? string.Empty : localPlayer.Identity.ToString())),
+                                Csv(Safe(() => localPlayer == null ? string.Empty : localPlayer.Name)),
+                                Csv(Safe(() => localPlayer == null ? string.Empty : localPlayer.IsPlayer.ToString())),
+                                Csv(Safe(() => localPlayer == null ? string.Empty : localPlayer.IsInPlay.ToString())),
+                                Csv(Safe(() => localPlayer == null ? string.Empty : localPlayer.IsAlive.ToString())),
+                                Csv(GetCharacterStatByName(localPlayer, "Level")),
+                                Csv(GetCharacterStatByName(localPlayer, "XP")),
+                                Csv(GetCharacterStatByName(localPlayer, "Breed")),
+                                Csv(GetCharacterStatByName(localPlayer, "Profession")),
+                                Csv(GetCharacterStatByName(localPlayer, "Gender")),
+                                Csv(GetCharacterStatByName(localPlayer, "Sex")),
+                                Csv(GetCharacterStatByName(localPlayer, "Race")),
+                                Csv(GetCharacterStatByName(localPlayer, "Side")),
+                                Csv(GetCharacterStatByName(localPlayer, "Faction")),
+                                Csv(GetCharacterStatByName(localPlayer, "Health")),
+                                Csv(GetCharacterStatByName(localPlayer, "MaxHealth")),
+                                Csv(SafeFloat(() => localPlayer == null ? 0 : localPlayer.HealthPercent).ToString("R", CultureInfo.InvariantCulture)),
+                                Csv(GetCharacterStatByName(localPlayer, "ComputerLiteracy")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "MinDamage")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "MaxDamage")),
+                                Csv(GetPlayerCombatStatSource(localPlayer, "MinDamage")),
+                                Csv(GetPlayerCombatStatSource(localPlayer, "MaxDamage")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "DefaultAttackType")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "DamageType1")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "DamageType2")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "AttackDelay")),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "RechargeDelay")),
+                                Csv(GetPlayerCombatStatSource(localPlayer, "AttackDelay")),
+                                Csv(GetPlayerCombatStatSource(localPlayer, "RechargeDelay")),
+                                Csv("UNPROVEN"),
+                                Csv("not-protocol-proven"),
+                                Csv(GetPlayerCombatStatEvidence(localPlayer, "EquippedWeapons")),
+                                Csv("runtime/client-state-character-stat-only"),
+                                Csv("UNRESOLVED"),
+                                Csv(Safe(() => localPlayer == null ? string.Empty : localPlayer.Position.ToString())),
+                                Csv(Safe(() => localPlayer == null || localPlayer.FightingTarget == null ? string.Empty : localPlayer.FightingTarget.Identity.ToString())),
+                                Csv(statsJson),
+                                Csv(localPlayer == null ? "local-player-null" : string.Empty)));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogEvent("PLAYER-PROFILE-ERROR", ex.ToString());
+            }
+        }
+
+        private static string GetCharacterStatByName(SimpleChar character, string statName)
+        {
+            if (character == null || string.IsNullOrWhiteSpace(statName))
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                Stat stat = (Stat)Enum.Parse(typeof(Stat), statName, true);
+                return character.GetStat(stat).ToString(CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string GetPlayerCombatStatEvidence(SimpleChar character, string statName)
+        {
+            string value = GetCharacterStatByName(character, statName);
+            return IsMissingOrSentinel(value) ? "UNPROVEN" : value;
+        }
+
+        private static string GetPlayerCombatStatSource(SimpleChar character, string statName)
+        {
+            string value = GetCharacterStatByName(character, statName);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return "missing";
+            }
+
+            return IsMissingOrSentinel(value)
+                ? "sentinel/default"
+                : "runtime/client-state-observed";
+        }
+
+        private static bool IsMissingOrSentinel(string value)
+        {
+            return string.IsNullOrWhiteSpace(value)
+                || string.Equals(value, "1234567890", StringComparison.Ordinal);
+        }
+
+        private static string FirstNonEmpty(string first, string second)
+        {
+            return string.IsNullOrWhiteSpace(first) ? second : first;
+        }
+
+        private static string BuildCharacterStatsJson(SimpleChar character)
+        {
+            StringBuilder json = new StringBuilder();
+            json.Append("{");
+
+            string[] statNames = Enum.GetNames(typeof(Stat));
+            for (int i = 0; i < statNames.Length; i++)
+            {
+                if (i > 0)
+                {
+                    json.Append(",");
+                }
+
+                json.Append(Json(statNames[i]));
+                json.Append(":");
+                string value = GetCharacterStatByName(character, statNames[i]);
+                if (IsPlayerCombatStatName(statNames[i]))
+                {
+                    value = IsMissingOrSentinel(value) ? "UNPROVEN" : value;
+                }
+
+                json.Append(Json(value));
+            }
+
+            json.Append("}");
+            return json.ToString();
+        }
+
+        private static bool IsPlayerCombatStatName(string statName)
+        {
+            return string.Equals(statName, "MinDamage", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "MaxDamage", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "DefaultAttackType", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "DamageType1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "DamageType2", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "AttackDelay", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "RechargeDelay", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statName, "AttackRange", StringComparison.OrdinalIgnoreCase);
         }
 
         private string GetDetectedPlayfieldId()
@@ -7207,7 +8068,7 @@ namespace AOSharpLiveCapture
 
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "identity={0} name={1} player={2} npc={3} pet={4} inPlay={5} alive={6} hp={7}/{8} pct={9:0.0} level={10} computerLiteracy={11} pos={12} attacking={13} fightingTarget={14} monsterData={15} catMesh={16} visualFlags={17} state={18} currentState={19} actionCategory={20} deadTimer={21} corpseType={22} corpseInstance={23} corpseAnimKey={24} dieAnim={25}",
+                "identity={0} name={1} player={2} npc={3} pet={4} inPlay={5} alive={6} hp={7}/{8} pct={9:0.0} level={10} xp={11} breed={12} profession={13} computerLiteracy={14} minDamage={15} maxDamage={16} defaultAttackType={17} damageType1={18} damageType2={19} attackDelay={20} rechargeDelay={21} equippedWeapons={22} pos={23} attacking={24} fightingTarget={25} monsterData={26} catMesh={27} visualFlags={28} state={29} currentState={30} actionCategory={31} deadTimer={32} corpseType={33} corpseInstance={34} corpseAnimKey={35} dieAnim={36}",
                 Safe(() => character.Identity.ToString()),
                 Safe(() => character.Name),
                 Safe(() => character.IsPlayer.ToString()),
@@ -7219,7 +8080,18 @@ namespace AOSharpLiveCapture
                 SafeStat(character, Stat.MaxHealth),
                 SafeFloat(() => character.HealthPercent),
                 SafeStat(character, Stat.Level),
+                GetCharacterStatByName(character, "XP"),
+                GetCharacterStatByName(character, "Breed"),
+                GetCharacterStatByName(character, "Profession"),
                 SafeStat(character, Stat.ComputerLiteracy),
+                GetPlayerCombatStatEvidence(character, "MinDamage"),
+                GetPlayerCombatStatEvidence(character, "MaxDamage"),
+                GetPlayerCombatStatEvidence(character, "DefaultAttackType"),
+                GetPlayerCombatStatEvidence(character, "DamageType1"),
+                GetPlayerCombatStatEvidence(character, "DamageType2"),
+                GetPlayerCombatStatEvidence(character, "AttackDelay"),
+                GetPlayerCombatStatEvidence(character, "RechargeDelay"),
+                GetPlayerCombatStatEvidence(character, "EquippedWeapons"),
                 Safe(() => character.Position.ToString()),
                 Safe(() => character.IsAttacking.ToString()),
                 Safe(() => character.FightingTarget == null ? "null" : character.FightingTarget.Identity.ToString()),
@@ -7585,6 +8457,12 @@ namespace AOSharpLiveCapture
             this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
             this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
+            this.playerCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat.csv"));
+            this.playerCombatLog.WriteLine("SchemaVersion,CapturedUtc,MonotonicTicks,MonotonicFrequency,Direction,Sequence,MessageType,EventPhase,AttackerRole,AttackerIdentity,TargetRole,TargetIdentity,AttackKind,Amount,HitType,DamageType,DamageTypeSource,Stat,WeaponSlot,WeaponInstance,AmmoCount,EquipmentSnapshotId,ActiveWeaponCorrelation,PlayerPositionX,PlayerPositionY,PlayerPositionZ,TargetPositionX,TargetPositionY,TargetPositionZ,EvidenceSource,Detail");
+            this.playerCombatStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat-state.csv"));
+            this.playerCombatStateLog.WriteLine("SchemaVersion,SnapshotId,CapturedUtc,MonotonicTicks,MonotonicFrequency,Phase,Trigger,Provenance,PlayerIdentity,Name,Level,Breed,Profession,PositionX,PositionY,PositionZ,TargetIdentity,TargetPositionX,TargetPositionY,TargetPositionZ,AttackRangeRuntime,AttackRangeSource,NaturalAttackMode,NaturalSpecialAttacks,MartialArts,UnarmedTemplateInstance,PlayerStatsJson,PlayerSkillMaxJson,ActiveWeaponsJson,EquipmentItemsJson,EquipmentFingerprint,Error");
+            this.playerCombatEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat-events.csv"));
+            this.playerCombatEventsLog.WriteLine("SchemaVersion,CapturedUtc,MonotonicTicks,MonotonicFrequency,Direction,Sequence,MessageType,EventKind,SnapshotId,PlayerIdentity,EquipmentStateEvidence,Provenance,Detail");
             this.corpseFullUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "corpse-full-updates.csv"));
             this.corpseFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,ReceiverInstance,CorpseType,CorpseInstance,CorpseIdentity,CorpseName,PlayfieldId,PositionX,PositionY,PositionZ,MonsterScale,Sex,Breed,Race,DeadNpcType,DeadNpcInstance,DeadNpcIdentity,DeadNpcName,CorpseCatMesh,CorpseCredits,CorpseMonsterData,TailDeadNpcType,TailDeadNpcInstance,TailDeadNpcIdentity,PacketLength,RawHex");
             this.npcLifecycleLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-lifecycle.csv"));
@@ -7614,9 +8492,11 @@ namespace AOSharpLiveCapture
             this.captureStartUtc = DateTime.UtcNow;
             this.captureStartLocal = DateTime.Now;
             this.lastPacketUtc = this.captureStartUtc;
-            this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
-            this.WriteCaptureInfo(null, CaptureValidation.Running());
-            this.captureClock.Restart();
+                this.WriteCaptureSessionMetadata(this.captureStartUtc, this.captureStartLocal);
+                this.WriteCaptureInfo(null, CaptureValidation.Running());
+                this.WritePlayerProfileSnapshot("capture-start");
+                this.EnsurePlayerCombatStateSnapshot("startup", "capture-start", "AOSharp LocalPlayer runtime snapshot");
+                this.captureClock.Restart();
             if (this.lootCaptureRequested)
             {
                 this.LogEvent("CAPTURE-MODE", "loot-10 armed by approved launcher");
@@ -7696,6 +8576,12 @@ namespace AOSharpLiveCapture
             this.enemyPositionUpdateCount = 0;
             this.enemyFullUpdateRowCount = 0;
             this.enemyCombatRowCount = 0;
+            this.playerCombatRowCount = 0;
+            this.playerCombatStateRowCount = 0;
+            this.playerCombatEventRowCount = 0;
+            this.playerCombatSnapshotOrdinal = 0;
+            this.lastPlayerCombatSnapshotId = string.Empty;
+            this.lastPlayerCombatFingerprint = string.Empty;
             this.enemyMovementRowCount = 0;
             this.movementPacketRowCount = 0;
             this.movementFollowTargetPacketCount = 0;
@@ -7772,6 +8658,9 @@ namespace AOSharpLiveCapture
                 this.FlushWriterNoThrow(this.movementPacketsLog, false);
                 this.FlushWriterNoThrow(this.enemyStatUpdatesLog, false);
                 this.FlushWriterNoThrow(this.enemyFightEventsLog, false);
+                this.FlushWriterNoThrow(this.playerCombatLog, false);
+                this.FlushWriterNoThrow(this.playerCombatStateLog, false);
+                this.FlushWriterNoThrow(this.playerCombatEventsLog, false);
                 this.FlushWriterNoThrow(this.corpseFullUpdatesLog, false);
                 this.FlushWriterNoThrow(this.npcLifecycleLog, false);
                 this.pf127GeometryCapture?.Flush();
@@ -7810,6 +8699,9 @@ namespace AOSharpLiveCapture
                 this.movementPacketsLog = this.CloseWriterNoThrow(this.movementPacketsLog, false);
                 this.enemyStatUpdatesLog = this.CloseWriterNoThrow(this.enemyStatUpdatesLog, false);
                 this.enemyFightEventsLog = this.CloseWriterNoThrow(this.enemyFightEventsLog, false);
+                this.playerCombatLog = this.CloseWriterNoThrow(this.playerCombatLog, false);
+                this.playerCombatStateLog = this.CloseWriterNoThrow(this.playerCombatStateLog, false);
+                this.playerCombatEventsLog = this.CloseWriterNoThrow(this.playerCombatEventsLog, false);
                 this.corpseFullUpdatesLog = this.CloseWriterNoThrow(this.corpseFullUpdatesLog, false);
                 this.npcLifecycleLog = this.CloseWriterNoThrow(this.npcLifecycleLog, false);
                 this.pf127GeometryCapture?.Dispose();
