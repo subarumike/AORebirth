@@ -10,7 +10,7 @@
   <CommPort>6996</CommPort>
   <SqlLog>true</SqlLog>
   <LogChat>false</LogChat>
-  <Motd>twidbits.com</Motd>
+  <Motd>https://ao-rebirth.com</Motd>
   <SQLType>MySql</SQLType>
   <MysqlConnection>Server=localhost;Database=cellao_codex_clean;Uid=cellaodbuser;Pwd=REPLACE_WITH_LOCAL_PASSWORD</MysqlConnection>
   <MsSqlConnection>Data Source=localhost;Inital Catalog=cellao;UserID=cellaodbuser;Password=REPLACE_WITH_LOCAL_PASSWORD;Trusted_Connection=false</MsSqlConnection>
