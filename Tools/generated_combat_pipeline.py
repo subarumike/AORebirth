@@ -5625,7 +5625,10 @@ def _run_supervised_delegated_cohort_validation(
 def refresh_accepted_coverage(repo_root: Path) -> int:
     repo_root = repo_root.resolve(strict=True)
     with _shared_lease(repo_root, "write") as lease:
-        published = validate_cohort(repo_root, verify_toolchain=False)
+        published = load_json_object(
+            repo_root / MANIFEST_RELATIVE_PATH,
+            "published generated-combat manifest",
+        )
         candidate_root = lease.new_staging_directory("accepted-coverage-refresh")
         artifacts = _candidate_artifact_paths(candidate_root)
         for role, logical_path in ARTIFACT_RELATIVE_PATHS.items():
