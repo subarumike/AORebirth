@@ -53,7 +53,7 @@ Suggested next task: `AORebirth - Capture-Backed Melee Range And Attack-Start Pa
 
 Priority: P1
 Status: Partial; needs validation
-Evidence: The audit found robot patrol replay loading from `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260629-193121/movement-packets.csv` through `Playfield.cs`, with replay state emitted by `NPCController.cs`.
+Evidence: The current robot patrol provider loads committed `Content/Captured/Arete/cleaning_robot_patrol_replay.csv`; historical movement capture paths are forensic provenance only and are not runtime inputs.
 Why it matters: Runtime gameplay depends on a local capture folder that may not exist on fresh clones, other developer machines, or CI.
 Likely files: `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`, `AORebirth/Server/ZoneEngine/Core/Controllers/NPCController.cs`, a new committed capture-derived data file.
 What not to touch: NPC movement algorithms, combat chase, live capture tooling behavior.

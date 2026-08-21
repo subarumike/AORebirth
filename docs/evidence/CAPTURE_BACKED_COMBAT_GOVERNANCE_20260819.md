@@ -1,8 +1,22 @@
 # Capture-backed combat governance, 2026-08-19
 
 This note separates the accepted legacy generated combat cohort from future
-capture-backed promotion gates. It does not promote ICC Shuttleport / PF 4582
-combat and it does not change the strict historical raw validator.
+capture-backed promotion gates. The accepted generated cohort is the authority
+for normal runtime, build, and acceptance work; raw captures are historical
+evidence and forensic replay inputs, not permanent runtime dependencies. It does
+not promote ICC Shuttleport / PF 4582 combat and it does not change the strict
+historical raw validator.
+
+## Normal accepted implementation gate
+
+Run `Tools\generate_capture_backed_npc_combat_inventory.cmd --check` to verify
+the committed accepted generated artifacts. This gate is intentionally
+raw-independent so deleted historical captures do not invalidate the current
+implementation.
+
+Run `--validate-current` only for strict historical replay and reproducibility.
+It must fail closed with `FAIL_MISSING_RAW` when required raw capture roots are
+unavailable. New capture-backed content remains raw-dependent until accepted.
 
 ## Evidence states
 

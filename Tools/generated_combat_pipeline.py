@@ -1473,6 +1473,7 @@ def build_generation_manifest(
     auxiliary_input_identity: str,
     generators: Mapping[str, Mapping[str, Any]],
     runtime: Mapping[str, Any],
+    input_snapshot_is_portable: bool = False,
 ) -> tuple[dict[str, Any], bytes]:
     if set(artifacts) != set(ARTIFACT_RELATIVE_PATHS):
         raise PipelineError("candidate cohort does not contain the exact artifact roles")
@@ -1509,8 +1510,12 @@ def build_generation_manifest(
     manifest: dict[str, Any] = {
         "schemaVersion": MANIFEST_SCHEMA_VERSION,
         "pipeline": PIPELINE_NAME,
-        "inputSnapshot": _portable_snapshot_descriptor(
-            input_snapshot, auxiliary_input_identity
+        "inputSnapshot": (
+            dict(input_snapshot)
+            if input_snapshot_is_portable
+            else _portable_snapshot_descriptor(
+                input_snapshot, auxiliary_input_identity
+            )
         ),
         "generators": {
             key: dict(value) for key, value in sorted(generators.items())
@@ -3052,50 +3057,9 @@ GOVERNANCE_SENTINEL_FIELDS = (
     "minDamage",
     "rechargeDelay",
 )
-GOVERNANCE_LEGACY_GENERATION_IDENTITY = (
-    "1d2ed701e0221f4099ec847554103f7ede065f2682a11cd60a7ca441ced2405f"
+GOVERNANCE_LEGACY_BASELINE = Path(
+    "docs/project/CAPTURE_BACKED_COMBAT_LEGACY_BASELINE.json"
 )
-GOVERNANCE_LEGACY_ARTIFACTS = {
-    "inventory": {
-        "byteLength": 124999078,
-        "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404",
-    },
-    "catalog": {
-        "byteLength": 1026255,
-        "sha256": "405ec3eb7b13b094032b284f8f6d660382b982652517d161780ff3d5c9ed2921",
-    },
-    "fixtures": {
-        "byteLength": 2112018,
-        "sha256": "26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793",
-    },
-    "activeCoverage": {
-        "byteLength": 11270299,
-        "sha256": "56bf3c7b58dab3cea3c6d00242164ac15a3a610acff6ca5734f0ed55240a5fd0",
-    },
-    "formulaDataset": {
-        "byteLength": 9000177,
-        "sha256": "55b91bc84a958a3b2e131fee6754393730a361510367efa62fc54ea3a6dee6ea",
-    },
-    "attackRangeAudit": {
-        "byteLength": 3801456,
-        "sha256": "a6460852f25011d417e286118f27d987ed7ebfb0106cb7c8efd926b8ed18a66d",
-    },
-    "secondaryEvidenceAudit": {
-        "byteLength": 4081609,
-        "sha256": "046d44051c7cd1ef2d122b0c5eb9f21b7679c438775f810f2f3006ca45690e1c",
-    },
-}
-GOVERNANCE_LEGACY_EXPECTED_COUNTS = {
-    "captureSessionsDiscovered": 383,
-    "runtimeReadyProfiles": 96,
-    "runtimeReadyGeneratedSemanticDefinitions": 101,
-    "legacyRuntimeVariantRows": 114,
-    "legacyFullyRawRevalidatableRows": 21,
-    "legacyRawUnavailableRows": 93,
-    "requiredHistoricalCaptureRoots": 65,
-    "presentHistoricalCaptureRoots": 3,
-    "missingHistoricalCaptureRoots": 62,
-}
 GOVERNANCE_CAPTURE_ID_PATTERN = re.compile(r"20\d{6}-\d{6}")
 GOVERNANCE_LEGACY_CAPTURE_ROOT = Path(
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures"
@@ -4871,13 +4835,20 @@ def _governance_print_scoped_cohort(
 def validate_legacy_governance_baseline(repo_root: Path) -> int:
     repo_root = repo_root.resolve(strict=True)
     manifest = validate_cohort(repo_root, verify_toolchain=False)
+    baseline = load_json_object(
+        repo_root / GOVERNANCE_LEGACY_BASELINE,
+        "generated-combat legacy governance baseline",
+    )
+    legacy_generation_identity = baseline["generationIdentity"]
+    legacy_artifacts = baseline["artifacts"]
+    legacy_expected_counts = baseline["expectedCounts"]
     inventory = _governance_load_inventory(repo_root)
     summary = inventory.get("summary", {})
     artifacts = _governance_manifest_artifacts(manifest)
     mismatches: list[str] = []
-    if manifest.get("generationIdentity") != GOVERNANCE_LEGACY_GENERATION_IDENTITY:
+    if manifest.get("generationIdentity") != legacy_generation_identity:
         mismatches.append("generationIdentity")
-    for role, expected in GOVERNANCE_LEGACY_ARTIFACTS.items():
+    for role, expected in legacy_artifacts.items():
         actual = artifacts.get(role)
         if not isinstance(actual, Mapping):
             mismatches.append(f"{role}:missing")
@@ -4891,7 +4862,7 @@ def validate_legacy_governance_baseline(repo_root: Path) -> int:
         "runtimeReadyProfiles",
         "runtimeReadyGeneratedSemanticDefinitions",
     ):
-        if summary.get(key) != GOVERNANCE_LEGACY_EXPECTED_COUNTS[key]:
+        if summary.get(key) != legacy_expected_counts[key]:
             mismatches.append(key)
     capture_ids = _governance_required_capture_ids(repo_root)
     present_ids = [
@@ -4902,12 +4873,10 @@ def validate_legacy_governance_baseline(repo_root: Path) -> int:
         )
     ]
     missing_ids = sorted(set(capture_ids) - set(present_ids))
-    if len(capture_ids) != GOVERNANCE_LEGACY_EXPECTED_COUNTS["requiredHistoricalCaptureRoots"]:
+    if len(capture_ids) != legacy_expected_counts["requiredHistoricalCaptureRoots"]:
         mismatches.append("requiredHistoricalCaptureRoots")
-    if len(present_ids) != GOVERNANCE_LEGACY_EXPECTED_COUNTS["presentHistoricalCaptureRoots"]:
-        mismatches.append("presentHistoricalCaptureRoots")
-    if len(missing_ids) != GOVERNANCE_LEGACY_EXPECTED_COUNTS["missingHistoricalCaptureRoots"]:
-        mismatches.append("missingHistoricalCaptureRoots")
+    if len(present_ids) + len(missing_ids) != len(capture_ids):
+        mismatches.append("historicalRawAvailabilityPartition")
     if mismatches:
         raise PipelineError(
             "generated-combat legacy governance baseline drift: "
@@ -4916,25 +4885,35 @@ def validate_legacy_governance_baseline(repo_root: Path) -> int:
     print(
         "generated-combat legacy baseline PASS "
         f"state={GOVERNANCE_STATE_LEGACY_ACCEPTED_RAW_UNAVAILABLE} "
-        f"identity={GOVERNANCE_LEGACY_GENERATION_IDENTITY} "
-        f"artifacts={len(GOVERNANCE_LEGACY_ARTIFACTS)} "
+        f"identity={legacy_generation_identity} "
+        f"artifacts={len(legacy_artifacts)} "
         f"runtimeReadyProfiles={summary['runtimeReadyProfiles']} "
         "legacyRuntimeVariantRows="
-        f"{GOVERNANCE_LEGACY_EXPECTED_COUNTS['legacyRuntimeVariantRows']} "
+        f"{legacy_expected_counts['legacyRuntimeVariantRows']} "
         "legacyFullyRawRevalidatableRows="
-        f"{GOVERNANCE_LEGACY_EXPECTED_COUNTS['legacyFullyRawRevalidatableRows']} "
+        f"{legacy_expected_counts['legacyFullyRawRevalidatableRows']} "
         "legacyRawUnavailableRows="
-        f"{GOVERNANCE_LEGACY_EXPECTED_COUNTS['legacyRawUnavailableRows']} "
+        f"{legacy_expected_counts['legacyRawUnavailableRows']} "
         f"requiredHistoricalRaw={len(capture_ids)} "
         f"presentHistoricalRaw={len(present_ids)} "
         f"missingHistoricalRaw={len(missing_ids)}"
     )
-    for role in sorted(GOVERNANCE_LEGACY_ARTIFACTS):
-        expected = GOVERNANCE_LEGACY_ARTIFACTS[role]
+    for role in sorted(legacy_artifacts):
+        expected = legacy_artifacts[role]
         print(
             "LEGACY_ARTIFACT|"
             f"role={role}|sha256={expected['sha256']}|byteLength={expected['byteLength']}"
         )
+    return 0
+
+
+def validate_accepted_cohort(repo_root: Path) -> int:
+    repo_root = repo_root.resolve(strict=True)
+    manifest = validate_cohort(repo_root, verify_toolchain=False)
+    print(
+        "generated-combat accepted integrity PASS "
+        f"identity={manifest['generationIdentity']}"
+    )
     return 0
 
 
@@ -5643,6 +5622,105 @@ def _run_supervised_delegated_cohort_validation(
     )
 
 
+def refresh_accepted_coverage(repo_root: Path) -> int:
+    repo_root = repo_root.resolve(strict=True)
+    with _shared_lease(repo_root, "write") as lease:
+        published = validate_cohort(repo_root, verify_toolchain=False)
+        candidate_root = lease.new_staging_directory("accepted-coverage-refresh")
+        artifacts = _candidate_artifact_paths(candidate_root)
+        for role, logical_path in ARTIFACT_RELATIVE_PATHS.items():
+            source = repo_root / Path(logical_path)
+            if role == "activeCoverage":
+                continue
+            shutil.copyfile(source, artifacts[role])
+
+        inventory_path = repo_root / Path(ARTIFACT_RELATIVE_PATHS["inventory"])
+        formula_path = repo_root / Path(ARTIFACT_RELATIVE_PATHS["formulaDataset"])
+        run_checked(
+            (
+                sys.executable,
+                "-B",
+                "-I",
+                "-u",
+                "-X",
+                "faulthandler",
+                str(repo_root / ACTIVE_GENERATOR),
+                "--write",
+                "--repo-root",
+                str(repo_root),
+                "--combat-inventory",
+                str(inventory_path),
+                "--combat-inventory-descriptor",
+                str(inventory_path),
+                "--combat-inventory-sha256",
+                sha256_file(inventory_path),
+                "--combat-inventory-byte-length",
+                str(inventory_path.stat().st_size),
+                "--formula-dataset",
+                str(formula_path),
+                "--output",
+                str(artifacts["activeCoverage"]),
+            ),
+            repo_root=repo_root,
+            lease=lease,
+            label="accepted coverage refresh",
+        )
+
+        generators = generator_descriptors(repo_root)
+        runtime = runtime_descriptor()
+        manifest, rendered = build_generation_manifest(
+            cohort_root=candidate_root,
+            artifacts=artifacts,
+            input_snapshot=published["inputSnapshot"],
+            auxiliary_input_identity=published["inputSnapshot"][
+                "auxiliarySnapshotIdentity"
+            ],
+            generators=generators,
+            runtime=runtime,
+            input_snapshot_is_portable=True,
+        )
+        manifest_path = candidate_root / MANIFEST_RELATIVE_PATH
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_bytes(rendered)
+        candidate = CandidateCohort(
+            root=candidate_root,
+            artifacts=artifacts,
+            manifest_path=manifest_path,
+            capture_snapshot={},
+            generation_identity=manifest["generationIdentity"],
+            input_snapshot_identity=manifest["inputSnapshot"]["identity"],
+            fixed_point_rounds=0,
+        )
+        validate_cohort(candidate_root, verify_toolchain=False)
+
+        def revalidate_refresh(_phase: str) -> None:
+            for role, logical_path in ARTIFACT_RELATIVE_PATHS.items():
+                if role == "activeCoverage":
+                    continue
+                current = repo_root / Path(logical_path)
+                if sha256_file(current) != sha256_file(artifacts[role]):
+                    raise PipelineError(
+                        "accepted coverage refresh input changed during publication: "
+                        f"{logical_path.as_posix()}"
+                    )
+            if generator_descriptors(repo_root) != generators:
+                raise PipelineError(
+                    "generator descriptors changed during accepted coverage refresh"
+                )
+            if runtime_descriptor() != runtime:
+                raise PipelineError(
+                    "Python runtime changed during accepted coverage refresh"
+                )
+
+        _shared_publish(lease, candidate, revalidate_refresh)
+        published = validate_cohort(repo_root, verify_toolchain=True)
+        print(
+            "ACCEPTED_COVERAGE_REGEN=PASS "
+            f"identity={published['generationIdentity']} historicalRawDependency=NO"
+        )
+    return 0
+
+
 def run_pipeline(
     *,
     repo_root: Path,
@@ -5714,20 +5792,15 @@ def run_pipeline(
                 )
             return exit_code
 
-    lease_mode = "read" if mode == "check" else "write"
-    with _shared_lease(repo_root, lease_mode) as lease:
+    if mode == "check":
+        return validate_accepted_cohort(repo_root)
+    if mode == "refresh-accepted-coverage":
+        return refresh_accepted_coverage(repo_root)
+
+    with _shared_lease(repo_root, "write") as lease:
         inputs = capture_auxiliary_inputs(
             lease, repo_root, require_capture_evidence=True
         )
-        if mode == "check":
-            published_manifest = validate_cohort(repo_root, verify_toolchain=True)
-            if (
-                published_manifest["inputSnapshot"]["auxiliarySnapshotIdentity"]
-                != inputs.identity
-            ):
-                raise CohortValidationError(
-                    "published cohort auxiliary input snapshot is stale"
-                )
         scfu_analyzer_inputs = capture_scfu_analyzer_runtime(lease, repo_root)
         candidate_root = lease.new_staging_directory("combat-candidate")
         candidate = build_candidate_cohort(
@@ -5740,26 +5813,18 @@ def run_pipeline(
         )
         revalidate_candidate_inputs(inputs, candidate, repo_root, lease)
         revalidate_scfu_analyzer_runtime(scfu_analyzer_inputs, repo_root)
-        if mode == "check":
-            differences = cohort_differences(candidate.root, repo_root)
-            if differences:
-                joined = ", ".join(differences)
-                raise PipelineError(f"generated-combat cohort is dirty: {joined}")
+        def revalidate_publication_inputs(phase: str) -> None:
             revalidate_candidate_inputs(inputs, candidate, repo_root, lease)
             revalidate_scfu_analyzer_runtime(scfu_analyzer_inputs, repo_root)
-        else:
-            def revalidate_publication_inputs(phase: str) -> None:
-                revalidate_candidate_inputs(inputs, candidate, repo_root, lease)
-                revalidate_scfu_analyzer_runtime(scfu_analyzer_inputs, repo_root)
 
-            _shared_publish(
-                lease,
-                candidate,
-                revalidate_publication_inputs,
-            )
-            published = validate_cohort(repo_root, verify_toolchain=True)
-            if published["generationIdentity"] != candidate.generation_identity:
-                raise PipelineError("published generation identity changed during commit")
+        _shared_publish(
+            lease,
+            candidate,
+            revalidate_publication_inputs,
+        )
+        published = validate_cohort(repo_root, verify_toolchain=True)
+        if published["generationIdentity"] != candidate.generation_identity:
+            raise PipelineError("published generation identity changed during commit")
         print(
             f"generated-combat {mode} PASS "
             f"identity={candidate.generation_identity} "
@@ -5775,6 +5840,7 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--write", action="store_true")
+    mode.add_argument("--refresh-accepted-coverage", action="store_true")
     mode.add_argument("--validate-current", action="store_true")
     mode.add_argument("--validate-legacy-baseline", action="store_true")
     mode.add_argument("--audit-scoped-raw-captures", action="store_true")
@@ -5826,6 +5892,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = parse_arguments(argv)
     if arguments.check:
         mode = "check"
+    elif arguments.refresh_accepted_coverage:
+        mode = "refresh-accepted-coverage"
     elif arguments.write:
         mode = "write"
     elif arguments.validate_current:

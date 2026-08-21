@@ -236,6 +236,47 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
     ),
 }
 
+RUNTIME_PREPARE_ACTIVE_EVIDENCE_REFERENCES: Mapping[
+    str, Tuple[int, str, Tuple[str, ...]]
+] = {
+    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs": (
+        1,
+        "active-evidence",
+        ("icc-shuttleport-entry-governance",),
+    ),
+}
+
+ICC_SHUTTLEPORT_SOURCE = (
+    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs"
+)
+ICC_SHUTTLEPORT_ENTRY_GOVERNANCE: Tuple[Tuple[str, str], ...] = (
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Clan Equipment Vendor", "ACTIVE_EVIDENCE"),
+    ("Clan Recruiter", "ACTIVE_EVIDENCE"),
+    ("Adri Afeli", "ACTIVE_EVIDENCE"),
+    ("Omni-Trans Equipment Vendor", "ACTIVE_EVIDENCE"),
+    ("Vendor Antonio Stacklund", "ACTIVE_EVIDENCE"),
+    ("Omni-Tek Recruitment Officer", "ACTIVE_EVIDENCE"),
+    ("Neutral Observer", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("Omni Unicorn Squadleader Fixx", "ACTIVE_EVIDENCE"),
+    ("Clan Field Surgeon Elsa Oosta", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("Brandon Thorn", "ACTIVE_EVIDENCE"),
+    ("ICC Bio-Inspector", "ACTIVE_EVIDENCE"),
+    ("Manager Travis Molen", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+    ("ICC Shuttle Guard", "ACTIVE_EVIDENCE"),
+)
+
 
 class CoverageError(RuntimeError):
     """Raised when a checked-in content shape cannot be reconciled safely."""
@@ -369,7 +410,11 @@ def discover_runtime_prepare_entry_points(repo_root: Path) -> List[Dict[str, Any
         )
 
     discovered_paths = {row["path"] for row in discovered}
-    expected_paths = set(RUNTIME_PREPARE_AUDIT_REFERENCES)
+    audit_references = {
+        **RUNTIME_PREPARE_AUDIT_REFERENCES,
+        **RUNTIME_PREPARE_ACTIVE_EVIDENCE_REFERENCES,
+    }
+    expected_paths = set(audit_references)
     unaudited = sorted(discovered_paths - expected_paths)
     stale = sorted(expected_paths - discovered_paths)
     if unaudited or stale:
@@ -384,9 +429,9 @@ def discover_runtime_prepare_entry_points(repo_root: Path) -> List[Dict[str, Any
         )
 
     for row in discovered:
-        expected_count, audit_kind, audit_references = (
-            RUNTIME_PREPARE_AUDIT_REFERENCES[row["path"]]
-        )
+        expected_count, audit_kind, audit_reference_values = audit_references[
+            row["path"]
+        ]
         if row["prepareCallCount"] != expected_count:
             raise CoverageError(
                 "production CapturedEnemyCombatRuntime.Prepare call count changed for "
@@ -394,8 +439,73 @@ def discover_runtime_prepare_entry_points(repo_root: Path) -> List[Dict[str, Any
                 f"{row['prepareCallCount']}"
             )
         row["auditKind"] = audit_kind
-        row["auditReferences"] = list(audit_references)
+        row["auditReferences"] = list(audit_reference_values)
+        row["governanceState"] = (
+            "ACTIVE_EVIDENCE"
+            if row["path"] in RUNTIME_PREPARE_ACTIVE_EVIDENCE_REFERENCES
+            else "ACCEPTED_COVERAGE"
+        )
     return discovered
+
+
+def discover_icc_shuttleport_entry_governance(
+    repo_root: Path,
+) -> Dict[str, Any]:
+    source = read_source(repo_root, ICC_SHUTTLEPORT_SOURCE)
+    body = extract_array_initializer(source, "ShuttleportNpc[] Npcs")
+    definitions = parse_object_initializers(body, "ShuttleportNpc")
+    actual_names = [
+        parse_csharp_string(definition["Name"])
+        for definition in definitions
+        if "Name" in definition
+    ]
+    expected_names = [name for name, _ in ICC_SHUTTLEPORT_ENTRY_GOVERNANCE]
+    if actual_names != expected_names:
+        raise CoverageError(
+            "ICC Shuttleport entry governance is stale: expected ordered entries "
+            f"{len(expected_names)}, found {len(actual_names)}"
+        )
+    if not definitions or definitions[0].get(
+        "CombatContractFactory"
+    ) != "IccShuttleportBasicCombatCatalog.IslandReet":
+        raise CoverageError(
+            "ICC Shuttleport accepted Island Reet entry is not bound to its "
+            "capture-backed combat catalog"
+        )
+    if any(
+        definition.get("CombatContractFactory")
+        for definition in definitions[1:]
+    ):
+        raise CoverageError(
+            "ICC Shuttleport active-evidence entries must not acquire an "
+            "accepted combat contract"
+        )
+
+    entries = [
+        {
+            "ordinal": ordinal,
+            "name": name,
+            "state": state,
+            "coverageKey": (
+                "icc-shuttleport-island-reet-basic-combat"
+                if state == "ACCEPTED_RUNTIME_CONTENT"
+                else None
+            ),
+        }
+        for ordinal, (name, state) in enumerate(ICC_SHUTTLEPORT_ENTRY_GOVERNANCE)
+    ]
+    return {
+        "source": ICC_SHUTTLEPORT_SOURCE,
+        "playfield": 4582,
+        "entries": entries,
+        "acceptedEntries": sum(
+            entry["state"] == "ACCEPTED_RUNTIME_CONTENT" for entry in entries
+        ),
+        "activeEvidenceEntries": sum(
+            entry["state"] == "ACTIVE_EVIDENCE" for entry in entries
+        ),
+        "blockedUnauditedEntries": 0,
+    }
 
 
 def _scan_balanced(text: str, opening_index: int, opening: str, closing: str) -> int:
@@ -2980,6 +3090,9 @@ def build_inventory(
     searched_capture_ids = {
         Path(session.replace("\\", "/")).name for session in searched_sessions
     }
+    icc_shuttleport_entry_governance = discover_icc_shuttleport_entry_governance(
+        repo_root
+    )
     runtime_prepare_entry_points = discover_runtime_prepare_entry_points(repo_root)
     pf127_ordinary_profile_owners = discover_pf127_ordinary_profile_owners(
         repo_root
@@ -3179,7 +3292,11 @@ def build_inventory(
         }
         | {row["path"] for row in pf127_ordinary_profile_owners}
         | {row["path"] for row in pf1931_profile_owners}
-        | {row["path"] for row in runtime_prepare_entry_points}
+        | {
+            row["path"]
+            for row in runtime_prepare_entry_points
+            if row["governanceState"] == "ACCEPTED_COVERAGE"
+        }
     )
     source_inputs = [
         {
@@ -3280,6 +3397,10 @@ def build_inventory(
             missing_references = audit_references - fixed_surface_names
         elif audit_kind == "non-denominator-audit":
             missing_references = audit_references - non_denominator_family_names
+        elif audit_kind == "active-evidence":
+            missing_references = audit_references - {
+                "icc-shuttleport-entry-governance"
+            }
         else:
             raise CoverageError(
                 "unknown runtime Prepare audit kind for "
@@ -3484,8 +3605,19 @@ def build_inventory(
             "entryPointCount": sum(
                 row["prepareCallCount"] for row in runtime_prepare_entry_points
             ),
+            "acceptedCoverageEntryPointCount": sum(
+                row["prepareCallCount"]
+                for row in runtime_prepare_entry_points
+                if row["governanceState"] == "ACCEPTED_COVERAGE"
+            ),
+            "activeEvidenceEntryPointCount": sum(
+                row["prepareCallCount"]
+                for row in runtime_prepare_entry_points
+                if row["governanceState"] == "ACTIVE_EVIDENCE"
+            ),
             "entries": runtime_prepare_entry_points,
         },
+        "iccShuttleportEntryGovernance": icc_shuttleport_entry_governance,
         "pf127OrdinaryProfileResolverAudit": {
             "resolutionMode": PF127_ORDINARY_PROFILE_RESOLUTION_MODE,
             "surface": "subway-ordinary",
@@ -3685,7 +3817,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(
             "WROTE "
             f"{output_path.relative_to(repo_root)} actors={document['totals']['initialActorCount']} "
-            f"certified={document['totals']['certified']} unresolved={document['totals']['unresolved']}"
+            f"certified={document['totals']['certified']} unresolved={document['totals']['unresolved']} "
+            f"ICC_ACCEPTED_ENTRIES={document['iccShuttleportEntryGovernance']['acceptedEntries']} "
+            f"ICC_ACTIVE_EVIDENCE_ENTRIES={document['iccShuttleportEntryGovernance']['activeEvidenceEntries']} "
+            f"ICC_BLOCKED_UNAUDITED_ENTRIES={document['iccShuttleportEntryGovernance']['blockedUnauditedEntries']}"
         )
         return 0
 
@@ -3702,7 +3837,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print(
         "PASS "
         f"actors={document['totals']['initialActorCount']} "
-        f"certified={document['totals']['certified']} unresolved={document['totals']['unresolved']}"
+        f"certified={document['totals']['certified']} unresolved={document['totals']['unresolved']} "
+        f"ICC_ACCEPTED_ENTRIES={document['iccShuttleportEntryGovernance']['acceptedEntries']} "
+        f"ICC_ACTIVE_EVIDENCE_ENTRIES={document['iccShuttleportEntryGovernance']['activeEvidenceEntries']} "
+        f"ICC_BLOCKED_UNAUDITED_ENTRIES={document['iccShuttleportEntryGovernance']['blockedUnauditedEntries']}"
     )
     return 0
 

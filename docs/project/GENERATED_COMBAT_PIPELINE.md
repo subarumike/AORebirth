@@ -129,14 +129,14 @@ Tools\stress_generated_combat_pipeline.cmd
 
 With no arguments, `Tools\generate_capture_backed_npc_combat_inventory.cmd` performs `--check`.
 
-- `--check` builds a complete candidate from frozen inputs and fails if any of the six published files differs. It does not publish.
+- `--check` validates the committed accepted artifact cohort without reading historical raw captures and fails if any of the six published files differs. It does not publish.
 - `--write` builds, validates, and atomically publishes a complete candidate under the writer lease.
 - `--validate-current` validates the current manifest, all five payload descriptors and acceptance counts, the recorded toolchain, and current authoritative input identities without regenerating.
 - `--self-test` runs the primary extractor's focused self-test, including its controlled missing-generation-key invariant.
 - `Tools\run_generated_combat_concurrency_tests.cmd` runs transaction/coordinator unit coverage plus the isolated fixture concurrency scenario.
 - `Tools\stress_generated_combat_pipeline.cmd` requires a clean worktree and exercises real sequential checks, concurrent checks, reader/writer contention, identity stability, status stability, and residue cleanup.
 
-The complete integration gate calls `--check`; it therefore rejects stale or mixed generated-combat inputs before later build and acceptance stages.
+The complete integration gate calls `--check`; it therefore rejects stale or mixed generated-combat inputs before later build and acceptance stages. Raw-dependent generation uses `--write`, and strict historical replay uses `--validate-current`.
 
 ## Failure contract
 
