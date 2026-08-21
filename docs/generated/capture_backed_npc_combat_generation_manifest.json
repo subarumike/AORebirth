@@ -31,10 +31,10 @@
       "sha256": "55b91bc84a958a3b2e131fee6754393730a361510367efa62fc54ea3a6dee6ea"
     },
     {
-      "byteLength": 3801456,
+      "byteLength": 3691427,
       "path": "docs/generated/capture_backed_npc_attack_range_audit.json",
       "role": "attackRangeAudit",
-      "sha256": "a6460852f25011d417e286118f27d987ed7ebfb0106cb7c8efd926b8ed18a66d"
+      "sha256": "e02cc199f355afdbf2ebbaf266840c922b67e32b8069c738df00e9eea6b28b5d"
     },
     {
       "byteLength": 4081609,
