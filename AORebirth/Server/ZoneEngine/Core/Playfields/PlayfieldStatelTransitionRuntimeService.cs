@@ -110,8 +110,8 @@ namespace AORebirth.Core.Playfields
 
         private const float CapturedSubwayEntranceHeadingW = 0.7071012f;
 
-        // Capture 20260719-155043: Andromeda ICC HQ (655) ↔ Holodeck Freelancers Inc. (7001).
-        // No door/statel identity in capture — coordinate-radius zones (Subway proxy pattern).
+        // Capture 20260719-155043: Andromeda ICC HQ (655) â†” Holodeck Freelancers Inc. (7001).
+        // No door/statel identity in capture â€” coordinate-radius zones (Subway proxy pattern).
         private const int CapturedHoloDeckPlayfieldId = 7001;
 
         private const int CapturedHoloDeckEntrySourcePlayfieldId = 655;
@@ -164,6 +164,35 @@ namespace AORebirth.Core.Playfields
 
         private const float CapturedHoloDeckExitLandingHeadingW = 0.5969435f;
 
+        // Capture 20260821-191836 + Mike: Nascense outdoor (4310-4313) swim -> Jobe (4001).
+        // Rules that stick:
+        // - never zone while ascending (jump UP)
+        // - never raise walking groundY (jump apex must not become baseline)
+        // - zone when BELOW walking ground by 5+ for ~350ms, or stop/elevate while below
+        //   (strict "settled step" blocked jump-into-water freefall)
+        private const int CapturedNascenseJobeDestinationPlayfieldId = 4001;
+
+        private const float CapturedNascenseJobeBelowGroundDeltaY = 5.0f;
+
+        private const float CapturedNascenseJobeGroundSampleMaxStepY = 1.0f;
+
+        private static readonly TimeSpan CapturedNascenseJobeBelowGroundHold =
+            TimeSpan.FromMilliseconds(350);
+
+        private const float CapturedNascenseJobeEntryLandingX = 826.0f;
+
+        private const float CapturedNascenseJobeEntryLandingY = 1.0f;
+
+        private const float CapturedNascenseJobeEntryLandingZ = 822.0f;
+
+        private const float CapturedNascenseJobeEntryLandingHeadingX = 0.0f;
+
+        private const float CapturedNascenseJobeEntryLandingHeadingY = 0.9900106f;
+
+        private const float CapturedNascenseJobeEntryLandingHeadingZ = 0.0f;
+
+        private const float CapturedNascenseJobeEntryLandingHeadingW = 0.1409931f;
+
         private readonly HashSet<int> capturedSunriseLobbyEntryContacts = new HashSet<int>();
 
         private readonly HashSet<int> capturedSunriseApartmentExitContacts = new HashSet<int>();
@@ -187,6 +216,16 @@ namespace AORebirth.Core.Playfields
         private readonly HashSet<int> capturedHoloDeckEntryContacts = new HashSet<int>();
 
         private readonly HashSet<int> capturedHoloDeckExitContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedNascenseJobeEntryContacts = new HashSet<int>();
+
+        // Per-character walking height baseline on Nascense (for swim-below-ground detection).
+        private readonly Dictionary<int, float> nascenseGroundYByCharacter = new Dictionary<int, float>();
+
+        private readonly Dictionary<int, float> nascensePreviousMoveYByCharacter = new Dictionary<int, float>();
+
+        // First UTC when character went 5+ below groundY (cleared when back near ground).
+        private readonly Dictionary<int, DateTime> nascenseBelowGroundSinceUtc = new Dictionary<int, DateTime>();
 
         // After mission enter, player must walk away from the exit door before walk-on exit arms.
         private readonly HashSet<int> missionExitDoorArmedCharacters = new HashSet<int>();
@@ -237,6 +276,18 @@ namespace AORebirth.Core.Playfields
             this.statelEnterContacts.Remove(dynelId);
             this.statelCollisionInitializedCharacters.Remove(dynelId);
             this.capturedSubwayEntryContacts.Remove(dynelId);
+            this.capturedNascenseJobeEntryContacts.Remove(dynelId);
+            this.nascenseGroundYByCharacter.Remove(dynelId);
+            this.nascensePreviousMoveYByCharacter.Remove(dynelId);
+            this.nascenseBelowGroundSinceUtc.Remove(dynelId);
+        }
+
+        internal static bool IsNascenseOutdoorPlayfield(int playfieldInstance)
+        {
+            return playfieldInstance == 4310
+                   || playfieldInstance == 4311
+                   || playfieldInstance == 4312
+                   || playfieldInstance == 4313;
         }
 
         internal void PrimeStatelCollisionContacts(
@@ -326,6 +377,15 @@ namespace AORebirth.Core.Playfields
             }
 
             if (this.TryHandleCapturedHoloDeckExit(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedNascenseJobeEntry(
                 dynel,
                 playfieldIdentity,
                 stopMovement,
@@ -600,7 +660,7 @@ namespace AORebirth.Core.Playfields
             string nearReason = null;
             double nearestDistanceSquared = double.MaxValue;
 
-            // Outdoor rolled marker (capture 20260718-062936: walk to map mark on dest PF → enter).
+            // Outdoor rolled marker (capture 20260718-062936: walk to map mark on dest PF â†’ enter).
             List<MissionAcceptedStore.AcceptedMission> missions =
                 MissionAcceptedStore.GetAll(character.Identity.Instance);
             for (int i = 0; i < missions.Count; i++)
@@ -620,7 +680,7 @@ namespace AORebirth.Core.Playfields
                 }
 
                 double verticalDistance = Math.Abs(sourceY - entry.MarkerY);
-                // Slightly larger than Rome door radius — outdoor marks have no physical door mesh yet.
+                // Slightly larger than Rome door radius â€” outdoor marks have no physical door mesh yet.
                 if (horizontalDistanceSquared <= 8.0 * 8.0 && verticalDistance <= 12.0)
                 {
                     near = true;
@@ -682,7 +742,7 @@ namespace AORebirth.Core.Playfields
                 sourceZ);
 
             // Same path as door-use enter (shape spawn + door clearance). Do not use the
-            // legacy hardcoded SpawnX/Y/Z — that lands on the exit door and loops.
+            // legacy hardcoded SpawnX/Y/Z â€” that lands on the exit door and loops.
             stopMovement(character);
             if (!MissionInstanceService.TryEnterMissionInstance(character.Controller.Client))
             {
@@ -705,7 +765,7 @@ namespace AORebirth.Core.Playfields
         }
 
         /// <summary>
-        /// Walk onto the interior exit door after leaving spawn clearance — click-use also exits.
+        /// Walk onto the interior exit door after leaving spawn clearance â€” click-use also exits.
         /// Armed only after the player walks away from the door once (prevents enter/exit loop).
         /// </summary>
         private bool TryHandleMissionInstanceExit(
@@ -1033,6 +1093,205 @@ namespace AORebirth.Core.Playfields
             return true;
         }
 
+        private bool TryHandleCapturedNascenseJobeEntry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !IsNascenseOutdoorPlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            int dynelId = character.Identity.Instance;
+            if (character.MoveMode != MoveModes.Swim)
+            {
+                return false;
+            }
+
+            if (this.capturedNascenseJobeEntryContacts.Contains(dynelId))
+            {
+                return false;
+            }
+
+            this.capturedNascenseJobeEntryContacts.Add(dynelId);
+            this.StartNascenseSwimTeleport(
+                character,
+                dynel,
+                playfieldIdentity.Instance,
+                stopMovement,
+                teleportToPlayfield,
+                "MoveMode.Swim");
+            return true;
+        }
+
+        internal bool TryHandleCapturedNascenseJobeFromMove(
+            ICharacter character,
+            Identity playfieldIdentity,
+            byte moveType,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !IsNascenseOutdoorPlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            int dynelId = character.Identity.Instance;
+            float y = character.RawCoordinates.Y;
+
+            float previousY;
+            bool havePrevious = this.nascensePreviousMoveYByCharacter.TryGetValue(dynelId, out previousY);
+            this.nascensePreviousMoveYByCharacter[dynelId] = y;
+
+            float stepAbs = havePrevious ? Math.Abs(y - previousY) : 0f;
+            bool ascending = havePrevious && y > previousY + 0.05f;
+
+            // Walking ground baseline: never raise (jump UP must not rewrite it).
+            if (!ascending && stepAbs <= CapturedNascenseJobeGroundSampleMaxStepY)
+            {
+                float existingGroundY;
+                if (!this.nascenseGroundYByCharacter.TryGetValue(dynelId, out existingGroundY))
+                {
+                    this.nascenseGroundYByCharacter[dynelId] = y;
+                }
+                else if (y <= existingGroundY)
+                {
+                    this.nascenseGroundYByCharacter[dynelId] = y;
+                }
+            }
+            else if (!this.nascenseGroundYByCharacter.ContainsKey(dynelId))
+            {
+                this.nascenseGroundYByCharacter[dynelId] = havePrevious && !ascending ? previousY : y;
+            }
+
+            float baselineGroundY;
+            bool haveGround = this.nascenseGroundYByCharacter.TryGetValue(dynelId, out baselineGroundY);
+            bool belowGround = haveGround
+                               && (baselineGroundY - y) >= CapturedNascenseJobeBelowGroundDeltaY;
+
+            DateTime belowSinceUtc;
+            if (belowGround)
+            {
+                if (!this.nascenseBelowGroundSinceUtc.ContainsKey(dynelId))
+                {
+                    this.nascenseBelowGroundSinceUtc[dynelId] = DateTime.UtcNow;
+                }
+
+                belowSinceUtc = this.nascenseBelowGroundSinceUtc[dynelId];
+            }
+            else
+            {
+                this.nascenseBelowGroundSinceUtc.Remove(dynelId);
+                belowSinceUtc = DateTime.MinValue;
+            }
+
+            bool swimPacket = moveType == 26 || character.MoveMode == MoveModes.Swim;
+            bool stopInWater = belowGround && (moveType == 2 || moveType == 21 || moveType == 4);
+            bool elevateInWater = belowGround && (moveType == 17 || moveType == 18);
+            bool heldInWater = belowGround
+                               && belowSinceUtc != DateTime.MinValue
+                               && (DateTime.UtcNow - belowSinceUtc) >= CapturedNascenseJobeBelowGroundHold;
+
+            // Hard rule: never zone while going up (jump on land).
+            if (ascending && !swimPacket)
+            {
+                this.capturedNascenseJobeEntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            if (!swimPacket && !stopInWater && !elevateInWater && !heldInWater)
+            {
+                this.capturedNascenseJobeEntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            if (this.capturedNascenseJobeEntryContacts.Contains(dynelId))
+            {
+                return false;
+            }
+
+            this.capturedNascenseJobeEntryContacts.Add(dynelId);
+            string via = swimPacket
+                             ? "swim-packet"
+                             : (stopInWater
+                                    ? "stop-in-water"
+                                    : (elevateInWater ? "elevate-in-water" : "held-below-ground"));
+            this.StartNascenseSwimTeleport(
+                character,
+                dynel,
+                playfieldIdentity.Instance,
+                stopMovement,
+                teleportToPlayfield,
+                via);
+            return true;
+        }
+
+        private void StartNascenseSwimTeleport(
+            ICharacter character,
+            Dynel dynel,
+            int sourcePlayfieldId,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield,
+            string evidenceTag)
+        {
+            var destination = new Coordinate(
+                CapturedNascenseJobeEntryLandingX,
+                CapturedNascenseJobeEntryLandingY,
+                CapturedNascenseJobeEntryLandingZ);
+            var heading = new RuntimeQuaternion(
+                CapturedNascenseJobeEntryLandingHeadingX,
+                CapturedNascenseJobeEntryLandingHeadingY,
+                CapturedNascenseJobeEntryLandingHeadingZ,
+                CapturedNascenseJobeEntryLandingHeadingW);
+
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue = (uint)sourcePlayfieldId;
+
+            stopMovement(character);
+            teleportToPlayfield(
+                dynel,
+                destination,
+                heading,
+                CapturedNascenseJobeDestinationPlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Nascense->Jobe swim teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) via={9} evidence=20260821-191836",
+                    character.Identity.ToString(true),
+                    sourcePlayfieldId,
+                    character.RawCoordinates.X,
+                    character.RawCoordinates.Y,
+                    character.RawCoordinates.Z,
+                    CapturedNascenseJobeDestinationPlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z,
+                    evidenceTag));
+        }
+
         private bool TryHandleCapturedSunriseApartmentProximityEntry(
             ICharacter character,
             Identity playfieldIdentity,
@@ -1149,7 +1408,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            // Landing is ~1.5m from the exit trigger — arm only after leave/re-enter
+            // Landing is ~1.5m from the exit trigger â€” arm only after leave/re-enter
             // (same pattern as HoloDeck exit). Capture 20260806-210903: walk-out, no Use.
             if (this.capturedSunriseApartmentExitContacts.Contains(dynelId)
                 || !this.statelCollisionInitializedCharacters.Contains(dynelId))

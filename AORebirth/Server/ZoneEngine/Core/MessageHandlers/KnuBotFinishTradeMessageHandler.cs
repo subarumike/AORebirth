@@ -19,6 +19,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.KnuBot;
     using ZoneEngine.Core.Arete.Quests;
+    using ZoneEngine.Core.Doja;
     using ZoneEngine.Core.Subway.Quests;
     using ZoneEngine.Core.Thrak.Quests;
 
@@ -46,6 +47,13 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (ThrakGardenKeyTradeAdapter.TryFinishTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (DojaChipTradeAdapter.TryFinishTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
             {

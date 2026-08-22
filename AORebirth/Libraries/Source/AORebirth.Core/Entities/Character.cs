@@ -934,6 +934,8 @@ namespace AORebirth.Core.Entities
                     this.currentmovementmode = MoveModes.Run;
                     break;
                 case 26: // Switch To Swim Mode
+                    this.prevmovementmode = this.currentmovementmode;
+                    this.currentmovementmode = MoveModes.Swim;
                     break;
                 case 27: // Switch To Crawl Mode
                     this.prevmovementmode = this.currentmovementmode;
@@ -967,6 +969,7 @@ namespace AORebirth.Core.Entities
                     break;
 
                 case 35: // Leave Swim Mode
+                    this.currentmovementmode = this.prevmovementmode;
                     break;
                 case 36: // Leave Sneak Mode
                     this.currentmovementmode = this.prevmovementmode;

@@ -26,6 +26,7 @@ namespace ZoneEngine.Core
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Doja;
     using ZoneEngine.Core.MessageHandlers;
 
     using Utility;
@@ -119,6 +120,12 @@ namespace ZoneEngine.Core
         public bool TryUsePetShell(ICharacter character, Identity itemPosition, Item item)
         {
             if (character == null || item == null || IsNanoCrystalItem(item))
+            {
+                return false;
+            }
+
+            // DOJA chips are quest items; never treat as pet shells even if itemdata OnUse looks summon-like.
+            if (DojaChipInteractionRules.IsKnownDojaChip(item.LowID, item.HighID))
             {
                 return false;
             }

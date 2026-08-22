@@ -58,6 +58,12 @@ namespace ZoneEngine.Core.Thrak.Quests
                 return;
             }
 
+            if ((parsed == TradeKind.HypAnalyzer || parsed == TradeKind.HypReturn)
+                && !ThrakGardenKeyQuestRuntime.CanTalkToHypnagogic(source))
+            {
+                return;
+            }
+
             lock (SyncRoot)
             {
                 SessionsByCharacter[source.Identity.Instance] = new ThrakTradeSession
@@ -193,15 +199,26 @@ namespace ZoneEngine.Core.Thrak.Quests
             {
                 if (session.Kind == TradeKind.HypReturn)
                 {
-                    // Capture @17:01:31: after return trade, TemplateAction 214785 (favored analyzer back).
+                    // Capture 20260821-225658: RejectedItems Unknown2=0, then TemplateAction
+                    // 226994 (garden key), then 214785 (full/favored analyzer).
+                    ThrakGardenKeyQuestRuntime.TryGrantGardenKey(source);
                     ThrakGardenKeyQuestRuntime.TryGrantFavoredAnalyzer(source);
                 }
 
                 if (session.Kind == TradeKind.Silvertail)
                 {
-                    // Capture: device stays with player; 3rd soul uses Unknown2=0 then TemplateAction.
-                    ThrakGardenKeyQuestRuntime.TryForceReturnFavoredAnalyzer(source);
+                    // Capture 20260821-225658: souls 1–2 keep favored via RejectedItems Unknown2=1;
+                    // 3rd soul Unknown2=0 then TemplateAction 214783 (empty/inspected analyzer).
                     int count = ThrakGardenKeyQuestRuntime.IncrementSoulCount(source);
+                    if (count >= 3)
+                    {
+                        ThrakGardenKeyQuestRuntime.TryForceReturnInspectedAnalyzer(source);
+                    }
+                    else
+                    {
+                        ThrakGardenKeyQuestRuntime.TryForceReturnFavoredAnalyzer(source);
+                    }
+
                     LogUtil.Debug(
                         DebugInfoDetail.Engine,
                         "ThrakGardenKey Silvertail trade souls=" + count
@@ -360,12 +377,13 @@ namespace ZoneEngine.Core.Thrak.Quests
                     }
 
                     TryConsumeItem(source, itemId, session.StagedContainer);
-                    ThrakGardenKeyQuestRuntime.TryGrantGardenKey(source);
                     ThrakGardenKeyQuestRuntime.CompleteQuest(
                         source,
                         ThrakGardenKeyInteractionRules.QuestReturn);
                     // Belt-and-suspenders: wipe VeronicaUpdated / Garden leftovers from the journal.
                     ThrakGardenKeyQuestRuntime.ClearFinishedThrakChainJournal(source);
+                    // Key + favored analyzer TemplateActions are sent after RejectedItems
+                    // (capture 20260821-225658: 226994 then 214785).
                     return true;
 
                 case TradeKind.Silvertail:
@@ -543,6 +561,11 @@ namespace ZoneEngine.Core.Thrak.Quests
             if (string.Equals(name, ThrakGardenKeyInteractionRules.HypnagogicName, StringComparison.OrdinalIgnoreCase)
                 || ThrakGardenKeyInteractionRules.IsHypnagogic(target))
             {
+                if (!ThrakGardenKeyQuestRuntime.CanTalkToHypnagogic(source))
+                {
+                    return string.Empty;
+                }
+
                 return ThrakGardenKeyQuestRuntime.GetSoulCount(source) >= 3
                        || ThrakGardenKeyQuestRuntime.IsMissionActive(
                            source,

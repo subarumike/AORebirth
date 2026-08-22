@@ -259,6 +259,7 @@ namespace AORebirth.Core.Playfields
             this.nascenceCoreHecklers.SpawnForPlayfield(this.playfield, playfieldIdentity);
             NascenceLifeSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             ThrakOmniGardenSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            ScarlettDalquistSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             RomeBlueCitySpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             AndromedaIccHqSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             IccShuttleportSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);

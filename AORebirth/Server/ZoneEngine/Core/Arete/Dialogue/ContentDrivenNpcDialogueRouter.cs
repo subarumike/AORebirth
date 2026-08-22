@@ -18,6 +18,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
     using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Doja;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
@@ -447,6 +448,24 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 ThrakGardenVendorInteractionRules.SonLenInstance,
                 ThrakGardenVendorInteractionRules.SonLenIdentityText);
 
+        // Capture 20260821-222107: Scarlett Dalquist — Nascense DOJA chip turn-in (PF 7010).
+        private static readonly ContentDrivenNpcDialogueRegistration ScarlettDalquistRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Scarlett Dalquist",
+                ExpectedNpcName = DojaChipInteractionRules.ScarlettName,
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = DojaChipInteractionRules.ScarlettInstance
+                    },
+                NpcIdentityText = DojaChipInteractionRules.ScarlettIdentityText,
+                PlayfieldId = DojaChipInteractionRules.ScarlettPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "DOJA_NASCENSE"
+            };
+
         // Capture 20260806-naleb-transport: Zyvania Bagh Neleb / Steps of Madness transport.
         private const int AndromedaIccHqPlayfieldId = 655;
         private const int ZyvaniaBaghInstance = unchecked((int)0x7976BCF3);
@@ -498,6 +517,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             CraigOrGearAndAmmoRegistration,
             CraigOrProtectionRegistration,
             SonLenRegistration,
+            ScarlettDalquistRegistration,
             ZyvaniaBaghRegistration
         };
 
@@ -832,6 +852,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            previousNodeId,
                            answerIndex)
                        || TryHandleThrakGardenVendorSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex)
+                       || TryHandleDojaScarlettSideEffect(
                            source,
                            registration,
                            previousNodeId,
@@ -1272,6 +1297,34 @@ namespace ZoneEngine.Core.Arete.Dialogue
                      && !WindcallerKarrecQuestRuntime.IsActive(source))
             {
                 return CloseRegisteredDialogueSafely(source, npc, registration);
+            }
+            else if (IsRegistration(registration, HypnagogicUrgaLumRegistration)
+                     && !ThrakGardenKeyQuestRuntime.CanTalkToHypnagogic(source))
+            {
+                // No dialog window — silent refuse until Ancient-Device / Hyp stage.
+                FaceNpcTowardSource(npc, source);
+                return true;
+            }
+            else if (IsRegistration(registration, SonLenRegistration)
+                     && !ThrakGardenKeyQuestRuntime.HasCompletedGardenKeyQuest(source))
+            {
+                // No dialog window — chat-only gate (capture-backed Son-Len refuse).
+                FaceNpcTowardSource(npc, source);
+                SendSonLenNoKeyChat(source, registration.NpcIdentity);
+                return true;
+            }
+            else if (IsRegistration(registration, VeronicaEscobarRegistration)
+                     && ThrakGardenKeyQuestRuntime.IsMissionActive(
+                         source,
+                         ThrakGardenKeyInteractionRules.QuestVeronica)
+                     && !ThrakGardenKeyQuestRuntime.HasAnalyzer(source))
+            {
+                // Quest Active but Ancient Device missing (stale grant flag) — restore on talk.
+                ThrakGardenKeyQuestRuntime.TryGrantAnalyzer(source);
+                if (!ThrakGardenKeyQuestRuntime.HasAnalyzer(source))
+                {
+                    ThrakGardenKeyQuestRuntime.TryForceReturnAncientDevice(source);
+                }
             }
 
             DialogueSessionService service;
@@ -1908,7 +1961,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 ThrakGardenKeyQuestRuntime.AcceptQuest(
                     source,
                     ThrakGardenKeyInteractionRules.QuestVeronica);
+                // Always ensure Ancient Device is in inventory (flag alone is not enough).
                 ThrakGardenKeyQuestRuntime.TryGrantAnalyzer(source);
+                if (!ThrakGardenKeyQuestRuntime.HasAnalyzer(source))
+                {
+                    ThrakGardenKeyQuestRuntime.TryForceReturnAncientDevice(source);
+                }
+
                 return false;
             }
 
@@ -2004,6 +2063,36 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return false;
+        }
+
+        private static bool TryHandleDojaScarlettSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, ScarlettDalquistRegistration)
+                || !string.Equals(previousNodeId, "scarlett_001", StringComparison.OrdinalIgnoreCase)
+                || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!DojaChipQuestRuntime.CanTurnIn(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You need an active DOJA chip mission and the Nascense chip to turn in.");
+                return true;
+            }
+
+            DojaChipTradeAdapter.BeginTrade(source, registration.NpcIdentity);
+            KnuBotStartTradeMessageHandler.Default.Send(
+                source,
+                registration.NpcIdentity,
+                "Drag and drop the item(s) you want to give to Scarlett Dalquist into one of the slots available and press \"accept\"",
+                1);
+            return true;
         }
 
         private static bool TryHandleThrakGardenVendorSideEffect(
@@ -2379,6 +2468,33 @@ namespace ZoneEngine.Core.Arete.Dialogue
             PaceKnuBotPackets();
             KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
             return true;
+        }
+
+        /// <summary>
+        /// Son-Len without garden key: chat lines only, no KnuBot window.
+        /// </summary>
+        private static void SendSonLenNoKeyChat(ICharacter source, Identity npcIdentity)
+        {
+            if (source == null
+                || source.Controller == null
+                || source.Controller.Client == null
+                || npcIdentity.Instance == 0)
+            {
+                return;
+            }
+
+            source.Controller.Client.SendCompressed(
+                new SmokeLounge.AOtomation.Messaging.Messages.N3Messages.ChatTextMessage
+                {
+                    Identity = npcIdentity,
+                    Text = ThrakGardenVendorInteractionRules.SonLenNoKeyChatLine1
+                });
+            source.Controller.Client.SendCompressed(
+                new SmokeLounge.AOtomation.Messaging.Messages.N3Messages.ChatTextMessage
+                {
+                    Identity = npcIdentity,
+                    Text = ThrakGardenVendorInteractionRules.SonLenNoKeyChatLine2
+                });
         }
 
         private static void SendOpenChatWindow(

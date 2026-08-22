@@ -1137,6 +1137,19 @@ namespace AORebirth.Core.Playfields
                 this.TeleportToPlayfield);
         }
 
+        /// <summary>
+        /// CharDCMove: Nascense outdoor swim → Jobe Research (swim packet/mode only).
+        /// </summary>
+        internal void TryNascenseSwimToJobeOnMove(ICharacter character, byte moveType)
+        {
+            this.runtimeSystems.TryNascenseSwimToJobeOnMove(
+                character,
+                this.Identity,
+                moveType,
+                x => x.StopMovement(),
+                this.TeleportToPlayfield);
+        }
+
         private void PrimeStatelCollisionContacts(ICharacter dynel)
         {
             this.runtimeSystems.PrimeStatelCollisionContacts(dynel, this.collisionStatels);
@@ -1167,6 +1180,39 @@ namespace AORebirth.Core.Playfields
                 var envelope = new AORebirth.Core.Vector.Vector3(
                     dynel.RawCoordinates.X,
                     dynel.RawCoordinates.Y,
+                    dynel.RawCoordinates.Z);
+                var landing = new AORebirth.Core.Vector.Vector3(
+                    (float)destination.x,
+                    (float)destination.y,
+                    (float)destination.z);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedGatewayTransfer(
+                        character,
+                        envelope,
+                        landing,
+                        heading,
+                        playfieldInstance));
+                return;
+            }
+
+            // Capture 20260821-191836: Nascense outdoor (4310–4313) → Jobe Research (4001)
+            // uses gateway-style N3Teleport (Playfield1 + payload landing). Envelope Y=7.09.
+            if ((PlayfieldStatelTransitionRuntimeService.IsNascenseOutdoorPlayfield(this.Identity.Instance)
+                 && playfieldInstance == 4001)
+                || (this.Identity.Instance == 4001
+                    && PlayfieldStatelTransitionRuntimeService.IsNascenseOutdoorPlayfield(playfieldInstance)))
+            {
+                float envelopeY = PlayfieldStatelTransitionRuntimeService.IsNascenseOutdoorPlayfield(
+                                     this.Identity.Instance)
+                                     ? 7.09f
+                                     : dynel.RawCoordinates.Y;
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    dynel.RawCoordinates.X,
+                    envelopeY,
                     dynel.RawCoordinates.Z);
                 var landing = new AORebirth.Core.Vector.Vector3(
                     (float)destination.x,
