@@ -204,7 +204,8 @@ namespace AORebirth.Database.Dao
             {
                 using (IDbConnection conn = Connector.GetConnection())
                 {
-                    int tableCount = conn.Query<int>(
+                    // MySQL COUNT(*) maps as Int64 via Dapper (see LoginDataDao / Dao.Count).
+                    long tableCount = conn.Query<long>(
                         @"SELECT COUNT(*)
                           FROM information_schema.tables
                           WHERE table_schema = DATABASE()
