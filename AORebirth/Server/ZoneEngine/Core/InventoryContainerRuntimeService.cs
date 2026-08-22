@@ -28,6 +28,7 @@ namespace ZoneEngine.Core
     using Utility;
 
     using ZoneEngine.Core.Arete.Quests;
+    using ZoneEngine.Core.Doja;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Functions;
@@ -1009,6 +1010,13 @@ namespace ZoneEngine.Core
             if (this.IsUseBlockedBySkillLock(character, item))
             {
                 return false;
+            }
+
+            // Capture 20260821-222107: Nascense DOJA chip (284954) must run before pet-shell
+            // resolution — item OnUse data otherwise falsely resolves as an engineer pet shell.
+            if (DojaChipQuestRuntime.TryHandleChipUse(character, itemPosition, item))
+            {
+                return true;
             }
 
             if (PetShellItemService.Default.TryUsePetShell(character, itemPosition, item))

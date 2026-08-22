@@ -131,6 +131,7 @@ namespace ZoneEngine.Core.Playfields
                 new NascenceCoreContentModule(),
                 new NascenceLifeContentModule(),
                 new ThrakOmniGardenContentModule(),
+                new DojaResearchContentModule(),
                 new RomeBlueCityContentModule(),
                 new AndromedaIccHqContentModule(),
                 new IccShuttleportContentModule(),
@@ -1003,6 +1004,21 @@ namespace ZoneEngine.Core.Playfields
                 resolveCharacterOrganizationInstance,
                 stopMovement,
                 sendCapturedPrivateCityEntrySocialStatus,
+                teleportToPlayfield);
+        }
+
+        internal bool TryNascenseSwimToJobeOnMove(
+            ICharacter character,
+            Identity playfieldIdentity,
+            byte moveType,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, AORebirth.Core.Vector.Quaternion, int> teleportToPlayfield)
+        {
+            return this.statelTransitions.TryHandleCapturedNascenseJobeFromMove(
+                character,
+                playfieldIdentity,
+                moveType,
+                stopMovement,
                 teleportToPlayfield);
         }
 

@@ -151,6 +151,14 @@ namespace ZoneEngine.Core.MessageHandlers
             client.Controller.Move(moveType, coordinates, heading);
             AreteRoboticGuardDogRuntime.NoteMoveType(client.Controller.Character, rawMoveType);
 
+            var nascensePlayfield = client.Controller.Character.Playfield as AORebirth.Core.Playfields.Playfield;
+            if (nascensePlayfield != null)
+            {
+                nascensePlayfield.TryNascenseSwimToJobeOnMove(
+                    client.Controller.Character,
+                    rawMoveType);
+            }
+
             if (client.Controller.Character.Playfield == null
                 || !ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))

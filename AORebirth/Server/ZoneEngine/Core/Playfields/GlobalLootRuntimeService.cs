@@ -39,6 +39,9 @@ namespace AORebirth.Core.Playfields
         private const string NascenceYuttosProfileKey = "captured.nascence.yuttos";
         private const string NascenceDreamingSilvertailProfileKey = "captured.nascence.dreaming-silvertail";
         private const string NascenceSwiftProfileKey = "captured.nascence.swift-silvertail";
+        private const string NascenceDojaChipProfileKey = "documented.nascence.doja-chip";
+        // AO-Universe: outdoor plain mobs; drop rate not great — provisional 2.5% until capture-backed rate.
+        private const int NascenceDojaChipDropChanceBasisPoints = 250;
         private const string NascenceLifeLootEvidence =
             "AOSharpLiveCapture 20260723-225021 Barking Chimera 15 corpses credits=0 (8 empty + 7 with items); 20260723-221330 Swift Silvertail 798C1F89 items 232839:232840 ql6 + 42640:42641 ql7; Dreaming/Yuttos empty openable corpse";
         private const int CapturedAbmouthCredits = 587;
@@ -292,6 +295,13 @@ namespace AORebirth.Core.Playfields
                 {
                     this.EnsureNascenceSwiftSilvertail();
                     context.EnemyProfileKey = NascenceSwiftProfileKey;
+                    return;
+                }
+
+                if (IsNascenceDojaChipDropper(target.Name))
+                {
+                    this.EnsureNascenceDojaChipLoot();
+                    context.EnemyProfileKey = NascenceDojaChipProfileKey;
                     return;
                 }
 
@@ -909,6 +919,84 @@ namespace AORebirth.Core.Playfields
                     Confidence = LootEvidenceConfidence.ProvenCapture,
                     Enabled = true,
                     Conditions = new string[0]
+                });
+        }
+
+        private static bool IsNascenceDojaChipDropper(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            // AO-Universe DOJA guide: Nascense outdoor mobs.
+            return name.IndexOf("Crippler of Growth", StringComparison.OrdinalIgnoreCase) >= 0
+                   || name.IndexOf("Hiathlin", StringComparison.OrdinalIgnoreCase) >= 0
+                   || name.IndexOf("Malah-Ana", StringComparison.OrdinalIgnoreCase) >= 0
+                   || name.IndexOf("Predator Striker", StringComparison.OrdinalIgnoreCase) >= 0
+                   || name.IndexOf("Spinetooth Hatchling", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void EnsureNascenceDojaChipLoot()
+        {
+            const string tableKey = "documented.nascense.doja-chip";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string evidence = "ao-universe.doja-chips; item capture 20260821-222107 item=284954";
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = "Nascense DOJA Chip (documented)",
+                    TableType = LootTableType.EnemyType,
+                    RollGroups =
+                        new[]
+                        {
+                            new LootGroupDefinition
+                            {
+                                LootGroupKey = "nascense-doja-chip",
+                                RollMode = LootRollMode.Independent,
+                                RollCount = 1,
+                                EmptyWeight = 0,
+                                DropChanceBasisPoints = NascenceDojaChipDropChanceBasisPoints,
+                                Entries =
+                                    new[]
+                                    {
+                                        FixedEntry(
+                                            284954,
+                                            1,
+                                            "doja-chip-nascense",
+                                            1)
+                                    }
+                            }
+                        },
+                    ObservedCorpseSnapshots = new ObservedCorpseSnapshotDefinition[0],
+                    CreditsPolicy = new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.CommunityDocumented
+                    },
+                    QualityPolicy = "documented-ao-universe-doja",
+                    Evidence = evidence,
+                    Confidence = LootEvidenceConfidence.CommunityDocumented,
+                    ItemPoolUnresolved = false,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = NascenceDojaChipProfileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Conditions = new string[0],
+                    Evidence = evidence,
+                    Confidence = LootEvidenceConfidence.CommunityDocumented,
+                    Enabled = true
                 });
         }
 

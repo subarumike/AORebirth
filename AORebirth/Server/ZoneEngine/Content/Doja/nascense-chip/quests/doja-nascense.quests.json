@@ -1,0 +1,68 @@
+{
+  "Identity": {
+    "Id": "doja-nascense-quests-20260821-222107",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260821-222107"
+  },
+  "SourceCaptures": [
+    "20260821-222107"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:55AA2421",
+      "Title": "You've found a DOJA-Chip",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18B924",
+      "InitialStepId": "return_chip",
+      "Steps": [
+        {
+          "StepId": "return_chip",
+          "Name": "Return the DOJA chip to Scarlett Dalquist",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA2421_turnin",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Hand the Nascense DOJA chip to Scarlett Dalquist at DOJA Research.",
+              "TargetIdentity": "SimpleChar:7A18B924",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA2803",
+      "Title": "You can only turn in one DOJ...",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18B924",
+      "InitialStepId": "cooldown",
+      "Steps": [
+        {
+          "StepId": "cooldown",
+          "Name": "Daily DOJA chip turn-in cooldown",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA2803_cooldown",
+              "Type": "CapturedDialogueObjective",
+              "Description": "You can only turn in one DOJA chip today.",
+              "TargetIdentity": "SimpleChar:7A18B924",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    }
+  ]
+}

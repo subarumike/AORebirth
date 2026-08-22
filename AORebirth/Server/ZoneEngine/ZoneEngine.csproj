@@ -197,6 +197,10 @@
     <Compile Include="Core\Thrak\Quests\ThrakGardenKeySilvertailTransform.cs" />
     <Compile Include="Core\Thrak\Quests\ThrakGardenKeyTradeAdapter.cs" />
     <Compile Include="Core\Thrak\Vendors\ThrakGardenVendorInteractionRules.cs" />
+    <Compile Include="Core\Doja\DojaChipInteractionRules.cs" />
+    <Compile Include="Core\Doja\DojaChipPacketSender.cs" />
+    <Compile Include="Core\Doja\DojaChipQuestRuntime.cs" />
+    <Compile Include="Core\Doja\DojaChipTradeAdapter.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\PlayerSpecialAttackRules.cs" />
@@ -554,6 +558,8 @@
     <Compile Include="Core\Playfields\NascenceCoreHecklerSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NascenceLifeSpawn.cs" />
     <Compile Include="Core\Playfields\ThrakOmniGardenSpawn.cs" />
+    <Compile Include="Core\Playfields\ScarlettDalquistSpawn.cs" />
+    <Compile Include="Core\Playfields\Content\DojaResearchContentModule.cs" />
     <Compile Include="Core\Playfields\PerkResetServiceProviderSpawn.cs" />
     <Compile Include="Core\Playfields\RomeBlueCitySpawn.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqSpawn.cs" />
@@ -870,6 +876,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Thrak\garden-key\quests\thrak-garden-key.quests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Doja\nascense-chip\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Doja\nascense-chip\dialogue\doja-nascense.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Doja\nascense-chip\quests\doja-nascense.quests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Nascence\life-dialogs\manifest.json">

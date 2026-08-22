@@ -628,13 +628,26 @@ namespace ZoneEngine.Core.Thrak.Quests
 
         /// <summary>
         /// Capture Hyp return trade: TemplateAction 214785 after RejectedItems Unknown2=0.
+        /// Consumes empty/inspected analyzer first so the client gets a full favored device.
         /// </summary>
         internal static bool TryGrantFavoredAnalyzer(ICharacter source)
         {
+            if (source == null)
+            {
+                return false;
+            }
+
             if (HasFavoredAnalyzer(source))
             {
                 return true;
             }
+
+            TryConsumeCarriedItem(
+                source,
+                ThrakGardenKeyInteractionRules.InspectedAncientPatternAnalyzerItemId);
+            TryConsumeCarriedItem(
+                source,
+                ThrakGardenKeyInteractionRules.AncientPatternAnalyzerItemId);
 
             return TryRestoreItem(
                 source,
@@ -844,8 +857,54 @@ namespace ZoneEngine.Core.Thrak.Quests
         }
 
         /// <summary>
-        /// Finished Thrak garden key quest (account flag or key-granted mission flag / key held).
-        /// Gates Son-Len, Official of Power shop access (capture 20260718-210135).
+        /// Hypnagogic Urga-Lum Thrak only speaks during the garden Ancient-Device stage
+        /// (QuestGarden / souls / active return). After the garden key quest is finished,
+        /// dialog stays closed (Mike 20260821).
+        /// </summary>
+        internal static bool CanTalkToHypnagogic(ICharacter source)
+        {
+            if (source == null)
+            {
+                return false;
+            }
+
+            if (HasCompletedGardenKeyQuest(source))
+            {
+                return false;
+            }
+
+            if (IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestGarden))
+            {
+                return true;
+            }
+
+            if (IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestSouls)
+                || IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestSouls1)
+                || IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestSouls2))
+            {
+                return true;
+            }
+
+            // Mid-chain: garden/souls completed but return trade not finished yet.
+            if (IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestReturn))
+            {
+                return true;
+            }
+
+            if (IsMissionCompleted(source, ThrakGardenKeyInteractionRules.QuestGarden)
+                || IsMissionCompleted(source, ThrakGardenKeyInteractionRules.QuestSouls))
+            {
+                return true;
+            }
+
+            return GetSoulCount(source) > 0;
+        }
+
+        /// <summary>
+        /// Finished Thrak garden key quest (account / mission completion flags only).
+        /// Gates Son-Len shop/nano access (capture 20260718-210135).
+        /// Inventory key alone is NOT completion — lost key still allows repurchase;
+        /// holding a key without finishing the quest does not unlock Son-Len.
         /// </summary>
         internal static bool HasCompletedGardenKeyQuest(ICharacter source)
         {
@@ -854,7 +913,7 @@ namespace ZoneEngine.Core.Thrak.Quests
                 return false;
             }
 
-            if (HasGardenKey(source) || HasAccountGardenKeyFlag(source))
+            if (HasAccountGardenKeyFlag(source))
             {
                 return true;
             }
@@ -862,6 +921,11 @@ namespace ZoneEngine.Core.Thrak.Quests
             if (!MissionRuntime.IsInitialized)
             {
                 return false;
+            }
+
+            if (IsMissionCompleted(source, ThrakGardenKeyInteractionRules.QuestReturn))
+            {
+                return true;
             }
 
             return MissionRuntime.Service.GetFlag(
@@ -989,8 +1053,7 @@ namespace ZoneEngine.Core.Thrak.Quests
 
         /// <summary>
         /// Capture Silvertail trade: favored analyzer must stay with the player (Returned via
-        /// RejectedItems Unknown2=1 for souls 1–2; Unknown2=0 then TemplateAction for soul 3).
-        /// Always re-materialize with TemplateAction so the client inventory matches the server.
+        /// RejectedItems Unknown2=1 for souls 1–2). Always re-materialize with TemplateAction.
         /// </summary>
         internal static bool TryForceReturnFavoredAnalyzer(ICharacter source)
         {
@@ -1006,6 +1069,33 @@ namespace ZoneEngine.Core.Thrak.Quests
             return TryRestoreItem(
                 source,
                 ThrakGardenKeyInteractionRules.FavoredAncientPatternAnalyzerItemId,
+                1);
+        }
+
+        /// <summary>
+        /// Capture 20260821-225658 3rd Silvertail soul: RejectedItems Unknown2=0 then
+        /// TemplateAction 214783 (empty/inspected Ancient Pattern Analyzer).
+        /// </summary>
+        internal static bool TryForceReturnInspectedAnalyzer(ICharacter source)
+        {
+            if (source == null)
+            {
+                return false;
+            }
+
+            TryConsumeCarriedItem(
+                source,
+                ThrakGardenKeyInteractionRules.FavoredAncientPatternAnalyzerItemId);
+            TryConsumeCarriedItem(
+                source,
+                ThrakGardenKeyInteractionRules.InspectedAncientPatternAnalyzerItemId);
+            TryConsumeCarriedItem(
+                source,
+                ThrakGardenKeyInteractionRules.AncientPatternAnalyzerItemId);
+
+            return TryRestoreItem(
+                source,
+                ThrakGardenKeyInteractionRules.InspectedAncientPatternAnalyzerItemId,
                 1);
         }
 
@@ -1237,7 +1327,14 @@ namespace ZoneEngine.Core.Thrak.Quests
             }
 
             int characterId = source.Identity.Instance;
-            if (MissionRuntime.Service.GetFlag(characterId, questId, flagKey) != null)
+            bool alreadyFlagged = MissionRuntime.Service.GetFlag(characterId, questId, flagKey) != null;
+            bool hasItem = InventoryContainerRuntimeService.Default.HasCharacterInventory(source)
+                           && InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                               source,
+                               itemId);
+
+            // Flag can survive quest delete / journal wipe while the item is gone — still restore.
+            if (alreadyFlagged && hasItem)
             {
                 return true;
             }
@@ -1250,7 +1347,7 @@ namespace ZoneEngine.Core.Thrak.Quests
                 return false;
             }
 
-            if (!InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(source, itemId))
+            if (!hasItem)
             {
                 Item item;
                 try

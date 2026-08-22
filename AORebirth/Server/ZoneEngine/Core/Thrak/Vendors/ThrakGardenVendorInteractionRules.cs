@@ -20,6 +20,11 @@ namespace ZoneEngine.Core.Thrak.Vendors
         internal const string ProtectionName = "Craig-Or of Protection";
         internal const string SonLenName = "Son-Len, Official of Power";
 
+        internal const string SonLenNoKeyChatLine1 = "You do not have the key to this garden.";
+
+        internal const string SonLenNoKeyChatLine2 =
+            "I would recommend you to return when you have the blessing of the Divine.";
+
         internal const int FuriousFistsInstance = unchecked((int)0x79758F3F);
         internal const int PreservationInstance = unchecked((int)0x79758F3E);
         internal const int FlamingBarrelsInstance = unchecked((int)0x79758F3B);

@@ -359,6 +359,10 @@ client.Controller.Character.Playfield.Identity,
                     ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryResendActiveMissionsForLogin(
                         client.Controller.Character);
 
+                    // DOJA cooldown / turn-in journal (18h tip) — same relog wipe as Thrak.
+                    ZoneEngine.Core.Doja.DojaChipQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+
                     // Arete Rex→Marcus→Flint tip journal (Talk to Flint Novak) — same relog wipe as Thrak.
                     ZoneEngine.Core.Arete.Quests.RexMarcusChainCoordinator.TryResendActiveTipsForLogin(
                         client.Controller.Character);

@@ -14,12 +14,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Thrak.Quests;
+    using ZoneEngine.Core.Thrak.Vendors;
 
     /// <summary>
     /// Thrak Omni garden vendors (PF 4677). Capture 20260718-210135:
     /// Click opens KnuBot dialogue first; shop opens via dialog shop icon (GenericCmd Use)
     /// or Craig-Or "Business. Let's see what you've got." answer.
-    /// Son-Len shop requires completed Thrak garden key quest.
+    /// Son-Len shop/talk require garden key — without key: chat lines only, no dialog/shop.
     /// </summary>
     internal sealed class CapturedThrakGardenVendorInteractionHandler
     {
@@ -83,6 +84,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 && runtime.Content.RequiresCompletedGardenKeyQuest
                 && !ThrakGardenKeyQuestRuntime.HasCompletedGardenKeyQuest(character))
             {
+                SendSonLenNoKeyChat(character, npcIdentity);
                 return false;
             }
 
@@ -119,6 +121,31 @@ namespace ZoneEngine.Core.MessageHandlers
             character.ShoppingBag = temporaryBag;
             TradeMessageHandler.Default.Send(character, temporaryBag);
             return true;
+        }
+
+        private static void SendSonLenNoKeyChat(ICharacter character, Identity npcIdentity)
+        {
+            if (character == null
+                || character.Controller == null
+                || character.Controller.Client == null
+                || npcIdentity.Instance == 0
+                || npcIdentity.Instance != ThrakGardenVendorInteractionRules.SonLenInstance)
+            {
+                return;
+            }
+
+            character.Controller.Client.SendCompressed(
+                new ChatTextMessage
+                {
+                    Identity = npcIdentity,
+                    Text = ThrakGardenVendorInteractionRules.SonLenNoKeyChatLine1
+                });
+            character.Controller.Client.SendCompressed(
+                new ChatTextMessage
+                {
+                    Identity = npcIdentity,
+                    Text = ThrakGardenVendorInteractionRules.SonLenNoKeyChatLine2
+                });
         }
     }
 }

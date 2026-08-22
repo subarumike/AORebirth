@@ -508,6 +508,14 @@ namespace ZoneEngine.Core.Packets
                     | SimpleCharFullUpdateFlags.IsPet
                     | SimpleCharFullUpdateFlags.UnknownDataFlag;
             }
+            else if (character.Controller is NPCController
+                     && ThrakOmniGardenSpawn.NeedsCapturedScfuIsPet(charName))
+            {
+                // Capture 20260821-225658: Hypnagogic Urga-Lum Thrak SCFU Flags include IsPet.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
             else if (!hasWindcallerNpcRuntime
                      && !hasCapturedVendorRuntime
                      && !hasEncounterRuntime

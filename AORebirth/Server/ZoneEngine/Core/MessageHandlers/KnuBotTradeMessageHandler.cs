@@ -16,6 +16,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.Arete.Quests;
+    using ZoneEngine.Core.Doja;
     using ZoneEngine.Core.Subway.Quests;
     using ZoneEngine.Core.Thrak.Quests;
 
@@ -165,6 +166,18 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (ThrakGardenKeyTradeAdapter.IsThrakTradeNpc(
+                client.Controller.Character,
+                message.Target))
+            {
+                return;
+            }
+
+            if (DojaChipTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (DojaChipTradeAdapter.IsDojaTradeNpc(
                 client.Controller.Character,
                 message.Target))
             {

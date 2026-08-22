@@ -197,6 +197,10 @@ namespace ZoneEngine.Core.MessageHandlers
                 ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryResendActiveMissionsForLogin(
                     client.Controller.Character);
 
+            bool dojaMissionResent =
+                ZoneEngine.Core.Doja.DojaChipQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+
             bool areteTipResent =
                 ZoneEngine.Core.Arete.Quests.RexMarcusChainCoordinator.TryResendActiveTipsForLogin(
                     client.Controller.Character);
@@ -210,17 +214,19 @@ namespace ZoneEngine.Core.MessageHandlers
                                  : 0;
             client.Server.Info(
                 client,
-                "CharInPlay mission-window resync resent={0} thrak={1} areteTips={2}",
+                "CharInPlay mission-window resync resent={0} thrak={1} doja={2} areteTips={3}",
                 missionWindowResent,
                 thrakMissionResent,
+                dojaMissionResent,
                 areteTipResent);
 
             ZoneEngine.Core.Missions.MissionDiagnostics.Log(
-                "CHARINPLAY char={0} pf={1} windowResent={2} thrakResent={3}",
+                "CHARINPLAY char={0} pf={1} windowResent={2} thrakResent={3} dojaResent={4}",
                 client.Controller.Character.Identity.Instance,
                 pfInstance,
                 missionWindowResent,
-                thrakMissionResent);
+                thrakMissionResent,
+                dojaMissionResent);
 
             // Mission interiors: re-send exact instance-local captured objects after CharInPlay.
             if (client.Controller.Character.Playfield != null

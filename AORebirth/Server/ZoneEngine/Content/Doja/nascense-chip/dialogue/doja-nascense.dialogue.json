@@ -1,0 +1,83 @@
+{
+  "Identity": {
+    "Id": "doja-nascense-dialogue-20260821-222107",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260821-222107"
+  },
+  "SourceCaptures": [
+    "20260821-222107"
+  ],
+  "Npcs": [
+    {
+      "Id": "scarlett_dalquist_7A18B924",
+      "NpcIdentity": "SimpleChar:7A18B924",
+      "Name": "Scarlett Dalquist",
+      "RootNodeId": "scarlett_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "scarlett_001",
+          "PromptText": "If you are here for a tour… tags, discs or chips just hand them to me.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "s001_0",
+              "Index": 0,
+              "Text": "I have found a DOJA Chip in Nascense.",
+              "TextEvidence": "20260821-222107",
+              "NextNodeId": "scarlett_trade",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "s001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260821-222107",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "scarlett_trade",
+          "PromptText": "Hand it to me.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "st_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260821-222107",
+              "NextNodeId": "scarlett_done",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "scarlett_done",
+          "PromptText": "Thank you. The DOJA chip will help us track the creatures in the Shadowlands.",
+          "PromptTextConfidence": "capture-minimal",
+          "Options": [
+            {
+              "Id": "sd_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260821-222107",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}
