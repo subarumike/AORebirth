@@ -81,7 +81,8 @@ namespace AORebirth.Database.Dao
                 {
                     using (IDbConnection conn = Connector.GetConnection())
                     {
-                        int tableCount = conn.Query<int>(TableExistsSql).Single();
+                        // MySQL COUNT(*) maps as Int64 via Dapper (see LoginDataDao / Dao.Count).
+                        long tableCount = conn.Query<long>(TableExistsSql).Single();
                         if (tableCount <= 0)
                         {
                             throw new InvalidOperationException(
