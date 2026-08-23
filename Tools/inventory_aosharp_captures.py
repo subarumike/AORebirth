@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -177,6 +178,64 @@ ARTIFACT_COLUMNS = (
     "enemy-respawns.csv",
 )
 
+EVIDENCE_DIGEST_FILES = (
+    "capture-session.json",
+    "capture_info.json",
+    "capture-health.json",
+    "events.log",
+    "packets.hex.log",
+    "raw-packets.csv",
+)
+
+INVENTORY_COLUMNS = (
+    "capture_id",
+    "capture_path",
+    "evidence_digest",
+    "classification",
+    "confidence",
+    "pf127_signal",
+    "capture_playfield_id",
+    "event_playfield_ids",
+    "resource_playfield_ids",
+    "runtime_playfield_ids",
+    "character",
+    "validation_status",
+    "raw_packet_evidence",
+    "packets_hex_bytes",
+    "raw_packets_bytes",
+    "packets_hex_rows",
+    "raw_packets_rows",
+    "enemy_name_count",
+    "enemy_names",
+    "subway_terms",
+    "repository_reference_count",
+    "repository_references",
+    "implementation_reference_count",
+    "implementation_references",
+    "artifacts",
+    "reason",
+)
+
+RETENTION_COLUMNS = (
+    "capture_id",
+    "evidence_digest",
+    "analysis_state",
+    "evidence_coverage",
+    "used_by",
+    "derived_artifacts",
+    "raw_archive_path",
+    "raw_archive_digest",
+    "unresolved_gaps",
+    "retention_state",
+    "approved_by",
+    "approved_at",
+    "reason",
+)
+
+RETENTION_STATES = {"retain", "archive_required", "discard_approved"}
+ANALYSIS_STATES = {"unreviewed", "partial", "complete"}
+EVIDENCE_COVERAGE_STATES = {"unknown", "partial", "complete"}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -188,6 +247,41 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-md",
         default="docs/generated/aosharp_capture_inventory.md",
+    )
+    parser.add_argument(
+        "--retention-ledger",
+        default="docs/evidence/aosharp_capture_retention.csv",
+        help="Tracked fail-closed raw-capture retention authority.",
+    )
+    parser.add_argument(
+        "--retention-md",
+        default="docs/generated/aosharp_capture_retention.md",
+        help="Generated human-readable retention report.",
+    )
+    parser.add_argument(
+        "--validate-current",
+        action="store_true",
+        help=(
+            "Validate current folders against the accepted inventory without "
+            "rewriting either inventory output."
+        ),
+    )
+    parser.add_argument(
+        "--exclude-capture-id",
+        action="append",
+        default=[],
+        help=(
+            "Exclude a newly discovered capture identity from this run. "
+            "An already accepted identity cannot be excluded."
+        ),
+    )
+    parser.add_argument(
+        "--capture-id-cutoff",
+        default="",
+        help=(
+            "Process discovered capture identities at or before this timestamp ID. "
+            "Newer accepted rows remain preserved but are not refreshed."
+        ),
     )
     return parser.parse_args()
 
@@ -232,6 +326,8 @@ def collect_repository_references(repo_root: Path) -> tuple[dict[str, set[str]],
             if path.name in {
                 "aosharp_capture_inventory.csv",
                 "aosharp_capture_inventory.md",
+                "aosharp_capture_retention.csv",
+                "aosharp_capture_retention.md",
                 "aosharp_subway_capture_content.csv",
                 "aosharp_subway_capture_content.md",
             }:
@@ -362,6 +458,35 @@ def raw_packet_evidence(capture_path: Path) -> tuple[str, int, int]:
         )
     )
     return status, packets_hex_rows, raw_packets_rows
+
+
+def capture_evidence_digest(capture_path: Path) -> str:
+    digest = hashlib.sha256()
+    found = False
+    for filename in EVIDENCE_DIGEST_FILES:
+        path = capture_path / filename
+        if not path.is_file():
+            continue
+        found = True
+        digest.update(filename.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(str(path.stat().st_size).encode("ascii"))
+        digest.update(b"\0")
+        with path.open("rb") as stream:
+            while chunk := stream.read(1024 * 1024):
+                digest.update(chunk)
+    return digest.hexdigest() if found else ""
+
+
+def capture_source_signature(capture_path: Path) -> tuple[tuple[str, int, int], ...]:
+    signature: list[tuple[str, int, int]] = []
+    for filename in EVIDENCE_DIGEST_FILES:
+        path = capture_path / filename
+        if not path.is_file():
+            continue
+        stat = path.stat()
+        signature.append((filename, stat.st_size, stat.st_mtime_ns))
+    return tuple(signature)
 
 
 def scan_text_evidence(path: Path, resource_ids: set[int], terms: set[str]) -> None:
@@ -515,6 +640,7 @@ def inspect_capture(
     return {
         "capture_id": capture_id,
         "capture_path": capture_path.relative_to(repo_root).as_posix(),
+        "evidence_digest": capture_evidence_digest(capture_path),
         "classification": classification,
         "confidence": confidence,
         "pf127_signal": pf127_signal,
@@ -543,19 +669,521 @@ def inspect_capture(
     }
 
 
+def normalize_inventory_row(row: dict[str, object]) -> dict[str, object]:
+    return {column: row.get(column, "") for column in INVENTORY_COLUMNS}
+
+
+def load_inventory(path: Path) -> list[dict[str, object]]:
+    if not path.exists():
+        return []
+    try:
+        with path.open("r", encoding="utf-8-sig", newline="") as stream:
+            reader = csv.DictReader(stream)
+            fieldnames = set(reader.fieldnames or ())
+            required = set(INVENTORY_COLUMNS) - {"evidence_digest"}
+            missing = sorted(required - fieldnames)
+            unknown = sorted(fieldnames - set(INVENTORY_COLUMNS))
+            if missing or unknown:
+                raise SystemExit(
+                    "Accepted inventory schema conflict: missing={0} unknown={1}".format(
+                        ",".join(missing) or "none",
+                        ",".join(unknown) or "none",
+                    )
+                )
+            return [normalize_inventory_row(row) for row in reader]
+    except (OSError, UnicodeError, csv.Error) as error:
+        raise SystemExit(f"Unable to read accepted inventory {path}: {error}") from error
+
+
+def conflict_record(row: dict[str, object]) -> str:
+    return json.dumps(
+        {
+            "capture_id": str(row.get("capture_id", "")),
+            "capture_path": str(row.get("capture_path", "")),
+            "evidence_digest": str(row.get("evidence_digest", "")),
+        },
+        sort_keys=True,
+    )
+
+
+def fail_conflict(
+    conflict_type: str,
+    left_label: str,
+    left: dict[str, object],
+    right_label: str,
+    right: dict[str, object],
+) -> None:
+    raise SystemExit(
+        f"Capture inventory {conflict_type} conflict: "
+        f"{left_label}={conflict_record(left)} "
+        f"{right_label}={conflict_record(right)}"
+    )
+
+
+def validate_unique_inventory(
+    rows: list[dict[str, object]], source: str
+) -> None:
+    identities: dict[str, dict[str, object]] = {}
+    digests: dict[str, dict[str, object]] = {}
+    for row in rows:
+        capture_id = str(row.get("capture_id", ""))
+        capture_path = str(row.get("capture_path", ""))
+        evidence_digest = str(row.get("evidence_digest", ""))
+        if not capture_id or not capture_path:
+            raise SystemExit(
+                f"Capture inventory invalid record in {source}: {conflict_record(row)}"
+            )
+        previous_identity = identities.get(capture_id)
+        if previous_identity is not None:
+            fail_conflict(
+                "identity",
+                f"{source}-first",
+                previous_identity,
+                f"{source}-second",
+                row,
+            )
+        identities[capture_id] = row
+        if not evidence_digest:
+            continue
+        previous_digest = digests.get(evidence_digest)
+        if previous_digest is not None:
+            fail_conflict(
+                "digest",
+                f"{source}-first",
+                previous_digest,
+                f"{source}-second",
+                row,
+            )
+        digests[evidence_digest] = row
+
+
+def merge_inventory(
+    accepted_rows: list[dict[str, object]],
+    current_rows: list[dict[str, object]],
+) -> tuple[list[dict[str, object]], dict[str, int]]:
+    accepted = [normalize_inventory_row(row) for row in accepted_rows]
+    current = [normalize_inventory_row(row) for row in current_rows]
+    validate_unique_inventory(accepted, "accepted")
+    validate_unique_inventory(current, "current")
+
+    merged = [dict(row) for row in accepted]
+    accepted_by_id = {
+        str(row["capture_id"]): (index, row) for index, row in enumerate(merged)
+    }
+    accepted_by_digest = {
+        str(row["evidence_digest"]): row
+        for row in merged
+        if str(row["evidence_digest"])
+    }
+    refreshed = 0
+    appended = 0
+
+    for row in sorted(
+        current,
+        key=lambda item: (str(item["capture_id"]), str(item["capture_path"])),
+    ):
+        capture_id = str(row["capture_id"])
+        capture_path = str(row["capture_path"])
+        evidence_digest = str(row["evidence_digest"])
+        digest_match = accepted_by_digest.get(evidence_digest)
+        if digest_match is not None and str(digest_match["capture_id"]) != capture_id:
+            fail_conflict(
+                "digest",
+                "accepted",
+                digest_match,
+                "current",
+                row,
+            )
+
+        identity_match = accepted_by_id.get(capture_id)
+        if identity_match is None:
+            merged.append(dict(row))
+            accepted_by_id[capture_id] = (len(merged) - 1, merged[-1])
+            if evidence_digest:
+                accepted_by_digest[evidence_digest] = merged[-1]
+            appended += 1
+            continue
+
+        index, accepted_row = identity_match
+        accepted_path = str(accepted_row["capture_path"])
+        accepted_digest = str(accepted_row["evidence_digest"])
+        if accepted_digest and accepted_digest != evidence_digest:
+            fail_conflict(
+                "identity",
+                "accepted",
+                accepted_row,
+                "current",
+                row,
+            )
+        if accepted_path != capture_path and (
+            not accepted_digest or accepted_digest != evidence_digest
+        ):
+            fail_conflict(
+                "identity",
+                "accepted",
+                accepted_row,
+                "current",
+                row,
+            )
+
+        if accepted_digest:
+            accepted_by_digest.pop(accepted_digest, None)
+        merged[index] = dict(row)
+        accepted_by_id[capture_id] = (index, merged[index])
+        if evidence_digest:
+            accepted_by_digest[evidence_digest] = merged[index]
+        refreshed += 1
+
+    validate_unique_inventory(merged, "merged")
+    return merged, {
+        "accepted_before": len(accepted),
+        "current": len(current),
+        "preserved": len(accepted) - refreshed,
+        "refreshed": refreshed,
+        "appended": appended,
+        "removed": 0,
+    }
+
+
+def select_current_capture_paths(
+    capture_paths: list[Path],
+    excluded_capture_ids: set[str],
+    accepted_rows: list[dict[str, object]],
+    capture_id_cutoff: str = "",
+) -> list[Path]:
+    if capture_id_cutoff and not CAPTURE_ID.fullmatch(capture_id_cutoff):
+        raise SystemExit(
+            "Invalid --capture-id-cutoff; expected YYYYMMDD-HHMMSS: "
+            + capture_id_cutoff
+        )
+    if not excluded_capture_ids:
+        explicit_exclusions: set[str] = set()
+    else:
+        explicit_exclusions = excluded_capture_ids
+    accepted_ids = {str(row["capture_id"]) for row in accepted_rows}
+    accepted_exclusions = sorted(explicit_exclusions.intersection(accepted_ids))
+    if accepted_exclusions:
+        raise SystemExit(
+            "Refusing to exclude accepted capture identities because normal "
+            "generation cannot prune: " + ",".join(accepted_exclusions)
+        )
+    discovered_ids = {
+        capture_id_from_directory_name(path.name) for path in capture_paths
+    }
+    unknown_exclusions = sorted(explicit_exclusions - discovered_ids)
+    if unknown_exclusions:
+        raise SystemExit(
+            "Excluded capture identities were not discovered: "
+            + ",".join(unknown_exclusions)
+        )
+    cutoff_exclusions = {
+        capture_id
+        for capture_id in discovered_ids
+        if capture_id_cutoff and capture_id > capture_id_cutoff
+    }
+    all_exclusions = explicit_exclusions.union(cutoff_exclusions)
+    return [
+        path
+        for path in capture_paths
+        if capture_id_from_directory_name(path.name) not in all_exclusions
+    ]
+
+
 def write_csv(path: Path, rows: list[dict[str, object]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(stream, fieldnames=INVENTORY_COLUMNS)
         writer.writeheader()
         writer.writerows(rows)
+
+
+def normalize_retention_row(row: dict[str, object]) -> dict[str, object]:
+    return {column: row.get(column, "") for column in RETENTION_COLUMNS}
+
+
+def default_retention_row(inventory_row: dict[str, object]) -> dict[str, object]:
+    return {
+        "capture_id": str(inventory_row.get("capture_id", "")),
+        "evidence_digest": str(inventory_row.get("evidence_digest", "")),
+        "analysis_state": "unreviewed",
+        "evidence_coverage": "unknown",
+        "used_by": "",
+        "derived_artifacts": "",
+        "raw_archive_path": "",
+        "raw_archive_digest": "",
+        "unresolved_gaps": "Capture has not been reviewed for raw-evidence disposal.",
+        "retention_state": "retain",
+        "approved_by": "",
+        "approved_at": "",
+        "reason": "Default fail-closed retention; no discard review recorded.",
+    }
+
+
+def load_retention_ledger(path: Path) -> list[dict[str, object]]:
+    if not path.exists():
+        return []
+    try:
+        with path.open("r", encoding="utf-8-sig", newline="") as stream:
+            reader = csv.DictReader(stream)
+            fieldnames = set(reader.fieldnames or ())
+            missing = sorted(set(RETENTION_COLUMNS) - fieldnames)
+            unknown = sorted(fieldnames - set(RETENTION_COLUMNS))
+            if missing or unknown:
+                raise SystemExit(
+                    "Capture retention schema conflict: missing={0} unknown={1}".format(
+                        ",".join(missing) or "none",
+                        ",".join(unknown) or "none",
+                    )
+                )
+            return [normalize_retention_row(row) for row in reader]
+    except (OSError, UnicodeError, csv.Error) as error:
+        raise SystemExit(f"Unable to read capture retention ledger {path}: {error}") from error
+
+
+def retention_record(row: dict[str, object]) -> str:
+    return json.dumps(
+        {column: str(row.get(column, "")) for column in RETENTION_COLUMNS},
+        sort_keys=True,
+    )
+
+
+def tracked_paths(
+    repo_root: Path,
+    value: object,
+    field: str,
+    capture_id: str,
+) -> list[str]:
+    paths = [item.strip() for item in str(value).split(";") if item.strip()]
+    missing = [path for path in paths if not (repo_root / path).is_file()]
+    if missing:
+        raise SystemExit(
+            f"Capture retention {field} missing for {capture_id}: " + ",".join(missing)
+        )
+    return paths
+
+
+def validate_retention_rows(
+    rows: list[dict[str, object]],
+    inventory_rows: list[dict[str, object]],
+    repo_root: Path,
+) -> None:
+    inventory_by_id = {
+        str(row.get("capture_id", "")): row for row in inventory_rows
+    }
+    seen: dict[str, dict[str, object]] = {}
+    for raw_row in rows:
+        row = normalize_retention_row(raw_row)
+        capture_id = str(row["capture_id"])
+        if not capture_id:
+            raise SystemExit("Capture retention row has an empty capture identity.")
+        if capture_id in seen:
+            raise SystemExit(
+                "Capture retention identity conflict: first={0} second={1}".format(
+                    retention_record(seen[capture_id]),
+                    retention_record(row),
+                )
+            )
+        seen[capture_id] = row
+        inventory_row = inventory_by_id.get(capture_id)
+        if inventory_row is None:
+            raise SystemExit(
+                "Capture retention orphan conflict: retention={0}".format(
+                    retention_record(row)
+                )
+            )
+        ledger_digest = str(row["evidence_digest"])
+        inventory_digest = str(inventory_row.get("evidence_digest", ""))
+        if ledger_digest and inventory_digest and ledger_digest != inventory_digest:
+            raise SystemExit(
+                "Capture retention digest conflict: inventory={0} retention={1}".format(
+                    conflict_record(inventory_row),
+                    retention_record(row),
+                )
+            )
+        if ledger_digest and not re.fullmatch(r"[0-9a-f]{64}", ledger_digest):
+            raise SystemExit(
+                f"Capture retention evidence digest is not SHA-256 for {capture_id}."
+            )
+        analysis_state = str(row["analysis_state"])
+        evidence_coverage = str(row["evidence_coverage"])
+        retention_state = str(row["retention_state"])
+        if analysis_state not in ANALYSIS_STATES:
+            raise SystemExit(
+                f"Unknown capture analysis state for {capture_id}: {analysis_state}"
+            )
+        if evidence_coverage not in EVIDENCE_COVERAGE_STATES:
+            raise SystemExit(
+                f"Unknown capture evidence coverage for {capture_id}: {evidence_coverage}"
+            )
+        if retention_state not in RETENTION_STATES:
+            raise SystemExit(
+                f"Unknown capture retention state for {capture_id}: {retention_state}"
+            )
+        archive_path = str(row["raw_archive_path"]).strip()
+        archive_digest = str(row["raw_archive_digest"]).strip()
+        if bool(archive_path) != bool(archive_digest):
+            raise SystemExit(
+                f"Capture retention archive path/digest pair is incomplete for {capture_id}."
+            )
+        if archive_digest and not re.fullmatch(r"[0-9a-f]{64}", archive_digest):
+            raise SystemExit(
+                f"Capture retention archive digest is not SHA-256 for {capture_id}."
+            )
+        if retention_state != "discard_approved":
+            continue
+        missing_requirements: list[str] = []
+        if not (ledger_digest or inventory_digest):
+            missing_requirements.append("evidence_digest")
+        if analysis_state != "complete":
+            missing_requirements.append("analysis_state=complete")
+        if evidence_coverage != "complete":
+            missing_requirements.append("evidence_coverage=complete")
+        if not str(row["used_by"]).strip():
+            missing_requirements.append("used_by")
+        if not str(row["approved_by"]).strip():
+            missing_requirements.append("approved_by")
+        if not re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}Z)?",
+            str(row["approved_at"]),
+        ):
+            missing_requirements.append("approved_at")
+        if not str(row["reason"]).strip():
+            missing_requirements.append("reason")
+        used_by = tracked_paths(repo_root, row["used_by"], "used_by", capture_id)
+        derived_artifacts = tracked_paths(
+            repo_root,
+            row["derived_artifacts"],
+            "derived_artifacts",
+            capture_id,
+        )
+        if not used_by:
+            missing_requirements.append("tracked used_by")
+        if not archive_path and not derived_artifacts:
+            missing_requirements.append("raw archive or complete derived artifacts")
+        if missing_requirements:
+            raise SystemExit(
+                "Capture discard approval is incomplete for {0}: {1}; record={2}".format(
+                    capture_id,
+                    ",".join(missing_requirements),
+                    retention_record(row),
+                )
+            )
+
+
+def merge_retention_ledger(
+    existing_rows: list[dict[str, object]],
+    inventory_rows: list[dict[str, object]],
+    repo_root: Path,
+) -> tuple[list[dict[str, object]], dict[str, int]]:
+    existing = [normalize_retention_row(row) for row in existing_rows]
+    validate_retention_rows(existing, inventory_rows, repo_root)
+    existing_by_id = {str(row["capture_id"]): row for row in existing}
+    merged: list[dict[str, object]] = []
+    appended = 0
+    digest_refreshed = 0
+    for inventory_row in inventory_rows:
+        capture_id = str(inventory_row.get("capture_id", ""))
+        row = existing_by_id.get(capture_id)
+        if row is None:
+            row = default_retention_row(inventory_row)
+            appended += 1
+        else:
+            row = dict(row)
+            inventory_digest = str(inventory_row.get("evidence_digest", ""))
+            if inventory_digest and not str(row["evidence_digest"]):
+                row["evidence_digest"] = inventory_digest
+                digest_refreshed += 1
+        merged.append(row)
+    validate_retention_rows(merged, inventory_rows, repo_root)
+    return merged, {
+        "preserved": len(merged) - appended,
+        "appended": appended,
+        "digest_refreshed": digest_refreshed,
+        "discard_approved": sum(
+            str(row["retention_state"]) == "discard_approved" for row in merged
+        ),
+    }
+
+
+def write_retention_csv(path: Path, rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=RETENTION_COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_retention_markdown(path: Path, rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    state_counts = Counter(str(row["retention_state"]) for row in rows)
+    lines = [
+        "# AOSharp Capture Retention",
+        "",
+        "This report is generated from the tracked fail-closed retention ledger.",
+        "Absence from this report never authorizes deletion; unaccepted local captures default to retain.",
+        "The inventory generator does not delete or prune raw capture folders.",
+        "",
+        f"- Tracked captures: **{len(rows)}**",
+        f"- Retain: **{state_counts.get('retain', 0)}**",
+        f"- Archive required: **{state_counts.get('archive_required', 0)}**",
+        f"- Discard approved: **{state_counts.get('discard_approved', 0)}**",
+        "",
+        "| Capture ID | Retention | Analysis | Coverage | Discardable | Used by | Unresolved gaps | Reason |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for row in rows:
+        capture_id = str(row["capture_id"])
+        lines.append(f"<!-- retention-capture-id: {capture_id} -->")
+        lines.append(
+            "| {0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} |".format(
+                markdown_cell(capture_id),
+                markdown_cell(row["retention_state"]),
+                markdown_cell(row["analysis_state"]),
+                markdown_cell(row["evidence_coverage"]),
+                "YES" if str(row["retention_state"]) == "discard_approved" else "NO",
+                markdown_cell(row["used_by"]),
+                markdown_cell(row["unresolved_gaps"]),
+                markdown_cell(row["reason"]),
+            )
+        )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def retention_markdown_ids(path: Path) -> list[str]:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as error:
+        raise SystemExit(f"Unable to read capture retention Markdown {path}: {error}") from error
+    return re.findall(r"<!-- retention-capture-id: ([^ ]+) -->", text)
+
+
+def validate_retention_markdown_sync(
+    rows: list[dict[str, object]],
+    markdown_path: Path,
+) -> None:
+    csv_ids = [str(row["capture_id"]) for row in rows]
+    markdown_ids = retention_markdown_ids(markdown_path)
+    if csv_ids != markdown_ids:
+        raise SystemExit(
+            "Capture retention CSV/Markdown identity conflict: csv={0} markdown={1}".format(
+                json.dumps(csv_ids),
+                json.dumps(markdown_ids),
+            )
+        )
 
 
 def markdown_cell(value: object) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ")
 
 
-def write_markdown(path: Path, rows: list[dict[str, object]]) -> None:
+def write_markdown(
+    path: Path,
+    rows: list[dict[str, object]],
+    current_capture_count: int | None = None,
+    discovered_capture_count: int | None = None,
+    out_of_scope_count: int = 0,
+    concurrently_changed_count: int = 0,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     classification_counts = Counter(str(row["classification"]) for row in rows)
     confidence_counts = Counter(str(row["confidence"]) for row in rows)
@@ -570,13 +1198,17 @@ def write_markdown(path: Path, rows: list[dict[str, object]]) -> None:
     lines = [
         "# AOSharp Capture Location Inventory",
         "",
-        "Generated by `tools/inventory_aosharp_captures.py`. Classification uses exact location evidence only: `enemy-dossier.resourcePlayfieldId=127`, PF127 geometry observation, capture/event playfield identities, and explicit zoning boundaries. Names, player names, and repository references never determine location. The frozen-corpus PF127 runtime-instance map is `127`, `1187842`, `1363982`, `1388552`, and `1407006`; future runtime instances require a fresh exact resource signal. `MIXED` means the same capture contains PF127 plus an outside/zoning playfield. `UNRESOLVED` means no usable location evidence exists; it does not mean elsewhere. Raw evidence counts data rows, so a BOM-only log or header-only CSV is reported as `none`.",
+        "Generated by `tools/inventory_aosharp_captures.py` with non-destructive merge semantics. Accepted historical rows remain when their raw folders are absent; present folders refresh matching identities, and new identities append. Classification uses exact location evidence only: `enemy-dossier.resourcePlayfieldId=127`, PF127 geometry observation, capture/event playfield identities, and explicit zoning boundaries. Names, player names, folder labels, and repository references never determine location. The frozen-corpus PF127 runtime-instance map is `127`, `1187842`, `1363982`, `1388552`, and `1407006`; future runtime instances require a fresh exact resource signal. `MIXED` means the same capture contains PF127 plus an outside/zoning playfield. `UNRESOLVED` means no usable location evidence exists; it does not mean elsewhere. Raw evidence counts data rows, so a BOM-only log or header-only CSV is reported as `none`.",
         "",
         "## Summary",
         "",
         "| Metric | Count |",
         "| --- | ---: |",
-        f"| Total capture folders | {len(rows)} |",
+        f"| Total accepted capture records | {len(rows)} |",
+        f"| Discovered on-disk capture folders at snapshot | {discovered_capture_count if discovered_capture_count is not None else (current_capture_count if current_capture_count is not None else len(rows))} |",
+        f"| In-scope stable current capture folders | {current_capture_count if current_capture_count is not None else len(rows)} |",
+        f"| Out-of-scope discovered folders | {out_of_scope_count} |",
+        f"| Concurrently changed folders skipped | {concurrently_changed_count} |",
         f"| Subway | {classification_counts['SUBWAY']} |",
         f"| Mixed including Subway | {classification_counts['MIXED']} |",
         f"| Elsewhere | {classification_counts['ELSEWHERE']} |",
@@ -618,6 +1250,39 @@ def write_markdown(path: Path, rows: list[dict[str, object]]) -> None:
         lines.append("")
 
     path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def markdown_inventory_ids(path: Path) -> list[str]:
+    result: list[str] = []
+    try:
+        with path.open("r", encoding="utf-8-sig") as stream:
+            for line in stream:
+                if not line.startswith("|"):
+                    continue
+                cells = [cell.strip() for cell in line.split("|")]
+                if len(cells) > 2 and CAPTURE_ID.fullmatch(cells[1]):
+                    result.append(cells[1])
+    except OSError as error:
+        raise SystemExit(f"Unable to read Markdown inventory {path}: {error}") from error
+    return result
+
+
+def validate_csv_markdown_sync(
+    rows: list[dict[str, object]], markdown_path: Path
+) -> None:
+    csv_ids = [str(row["capture_id"]) for row in rows]
+    markdown_ids = markdown_inventory_ids(markdown_path)
+    if len(markdown_ids) != len(set(markdown_ids)):
+        raise SystemExit("Markdown inventory contains duplicate capture identities.")
+    if set(csv_ids) != set(markdown_ids) or len(csv_ids) != len(markdown_ids):
+        missing_markdown = sorted(set(csv_ids) - set(markdown_ids))
+        missing_csv = sorted(set(markdown_ids) - set(csv_ids))
+        raise SystemExit(
+            "CSV/Markdown inventory mismatch: missing_markdown={0} missing_csv={1}".format(
+                ",".join(missing_markdown) or "none",
+                ",".join(missing_csv) or "none",
+            )
+        )
 
 
 def validate_reviewed_corpus(rows: list[dict[str, object]]) -> None:
@@ -680,30 +1345,117 @@ def validate_reviewed_corpus(rows: list[dict[str, object]]) -> None:
 def main() -> int:
     args = parse_args()
     repo_root = Path(args.repo_root).resolve()
-    documented, indexed = collect_repository_references(repo_root)
-    capture_paths = discover_capture_directories(repo_root)
-    if not capture_paths:
-        raise SystemExit("No AOSharp capture folders were found.")
-    rows = [
-        inspect_capture(repo_root, path, documented, indexed) for path in capture_paths
-    ]
-    validate_reviewed_corpus(rows)
     output_csv = (repo_root / args.output_csv).resolve()
     output_md = (repo_root / args.output_md).resolve()
+    retention_ledger = (repo_root / args.retention_ledger).resolve()
+    retention_md = (repo_root / args.retention_md).resolve()
+    accepted_rows = load_inventory(output_csv)
+    accepted_retention_rows = load_retention_ledger(retention_ledger)
+    discovered_capture_paths = discover_capture_directories(repo_root)
+    excluded_capture_ids = set(args.exclude_capture_id)
+    capture_paths = select_current_capture_paths(
+        discovered_capture_paths,
+        excluded_capture_ids,
+        accepted_rows,
+        args.capture_id_cutoff,
+    )
+    initial_signatures = {
+        path: capture_source_signature(path) for path in capture_paths
+    }
+    documented, indexed = collect_repository_references(repo_root)
+    if not capture_paths and not accepted_rows:
+        raise SystemExit("No accepted inventory or AOSharp capture folders were found.")
+    current_rows: list[dict[str, object]] = []
+    concurrently_changed: list[Path] = []
+    for path in capture_paths:
+        if capture_source_signature(path) != initial_signatures[path]:
+            concurrently_changed.append(path)
+            continue
+        row = inspect_capture(repo_root, path, documented, indexed)
+        if capture_source_signature(path) != initial_signatures[path]:
+            concurrently_changed.append(path)
+            continue
+        current_rows.append(row)
+    out_of_scope_count = len(discovered_capture_paths) - len(capture_paths)
+    rows, merge_counts = merge_inventory(accepted_rows, current_rows)
+    validate_reviewed_corpus(rows)
+    if args.validate_current:
+        validate_csv_markdown_sync(accepted_rows, output_md)
+        retention_rows, retention_counts = merge_retention_ledger(
+            accepted_retention_rows,
+            accepted_rows,
+            repo_root,
+        )
+        if retention_counts["appended"]:
+            raise SystemExit(
+                "Capture retention ledger is incomplete: missing accepted rows={0}. "
+                "Run normal inventory regeneration to append fail-closed defaults.".format(
+                    retention_counts["appended"]
+                )
+            )
+        validate_retention_markdown_sync(retention_rows, retention_md)
+        print(
+            "CURRENT_CAPTURE_INVENTORY_VALID accepted={0} current={1} "
+            "discovered_snapshot={2} out_of_scope={3} concurrent_skipped={4} "
+            "preserved={5} refreshed={6} appended={7} removed=0 "
+            "retention_tracked={8} discard_approved={9}".format(
+                len(accepted_rows),
+                len(current_rows),
+                len(discovered_capture_paths),
+                out_of_scope_count,
+                len(concurrently_changed),
+                merge_counts["preserved"],
+                merge_counts["refreshed"],
+                merge_counts["appended"],
+                len(retention_rows),
+                retention_counts["discard_approved"],
+            )
+        )
+        return 0
+    retention_rows, retention_counts = merge_retention_ledger(
+        accepted_retention_rows,
+        rows,
+        repo_root,
+    )
     write_csv(output_csv, rows)
-    write_markdown(output_md, rows)
+    write_markdown(
+        output_md,
+        rows,
+        len(current_rows),
+        len(discovered_capture_paths),
+        out_of_scope_count,
+        len(concurrently_changed),
+    )
+    validate_csv_markdown_sync(rows, output_md)
+    write_retention_csv(retention_ledger, retention_rows)
+    write_retention_markdown(retention_md, retention_rows)
+    validate_retention_markdown_sync(retention_rows, retention_md)
     counts = Counter(str(row["classification"]) for row in rows)
     print(
-        "captures={0} subway={1} mixed={2} elsewhere={3} unresolved={4}".format(
+        "accepted={0} current={1} discovered_snapshot={2} out_of_scope={3} "
+        "concurrent_skipped={4} preserved={5} refreshed={6} appended={7} removed=0 "
+        "subway={8} mixed={9} elsewhere={10} unresolved={11} "
+        "retention_appended={12} discard_approved={13}".format(
             len(rows),
+            len(current_rows),
+            len(discovered_capture_paths),
+            out_of_scope_count,
+            len(concurrently_changed),
+            merge_counts["preserved"],
+            merge_counts["refreshed"],
+            merge_counts["appended"],
             counts["SUBWAY"],
             counts["MIXED"],
             counts["ELSEWHERE"],
             counts["UNRESOLVED"],
+            retention_counts["appended"],
+            retention_counts["discard_approved"],
         )
     )
     print("csv=" + str(output_csv))
     print("markdown=" + str(output_md))
+    print("retention_ledger=" + str(retention_ledger))
+    print("retention_markdown=" + str(retention_md))
     return 0
 
 
