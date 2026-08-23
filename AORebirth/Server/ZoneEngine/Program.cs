@@ -1263,6 +1263,23 @@ namespace ZoneEngine
                 return;
             }
 
+            if (HasEitherArgument(args, "/recover-stale-online", "--recover-stale-online"))
+            {
+                string recoveryLockFile = GetEitherArgumentValue(
+                    args,
+                    "/recovery-lock-file",
+                    "--recovery-lock-file");
+                if (string.IsNullOrWhiteSpace(recoveryLockFile))
+                {
+                    recoveryLockFile = "/run/ao-rebirth-zoneengine/stale-online-recovery.lock";
+                }
+
+                Environment.ExitCode = StaleOnlineRecoveryCommand.Run(
+                    recoveryLockFile,
+                    Convert.ToInt32(ConfigReadWrite.Instance.CurrentConfig.ZonePort));
+                return;
+            }
+
             if (HasEitherArgument(args, "/validate-database", "--validate-database"))
             {
                 Environment.ExitCode = ValidateDatabase();

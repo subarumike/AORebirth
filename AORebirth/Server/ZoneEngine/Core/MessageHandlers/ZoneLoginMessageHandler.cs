@@ -66,6 +66,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             zc.SessionLifecycle.BeginCharacterLoading();
             zc.CreateCharacter(message.CharacterId);
+            zc.AcceptCharacterOnlineOwnership(message.CharacterId);
             zc.SendInitiateCompressionMessage(new InitiateCompressionMessage());
 
             client.Controller.Character.Playfield = zc.Playfield;

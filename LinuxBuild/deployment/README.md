@@ -521,10 +521,12 @@ journalctl -u ao-rebirth-chatengine.service
   it to `127.0.0.1`; change `AO_REBIRTH_CHAT_LISTEN_IP` only after that approval.
 - TCP 6996 is unauthenticated internal ISCom traffic. The Linux default and
   example environment bind it to `127.0.0.1`; never expose it publicly.
-- TCP 7500 is LoginEngine. Stage 7 requires `127.0.0.1` and leaves its unit
-  disabled; public exposure is not approved.
-- TCP 7501 is the currently advertised ZoneEngine endpoint, but ZoneEngine is
-  not part of this checkpoint.
+- TCP 7500 is the player-facing LoginEngine endpoint. Production clients connect
+  directly, so the production unit uses explicit `AO_REBIRTH_BIND_MODE=Public`;
+  `Loopback` remains the local/rollback mode.
+- TCP 7501 is the player-facing ZoneEngine endpoint advertised by LoginEngine's
+  configured `ZoneIP`. There is no reverse proxy or tunnel terminating either
+  game-engine connection.
 - UDP is disabled.
 
 The first VPS pass must run `--validate-startup`, `--validate-database`, and

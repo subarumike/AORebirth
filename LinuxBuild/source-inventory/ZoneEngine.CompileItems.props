@@ -115,6 +115,10 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeyTradeAdapter.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Thrak/Vendors/ThrakGardenVendorInteractionRules.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Doja/DojaChipInteractionRules.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Doja/DojaChipPacketSender.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Doja/DojaChipQuestRuntime.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Doja/DojaChipTradeAdapter.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/CombatCorpseRules.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/CombatDamageRules.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/PlayerSpecialAttackRules.cs" />
@@ -472,6 +476,8 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerSpawnOrchestrator.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/Content/DojaResearchContentModule.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/PerkResetServiceProviderSpawn.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/RomeBlueCitySpawn.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/AndromedaIccHqSpawn.cs" />
@@ -612,6 +618,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/ZoneClient.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/ZoneClientSessionLifecycleCoordinator.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/ZoneServer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Program.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Properties/AssemblyInfo.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/ChatCommands/AOChatCommand.cs" />

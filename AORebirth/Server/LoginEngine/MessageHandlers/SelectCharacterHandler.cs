@@ -100,24 +100,44 @@ namespace LoginEngine.MessageHandlers
                 CharacterDao.Instance.SetOffline(selectCharacterMessage.CharacterId);
             }
 
-            CharacterDao.Instance.SetOnline(selectCharacterMessage.CharacterId);
+            client.MarkCharacterOnlineForHandoff(selectCharacterMessage.CharacterId);
 
-            IPAddress zoneIpAdress;
-            if (IPAddress.TryParse(ConfigReadWrite.Instance.CurrentConfig.ZoneIP, out zoneIpAdress) == false)
+            try
             {
-                IPHostEntry zoneHost = Dns.GetHostEntry(ConfigReadWrite.Instance.CurrentConfig.ZoneIP);
-                zoneIpAdress = zoneHost.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
-            }
+                IPAddress zoneIpAdress;
+                if (IPAddress.TryParse(ConfigReadWrite.Instance.CurrentConfig.ZoneIP, out zoneIpAdress) == false)
+                {
+                    IPHostEntry zoneHost = Dns.GetHostEntry(ConfigReadWrite.Instance.CurrentConfig.ZoneIP);
+                    zoneIpAdress = zoneHost.AddressList.FirstOrDefault(
+                        ip => ip.AddressFamily == AddressFamily.InterNetwork);
+                }
 
-            var zoneRedirectionMessage = new ZoneInfoMessage
-                                         {
-                                             CharacterId = selectCharacterMessage.CharacterId,
-                                             ServerIpAddress = zoneIpAdress,
-                                             ServerPort =
-                                                 (ushort)
-                                                 ConfigReadWrite.Instance.CurrentConfig.ZonePort
-                                         };
-            client.Send(0x0000615B, zoneRedirectionMessage);
+                if (zoneIpAdress == null)
+                {
+                    throw new InvalidOperationException("ZoneIP did not resolve to an IPv4 address.");
+                }
+
+                var zoneRedirectionMessage = new ZoneInfoMessage
+                                             {
+                                                 CharacterId = selectCharacterMessage.CharacterId,
+                                                 ServerIpAddress = zoneIpAdress,
+                                                 ServerPort =
+                                                     (ushort)
+                                                     ConfigReadWrite.Instance.CurrentConfig.ZonePort
+                                             };
+                client.StartZoneHandoff();
+                client.Send(0x0000615B, zoneRedirectionMessage);
+            }
+            catch (Exception exception)
+            {
+                client.Server.Warning(
+                    client,
+                    "Zone handoff failed for character {0}: {1}",
+                    selectCharacterMessage.CharacterId,
+                    exception.Message);
+                client.FailZoneHandoff("handoff-failure");
+                client.Server.DisconnectClient(client);
+            }
         }
 
         #endregion

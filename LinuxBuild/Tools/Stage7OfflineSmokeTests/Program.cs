@@ -160,7 +160,7 @@ internal static class Program
                 && publicStartup.StandardOutput.IndexOf(
                     "bindPolicy=Public address=0.0.0.0",
                     StringComparison.Ordinal) >= 0,
-                "Published LoginEngine startup validation rejected explicit Public mode.");
+                "Published LoginEngine startup validation rejected authoritative production Public mode.");
         }
         finally
         {
@@ -182,6 +182,54 @@ internal static class Program
                 "ZoneIP must be a concrete non-loopback IP address when AO_REBIRTH_BIND_MODE=Public",
                 StringComparison.Ordinal) >= 0,
             "Published LoginEngine startup validation accepted a loopback ZoneIP in Public mode.");
+
+        var loopbackPublicZoneEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        {
+            ["AO_REBIRTH_BIND_MODE"] = "Loopback",
+            ["AO_REBIRTH_CONFIG_PATH"] = CreateConfigWithZoneIp(config, "203.0.113.10")
+        };
+        try
+        {
+            ProcessResult loopbackPublicZone = RunDotNet(
+                publish,
+                loginEngine,
+                new[] { "--validate-startup" },
+                loopbackPublicZoneEnvironment);
+            Assert(
+                loopbackPublicZone.ExitCode != 0
+                && loopbackPublicZone.StandardError.IndexOf(
+                    "ZoneIP must remain a loopback IP address when AO_REBIRTH_BIND_MODE=Loopback",
+                    StringComparison.Ordinal) >= 0,
+                "Published LoginEngine startup validation accepted a public ZoneIP in Loopback mode.");
+        }
+        finally
+        {
+            DeleteIfExists(loopbackPublicZoneEnvironment["AO_REBIRTH_CONFIG_PATH"]);
+        }
+
+        var wrongLoginPortEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
+        {
+            ["AO_REBIRTH_BIND_MODE"] = "Public",
+            ["AO_REBIRTH_CONFIG_PATH"] = CreateConfigWithLoginPortAndZoneIp(config, 7599, "203.0.113.10")
+        };
+        try
+        {
+            ProcessResult wrongLoginPort = RunDotNet(
+                publish,
+                loginEngine,
+                new[] { "--validate-startup" },
+                wrongLoginPortEnvironment);
+            Assert(
+                wrongLoginPort.ExitCode != 0
+                && wrongLoginPort.StandardError.IndexOf(
+                    "LoginPort must be the canonical AORebirth login port 7500",
+                    StringComparison.Ordinal) >= 0,
+                "Published LoginEngine startup validation accepted a noncanonical Public login port.");
+        }
+        finally
+        {
+            DeleteIfExists(wrongLoginPortEnvironment["AO_REBIRTH_CONFIG_PATH"]);
+        }
 
         var invalidBindModeEnvironment = new Dictionary<string, string>(environment, StringComparer.Ordinal)
         {
@@ -290,6 +338,18 @@ internal static class Program
 
         string path = Path.Combine(Path.GetTempPath(), "aorebirth-stage7-login-public-" + Guid.NewGuid().ToString("N") + ".xml");
         File.WriteAllText(path, updatedConfig);
+        return path;
+    }
+
+    private static string CreateConfigWithLoginPortAndZoneIp(string sourceConfig, int loginPort, string zoneIp)
+    {
+        string configText = File.ReadAllText(sourceConfig)
+            .Replace("<ZoneIP>127.0.0.1</ZoneIP>", "<ZoneIP>" + zoneIp + "</ZoneIP>")
+            .Replace("<LoginPort>7500</LoginPort>", "<LoginPort>" + loginPort + "</LoginPort>");
+        string path = Path.Combine(
+            Path.GetTempPath(),
+            "aorebirth-stage7-login-public-port-" + Guid.NewGuid().ToString("N") + ".xml");
+        File.WriteAllText(path, configText);
         return path;
     }
 

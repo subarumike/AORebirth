@@ -381,8 +381,8 @@ namespace AORebirth.LinuxBuild.Contracts
                 .OrderBy(value => value, StringComparer.Ordinal)
                 .ToArray();
 
-            Assert(legacySources.Length == 35, "Legacy LoginEngine compile inventory must contain exactly 35 sources.");
-            Assert(linuxSources.Length == 35, "Linux LoginEngine compile inventory must contain exactly 35 sources.");
+            Assert(legacySources.Length == 36, "Legacy LoginEngine compile inventory must contain exactly 36 sources.");
+            Assert(linuxSources.Length == 36, "Linux LoginEngine compile inventory must contain exactly 36 sources.");
             Assert(legacySources.Distinct(StringComparer.Ordinal).Count() == legacySources.Length, "Legacy LoginEngine compile inventory contains duplicates.");
             Assert(linuxSources.Distinct(StringComparer.Ordinal).Count() == linuxSources.Length, "Linux LoginEngine compile inventory contains duplicates.");
             VerifySequence(legacySources, linuxSources, "LoginEngine linked source inventory");
@@ -732,22 +732,36 @@ namespace AORebirth.LinuxBuild.Contracts
 
         private static void VerifyDeploymentDatabaseIdentity(string root)
         {
+            const string authoritativeProductionBindMode = "Public";
+            const string ownershipDirectory = "/var/lib/ao-rebirth/session-ownership";
             string unitPath = RequireFile(
                 Path.Combine(root, "LinuxBuild", "deployment", "systemd", "ao-rebirth-loginengine.service"),
                 "LoginEngine systemd unit");
+            string zoneUnitPath = RequireFile(
+                Path.Combine(root, "LinuxBuild", "deployment", "systemd", "ao-rebirth-zoneengine.service"),
+                "ZoneEngine systemd unit");
             string environmentPath = RequireFile(
                 Path.Combine(root, "LinuxBuild", "deployment", "systemd", "loginengine.env.example"),
                 "LoginEngine environment example");
+            string ownershipGuardPath = RequireFile(
+                Path.Combine(root, "AORebirth", "Libraries", "Source", "AORebirth.Database", "Dao", "CharacterOnlineOwnershipGuard.cs"),
+                "session ownership guard source");
             string unit = File.ReadAllText(unitPath);
+            string zoneUnit = File.ReadAllText(zoneUnitPath);
             string environment = File.ReadAllText(environmentPath);
+            string ownershipGuard = File.ReadAllText(ownershipGuardPath);
             VerifyExactActiveLine(
                 unit,
                 "Environment=AO_REBIRTH_EXPECTED_DATABASE=aorebirth_chatengine_stage6",
                 "LoginEngine systemd database identity");
             VerifyExactActiveLine(
                 unit,
-                "Environment=AO_REBIRTH_BIND_MODE=Loopback",
+                "Environment=AO_REBIRTH_BIND_MODE=" + authoritativeProductionBindMode,
                 "LoginEngine systemd default bind mode");
+            VerifyExactActiveLine(
+                unit,
+                "EnvironmentFile=/etc/ao-rebirth/loginengine/loginengine.env",
+                "LoginEngine systemd environment source");
             VerifyExactActiveLine(
                 unit,
                 "ExecStartPre=/usr/bin/test ${AO_REBIRTH_EXPECTED_DATABASE} = aorebirth_chatengine_stage6",
@@ -766,8 +780,71 @@ namespace AORebirth.LinuxBuild.Contracts
                 "LoginEngine environment database identity");
             VerifyExactActiveLine(
                 environment,
-                "AO_REBIRTH_BIND_MODE=Loopback",
+                "AO_REBIRTH_BIND_MODE=" + authoritativeProductionBindMode,
                 "LoginEngine environment default bind mode");
+            VerifyExactActiveLine(
+                environment,
+                "AO_REBIRTH_CONFIG_PATH=/etc/ao-rebirth/loginengine/Config.xml",
+                "LoginEngine production configuration path");
+            foreach (KeyValuePair<string, string> service in new[]
+            {
+                Pair("LoginEngine", unit),
+                Pair("ZoneEngine", zoneUnit)
+            })
+            {
+                VerifyExactActiveLine(
+                    service.Value,
+                    "User=aorebirth",
+                    service.Key + " service identity");
+                VerifyExactActiveLine(
+                    service.Value,
+                    "Group=aorebirth",
+                    service.Key + " service group");
+                VerifyExactActiveLine(
+                    service.Value,
+                    "Environment=AO_REBIRTH_SESSION_OWNERSHIP_DIR=" + ownershipDirectory,
+                    service.Key + " shared session ownership directory");
+                VerifyExactActiveLine(
+                    service.Value,
+                    "StateDirectory=ao-rebirth",
+                    service.Key + " systemd-managed state directory");
+                VerifyExactActiveLine(
+                    service.Value,
+                    "StateDirectoryMode=0700",
+                    service.Key + " state directory mode");
+                VerifyExactActiveLine(
+                    service.Value,
+                    "ExecStartPre=/usr/bin/install -d -m 0700 " + ownershipDirectory,
+                    service.Key + " ownership directory creation preflight");
+                foreach (string permission in new[] { "r", "w", "x" })
+                {
+                    VerifyExactActiveLine(
+                        service.Value,
+                        "ExecStartPre=/usr/bin/test -" + permission + " " + ownershipDirectory,
+                        service.Key + " ownership directory access preflight");
+                }
+
+                VerifyExactActiveLine(
+                    service.Value,
+                    "PrivateTmp=true",
+                    service.Key + " private temporary directory hardening");
+            }
+
+            Assert(
+                !ownershipDirectory.StartsWith("/tmp", StringComparison.Ordinal)
+                && ownershipDirectory.IndexOf("loginengine", StringComparison.OrdinalIgnoreCase) < 0
+                && ownershipDirectory.IndexOf("zoneengine", StringComparison.OrdinalIgnoreCase) < 0,
+                "Shared session ownership directory must be outside /tmp and must not be service-private.");
+            Assert(
+                Regex.IsMatch(
+                    ownershipGuard,
+                    @"if\s*\(string\.IsNullOrWhiteSpace\(directory\)\)\s*\{\s*directory\s*=\s*Path\.Combine\(Path\.GetTempPath\(\),\s*\""ao-rebirth-session-ownership\""\);\s*\}\s*Directory\.CreateDirectory\(directory\);",
+                    RegexOptions.Singleline),
+                "Configured session ownership directory must fail closed without falling back to a private temporary path.");
+            Assert(
+                unit.IndexOf("AO_REBIRTH_LOGIN_LISTEN_IP", StringComparison.Ordinal) < 0
+                && environment.IndexOf("AO_REBIRTH_LOGIN_LISTEN_IP", StringComparison.Ordinal) < 0,
+                "LoginEngine Public deployment must not retain the obsolete loopback-only listener setting.");
         }
 
         private static void VerifyExactActiveLine(string content, string expected, string description)

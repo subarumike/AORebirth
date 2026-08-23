@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="../../../AORebirth/Server/LoginEngine/CoreClient/LoginHandoffLifecycle.cs" Link="LoginHandoffLifecycle.cs" />
     <ProjectReference Include="../../Projects/AORebirth.Core.Linux.csproj" />
     <ProjectReference Include="../../Projects/Ionic.Zlib.Linux.csproj" />
     <ProjectReference Include="../../Projects/PlayfieldLoader.Linux.csproj" />

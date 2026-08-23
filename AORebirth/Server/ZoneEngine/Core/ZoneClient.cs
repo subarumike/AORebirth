@@ -135,6 +135,8 @@ namespace ZoneEngine.Core
 
         private bool disposed = false;
 
+        private IDisposable characterOnlineOwnership;
+
         private readonly Queue<QueuedOutboundPacket> sendQueue = new Queue<QueuedOutboundPacket>();
 
         private readonly string questNpcTransportDiagnosticSessionId = Guid.NewGuid().ToString("N");
@@ -450,6 +452,20 @@ namespace ZoneEngine.Core
 
             ActiveNanoRuntimeService.Default.TryRestoreZoneTransferStats(this.Controller.Character);
             this.controller.Character.Stats[StatIds.visualprofession].BaseValue = (uint)this.controller.Character.Stats[StatIds.profession].Value;
+        }
+
+        public void AcceptCharacterOnlineOwnership(int characterId)
+        {
+            if (this.characterOnlineOwnership != null)
+            {
+                throw new InvalidOperationException("Zone ownership was already accepted for this client.");
+            }
+
+            this.characterOnlineOwnership = CharacterOnlineOwnershipGuard.AcquireZoneOwnership(characterId);
+            this.server.Info(
+                this,
+                "ZONE_HANDOFF event=ownership_accepted characterId={0} boundary=post-character-load-pre-session-init",
+                characterId);
         }
 
         private static bool HasRequiredPlayerInventoryPages(Character character)
@@ -922,6 +938,11 @@ namespace ZoneEngine.Core
                         // {
                         //this.character.Client = null;
                         // }
+                    }
+                    if (this.characterOnlineOwnership != null)
+                    {
+                        this.characterOnlineOwnership.Dispose();
+                        this.characterOnlineOwnership = null;
                     }
                     // Client often aborts the TCP socket before we dispose. Closing ZlibStream
                     // flushes to NetworkStream and throws IOException/SocketException — expected.

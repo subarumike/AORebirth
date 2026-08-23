@@ -35,6 +35,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 VerifyJavaScriptSerializerCompatibility();
                 VerifyZlibDiagnosticsCompatibility();
                 VerifyZoneCopiedAssets(repositoryRoot, zoneOutput);
+                StaleOnlineRecoveryTests.Run(repositoryRoot);
+                LoginHandoffLifecycleTests.Run();
                 if (!HasArgument(args, "--structure-only"))
                 {
                     VerifyZoneValidationModes(zoneOutput);

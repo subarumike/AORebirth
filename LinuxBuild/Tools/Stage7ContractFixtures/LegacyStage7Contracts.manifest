@@ -24,6 +24,16 @@ api|type.base%7CSystem.Object
 api|type.constructor%7Cpublic instance .ctor(AORebirth.Core.Components.IMessageSerializer messageSerializer,AORebirth.Core.Components.IBus bus)
 api|type.method%7Cpublic instance LoginEngine.CoreClient.Client Create(LoginEngine.CoreServer.LoginServer loginServer)
 api|type.end%7CLoginEngine.Component.ClientFactory
+api|type.begin%7CLoginEngine.CoreClient.CharacterDaoLoginHandoffOnlineStore
+api|type.kind%7Cclass
+api|type.modifiers%7Csealed
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.interface%7CLoginEngine.CoreClient.ILoginHandoffOnlineStore
+api|type.constructor%7Cpublic instance .ctor()
+api|type.method%7Cpublic instance virtual final AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult TryClearLoginOwnership(System.Int32 characterId)
+api|type.method%7Cpublic instance virtual final System.Void SetOnline(System.Int32 characterId)
+api|type.end%7CLoginEngine.CoreClient.CharacterDaoLoginHandoffOnlineStore
 api|type.begin%7CLoginEngine.CoreClient.Client
 api|type.kind%7Cclass
 api|type.modifiers%7C
@@ -41,6 +51,41 @@ api|type.method%7Cpublic instance special-name System.Void set_AccountName(Syste
 api|type.method%7Cpublic instance special-name System.Void set_ClientVersion(System.String value)
 api|type.method%7Cpublic instance special-name System.Void set_ServerSalt(System.String value)
 api|type.end%7CLoginEngine.CoreClient.Client
+api|type.begin%7CLoginEngine.CoreClient.ILoginHandoffOnlineStore
+api|type.kind%7Cinterface
+api|type.modifiers%7Cabstract
+api|type.serializable-attribute%7Cnot-applicable
+api|type.base%7C
+api|type.method%7Cpublic instance abstract virtual AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult TryClearLoginOwnership(System.Int32 characterId)
+api|type.method%7Cpublic instance abstract virtual System.Void SetOnline(System.Int32 characterId)
+api|type.end%7CLoginEngine.CoreClient.ILoginHandoffOnlineStore
+api|type.begin%7CLoginEngine.CoreClient.LoginHandoffLifecycle
+api|type.kind%7Cclass
+api|type.modifiers%7Csealed
+api|type.serializable-attribute%7Cfalse
+api|type.base%7CSystem.Object
+api|type.constructor%7Cpublic instance .ctor(LoginEngine.CoreClient.ILoginHandoffOnlineStore store,System.Action<System.String> audit)
+api|type.property%7Cpublic instance LoginEngine.CoreClient.LoginHandoffState State {get:public;set:none}
+api|type.property%7Cpublic instance System.Int32 CharacterId {get:public;set:none}
+api|type.method%7Cpublic instance AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult CleanupLoginOwnership(System.String reason)
+api|type.method%7Cpublic instance System.Void MarkOnline(System.Int32 selectedCharacterId)
+api|type.method%7Cpublic instance System.Void RecordZoneAccepted(System.String reason)
+api|type.method%7Cpublic instance System.Void StartHandoff()
+api|type.method%7Cpublic instance special-name LoginEngine.CoreClient.LoginHandoffState get_State()
+api|type.method%7Cpublic instance special-name System.Int32 get_CharacterId()
+api|type.end%7CLoginEngine.CoreClient.LoginHandoffLifecycle
+api|type.begin%7CLoginEngine.CoreClient.LoginHandoffState
+api|type.kind%7Cenum
+api|type.modifiers%7Csealed
+api|type.serializable-attribute%7Cnot-applicable
+api|type.enum-underlying%7CSystem.Int32
+api|type.enum-flags-attribute%7Cfalse
+api|type.enum-value%7CCleanupCompleted%7CSystem.Int32:4
+api|type.enum-value%7CHandoffStarted%7CSystem.Int32:2
+api|type.enum-value%7CNone%7CSystem.Int32:0
+api|type.enum-value%7CPreHandoffLoginOwned%7CSystem.Int32:1
+api|type.enum-value%7CZoneAccepted%7CSystem.Int32:3
+api|type.end%7CLoginEngine.CoreClient.LoginHandoffState
 api|type.begin%7CLoginEngine.CoreServer.LoginServer
 api|type.kind%7Cclass
 api|type.modifiers%7Csealed

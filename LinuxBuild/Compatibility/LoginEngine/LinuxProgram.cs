@@ -634,9 +634,9 @@ namespace LoginEngine
 
             EngineBindPolicy bindPolicy = GetLoginBindPolicy();
 
-            if (configuration.LoginPort < 1 || configuration.LoginPort > 65535)
+            if (configuration.LoginPort != 7500)
             {
-                throw new InvalidDataException("LoginPort must be between 1 and 65535.");
+                throw new InvalidDataException("LoginPort must be the canonical AORebirth login port 7500.");
             }
 
             IPAddress zoneAddress;

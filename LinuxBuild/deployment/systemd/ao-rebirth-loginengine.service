@@ -12,8 +12,15 @@ WorkingDirectory=/opt/ao-rebirth/loginengine/current
 Environment=AO_REBIRTH_REQUIRED_SQL_TYPE=MySql
 Environment=AO_REBIRTH_EXPECTED_DATABASE=aorebirth_chatengine_stage6
 Environment=AO_REBIRTH_BIND_MODE=Public
+Environment=AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/session-ownership
 EnvironmentFile=/etc/ao-rebirth/loginengine/loginengine.env
+StateDirectory=ao-rebirth
+StateDirectoryMode=0700
 ExecStartPre=/usr/bin/test ${AO_REBIRTH_EXPECTED_DATABASE} = aorebirth_chatengine_stage6
+ExecStartPre=/usr/bin/install -d -m 0700 /var/lib/ao-rebirth/session-ownership
+ExecStartPre=/usr/bin/test -r /var/lib/ao-rebirth/session-ownership
+ExecStartPre=/usr/bin/test -w /var/lib/ao-rebirth/session-ownership
+ExecStartPre=/usr/bin/test -x /var/lib/ao-rebirth/session-ownership
 ExecStartPre=/opt/ao-rebirth/loginengine/current/LoginEngine --validate-startup
 ExecStartPre=/opt/ao-rebirth/loginengine/current/LoginEngine --validate-database
 ExecStart=/opt/ao-rebirth/loginengine/current/LoginEngine --headless

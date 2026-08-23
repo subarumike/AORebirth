@@ -5,6 +5,7 @@
       <Link>Properties/SolutionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Connector.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Dao/NewCharacterStartAreaSelectionDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Dao/Dao.cs" />

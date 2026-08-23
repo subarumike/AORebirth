@@ -5,6 +5,7 @@
       <Link>Properties/SolutionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreClient/Client.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreClient/LoginHandoffLifecycle.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/AdventurerStarterLoadout.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/AgentStarterLoadout.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/BureaucratStarterLoadout.cs" />

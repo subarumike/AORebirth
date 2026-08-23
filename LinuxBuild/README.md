@@ -154,7 +154,7 @@ handlers; this does not claim that full Core or PlayfieldLoader has been ported.
 NBug and `System.Messaging` remain excluded from the Linux executable.
 
 The LoginEngine Linux entrypoint uses exact-case configuration, env-only MySQL
-credentials, a loopback-only TCP listener, live read-only database preflight,
+credentials, a policy-gated Loopback/Public TCP listener, live read-only database preflight,
 `Type=notify` readiness, and SIGTERM/SIGINT cleanup. Build its contract and
 runtime gate, then publish the Ubuntu package with:
 
@@ -197,10 +197,11 @@ lifecycle, and publish-structure gates. Native Ubuntu 24.04.4 x86_64 apphost
 execution, an exact 34-table MySQL 8.4 import, production database/login-path
 parity, listener-free Stage 7.1 security acceptance with zero residue, guarded
 atomic upgrade to `stage7-20260809-login-003`, systemd live database readiness,
-loopback listener ownership, and real SIGTERM delivery pass. The LoginEngine
-unit remains disabled/inactive, TCP 7500 is closed, and MySQL remains healthy on
-loopback. Stage 8 ZoneEngine/full Core, official-client end-to-end and retry/UX
-proof, resolved character-count semantics, sustained multiplayer soak, boot
-persistence, and public player traffic remain pending.
+loopback listener ownership, and real SIGTERM delivery pass. That initial Stage 7
+checkpoint left LoginEngine disabled on loopback. Current production supersedes
+that activation boundary: clients connect directly to public TCP 7500 and receive
+the public ZoneEngine handoff for TCP 7501 through explicit
+`AO_REBIRTH_BIND_MODE=Public`. Loopback remains the default and rollback mode,
+while MySQL and internal service paths remain private.
 The staged dependency and Ubuntu deployment path is recorded in
 [`PORTING_PLAN.md`](PORTING_PLAN.md).
