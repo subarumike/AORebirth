@@ -700,6 +700,7 @@
     <Compile Include="Core\ZoneClient.cs" />
     <Compile Include="Core\ZoneClientSessionLifecycleCoordinator.cs" />
     <Compile Include="Core\ZoneServer.cs" />
+    <Compile Include="StaleOnlineRecovery.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChatCommands\AOChatCommand.cs" />

@@ -36,11 +36,13 @@ namespace LoginEngine.CoreClient
     using System;
     using System.Globalization;
     using System.Text;
+    using System.Threading;
 
     using Cell.Core;
 
     using AORebirth.Core.Components;
     using AORebirth.Core.EventHandlers.Events;
+    using AORebirth.Database.Dao;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
@@ -95,6 +97,10 @@ namespace LoginEngine.CoreClient
         /// </summary>
         private string serverSalt = string.Empty;
 
+        private readonly LoginHandoffLifecycle handoffLifecycle;
+
+        private Timer handoffTimeout;
+
         /// <summary>
         /// </summary>
         private enum AuthenticationState
@@ -123,6 +129,9 @@ namespace LoginEngine.CoreClient
         {
             this.messageSerializer = messageSerializer;
             this.bus = bus;
+            this.handoffLifecycle = new LoginHandoffLifecycle(
+                new CharacterDaoLoginHandoffOnlineStore(),
+                Console.WriteLine);
         }
 
         #endregion
@@ -441,12 +450,37 @@ namespace LoginEngine.CoreClient
             }
         }
 
+        internal void MarkCharacterOnlineForHandoff(int characterId)
+        {
+            this.handoffLifecycle.MarkOnline(characterId);
+        }
+
+        internal void StartZoneHandoff()
+        {
+            this.handoffLifecycle.StartHandoff();
+            this.StopHandoffTimer();
+            this.handoffTimeout = new Timer(
+                this.OnHandoffTimeout,
+                null,
+                ResolveHandoffTimeoutMilliseconds(),
+                Timeout.Infinite);
+        }
+
+        internal void FailZoneHandoff(string reason)
+        {
+            this.StopHandoffTimer();
+            this.TryCleanupHandoff(reason);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="disposing">
         /// </param>
         protected override void Dispose(bool disposing)
         {
+            this.StopHandoffTimer();
+            this.TryCleanupHandoff("client-disconnect");
+
             lock (this.authenticationSync)
             {
                 this.accountName = string.Empty;
@@ -461,6 +495,50 @@ namespace LoginEngine.CoreClient
             }
 
             base.Dispose(disposing);
+        }
+
+        private void OnHandoffTimeout(object state)
+        {
+            this.TryCleanupHandoff("handoff-timeout");
+            this.Server.DisconnectClient(this);
+        }
+
+        private void TryCleanupHandoff(string reason)
+        {
+            try
+            {
+                this.handoffLifecycle.CleanupLoginOwnership(reason);
+            }
+            catch (Exception exception)
+            {
+                this.Server.Warning(
+                    this,
+                    "Login handoff cleanup failed for character {0}: {1}",
+                    this.handoffLifecycle.CharacterId,
+                    exception.Message);
+            }
+        }
+
+        private void StopHandoffTimer()
+        {
+            Timer timer = Interlocked.Exchange(ref this.handoffTimeout, null);
+            if (timer != null)
+            {
+                timer.Dispose();
+            }
+        }
+
+        private static int ResolveHandoffTimeoutMilliseconds()
+        {
+            const int defaultSeconds = 30;
+            int seconds;
+            string configured = Environment.GetEnvironmentVariable("AO_REBIRTH_LOGIN_HANDOFF_TIMEOUT_SECONDS");
+            if (!int.TryParse(configured, out seconds) || seconds < 5 || seconds > 120)
+            {
+                seconds = defaultSeconds;
+            }
+
+            return seconds * 1000;
         }
 
         /// <summary>
