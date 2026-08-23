@@ -623,6 +623,35 @@ cmd /d /c tools\validate_capture_evidence_fixtures.cmd
 This is a Windows-lane gate. After it passes, the same tracked fixture files can
 be reconciled into the Linux branch before any gameplay code is promoted.
 
+### Raw capture retention authority
+
+`docs/evidence/aosharp_capture_retention.csv` is the tracked source of truth for
+whether accepted AOSharp raw evidence must be retained. Its synchronized report
+is `docs/generated/aosharp_capture_retention.md`.
+
+Normal inventory regeneration appends every newly accepted capture as
+`retain/unreviewed`; it preserves reviewed records and fills a previously blank
+digest only when the accepted inventory proves that identity. An identity or
+digest mismatch fails closed. A local capture that is absent from the accepted
+inventory or retention report is still retained by default.
+
+Only `discard_approved` is discard authority. It requires an evidence digest,
+complete analysis and evidence coverage, tracked `used_by` paths, an immutable
+raw archive path plus SHA-256 or complete tracked derived artifacts, and an
+approval name, date, and reason. Repository references, generated inventory
+rows, implementation references, or fixture existence alone are not discard
+authority.
+
+Regenerate and validate with:
+
+```cmd
+cmd /d /c python Tools\inventory_aosharp_captures.py
+cmd /d /c python Tools\inventory_aosharp_captures.py --validate-current
+```
+
+The generator has no prune or delete operation. Raw-folder removal is never an
+inventory side effect and must not be automated from inferred usage.
+
 ## Windows/Linux server repair parity
 
 Server repairs are Windows-authoritative first and Linux-deployed second.
