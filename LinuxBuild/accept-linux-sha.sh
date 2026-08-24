@@ -109,15 +109,21 @@ if [[ -n "$(git -C "${repo_dir}" status --porcelain --untracked-files=no)" ]]; t
 fi
 echo "TRACKED_SOURCE_CLEAN=PASS"
 
+"${repo_dir}/LinuxBuild/publish-loginengine.sh" "${runtime_id}" "${self_contained}"
 "${repo_dir}/LinuxBuild/publish-zoneengine.sh" "${runtime_id}" "${self_contained}"
+bash "${repo_dir}/LinuxBuild/deployment/production-release/tests/test-upgrade-active-services.sh"
 
-publish_dir="${repo_dir}/LinuxBuild/artifacts/zoneengine/${runtime_id}/${package_kind}"
+login_publish_dir="${repo_dir}/LinuxBuild/artifacts/loginengine/${runtime_id}/${package_kind}"
+zone_publish_dir="${repo_dir}/LinuxBuild/artifacts/zoneengine/${runtime_id}/${package_kind}"
 dotnet_sdk_version="$(dotnet --version)"
 build_timestamp_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 build_host_type="$(uname -srm)"
 
-printf '%s\n' "${expected_sha}" > "${publish_dir}/SOURCE_SHA"
-cat > "${publish_dir}/BUILD_PROVENANCE.env" <<EOF
+write_accepted_provenance()
+{
+    local publish_dir="$1"
+    printf '%s\n' "${expected_sha}" > "${publish_dir}/SOURCE_SHA"
+    cat > "${publish_dir}/BUILD_PROVENANCE.env" <<EOF
 REPOSITORY=AORebirth
 COMMIT_SHA=${expected_sha}
 BUILD_PLATFORM=linux
@@ -130,7 +136,7 @@ BUILD_TIMESTAMP_UTC=${build_timestamp_utc}
 ACCEPTANCE_RESULT=PASS
 EOF
 
-cat > "${publish_dir}/LINUX_ACCEPTANCE.env" <<EOF
+    cat > "${publish_dir}/LINUX_ACCEPTANCE.env" <<EOF
 AO_REBIRTH_SOURCE_SHA=${expected_sha}
 EXPECTED_SOURCE_SHA=${expected_sha}
 SOURCE_SHA_MATCH=PASS
@@ -143,10 +149,26 @@ RUNTIME_IDENTIFIER=${runtime_id}
 SELF_CONTAINED=${self_contained}
 LINUX_ACCEPTANCE=PASS
 EOF
+}
+
+write_accepted_provenance "${login_publish_dir}"
+write_accepted_provenance "${zone_publish_dir}"
+
+release_manifest="${repo_dir}/LinuxBuild/artifacts/production-release/release.manifest"
+bash "${repo_dir}/LinuxBuild/deployment/production-release/create-release-manifest.sh" \
+    --expected-sha "${expected_sha}" \
+    --login-artifact-dir "${login_publish_dir}" \
+    --zone-artifact-dir "${zone_publish_dir}" \
+    --login-unit "${repo_dir}/LinuxBuild/deployment/systemd/ao-rebirth-loginengine.service" \
+    --zone-unit "${repo_dir}/LinuxBuild/deployment/systemd/ao-rebirth-zoneengine.service" \
+    --output "${release_manifest}"
 
 echo "RESTORE=PASS"
 echo "BUILD=PASS"
 echo "TESTS=PASS"
 echo "PUBLISH=PASS"
-echo "LINUX_ARTIFACT_DIR=${publish_dir}"
+echo "LINUX_LOGINENGINE_ARTIFACT_DIR=${login_publish_dir}"
+echo "LINUX_ZONEENGINE_ARTIFACT_DIR=${zone_publish_dir}"
+echo "LINUX_ARTIFACT_DIR=${zone_publish_dir}"
+echo "LINUX_RELEASE_MANIFEST=${release_manifest}"
 echo "LINUX_ACCEPTANCE=PASS"

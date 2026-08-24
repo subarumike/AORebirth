@@ -38,6 +38,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 StaleOnlineRecoveryTests.Run(repositoryRoot);
                 LoginHandoffLifecycleTests.Run();
                 CleanmeisterCorpseMappingTests.Run(repositoryRoot);
+                ProductionDeploymentWorkflowContractTests.Run(repositoryRoot);
                 if (!HasArgument(args, "--structure-only"))
                 {
                     VerifyZoneValidationModes(zoneOutput);
