@@ -137,6 +137,11 @@ PF1931_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
     ),
 }
 
+SCARLETT_DALQUIST_SOURCE = (
+    "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs"
+)
+SCARLETT_DALQUIST_CAPTURE_ID = "20260821-222107"
+
 # Every production call site must be assigned to either the fixed-denominator
 # coverage or an explicit non-denominator audit family.  The expected call
 # count makes a second call in an already-covered file fail closed too.
@@ -198,6 +203,11 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
         1,
         "non-denominator-audit",
         ("cleaning-robots",),
+    ),
+    SCARLETT_DALQUIST_SOURCE: (
+        1,
+        "non-denominator-audit",
+        ("captured-dialogue-trade-npcs",),
     ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs": (
         2,
@@ -2949,12 +2959,75 @@ def build_non_denominator_audit_records(
         }
     )
 
+    if SCARLETT_DALQUIST_CAPTURE_ID in searched_capture_ids:
+        raise CoverageError(
+            "Scarlett Dalquist content capture is now present in the combat corpus; "
+            "replace its source-citation audit with exact recovered combat evidence"
+        )
+    records.append(
+        {
+            "auditKey": hashlib.sha256(
+                (
+                    "captured-dialogue-trade-npcs|Scarlett Dalquist|26090|150"
+                ).encode("utf-8")
+            ).hexdigest()[:20],
+            "auditFamily": "captured-dialogue-trade-npcs",
+            "denominatorContribution": 0,
+            "denominatorExplanation": (
+                "captured social dialogue/trade NPC outside the fixed hostile combat "
+                "denominator"
+            ),
+            "runtimeCardinality": "one fixed social NPC in DOJA Research / Lab R1",
+            "runtimePlayfieldOrResource": 7010,
+            "name": "Scarlett Dalquist",
+            "monsterData": 26090,
+            "level": 150,
+            "sourceIdentity": None,
+            "roles": ["dialogue NPC", "trade NPC", "DOJA research NPC"],
+            "runtimeProfileSelector": "explicit-unresolved-noncombat-contract",
+            "combatProfileKey": (
+                "resource=7010|md=26090|level=150|name=Scarlett Dalquist"
+            ),
+            "classification": "unresolved",
+            "capturedContractDataRuntimeReady": False,
+            "runtimeBindingReady": True,
+            "captureSearchScope": "corpusSearch.sessionsSearched",
+            "captureSessionCountSearched": len(searched_sessions),
+            "matchingEvidenceSessionCount": 0,
+            "noMatchingEvidenceAfterExhaustiveSearch": True,
+            "captureSessions": [],
+            "evidencePacketIds": [],
+            "evidenceFound": [
+                {
+                    "observationType": "runtime-source-explicit-unresolved-contract",
+                    "captureId": SCARLETT_DALQUIST_CAPTURE_ID,
+                    "aiProfile": "Social",
+                    "capturedRole": "dialogue/trade NPC",
+                }
+            ],
+            "missingEvidence": [
+                "capture-backed hostile combat contract; authoritative source classifies the actor as a social dialogue/trade NPC"
+            ],
+            "runtimeMissingEvidence": [],
+            "unresolvedReasons": [
+                "the authoritative source binds an explicit unresolved contract because the captured actor is a social dialogue/trade NPC, not a promoted hostile"
+            ],
+            "disabledGameplayCapabilities": [
+                "NPC auto-attack emission and damage application"
+            ],
+            "contentSources": [SCARLETT_DALQUIST_SOURCE],
+            "contentEvidenceCaptureIds": [SCARLETT_DALQUIST_CAPTURE_ID],
+            "unavailableContentEvidenceCaptureIds": [SCARLETT_DALQUIST_CAPTURE_ID],
+        }
+    )
+
     family_summaries: List[Dict[str, Any]] = []
     for family in (
         "dynamic-mission-mobs",
         "cleaning-robots",
         "elysium-east-captured-population",
         "scripted-hostiles",
+        "captured-dialogue-trade-npcs",
     ):
         family_rows = [row for row in records if row["auditFamily"] == family]
         family_summaries.append(
@@ -2978,6 +3051,8 @@ def build_non_denominator_audit_records(
         raise CoverageError("Elysium East/South audit lost its captured population")
     if family_summaries[3]["recordCount"] != 1:
         raise CoverageError("scripted-hostile audit lost Cursed Silvertail")
+    if family_summaries[4]["recordCount"] != 1:
+        raise CoverageError("dialogue/trade NPC audit lost Scarlett Dalquist")
     return records, family_summaries
 
 
