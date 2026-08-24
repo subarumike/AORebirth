@@ -122,14 +122,19 @@ namespace ZoneEngine
                             + " characterIds=" + characterIds
                             + " oldOnlineValues=" + oldValues);
 
-                        int updated = 0;
-                        if (rows.Count != 0)
+                        if (rows.Count == 0)
                         {
-                            updated = store.ClearRows(rows.Select(row => row.CharacterId).ToArray());
-                            if (updated != rows.Count)
-                            {
-                                throw new InvalidDataException("Bounded stale Online update count mismatch.");
-                            }
+                            runtime.Audit(
+                                Prefix(timestamp, store.DatabaseName)
+                                + " cleanupRequired=NO rowsUpdated=0 postUpdateNonzero=not-required"
+                                + " RECOVERY_ALLOWED=NOT_REQUIRED DATABASE_VALIDATION_ALLOWED=YES");
+                            return 0;
+                        }
+
+                        int updated = store.ClearRows(rows.Select(row => row.CharacterId).ToArray());
+                        if (updated != rows.Count)
+                        {
+                            throw new InvalidDataException("Bounded stale Online update count mismatch.");
                         }
 
                         long postUpdateCount = store.CountNonzeroRows();
@@ -141,7 +146,7 @@ namespace ZoneEngine
                         store.Commit();
                         runtime.Audit(
                             Prefix(timestamp, store.DatabaseName)
-                            + " rowsUpdated=" + updated.ToString(CultureInfo.InvariantCulture)
+                            + " cleanupRequired=YES rowsUpdated=" + updated.ToString(CultureInfo.InvariantCulture)
                             + " postUpdateNonzero=" + postUpdateCount.ToString(CultureInfo.InvariantCulture)
                             + " RECOVERY_ALLOWED=YES DATABASE_VALIDATION_ALLOWED=YES");
                         return 0;
@@ -150,12 +155,34 @@ namespace ZoneEngine
             }
             catch (Exception exception)
             {
+                StackFrame[] frames = new StackTrace(exception, true).GetFrames();
+                StackFrame sourceFrame = frames == null
+                    ? null
+                    : frames.FirstOrDefault(frame => frame.GetFileLineNumber() != 0);
+                string exceptionSource = sourceFrame == null
+                    ? exception.Source ?? "unknown"
+                    : sourceFrame.GetFileName() ?? exception.Source ?? "unknown";
+                int exceptionLine = sourceFrame == null ? 0 : sourceFrame.GetFileLineNumber();
                 runtime.Audit(
                     Prefix(timestamp, expectedDatabase)
                     + " error=" + exception.GetType().Name
+                    + " exceptionMessage=" + AuditQuoted(exception.Message)
+                    + " exceptionSource=" + AuditQuoted(exceptionSource)
+                    + " exceptionLine=" + exceptionLine.ToString(CultureInfo.InvariantCulture)
+                    + " exceptionStack=" + AuditQuoted(exception.StackTrace)
                     + " RECOVERY_ALLOWED=NO DATABASE_VALIDATION_ALLOWED=NO");
                 return 1;
             }
+        }
+
+        private static string AuditQuoted(string value)
+        {
+            string escaped = (value ?? string.Empty)
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\r", "\\r")
+                .Replace("\n", "\\n");
+            return "\"" + escaped + "\"";
         }
 
         private static string Prefix(string timestamp, string database)
