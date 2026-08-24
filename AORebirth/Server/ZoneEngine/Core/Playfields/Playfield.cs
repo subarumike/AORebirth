@@ -4465,9 +4465,14 @@ namespace AORebirth.Core.Playfields
 
         private static int DeathAnimationKeyFor(ICharacter target)
         {
+            if (IsCleanmeisterIntelligenceRobot(target))
+            {
+                return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(true);
+            }
+
             if (IsCapturedCleaningRobot(target))
             {
-                return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2;
+                return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(false);
             }
 
             // L7 gold 20260725-002423: mission trash Death Parameter2=501 (not default 0x1F7).

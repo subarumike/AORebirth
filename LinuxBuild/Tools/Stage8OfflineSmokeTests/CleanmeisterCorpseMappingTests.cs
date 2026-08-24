@@ -10,6 +10,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
     {
         private const int ExpectedCorpseCatMesh = 297018;
         private const int ExpectedCorpseMonsterData = 297023;
+        private const int ExpectedDeathActionParameter2 = 501;
 
         public static void Run(string repositoryRoot)
         {
@@ -79,9 +80,50 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                     ExpectedCorpseMonsterData,
                     ExpectedCorpseCatMesh) == ExpectedCorpseMonsterData,
                 "Cleanmeister corpse mapping changed MonsterData");
+            Require(
+                NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(true)
+                == ExpectedDeathActionParameter2,
+                "Cleanmeister death action Parameter2 is not capture-backed value 501");
+            Require(
+                NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(false)
+                == NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2
+                && NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2
+                == 503,
+                "generic cleaning-robot death action Parameter2 changed from 503");
+            Require(
+                NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(true)
+                != NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2,
+                "Cleanmeister can silently fall through to generic death action 503");
+
+            int deathMapping = playfieldSource.IndexOf(
+                "private static int DeathAnimationKeyFor(ICharacter target)",
+                StringComparison.Ordinal);
+            int cleanmeisterDeathBranch = playfieldSource.IndexOf(
+                "if (IsCleanmeisterIntelligenceRobot(target))",
+                deathMapping,
+                StringComparison.Ordinal);
+            int cleanmeisterDeathReturn = playfieldSource.IndexOf(
+                "return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(true);",
+                cleanmeisterDeathBranch,
+                StringComparison.Ordinal);
+            int genericCleaningRobotDeathBranch = playfieldSource.IndexOf(
+                "if (IsCapturedCleaningRobot(target))",
+                deathMapping,
+                StringComparison.Ordinal);
+            int genericCleaningRobotDeathReturn = playfieldSource.IndexOf(
+                "return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2For(false);",
+                genericCleaningRobotDeathBranch,
+                StringComparison.Ordinal);
+            Require(
+                deathMapping >= 0
+                && cleanmeisterDeathBranch > deathMapping
+                && cleanmeisterDeathReturn > cleanmeisterDeathBranch
+                && genericCleaningRobotDeathBranch > cleanmeisterDeathReturn
+                && genericCleaningRobotDeathReturn > genericCleaningRobotDeathBranch,
+                "Cleanmeister death action is not selected before the generic cleaning-robot mapping");
 
             Console.WriteLine(
-                "PASS: Cleanmeister corpse CatMesh 297018 with MonsterData 297023");
+                "PASS: Cleanmeister death Parameter2 501 with corpse CatMesh 297018 and MonsterData 297023");
         }
 
         private static void Require(bool condition, string message)
