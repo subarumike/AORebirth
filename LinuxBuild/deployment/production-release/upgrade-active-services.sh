@@ -152,12 +152,13 @@ validate_units()
     require_exact_line "${LOGIN_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/loginengine/current/LoginEngine --headless" "LoginEngine executable contract failed"
     require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --recover-stale-online --recovery-lock-file /run/ao-rebirth-zoneengine/stale-online-recovery.lock" "ZoneEngine stale-online recovery contract failed"
     require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database" "ZoneEngine database validation contract failed"
-    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "ZoneEngine executable contract failed"
+    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "ZoneEngine production executable contract failed"
+    [[ "$(grep -Fxc -- "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "${ZONE_UNIT_SOURCE}" || true)" == "0" ]] || fail "ZoneEngine validation lifecycle cannot be production ExecStart"
     local ownership_line recovery_line database_line start_line
     ownership_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/usr/bin/install -d -m 0700 ${EXPECTED_OWNERSHIP_DIR}")"
     recovery_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --recover-stale-online --recovery-lock-file /run/ao-rebirth-zoneengine/stale-online-recovery.lock")"
     database_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database")"
-    start_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown")"
+    start_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown")"
     (( ownership_line < recovery_line && database_line == recovery_line + 1 && database_line < start_line )) || fail "ZoneEngine ExecStartPre ordering contract failed"
 }
 

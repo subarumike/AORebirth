@@ -205,6 +205,7 @@ create_fixture; sed -i 's|AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/s
 create_fixture; sed -i 's|/var/lib/ao-rebirth/session-ownership|/tmp/session-ownership|g' "${input}/login.service" "${input}/zone.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i '/^PrivateTmp=true$/d' "${input}/login.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i '/ZoneEngine --recover-stale-online/d' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
+create_fixture; sed -i 's|ZoneEngine --headless --shutdown-file|ZoneEngine --validate-lifecycle --shutdown-file|' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure; require grep -F 'ZoneEngine production executable contract failed' "${fixture}/output"
 create_fixture; printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"; expect_transaction_failure artifact_install; require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/output"; require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/output"
 create_fixture; expect_transaction_failure unit_install
 create_fixture; expect_transaction_failure login_start
@@ -238,5 +239,5 @@ behavior_hash_after="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngin
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 require test "${behavior_hash_before}" = "${behavior_hash_after}"
 tests_run=$((tests_run + 1))
-require test "${tests_run}" = 17
-echo "PASS: production deployment workflow tests (17/17)"
+require test "${tests_run}" = 18
+echo "PASS: production deployment workflow tests (18/18)"

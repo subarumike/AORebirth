@@ -1,10 +1,11 @@
 [Unit]
-Description=AORebirth ZoneEngine Stage 9 validation service
+Description=AORebirth ZoneEngine
 Wants=network-online.target
 After=network-online.target ao-rebirth-chatengine.service ao-rebirth-loginengine.service
 
 [Service]
-Type=simple
+Type=notify
+NotifyAccess=main
 User=aorebirth
 Group=aorebirth
 WorkingDirectory=/opt/ao-rebirth/zoneengine/current
@@ -28,7 +29,7 @@ ExecStartPre=/usr/bin/rm -f /run/ao-rebirth-zoneengine/shutdown
 ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-startup
 ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --recover-stale-online --recovery-lock-file /run/ao-rebirth-zoneengine/stale-online-recovery.lock
 ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database
-ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown
+ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown
 ExecStop=/usr/bin/touch /run/ao-rebirth-zoneengine/shutdown
 Restart=on-failure
 RestartSec=5s

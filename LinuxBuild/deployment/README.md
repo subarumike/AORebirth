@@ -532,3 +532,8 @@ journalctl -u ao-rebirth-chatengine.service
 The first VPS pass must run `--validate-startup`, `--validate-database`, and
 `--validate-lifecycle` before production listener activation. A public firewall
 change or player test still requires separate authorization.
+
+Those validation modes are preflight operations only. The installed ZoneEngine
+service must run `--headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown`;
+`--validate-lifecycle` intentionally starts no listener and is rejected as the
+production `ExecStart` command.

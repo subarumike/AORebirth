@@ -12,6 +12,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             string manifest = File.ReadAllText(Path.Combine(deploymentRoot, "create-release-manifest.sh"));
             string tests = File.ReadAllText(Path.Combine(deploymentRoot, "tests", "test-upgrade-active-services.sh"));
             string acceptance = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "accept-linux-sha.sh"));
+            string zoneUnit = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "systemd", "ao-rebirth-zoneengine.service"));
 
             Require(upgrader.Contains("--dry-run"), "production upgrader lost dry-run mode");
             Require(upgrader.Contains("manifest source SHA mismatch"), "production upgrader lost source SHA gating");
@@ -33,6 +34,13 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("wait_for_readiness zone 7501"), "ZoneEngine bounded readiness wait is missing");
             Require(upgrader.Contains("READINESS_JOURNAL_BEGIN"), "readiness timeout journal diagnostics are missing");
             Require(upgrader.Contains("state=${state_value} restarts=${restart_value}"), "readiness timeout service diagnostics are missing");
+            Require(upgrader.Contains("ZoneEngine production executable contract failed"), "production upgrader does not require the headless ZoneEngine runtime");
+            Require(upgrader.Contains("ZoneEngine validation lifecycle cannot be production ExecStart"), "production upgrader does not reject the listener-free ZoneEngine validation runtime");
+
+            Require(zoneUnit.Contains("Type=notify"), "production ZoneEngine unit does not use readiness notification");
+            Require(zoneUnit.Contains("NotifyAccess=main"), "production ZoneEngine unit does not authorize main-process readiness notification");
+            Require(zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown"), "production ZoneEngine unit does not start the headless listener runtime");
+            Require(!zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle"), "production ZoneEngine unit incorrectly starts the listener-free lifecycle validator");
 
             int stopLogin = upgrader.IndexOf("service_stop login", StringComparison.Ordinal);
             int stopZone = upgrader.IndexOf("service_stop zone", StringComparison.Ordinal);
@@ -47,7 +55,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(manifest.Contains("ZONEENGINE_UNIT_SHA256="), "release manifest lacks ZoneEngine unit hash");
             Require(manifest.Contains("repository HEAD does not match expected source SHA"), "manifest generator lost immutable SHA gate");
 
-            Require(tests.Contains("production deployment workflow tests (17/17)"), "deployment fixture suite count changed");
+            Require(tests.Contains("production deployment workflow tests (18/18)"), "deployment fixture suite count changed");
             Require(tests.Contains("artifact_install"), "deployment fixture suite lacks artifact rollback failure");
             Require(tests.Contains("unit_install"), "deployment fixture suite lacks unit rollback failure");
             Require(tests.Contains("login_start"), "deployment fixture suite lacks first-service startup failure");
@@ -56,6 +64,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(tests.Contains("READINESS_WAIT=PASS engine=login elapsedSeconds=7"), "deployment fixture does not prove delayed LoginEngine readiness");
             Require(tests.Contains("READINESS_WAIT=PASS engine=zone elapsedSeconds=7"), "deployment fixture does not prove delayed ZoneEngine readiness");
             Require(tests.Contains("READINESS_WAIT=TIMEOUT engine=login elapsedSeconds=30"), "deployment fixture does not prove bounded readiness timeout");
+            Require(tests.Contains("ZoneEngine --validate-lifecycle --shutdown-file"), "deployment fixture does not reject the listener-free ZoneEngine validation runtime");
             Require(tests.Contains("prior_login_link_target=\"releases/old-login\""), "deployment fixture suite does not preserve an exact relative LoginEngine symlink target");
             Require(tests.Contains("prior_zone_link_target=\"releases/old-zone\""), "deployment fixture suite does not preserve an exact relative ZoneEngine symlink target");
 
