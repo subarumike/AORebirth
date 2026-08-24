@@ -188,8 +188,8 @@ listener_present()
     local engine="$1" port="$2" service="$3"
     if [[ "${test_mode}" == "1" ]]; then
         [[ "${mutation_started}" != "true" || "${rolling_back}" == "true" || "${failure_step}" != listener ]] || return 1
-        service_active "${engine}" "${service}"
-        return
+        service_active "${engine}" "${service}" || return 1
+        return 0
     fi
     local main_pid="$(systemctl show "${service}" -p MainPID --value)"
     [[ "${main_pid}" =~ ^[1-9][0-9]*$ ]] || return 1
