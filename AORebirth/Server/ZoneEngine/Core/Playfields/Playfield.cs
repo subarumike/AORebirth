@@ -187,6 +187,8 @@ namespace AORebirth.Core.Playfields
 
         private const string CapturedCleaningRobotName = "Malfunctioning Cleaning Robot";
 
+        private const string CleanmeisterIntelligenceRobotName = "Cleanmeister Intelligence Robot";
+
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         private const int CapturedSubwayThiefCorpseCatMesh = 5907;
@@ -4418,6 +4420,11 @@ namespace AORebirth.Core.Playfields
                 return CapturedCleaningRobotCorpseCatMesh;
             }
 
+            if (IsCleanmeisterIntelligenceRobot(target))
+            {
+                return CapturedCleaningRobotCorpseCatMesh;
+            }
+
             if (UsesCapturedThiefCorpseProfile(target))
             {
                 return CapturedSubwayThiefCorpseCatMesh;
@@ -4435,6 +4442,16 @@ namespace AORebirth.Core.Playfields
             }
 
             return mesh;
+        }
+
+        private static bool IsCleanmeisterIntelligenceRobot(ICharacter target)
+        {
+            return target != null
+                   && target.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData
+                   && string.Equals(
+                       target.Name,
+                       CleanmeisterIntelligenceRobotName,
+                       StringComparison.Ordinal);
         }
 
         private static bool UsesCapturedThiefCorpseProfile(ICharacter target)
