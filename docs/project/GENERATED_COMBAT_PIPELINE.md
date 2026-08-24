@@ -121,6 +121,7 @@ Run commands from the repository root with `cmd.exe`:
 ```bat
 Tools\generate_capture_backed_npc_combat_inventory.cmd --check
 Tools\generate_capture_backed_npc_combat_inventory.cmd --write
+Tools\generate_capture_backed_npc_combat_inventory.cmd --refresh-accepted-coverage
 Tools\generate_capture_backed_npc_combat_inventory.cmd --validate-current
 Tools\generate_capture_backed_npc_combat_inventory.cmd --self-test
 Tools\run_generated_combat_concurrency_tests.cmd
@@ -131,6 +132,7 @@ With no arguments, `Tools\generate_capture_backed_npc_combat_inventory.cmd` perf
 
 - `--check` validates the committed accepted artifact cohort without reading historical raw captures and fails if any of the six published files differs. It does not publish.
 - `--write` builds, validates, and atomically publishes a complete candidate under the writer lease.
+- `--refresh-accepted-coverage` is the governed reconciliation path when accepted runtime source changed but the accepted inventory, catalog, fixtures, and formula inputs remain authoritative. It regenerates active coverage from current source, rebuilds the manifest, validates the complete cohort, and atomically publishes only those derived changes without requiring absent historical raw capture folders. Before using it, fetch the authoritative branch, inspect and validate the source change, and never revert source or hand-edit generated hashes merely to satisfy stale metadata. Commit the regenerated outputs separately and repeat exact-SHA acceptance on the resulting commit.
 - `--validate-current` validates the current manifest, all five payload descriptors and acceptance counts, the recorded toolchain, and current authoritative input identities without regenerating.
 - `--self-test` runs the primary extractor's focused self-test, including its controlled missing-generation-key invariant.
 - `Tools\run_generated_combat_concurrency_tests.cmd` runs transaction/coordinator unit coverage plus the isolated fixture concurrency scenario.

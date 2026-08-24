@@ -67,6 +67,24 @@ class GeneratedCombatActiveCoverageGovernanceTests(unittest.TestCase):
         self.assertEqual(entry["auditKind"], "active-evidence")
         self.assertEqual(entry["governanceState"], "ACTIVE_EVIDENCE")
 
+    def test_scarlett_prepare_callsite_is_explicit_non_denominator_governance(self):
+        source = self.generator.SCARLETT_DALQUIST_SOURCE
+        self.assertEqual(
+            self.generator.RUNTIME_PREPARE_AUDIT_REFERENCES[source],
+            (1, "non-denominator-audit", ("captured-dialogue-trade-npcs",)),
+        )
+
+        entry = next(
+            row
+            for row in self.generator.discover_runtime_prepare_entry_points(REPO_ROOT)
+            if row["path"] == source
+        )
+        self.assertEqual(entry["prepareCallCount"], 1)
+        self.assertEqual(entry["auditKind"], "non-denominator-audit")
+        self.assertEqual(
+            entry["auditReferences"], ["captured-dialogue-trade-npcs"]
+        )
+
     def test_published_coverage_excludes_icc_active_source_from_content_inputs(self):
         coverage_path = (
             REPO_ROOT

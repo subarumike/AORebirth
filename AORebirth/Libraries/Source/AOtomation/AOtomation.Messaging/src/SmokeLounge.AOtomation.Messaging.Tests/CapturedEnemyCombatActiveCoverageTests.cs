@@ -658,7 +658,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(14, recordsByFamily["cleaning-robots"].Length);
             Assert.AreEqual(1, recordsByFamily["elysium-east-captured-population"].Length);
             Assert.AreEqual(1, recordsByFamily["scripted-hostiles"].Length);
-            Assert.AreEqual(171, records.Length);
+            Assert.AreEqual(1, recordsByFamily["captured-dialogue-trade-npcs"].Length);
+            Assert.AreEqual(172, records.Length);
+            Dictionary<string, object> scarlett =
+                recordsByFamily["captured-dialogue-trade-npcs"].Single();
+            Assert.AreEqual("Scarlett Dalquist", StringMember(scarlett, "name"));
+            Assert.AreEqual(7010, IntMember(scarlett, "runtimePlayfieldOrResource"));
+            Assert.AreEqual(26090, IntMember(scarlett, "monsterData"));
+            Assert.AreEqual(150, IntMember(scarlett, "level"));
+            Assert.AreEqual(0, IntMember(scarlett, "denominatorContribution"));
+            Assert.AreEqual(true, (bool)scarlett["runtimeBindingReady"]);
+            CollectionAssert.AreEqual(
+                new[] { "NPC auto-attack emission and damage application" },
+                StringArrayMember(scarlett, "disabledGameplayCapabilities"));
             Assert.AreEqual(
                 27,
                 recordsByFamily["cleaning-robots"].Sum(
@@ -841,8 +853,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
             Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
             Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(20, discovered.Count);
-            Assert.AreEqual(22, discovered.Values.Sum());
+            Assert.AreEqual(21, discovered.Count);
+            Assert.AreEqual(23, discovered.Values.Sum());
             foreach (KeyValuePair<string, int> entryPoint in discovered)
             {
                 Dictionary<string, object> record = recorded[entryPoint.Key];
@@ -877,6 +889,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(
                 new[] { "elysium-east-captured-population" },
                 StringArrayMember(elysiumEntry, "auditReferences"));
+            Dictionary<string, object> scarlettEntry = recorded[
+                "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs"];
+            Assert.AreEqual(
+                "non-denominator-audit",
+                StringMember(scarlettEntry, "auditKind"));
+            CollectionAssert.AreEqual(
+                new[] { "captured-dialogue-trade-npcs" },
+                StringArrayMember(scarlettEntry, "auditReferences"));
         }
 
         private static void AssertCertifiedBindingResolves(

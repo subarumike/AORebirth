@@ -39910,8 +39910,13 @@
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs",
+      "sha256": "f6b04f5fed9378d4c73655ec7ba59496c2d8a69b7dcd909932ebed716f059d97"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs",
-      "sha256": "d95c1200af811106a4e864a6bd49a69b1b893bcc6b66ed6fe5eef06b938693b2"
+      "sha256": "8617ffccc1553ca9b429cb95079dc0dd83309818532c391630e424e0f1eb4c43"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40578,6 +40583,13 @@
       },
       {
         "auditFamily": "scripted-hostiles",
+        "certified": 0,
+        "denominatorContribution": 0,
+        "recordCount": 1,
+        "unresolved": 1
+      },
+      {
+        "auditFamily": "captured-dialogue-trade-npcs",
         "certified": 0,
         "denominatorContribution": 0,
         "recordCount": 1,
@@ -57351,6 +57363,61 @@
           "20260718-185306"
         ],
         "unresolvedReason": "the referenced official capture artifacts are absent and the exhaustive corpus has no complete runtime-bindable Cursed Silvertail attack contract"
+      },
+      {
+        "auditFamily": "captured-dialogue-trade-npcs",
+        "auditKey": "c5b2422f21b84982d671",
+        "captureSearchScope": "corpusSearch.sessionsSearched",
+        "captureSessionCountSearched": 383,
+        "captureSessions": [],
+        "capturedContractDataRuntimeReady": false,
+        "classification": "unresolved",
+        "combatProfileKey": "resource=7010|md=26090|level=150|name=Scarlett Dalquist",
+        "contentEvidenceCaptureIds": [
+          "20260821-222107"
+        ],
+        "contentSources": [
+          "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs"
+        ],
+        "denominatorContribution": 0,
+        "denominatorExplanation": "captured social dialogue/trade NPC outside the fixed hostile combat denominator",
+        "disabledGameplayCapabilities": [
+          "NPC auto-attack emission and damage application"
+        ],
+        "evidenceFound": [
+          {
+            "aiProfile": "Social",
+            "captureId": "20260821-222107",
+            "capturedRole": "dialogue/trade NPC",
+            "observationType": "runtime-source-explicit-unresolved-contract"
+          }
+        ],
+        "evidencePacketIds": [],
+        "level": 150,
+        "matchingEvidenceSessionCount": 0,
+        "missingEvidence": [
+          "capture-backed hostile combat contract; authoritative source classifies the actor as a social dialogue/trade NPC"
+        ],
+        "monsterData": 26090,
+        "name": "Scarlett Dalquist",
+        "noMatchingEvidenceAfterExhaustiveSearch": true,
+        "roles": [
+          "dialogue NPC",
+          "trade NPC",
+          "DOJA research NPC"
+        ],
+        "runtimeBindingReady": true,
+        "runtimeCardinality": "one fixed social NPC in DOJA Research / Lab R1",
+        "runtimeMissingEvidence": [],
+        "runtimePlayfieldOrResource": 7010,
+        "runtimeProfileSelector": "explicit-unresolved-noncombat-contract",
+        "sourceIdentity": null,
+        "unavailableContentEvidenceCaptureIds": [
+          "20260821-222107"
+        ],
+        "unresolvedReasons": [
+          "the authoritative source binds an explicit unresolved contract because the captured actor is a social dialogue/trade NPC, not a promoted hostile"
+        ]
       }
     ],
     "recoverableRuntimeBindingBlockers": []
@@ -223863,7 +223930,7 @@
     }
   ],
   "runtimePrepareAudit": {
-    "acceptedCoverageEntryPointCount": 21,
+    "acceptedCoverageEntryPointCount": 22,
     "activeEvidenceEntryPointCount": 1,
     "entries": [
       {
@@ -224087,6 +224154,18 @@
         ]
       },
       {
+        "auditKind": "non-denominator-audit",
+        "auditReferences": [
+          "captured-dialogue-trade-npcs"
+        ],
+        "governanceState": "ACCEPTED_COVERAGE",
+        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs",
+        "prepareCallCount": 1,
+        "prepareCallSourceLines": [
+          146
+        ]
+      },
+      {
         "auditKind": "fixed-denominator-surfaces",
         "auditReferences": [
           "thrak-omni-garden"
@@ -224095,7 +224174,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          249
+          297
         ]
       },
       {
@@ -224111,8 +224190,8 @@
         ]
       }
     ],
-    "entryPointCount": 22,
-    "entryPointFileCount": 20,
+    "entryPointCount": 23,
+    "entryPointFileCount": 21,
     "prepareCallPattern": "\\bCapturedEnemyCombatRuntime\\s*\\.\\s*Prepare\\s*\\(",
     "productionRoot": "AORebirth/Server/ZoneEngine/Core"
   },
