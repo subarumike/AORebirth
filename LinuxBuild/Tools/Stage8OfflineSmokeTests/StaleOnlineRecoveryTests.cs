@@ -12,6 +12,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
         public static void Run(string repositoryRoot)
         {
             HealthyZeroRowsContinuesWithoutUpdate();
+            ZeroRowsWithLoginEngineActiveContinues();
             StaleRowsAreLoggedAndClearedExactly();
             ProcessGuardBlocksWithoutMutation();
             ListenerGuardBlocksWithoutMutation();
@@ -33,9 +34,26 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             Require(result == 0, "healthy zero-row recovery did not continue");
             Require(store.ClearCalls == 0, "healthy zero-row recovery performed an update");
-            Require(store.Committed, "healthy zero-row recovery did not complete verification");
+            Require(store.CountCalls == 0, "healthy zero-row recovery entered mutation verification");
+            Require(!store.Committed, "healthy zero-row recovery committed a mutation transaction");
             Require(runtime.AuditContains("staleRows=0"), "healthy zero-row count was not logged");
+            Require(runtime.AuditContains("cleanupRequired=NO"), "healthy zero-row cleanup state was not logged");
+            Require(runtime.AuditContains("RECOVERY_ALLOWED=NOT_REQUIRED"), "healthy zero-row recovery was treated as required");
             Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=YES"), "healthy startup was not allowed");
+        }
+
+        private static void ZeroRowsWithLoginEngineActiveContinues()
+        {
+            var store = new FakeStore(new FakeCharacter[0]);
+            var runtime = new FakeRuntime(store) { LoginEngineActive = true };
+
+            int result = StaleOnlineRecovery.Execute(runtime, 7501);
+
+            Require(runtime.LoginEngineActive, "LoginEngine-active fixture state was not established");
+            Require(result == 0, "LoginEngine-active zero-row recovery blocked ZoneEngine startup");
+            Require(store.ClearCalls == 0, "LoginEngine-active zero-row recovery performed an update");
+            Require(runtime.AuditContains("processDetected=NO"), "LoginEngine was misclassified as a competing ZoneEngine");
+            Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=YES"), "LoginEngine-active startup did not reach database validation");
         }
 
         private static void StaleRowsAreLoggedAndClearedExactly()
@@ -57,6 +75,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(store.Characters.Single(character => character.Id == 40).Online == 0, "offline row changed");
             Require(runtime.AuditContains("characterIds=38,39"), "affected IDs were not logged");
             Require(runtime.AuditContains("oldOnlineValues=38:1,39:1"), "old Online values were not logged");
+            Require(runtime.AuditContains("cleanupRequired=YES"), "required cleanup state was not logged");
             Require(runtime.AuditContains("rowsUpdated=2"), "updated row count was not logged");
             Require(runtime.AuditContains("postUpdateNonzero=0"), "post-update count was not logged");
         }
@@ -124,6 +143,12 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(result != 0, "failed query allowed startup");
             Require(store.Characters[0].Online == 1, "failed query mutated a row");
             Require(store.ClearCalls == 0, "failed query reached the update");
+            Require(runtime.AuditContains("error=InvalidOperationException"), "internal exception type was not logged");
+            Require(runtime.AuditContains("exceptionMessage=\"query failure\""), "internal exception message was not logged");
+            Require(runtime.AuditContains("exceptionSource="), "internal exception source was not logged");
+            Require(runtime.AuditContains("exceptionLine="), "internal exception line was not logged");
+            Require(runtime.AuditContains("exceptionStack="), "internal exception stack was not logged");
+            Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=NO"), "internal exception did not fail closed");
         }
 
         private static void UnrelatedCharacterFieldsRemainUnchanged()
@@ -191,6 +216,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             public bool ProcessDetected { get; set; }
 
             public bool ListenerDetected { get; set; }
+
+            public bool LoginEngineActive { get; set; }
 
             public int OpenStoreCalls { get; private set; }
 
@@ -264,6 +291,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             public int ClearCalls { get; private set; }
 
+            public int CountCalls { get; private set; }
+
             public string DatabaseName
             {
                 get { return "aorebirth_test"; }
@@ -305,6 +334,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             public long CountNonzeroRows()
             {
+                this.CountCalls++;
                 if (this.ForcePostUpdateNonzero && this.clearAttempted)
                 {
                     return 1;

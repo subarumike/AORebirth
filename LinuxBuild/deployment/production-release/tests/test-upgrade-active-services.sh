@@ -62,6 +62,8 @@ create_fixture()
     printf 'active\n' > "${state}/login.active"; printf 'active\n' > "${state}/zone.active"
     printf '0\n' > "${state}/login.restarts"; printf '0\n' > "${state}/zone.restarts"
     printf '0\n' > "${state}/login.starts"; printf '0\n' > "${state}/zone.starts"; printf '0\n' > "${state}/online"
+    printf '0\n' > "${state}/login.listener-delay"; printf '0\n' > "${state}/zone.listener-delay"
+    printf '0\n' > "${state}/login.listener-checks"; printf '0\n' > "${state}/zone.listener-checks"
     create_artifact "${input}/login" LoginEngine
     create_artifact "${input}/zone" ZoneEngine
     cp -- "${login_unit_source}" "${input}/login.service"
@@ -136,16 +138,35 @@ expect_transaction_failure()
     grep -F 'ROLLBACK_EXACT_PRIOR_TARGETS=PASS' "${fixture}/output" >/dev/null || fail "exact prior symlink targets were not restored for $1"
     grep -F 'ROLLBACK_PRIOR_ARTIFACTS_AND_UNITS=PASS' "${fixture}/output" >/dev/null || fail "prior artifacts and units were not restored for $1"
     grep -F 'ROLLBACK_NO_MIXED_STATE=PASS' "${fixture}/output" >/dev/null || fail "rollback left mixed deployment state for $1"
+    grep -F 'ROLLBACK_STEP_LOGIN_READINESS=PASS' "${fixture}/output" >/dev/null || fail "LoginEngine rollback readiness did not pass for $1"
+    grep -F 'ROLLBACK_STEP_ZONE_READINESS=PASS' "${fixture}/output" >/dev/null || fail "ZoneEngine rollback readiness did not pass for $1"
     assert_old_pair
     tests_run=$((tests_run + 1))
 }
 
 case "${AO_REBIRTH_DEPLOY_TEST_CASE:-all}" in
     all) ;;
-    artifact_install|unit_install|login_start)
+    success)
+        create_fixture
+        printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"
+        run_upgrade > "${fixture}/success-output"
+        require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/success-output"
+        require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/success-output"
+        require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/success-output"
+        echo "PASS: production deployment workflow successful startup (1/1)"
+        exit 0
+        ;;
+    artifact_install|unit_install|login_start|zone_start)
         selected_case="${AO_REBIRTH_DEPLOY_TEST_CASE}"
         create_fixture
+        if [[ "${selected_case}" == artifact_install ]]; then
+            printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"
+        fi
         expect_transaction_failure "${selected_case}"
+        if [[ "${selected_case}" == artifact_install ]]; then
+            require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/output"
+            require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/output"
+        fi
         if [[ "${selected_case}" == login_start ]]; then
             require grep -F 'OWNERSHIP_DIR_FIXTURE_SHARED_PATH=PASS' "${fixture}/output"
             require test -d "${root}/var/lib/ao-rebirth/session-ownership"
@@ -184,15 +205,18 @@ create_fixture; sed -i 's|AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/s
 create_fixture; sed -i 's|/var/lib/ao-rebirth/session-ownership|/tmp/session-ownership|g' "${input}/login.service" "${input}/zone.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i '/^PrivateTmp=true$/d' "${input}/login.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i '/ZoneEngine --recover-stale-online/d' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
-create_fixture; expect_transaction_failure artifact_install
+create_fixture; printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"; expect_transaction_failure artifact_install; require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/output"; require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/output"
 create_fixture; expect_transaction_failure unit_install
 create_fixture; expect_transaction_failure login_start
 create_fixture; expect_transaction_failure zone_start
-create_fixture; expect_transaction_failure listener
+create_fixture; expect_transaction_failure listener; require grep -F 'READINESS_WAIT=TIMEOUT engine=login elapsedSeconds=30' "${fixture}/output"; require grep -F 'READINESS_JOURNAL_BEGIN service=ao-rebirth-loginengine.service' "${fixture}/output"; require grep -F 'READINESS_JOURNAL_END service=ao-rebirth-loginengine.service' "${fixture}/output"
 
 create_fixture
+printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"
 run_upgrade > "${fixture}/success-output"
 require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/success-output"
+require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/success-output"
+require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/success-output"
 require test "$(tr -d '\r\n\t ' < "${root}/opt/ao-rebirth/loginengine/current/SOURCE_SHA")" = "${fake_sha}"
 require test "$(tr -d '\r\n\t ' < "${root}/opt/ao-rebirth/zoneengine/current/SOURCE_SHA")" = "${fake_sha}"
 require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-loginengine.service" | awk '{print $1}')" = "$(sha256sum "${input}/login.service" | awk '{print $1}')"

@@ -27,6 +27,12 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("ROLLBACK_PRIOR_ARTIFACTS_AND_UNITS=PASS"), "production upgrader lost prior artifact/unit restoration evidence");
             Require(upgrader.Contains("ROLLBACK_NO_MIXED_STATE=PASS"), "production upgrader lost no-mixed-state rollback evidence");
             Require(upgrader.Contains("IDEMPOTENT_REDEPLOY=PASS"), "production upgrader lost idempotent no-op evidence");
+            Require(upgrader.Contains("READINESS_TIMEOUT_SECONDS=30"), "production readiness timeout does not safely exceed observed startup time");
+            Require(upgrader.Contains("READINESS_POLL_INTERVAL_SECONDS=1"), "production readiness polling interval changed");
+            Require(upgrader.Contains("wait_for_readiness login 7500"), "LoginEngine bounded readiness wait is missing");
+            Require(upgrader.Contains("wait_for_readiness zone 7501"), "ZoneEngine bounded readiness wait is missing");
+            Require(upgrader.Contains("READINESS_JOURNAL_BEGIN"), "readiness timeout journal diagnostics are missing");
+            Require(upgrader.Contains("state=${state_value} restarts=${restart_value}"), "readiness timeout service diagnostics are missing");
 
             int stopLogin = upgrader.IndexOf("service_stop login", StringComparison.Ordinal);
             int stopZone = upgrader.IndexOf("service_stop zone", StringComparison.Ordinal);
@@ -47,6 +53,9 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(tests.Contains("login_start"), "deployment fixture suite lacks first-service startup failure");
             Require(tests.Contains("zone_start"), "deployment fixture suite lacks second-service startup failure");
             Require(tests.Contains("listener"), "deployment fixture suite lacks listener failure");
+            Require(tests.Contains("READINESS_WAIT=PASS engine=login elapsedSeconds=7"), "deployment fixture does not prove delayed LoginEngine readiness");
+            Require(tests.Contains("READINESS_WAIT=PASS engine=zone elapsedSeconds=7"), "deployment fixture does not prove delayed ZoneEngine readiness");
+            Require(tests.Contains("READINESS_WAIT=TIMEOUT engine=login elapsedSeconds=30"), "deployment fixture does not prove bounded readiness timeout");
             Require(tests.Contains("prior_login_link_target=\"releases/old-login\""), "deployment fixture suite does not preserve an exact relative LoginEngine symlink target");
             Require(tests.Contains("prior_zone_link_target=\"releases/old-zone\""), "deployment fixture suite does not preserve an exact relative ZoneEngine symlink target");
 

@@ -7,6 +7,8 @@ readonly EXPECTED_SERVICE_USER="aorebirth"
 readonly EXPECTED_SERVICE_GROUP="aorebirth"
 readonly EXPECTED_DATABASE="aorebirth_chatengine_stage6"
 readonly DATABASE_CONTAINER="aorebirth-chatengine-mysql-stage6"
+readonly READINESS_TIMEOUT_SECONDS=30
+readonly READINESS_POLL_INTERVAL_SECONDS=1
 
 manifest_path=""
 expected_sha=""
@@ -189,11 +191,63 @@ listener_present()
     if [[ "${test_mode}" == "1" ]]; then
         [[ "${mutation_started}" != "true" || "${rolling_back}" == "true" || "${failure_step}" != listener ]] || return 1
         service_active "${engine}" "${service}" || return 1
+        if [[ "${mutation_started}" == "true" ]]; then
+            local delay checks
+            delay="$(cat "${TEST_STATE}/${engine}.listener-delay")"
+            checks="$(cat "${TEST_STATE}/${engine}.listener-checks")"
+            if (( checks < delay )); then
+                printf '%s\n' "$((checks + 1))" > "${TEST_STATE}/${engine}.listener-checks"
+                return 1
+            fi
+        fi
         return 0
     fi
     local main_pid="$(systemctl show "${service}" -p MainPID --value)"
     [[ "${main_pid}" =~ ^[1-9][0-9]*$ ]] || return 1
     ss -H -ltnp "sport = :${port}" | grep -F "pid=${main_pid}," >/dev/null
+}
+service_state()
+{
+    if [[ "${test_mode}" == "1" ]]; then
+        cat "${TEST_STATE}/$1.active"
+    else
+        systemctl show "$2" -p ActiveState -p SubState --value 2>/dev/null | tr '\n' '/' | sed 's|/$||'
+    fi
+}
+service_journal()
+{
+    if [[ "${test_mode}" == "1" ]]; then
+        printf 'fixture journal service=%s state=%s restarts=%s\n' "$2" "$(service_state "$1" "$2")" "$(service_restarts "$1" "$2")"
+    else
+        journalctl --unit="$2" --lines=50 --no-pager
+    fi
+}
+readiness_pause()
+{
+    [[ "${test_mode}" == "1" ]] || sleep "${READINESS_POLL_INTERVAL_SECONDS}"
+}
+wait_for_readiness()
+{
+    local engine="$1" port="$2" service="$3" elapsed=0
+    while true; do
+        if service_active "${engine}" "${service}" && listener_present "${engine}" "${port}" "${service}"; then
+            echo "READINESS_WAIT=PASS engine=${engine} elapsedSeconds=${elapsed} timeoutSeconds=${READINESS_TIMEOUT_SECONDS} pollIntervalSeconds=${READINESS_POLL_INTERVAL_SECONDS} service=${service} state=$(service_state "${engine}" "${service}") restarts=$(service_restarts "${engine}" "${service}") listenerPort=${port} listenerDetected=YES"
+            return 0
+        fi
+        (( elapsed < READINESS_TIMEOUT_SECONDS )) || break
+        readiness_pause
+        elapsed=$((elapsed + READINESS_POLL_INTERVAL_SECONDS))
+    done
+
+    local listener_state=NO state_value restart_value
+    listener_present "${engine}" "${port}" "${service}" && listener_state=YES
+    state_value="$(service_state "${engine}" "${service}" 2>/dev/null || printf unknown)"
+    restart_value="$(service_restarts "${engine}" "${service}" 2>/dev/null || printf unknown)"
+    echo "READINESS_WAIT=TIMEOUT engine=${engine} elapsedSeconds=${elapsed} timeoutSeconds=${READINESS_TIMEOUT_SECONDS} pollIntervalSeconds=${READINESS_POLL_INTERVAL_SECONDS} service=${service} state=${state_value} restarts=${restart_value} listenerPort=${port} listenerDetected=${listener_state}" >&2
+    echo "READINESS_JOURNAL_BEGIN service=${service}" >&2
+    service_journal "${engine}" "${service}" >&2 || true
+    echo "READINESS_JOURNAL_END service=${service}" >&2
+    return 1
 }
 online_count()
 {
@@ -479,11 +533,9 @@ rollback()
     rollback_operation DAEMON_RELOAD daemon_reload || failed=true
     rollback_operation VERIFY_EXACT_PRIOR_STATE verify_rollback_state || failed=true
     rollback_operation START_LOGIN service_start login "${LOGIN_SERVICE}" || failed=true
+    rollback_operation LOGIN_READINESS wait_for_readiness login 7500 "${LOGIN_SERVICE}" || failed=true
     rollback_operation START_ZONE service_start zone "${ZONE_SERVICE}" || failed=true
-    rollback_operation LOGIN_ACTIVE service_active login "${LOGIN_SERVICE}" || failed=true
-    rollback_operation ZONE_ACTIVE service_active zone "${ZONE_SERVICE}" || failed=true
-    rollback_operation LOGIN_LISTENER listener_present login 7500 "${LOGIN_SERVICE}" || failed=true
-    rollback_operation ZONE_LISTENER listener_present zone 7501 "${ZONE_SERVICE}" || failed=true
+    rollback_operation ZONE_READINESS wait_for_readiness zone 7501 "${ZONE_SERVICE}" || failed=true
     [[ "${failed}" == false ]] || { echo "ROLLBACK_BOTH_SERVICES=FAIL" >&2; return 1; }
     echo "ROLLBACK_BOTH_SERVICES=PASS"
 }
@@ -525,11 +577,9 @@ main()
     daemon_reload
     verify_unit_static
     service_start login "${LOGIN_SERVICE}" || fail "LoginEngine failed startup"
-    service_active login "${LOGIN_SERVICE}" || fail "LoginEngine is not active after startup"
-    listener_present login 7500 "${LOGIN_SERVICE}" || fail "LoginEngine listener is missing after startup"
+    wait_for_readiness login 7500 "${LOGIN_SERVICE}" || fail "LoginEngine readiness timed out after startup"
     service_start zone "${ZONE_SERVICE}" || fail "ZoneEngine failed startup"
-    service_active zone "${ZONE_SERVICE}" || fail "ZoneEngine is not active after startup"
-    listener_present zone 7501 "${ZONE_SERVICE}" || fail "ZoneEngine listener is missing after startup"
+    wait_for_readiness zone 7501 "${ZONE_SERVICE}" || fail "ZoneEngine readiness timed out after startup"
     post_health || fail "post-deployment health check failed"
     write_deployed_manifest
     deployment_committed=true
