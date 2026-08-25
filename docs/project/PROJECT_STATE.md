@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-15
+Updated: 2026-08-25
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,15 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- Playfield hydration Stage 0/1: the current mixed loader and `Playfield`
+  constructor remain the sole production authority behind a narrow legacy-only
+  composition seam. Static definition, validation, provenance, canonical
+  SHA-256, comparison, and runtime-materialization contracts are present, but no
+  DAO shadow hydrator, allowlist, new runtime configuration, database change, or
+  production behavior change is enabled. Evidence:
+  `docs/architecture/PLAYFIELD_HYDRATION_SOURCE_INVENTORY.md` and
+  `docs/architecture/PLAYFIELD_HYDRATION_MIGRATION.md`.
 
 - First-party bot service foundation: AORebirth now has a storage-neutral bot principal,
   versioned service credential, scoped authorization, revocation-aware session, structured

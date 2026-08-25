@@ -290,6 +290,23 @@
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="PlayfieldHydrationCharacterizationTests.cs" />
+    <Compile Include="PlayfieldHydrationIPlayfieldTestStub.cs" />
+    <Compile Include="PlayfieldHydrationSeamTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldHydrationContracts.cs">
+      <Link>PlayfieldHydrationContracts.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldDefinitionCanonicalizer.cs">
+      <Link>PlayfieldDefinitionCanonicalizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldDefinitionValidator.cs">
+      <Link>PlayfieldDefinitionValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldDefinitionComparer.cs">
+      <Link>PlayfieldDefinitionComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\LegacyPlayfieldInstantiationCoordinator.cs">
+      <Link>LegacyPlayfieldInstantiationCoordinator.cs</Link>
+    </Compile>
     <Compile Include="PlayfieldRuntimeOwnershipTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\RuntimeOwnershipRegistry.cs">
       <Link>RuntimeOwnershipRegistry.cs</Link>
