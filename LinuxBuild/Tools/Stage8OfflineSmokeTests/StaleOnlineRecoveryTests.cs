@@ -20,7 +20,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             PostUpdateFailureBlocksAndRollsBack();
             QueryFailureBlocksWithoutMutation();
             UnrelatedCharacterFieldsRemainUnchanged();
-            StrictDatabaseValidationContractRemains();
+            StrictDatabaseValidationContractRemains(repositoryRoot);
             ServiceRunsRecoveryImmediatelyBeforeValidation(repositoryRoot);
             Console.WriteLine("PASS: guarded ZoneEngine stale Online recovery tests");
         }
@@ -164,10 +164,15 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(character.UnrelatedValue == 8675309, "unrelated character field changed");
         }
 
-        private static void StrictDatabaseValidationContractRemains()
+        private static void StrictDatabaseValidationContractRemains(string repositoryRoot)
         {
             string source = File.ReadAllText(
-                Path.Combine("..", "AORebirth", "Server", "ZoneEngine", "Program.cs"));
+                Stage8RepositoryRootResolver.ResolveRequiredFile(
+                    repositoryRoot,
+                    "AORebirth",
+                    "Server",
+                    "ZoneEngine",
+                    "Program.cs"));
             Require(
                 source.Contains("SELECT COUNT(*) FROM characters WHERE Online IS NOT NULL AND Online <> 0"),
                 "strict Online validation query changed");
