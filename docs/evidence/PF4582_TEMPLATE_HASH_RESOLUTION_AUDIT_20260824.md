@@ -379,11 +379,11 @@ Pinned evidence digests:
 
 - `AORebirth/Libraries/Source/AORebirth.Database/SqlTables/mobtemplate.sql`: `75bd10fed1bd92d8ce1de16bb7179c97cf0e1dab8461eb4719d6f1c567584dfb`
 - `AORebirth/Server/ZoneEngine/Core/CombatTestMobArchetype.cs`: `4e1be24bbf9afe7b035afd125b705b60df5b6e94e36acb7f117ae733aced5774`
-- `AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs`: `7f0381d89cdaf3670425877d95f9014977c190506a878a262e082ebeb3ec0df7`
-- `Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json`: `36ef949c3e7fa40781ee52f78dfa164954957bb94404a1dcd4a2f13ccd924d24`
+- `AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs`: `ed8896d81adcf3b580aed1a2ac5b5192b6c448cd407368ca23b0b1de8c29366d`
 - `Tools/tests/test_generate_pf4582_placements.py`: `0df11e4f739407887024996b342bf0f743f3f3e5cfcf4574f426f8f26fececcb`
-- `docs/generated/aosharp_capture_inventory.csv`: `8a217cc45121bf850cdadb4219a4457f30a339f832777f4f70a192feeb68e082`
+- `docs/generated/aosharp_capture_inventory.csv`: `6acf291e3666840806d136fc3f6bac0dffba8c8e57bfe9e44163309ed4ded4a6`
 - `docs/reference/pf4582/PlayfieldDistrictInfo.json`: `b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32`
+- `docs/reference/pf4582/accepted-capture-20260818-214552-enemy-dossier.json`: `e4fbd628f850e5f317b6d5ec6aeac94022a6bbd1ef79a25b6791908137918af5`
 - `docs/reference/pf4582/runtime-evidence-map.json`: `02a1b167b97d1caa223aeaa60eaebbaf0a1e99ce6ddce753f7d54eae1f716869`
 
 ## Governance conclusion

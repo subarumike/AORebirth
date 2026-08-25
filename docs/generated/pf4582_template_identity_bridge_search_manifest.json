@@ -1499,11 +1499,14 @@
     "The exporter custody record explaining the accepted JSON NpcId lineage and legacy field labels."
   ],
   "InputDigests": {
-    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs": "7f0381d89cdaf3670425877d95f9014977c190506a878a262e082ebeb3ec0df7",
-    "docs/generated/pf4582_template_hash_resolution_report.json": "d65f3e750b474d345d0093a323840e357ed48abd4493c2191baba7c6d261b8bc",
+    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs": "ed8896d81adcf3b580aed1a2ac5b5192b6c448cd407368ca23b0b1de8c29366d",
+    "docs/generated/pf4582_template_hash_resolution_report.json": "652ef71ff7c3cd7ad6a0fa9c6fb99181492c55b1b86d87350b9a5ade3523dfba",
     "docs/reference/pf4582/PlayfieldDistrictInfo.json": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32",
     "docs/reference/pf4582/official/ep1_18_8_62_pf4582_acghash_records.json": "f19ed7fb094369f99998cd83da451839f08a4882833d6ade1b533ccc4bba3ec2",
     "docs/reference/pf4582/official/ep1_18_8_62_pf4582_evidence_manifest.json": "14b83e64626dbbe710ce5cd033c1765e9f31429a531b50cc7665efa1776587f5",
     "docs/reference/pf4582/official/ep1_18_8_62_pf4582_search_report.json": "7bc10b90e5e7e7d25c7ff1f47cf7e74f8fba37bab8da9d1e7cc67d5457c290f2"
+  },
+  "InputDigestNormalizations": {
+    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs": "text-lf"
   }
 }

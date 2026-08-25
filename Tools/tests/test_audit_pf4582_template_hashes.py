@@ -281,6 +281,56 @@ class Pf4582TemplateHashAuditTests(unittest.TestCase):
         self.assertEqual(25, len(set(capture_ids)))
         self.assertEqual(sorted(capture_ids), capture_ids)
 
+    def test_39_text_digest_is_stable_across_checkout_line_endings(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            lf_path = Path(temp_dir) / "inventory-lf.csv"
+            crlf_path = Path(temp_dir) / "inventory-crlf.csv"
+            lf_path.write_bytes(b"CaptureId,Status\n4582,accepted\n")
+            crlf_path.write_bytes(b"CaptureId,Status\r\n4582,accepted\r\n")
+
+            self.assertNotEqual(audit.sha256_file(lf_path), audit.sha256_file(crlf_path))
+            self.assertEqual(
+                audit.sha256_governed_input(lf_path, "text-lf"),
+                audit.sha256_governed_input(crlf_path, "text-lf"),
+            )
+
+    def test_40_capture_dossier_fixture_is_stable_and_minimal(self):
+        source = {
+            "generatedUtc": "ignored",
+            "enemies": [
+                {
+                    "identity": "(SimpleChar:2)",
+                    "name": "Second",
+                    "monsterData": "22",
+                    "monsterScale": "90",
+                    "npcFamily": "3",
+                    "level": 2,
+                    "currentHealth": 1,
+                },
+                {
+                    "identity": "(SimpleChar:1)",
+                    "name": "First",
+                    "monsterData": "11",
+                    "monsterScale": "80",
+                    "npcFamily": "4",
+                    "level": 1,
+                    "currentHealth": 99,
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "enemy-dossier.json"
+            path.write_text(json.dumps(source), encoding="utf-8")
+            fixture = audit.build_capture_dossier_fixture(path)
+
+        self.assertEqual(2, fixture["enemyCount"])
+        self.assertEqual(
+            ["(SimpleChar:1)", "(SimpleChar:2)"],
+            [enemy["identity"] for enemy in fixture["enemies"]],
+        )
+        self.assertNotIn("generatedUtc", fixture)
+        self.assertNotIn("currentHealth", fixture["enemies"][0])
+
 
 if __name__ == "__main__":
     unittest.main()

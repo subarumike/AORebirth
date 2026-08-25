@@ -21,6 +21,11 @@ and blockers but grants no activation authority. `TemplateHash` remains a
 compatibility name: official EP1 evidence proves a packed four-byte `ACGHash_t`
 scalar/tag, not a cryptographic hash or terminal mob-template identity. Its
 generated audit is reproducible through `Tools\audit_pf4582_template_hashes.cmd`.
+`accepted-capture-20260818-214552-enemy-dossier.json` is the deterministic,
+tracked projection of the complete accepted raw dossier used by that audit. It
+retains only the identity/profile fields the audit consumes and records the
+exact SHA-256 of the source dossier so clean worktrees do not require ignored
+raw capture folders.
 
 `official/` contains the byte-identical structured EP1 evidence snapshot and
 its governed manifest. The official source has 207 `HashSpawnPoint_t` records;
