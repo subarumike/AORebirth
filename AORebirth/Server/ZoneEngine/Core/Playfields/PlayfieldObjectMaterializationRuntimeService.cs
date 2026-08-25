@@ -17,6 +17,9 @@ namespace ZoneEngine.Core.Playfields
 
     internal sealed class PlayfieldObjectMaterializationRuntimeService
     {
+        // Toggle OLD statel/DB materialization diagnostics independently from NEW hydration diagnostics.
+        private const bool EnableOldStaticConsoleDiagnostics = false;
+
         internal delegate bool TryResolveVendorStatelsDelegate(
             Identity playfieldIdentity,
             IEnumerable<StatelData> statels,
@@ -39,6 +42,7 @@ namespace ZoneEngine.Core.Playfields
             Action<IEntity> registerDynel,
             Action refreshDynelRegistry)
         {
+            ConsoleLog($"[OLD static materialization] PF {playfieldIdentity.Instance} START");
             Require(loadMobSpawns, "loadMobSpawns");
             Require(shouldSuppressDbMobSpawn, "shouldSuppressDbMobSpawn");
             Require(loadMobSpawnStats, "loadMobSpawnStats");
@@ -65,6 +69,7 @@ namespace ZoneEngine.Core.Playfields
             this.MaterializeVendors(playfieldIdentity, statels, tryResolveVendorStatels, spawnVendors);
             this.MaterializeStaticDynels(playfieldIdentity, resolveStaticDynels, instantiateStaticDynel, registerDynel);
             refreshDynelRegistry();
+            ConsoleLog($"[OLD static materialization] PF {playfieldIdentity.Instance} COMPLETE");
         }
 
         private void MaterializeDbMobSpawns(
@@ -76,6 +81,7 @@ namespace ZoneEngine.Core.Playfields
             Action<ICharacter> activateNpc,
             Action<DBMobSpawn, ICharacter> attachMobSpawnScript)
         {
+            int loaded = 0;
             foreach (DBMobSpawn mob in loadMobSpawns(playfieldIdentity))
             {
                 if (shouldSuppressDbMobSpawn(mob))
@@ -86,7 +92,10 @@ namespace ZoneEngine.Core.Playfields
                 ICharacter character = instantiateDbMobSpawn(mob, loadMobSpawnStats(mob).ToArray());
                 activateNpc(character);
                 attachMobSpawnScript(mob, character);
+                loaded++;
+                ConsoleLog($"[OLD static materialization][MOB] PF {playfieldIdentity.Instance} sourceMob={mob.Id} activated");
             }
+            ConsoleLog($"[OLD static materialization][MOB] PF {playfieldIdentity.Instance} count={loaded}");
         }
 
         private void MaterializeVendors(
@@ -98,6 +107,7 @@ namespace ZoneEngine.Core.Playfields
             StatelData[] vendorStatels;
             if (tryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels))
             {
+                ConsoleLog($"[OLD static materialization][SHOP] PF {playfieldIdentity.Instance} statels={vendorStatels.Length}");
                 spawnVendors(vendorStatels);
             }
         }
@@ -118,6 +128,15 @@ namespace ZoneEngine.Core.Playfields
             Utility.LogUtil.Debug(
                 Utility.DebugInfoDetail.Database,
                 "MaterializeStaticDynels pf=" + playfieldIdentity.Instance + " loaded=" + loaded);
+            ConsoleLog($"[OLD static materialization][STATIC] PF {playfieldIdentity.Instance} count={loaded}");
+        }
+
+        private static void ConsoleLog(string message)
+        {
+            if (EnableOldStaticConsoleDiagnostics)
+            {
+                Console.WriteLine(message);
+            }
         }
 
         private static void Require(Delegate callback, string name)
