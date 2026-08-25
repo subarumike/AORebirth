@@ -1,0 +1,4 @@
+SourceCapture=20260717-220340
+SourceArtifact=npc-lifecycle.csv
+ExactObservedRow="2026-07-18T03:03:41.2625410Z","LOCAL",0,"corpse-seen","DynelSnapshot","(Corpse:F6900C)","","Remains of Eumenides","identity=(Corpse:F6900C) name=Remains of Eumenides pos=(220.3168, 72.96559, 38.86212) open=False"
+ExactObservedRow="2026-07-18T03:03:41.2625410Z","LOCAL",0,"corpse-seen","DynelSnapshot","(Corpse:F6900F)","","Remains of Eumenides","identity=(Corpse:F6900F) name=Remains of Eumenides pos=(221.8366, 73.66236, 43.01) open=False"

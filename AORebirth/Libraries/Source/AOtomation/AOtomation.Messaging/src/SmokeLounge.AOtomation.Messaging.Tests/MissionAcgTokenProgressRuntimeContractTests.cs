@@ -704,24 +704,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static string ReadZoneSource(string relativePath)
         {
-            DirectoryInfo current =
-                new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            while (current != null)
-            {
-                if (Directory.Exists(Path.Combine(current.FullName, ".git")))
-                {
-                    return File.ReadAllText(
-                        Path.Combine(
-                            current.FullName,
-                            "AORebirth/Server/ZoneEngine",
-                            relativePath.Replace('/', Path.DirectorySeparatorChar)));
-                }
-
-                current = current.Parent;
-            }
-
-            Assert.Fail("Repository root could not be located.");
-            return string.Empty;
+            string repositoryRoot = TestRepositoryRootResolver.FindFromCallerFilePath();
+            return File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    "AORebirth/Server/ZoneEngine",
+                    relativePath.Replace('/', Path.DirectorySeparatorChar)));
         }
     }
 }

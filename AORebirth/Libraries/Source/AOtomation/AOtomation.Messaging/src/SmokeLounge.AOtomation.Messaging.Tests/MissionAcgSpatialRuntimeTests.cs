@@ -666,18 +666,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static string FindRepositoryRoot(
             [CallerFilePath] string sourcePath = null)
         {
-            DirectoryInfo current = new FileInfo(sourcePath).Directory;
-            while (current != null)
-            {
-                if (Directory.Exists(Path.Combine(current.FullName, ".git")))
-                {
-                    return current.FullName;
-                }
-
-                current = current.Parent;
-            }
-
-            throw new InvalidOperationException("Repository root was not found.");
+            return TestRepositoryRootResolver.Resolve(sourcePath);
         }
 
         private static void AssertTextBefore(

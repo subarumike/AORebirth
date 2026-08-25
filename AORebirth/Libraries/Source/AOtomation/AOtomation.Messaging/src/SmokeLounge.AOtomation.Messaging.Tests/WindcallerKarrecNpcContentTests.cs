@@ -292,18 +292,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static string FindRepositoryRoot()
         {
-            DirectoryInfo cursor = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            while (cursor != null)
-            {
-                if (Directory.Exists(Path.Combine(cursor.FullName, ".git")))
-                {
-                    return cursor.FullName;
-                }
-
-                cursor = cursor.Parent;
-            }
-
-            throw new InvalidOperationException("Repository root not found.");
+            return TestRepositoryRootResolver.FindFromCallerFilePath();
         }
 
         [TestMethod]

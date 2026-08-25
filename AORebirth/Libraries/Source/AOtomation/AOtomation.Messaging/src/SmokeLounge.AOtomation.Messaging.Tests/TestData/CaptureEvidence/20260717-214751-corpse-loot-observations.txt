@@ -1,0 +1,3 @@
+SourceCapture=20260717-214751
+SourceArtifact=corpse-loot-observations.csv
+ExactObservedRow=2026-07-18T02:48:25.9344451Z,IN-N3,442,(Corpse:F69010),1,true,3,(SimpleChar:79748428),Eumenides,203726,20,186,(SimpleChar:7944C065),25,1407006,163430:163431:22:1;301714:301714:1:1;287146:287146:200:1,linked-offline-generation

@@ -1336,19 +1336,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static string ReadSource(string relativePath)
         {
-            DirectoryInfo current =
-                new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            while (current != null)
-            {
-                if (Directory.Exists(Path.Combine(current.FullName, ".git")))
-                {
-                    return File.ReadAllText(Path.Combine(current.FullName, relativePath));
-                }
-
-                current = current.Parent;
-            }
-
-            throw new InvalidOperationException("Repository root was not found.");
+            string repositoryRoot = TestRepositoryRootResolver.FindFromCallerFilePath();
+            return File.ReadAllText(Path.Combine(repositoryRoot, relativePath));
         }
     }
 }

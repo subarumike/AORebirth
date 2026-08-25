@@ -647,6 +647,11 @@
     <Compile Include="Core\Playfields\PlayfieldLifecycleRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs" />
+    <Compile Include="Core\Playfields\Hydration\PlayfieldHydrationContracts.cs" />
+    <Compile Include="Core\Playfields\Hydration\PlayfieldDefinitionCanonicalizer.cs" />
+    <Compile Include="Core\Playfields\Hydration\PlayfieldDefinitionValidator.cs" />
+    <Compile Include="Core\Playfields\Hydration\PlayfieldDefinitionComparer.cs" />
+    <Compile Include="Core\Playfields\Hydration\LegacyPlayfieldInstantiationCoordinator.cs" />
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
     <Compile Include="Core\RuntimeOwnershipRegistry.cs" />
     <Compile Include="Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs" />
