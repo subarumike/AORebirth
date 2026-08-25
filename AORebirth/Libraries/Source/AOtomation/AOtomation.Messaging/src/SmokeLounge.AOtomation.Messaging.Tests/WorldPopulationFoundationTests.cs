@@ -2384,7 +2384,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static void AssertThrowsArgument(Action action) { try { action(); Assert.Fail("Expected ArgumentException."); } catch (ArgumentException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }
-        private static string FindRepositoryRoot() { string current = AppDomain.CurrentDomain.BaseDirectory; while (!string.IsNullOrEmpty(current)) { if (System.IO.Directory.Exists(System.IO.Path.Combine(current, ".git"))) return current; System.IO.DirectoryInfo parent = System.IO.Directory.GetParent(current); current = parent == null ? null : parent.FullName; } throw new InvalidOperationException("Repository root not found."); }
+        private static string FindRepositoryRoot() { return TestRepositoryRootResolver.FindFromCallerFilePath(); }
         private sealed class FixedRandom : IPopulationRandomSource { private readonly double value; internal FixedRandom(double value) { this.value = value; } public double NextUnit() { return this.value; } }
     }
 }
