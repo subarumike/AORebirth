@@ -289,6 +289,7 @@
     <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="PlayfieldHydrationCharacterizationTests.cs" />
     <Compile Include="PlayfieldRuntimeOwnershipTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\RuntimeOwnershipRegistry.cs">
       <Link>RuntimeOwnershipRegistry.cs</Link>
