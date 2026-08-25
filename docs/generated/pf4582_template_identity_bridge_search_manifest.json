@@ -1,6 +1,8 @@
 {
-  "SchemaVersion": 1,
-  "Outcome": "NO_BRIDGE_LOCATED",
+  "SchemaVersion": 2,
+  "PriorOutcome": "NO_BRIDGE_LOCATED",
+  "Outcome": "STRUCTURAL_SOURCE_AND_CONSUMER_FOUND",
+  "PriorOutcomeSuperseded": true,
   "SearchMethods": [
     "UNSIGNED_DECIMAL_TEXT",
     "EIGHT_DIGIT_HEX_TEXT",
@@ -11,11 +13,164 @@
   ],
   "KeysSearched": [
     {
-      "TemplateHashUInt32": 1095584067,
-      "TemplateHashHex": "0x414D4943",
-      "TemplateHashLittleEndianBytes": "43 49 4D 41",
-      "TemplateHashBigEndianBytes": "41 4D 49 43",
-      "TemplateHashAscii": "CIMA",
+      "CanonicalAcgHashText": "ACFJ",
+      "AcceptedSourceUInt32": 1246118721,
+      "OfficialWireBytes": "4A 46 43 41",
+      "OfficialNativeUInt32": 1094927946,
+      "NpcIds": [
+        1007988,
+        1007989,
+        1007990,
+        1007991,
+        1007992,
+        1007993,
+        1007994,
+        1007995,
+        1007996,
+        1007997,
+        1007998,
+        1007999,
+        1008000,
+        1008001,
+        1008002,
+        1008003,
+        1008004,
+        1008005,
+        1008006,
+        1008007,
+        1008008,
+        1008009,
+        1008010
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "ADAF",
+      "AcceptedSourceUInt32": 1178682433,
+      "OfficialWireBytes": "46 41 44 41",
+      "OfficialNativeUInt32": 1094992198,
+      "NpcIds": [
+        1008037
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BDML",
+      "AcceptedSourceUInt32": 1280132162,
+      "OfficialWireBytes": "4C 4D 44 42",
+      "OfficialNativeUInt32": 1111772492,
+      "NpcIds": [
+        1007961
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BDMO",
+      "AcceptedSourceUInt32": 1330463810,
+      "OfficialWireBytes": "4F 4D 44 42",
+      "OfficialNativeUInt32": 1111772495,
+      "NpcIds": [
+        1007966
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BEML",
+      "AcceptedSourceUInt32": 1280132418,
+      "OfficialWireBytes": "4C 4D 45 42",
+      "OfficialNativeUInt32": 1111838028,
+      "NpcIds": [
+        1007963
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BJMR",
+      "AcceptedSourceUInt32": 1380796994,
+      "OfficialWireBytes": "52 4D 4A 42",
+      "OfficialNativeUInt32": 1112165714,
+      "NpcIds": [
+        1007967
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BLMM",
+      "AcceptedSourceUInt32": 1296911426,
+      "OfficialWireBytes": "4D 4D 4C 42",
+      "OfficialNativeUInt32": 1112296781,
+      "NpcIds": [
+        1007965
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BNTO",
+      "AcceptedSourceUInt32": 1330925122,
+      "OfficialWireBytes": "4F 54 4E 42",
+      "OfficialNativeUInt32": 1112429647,
+      "NpcIds": [
+        1008027
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BSMG",
+      "AcceptedSourceUInt32": 1196249922,
+      "OfficialWireBytes": "47 4D 53 42",
+      "OfficialNativeUInt32": 1112755527,
+      "NpcIds": [
+        1008051
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "BTMO",
+      "AcceptedSourceUInt32": 1330467906,
+      "OfficialWireBytes": "4F 4D 54 42",
+      "OfficialNativeUInt32": 1112821071,
+      "NpcIds": [
+        1007964
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CADR",
+      "AcceptedSourceUInt32": 1380204867,
+      "OfficialWireBytes": "52 44 41 43",
+      "OfficialNativeUInt32": 1128350802,
+      "NpcIds": [
+        1007915,
+        1007916,
+        1007917,
+        1007918,
+        1007919,
+        1007920,
+        1007921,
+        1007922,
+        1007923,
+        1007924
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CBSN",
+      "AcceptedSourceUInt32": 1314079299,
+      "OfficialWireBytes": "4E 53 42 43",
+      "OfficialNativeUInt32": 1128420174,
+      "NpcIds": [
+        1007983,
+        1007984,
+        1008022,
+        1008023,
+        1008024,
+        1008025,
+        1008026
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CCRI",
+      "AcceptedSourceUInt32": 1230127939,
+      "OfficialWireBytes": "49 52 43 43",
+      "OfficialNativeUInt32": 1128485449,
+      "NpcIds": [
+        1008034
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CIMA",
+      "AcceptedSourceUInt32": 1095584067,
+      "OfficialWireBytes": "41 4D 49 43",
+      "OfficialNativeUInt32": 1128877377,
       "NpcIds": [
         1007897,
         1007898,
@@ -33,11 +188,269 @@
       ]
     },
     {
-      "TemplateHashUInt32": 1095979092,
-      "TemplateHashHex": "0x41535054",
-      "TemplateHashLittleEndianBytes": "54 50 53 41",
-      "TemplateHashBigEndianBytes": "41 53 50 54",
-      "TemplateHashAscii": "TPSA",
+      "CanonicalAcgHashText": "CLFI",
+      "AcceptedSourceUInt32": 1229343811,
+      "OfficialWireBytes": "49 46 4C 43",
+      "OfficialNativeUInt32": 1129072201,
+      "NpcIds": [
+        1008032
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CNTD",
+      "AcceptedSourceUInt32": 1146375747,
+      "OfficialWireBytes": "44 54 4E 43",
+      "OfficialNativeUInt32": 1129206852,
+      "NpcIds": [
+        1008030
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CRDY",
+      "AcceptedSourceUInt32": 1497649731,
+      "OfficialWireBytes": "59 44 52 43",
+      "OfficialNativeUInt32": 1129464921,
+      "NpcIds": [
+        1008011
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "CRJU",
+      "AcceptedSourceUInt32": 1430934083,
+      "OfficialWireBytes": "55 4A 52 43",
+      "OfficialNativeUInt32": 1129466453,
+      "NpcIds": [
+        1007968,
+        1007969,
+        1007970,
+        1007971,
+        1007972,
+        1007973,
+        1007974,
+        1007975
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "EQVE",
+      "AcceptedSourceUInt32": 1163284805,
+      "OfficialWireBytes": "45 56 51 45",
+      "OfficialNativeUInt32": 1162958405,
+      "NpcIds": [
+        1008033
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "FDQO",
+      "AcceptedSourceUInt32": 1330725958,
+      "OfficialWireBytes": "4F 51 44 46",
+      "OfficialNativeUInt32": 1178882383,
+      "NpcIds": [
+        1007845,
+        1007846,
+        1007847,
+        1007848,
+        1007849,
+        1007850,
+        1007851,
+        1007986,
+        1008038
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "GISK",
+      "AcceptedSourceUInt32": 1263749447,
+      "OfficialWireBytes": "4B 53 49 47",
+      "OfficialNativeUInt32": 1195987787,
+      "NpcIds": [
+        1008012,
+        1008013,
+        1008014,
+        1008015,
+        1008016,
+        1008017,
+        1008018,
+        1008019,
+        1008020,
+        1008021
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "ICBI",
+      "AcceptedSourceUInt32": 1229079369,
+      "OfficialWireBytes": "49 42 43 49",
+      "OfficialNativeUInt32": 1229144649,
+      "NpcIds": [
+        1007985
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "ICST",
+      "AcceptedSourceUInt32": 1414742857,
+      "OfficialWireBytes": "54 53 43 49",
+      "OfficialNativeUInt32": 1229149012,
+      "NpcIds": [
+        1008039,
+        1008040,
+        1008041,
+        1008042,
+        1008043,
+        1008044,
+        1008045,
+        1008046,
+        1008047,
+        1008048,
+        1008049,
+        1008050
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "ISRE",
+      "AcceptedSourceUInt32": 1163023177,
+      "OfficialWireBytes": "45 52 53 49",
+      "OfficialNativeUInt32": 1230197317,
+      "NpcIds": [
+        1007852,
+        1007853,
+        1007854,
+        1007855,
+        1007856,
+        1007857,
+        1007858,
+        1007859,
+        1007860,
+        1007861,
+        1007987
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "LLER",
+      "AcceptedSourceUInt32": 1380273228,
+      "OfficialWireBytes": "52 45 4C 4C",
+      "OfficialNativeUInt32": 1280066898,
+      "NpcIds": [
+        1007910,
+        1007911,
+        1007912,
+        1007913,
+        1007914
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "LPAK",
+      "AcceptedSourceUInt32": 1262571596,
+      "OfficialWireBytes": "4B 41 50 4C",
+      "OfficialNativeUInt32": 1280328011,
+      "NpcIds": [
+        1007981,
+        1007982
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "NERE",
+      "AcceptedSourceUInt32": 1163019598,
+      "OfficialWireBytes": "45 52 45 4E",
+      "OfficialNativeUInt32": 1313165893,
+      "NpcIds": [
+        1008036
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "OITA",
+      "AcceptedSourceUInt32": 1096042831,
+      "OfficialWireBytes": "41 54 49 4F",
+      "OfficialNativeUInt32": 1330205761,
+      "NpcIds": [
+        1008029
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "OMUI",
+      "AcceptedSourceUInt32": 1230327119,
+      "OfficialWireBytes": "49 55 4D 4F",
+      "OfficialNativeUInt32": 1330468169,
+      "NpcIds": [
+        1008031
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "ONRE",
+      "AcceptedSourceUInt32": 1163021903,
+      "OfficialWireBytes": "45 52 4E 4F",
+      "OfficialNativeUInt32": 1330532933,
+      "NpcIds": [
+        1008035
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "RFSL",
+      "AcceptedSourceUInt32": 1280525906,
+      "OfficialWireBytes": "4C 53 46 52",
+      "OfficialNativeUInt32": 1380340556,
+      "NpcIds": [
+        1007890,
+        1007891,
+        1007892,
+        1007893,
+        1007894,
+        1007895,
+        1007896
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "SHMG",
+      "AcceptedSourceUInt32": 1196247123,
+      "OfficialWireBytes": "47 4D 48 53",
+      "OfficialNativeUInt32": 1397247303,
+      "NpcIds": [
+        1008028
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "SORL",
+      "AcceptedSourceUInt32": 1280462675,
+      "OfficialWireBytes": "4C 52 4F 53",
+      "OfficialNativeUInt32": 1397707340,
+      "NpcIds": [
+        1007976,
+        1007977,
+        1007978,
+        1007979,
+        1007980
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "SRLZ",
+      "AcceptedSourceUInt32": 1514951251,
+      "OfficialWireBytes": "5A 4C 52 53",
+      "OfficialNativeUInt32": 1397902426,
+      "NpcIds": [
+        1007865,
+        1007866,
+        1007867,
+        1007868,
+        1007869,
+        1007870,
+        1007871,
+        1007872,
+        1007873
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "SRSK",
+      "AcceptedSourceUInt32": 1263751763,
+      "OfficialWireBytes": "4B 53 52 53",
+      "OfficialNativeUInt32": 1397904203,
+      "NpcIds": [
+        1007862,
+        1007863,
+        1007864
+      ]
+    },
+    {
+      "CanonicalAcgHashText": "TPSA",
+      "AcceptedSourceUInt32": 1095979092,
+      "OfficialWireBytes": "41 53 50 54",
+      "OfficialNativeUInt32": 1414550337,
       "NpcIds": [
         1007874,
         1007875,
@@ -58,151 +471,28 @@
       ]
     },
     {
-      "TemplateHashUInt32": 1096042831,
-      "TemplateHashHex": "0x4154494F",
-      "TemplateHashLittleEndianBytes": "4F 49 54 41",
-      "TemplateHashBigEndianBytes": "41 54 49 4F",
-      "TemplateHashAscii": "OITA",
+      "CanonicalAcgHashText": "WTCO",
+      "AcceptedSourceUInt32": 1329812567,
+      "OfficialWireBytes": "4F 43 54 57",
+      "OfficialNativeUInt32": 1465140047,
       "NpcIds": [
-        1008029
+        1007925,
+        1007926,
+        1007927,
+        1007928,
+        1007929,
+        1007930,
+        1007931,
+        1007932,
+        1007933,
+        1007934
       ]
     },
     {
-      "TemplateHashUInt32": 1146375747,
-      "TemplateHashHex": "0x44544E43",
-      "TemplateHashLittleEndianBytes": "43 4E 54 44",
-      "TemplateHashBigEndianBytes": "44 54 4E 43",
-      "TemplateHashAscii": "CNTD",
-      "NpcIds": [
-        1008030
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1163019598,
-      "TemplateHashHex": "0x4552454E",
-      "TemplateHashLittleEndianBytes": "4E 45 52 45",
-      "TemplateHashBigEndianBytes": "45 52 45 4E",
-      "TemplateHashAscii": "NERE",
-      "NpcIds": [
-        1008036
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1163021903,
-      "TemplateHashHex": "0x45524E4F",
-      "TemplateHashLittleEndianBytes": "4F 4E 52 45",
-      "TemplateHashBigEndianBytes": "45 52 4E 4F",
-      "TemplateHashAscii": "ONRE",
-      "NpcIds": [
-        1008035
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1163023177,
-      "TemplateHashHex": "0x45525349",
-      "TemplateHashLittleEndianBytes": "49 53 52 45",
-      "TemplateHashBigEndianBytes": "45 52 53 49",
-      "TemplateHashAscii": "ISRE",
-      "NpcIds": [
-        1007852,
-        1007853,
-        1007854,
-        1007855,
-        1007856,
-        1007857,
-        1007858,
-        1007859,
-        1007860,
-        1007861,
-        1007987
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1163284805,
-      "TemplateHashHex": "0x45565145",
-      "TemplateHashLittleEndianBytes": "45 51 56 45",
-      "TemplateHashBigEndianBytes": "45 56 51 45",
-      "TemplateHashAscii": "EQVE",
-      "NpcIds": [
-        1008033
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1178682433,
-      "TemplateHashHex": "0x46414441",
-      "TemplateHashLittleEndianBytes": "41 44 41 46",
-      "TemplateHashBigEndianBytes": "46 41 44 41",
-      "TemplateHashAscii": "ADAF",
-      "NpcIds": [
-        1008037
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1196247123,
-      "TemplateHashHex": "0x474D4853",
-      "TemplateHashLittleEndianBytes": "53 48 4D 47",
-      "TemplateHashBigEndianBytes": "47 4D 48 53",
-      "TemplateHashAscii": "SHMG",
-      "NpcIds": [
-        1008028
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1196249922,
-      "TemplateHashHex": "0x474D5342",
-      "TemplateHashLittleEndianBytes": "42 53 4D 47",
-      "TemplateHashBigEndianBytes": "47 4D 53 42",
-      "TemplateHashAscii": "BSMG",
-      "NpcIds": [
-        1008051
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1229079369,
-      "TemplateHashHex": "0x49424349",
-      "TemplateHashLittleEndianBytes": "49 43 42 49",
-      "TemplateHashBigEndianBytes": "49 42 43 49",
-      "TemplateHashAscii": "ICBI",
-      "NpcIds": [
-        1007985
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1229343811,
-      "TemplateHashHex": "0x49464C43",
-      "TemplateHashLittleEndianBytes": "43 4C 46 49",
-      "TemplateHashBigEndianBytes": "49 46 4C 43",
-      "TemplateHashAscii": "CLFI",
-      "NpcIds": [
-        1008032
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1230127939,
-      "TemplateHashHex": "0x49524343",
-      "TemplateHashLittleEndianBytes": "43 43 52 49",
-      "TemplateHashBigEndianBytes": "49 52 43 43",
-      "TemplateHashAscii": "CCRI",
-      "NpcIds": [
-        1008034
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1230327119,
-      "TemplateHashHex": "0x49554D4F",
-      "TemplateHashLittleEndianBytes": "4F 4D 55 49",
-      "TemplateHashBigEndianBytes": "49 55 4D 4F",
-      "TemplateHashAscii": "OMUI",
-      "NpcIds": [
-        1008031
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1230522714,
-      "TemplateHashHex": "0x4958495A",
-      "TemplateHashLittleEndianBytes": "5A 49 58 49",
-      "TemplateHashBigEndianBytes": "49 58 49 5A",
-      "TemplateHashAscii": "ZIXI",
+      "CanonicalAcgHashText": "ZIXI",
+      "AcceptedSourceUInt32": 1230522714,
+      "OfficialWireBytes": "49 58 49 5A",
+      "OfficialNativeUInt32": 1514756169,
       "NpcIds": [
         1007935,
         1007936,
@@ -231,345 +521,17 @@
         1007959,
         1007960
       ]
-    },
-    {
-      "TemplateHashUInt32": 1246118721,
-      "TemplateHashHex": "0x4A464341",
-      "TemplateHashLittleEndianBytes": "41 43 46 4A",
-      "TemplateHashBigEndianBytes": "4A 46 43 41",
-      "TemplateHashAscii": "ACFJ",
-      "NpcIds": [
-        1007988,
-        1007989,
-        1007990,
-        1007991,
-        1007992,
-        1007993,
-        1007994,
-        1007995,
-        1007996,
-        1007997,
-        1007998,
-        1007999,
-        1008000,
-        1008001,
-        1008002,
-        1008003,
-        1008004,
-        1008005,
-        1008006,
-        1008007,
-        1008008,
-        1008009,
-        1008010
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1262571596,
-      "TemplateHashHex": "0x4B41504C",
-      "TemplateHashLittleEndianBytes": "4C 50 41 4B",
-      "TemplateHashBigEndianBytes": "4B 41 50 4C",
-      "TemplateHashAscii": "LPAK",
-      "NpcIds": [
-        1007981,
-        1007982
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1263749447,
-      "TemplateHashHex": "0x4B534947",
-      "TemplateHashLittleEndianBytes": "47 49 53 4B",
-      "TemplateHashBigEndianBytes": "4B 53 49 47",
-      "TemplateHashAscii": "GISK",
-      "NpcIds": [
-        1008012,
-        1008013,
-        1008014,
-        1008015,
-        1008016,
-        1008017,
-        1008018,
-        1008019,
-        1008020,
-        1008021
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1263751763,
-      "TemplateHashHex": "0x4B535253",
-      "TemplateHashLittleEndianBytes": "53 52 53 4B",
-      "TemplateHashBigEndianBytes": "4B 53 52 53",
-      "TemplateHashAscii": "SRSK",
-      "NpcIds": [
-        1007862,
-        1007863,
-        1007864
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1280132162,
-      "TemplateHashHex": "0x4C4D4442",
-      "TemplateHashLittleEndianBytes": "42 44 4D 4C",
-      "TemplateHashBigEndianBytes": "4C 4D 44 42",
-      "TemplateHashAscii": "BDML",
-      "NpcIds": [
-        1007961
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1280132418,
-      "TemplateHashHex": "0x4C4D4542",
-      "TemplateHashLittleEndianBytes": "42 45 4D 4C",
-      "TemplateHashBigEndianBytes": "4C 4D 45 42",
-      "TemplateHashAscii": "BEML",
-      "NpcIds": [
-        1007963
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1280462675,
-      "TemplateHashHex": "0x4C524F53",
-      "TemplateHashLittleEndianBytes": "53 4F 52 4C",
-      "TemplateHashBigEndianBytes": "4C 52 4F 53",
-      "TemplateHashAscii": "SORL",
-      "NpcIds": [
-        1007976,
-        1007977,
-        1007978,
-        1007979,
-        1007980
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1280525906,
-      "TemplateHashHex": "0x4C534652",
-      "TemplateHashLittleEndianBytes": "52 46 53 4C",
-      "TemplateHashBigEndianBytes": "4C 53 46 52",
-      "TemplateHashAscii": "RFSL",
-      "NpcIds": [
-        1007890,
-        1007891,
-        1007892,
-        1007893,
-        1007894,
-        1007895,
-        1007896
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1296911426,
-      "TemplateHashHex": "0x4D4D4C42",
-      "TemplateHashLittleEndianBytes": "42 4C 4D 4D",
-      "TemplateHashBigEndianBytes": "4D 4D 4C 42",
-      "TemplateHashAscii": "BLMM",
-      "NpcIds": [
-        1007965
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1314079299,
-      "TemplateHashHex": "0x4E534243",
-      "TemplateHashLittleEndianBytes": "43 42 53 4E",
-      "TemplateHashBigEndianBytes": "4E 53 42 43",
-      "TemplateHashAscii": "CBSN",
-      "NpcIds": [
-        1007983,
-        1007984,
-        1008022,
-        1008023,
-        1008024,
-        1008025,
-        1008026
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1329812567,
-      "TemplateHashHex": "0x4F435457",
-      "TemplateHashLittleEndianBytes": "57 54 43 4F",
-      "TemplateHashBigEndianBytes": "4F 43 54 57",
-      "TemplateHashAscii": "WTCO",
-      "NpcIds": [
-        1007925,
-        1007926,
-        1007927,
-        1007928,
-        1007929,
-        1007930,
-        1007931,
-        1007932,
-        1007933,
-        1007934
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1330463810,
-      "TemplateHashHex": "0x4F4D4442",
-      "TemplateHashLittleEndianBytes": "42 44 4D 4F",
-      "TemplateHashBigEndianBytes": "4F 4D 44 42",
-      "TemplateHashAscii": "BDMO",
-      "NpcIds": [
-        1007966
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1330467906,
-      "TemplateHashHex": "0x4F4D5442",
-      "TemplateHashLittleEndianBytes": "42 54 4D 4F",
-      "TemplateHashBigEndianBytes": "4F 4D 54 42",
-      "TemplateHashAscii": "BTMO",
-      "NpcIds": [
-        1007964
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1330725958,
-      "TemplateHashHex": "0x4F514446",
-      "TemplateHashLittleEndianBytes": "46 44 51 4F",
-      "TemplateHashBigEndianBytes": "4F 51 44 46",
-      "TemplateHashAscii": "FDQO",
-      "NpcIds": [
-        1007845,
-        1007846,
-        1007847,
-        1007848,
-        1007849,
-        1007850,
-        1007851,
-        1007986,
-        1008038
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1330925122,
-      "TemplateHashHex": "0x4F544E42",
-      "TemplateHashLittleEndianBytes": "42 4E 54 4F",
-      "TemplateHashBigEndianBytes": "4F 54 4E 42",
-      "TemplateHashAscii": "BNTO",
-      "NpcIds": [
-        1008027
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1380204867,
-      "TemplateHashHex": "0x52444143",
-      "TemplateHashLittleEndianBytes": "43 41 44 52",
-      "TemplateHashBigEndianBytes": "52 44 41 43",
-      "TemplateHashAscii": "CADR",
-      "NpcIds": [
-        1007915,
-        1007916,
-        1007917,
-        1007918,
-        1007919,
-        1007920,
-        1007921,
-        1007922,
-        1007923,
-        1007924
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1380273228,
-      "TemplateHashHex": "0x52454C4C",
-      "TemplateHashLittleEndianBytes": "4C 4C 45 52",
-      "TemplateHashBigEndianBytes": "52 45 4C 4C",
-      "TemplateHashAscii": "LLER",
-      "NpcIds": [
-        1007910,
-        1007911,
-        1007912,
-        1007913,
-        1007914
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1380796994,
-      "TemplateHashHex": "0x524D4A42",
-      "TemplateHashLittleEndianBytes": "42 4A 4D 52",
-      "TemplateHashBigEndianBytes": "52 4D 4A 42",
-      "TemplateHashAscii": "BJMR",
-      "NpcIds": [
-        1007967
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1414742857,
-      "TemplateHashHex": "0x54534349",
-      "TemplateHashLittleEndianBytes": "49 43 53 54",
-      "TemplateHashBigEndianBytes": "54 53 43 49",
-      "TemplateHashAscii": "ICST",
-      "NpcIds": [
-        1008039,
-        1008040,
-        1008041,
-        1008042,
-        1008043,
-        1008044,
-        1008045,
-        1008046,
-        1008047,
-        1008048,
-        1008049,
-        1008050
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1430934083,
-      "TemplateHashHex": "0x554A5243",
-      "TemplateHashLittleEndianBytes": "43 52 4A 55",
-      "TemplateHashBigEndianBytes": "55 4A 52 43",
-      "TemplateHashAscii": "CRJU",
-      "NpcIds": [
-        1007968,
-        1007969,
-        1007970,
-        1007971,
-        1007972,
-        1007973,
-        1007974,
-        1007975
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1497649731,
-      "TemplateHashHex": "0x59445243",
-      "TemplateHashLittleEndianBytes": "43 52 44 59",
-      "TemplateHashBigEndianBytes": "59 44 52 43",
-      "TemplateHashAscii": "CRDY",
-      "NpcIds": [
-        1008011
-      ]
-    },
-    {
-      "TemplateHashUInt32": 1514951251,
-      "TemplateHashHex": "0x5A4C5253",
-      "TemplateHashLittleEndianBytes": "53 52 4C 5A",
-      "TemplateHashBigEndianBytes": "5A 4C 52 53",
-      "TemplateHashAscii": "SRLZ",
-      "NpcIds": [
-        1007865,
-        1007866,
-        1007867,
-        1007868,
-        1007869,
-        1007870,
-        1007871,
-        1007872,
-        1007873
-      ]
     }
   ],
   "OfficialSources": [
     {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_ANARCHYONLINE_EXE",
+      "LogicalSourceLabel": "AOREBIRTH_LOCAL_EP1_PF4582_ACGHASH_RECORDS",
       "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "AnarchyOnline.exe",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 85936,
-      "Sha256": "370c0670cc9cb46626ef24692376aaf492bb1787bad8a1125365a6be4f663862",
-      "PeTimestampHex": "0x647a09e1",
-      "ImageBaseHex": "0x400000",
+      "RelativePath": "docs/reference/pf4582/official/ep1_18_8_62_pf4582_acghash_records.json",
+      "MediaClass": "IMPORTED_STRUCTURED_EVIDENCE",
+      "FileSize": 468641,
+      "Sha256": "f19ed7fb094369f99998cd83da451839f08a4882833d6ade1b533ccc4bba3ec2",
+      "KeysSearched": 38,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -577,191 +539,20 @@
         "BIG_ENDIAN_BYTES",
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "Official EP1 client process image; client was not launched"
-      ],
-      "CoverageLimitations": [
-        "No PF4582 parser or identity bridge was located in the executable image."
-      ],
-      "InspectionEvidence": "Bounded exact-pattern scan and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_BINARYSTREAM_DLL",
-      "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "BinaryStream.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 15360,
-      "Sha256": "ae2b6b93effecb892e515afb967c034ef319a5a9aea687a14a95eb9f8700eb2d",
-      "PeTimestampHex": "0x647a065b",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "BinaryStream integer deserialization used by GameData::ACGHash_t"
-      ],
-      "CoverageLimitations": [
-        "No PF4582 identity lookup symbol was present."
-      ],
-      "InspectionEvidence": "Bounded exact-pattern scan, SHA-256 fingerprint, and import-call inspection."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_GAMECODE_DLL",
-      "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "Gamecode.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 3035136,
-      "Sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
-      "PeTimestampHex": "0x647a08f0",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "PlayfieldAnarchy_t::GetDistrictInfo",
-        "PlayfieldAnarchy_t::SetDistrictInfo"
-      ],
-      "CoverageLimitations": [
-        "No inspected import or call consumes HashSpawnPoint_t::GetHash, GetHashSpawnPoints, or GetSpawnInfo."
-      ],
-      "InspectionEvidence": "Exact official imports/exports, bounded byte search, and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_GAMEDATA_DLL",
-      "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "GameData.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 205312,
-      "Sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
-      "PeTimestampHex": "0x647a067e",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "GameData::HashSpawnPoint_t::ReadBlob VA 0x1000640F",
-        "GameData::HashSpawnPoint_t::GetHash VA 0x10004459",
-        "GameData::ACGHash_t::GetHashAsInt VA 0x100019BF",
-        "GameData::PlayfieldDistrictInfo_t::ReadBlob VA 0x10009DEF"
-      ],
-      "CoverageLimitations": [
-        "The parser exposes ACGHash_t but contains no terminal mob identity lookup."
-      ],
-      "InspectionEvidence": "Exact official DLL export/decorated-symbol map, matched Ghidra function map, bounded byte search, and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-      "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "cd_image/data/db/ResourceDatabase.dat",
-      "MediaClass": "INSTALLED_OFFICIAL_RESOURCE_DATABASE",
-      "FileSize": 1073741824,
-      "Sha256": "fe480aaf552b77100337a7d0fc7d5d2686cc598d688543a50699e560e4cd1ba0",
-      "ArchiveMemberPath": "inferred type=1000014,id=4582 member [0x0C6B4436,0x0C6B6F2D); key window [0x0C6B44D0,0x0C6B6559)",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [
-        "ADAF",
-        "ACFJ",
-        "BDML",
-        "BDMO",
-        "BEML",
-        "BJMR",
-        "BLMM",
-        "BNTO",
-        "BSMG",
-        "BTMO",
-        "CADR",
-        "CBSN",
-        "CCRI",
-        "CIMA",
-        "CLFI",
-        "CNTD",
-        "CRDY",
-        "CRJU",
-        "EQVE",
-        "FDQO",
-        "GISK",
-        "ICBI",
-        "ICST",
-        "ISRE",
-        "LLER",
-        "LPAK",
-        "NERE",
-        "OITA",
-        "OMUI",
-        "ONRE",
-        "RFSL",
-        "SORL",
-        "SRLZ",
-        "SRSK",
-        "SHMG",
-        "TPSA",
-        "WTCO",
-        "ZIXI"
       ],
       "StructuralOccurrencesRetained": 206,
-      "FalsePositiveOccurrencesRejected": 40,
-      "FalsePositiveCountingScope": "all same native big-endian key patterns outside the PF4582 key window across the complete EP1 RDB set",
-      "ParserConsumerReferences": [
-        "PF4582 fixed-record table at 0x0C6B44D0",
-        "GameData::HashSpawnPoint_t::ReadBlob"
-      ],
-      "CoverageLimitations": [
-        "The bounded PF4582 resource structure contains no proven terminal mob identity, MonsterData, display name, or source NpcId."
-      ],
-      "InspectionEvidence": "All 206 native key occurrences and all 38 multiplicities matched the governed source in the bounded member; adjacent spawn fields and the official parser establish placement structure without assuming flat record boundaries."
+      "FalsePositiveOccurrencesRejected": 0,
+      "InspectionCompleted": true,
+      "InspectionEvidence": "Byte-identical structured snapshot of all 207 official PF4582 HashSpawnPoint_t records."
     },
     {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_RDB_INDEX",
+      "LogicalSourceLabel": "AOREBIRTH_LOCAL_EP1_PF4582_OFFICIAL_SEARCH_REPORT",
       "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "cd_image/data/db/ResourceDatabase.idx",
-      "MediaClass": "INSTALLED_OFFICIAL_RESOURCE_DATABASE",
-      "FileSize": 9437184,
-      "Sha256": "498ce5e038567580ed683275508c3fad6b7d18d4c660ce457769aa2f92f217ee",
+      "RelativePath": "docs/reference/pf4582/official/ep1_18_8_62_pf4582_search_report.json",
+      "MediaClass": "IMPORTED_STRUCTURED_EVIDENCE",
+      "FileSize": 10032170,
+      "Sha256": "7bc10b90e5e7e7d25c7ff1f47cf7e74f8fba37bab8da9d1e7cc67d5457c290f2",
+      "KeysSearched": 38,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -769,309 +560,20 @@
         "BIG_ENDIAN_BYTES",
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "ResourceDatabase index for the EP1 data segments"
-      ],
-      "CoverageLimitations": [
-        "No terminal tag-to-identity table was identified in the index."
-      ],
-      "InspectionEvidence": "Bounded all-key and NpcId binary scan with SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP1_VERSION_ID",
-      "ProductBuildVersion": "18.8.62_EP1",
-      "RootLabel": "AO_CLIENT_EP1_INSTALL",
-      "RelativePath": "version.id",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 13,
-      "Sha256": "e321d2adb1ff92b886d6dc57e66c7e928459221197c74596d0979566635eb8fa",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "Build label source"
-      ],
-      "CoverageLimitations": [
-        "Build marker only."
-      ],
-      "InspectionEvidence": "Exact content, size, and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_ANARCHYONLINE_EXE",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "AnarchyOnline.exe",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 86448,
-      "Sha256": "20aa1daa31de191cc5498cef34f6a95df8667d2c0a01b9212888f71882e3d387",
-      "PeTimestampHex": "0x647a0f2b",
-      "ImageBaseHex": "0x400000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "Official client process image; client was not launched"
-      ],
-      "CoverageLimitations": [
-        "No PF4582 parser or identity bridge was located in the launcher image."
-      ],
-      "InspectionEvidence": "Bounded exact-pattern scan and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_BINARYSTREAM_DLL",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "BinaryStream.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 15872,
-      "Sha256": "fca5131ae23d538bef37a3a0656893620143731f4874336e41256c28f2a3b5f1",
-      "PeTimestampHex": "0x647a0c1e",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "BinaryStream integer deserialization used by GameData::ACGHash_t"
-      ],
-      "CoverageLimitations": [
-        "No terminal identity lookup was located."
-      ],
-      "InspectionEvidence": "Direct instruction/import inspection, bounded exact-pattern scan, and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_GAMECODE_DLL",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "Gamecode.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 3057664,
-      "Sha256": "60e5c2073fd488ec01579cd23ba7c87e3881228815ec037954d5ce3dbf64b5b4",
-      "PeTimestampHex": "0x647a0e09",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "PlayfieldAnarchy_t::SetDistrictInfo RVA 0x123B0F",
-        "PlayfieldAnarchy_t::SetRDBDynels RVA 0x124045",
-        "PlayfieldAnarchy_t::CreateRDBDynels RVA 0x1242ED"
-      ],
-      "CoverageLimitations": [
-        "District data at +0xB8 and RDB dynel data at +0xC8 are separate; CreateFromTemplate consumes only RDBDynelLoader_t."
-      ],
-      "InspectionEvidence": "Direct import, call-graph, object-member, and bounded exact-pattern analysis against the exact DLL fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_GAMEDATA_DLL",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "GameData.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 205312,
-      "Sha256": "feb26481fe8555fddbecb2ee6eef49cd7a18940c08ea33a3190ea68ac1f05909",
-      "PeTimestampHex": "0x647a0c4e",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "HashSpawnPoint_t::ReadBlob RVA 0x6124",
-        "HashSpawnPoint_t::GetHash RVA 0x41B9",
-        "ACGHash_t::operator>> RVA 0x1B1B",
-        "ACGHash_t::GetHashAsInt RVA 0x19B7",
-        "PlayfieldDistrictInfo_t::ReadBlob RVA 0x9CF4"
-      ],
-      "CoverageLimitations": [
-        "The parser terminates in ACGHash_t, not a stable AO mob identity."
-      ],
-      "InspectionEvidence": "Direct export, instruction, object-layout, and bounded exact-pattern analysis against the exact DLL fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_N3_DLL",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "N3.dll",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 406528,
-      "Sha256": "e242f4855de93094161b619047cd838b6a3261bb53a5eb17065f60eda5239168",
-      "PeTimestampHex": "0x647a0d46",
-      "ImageBaseHex": "0x10000000",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "Live dynel engine boundary inspected for source-key retention"
-      ],
-      "CoverageLimitations": [
-        "No source PF hash or NpcId accessor was located on a live dynel."
-      ],
-      "InspectionEvidence": "Exact Ghidra function inventory, direct cross-reference inspection, bounded exact-pattern scan, and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_RDB_INDEX",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "cd_image/data/db/ResourceDatabase.idx",
-      "MediaClass": "INSTALLED_OFFICIAL_RESOURCE_DATABASE",
-      "FileSize": 16777216,
-      "Sha256": "6ab5f9747bd82840a6562f1f03d44faece899f7be1c3552aa7c1e646b07892d9",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
-      "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "PF RDB index pair type=1000014,id=4582 at offsets 0x29C144 and 0xDD0934"
-      ],
-      "CoverageLimitations": [
-        "The index identifies the PF resource but contains no terminal tag-to-identity join."
-      ],
-      "InspectionEvidence": "Exact index-pair inspection, bounded all-key/NpcId scan, and SHA-256 fingerprint."
-    },
-    {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_RDB_SEGMENT_009",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "cd_image/data/db/ResourceDatabase.dat.009",
-      "MediaClass": "INSTALLED_OFFICIAL_RESOURCE_DATABASE",
-      "FileSize": 1073741824,
-      "Sha256": "d93e794944ce046214c756c25a1378164b580b8eb0e8070451dbfc8b27bb0ac6",
-      "ArchiveMemberPath": "PF4582 key window [0x30D71B53,0x30D73BDC)",
-      "SearchMethods": [
-        "UNSIGNED_DECIMAL_TEXT",
-        "EIGHT_DIGIT_HEX_TEXT",
-        "LITTLE_ENDIAN_BYTES",
-        "BIG_ENDIAN_BYTES",
-        "FOUR_CHARACTER_TEXT",
-        "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
-      ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [
-        "ADAF",
-        "ACFJ",
-        "BDML",
-        "BDMO",
-        "BEML",
-        "BJMR",
-        "BLMM",
-        "BNTO",
-        "BSMG",
-        "BTMO",
-        "CADR",
-        "CBSN",
-        "CCRI",
-        "CIMA",
-        "CLFI",
-        "CNTD",
-        "CRDY",
-        "CRJU",
-        "EQVE",
-        "FDQO",
-        "GISK",
-        "ICBI",
-        "ICST",
-        "ISRE",
-        "LLER",
-        "LPAK",
-        "NERE",
-        "OITA",
-        "OMUI",
-        "ONRE",
-        "RFSL",
-        "SORL",
-        "SRLZ",
-        "SRSK",
-        "SHMG",
-        "TPSA",
-        "WTCO",
-        "ZIXI"
       ],
       "StructuralOccurrencesRetained": 206,
-      "FalsePositiveOccurrencesRejected": 1176,
-      "FalsePositiveCountingScope": "all same native big-endian key patterns outside the PF4582 key window across the complete EP2 RDB set",
-      "ParserConsumerReferences": [
-        "Build-consistent EP2 PF4582 record multiset",
-        "EP2 GameData::HashSpawnPoint_t::ReadBlob"
-      ],
-      "CoverageLimitations": [
-        "Records contain no NpcId or terminal identity and no inspected consumer joins ACGHash_t to a dynel."
-      ],
-      "InspectionEvidence": "All 206 native key occurrences and all 38 multiplicities matched the governed source within the exact EP2 key window."
+      "FalsePositiveOccurrencesRejected": 5039,
+      "InspectionCompleted": true,
+      "InspectionEvidence": "Completed official EP1 source, parser, object-layout, accessor, and bounded terminal-identity search report."
     },
     {
-      "LogicalSourceLabel": "AO_CLIENT_EP2_VERSION_ID",
-      "ProductBuildVersion": "18.8.62_EP2",
-      "RootLabel": "AO_CLIENT_EP2_INSTALL",
-      "RelativePath": "version.id",
-      "MediaClass": "INSTALLED_OFFICIAL_CLIENT",
-      "FileSize": 13,
-      "Sha256": "8a250438c64aa6750f3ee2c20731400a58c713cd424fbd17b7fb6ff3e761ace2",
+      "LogicalSourceLabel": "AOREBIRTH_LOCAL_EP1_PF4582_OCCURRENCE_MANIFEST",
+      "ProductBuildVersion": "18.8.62_EP1",
+      "RelativePath": "docs/reference/pf4582/official/ep1_18_8_62_pf4582_occurrence_manifest.json",
+      "MediaClass": "IMPORTED_STRUCTURED_EVIDENCE",
+      "FileSize": 4418993,
+      "Sha256": "b87691b66a9f92f4e44130079bf0e749d808032a6a280ac6a9933f74b75c504c",
+      "KeysSearched": 38,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1080,24 +582,18 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "KeysSearched": 38,
-      "ExactKeysFound": [],
       "StructuralOccurrencesRetained": 0,
-      "FalsePositiveOccurrencesRejected": 0,
-      "ParserConsumerReferences": [
-        "Build label source"
-      ],
-      "CoverageLimitations": [
-        "Build marker only."
-      ],
-      "InspectionEvidence": "Exact content, size, and SHA-256 fingerprint."
+      "FalsePositiveOccurrencesRejected": 5039,
+      "InspectionCompleted": true,
+      "InspectionEvidence": "Deterministic occurrence accounting supporting the official search result."
     }
   ],
   "PerKeyResults": [
     {
-      "TemplateHashUInt32": 1095584067,
-      "TemplateHashHex": "0x414D4943",
-      "TemplateHashAscii": "CIMA",
+      "CanonicalAcgHashText": "ACFJ",
+      "AcceptedSourceUInt32": 1246118721,
+      "OfficialWireBytes": "4A 46 43 41",
+      "OfficialNativeUInt32": 1094927946,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1106,38 +602,39 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 23,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-1",
+        "18.8.62_EP1:1000014:4582:district-1:record-2",
+        "18.8.62_EP1:1000014:4582:district-1:record-3",
+        "18.8.62_EP1:1000014:4582:district-1:record-4",
+        "18.8.62_EP1:1000014:4582:district-1:record-5",
+        "18.8.62_EP1:1000014:4582:district-1:record-6",
+        "18.8.62_EP1:1000014:4582:district-1:record-7",
+        "18.8.62_EP1:1000014:4582:district-1:record-8",
+        "18.8.62_EP1:1000014:4582:district-1:record-9",
+        "18.8.62_EP1:1000014:4582:district-1:record-10",
+        "18.8.62_EP1:1000014:4582:district-1:record-11",
+        "18.8.62_EP1:1000014:4582:district-1:record-12",
+        "18.8.62_EP1:1000014:4582:district-1:record-13",
+        "18.8.62_EP1:1000014:4582:district-1:record-14",
+        "18.8.62_EP1:1000014:4582:district-1:record-15",
+        "18.8.62_EP1:1000014:4582:district-1:record-16",
+        "18.8.62_EP1:1000014:4582:district-1:record-17",
+        "18.8.62_EP1:1000014:4582:district-1:record-18",
+        "18.8.62_EP1:1000014:4582:district-1:record-19",
+        "18.8.62_EP1:1000014:4582:district-1:record-20",
+        "18.8.62_EP1:1000014:4582:district-1:record-21",
+        "18.8.62_EP1:1000014:4582:district-1:record-22",
+        "18.8.62_EP1:1000014:4582:district-1:record-23"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 13,
-          "FileOffsets": [
-            "0x0C6B4CF0",
-            "0x0C6B4D18",
-            "0x0C6B4D40",
-            "0x0C6B4D68",
-            "0x0C6B4D90",
-            "0x0C6B4DB8",
-            "0x0C6B4DE0",
-            "0x0C6B4E08",
-            "0x0C6B4E30",
-            "0x0C6B4E58",
-            "0x0C6B4E80",
-            "0x0C6B4EA8",
-            "0x0C6B4ED0"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 20
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1095979092,
-      "TemplateHashHex": "0x41535054",
-      "TemplateHashAscii": "TPSA",
+      "CanonicalAcgHashText": "ADAF",
+      "AcceptedSourceUInt32": 1178682433,
+      "OfficialWireBytes": "46 41 44 41",
+      "OfficialNativeUInt32": 1094992198,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1146,41 +643,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-51"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 16,
-          "FileOffsets": [
-            "0x0C6B4958",
-            "0x0C6B4980",
-            "0x0C6B49A8",
-            "0x0C6B49D0",
-            "0x0C6B49F8",
-            "0x0C6B4A20",
-            "0x0C6B4A48",
-            "0x0C6B4A70",
-            "0x0C6B4A98",
-            "0x0C6B4AC0",
-            "0x0C6B4AE8",
-            "0x0C6B4B10",
-            "0x0C6B4B38",
-            "0x0C6B4B60",
-            "0x0C6B4B88",
-            "0x0C6B4BB0"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 3
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1096042831,
-      "TemplateHashHex": "0x4154494F",
-      "TemplateHashAscii": "OITA",
+      "CanonicalAcgHashText": "BDML",
+      "AcceptedSourceUInt32": 1280132162,
+      "OfficialWireBytes": "4C 4D 44 42",
+      "OfficialNativeUInt32": 1111772492,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1189,26 +662,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-116"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B61E5"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 3
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1146375747,
-      "TemplateHashHex": "0x44544E43",
-      "TemplateHashAscii": "CNTD",
+      "CanonicalAcgHashText": "BDMO",
+      "AcceptedSourceUInt32": 1330463810,
+      "OfficialWireBytes": "4F 4D 44 42",
+      "OfficialNativeUInt32": 1111772495,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1217,26 +681,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-121"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B620D"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 23
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1163019598,
-      "TemplateHashHex": "0x4552454E",
-      "TemplateHashAscii": "NERE",
+      "CanonicalAcgHashText": "BEML",
+      "AcceptedSourceUInt32": 1280132418,
+      "OfficialWireBytes": "4C 4D 45 42",
+      "OfficialNativeUInt32": 1111838028,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1245,26 +700,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-118"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B62FD"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 26
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1163021903,
-      "TemplateHashHex": "0x45524E4F",
-      "TemplateHashAscii": "ONRE",
+      "CanonicalAcgHashText": "BJMR",
+      "AcceptedSourceUInt32": 1380796994,
+      "OfficialWireBytes": "52 4D 4A 42",
+      "OfficialNativeUInt32": 1112165714,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1273,26 +719,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-122"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B62D5"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 50
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1163023177,
-      "TemplateHashHex": "0x45525349",
-      "TemplateHashAscii": "ISRE",
+      "CanonicalAcgHashText": "BLMM",
+      "AcceptedSourceUInt32": 1296911426,
+      "OfficialWireBytes": "4D 4D 4C 42",
+      "OfficialNativeUInt32": 1112296781,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1301,36 +738,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-120"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 11,
-          "FileOffsets": [
-            "0x0C6B45E8",
-            "0x0C6B4610",
-            "0x0C6B4638",
-            "0x0C6B4660",
-            "0x0C6B4688",
-            "0x0C6B46B0",
-            "0x0C6B46D8",
-            "0x0C6B4700",
-            "0x0C6B4728",
-            "0x0C6B4750",
-            "0x0C6B5B55"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 16
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1163284805,
-      "TemplateHashHex": "0x45565145",
-      "TemplateHashAscii": "EQVE",
+      "CanonicalAcgHashText": "BNTO",
+      "AcceptedSourceUInt32": 1330925122,
+      "OfficialWireBytes": "4F 54 4E 42",
+      "OfficialNativeUInt32": 1112429647,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1339,26 +757,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-40"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B6285"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 9
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1178682433,
-      "TemplateHashHex": "0x46414441",
-      "TemplateHashAscii": "ADAF",
+      "CanonicalAcgHashText": "BSMG",
+      "AcceptedSourceUInt32": 1196249922,
+      "OfficialWireBytes": "47 4D 53 42",
+      "OfficialNativeUInt32": 1112755527,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1367,26 +776,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-117"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B634D"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 48
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1196247123,
-      "TemplateHashHex": "0x474D4853",
-      "TemplateHashAscii": "SHMG",
+      "CanonicalAcgHashText": "BTMO",
+      "AcceptedSourceUInt32": 1330467906,
+      "OfficialWireBytes": "4F 4D 54 42",
+      "OfficialNativeUInt32": 1112821071,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1395,26 +795,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-119"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B61BD"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 32
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1196249922,
-      "TemplateHashHex": "0x474D5342",
-      "TemplateHashAscii": "BSMG",
+      "CanonicalAcgHashText": "CADR",
+      "AcceptedSourceUInt32": 1380204867,
+      "OfficialWireBytes": "52 44 41 43",
+      "OfficialNativeUInt32": 1128350802,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1423,26 +814,26 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 10,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-70",
+        "18.8.62_EP1:1000014:4582:district-0:record-71",
+        "18.8.62_EP1:1000014:4582:district-0:record-72",
+        "18.8.62_EP1:1000014:4582:district-0:record-73",
+        "18.8.62_EP1:1000014:4582:district-0:record-74",
+        "18.8.62_EP1:1000014:4582:district-0:record-75",
+        "18.8.62_EP1:1000014:4582:district-0:record-76",
+        "18.8.62_EP1:1000014:4582:district-0:record-77",
+        "18.8.62_EP1:1000014:4582:district-0:record-78",
+        "18.8.62_EP1:1000014:4582:district-0:record-79"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B5718"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 3
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1229079369,
-      "TemplateHashHex": "0x49424349",
-      "TemplateHashAscii": "ICBI",
+      "CanonicalAcgHashText": "CBSN",
+      "AcceptedSourceUInt32": 1314079299,
+      "OfficialWireBytes": "4E 53 42 43",
+      "OfficialNativeUInt32": 1128420174,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1451,26 +842,23 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 7,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-138",
+        "18.8.62_EP1:1000014:4582:district-0:record-139",
+        "18.8.62_EP1:1000014:4582:district-1:record-35",
+        "18.8.62_EP1:1000014:4582:district-1:record-36",
+        "18.8.62_EP1:1000014:4582:district-1:record-37",
+        "18.8.62_EP1:1000014:4582:district-1:record-38",
+        "18.8.62_EP1:1000014:4582:district-1:record-39"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B5AB0"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 36
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1229343811,
-      "TemplateHashHex": "0x49464C43",
-      "TemplateHashAscii": "CLFI",
+      "CanonicalAcgHashText": "CCRI",
+      "AcceptedSourceUInt32": 1230127939,
+      "OfficialWireBytes": "49 52 43 43",
+      "OfficialNativeUInt32": 1128485449,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1479,26 +867,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-47"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B625D"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 8
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1230127939,
-      "TemplateHashHex": "0x49524343",
-      "TemplateHashAscii": "CCRI",
+      "CanonicalAcgHashText": "CIMA",
+      "AcceptedSourceUInt32": 1095584067,
+      "OfficialWireBytes": "41 4D 49 43",
+      "OfficialNativeUInt32": 1128877377,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1507,26 +886,29 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 13,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-52",
+        "18.8.62_EP1:1000014:4582:district-0:record-53",
+        "18.8.62_EP1:1000014:4582:district-0:record-54",
+        "18.8.62_EP1:1000014:4582:district-0:record-55",
+        "18.8.62_EP1:1000014:4582:district-0:record-56",
+        "18.8.62_EP1:1000014:4582:district-0:record-57",
+        "18.8.62_EP1:1000014:4582:district-0:record-58",
+        "18.8.62_EP1:1000014:4582:district-0:record-59",
+        "18.8.62_EP1:1000014:4582:district-0:record-60",
+        "18.8.62_EP1:1000014:4582:district-0:record-61",
+        "18.8.62_EP1:1000014:4582:district-0:record-62",
+        "18.8.62_EP1:1000014:4582:district-0:record-63",
+        "18.8.62_EP1:1000014:4582:district-0:record-64"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B62AD"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 19
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1230327119,
-      "TemplateHashHex": "0x49554D4F",
-      "TemplateHashAscii": "OMUI",
+      "CanonicalAcgHashText": "CLFI",
+      "AcceptedSourceUInt32": 1229343811,
+      "OfficialWireBytes": "49 46 4C 43",
+      "OfficialNativeUInt32": 1129072201,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1535,26 +917,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-45"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B6235"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 44
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1230522714,
-      "TemplateHashHex": "0x4958495A",
-      "TemplateHashAscii": "ZIXI",
+      "CanonicalAcgHashText": "CNTD",
+      "AcceptedSourceUInt32": 1146375747,
+      "OfficialWireBytes": "44 54 4E 43",
+      "OfficialNativeUInt32": 1129206852,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1563,51 +936,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-43"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 26,
-          "FileOffsets": [
-            "0x0C6B52E0",
-            "0x0C6B5308",
-            "0x0C6B5330",
-            "0x0C6B5358",
-            "0x0C6B5380",
-            "0x0C6B53A8",
-            "0x0C6B53D0",
-            "0x0C6B53F8",
-            "0x0C6B5420",
-            "0x0C6B5448",
-            "0x0C6B5470",
-            "0x0C6B5498",
-            "0x0C6B54C0",
-            "0x0C6B54E8",
-            "0x0C6B5510",
-            "0x0C6B5538",
-            "0x0C6B5560",
-            "0x0C6B5588",
-            "0x0C6B55B0",
-            "0x0C6B55D8",
-            "0x0C6B5600",
-            "0x0C6B5628",
-            "0x0C6B5650",
-            "0x0C6B5678",
-            "0x0C6B56A0",
-            "0x0C6B56C8"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 40
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1246118721,
-      "TemplateHashHex": "0x4A464341",
-      "TemplateHashAscii": "ACFJ",
+      "CanonicalAcgHashText": "CRDY",
+      "AcceptedSourceUInt32": 1497649731,
+      "OfficialWireBytes": "59 44 52 43",
+      "OfficialNativeUInt32": 1129464921,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1616,48 +955,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-24"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 23,
-          "FileOffsets": [
-            "0x0C6B5B7D",
-            "0x0C6B5BA5",
-            "0x0C6B5BCD",
-            "0x0C6B5BF5",
-            "0x0C6B5C1D",
-            "0x0C6B5C45",
-            "0x0C6B5C6D",
-            "0x0C6B5C95",
-            "0x0C6B5CBD",
-            "0x0C6B5CE5",
-            "0x0C6B5D0D",
-            "0x0C6B5D35",
-            "0x0C6B5D5D",
-            "0x0C6B5D85",
-            "0x0C6B5DAD",
-            "0x0C6B5DD5",
-            "0x0C6B5DFD",
-            "0x0C6B5E25",
-            "0x0C6B5E4D",
-            "0x0C6B5E75",
-            "0x0C6B5E9D",
-            "0x0C6B5EC5",
-            "0x0C6B5EED"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 89
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1262571596,
-      "TemplateHashHex": "0x4B41504C",
-      "TemplateHashAscii": "LPAK",
+      "CanonicalAcgHashText": "CRJU",
+      "AcceptedSourceUInt32": 1430934083,
+      "OfficialWireBytes": "55 4A 52 43",
+      "OfficialNativeUInt32": 1129466453,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1666,27 +974,24 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 8,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-123",
+        "18.8.62_EP1:1000014:4582:district-0:record-124",
+        "18.8.62_EP1:1000014:4582:district-0:record-125",
+        "18.8.62_EP1:1000014:4582:district-0:record-126",
+        "18.8.62_EP1:1000014:4582:district-0:record-127",
+        "18.8.62_EP1:1000014:4582:district-0:record-128",
+        "18.8.62_EP1:1000014:4582:district-0:record-129",
+        "18.8.62_EP1:1000014:4582:district-0:record-130"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 2,
-          "FileOffsets": [
-            "0x0C6B5A10",
-            "0x0C6B5A38"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 2
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1263749447,
-      "TemplateHashHex": "0x4B534947",
-      "TemplateHashAscii": "GISK",
+      "CanonicalAcgHashText": "EQVE",
+      "AcceptedSourceUInt32": 1163284805,
+      "OfficialWireBytes": "45 56 51 45",
+      "OfficialNativeUInt32": 1162958405,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1695,35 +1000,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-46"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 10,
-          "FileOffsets": [
-            "0x0C6B5F3D",
-            "0x0C6B5F65",
-            "0x0C6B5F8D",
-            "0x0C6B5FB5",
-            "0x0C6B5FDD",
-            "0x0C6B6005",
-            "0x0C6B602D",
-            "0x0C6B6055",
-            "0x0C6B607D",
-            "0x0C6B60A5"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 102
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1263751763,
-      "TemplateHashHex": "0x4B535253",
-      "TemplateHashAscii": "SRSK",
+      "CanonicalAcgHashText": "FDQO",
+      "AcceptedSourceUInt32": 1330725958,
+      "OfficialWireBytes": "4F 51 44 46",
+      "OfficialNativeUInt32": 1178882383,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1732,28 +1019,25 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 9,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-0",
+        "18.8.62_EP1:1000014:4582:district-0:record-1",
+        "18.8.62_EP1:1000014:4582:district-0:record-2",
+        "18.8.62_EP1:1000014:4582:district-0:record-3",
+        "18.8.62_EP1:1000014:4582:district-0:record-4",
+        "18.8.62_EP1:1000014:4582:district-0:record-5",
+        "18.8.62_EP1:1000014:4582:district-0:record-6",
+        "18.8.62_EP1:1000014:4582:district-0:record-141",
+        "18.8.62_EP1:1000014:4582:district-1:record-52"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 3,
-          "FileOffsets": [
-            "0x0C6B4778",
-            "0x0C6B47A0",
-            "0x0C6B47C8"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 94
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1280132162,
-      "TemplateHashHex": "0x4C4D4442",
-      "TemplateHashAscii": "BDML",
+      "CanonicalAcgHashText": "GISK",
+      "AcceptedSourceUInt32": 1263749447,
+      "OfficialWireBytes": "4B 53 49 47",
+      "OfficialNativeUInt32": 1195987787,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1762,26 +1046,26 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 10,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-25",
+        "18.8.62_EP1:1000014:4582:district-1:record-26",
+        "18.8.62_EP1:1000014:4582:district-1:record-27",
+        "18.8.62_EP1:1000014:4582:district-1:record-28",
+        "18.8.62_EP1:1000014:4582:district-1:record-29",
+        "18.8.62_EP1:1000014:4582:district-1:record-30",
+        "18.8.62_EP1:1000014:4582:district-1:record-31",
+        "18.8.62_EP1:1000014:4582:district-1:record-32",
+        "18.8.62_EP1:1000014:4582:district-1:record-33",
+        "18.8.62_EP1:1000014:4582:district-1:record-34"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B56F0"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 55
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1280132418,
-      "TemplateHashHex": "0x4C4D4542",
-      "TemplateHashAscii": "BEML",
+      "CanonicalAcgHashText": "ICBI",
+      "AcceptedSourceUInt32": 1229079369,
+      "OfficialWireBytes": "49 42 43 49",
+      "OfficialNativeUInt32": 1229144649,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1790,26 +1074,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-140"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B5740"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 53
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1280462675,
-      "TemplateHashHex": "0x4C524F53",
-      "TemplateHashAscii": "SORL",
+      "CanonicalAcgHashText": "ICST",
+      "AcceptedSourceUInt32": 1414742857,
+      "OfficialWireBytes": "54 53 43 49",
+      "OfficialNativeUInt32": 1229149012,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1818,30 +1093,28 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 12,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-53",
+        "18.8.62_EP1:1000014:4582:district-1:record-54",
+        "18.8.62_EP1:1000014:4582:district-1:record-55",
+        "18.8.62_EP1:1000014:4582:district-1:record-56",
+        "18.8.62_EP1:1000014:4582:district-1:record-57",
+        "18.8.62_EP1:1000014:4582:district-1:record-58",
+        "18.8.62_EP1:1000014:4582:district-1:record-59",
+        "18.8.62_EP1:1000014:4582:district-1:record-60",
+        "18.8.62_EP1:1000014:4582:district-1:record-61",
+        "18.8.62_EP1:1000014:4582:district-1:record-62",
+        "18.8.62_EP1:1000014:4582:district-1:record-63",
+        "18.8.62_EP1:1000014:4582:district-1:record-64"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 5,
-          "FileOffsets": [
-            "0x0C6B5948",
-            "0x0C6B5970",
-            "0x0C6B5998",
-            "0x0C6B59C0",
-            "0x0C6B59E8"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 127
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1280525906,
-      "TemplateHashHex": "0x4C534652",
-      "TemplateHashAscii": "RFSL",
+      "CanonicalAcgHashText": "ISRE",
+      "AcceptedSourceUInt32": 1163023177,
+      "OfficialWireBytes": "45 52 53 49",
+      "OfficialNativeUInt32": 1230197317,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1850,32 +1123,27 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 11,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-7",
+        "18.8.62_EP1:1000014:4582:district-0:record-8",
+        "18.8.62_EP1:1000014:4582:district-0:record-9",
+        "18.8.62_EP1:1000014:4582:district-0:record-10",
+        "18.8.62_EP1:1000014:4582:district-0:record-11",
+        "18.8.62_EP1:1000014:4582:district-0:record-12",
+        "18.8.62_EP1:1000014:4582:district-0:record-13",
+        "18.8.62_EP1:1000014:4582:district-0:record-14",
+        "18.8.62_EP1:1000014:4582:district-0:record-15",
+        "18.8.62_EP1:1000014:4582:district-0:record-16",
+        "18.8.62_EP1:1000014:4582:district-1:record-0"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 7,
-          "FileOffsets": [
-            "0x0C6B4BD8",
-            "0x0C6B4C00",
-            "0x0C6B4C28",
-            "0x0C6B4C50",
-            "0x0C6B4C78",
-            "0x0C6B4CA0",
-            "0x0C6B4CC8"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 19
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1296911426,
-      "TemplateHashHex": "0x4D4D4C42",
-      "TemplateHashAscii": "BLMM",
+      "CanonicalAcgHashText": "LLER",
+      "AcceptedSourceUInt32": 1380273228,
+      "OfficialWireBytes": "52 45 4C 4C",
+      "OfficialNativeUInt32": 1280066898,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1884,26 +1152,21 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 5,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-65",
+        "18.8.62_EP1:1000014:4582:district-0:record-66",
+        "18.8.62_EP1:1000014:4582:district-0:record-67",
+        "18.8.62_EP1:1000014:4582:district-0:record-68",
+        "18.8.62_EP1:1000014:4582:district-0:record-69"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B5790"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 16
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1314079299,
-      "TemplateHashHex": "0x4E534243",
-      "TemplateHashAscii": "CBSN",
+      "CanonicalAcgHashText": "LPAK",
+      "AcceptedSourceUInt32": 1262571596,
+      "OfficialWireBytes": "4B 41 50 4C",
+      "OfficialNativeUInt32": 1280328011,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1912,32 +1175,18 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 2,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-136",
+        "18.8.62_EP1:1000014:4582:district-0:record-137"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 7,
-          "FileOffsets": [
-            "0x0C6B5A60",
-            "0x0C6B5A88",
-            "0x0C6B60CD",
-            "0x0C6B60F5",
-            "0x0C6B611D",
-            "0x0C6B6145",
-            "0x0C6B616D"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 6
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1329812567,
-      "TemplateHashHex": "0x4F435457",
-      "TemplateHashAscii": "WTCO",
+      "CanonicalAcgHashText": "NERE",
+      "AcceptedSourceUInt32": 1163019598,
+      "OfficialWireBytes": "45 52 45 4E",
+      "OfficialNativeUInt32": 1313165893,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1946,35 +1195,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-49"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 10,
-          "FileOffsets": [
-            "0x0C6B5150",
-            "0x0C6B5178",
-            "0x0C6B51A0",
-            "0x0C6B51C8",
-            "0x0C6B51F0",
-            "0x0C6B5218",
-            "0x0C6B5240",
-            "0x0C6B5268",
-            "0x0C6B5290",
-            "0x0C6B52B8"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 0
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1330463810,
-      "TemplateHashHex": "0x4F4D4442",
-      "TemplateHashAscii": "BDMO",
+      "CanonicalAcgHashText": "OITA",
+      "AcceptedSourceUInt32": 1096042831,
+      "OfficialWireBytes": "41 54 49 4F",
+      "OfficialNativeUInt32": 1330205761,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -1983,26 +1214,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-42"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B57B8"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 67
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1330467906,
-      "TemplateHashHex": "0x4F4D5442",
-      "TemplateHashAscii": "BTMO",
+      "CanonicalAcgHashText": "OMUI",
+      "AcceptedSourceUInt32": 1230327119,
+      "OfficialWireBytes": "49 55 4D 4F",
+      "OfficialNativeUInt32": 1330468169,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2011,26 +1233,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-44"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B5768"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 19
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1330725958,
-      "TemplateHashHex": "0x4F514446",
-      "TemplateHashAscii": "FDQO",
+      "CanonicalAcgHashText": "ONRE",
+      "AcceptedSourceUInt32": 1163021903,
+      "OfficialWireBytes": "45 52 4E 4F",
+      "OfficialNativeUInt32": 1330532933,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2039,34 +1252,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-48"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 9,
-          "FileOffsets": [
-            "0x0C6B44D0",
-            "0x0C6B44F8",
-            "0x0C6B4520",
-            "0x0C6B4548",
-            "0x0C6B4570",
-            "0x0C6B4598",
-            "0x0C6B45C0",
-            "0x0C6B5AD8",
-            "0x0C6B6375"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 32
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1330925122,
-      "TemplateHashHex": "0x4F544E42",
-      "TemplateHashAscii": "BNTO",
+      "CanonicalAcgHashText": "RFSL",
+      "AcceptedSourceUInt32": 1280525906,
+      "OfficialWireBytes": "4C 53 46 52",
+      "OfficialNativeUInt32": 1380340556,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2075,26 +1271,23 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 7,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-45",
+        "18.8.62_EP1:1000014:4582:district-0:record-46",
+        "18.8.62_EP1:1000014:4582:district-0:record-47",
+        "18.8.62_EP1:1000014:4582:district-0:record-48",
+        "18.8.62_EP1:1000014:4582:district-0:record-49",
+        "18.8.62_EP1:1000014:4582:district-0:record-50",
+        "18.8.62_EP1:1000014:4582:district-0:record-51"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B6195"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 4
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1380204867,
-      "TemplateHashHex": "0x52444143",
-      "TemplateHashAscii": "CADR",
+      "CanonicalAcgHashText": "SHMG",
+      "AcceptedSourceUInt32": 1196247123,
+      "OfficialWireBytes": "47 4D 48 53",
+      "OfficialNativeUInt32": 1397247303,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2103,35 +1296,17 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 1,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-1:record-41"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 10,
-          "FileOffsets": [
-            "0x0C6B4FC0",
-            "0x0C6B4FE8",
-            "0x0C6B5010",
-            "0x0C6B5038",
-            "0x0C6B5060",
-            "0x0C6B5088",
-            "0x0C6B50B0",
-            "0x0C6B50D8",
-            "0x0C6B5100",
-            "0x0C6B5128"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 25
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1380273228,
-      "TemplateHashHex": "0x52454C4C",
-      "TemplateHashAscii": "LLER",
+      "CanonicalAcgHashText": "SORL",
+      "AcceptedSourceUInt32": 1280462675,
+      "OfficialWireBytes": "4C 52 4F 53",
+      "OfficialNativeUInt32": 1397707340,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2140,30 +1315,21 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 5,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-131",
+        "18.8.62_EP1:1000014:4582:district-0:record-132",
+        "18.8.62_EP1:1000014:4582:district-0:record-133",
+        "18.8.62_EP1:1000014:4582:district-0:record-134",
+        "18.8.62_EP1:1000014:4582:district-0:record-135"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 5,
-          "FileOffsets": [
-            "0x0C6B4EF8",
-            "0x0C6B4F20",
-            "0x0C6B4F48",
-            "0x0C6B4F70",
-            "0x0C6B4F98"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 21
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1380796994,
-      "TemplateHashHex": "0x524D4A42",
-      "TemplateHashAscii": "BJMR",
+      "CanonicalAcgHashText": "SRLZ",
+      "AcceptedSourceUInt32": 1514951251,
+      "OfficialWireBytes": "5A 4C 52 53",
+      "OfficialNativeUInt32": 1397902426,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2172,26 +1338,25 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 9,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-20",
+        "18.8.62_EP1:1000014:4582:district-0:record-21",
+        "18.8.62_EP1:1000014:4582:district-0:record-22",
+        "18.8.62_EP1:1000014:4582:district-0:record-23",
+        "18.8.62_EP1:1000014:4582:district-0:record-24",
+        "18.8.62_EP1:1000014:4582:district-0:record-25",
+        "18.8.62_EP1:1000014:4582:district-0:record-26",
+        "18.8.62_EP1:1000014:4582:district-0:record-27",
+        "18.8.62_EP1:1000014:4582:district-0:record-28"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B57E0"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 21
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1414742857,
-      "TemplateHashHex": "0x54534349",
-      "TemplateHashAscii": "ICST",
+      "CanonicalAcgHashText": "SRSK",
+      "AcceptedSourceUInt32": 1263751763,
+      "OfficialWireBytes": "4B 53 52 53",
+      "OfficialNativeUInt32": 1397904203,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2200,37 +1365,19 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 3,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-17",
+        "18.8.62_EP1:1000014:4582:district-0:record-18",
+        "18.8.62_EP1:1000014:4582:district-0:record-19"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 12,
-          "FileOffsets": [
-            "0x0C6B639D",
-            "0x0C6B63C5",
-            "0x0C6B63ED",
-            "0x0C6B6415",
-            "0x0C6B643D",
-            "0x0C6B6465",
-            "0x0C6B648D",
-            "0x0C6B64B5",
-            "0x0C6B64DD",
-            "0x0C6B6505",
-            "0x0C6B652D",
-            "0x0C6B6555"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 11
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1430934083,
-      "TemplateHashHex": "0x554A5243",
-      "TemplateHashAscii": "CRJU",
+      "CanonicalAcgHashText": "TPSA",
+      "AcceptedSourceUInt32": 1095979092,
+      "OfficialWireBytes": "41 53 50 54",
+      "OfficialNativeUInt32": 1414550337,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2239,33 +1386,32 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 16,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-29",
+        "18.8.62_EP1:1000014:4582:district-0:record-30",
+        "18.8.62_EP1:1000014:4582:district-0:record-31",
+        "18.8.62_EP1:1000014:4582:district-0:record-32",
+        "18.8.62_EP1:1000014:4582:district-0:record-33",
+        "18.8.62_EP1:1000014:4582:district-0:record-34",
+        "18.8.62_EP1:1000014:4582:district-0:record-35",
+        "18.8.62_EP1:1000014:4582:district-0:record-36",
+        "18.8.62_EP1:1000014:4582:district-0:record-37",
+        "18.8.62_EP1:1000014:4582:district-0:record-38",
+        "18.8.62_EP1:1000014:4582:district-0:record-39",
+        "18.8.62_EP1:1000014:4582:district-0:record-40",
+        "18.8.62_EP1:1000014:4582:district-0:record-41",
+        "18.8.62_EP1:1000014:4582:district-0:record-42",
+        "18.8.62_EP1:1000014:4582:district-0:record-43",
+        "18.8.62_EP1:1000014:4582:district-0:record-44"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 8,
-          "FileOffsets": [
-            "0x0C6B5808",
-            "0x0C6B5830",
-            "0x0C6B5858",
-            "0x0C6B5880",
-            "0x0C6B58A8",
-            "0x0C6B58D0",
-            "0x0C6B58F8",
-            "0x0C6B5920"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 2
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1497649731,
-      "TemplateHashHex": "0x59445243",
-      "TemplateHashAscii": "CRDY",
+      "CanonicalAcgHashText": "WTCO",
+      "AcceptedSourceUInt32": 1329812567,
+      "OfficialWireBytes": "4F 43 54 57",
+      "OfficialNativeUInt32": 1465140047,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2274,26 +1420,26 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 10,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-80",
+        "18.8.62_EP1:1000014:4582:district-0:record-81",
+        "18.8.62_EP1:1000014:4582:district-0:record-82",
+        "18.8.62_EP1:1000014:4582:district-0:record-83",
+        "18.8.62_EP1:1000014:4582:district-0:record-84",
+        "18.8.62_EP1:1000014:4582:district-0:record-85",
+        "18.8.62_EP1:1000014:4582:district-0:record-86",
+        "18.8.62_EP1:1000014:4582:district-0:record-87",
+        "18.8.62_EP1:1000014:4582:district-0:record-88",
+        "18.8.62_EP1:1000014:4582:district-0:record-89"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 1,
-          "FileOffsets": [
-            "0x0C6B5F15"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 2
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     },
     {
-      "TemplateHashUInt32": 1514951251,
-      "TemplateHashHex": "0x5A4C5253",
-      "TemplateHashAscii": "SRLZ",
+      "CanonicalAcgHashText": "ZIXI",
+      "AcceptedSourceUInt32": 1230522714,
+      "OfficialWireBytes": "49 58 49 5A",
+      "OfficialNativeUInt32": 1514756169,
       "SearchMethods": [
         "UNSIGNED_DECIMAL_TEXT",
         "EIGHT_DIGIT_HEX_TEXT",
@@ -2302,85 +1448,62 @@
         "FOUR_CHARACTER_TEXT",
         "SOURCE_NPCID_WHERE_STRUCTURALLY_USEFUL"
       ],
-      "FoundSourceLabels": [
-        "AO_CLIENT_EP1_RDB_BASE"
+      "OfficialRecordCount": 26,
+      "OfficialRecordIdentities": [
+        "18.8.62_EP1:1000014:4582:district-0:record-90",
+        "18.8.62_EP1:1000014:4582:district-0:record-91",
+        "18.8.62_EP1:1000014:4582:district-0:record-92",
+        "18.8.62_EP1:1000014:4582:district-0:record-93",
+        "18.8.62_EP1:1000014:4582:district-0:record-94",
+        "18.8.62_EP1:1000014:4582:district-0:record-95",
+        "18.8.62_EP1:1000014:4582:district-0:record-96",
+        "18.8.62_EP1:1000014:4582:district-0:record-97",
+        "18.8.62_EP1:1000014:4582:district-0:record-98",
+        "18.8.62_EP1:1000014:4582:district-0:record-99",
+        "18.8.62_EP1:1000014:4582:district-0:record-100",
+        "18.8.62_EP1:1000014:4582:district-0:record-101",
+        "18.8.62_EP1:1000014:4582:district-0:record-102",
+        "18.8.62_EP1:1000014:4582:district-0:record-103",
+        "18.8.62_EP1:1000014:4582:district-0:record-104",
+        "18.8.62_EP1:1000014:4582:district-0:record-105",
+        "18.8.62_EP1:1000014:4582:district-0:record-106",
+        "18.8.62_EP1:1000014:4582:district-0:record-107",
+        "18.8.62_EP1:1000014:4582:district-0:record-108",
+        "18.8.62_EP1:1000014:4582:district-0:record-109",
+        "18.8.62_EP1:1000014:4582:district-0:record-110",
+        "18.8.62_EP1:1000014:4582:district-0:record-111",
+        "18.8.62_EP1:1000014:4582:district-0:record-112",
+        "18.8.62_EP1:1000014:4582:district-0:record-113",
+        "18.8.62_EP1:1000014:4582:district-0:record-114",
+        "18.8.62_EP1:1000014:4582:district-0:record-115"
       ],
-      "StructuralOccurrences": [
-        {
-          "SourceLabel": "AO_CLIENT_EP1_RDB_BASE",
-          "Classification": "OFFICIAL_PF4582_HASH_IN_RESOURCE_WINDOW",
-          "Count": 9,
-          "FileOffsets": [
-            "0x0C6B47F0",
-            "0x0C6B4818",
-            "0x0C6B4840",
-            "0x0C6B4868",
-            "0x0C6B4890",
-            "0x0C6B48B8",
-            "0x0C6B48E0",
-            "0x0C6B4908",
-            "0x0C6B4930"
-          ],
-          "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_NOT_FOUND"
-        }
-      ],
-      "RejectedOccurrenceCount": 69
+      "ConsumerStatus": "PARSER_PROVEN_TERMINAL_IDENTITY_UNRESOLVED"
     }
   ],
-  "StructuralOccurrencesRetained": 412,
-  "FalsePositiveOccurrencesRejected": 1216,
+  "StructuralOccurrencesRetained": 206,
+  "OfficialRecordCount": 207,
+  "AdditionalOfficialKey": "NCNN",
+  "FalsePositiveOccurrencesRejected": 5039,
   "ParserConsumerReferences": [
-    "ACGHash_t::GetHashAsInt RVA 0x19B7",
-    "ACGHash_t::operator>> RVA 0x1B1B",
-    "BinaryStream integer deserialization used by GameData::ACGHash_t",
-    "Build label source",
-    "Build-consistent EP2 PF4582 record multiset",
-    "EP2 GameData::HashSpawnPoint_t::ReadBlob",
-    "GameData::ACGHash_t::GetHashAsInt VA 0x100019BF",
-    "GameData::HashSpawnPoint_t::GetHash VA 0x10004459",
-    "GameData::HashSpawnPoint_t::ReadBlob",
-    "GameData::HashSpawnPoint_t::ReadBlob VA 0x1000640F",
-    "GameData::PlayfieldDistrictInfo_t::ReadBlob VA 0x10009DEF",
-    "HashSpawnPoint_t::GetHash RVA 0x41B9",
-    "HashSpawnPoint_t::ReadBlob RVA 0x6124",
-    "Live dynel engine boundary inspected for source-key retention",
-    "Official EP1 client process image; client was not launched",
-    "Official client process image; client was not launched",
-    "PF RDB index pair type=1000014,id=4582 at offsets 0x29C144 and 0xDD0934",
-    "PF4582 fixed-record table at 0x0C6B44D0",
-    "PlayfieldAnarchy_t::CreateRDBDynels RVA 0x1242ED",
-    "PlayfieldAnarchy_t::GetDistrictInfo",
-    "PlayfieldAnarchy_t::SetDistrictInfo",
-    "PlayfieldAnarchy_t::SetDistrictInfo RVA 0x123B0F",
-    "PlayfieldAnarchy_t::SetRDBDynels RVA 0x124045",
-    "PlayfieldDistrictInfo_t::ReadBlob RVA 0x9CF4",
-    "ResourceDatabase index for the EP1 data segments"
+    "GameData.dll!operator>>(ACGHash_t) RVA 0x1B23",
+    "GameData.dll!HashSpawnPoint_t::GetHash RVA 0x4459",
+    "GameData.dll!DistrictData_t::GetHashSpawnPoints RVA 0x44F0",
+    "GameData.dll!operator>>(DistrictData_t) RVA 0x49BE",
+    "GameData.dll!HashSpawnPoint_t::ReadBlob RVA 0x640F",
+    "GameData.dll!PlayfieldDistrictInfo_t::ReadBlob RVA 0x9DEF"
   ],
   "CoverageLimitations": [
-    "The exact JSON exporter and its label assignment are unavailable.",
-    "No official server-side spawn-realization code or symbol set is locally available.",
-    "Raw four-byte matches outside the bounded PF4582 resource windows are rejected unless a parser and consumer establish record context.",
-    "EP1 resource offsets and EP2 runtime RVAs are reported as separate build-specific evidence and are never combined into one address chain."
+    "An official ACGHash_t-to-mob-template lookup that returns a stable AO identity.",
+    "An official district-spawn constructor retaining ACGHash_t or SourceNpcId with the resulting dynel identity.",
+    "A same-context official runtime join from HashSpawnPoint_t+0x24 to MonsterData or Identity_t.",
+    "The exporter custody record explaining the accepted JSON NpcId lineage and legacy field labels."
   ],
-  "SearchCoverageSummary": {
-    "OfficialFilesInspectedTotal": 40,
-    "OfficialRdbDataFilesSearched": 27,
-    "OfficialRdbIndexFilesSearched": 2,
-    "MaterialFingerprintRecordsEmitted": 15,
-    "EP1NativePatternOccurrences": 246,
-    "EP1Pf4582OccurrencesRetained": 206,
-    "EP1OccurrencesRejectedOutsidePf4582": 40,
-    "EP2NativePatternOccurrences": 1382,
-    "EP2Pf4582OccurrencesRetained": 206,
-    "EP2OccurrencesRejectedOutsidePf4582": 1176,
-    "UnsignedDecimalTextMatches": 0,
-    "EightDigitHexTextMatches": 0,
-    "ReversedLittleEndianDisplayMatches": "PRESENT_BUT_REJECTED_AS_NONSTRUCTURAL_AND_EXCLUDED_FROM_NATIVE_OCCURRENCE_TOTAL",
-    "CountingRule": "The exact 1216 rejected total counts native big-endian uint32 key patterns outside the two bounded PF4582 windows. Reversed display-byte coincidences are a separate nonstructural representation and are not double-counted."
-  },
   "InputDigests": {
     "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs": "7f0381d89cdaf3670425877d95f9014977c190506a878a262e082ebeb3ec0df7",
     "docs/generated/pf4582_template_hash_resolution_report.json": "d65f3e750b474d345d0093a323840e357ed48abd4493c2191baba7c6d261b8bc",
-    "docs/reference/pf4582/PlayfieldDistrictInfo.json": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32"
+    "docs/reference/pf4582/PlayfieldDistrictInfo.json": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32",
+    "docs/reference/pf4582/official/ep1_18_8_62_pf4582_acghash_records.json": "f19ed7fb094369f99998cd83da451839f08a4882833d6ade1b533ccc4bba3ec2",
+    "docs/reference/pf4582/official/ep1_18_8_62_pf4582_evidence_manifest.json": "14b83e64626dbbe710ce5cd033c1765e9f31429a531b50cc7665efa1776587f5",
+    "docs/reference/pf4582/official/ep1_18_8_62_pf4582_search_report.json": "7bc10b90e5e7e7d25c7ff1f47cf7e74f8fba37bab8da9d1e7cc67d5457c290f2"
   }
 }

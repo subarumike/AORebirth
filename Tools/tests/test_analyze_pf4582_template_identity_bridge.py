@@ -185,15 +185,10 @@ class Pf4582TemplateIdentityBridgeTests(unittest.TestCase):
         )
 
     def test_21_unsupported_or_missing_official_build_fails_closed(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            with self.assertRaises(bridge.BridgeAnalysisError):
-                bridge.verify_official_sources(
-                    self.evidence,
-                    {
-                        "AO_CLIENT_EP1_INSTALL": Path(temporary),
-                        "AO_CLIENT_EP2_INSTALL": Path(temporary),
-                    },
-                )
+        malformed = copy.deepcopy(self.evidence)
+        malformed["OfficialSources"][0]["RelativePath"] = "missing/official.json"
+        with self.assertRaises(bridge.BridgeAnalysisError):
+            bridge.verify_official_sources(malformed)
 
     def test_22_missing_native_fields_remain_unavailable(self):
         self.assertTrue(all(record["RuntimeFieldLocated"] is True for record in self.records))
@@ -268,7 +263,7 @@ class Pf4582TemplateIdentityBridgeTests(unittest.TestCase):
 
     def test_34_malformed_evidence_fails_closed(self):
         malformed = copy.deepcopy(self.evidence)
-        malformed["Outcome"] = "SPECULATIVE_BRIDGE"
+        malformed["CurrentOutcome"] = "SPECULATIVE_BRIDGE"
         source_keys = {record["TemplateHash"] for record in self.source_records}
         with self.assertRaises(bridge.BridgeAnalysisError):
             bridge.validate_evidence(malformed, source_keys)
@@ -308,7 +303,9 @@ class Pf4582TemplateIdentityBridgeTests(unittest.TestCase):
         self.assertEqual(self.runtime_before, bridge.sha256_file(bridge.DEFAULT_RUNTIME_SOURCE))
 
     def test_40_no_bridge_outcome_contains_neither_direct_path(self):
-        self.assertEqual("NO_BRIDGE_LOCATED", self.report["Outcome"])
+        self.assertEqual("NO_BRIDGE_LOCATED", self.report["PriorOutcome"])
+        self.assertEqual("STRUCTURAL_SOURCE_AND_CONSUMER_FOUND", self.report["Outcome"])
+        self.assertTrue(self.report["PriorOutcomeSuperseded"])
         self.assertFalse(self.evidence["Claims"]["DirectStaticBridge"])
         self.assertFalse(self.evidence["Claims"]["DirectRuntimeReadyBridge"])
 
@@ -318,13 +315,19 @@ class Pf4582TemplateIdentityBridgeTests(unittest.TestCase):
 
     def test_42_no_mapping_is_promoted(self):
         self.assertEqual(0, self.report["Metrics"]["PF4582_NEW_DIRECT_HASH_BRIDGES"])
-        self.assertTrue(all(record["DirectBridgeStatus"] == "NO_BRIDGE" for record in self.records))
-        self.assertTrue(all(record["NewProofClassification"] in {
-            "CORROBORATING_ONLY", "NO_BRIDGE"
-        } for record in self.records))
+        self.assertTrue(all(
+            record["DirectBridgeStatus"]
+            == "STRUCTURAL_SOURCE_AND_PARSER_CONSUMER_ONLY"
+            for record in self.records
+        ))
+        self.assertTrue(all(
+            record["NewProofClassification"]
+            == "OFFICIAL_STRUCTURAL_SOURCE_AND_PARSER_CONSUMER"
+            for record in self.records
+        ))
 
     def test_43_governed_inputs_are_sha256_pinned(self):
-        self.assertEqual(3, len(self.report["InputDigests"]))
+        self.assertEqual(6, len(self.report["InputDigests"]))
         self.assertTrue(all(bridge.SHA256_PATTERN.fullmatch(value) for value in self.report["InputDigests"].values()))
 
     def test_44_every_official_source_has_a_complete_fingerprint(self):
@@ -369,6 +372,37 @@ class Pf4582TemplateIdentityBridgeTests(unittest.TestCase):
     def test_50_official_source_labels_are_unique(self):
         labels = [item["LogicalSourceLabel"] for item in self.manifest["OfficialSources"]]
         self.assertEqual(len(labels), len(set(labels)))
+
+    def test_51_structural_source_and_parser_statuses_are_proven(self):
+        self.assertEqual("PROVEN", self.report["OfficialStructuralSourceStatus"])
+        self.assertEqual("PROVEN", self.report["OfficialAcgHashTypeStatus"])
+        self.assertEqual("PROVEN", self.report["OfficialParserConsumerStatus"])
+
+    def test_52_terminal_identity_and_runtime_join_remain_unresolved(self):
+        self.assertEqual("UNRESOLVED", self.report["TerminalMobIdentityStatus"])
+        self.assertEqual("UNRESOLVED", self.report["RuntimeHashToDynelJoinStatus"])
+        self.assertEqual(0, self.report["StaticMobMappingsExtracted"])
+
+    def test_53_runtime_capture_remains_not_ready(self):
+        self.assertEqual("NO", self.report["Metrics"]["PF4582_RUNTIME_CAPTURE_READY"])
+        self.assertEqual("NO", self.report["Metrics"]["PF4582_RUNTIME_DYNEL_JOIN_FOUND"])
+
+    def test_54_cima_dual_encoding_is_explicit(self):
+        cima = next(record for record in self.records if record["CanonicalAcgHashText"] == "CIMA")
+        self.assertEqual(1095584067, cima["AcceptedSourceUInt32"])
+        self.assertEqual("43 49 4D 41", cima["AcceptedSourceLittleEndianBytes"])
+        self.assertEqual("41 4D 49 43", cima["OfficialWireBytes"])
+        self.assertEqual(0x43494D41, cima["OfficialNativeUInt32"])
+
+    def test_55_current_report_uses_only_local_governed_evidence_paths(self):
+        serialized = bridge.render_json(self.report) + bridge.render_json(self.manifest)
+        self.assertNotIn("C:\\Users\\Mike", serialized)
+        self.assertNotIn("AO stripdown", serialized)
+
+    def test_56_official_record_count_and_extra_key_are_explicit(self):
+        self.assertEqual(207, self.report["Metrics"]["PF4582_OFFICIAL_RESOURCE_RECORDS"])
+        self.assertEqual(1, self.report["Metrics"]["PF4582_OFFICIAL_ADDITIONAL_RECORDS"])
+        self.assertEqual("NCNN", self.manifest["AdditionalOfficialKey"])
 
 
 if __name__ == "__main__":

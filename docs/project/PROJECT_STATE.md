@@ -409,6 +409,21 @@ migrations; details and exact source references are recorded in
   reliable identity evidence. Those 24 hashes account for 171 blocked rows; 10
   additional blocked Island Reet rows use the baseline-mapped ISRE hash. No audit
   result grants runtime activation.
+- PF4582 now also has a governed, byte-identical local snapshot of the completed
+  official EP1 structural investigation. The exact type-1000014 / instance-4582
+  resource contains 207 `HashSpawnPoint_t` records across districts of 142 and
+  65 records. All 206 accepted records reconcile one-to-one; `NCNN` is the one
+  additional official record and is retained as an official blocked placement
+  with null `SourceNpcId`, no profile, and no activation. Five exact duplicate
+  equivalence groups remain separate, and two legacy guard `SpawnAngle` values
+  differ from the official encoded field without preventing deterministic record
+  correspondence. The current bridge outcome is
+  `STRUCTURAL_SOURCE_AND_CONSUMER_FOUND`, superseding the historical
+  `NO_BRIDGE_LOCATED`: the packed four-byte `ACGHash_t` type, parser, native
+  field, vector, and accessors are proven, while terminal mob identity, static
+  mappings, and runtime hash-to-dynel join remain unresolved. The 207-record
+  official overlay is not runtime-consumed; current runtime remains 25 active
+  and 181 blocked.
 - PF127 Subway is complete for its current capture-backed population,
   navigation, combat, lifecycle, loot, vendor, Karrec, zoning, and teardown
   contracts. New behavior still requires capture evidence.
