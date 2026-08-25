@@ -24,7 +24,9 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             {
                 string repositoryRoot = ReadArgument(args, RepositoryRootArgument);
                 string zoneOutput = ReadArgument(args, ZoneOutputArgument);
+                repositoryRoot = Stage8RepositoryRootResolver.ResolveExplicit(repositoryRoot);
 
+                Stage8RepositoryRootResolverTests.Run();
                 VerifyAssembly(typeof(Character).Assembly, "AORebirth.Core", "1.0.0.0");
                 VerifyAssembly(
                     typeof(ZoneEngine.Core.Playfields.PlayfieldLoader).Assembly,
