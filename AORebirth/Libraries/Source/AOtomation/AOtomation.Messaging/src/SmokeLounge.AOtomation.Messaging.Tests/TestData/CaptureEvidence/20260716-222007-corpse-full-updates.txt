@@ -1,0 +1,3 @@
+SourceCapture=20260716-222007
+SourceArtifact=corpse-full-updates.csv
+ExactObservedRowFragment=Remains of Eumenides,1407006,232.477554,72.8163681,45.3814125,130,2,3,1,0x0000C350,0x79702234,(SimpleChar:79702234),,17905,186,203726,0x0000C350,0x79702234,(SimpleChar:79702234),416,

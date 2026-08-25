@@ -603,23 +603,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string captured = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260716-222007\corpse-full-updates.csv"));
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\TestData\CaptureEvidence\20260716-222007-corpse-full-updates.txt"));
             string capturedLoot = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-214751\corpse-loot-observations.csv"));
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\TestData\CaptureEvidence\20260717-214751-corpse-loot-observations.txt"));
             string capturedLootSecond = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-215250\corpse-loot-observations.csv"));
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\TestData\CaptureEvidence\20260717-215250-corpse-loot-observations.txt"));
             string membershipLoot = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-220340\corpse-loot-observations.csv"));
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\TestData\CaptureEvidence\20260717-220340-corpse-loot-observations.txt"));
             string membershipLifecycle = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260717-220340\npc-lifecycle.csv"));
+                    @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\TestData\CaptureEvidence\20260717-220340-npc-lifecycle.txt"));
 
             Assert.IsTrue(
                 captured.Contains("Remains of Eumenides")
@@ -1954,19 +1954,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static string FindRepositoryRoot()
         {
-            string current = AppDomain.CurrentDomain.BaseDirectory;
-            while (!string.IsNullOrEmpty(current))
-            {
-                if (Directory.Exists(Path.Combine(current, ".git")))
-                {
-                    return current;
-                }
-
-                DirectoryInfo parent = Directory.GetParent(current);
-                current = parent == null ? null : parent.FullName;
-            }
-
-            throw new InvalidOperationException("Repository root not found.");
+            return TestRepositoryRootResolver.FindFromCallerFilePath();
         }
     }
 }
