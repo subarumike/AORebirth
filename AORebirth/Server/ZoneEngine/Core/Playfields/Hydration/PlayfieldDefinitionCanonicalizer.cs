@@ -9,6 +9,32 @@ namespace ZoneEngine.Core.Playfields.Hydration
 
     internal static class PlayfieldDefinitionCanonicalizer
     {
+        internal const int CurrentCanonicalFormatVersion = 1;
+        internal const int SupportedDefinitionFormatVersion = 1;
+
+        internal static IEnumerable<string> CanonicalDefinitionPropertyNames
+        {
+            get
+            {
+                return new[]
+                {
+                    "FormatVersion",
+                    "PlayfieldInstance",
+                    "ResourceIdentity",
+                    "Name",
+                    "Records",
+                    "Provenance",
+                    "Warnings",
+                    "Conflicts"
+                };
+            }
+        }
+
+        internal static IEnumerable<string> ExplicitlyExcludedDefinitionPropertyNames
+        {
+            get { return new string[0]; }
+        }
+
         internal static string Serialize(HydratedPlayfieldDefinition definition)
         {
             if (definition == null)
@@ -16,8 +42,35 @@ namespace ZoneEngine.Core.Playfields.Hydration
                 throw new ArgumentNullException("definition");
             }
 
+            IList<PlayfieldHydrationDiagnostic> diagnostics =
+                new PlayfieldDefinitionValidator().Validate(definition);
+            PlayfieldHydrationDiagnostic[] errors = diagnostics
+                .Where(value => value.Severity == PlayfieldHydrationDiagnosticSeverity.Error)
+                .ToArray();
+            if (errors.Length > 0)
+            {
+                throw new InvalidOperationException(
+                    "Canonicalization rejected an invalid playfield definition: "
+                    + string.Join(
+                        "; ",
+                        errors.Select(value => value.Code + ":" + value.Message)));
+            }
+
+            if (definition.FormatVersion != SupportedDefinitionFormatVersion)
+            {
+                throw new InvalidOperationException(
+                    "Canonical format version "
+                    + CurrentCanonicalFormatVersion.ToString(CultureInfo.InvariantCulture)
+                    + " does not support definition format version "
+                    + definition.FormatVersion.ToString(CultureInfo.InvariantCulture)
+                    + ".");
+            }
+
             var builder = new StringBuilder();
-            builder.Append("{\"formatVersion\":").Append(definition.FormatVersion.ToString(CultureInfo.InvariantCulture));
+            builder.Append("{\"canonicalFormatVersion\":")
+                .Append(CurrentCanonicalFormatVersion.ToString(CultureInfo.InvariantCulture));
+            builder.Append(",\"definitionFormatVersion\":")
+                .Append(definition.FormatVersion.ToString(CultureInfo.InvariantCulture));
             builder.Append(",\"playfieldInstance\":").Append(definition.PlayfieldInstance.ToString(CultureInfo.InvariantCulture));
             builder.Append(",\"resourceIdentity\":").Append(definition.ResourceIdentity.ToString(CultureInfo.InvariantCulture));
             builder.Append(",\"name\":");

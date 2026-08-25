@@ -64,13 +64,19 @@ transient combat, current pathing, and service sessions remain runtime state.
 The Stage 1 validator rejects those runtime-only names and runtime provenance;
 the canonicalizer does not silently ignore them.
 
-The definition format is versioned. Its canonical form uses an explicit field
-allowlist, ordinal key ordering, ordinal collection-member ordering, invariant
-integer formatting, and invariant round-trip (`"R"`) formatting for `float`
-values. No tolerance is applied to positions or headings. Canonical digests are
-lowercase SHA-256 over the UTF-8 canonical representation. Hydration-generated
-timestamps, process IDs, active entity references, and runtime services are not
-part of the model.
+The definition and canonical formats are independently and explicitly versioned.
+Canonical format version 1 accepts only definition format version 1 and emits
+both version numbers. Its canonical form uses an explicit property allowlist,
+ordinal key ordering, ordinal collection-member ordering, invariant integer
+formatting, and invariant round-trip (`"R"`) formatting for `float` values. All
+current definition properties are included; none are silently excluded. The
+canonicalizer runs definition validation and rejects duplicate identities,
+runtime-only values, runtime provenance, and every other validation error before
+emitting bytes. Validation warnings remain explicit canonical content. No
+tolerance is applied to positions or headings. Canonical digests are lowercase
+SHA-256 over the UTF-8 canonical representation. Hydration-generated timestamps,
+process IDs, active entity references, and runtime services are not part of the
+model.
 
 ## Legacy compatibility and source precedence
 
