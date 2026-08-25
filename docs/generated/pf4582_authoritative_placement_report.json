@@ -1,0 +1,923 @@
+{
+  "schemaVersion": 1,
+  "playfieldId": 4582,
+  "authoritativeSource": "docs/reference/pf4582/PlayfieldDistrictInfo.json",
+  "sourceSha256": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32",
+  "importer": "Tools/generate_pf4582_placements.py",
+  "normalizedPlacementArtifact": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.g.cs",
+  "PF4582_SOURCE_PLACEMENTS": 206,
+  "PF4582_UNIQUE_NPC_IDS": 206,
+  "PF4582_DUPLICATE_NPC_IDS": 0,
+  "PF4582_UNIQUE_TEMPLATE_HASHES": 38,
+  "PF4582_EXISTING_MATCHED": 25,
+  "PF4582_EXISTING_NOT_MATCHED": 0,
+  "PF4582_NEW_PLACEMENTS": 181,
+  "PF4582_DUPLICATE_POSITION_RECORDS": 14,
+  "PF4582_DUPLICATE_POSITION_GROUPS": 5,
+  "PF4582_DUPLICATE_POSITION_EXCESS": 9,
+  "PF4582_TEMPLATE_HASHES_MAPPED": 14,
+  "PF4582_TEMPLATE_HASHES_UNRESOLVED": 24,
+  "PF4582_RUNTIME_ELIGIBLE": 25,
+  "PF4582_RUNTIME_BLOCKED": 181,
+  "existingMatches": [
+    {
+      "npcId": 1007858,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 3.220481
+    },
+    {
+      "npcId": 1007985,
+      "sourceName": "ICC Bio-Inspector",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Bio-Inspector",
+      "positionDelta": 3.267368
+    },
+    {
+      "npcId": 1008027,
+      "sourceName": "Brandon Thorn",
+      "runtimeProfile": "IccShuttleportSpawn:Brandon Thorn",
+      "positionDelta": 0.447511
+    },
+    {
+      "npcId": 1008028,
+      "sourceName": "Manager Travis Molen",
+      "runtimeProfile": "IccShuttleportSpawn:Manager Travis Molen",
+      "positionDelta": 1.096993
+    },
+    {
+      "npcId": 1008029,
+      "sourceName": "Omni-Tek Equipment Vendor",
+      "runtimeProfile": "IccShuttleportSpawn:Omni-Trans Equipment Vendor",
+      "positionDelta": 0.501056
+    },
+    {
+      "npcId": 1008030,
+      "sourceName": "Clan Equipment Vendor",
+      "runtimeProfile": "IccShuttleportSpawn:Clan Equipment Vendor",
+      "positionDelta": 0.545208
+    },
+    {
+      "npcId": 1008031,
+      "sourceName": "Omni Unicorn Squadleader Fixx",
+      "runtimeProfile": "IccShuttleportSpawn:Omni Unicorn Squadleader Fixx",
+      "positionDelta": 0.335864
+    },
+    {
+      "npcId": 1008032,
+      "sourceName": "Clan Field Surgeon Elsa Oosta",
+      "runtimeProfile": "IccShuttleportSpawn:Clan Field Surgeon Elsa Oosta",
+      "positionDelta": 0.534274
+    },
+    {
+      "npcId": 1008033,
+      "sourceName": "Vendor Antonio Stacklund",
+      "runtimeProfile": "IccShuttleportSpawn:Vendor Antonio Stacklund",
+      "positionDelta": 0.945913
+    },
+    {
+      "npcId": 1008034,
+      "sourceName": "Clan Recruiter",
+      "runtimeProfile": "IccShuttleportSpawn:Clan Recruiter",
+      "positionDelta": 0.384482
+    },
+    {
+      "npcId": 1008035,
+      "sourceName": "Omni-Tek Recruitment Officer",
+      "runtimeProfile": "IccShuttleportSpawn:Omni-Tek Recruitment Officer",
+      "positionDelta": 0.435655
+    },
+    {
+      "npcId": 1008036,
+      "sourceName": "Neutral Observer",
+      "runtimeProfile": "IccShuttleportSpawn:Neutral Observer",
+      "positionDelta": 0.491384
+    },
+    {
+      "npcId": 1008037,
+      "sourceName": "Adri Afeli",
+      "runtimeProfile": "IccShuttleportSpawn:Adri Afeli",
+      "positionDelta": 0.786511
+    },
+    {
+      "npcId": 1008039,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.105305
+    },
+    {
+      "npcId": 1008040,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.049434
+    },
+    {
+      "npcId": 1008041,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.348192
+    },
+    {
+      "npcId": 1008042,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.347794
+    },
+    {
+      "npcId": 1008043,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.181232
+    },
+    {
+      "npcId": 1008044,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.082744
+    },
+    {
+      "npcId": 1008045,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.143521
+    },
+    {
+      "npcId": 1008046,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.123605
+    },
+    {
+      "npcId": 1008047,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.073008
+    },
+    {
+      "npcId": 1008048,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.026998
+    },
+    {
+      "npcId": 1008049,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.091246
+    },
+    {
+      "npcId": 1008050,
+      "sourceName": "ICC Shuttle Guard",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "positionDelta": 0.181041
+    }
+  ],
+  "existingNotMatched": [],
+  "newPlacementNpcIds": [
+    1007845,
+    1007846,
+    1007847,
+    1007848,
+    1007849,
+    1007850,
+    1007851,
+    1007852,
+    1007853,
+    1007854,
+    1007855,
+    1007856,
+    1007857,
+    1007859,
+    1007860,
+    1007861,
+    1007862,
+    1007863,
+    1007864,
+    1007865,
+    1007866,
+    1007867,
+    1007868,
+    1007869,
+    1007870,
+    1007871,
+    1007872,
+    1007873,
+    1007874,
+    1007875,
+    1007876,
+    1007877,
+    1007878,
+    1007879,
+    1007880,
+    1007881,
+    1007882,
+    1007883,
+    1007884,
+    1007885,
+    1007886,
+    1007887,
+    1007888,
+    1007889,
+    1007890,
+    1007891,
+    1007892,
+    1007893,
+    1007894,
+    1007895,
+    1007896,
+    1007897,
+    1007898,
+    1007899,
+    1007900,
+    1007901,
+    1007902,
+    1007903,
+    1007904,
+    1007905,
+    1007906,
+    1007907,
+    1007908,
+    1007909,
+    1007910,
+    1007911,
+    1007912,
+    1007913,
+    1007914,
+    1007915,
+    1007916,
+    1007917,
+    1007918,
+    1007919,
+    1007920,
+    1007921,
+    1007922,
+    1007923,
+    1007924,
+    1007925,
+    1007926,
+    1007927,
+    1007928,
+    1007929,
+    1007930,
+    1007931,
+    1007932,
+    1007933,
+    1007934,
+    1007935,
+    1007936,
+    1007937,
+    1007938,
+    1007939,
+    1007940,
+    1007941,
+    1007942,
+    1007943,
+    1007944,
+    1007945,
+    1007946,
+    1007947,
+    1007948,
+    1007949,
+    1007950,
+    1007951,
+    1007952,
+    1007953,
+    1007954,
+    1007955,
+    1007956,
+    1007957,
+    1007958,
+    1007959,
+    1007960,
+    1007961,
+    1007963,
+    1007964,
+    1007965,
+    1007966,
+    1007967,
+    1007968,
+    1007969,
+    1007970,
+    1007971,
+    1007972,
+    1007973,
+    1007974,
+    1007975,
+    1007976,
+    1007977,
+    1007978,
+    1007979,
+    1007980,
+    1007981,
+    1007982,
+    1007983,
+    1007984,
+    1007986,
+    1007987,
+    1007988,
+    1007989,
+    1007990,
+    1007991,
+    1007992,
+    1007993,
+    1007994,
+    1007995,
+    1007996,
+    1007997,
+    1007998,
+    1007999,
+    1008000,
+    1008001,
+    1008002,
+    1008003,
+    1008004,
+    1008005,
+    1008006,
+    1008007,
+    1008008,
+    1008009,
+    1008010,
+    1008011,
+    1008012,
+    1008013,
+    1008014,
+    1008015,
+    1008016,
+    1008017,
+    1008018,
+    1008019,
+    1008020,
+    1008021,
+    1008022,
+    1008023,
+    1008024,
+    1008025,
+    1008026,
+    1008038,
+    1008051
+  ],
+  "duplicatePositionGroups": [
+    {
+      "position": {
+        "x": 832.5,
+        "y": 24.3,
+        "z": 871.9
+      },
+      "npcIds": [
+        1007988,
+        1007997
+      ]
+    },
+    {
+      "position": {
+        "x": 833.8,
+        "y": 27.0,
+        "z": 867.9
+      },
+      "npcIds": [
+        1007990,
+        1007999,
+        1008001
+      ]
+    },
+    {
+      "position": {
+        "x": 836.2,
+        "y": 27.6,
+        "z": 865.4
+      },
+      "npcIds": [
+        1007992,
+        1008002,
+        1008003
+      ]
+    },
+    {
+      "position": {
+        "x": 839.8,
+        "y": 25.1,
+        "z": 868.7
+      },
+      "npcIds": [
+        1008005,
+        1008006,
+        1008007
+      ]
+    },
+    {
+      "position": {
+        "x": 842.2,
+        "y": 26.0,
+        "z": 863.4
+      },
+      "npcIds": [
+        1007993,
+        1008008,
+        1008009
+      ]
+    }
+  ],
+  "mappedTemplateHashes": [
+    {
+      "templateHash": 1096042831,
+      "templateTag": "OITA",
+      "runtimeProfile": "IccShuttleportSpawn:Omni-Trans Equipment Vendor",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1146375747,
+      "templateTag": "CNTD",
+      "runtimeProfile": "IccShuttleportSpawn:Clan Equipment Vendor",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1163019598,
+      "templateTag": "NERE",
+      "runtimeProfile": "IccShuttleportSpawn:Neutral Observer",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1163021903,
+      "templateTag": "ONRE",
+      "runtimeProfile": "IccShuttleportSpawn:Omni-Tek Recruitment Officer",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1163023177,
+      "templateTag": "ISRE",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "sourceSpawnCount": 11
+    },
+    {
+      "templateHash": 1163284805,
+      "templateTag": "EQVE",
+      "runtimeProfile": "IccShuttleportSpawn:Vendor Antonio Stacklund",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1178682433,
+      "templateTag": "ADAF",
+      "runtimeProfile": "IccShuttleportSpawn:Adri Afeli",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1196247123,
+      "templateTag": "SHMG",
+      "runtimeProfile": "IccShuttleportSpawn:Manager Travis Molen",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1229079369,
+      "templateTag": "ICBI",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Bio-Inspector",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1229343811,
+      "templateTag": "CLFI",
+      "runtimeProfile": "IccShuttleportSpawn:Clan Field Surgeon Elsa Oosta",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1230127939,
+      "templateTag": "CCRI",
+      "runtimeProfile": "IccShuttleportSpawn:Clan Recruiter",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1230327119,
+      "templateTag": "OMUI",
+      "runtimeProfile": "IccShuttleportSpawn:Omni Unicorn Squadleader Fixx",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1330925122,
+      "templateTag": "BNTO",
+      "runtimeProfile": "IccShuttleportSpawn:Brandon Thorn",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1414742857,
+      "templateTag": "ICST",
+      "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
+      "sourceSpawnCount": 12
+    }
+  ],
+  "unresolvedTemplateHashes": [
+    {
+      "templateHash": 1095584067,
+      "templateTag": "CIMA",
+      "sourceName": "Cliff Malle",
+      "sourceSpawnCount": 13
+    },
+    {
+      "templateHash": 1095979092,
+      "templateTag": "TPSA",
+      "sourceName": "Tropical Stalker",
+      "sourceSpawnCount": 16
+    },
+    {
+      "templateHash": 1196249922,
+      "templateTag": "BSMG",
+      "sourceName": "Dreadknot the Toxictwister",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1230522714,
+      "templateTag": "ZIXI",
+      "sourceName": "Alien Spider - Zix",
+      "sourceSpawnCount": 26
+    },
+    {
+      "templateHash": 1246118721,
+      "templateTag": "ACFJ",
+      "sourceName": "Scout - Jaax'Sinuh",
+      "sourceSpawnCount": 23
+    },
+    {
+      "templateHash": 1262571596,
+      "templateTag": "LPAK",
+      "sourceName": "Shuttle Saboteur",
+      "sourceSpawnCount": 2
+    },
+    {
+      "templateHash": 1263749447,
+      "templateTag": "GISK",
+      "sourceName": "Giant Snake",
+      "sourceSpawnCount": 10
+    },
+    {
+      "templateHash": 1263751763,
+      "templateTag": "SRSK",
+      "sourceName": "Shore Snake",
+      "sourceSpawnCount": 3
+    },
+    {
+      "templateHash": 1280132162,
+      "templateTag": "BDML",
+      "sourceName": "Burntooth the Inferno Muddevil",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1280132418,
+      "templateTag": "BEML",
+      "sourceName": "Sparkletail the Jolly Wrecker",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1280462675,
+      "templateTag": "SORL",
+      "sourceName": "Stowaway Rollerrat",
+      "sourceSpawnCount": 5
+    },
+    {
+      "templateHash": 1280525906,
+      "templateTag": "RFSL",
+      "sourceName": "Reef Salamander",
+      "sourceSpawnCount": 7
+    },
+    {
+      "templateHash": 1296911426,
+      "templateTag": "BLMM",
+      "sourceName": "Oozefoot the Noxious Malle",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1314079299,
+      "templateTag": "CBSN",
+      "sourceName": "Climbing Salamander",
+      "sourceSpawnCount": 7
+    },
+    {
+      "templateHash": 1329812567,
+      "templateTag": "WTCO",
+      "sourceName": "Waste collector",
+      "sourceSpawnCount": 10
+    },
+    {
+      "templateHash": 1330463810,
+      "templateTag": "BDMO",
+      "sourceName": "Chipmind the Overclocked182-T1",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1330467906,
+      "templateTag": "BTMO",
+      "sourceName": "Malicespine the Wasteland Roller",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1330725958,
+      "templateTag": "FDQO",
+      "sourceName": "Beach Leet",
+      "sourceSpawnCount": 9
+    },
+    {
+      "templateHash": 1380204867,
+      "templateTag": "CADR",
+      "sourceName": "Cargo Droid",
+      "sourceSpawnCount": 10
+    },
+    {
+      "templateHash": 1380273228,
+      "templateTag": "LLER",
+      "sourceName": "Rollerrat",
+      "sourceSpawnCount": 5
+    },
+    {
+      "templateHash": 1380796994,
+      "templateTag": "BJMR",
+      "sourceName": "Sparky the Stabber",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1430934083,
+      "templateTag": "CRJU",
+      "sourceName": "Cross-Wired Junkbot",
+      "sourceSpawnCount": 8
+    },
+    {
+      "templateHash": 1497649731,
+      "templateTag": "CRDY",
+      "sourceName": "Specialist - Cha'Heru",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1514951251,
+      "templateTag": "SRLZ",
+      "sourceName": "Surf Lizard",
+      "sourceSpawnCount": 9
+    }
+  ],
+  "runtimeEligibleNpcIds": [
+    1007858,
+    1007985,
+    1008027,
+    1008028,
+    1008029,
+    1008030,
+    1008031,
+    1008032,
+    1008033,
+    1008034,
+    1008035,
+    1008036,
+    1008037,
+    1008039,
+    1008040,
+    1008041,
+    1008042,
+    1008043,
+    1008044,
+    1008045,
+    1008046,
+    1008047,
+    1008048,
+    1008049,
+    1008050
+  ],
+  "runtimeBlockedNpcIds": [
+    1007845,
+    1007846,
+    1007847,
+    1007848,
+    1007849,
+    1007850,
+    1007851,
+    1007852,
+    1007853,
+    1007854,
+    1007855,
+    1007856,
+    1007857,
+    1007859,
+    1007860,
+    1007861,
+    1007862,
+    1007863,
+    1007864,
+    1007865,
+    1007866,
+    1007867,
+    1007868,
+    1007869,
+    1007870,
+    1007871,
+    1007872,
+    1007873,
+    1007874,
+    1007875,
+    1007876,
+    1007877,
+    1007878,
+    1007879,
+    1007880,
+    1007881,
+    1007882,
+    1007883,
+    1007884,
+    1007885,
+    1007886,
+    1007887,
+    1007888,
+    1007889,
+    1007890,
+    1007891,
+    1007892,
+    1007893,
+    1007894,
+    1007895,
+    1007896,
+    1007897,
+    1007898,
+    1007899,
+    1007900,
+    1007901,
+    1007902,
+    1007903,
+    1007904,
+    1007905,
+    1007906,
+    1007907,
+    1007908,
+    1007909,
+    1007910,
+    1007911,
+    1007912,
+    1007913,
+    1007914,
+    1007915,
+    1007916,
+    1007917,
+    1007918,
+    1007919,
+    1007920,
+    1007921,
+    1007922,
+    1007923,
+    1007924,
+    1007925,
+    1007926,
+    1007927,
+    1007928,
+    1007929,
+    1007930,
+    1007931,
+    1007932,
+    1007933,
+    1007934,
+    1007935,
+    1007936,
+    1007937,
+    1007938,
+    1007939,
+    1007940,
+    1007941,
+    1007942,
+    1007943,
+    1007944,
+    1007945,
+    1007946,
+    1007947,
+    1007948,
+    1007949,
+    1007950,
+    1007951,
+    1007952,
+    1007953,
+    1007954,
+    1007955,
+    1007956,
+    1007957,
+    1007958,
+    1007959,
+    1007960,
+    1007961,
+    1007963,
+    1007964,
+    1007965,
+    1007966,
+    1007967,
+    1007968,
+    1007969,
+    1007970,
+    1007971,
+    1007972,
+    1007973,
+    1007974,
+    1007975,
+    1007976,
+    1007977,
+    1007978,
+    1007979,
+    1007980,
+    1007981,
+    1007982,
+    1007983,
+    1007984,
+    1007986,
+    1007987,
+    1007988,
+    1007989,
+    1007990,
+    1007991,
+    1007992,
+    1007993,
+    1007994,
+    1007995,
+    1007996,
+    1007997,
+    1007998,
+    1007999,
+    1008000,
+    1008001,
+    1008002,
+    1008003,
+    1008004,
+    1008005,
+    1008006,
+    1008007,
+    1008008,
+    1008009,
+    1008010,
+    1008011,
+    1008012,
+    1008013,
+    1008014,
+    1008015,
+    1008016,
+    1008017,
+    1008018,
+    1008019,
+    1008020,
+    1008021,
+    1008022,
+    1008023,
+    1008024,
+    1008025,
+    1008026,
+    1008038,
+    1008051
+  ],
+  "PF4582_PLACEMENT_KNOWN": 206,
+  "PF4582_BEHAVIOR_PROVEN": 25,
+  "PF4582_RUNTIME_ACTIVE": 25,
+  "runtimeEvidence": [
+    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
+    "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json"
+  ],
+  "unresolvedDynamicSourceNames": [
+    {
+      "npcId": 1007961,
+      "sourceName": "Burntooth the Inferno Muddevil",
+      "templateHash": 1280132162
+    },
+    {
+      "npcId": 1007963,
+      "sourceName": "Sparkletail the Jolly Wrecker",
+      "templateHash": 1280132418
+    },
+    {
+      "npcId": 1007964,
+      "sourceName": "Malicespine the Wasteland Roller",
+      "templateHash": 1330467906
+    },
+    {
+      "npcId": 1007965,
+      "sourceName": "Oozefoot the Noxious Malle",
+      "templateHash": 1296911426
+    },
+    {
+      "npcId": 1007966,
+      "sourceName": "Chipmind the Overclocked182-T1",
+      "templateHash": 1330463810
+    },
+    {
+      "npcId": 1007967,
+      "sourceName": "Sparky the Stabber",
+      "templateHash": 1380796994
+    },
+    {
+      "npcId": 1008051,
+      "sourceName": "Dreadknot the Toxictwister",
+      "templateHash": 1196249922
+    }
+  ],
+  "unresolvedSourceSemantics": [
+    "BossMods",
+    "ExFlags",
+    "SpawnAngle",
+    "SpawnAngleW",
+    "SpawnChance",
+    "SpawnPointFlags",
+    "SpawnTime",
+    "SpawnUnknowns"
+  ],
+  "rejectedPlacements": [],
+  "invariants": {
+    "NO_HAND_TRANSCRIPTION": "YES",
+    "DUPLICATE_POSITIONS_PRESERVED": "YES",
+    "UNKNOWN_METADATA_PRESERVED": "YES",
+    "UNPROVEN_BEHAVIOR_INVENTED": "NO",
+    "UNPROVEN_SPAWNS_ACTIVATED": "NO"
+  }
+}

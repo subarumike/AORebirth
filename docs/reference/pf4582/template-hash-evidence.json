@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "playfieldId": 4582,
+  "governance": {
+    "purpose": "Corroborating identity evidence for the PF4582 TemplateHash audit; this ledger is not runtime activation authority.",
+    "newRuntimeActivationAllowed": false,
+    "classificationBasis": {
+      "SINGLE_PLAUSIBLE_PROFILE": "CANDIDATE",
+      "MULTIPLE_PLAUSIBLE_PROFILES": "AMBIGUOUS",
+      "NO_RELIABLE_PROFILE_LINK": "NO_EVIDENCE"
+    }
+  },
+  "pinnedInputs": [
+    {
+      "path": "docs/reference/pf4582/PlayfieldDistrictInfo.json",
+      "sha256": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32"
+    },
+    {
+      "path": "docs/reference/pf4582/runtime-evidence-map.json",
+      "sha256": "02a1b167b97d1caa223aeaa60eaebbaf0a1e99ce6ddce753f7d54eae1f716869"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/mobtemplate.sql",
+      "sha256": "75bd10fed1bd92d8ce1de16bb7179c97cf0e1dab8461eb4719d6f1c567584dfb"
+    },
+    {
+      "path": "docs/generated/aosharp_capture_inventory.csv",
+      "sha256": "8a217cc45121bf850cdadb4219a4457f30a339f832777f4f70a192feeb68e082"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
+      "sha256": "36ef949c3e7fa40781ee52f78dfa164954957bb94404a1dcd4a2f13ccd924d24"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
+      "sha256": "7f0381d89cdaf3670425877d95f9014977c190506a878a262e082ebeb3ec0df7"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine/Core/CombatTestMobArchetype.cs",
+      "sha256": "4e1be24bbf9afe7b035afd125b705b60df5b6e94e36acb7f117ae733aced5774"
+    },
+    {
+      "path": "Tools/tests/test_generate_pf4582_placements.py",
+      "sha256": "0df11e4f739407887024996b342bf0f743f3f3e5cfcf4574f426f8f26fececcb"
+    }
+  ],
+  "acceptedCapture": {
+    "captureId": "20260818-214552",
+    "capturePath": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552",
+    "acceptedInventoryPath": "docs/generated/aosharp_capture_inventory.csv",
+    "acceptedInventoryDigest": "1efdae64b0339bf658b42225cd51f8e058b73e5ad2ca309958caace07c1288d3",
+    "dossierPath": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
+    "dossierKey": "$.enemies"
+  },
+  "unresolvedAssessments": [
+    {
+      "templateHashOriginal": "1095584067",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A035"],
+      "captureIdentity": "(SimpleChar:79F444A5)",
+      "expectedMonsterData": 17660,
+      "specificFinding": "The exact captured Cliff Malle identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1095979092",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A033"],
+      "captureIdentity": "(SimpleChar:79F4448C)",
+      "expectedMonsterData": 17708,
+      "specificFinding": "The exact captured Tropical Stalker identity and the unique same-name SQL profile agree on MonsterData and level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1196249922",
+      "assessmentBasis": "NO_RELIABLE_PROFILE_LINK",
+      "candidateProfileKeys": [],
+      "specificFinding": "The dynamic source name Dreadknot the Toxictwister is absent from accepted PF4582 identity artifacts; nearby alternate dynamic names are not identity evidence.",
+      "remainingBlockers": ["A stable identifier must link this TemplateHash or source NpcId to an accepted AO identity."]
+    },
+    {
+      "templateHashOriginal": "1230522714",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A026"],
+      "captureIdentity": "(SimpleChar:79F444C9)",
+      "expectedMonsterData": 247728,
+      "specificFinding": "The exact captured Alien Spider - Zix identity and the unique same-name SQL profile agree on MonsterData; their level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1246118721",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A002"],
+      "captureIdentity": "(SimpleChar:79F44514)",
+      "expectedMonsterData": 251782,
+      "specificFinding": "The exact captured Scout - Jaax'Sinuh identity and the unique same-name SQL profile agree on MonsterData and level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "Respawn correlations are ambiguous and cannot supply the missing identity bridge."]
+    },
+    {
+      "templateHashOriginal": "1262571596",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A014"],
+      "captureIdentity": "(SimpleChar:79F444F7)",
+      "expectedMonsterData": 26135,
+      "specificFinding": "The exact captured Shuttle Saboteur identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1263749447",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A030"],
+      "captureIdentity": "(SimpleChar:79F4451B)",
+      "expectedMonsterData": 30252,
+      "specificFinding": "The exact captured Giant Snake identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "MonsterData 30252 is shared and cannot establish identity alone."]
+    },
+    {
+      "templateHashOriginal": "1263751763",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A003"],
+      "captureIdentity": "(SimpleChar:79F44481)",
+      "expectedMonsterData": 30252,
+      "specificFinding": "The exact captured Shore Snake identity and the unique same-name SQL profile agree on MonsterData and level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "MonsterData 30252 is shared and cannot establish identity alone."]
+    },
+    {
+      "templateHashOriginal": "1280132162",
+      "assessmentBasis": "NO_RELIABLE_PROFILE_LINK",
+      "candidateProfileKeys": [],
+      "specificFinding": "The dynamic source name Burntooth the Inferno Muddevil is absent from accepted PF4582 identity artifacts; observed alternate Mudpuppy names cannot replace it.",
+      "remainingBlockers": ["A stable identifier must link this TemplateHash or source NpcId to an accepted AO identity."]
+    },
+    {
+      "templateHashOriginal": "1280132418",
+      "assessmentBasis": "NO_RELIABLE_PROFILE_LINK",
+      "candidateProfileKeys": [],
+      "specificFinding": "The dynamic source name Sparkletail the Jolly Wrecker is absent from accepted PF4582 identity artifacts; observed alternate dynamic names cannot replace it.",
+      "remainingBlockers": ["A stable identifier must link this TemplateHash or source NpcId to an accepted AO identity."]
+    },
+    {
+      "templateHashOriginal": "1280462675",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A012"],
+      "captureIdentity": "(SimpleChar:79F444F6)",
+      "expectedMonsterData": 17687,
+      "specificFinding": "The exact captured Stowaway Rollerrat identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1280525906",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A034"],
+      "captureIdentity": "(SimpleChar:79F4449C)",
+      "expectedMonsterData": 30354,
+      "specificFinding": "The exact captured Reef Salamander identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "MonsterData 30354 is shared and cannot establish identity alone."]
+    },
+    {
+      "templateHashOriginal": "1296911426",
+      "assessmentBasis": "MULTIPLE_PLAUSIBLE_PROFILES",
+      "candidateProfileKeys": ["mobtemplate:A035", "mobtemplate:A103", "mobtemplate:A123"],
+      "captureIdentity": "(SimpleChar:79F444E7)",
+      "expectedMonsterData": 17660,
+      "specificFinding": "An exact Oozefoot display name was captured, but the source marks the slot dynamic and multiple Malle-family profiles remain plausible.",
+      "contradictoryEvidence": ["The captured dynamic display name does not establish which stable Malle profile generated the slot."],
+      "remainingBlockers": ["A stable identifier must bridge this TemplateHash or source NpcId to one unique profile independently of the dynamic name and coordinates."]
+    },
+    {
+      "templateHashOriginal": "1314079299",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A013"],
+      "captureIdentity": "(SimpleChar:79F44520)",
+      "expectedMonsterData": 30354,
+      "specificFinding": "The exact captured Climbing Salamander identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "MonsterData 30354 is shared and cannot establish identity alone."]
+    },
+    {
+      "templateHashOriginal": "1329812567",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A029"],
+      "captureIdentity": "(SimpleChar:79F444C8)",
+      "expectedMonsterData": 17714,
+      "specificFinding": "The exact captured Waste collector identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1330463810",
+      "assessmentBasis": "NO_RELIABLE_PROFILE_LINK",
+      "candidateProfileKeys": [],
+      "specificFinding": "The dynamic source name Chipmind the Overclocked182-T1 is absent from accepted PF4582 identity artifacts; nearby generated robot names are not stable identity evidence.",
+      "remainingBlockers": ["A stable identifier must link this TemplateHash or source NpcId to an accepted AO identity."]
+    },
+    {
+      "templateHashOriginal": "1330467906",
+      "assessmentBasis": "NO_RELIABLE_PROFILE_LINK",
+      "candidateProfileKeys": [],
+      "specificFinding": "The dynamic source name Malicespine the Wasteland Roller is absent from accepted PF4582 identity artifacts; nearby generated roller names are not stable identity evidence.",
+      "remainingBlockers": ["A stable identifier must link this TemplateHash or source NpcId to an accepted AO identity."]
+    },
+    {
+      "templateHashOriginal": "1330725958",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A004"],
+      "captureIdentity": "(SimpleChar:79F444FC)",
+      "expectedMonsterData": 17655,
+      "specificFinding": "The exact captured Beach Leet identity and the unique same-name SQL profile agree on MonsterData and level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "Observed respawn timing cannot supply the missing identity bridge."]
+    },
+    {
+      "templateHashOriginal": "1380204867",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A027"],
+      "captureIdentity": "(SimpleChar:79F444BA)",
+      "expectedMonsterData": 17649,
+      "specificFinding": "The exact captured Cargo Droid identity and the unique same-name SQL profile agree on MonsterData; source and SQL level ranges overlap.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1380273228",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["runtime:CombatTestMobArchetype.StowawayRollerrat"],
+      "captureIdentity": "(SimpleChar:79F444B0)",
+      "expectedMonsterData": 17687,
+      "specificFinding": "The exact captured Rollerrat identity agrees with the existing AORebirth Rollerrat-family archetype on MonsterData and NpcFamily, making it the strongest current profile candidate.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "The generic level-2 Rollerrat stats differ from the Stowaway template and require independent profile proof before implementation."]
+    },
+    {
+      "templateHashOriginal": "1380796994",
+      "assessmentBasis": "NO_RELIABLE_PROFILE_LINK",
+      "candidateProfileKeys": [],
+      "specificFinding": "The dynamic source name Sparky the Stabber is absent from accepted PF4582 identity artifacts; unrelated Sparky tokens are not stable identity evidence.",
+      "remainingBlockers": ["A stable identifier must link this TemplateHash or source NpcId to an accepted AO identity."]
+    },
+    {
+      "templateHashOriginal": "1430934083",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A009"],
+      "captureIdentity": "(SimpleChar:79F444EF)",
+      "expectedMonsterData": 45873,
+      "specificFinding": "The exact captured Cross-Wired Junkbot identity and the unique same-name SQL profile agree on MonsterData and overlapping level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1497649731",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A016"],
+      "captureIdentity": "(SimpleChar:79F4456C)",
+      "expectedMonsterData": 251772,
+      "specificFinding": "The exact captured Specialist - Cha'Heru identity and the unique same-name SQL profile agree on MonsterData and level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity."]
+    },
+    {
+      "templateHashOriginal": "1514951251",
+      "assessmentBasis": "SINGLE_PLAUSIBLE_PROFILE",
+      "candidateProfileKeys": ["mobtemplate:A000"],
+      "captureIdentity": "(SimpleChar:79F44489)",
+      "expectedMonsterData": 22794,
+      "specificFinding": "The exact captured Surf Lizard identity and the unique same-name SQL profile agree on MonsterData and level range.",
+      "remainingBlockers": ["No accepted record links this numeric TemplateHash or a source NpcId to the captured identity.", "Observed respawn timing cannot supply the missing identity bridge."]
+    }
+  ]
+}

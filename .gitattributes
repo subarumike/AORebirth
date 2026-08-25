@@ -24,6 +24,9 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 
+# The authoritative PF4582 source is byte-hash governed and must not be normalized.
+docs/reference/pf4582/PlayfieldDistrictInfo.json -text whitespace=cr-at-eol
+
 # Windows launchers must remain directly executable by cmd.exe.
 *.cmd text eol=crlf
 *.bat text eol=crlf

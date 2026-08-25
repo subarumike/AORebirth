@@ -391,6 +391,57 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void IccShuttleportAuthoritativePlacementsRemainDataCompleteAndRuntimeFailClosed()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string placementText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportPlacementCatalog.cs"));
+            string generatedText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportPlacementCatalog.g.cs"));
+            string spawnText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportSpawn.cs"));
+            string reportText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"docs\generated\pf4582_authoritative_placement_report.json"));
+
+            Assert.IsTrue(
+                generatedText.Contains("SourcePlacementCount = 206")
+                && generatedText.Contains("UniqueTemplateHashCount = 38")
+                && generatedText.Contains("MappedTemplateHashCount = 14")
+                && generatedText.Contains("BehaviorProvenPlacementCount = 25")
+                && generatedText.Contains("RuntimeEligiblePlacementCount = 25")
+                && generatedText.Contains("RuntimeActivePlacementCount = 25"),
+                "The generated PF4582 placement catalog must preserve the accepted source and activation counts.");
+            Assert.AreEqual(
+                206,
+                generatedText.Split(
+                    new[] { "new IccShuttleportPlacementRecord(" },
+                    StringSplitOptions.None).Length - 1,
+                "The generated artifact must contain all 206 normalized placement records.");
+            Assert.AreEqual(
+                25,
+                spawnText.Split(new[] { "SourceNpcId =" }, StringSplitOptions.None).Length - 1,
+                "Only the 25 previously implemented PF4582 placements may be bound to active runtime definitions.");
+            Assert.IsTrue(
+                placementText.Contains("TryGetRuntimeActive(")
+                && placementText.Contains("template hash is unresolved")
+                && placementText.Contains("required behavior is unresolved")
+                && placementText.Contains("CandidateRespawnInterpretation")
+                && placementText.Contains("return \"Unresolved\";")
+                && spawnText.Contains("IccShuttleportPlacementCatalog.TryGetRuntimeActive(")
+                && spawnText.Contains("def.Level < sourcePlacement.MinLevel")
+                && spawnText.Contains("x = sourcePlacement.PositionX")
+                && spawnText.Contains("y = sourcePlacement.PositionY")
+                && spawnText.Contains("z = sourcePlacement.PositionZ"),
+                "Runtime activation must consume the placement catalog and fail closed on unresolved metadata or behavior.");
+            Assert.IsTrue(
+                reportText.Contains("\"NO_HAND_TRANSCRIPTION\": \"YES\"")
+                && reportText.Contains("\"DUPLICATE_POSITIONS_PRESERVED\": \"YES\"")
+                && reportText.Contains("\"UNKNOWN_METADATA_PRESERVED\": \"YES\"")
+                && reportText.Contains("\"UNPROVEN_SPAWNS_ACTIVATED\": \"NO\""),
+                "The deterministic report must publish the placement-governance invariants.");
+        }
+
+        [TestMethod]
         public void NpcCorpseLifecycleRulesPreserveCapturedCleaningRobotDeathTimings()
         {
             Assert.AreEqual(
