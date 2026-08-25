@@ -32,6 +32,8 @@ namespace ZoneEngine.Core.Playfields
 
     internal sealed class PlayfieldRuntimeSystems
     {
+        private readonly UnifiedPlayfieldContentHydrationService unifiedHydration;
+
         private readonly Playfield playfield;
 
         private readonly PlayfieldAnnouncementRuntimeService announcements;
@@ -106,7 +108,7 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PrivateCityReadyInitCoordinator privateCityReadyInit;
 
-        internal PlayfieldRuntimeSystems(
+        public PlayfieldRuntimeSystems(
             Playfield playfield,
             Identity playfieldIdentity,
             Func<Identity, bool> isPrivateCityPlayfieldCandidate,
@@ -196,6 +198,11 @@ namespace ZoneEngine.Core.Playfields
                     resolveCharacterOrganizationInstance,
                     resolveOrganizationName,
                     resolveCharacterStatWireValue);
+            this.unifiedHydration = new UnifiedPlayfieldContentHydrationService(
+                playfield,
+                playfieldIdentity,
+                this.dynelRegistry,
+                playfield.ActivateNpc);
         }
 
         internal void RegisterContent(Identity playfieldIdentity)
@@ -223,6 +230,7 @@ namespace ZoneEngine.Core.Playfields
                 staticDynel => this.staticDynelRuntime.CreateStaticDynel(playfieldIdentity, staticDynel),
                 this.RegisterDynel,
                 this.RefreshDynelRegistry);
+            this.unifiedHydration.HydrateFromDatabase();
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)

@@ -16,6 +16,11 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class GlobalLootRuntimeService
     {
+		
+		private readonly LootTableRegistry registry;
+		private readonly LootGenerationService generator;
+		private UnifiedLootHydrationService unifiedLootHydration;
+	
         private const string CleaningRobotProfileKey = "captured.arete.cleaning-robot";
         private const int CleaningRobotMonsterData = 297023;
         private const int CleaningRobotCredits = 5;
@@ -65,8 +70,8 @@ namespace AORebirth.Core.Playfields
         private readonly object sync = new object();
         private readonly object productionRandomSync = new object();
         private readonly Random productionRandom = new Random();
-        private readonly LootTableRegistry registry;
-        private readonly LootGenerationService generator;
+        //private readonly LootTableRegistry registry;
+        //private readonly LootGenerationService generator;
         private bool databaseLoaded;
         private CombatLootTableEntry[] databaseEntries = new CombatLootTableEntry[0];
         private CombatLootTableEntry[] debugEntries = new CombatLootTableEntry[0];
@@ -76,6 +81,12 @@ namespace AORebirth.Core.Playfields
             this.registry = new LootTableRegistry(value => ItemLoader.ItemList.ContainsKey(value));
             this.generator = new LootGenerationService(this.registry, new LootAssignmentResolver());
         }
+
+		internal void InitializeForPlayfield(int playfieldId)
+		{
+			this.unifiedLootHydration = new UnifiedLootHydrationService(this.registry, playfieldId);
+			this.unifiedLootHydration.HydrateFromDatabase();
+		}
 
         internal LootTableRegistry Registry { get { return this.registry; } }
 
