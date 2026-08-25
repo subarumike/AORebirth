@@ -129,4 +129,3 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
     }
 }
-

@@ -3,6 +3,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
 
     using AORebirth.Core.Playfields;
 
@@ -97,6 +98,92 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void EveryDefinitionPropertyHasAnExplicitCanonicalClassification()
+        {
+            string[] definitionProperties =
+                typeof(HydratedPlayfieldDefinition).GetProperties(
+                        System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Public)
+                    .Select(property => property.Name)
+                    .OrderBy(value => value, StringComparer.Ordinal)
+                    .ToArray();
+            string[] included = PlayfieldDefinitionCanonicalizer.CanonicalDefinitionPropertyNames
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            string[] excluded = PlayfieldDefinitionCanonicalizer.ExplicitlyExcludedDefinitionPropertyNames
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+
+            Assert.AreEqual(0, included.Intersect(excluded, StringComparer.Ordinal).Count());
+            CollectionAssert.AreEquivalent(
+                definitionProperties,
+                included.Concat(excluded).ToArray(),
+                "A definition property was added without an explicit canonical classification.");
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "FormatVersion",
+                    "PlayfieldInstance",
+                    "ResourceIdentity",
+                    "Name",
+                    "Records",
+                    "Provenance",
+                    "Warnings",
+                    "Conflicts"
+                },
+                included);
+            Assert.AreEqual(0, excluded.Length, "No current definition property is silently excluded.");
+        }
+
+        [TestMethod]
+        public void CanonicalAndDefinitionFormatVersionsHaveAnExplicitLockedMapping()
+        {
+            Assert.AreEqual(
+                HydratedPlayfieldDefinition.CurrentFormatVersion,
+                PlayfieldDefinitionCanonicalizer.SupportedDefinitionFormatVersion);
+            Assert.AreEqual(1, PlayfieldDefinitionCanonicalizer.CurrentCanonicalFormatVersion);
+
+            string canonical = PlayfieldDefinitionCanonicalizer.Serialize(CreateDefinition(false));
+            StringAssert.Contains(canonical, "\"canonicalFormatVersion\":1");
+            StringAssert.Contains(canonical, "\"definitionFormatVersion\":1");
+        }
+
+        [TestMethod]
+        public void RepeatedCanonicalizationProducesIdenticalUtf8BytesAndDigest()
+        {
+            HydratedPlayfieldDefinition definition = CreateDefinition(false);
+            byte[] expectedBytes = Encoding.UTF8.GetBytes(
+                PlayfieldDefinitionCanonicalizer.Serialize(definition));
+            string expectedDigest = PlayfieldDefinitionCanonicalizer.ComputeDigest(definition);
+
+            for (int iteration = 0; iteration < 5; iteration++)
+            {
+                CollectionAssert.AreEqual(
+                    expectedBytes,
+                    Encoding.UTF8.GetBytes(PlayfieldDefinitionCanonicalizer.Serialize(definition)));
+                Assert.AreEqual(
+                    expectedDigest,
+                    PlayfieldDefinitionCanonicalizer.ComputeDigest(definition));
+            }
+        }
+
+        [TestMethod]
+        public void MeaningfulStaticDefinitionChangeChangesCanonicalBytesAndDigest()
+        {
+            HydratedPlayfieldDefinition original = CreateDefinition(false);
+            HydratedPlayfieldDefinition changed = CreateDefinition(false);
+            changed.Records[0].Values[0] = HydratedPlayfieldValue.Scalar("level", "9");
+
+            Assert.AreNotEqual(
+                PlayfieldDefinitionCanonicalizer.Serialize(original),
+                PlayfieldDefinitionCanonicalizer.Serialize(changed));
+            Assert.AreNotEqual(
+                PlayfieldDefinitionCanonicalizer.ComputeDigest(original),
+                PlayfieldDefinitionCanonicalizer.ComputeDigest(changed));
+        }
+
+        [TestMethod]
         public void FloatValuesUseExactInvariantRoundTripFormatting()
         {
             HydratedPlayfieldValue value = HydratedPlayfieldValue.Float("heading", 1.2345678f);
@@ -118,6 +205,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(diagnostics.Any(value => value.Code == "RUNTIME_STATE_NOT_ALLOWED"));
             Assert.IsTrue(diagnostics.Any(value => value.Code == "RUNTIME_SOURCE_NOT_ALLOWED"));
+            AssertCanonicalizationRejected(definition, "RUNTIME_STATE_NOT_ALLOWED");
         }
 
         [TestMethod]
@@ -131,6 +219,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(diagnostics.Any(value => value.Code == "DUPLICATE_RECORD"));
             Assert.IsTrue(diagnostics.Any(value => value.Code == "DUPLICATE_VALUE"));
+            AssertCanonicalizationRejected(definition, "DUPLICATE_RECORD");
         }
 
         [TestMethod]
@@ -249,6 +338,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             foreach (PlayfieldDefinitionDifference difference in differences)
             {
                 kinds.Add(difference.Kind);
+            }
+        }
+
+        private static void AssertCanonicalizationRejected(
+            HydratedPlayfieldDefinition definition,
+            string expectedDiagnosticCode)
+        {
+            try
+            {
+                PlayfieldDefinitionCanonicalizer.Serialize(definition);
+                Assert.Fail("Invalid definition was canonicalized.");
+            }
+            catch (InvalidOperationException exception)
+            {
+                StringAssert.Contains(exception.Message, expectedDiagnosticCode);
             }
         }
 
