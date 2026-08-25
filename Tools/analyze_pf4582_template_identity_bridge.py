@@ -84,6 +84,16 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sha256_governed_input(path: Path, normalization: str = "raw") -> str:
+    _require(path.is_file(), f"missing governed input: {_repository_path(path)}")
+    _require(normalization in {"raw", "text-lf"},
+             f"unsupported governed input digest normalization: {normalization}")
+    payload = path.read_bytes()
+    if normalization == "text-lf":
+        payload = payload.replace(b"\r\n", b"\n")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def _repository_path(path: Path) -> str:
     try:
         return path.resolve().relative_to(REPOSITORY_ROOT.resolve()).as_posix()
@@ -203,6 +213,11 @@ def validate_evidence(evidence: dict[str, Any], source_keys: set[int]) -> None:
     inputs = evidence.get("InputDigests")
     _require(isinstance(inputs, dict) and len(inputs) == 6, "governed input digest set is incomplete")
     _require(all(isinstance(value, str) and SHA256_PATTERN.fullmatch(value) for value in inputs.values()), "governed input digest is invalid")
+    normalizations = evidence.get("InputDigestNormalizations", {})
+    _require(isinstance(normalizations, dict), "governed input digest normalizations are invalid")
+    _require(set(normalizations).issubset(inputs), "digest normalization references an unpinned input")
+    _require(all(value in {"raw", "text-lf"} for value in normalizations.values()),
+             "governed input digest normalization is invalid")
     sources = evidence.get("OfficialSources")
     _require(isinstance(sources, list) and len(sources) == 3, "three imported structured sources are required")
     labels = set()
@@ -214,10 +229,12 @@ def validate_evidence(evidence: dict[str, Any], source_keys: set[int]) -> None:
 
 def verify_governed_inputs(evidence: dict[str, Any], inputs: Iterable[Path]) -> None:
     expected = evidence["InputDigests"]
+    normalizations = evidence.get("InputDigestNormalizations", {})
     for path in inputs:
         label = _repository_path(path)
         _require(label in expected, f"evidence ledger does not pin {label}")
-        _require(sha256_file(path) == expected[label], f"governed input digest drifted: {label}")
+        actual = sha256_governed_input(path, normalizations.get(label, "raw"))
+        _require(actual == expected[label], f"governed input digest drifted: {label}")
 
 
 def verify_official_sources(evidence: dict[str, Any], official_roots: dict[str, Path] | None = None) -> None:
@@ -565,6 +582,7 @@ def build_model(
         "RequiredNextEvidence": evidence["RequiredNextEvidence"],
         "HashRecords": hash_records,
         "InputDigests": evidence["InputDigests"],
+        "InputDigestNormalizations": evidence.get("InputDigestNormalizations", {}),
         "PriorAuditMetrics": prior_payload["Metrics"],
     }
     search_manifest = {
@@ -592,6 +610,7 @@ def build_model(
         "ParserConsumerReferences": function_labels,
         "CoverageLimitations": evidence["MissingEvidence"],
         "InputDigests": evidence["InputDigests"],
+        "InputDigestNormalizations": evidence.get("InputDigestNormalizations", {}),
     }
     return {"Report": report, "SearchManifest": search_manifest}
 

@@ -26,6 +26,10 @@ DEFAULT_RUNTIME_SOURCE = (
 DEFAULT_EVIDENCE_LEDGER = (
     REPOSITORY_ROOT / "docs/reference/pf4582/template-hash-evidence.json"
 )
+DEFAULT_CAPTURE_DOSSIER_FIXTURE = (
+    REPOSITORY_ROOT
+    / "docs/reference/pf4582/accepted-capture-20260818-214552-enemy-dossier.json"
+)
 DEFAULT_SQL_SOURCE = (
     REPOSITORY_ROOT
     / "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/mobtemplate.sql"
@@ -88,6 +92,17 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def sha256_governed_input(path: Path, normalization: str = "raw") -> str:
+    """Hash governed bytes, with explicit checkout-stable text normalization when requested."""
+    _require(path.is_file(), f"missing governed input: {repository_path(path)}")
+    _require(normalization in {"raw", "text-lf"},
+             f"unsupported governed input digest normalization: {normalization}")
+    payload = path.read_bytes()
+    if normalization == "text-lf":
+        payload = payload.replace(b"\r\n", b"\n")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def repository_path(path: Path) -> str:
@@ -289,6 +304,8 @@ def load_accepted_capture(
     dossier = _load_json(dossier_path)
     _require(isinstance(dossier, dict) and isinstance(dossier.get("enemies"), list),
              "enemy dossier must contain an enemies array")
+    _require(dossier.get("sourceArtifactSha256") == expected.get("sourceDossierSha256"),
+             "tracked enemy dossier fixture is not tied to the accepted raw artifact")
     by_identity: dict[str, dict[str, Any]] = {}
     for enemy in dossier["enemies"]:
         _require(isinstance(enemy, dict), "malformed enemy dossier record")
@@ -320,6 +337,37 @@ def load_accepted_capture(
     return by_identity, inventory_row, capture_scope
 
 
+def build_capture_dossier_fixture(source_path: Path) -> dict[str, Any]:
+    """Reduce the accepted raw dossier to the stable fields consumed by this audit."""
+    source = _load_json(source_path)
+    enemies = source.get("enemies") if isinstance(source, dict) else None
+    _require(isinstance(enemies, list), "enemy dossier must contain an enemies array")
+    compact: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for enemy in enemies:
+        _require(isinstance(enemy, dict), "malformed enemy dossier record")
+        identity = enemy.get("identity")
+        _require(isinstance(identity, str) and identity and identity not in seen,
+                 f"invalid or duplicate dossier identity {identity!r}")
+        seen.add(identity)
+        compact.append({
+            "identity": identity,
+            "name": enemy.get("name", ""),
+            "monsterData": enemy.get("monsterData", ""),
+            "monsterScale": enemy.get("monsterScale", ""),
+            "npcFamily": enemy.get("npcFamily", ""),
+            "level": enemy.get("level"),
+        })
+    compact.sort(key=lambda item: item["identity"])
+    return {
+        "schemaVersion": 1,
+        "sourceArtifact": "enemy-dossier.json",
+        "sourceArtifactSha256": sha256_file(source_path),
+        "enemyCount": len(compact),
+        "enemies": compact,
+    }
+
+
 def _validate_pinned_inputs(ledger: dict[str, Any]) -> dict[str, str]:
     pins = ledger.get("pinnedInputs")
     _require(isinstance(pins, list) and pins, "evidence ledger lacks pinnedInputs")
@@ -329,12 +377,15 @@ def _validate_pinned_inputs(ledger: dict[str, Any]) -> dict[str, str]:
         _require(isinstance(pin, dict), "malformed pinned input")
         relative = pin.get("path")
         expected = pin.get("sha256")
+        normalization = pin.get("digestNormalization", "raw")
         _require(isinstance(relative, str) and relative and relative not in seen,
                  "pinned input paths must be unique nonempty strings")
         _require(isinstance(expected, str) and re.fullmatch(r"[0-9a-f]{64}", expected) is not None,
                  f"invalid SHA-256 pin for {relative}")
+        _require(normalization in {"raw", "text-lf"},
+                 f"invalid digest normalization for {relative}: {normalization}")
         path = REPOSITORY_ROOT / Path(relative)
-        actual = sha256_file(path)
+        actual = sha256_governed_input(path, normalization)
         _require(actual == expected,
                  f"governed input digest mismatch for {relative}: expected {expected}, got {actual}")
         seen.add(relative)
@@ -390,7 +441,7 @@ def _capture_evidence(
         "EvidenceType": "AcceptedCaptureIdentityProfile",
         "Strength": "CORROBORATING",
         "IdentityLinkToTemplateHash": False,
-        "Path": capture["dossierPath"],
+        "Path": capture.get("sourceDossierPath", capture["dossierPath"]),
         "RecordId": f"$.enemies[identity={enemy['identity']}]",
         "AcceptedInventoryPath": capture["acceptedInventoryPath"],
         "AcceptedInventoryRecordId": f"capture_id={capture['captureId']}",
@@ -521,7 +572,7 @@ def build_audit_model(
     capture_by_identity, _, accepted_capture_scope = load_accepted_capture(
         inventory_path, dossier_path, capture
     )
-    dossier_digest = sha256_file(dossier_path)
+    dossier_digest = capture["sourceDossierSha256"]
 
     assessments = ledger.get("unresolvedAssessments")
     _require(isinstance(assessments, list), "evidence ledger lacks unresolvedAssessments")
@@ -702,7 +753,7 @@ def build_audit_model(
                     "EvidenceType": "AcceptedCaptureExactNameAbsenceSearch",
                     "Strength": "ABSENCE_CONTEXT",
                     "IdentityLinkToTemplateHash": False,
-                    "Path": capture["dossierPath"],
+                    "Path": capture.get("sourceDossierPath", capture["dossierPath"]),
                     "RecordId": f"$.enemies[name in {source_names}] => no records",
                     "AcceptedInventoryPath": capture["acceptedInventoryPath"],
                     "AcceptedInventoryRecordId": f"capture_id={capture['captureId']}",
@@ -1073,9 +1124,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--evidence-ledger", type=Path, default=DEFAULT_EVIDENCE_LEDGER)
     parser.add_argument("--json-output", type=Path, default=DEFAULT_JSON_OUTPUT)
     parser.add_argument("--markdown-output", type=Path, default=DEFAULT_MARKDOWN_OUTPUT)
+    parser.add_argument("--refresh-capture-fixture-from", type=Path)
+    parser.add_argument(
+        "--capture-fixture-output",
+        type=Path,
+        default=DEFAULT_CAPTURE_DOSSIER_FIXTURE,
+    )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
     try:
+        if args.refresh_capture_fixture_from is not None:
+            fixture = build_capture_dossier_fixture(args.refresh_capture_fixture_from)
+            content = json.dumps(fixture, indent=2, ensure_ascii=False) + "\n"
+            _write_or_check(args.capture_fixture_output, content, False)
+            print(f"PF4582_CAPTURE_DOSSIER_FIXTURE_ENEMIES={fixture['enemyCount']}")
+            print(
+                "PF4582_CAPTURE_DOSSIER_SOURCE_SHA256="
+                + fixture["sourceArtifactSha256"]
+            )
+            return 0
         model = build_audit_model(
             source_path=args.source,
             evidence_map_path=args.evidence_map,

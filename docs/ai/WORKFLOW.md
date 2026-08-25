@@ -400,6 +400,16 @@ The audit pins its structured inputs, emits deterministic JSON and Markdown, and
 fails closed on drift or conflicting evidence. The 24 baseline-unresolved hashes
 account for 171 blocked placements. Ten additional blocked Island Reet rows use
 the baseline-mapped ISRE hash, so the complete runtime blocked count remains 181.
+Its accepted enemy-dossier projection is tracked under `docs/reference/pf4582`
+and is tied to the complete raw dossier by SHA-256, allowing `--check` and
+`--test` to run in clean or linked worktrees without the ignored capture folder.
+Refresh that projection only when a newly accepted complete dossier supersedes
+the current source:
+
+```cmd
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd --refresh-capture-fixture-from "<accepted-enemy-dossier.json>"
+```
+
 No audit classification authorizes activation; promotion requires a separate
 task with a stable source key to AO identity/profile bridge. `TemplateHash` is a
 legacy AORebirth field name. Official EP1 evidence proves that the represented

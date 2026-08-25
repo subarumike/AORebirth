@@ -404,6 +404,19 @@ class Pf4582TemplateIdentityBridgeTests(unittest.TestCase):
         self.assertEqual(1, self.report["Metrics"]["PF4582_OFFICIAL_ADDITIONAL_RECORDS"])
         self.assertEqual("NCNN", self.manifest["AdditionalOfficialKey"])
 
+    def test_57_text_digest_is_stable_across_checkout_line_endings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            lf_path = Path(temporary) / "source-lf.cs"
+            crlf_path = Path(temporary) / "source-crlf.cs"
+            lf_path.write_bytes(b"class Example {}\n")
+            crlf_path.write_bytes(b"class Example {}\r\n")
+
+            self.assertNotEqual(bridge.sha256_file(lf_path), bridge.sha256_file(crlf_path))
+            self.assertEqual(
+                bridge.sha256_governed_input(lf_path, "text-lf"),
+                bridge.sha256_governed_input(crlf_path, "text-lf"),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

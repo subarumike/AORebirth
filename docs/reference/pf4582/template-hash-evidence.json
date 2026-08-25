@@ -25,15 +25,17 @@
     },
     {
       "path": "docs/generated/aosharp_capture_inventory.csv",
-      "sha256": "8a217cc45121bf850cdadb4219a4457f30a339f832777f4f70a192feeb68e082"
+      "sha256": "6acf291e3666840806d136fc3f6bac0dffba8c8e57bfe9e44163309ed4ded4a6",
+      "digestNormalization": "text-lf"
     },
     {
-      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
-      "sha256": "36ef949c3e7fa40781ee52f78dfa164954957bb94404a1dcd4a2f13ccd924d24"
+      "path": "docs/reference/pf4582/accepted-capture-20260818-214552-enemy-dossier.json",
+      "sha256": "e4fbd628f850e5f317b6d5ec6aeac94022a6bbd1ef79a25b6791908137918af5"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
-      "sha256": "7f0381d89cdaf3670425877d95f9014977c190506a878a262e082ebeb3ec0df7"
+      "sha256": "ed8896d81adcf3b580aed1a2ac5b5192b6c448cd407368ca23b0b1de8c29366d",
+      "digestNormalization": "text-lf"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/CombatTestMobArchetype.cs",
@@ -49,7 +51,9 @@
     "capturePath": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552",
     "acceptedInventoryPath": "docs/generated/aosharp_capture_inventory.csv",
     "acceptedInventoryDigest": "1efdae64b0339bf658b42225cd51f8e058b73e5ad2ca309958caace07c1288d3",
-    "dossierPath": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
+    "dossierPath": "docs/reference/pf4582/accepted-capture-20260818-214552-enemy-dossier.json",
+    "sourceDossierPath": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
+    "sourceDossierSha256": "36ef949c3e7fa40781ee52f78dfa164954957bb94404a1dcd4a2f13ccd924d24",
     "dossierKey": "$.enemies"
   },
   "unresolvedAssessments": [
