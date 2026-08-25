@@ -612,6 +612,8 @@
     <Compile Include="Core\Playfields\WorldPopulationController.cs" />
     <Compile Include="Core\Playfields\WorldRespawnScheduler.cs" />
     <Compile Include="Core\Playfields\GlobalLootRuntimeService.cs" />
+    <Compile Include="Core\Playfields\UnifiedLootHydrationService.cs" />
+    <Compile Include="Core\Playfields\UnifiedPlayfieldContentHydrationService.cs" />
     <Compile Include="Core\Playfields\CorpseInventoryService.cs" />
     <Compile Include="Core\Playfields\SubwayLootPoolRules.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyRuntimeService.cs" />

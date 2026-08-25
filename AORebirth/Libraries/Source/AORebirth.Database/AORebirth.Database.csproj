@@ -136,6 +136,15 @@
 
     <Compile Include="Dao\VendorDao.cs" />
     <Compile Include="Dao\VendorTemplateDao.cs" />
+    <Compile Include="Dao\LootAssignmentDao.cs" />
+    <Compile Include="Dao\LootTableDefinitionDao.cs" />
+    <Compile Include="Dao\NpcPatrolRouteDao.cs" />
+    <Compile Include="Dao\NpcPatrolSegmentDao.cs" />
+    <Compile Include="Dao\OrdinaryEnemyProfileDao.cs" />
+    <Compile Include="Dao\OrdinaryEnemySpawnDao.cs" />
+    <Compile Include="Dao\PlayfieldConfigurationDao.cs" />
+    <Compile Include="Dao\PlayfieldStaticDynelDao.cs" />
+    <Compile Include="Dao\PlayfieldVendorDao.cs" />
     <Compile Include="Entities\DBMobDroptable.cs" />
     <Compile Include="Entities\DBMobSpawn.cs" />
     <Compile Include="Entities\DBMobSpawnStat.cs" />
@@ -161,6 +170,15 @@
     <Compile Include="Entities\DBVendorTemplate.cs" />
     <Compile Include="Entities\ForeignKeyAttribute.cs" />
     <Compile Include="Entities\IDBEntity.cs" />
+    <Compile Include="Entities\DBLootAssignment.cs" />
+    <Compile Include="Entities\DBLootTableDefinition.cs" />
+    <Compile Include="Entities\DBNpcPatrolRoute.cs" />
+    <Compile Include="Entities\DBNpcPatrolSegment.cs" />
+    <Compile Include="Entities\DBOrdinaryEnemyProfile.cs" />
+    <Compile Include="Entities\DBOrdinaryEnemySpawn.cs" />
+    <Compile Include="Entities\DBPlayfieldConfiguration.cs" />
+    <Compile Include="Entities\DBPlayfieldStaticDynel.cs" />
+    <Compile Include="Entities\DBPlayfieldVendor.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="MySQLConnector.cs" />
     <Compile Include="NpgsqlConnector.cs" />
