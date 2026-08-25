@@ -39,6 +39,7 @@ namespace AORebirth.Core.Playfields
 
         private sealed class ShuttleportNpc
         {
+            public int SourceNpcId;
             public string Name;
             public string TemplateHash;
             public int Level;
@@ -75,6 +76,7 @@ namespace AORebirth.Core.Playfields
         {
             new ShuttleportNpc
             {
+                SourceNpcId = 1007858,
                 Name = "Island Reet",
                 TemplateHash = "A001",
                 Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
@@ -89,6 +91,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008030,
                 Name = "Clan Equipment Vendor",
                 Level = 40, Health = 1650, MonsterData = 250381, Scale = 103, VisualFlags = 31, HeadMesh = 40243, RunSpeed = 137,
                 NpcFamily = 87, LosHeight = 0, CharacterFlags = 271061505, AppearanceValue = 1865,
@@ -101,6 +104,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008034,
                 Name = "Clan Recruiter",
                 Level = 40, Health = 1650, MonsterData = 165210, Scale = 103, VisualFlags = 31, HeadMesh = 40679, RunSpeed = 137,
                 NpcFamily = 104, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1577,
@@ -113,6 +117,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008037,
                 Name = "Adri Afeli",
                 Level = 25, Health = 941, MonsterData = 26092, Scale = 100, VisualFlags = 31, HeadMesh = 223803, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
@@ -125,6 +130,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008029,
                 Name = "Omni-Trans Equipment Vendor",
                 Level = 40, Health = 1650, MonsterData = 250380, Scale = 103, VisualFlags = 31, HeadMesh = 40173, RunSpeed = 137,
                 NpcFamily = 88, LosHeight = 0, CharacterFlags = 271061505, AppearanceValue = 1642,
@@ -137,6 +143,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008033,
                 Name = "Vendor Antonio Stacklund",
                 Level = 40, Health = 1650, MonsterData = 26088, Scale = 103, VisualFlags = 31, HeadMesh = 40687, RunSpeed = 137,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 279450113, AppearanceValue = 1576,
@@ -149,6 +156,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008035,
                 Name = "Omni-Tek Recruitment Officer",
                 Level = 40, Health = 1650, MonsterData = 165190, Scale = 103, VisualFlags = 31, HeadMesh = 40680, RunSpeed = 137,
                 NpcFamily = 105, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1578,
@@ -161,6 +169,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008036,
                 Name = "Neutral Observer",
                 Level = 40, Health = 1650, MonsterData = 165188, Scale = 103, VisualFlags = 31, HeadMesh = 40690, RunSpeed = 137,
                 NpcFamily = 103, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
@@ -173,6 +182,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008043,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -185,6 +195,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008044,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -197,6 +208,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008031,
                 Name = "Omni Unicorn Squadleader Fixx",
                 Level = 100, Health = 6829, MonsterData = 247041, Scale = 156, VisualFlags = 31, HeadMesh = 0, RunSpeed = 346,
                 NpcFamily = 219, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1739,
@@ -209,6 +221,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008032,
                 Name = "Clan Field Surgeon Elsa Oosta",
                 Level = 100, Health = 6829, MonsterData = 26080, Scale = 112, VisualFlags = 31, HeadMesh = 40637, RunSpeed = 346,
                 NpcFamily = 87, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1833,
@@ -221,6 +234,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008039,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -233,6 +247,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008040,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -245,6 +260,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008045,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 42536,
@@ -257,6 +273,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008046,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 42536,
@@ -269,6 +286,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008047,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 42536,
@@ -281,6 +299,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008048,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 42536,
@@ -293,6 +312,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008041,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -305,6 +325,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008042,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -317,6 +338,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008027,
                 Name = "Brandon Thorn",
                 Level = 40, Health = 1650, MonsterData = 204985, Scale = 103, VisualFlags = 31, HeadMesh = 40700, RunSpeed = 137,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
@@ -329,6 +351,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1007985,
                 Name = "ICC Bio-Inspector",
                 Level = 25, Health = 941, MonsterData = 26151, Scale = 100, VisualFlags = 31, HeadMesh = 223923, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1640,
@@ -341,6 +364,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008028,
                 Name = "Manager Travis Molen",
                 Level = 100, Health = 6829, MonsterData = 26084, Scale = 112, VisualFlags = 31, HeadMesh = 40689, RunSpeed = 346,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
@@ -353,6 +377,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008049,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -365,6 +390,7 @@ namespace AORebirth.Core.Playfields
             },
             new ShuttleportNpc
             {
+                SourceNpcId = 1008050,
                 Name = "ICC Shuttle Guard",
                 Level = 25, Health = 941, MonsterData = 254118, Scale = 105, VisualFlags = 31, HeadMesh = 40627, RunSpeed = 129,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 269095425, AppearanceValue = 1576,
@@ -429,6 +455,31 @@ namespace AORebirth.Core.Playfields
             Action<ICharacter> activateNpc,
             ShuttleportNpc def)
         {
+            IccShuttleportPlacementRecord sourcePlacement;
+            string placementFailure;
+            if (!IccShuttleportPlacementCatalog.TryGetRuntimeActive(
+                    def.SourceNpcId,
+                    out sourcePlacement,
+                    out placementFailure))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "IccShuttleportSpawn placement blocked npcId=" + def.SourceNpcId
+                    + " npc=" + def.Name + " reason=" + placementFailure);
+                return false;
+            }
+
+            if (def.Level < sourcePlacement.MinLevel || def.Level > sourcePlacement.MaxLevel)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "IccShuttleportSpawn placement level blocked npcId=" + def.SourceNpcId
+                    + " npc=" + def.Name + " level=" + def.Level
+                    + " sourceRange=" + sourcePlacement.MinLevel + ".."
+                    + sourcePlacement.MaxLevel);
+                return false;
+            }
+
             var npcController = new NPCController
             {
                 AiProfile = def.CombatContractFactory == null
@@ -441,7 +492,12 @@ namespace AORebirth.Core.Playfields
             Character mob = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                 templateHash,
                 playfieldIdentity,
-                new Coordinate { x = def.X, y = def.Y, z = def.Z },
+                new Coordinate
+                {
+                    x = sourcePlacement.PositionX,
+                    y = sourcePlacement.PositionY,
+                    z = sourcePlacement.PositionZ
+                },
                 new Quaternion(def.Hx, def.Hy, def.Hz, def.Hw),
                 npcController,
                 def.Level);
@@ -450,7 +506,8 @@ namespace AORebirth.Core.Playfields
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
-                    "IccShuttleportSpawn FAILED template=" + templateHash + " npc=" + def.Name);
+                    "IccShuttleportSpawn FAILED sourceNpcId=" + sourcePlacement.NpcId
+                    + " template=" + templateHash + " npc=" + def.Name);
                 return false;
             }
 
@@ -494,7 +551,13 @@ namespace AORebirth.Core.Playfields
 
             ApplyAppearance(mob, def);
             ApplyWaypoints(mob, npcController, def);
-            mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
+            mob.Coordinates(
+                new Coordinate
+                {
+                    x = sourcePlacement.PositionX,
+                    y = sourcePlacement.PositionY,
+                    z = sourcePlacement.PositionZ
+                });
 
             if (def.CombatContractFactory != null)
             {

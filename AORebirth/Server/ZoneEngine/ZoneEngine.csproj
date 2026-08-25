@@ -564,6 +564,8 @@
     <Compile Include="Core\Playfields\RomeBlueCitySpawn.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqSpawn.cs" />
     <Compile Include="Core\Playfields\IccShuttleportSpawn.cs" />
+    <Compile Include="Core\Playfields\IccShuttleportPlacementCatalog.cs" />
+    <Compile Include="Core\Playfields\IccShuttleportPlacementCatalog.g.cs" />
     <Compile Include="Core\Playfields\IccShuttleportBasicCombatCatalog.g.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />

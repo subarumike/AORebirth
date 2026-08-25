@@ -397,6 +397,18 @@ migrations; details and exact source references are recorded in
   where exact combat evidence is insufficient.
 - Rubi-Ka character creation persists its initial Arete location as PF 6553,
   X 3607.6, Y 52.4, Z 785.7 without integer rounding.
+- PF4582 ICC Shuttleport has a checked-in authoritative placement layer with
+  all 206 source records, 206 unique `NpcId` values, 38 template hashes, and
+  all duplicate-position records preserved. The 25 previously implemented
+  placements are reconciled and remain the only runtime-active rows; 181 new
+  placements and 24 unresolved template hashes remain fail-closed. Source
+  names, flags, and candidate respawn timing remain placement metadata rather
+  than behavioral authority. The pinned deterministic TemplateHash audit
+  verifies all 14 baseline mappings at repository-governance level and classifies
+  the 24 unresolved hashes as 0 proven, 17 candidate, 1 ambiguous, and 6 with no
+  reliable identity evidence. Those 24 hashes account for 171 blocked rows; 10
+  additional blocked Island Reet rows use the baseline-mapped ISRE hash. No audit
+  result grants runtime activation.
 - PF127 Subway is complete for its current capture-backed population,
   navigation, combat, lifecycle, loot, vendor, Karrec, zoning, and teardown
   contracts. New behavior still requires capture evidence.

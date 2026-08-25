@@ -365,6 +365,43 @@ The upstream ODS is provenance only because its mission cells after level 133
 were precision-coerced. Do not generate the complete graph from that ODS and do
 not make production depend on either spreadsheet file.
 
+## PF4582 Authoritative Placement Import
+
+Regenerate the normalized ICC Shuttleport placement catalog and audit report
+from the checked-in authoritative source and runtime evidence map with:
+
+```cmd
+cmd /d /c Tools\generate_pf4582_placements.cmd
+```
+
+Verify byte-for-byte reproducibility, strict source validation, duplicate-position
+retention, and fail-closed runtime activation with:
+
+```cmd
+cmd /d /c Tools\run_pf4582_placement_tests.cmd
+```
+
+The placement source proves 206 placement records only. `NpcId` is the placement
+key. Candidate respawn timing, names, flags, and unknown fields remain metadata;
+they do not authorize movement, combat, loot, scripts, or runtime activation.
+Only explicitly mapped existing runtime definitions may be active.
+
+Audit all 38 numeric PF4582 `TemplateHash` groups against the governed evidence
+ledger without changing runtime activation:
+
+```cmd
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd --check
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd --test
+```
+
+The audit pins its structured inputs, emits deterministic JSON and Markdown, and
+fails closed on drift or conflicting evidence. The 24 baseline-unresolved hashes
+account for 171 blocked placements. Ten additional blocked Island Reet rows use
+the baseline-mapped ISRE hash, so the complete runtime blocked count remains 181.
+No audit classification authorizes activation; promotion requires a separate
+task with a stable source `TemplateHash` or `NpcId` to AO identity/profile bridge.
+
 ## AOtomation Messaging Tests
 
 Build and run the legacy MSTest assembly through the repo-owned wrapper:

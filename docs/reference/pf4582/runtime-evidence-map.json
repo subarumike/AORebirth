@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "playfieldId": 4582,
+  "sourceSha256": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32",
+  "placementSource": "docs/reference/pf4582/PlayfieldDistrictInfo.json",
+  "runtimeEvidence": [
+    "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
+    "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json"
+  ],
+  "runtimeMappings": [
+    { "npcId": 1007858, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007985, "sourceName": "ICC Bio-Inspector", "runtimeProfile": "IccShuttleportSpawn:ICC Bio-Inspector" },
+    { "npcId": 1008027, "sourceName": "Brandon Thorn", "runtimeProfile": "IccShuttleportSpawn:Brandon Thorn" },
+    { "npcId": 1008028, "sourceName": "Manager Travis Molen", "runtimeProfile": "IccShuttleportSpawn:Manager Travis Molen" },
+    { "npcId": 1008029, "sourceName": "Omni-Tek Equipment Vendor", "runtimeProfile": "IccShuttleportSpawn:Omni-Trans Equipment Vendor" },
+    { "npcId": 1008030, "sourceName": "Clan Equipment Vendor", "runtimeProfile": "IccShuttleportSpawn:Clan Equipment Vendor" },
+    { "npcId": 1008031, "sourceName": "Omni Unicorn Squadleader Fixx", "runtimeProfile": "IccShuttleportSpawn:Omni Unicorn Squadleader Fixx" },
+    { "npcId": 1008032, "sourceName": "Clan Field Surgeon Elsa Oosta", "runtimeProfile": "IccShuttleportSpawn:Clan Field Surgeon Elsa Oosta" },
+    { "npcId": 1008033, "sourceName": "Vendor Antonio Stacklund", "runtimeProfile": "IccShuttleportSpawn:Vendor Antonio Stacklund" },
+    { "npcId": 1008034, "sourceName": "Clan Recruiter", "runtimeProfile": "IccShuttleportSpawn:Clan Recruiter" },
+    { "npcId": 1008035, "sourceName": "Omni-Tek Recruitment Officer", "runtimeProfile": "IccShuttleportSpawn:Omni-Tek Recruitment Officer" },
+    { "npcId": 1008036, "sourceName": "Neutral Observer", "runtimeProfile": "IccShuttleportSpawn:Neutral Observer" },
+    { "npcId": 1008037, "sourceName": "Adri Afeli", "runtimeProfile": "IccShuttleportSpawn:Adri Afeli" },
+    { "npcId": 1008039, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008040, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008041, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008042, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008043, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008044, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008045, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008046, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008047, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008048, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008049, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
+    { "npcId": 1008050, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" }
+  ],
+  "unresolvedDynamicSourceNameNpcIds": [
+    1007961,
+    1007963,
+    1007964,
+    1007965,
+    1007966,
+    1007967,
+    1008051
+  ],
+  "unresolvedSemantics": [
+    "BossMods",
+    "ExFlags",
+    "SpawnAngle",
+    "SpawnAngleW",
+    "SpawnChance",
+    "SpawnPointFlags",
+    "SpawnTime",
+    "SpawnUnknowns"
+  ]
+}
