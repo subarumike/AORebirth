@@ -56,6 +56,7 @@ namespace ZoneEngine.Core
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine.ChatCommands;
+    using ZoneEngine.Core.Playfields.Hydration;
     using ZoneEngine.Script;
 
     using IBus = MemBus.IBus;
@@ -80,6 +81,8 @@ namespace ZoneEngine.Core
         /// </summary>
         private readonly RuntimeOwnershipRegistry<int, IPlayfield> playfields;
 
+        private readonly PlayfieldInstantiationCoordinator playfieldInstantiation;
+
         private readonly DisposeContainer memBusDisposeContainer = new DisposeContainer();
 
         private readonly IBus zoneBus;
@@ -98,6 +101,10 @@ namespace ZoneEngine.Core
         {
             // TODO: Get the Server id from chatengine or config file
             this.Id = 0x356;
+            this.playfieldInstantiation =
+                new PlayfieldInstantiationCoordinator(
+                    PlayfieldHydrationMode.Legacy,
+                    new LegacyPlayfieldRuntimeMaterializer(this.MaterializeLegacyPlayfield));
             this.playfields =
                 new RuntimeOwnershipRegistry<int, IPlayfield>(this.CreateOwnedPlayfield);
             this.ClientDisconnected += this.ZoneServerClientDisconnected;
@@ -318,6 +325,11 @@ namespace ZoneEngine.Core
         }
 
         private IPlayfield CreateOwnedPlayfield(int playfieldInstance)
+        {
+            return this.playfieldInstantiation.Materialize(playfieldInstance);
+        }
+
+        private IPlayfield MaterializeLegacyPlayfield(int playfieldInstance)
         {
             return new Playfield(
                 this,
