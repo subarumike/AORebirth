@@ -14,6 +14,7 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
+    using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -36,6 +37,9 @@ namespace ZoneEngine.Core.Playfields
     /// </summary>
     internal sealed class UnifiedPlayfieldContentHydrationService
     {
+        // Toggle NEW dynamic-hydration diagnostics independently from OLD static diagnostics.
+        private const bool EnableNewContentConsoleDiagnostics = true;
+
         private readonly Playfield playfield;
         private readonly Identity playfieldIdentity;
         private readonly PlayfieldDynelRegistry dynelRegistry;
@@ -58,9 +62,15 @@ namespace ZoneEngine.Core.Playfields
         /// </summary>
         internal void HydrateFromDatabase()
         {
+            string stage = "configuration DAO";
+            ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} START");
+            try
+            {
             // 1) Load configuration for this playfield
+            ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} -> PlayfieldConfigurationDao.GetByPlayfieldId");
             var config = PlayfieldConfigurationDao.Instance.GetByPlayfieldId(
                 this.playfieldIdentity.Instance);
+            ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} <- configuration {(config == null ? "NULL" : "FOUND")}");
 
             if (config == null)
             {
@@ -83,23 +93,33 @@ namespace ZoneEngine.Core.Playfields
                 $"Starting unified hydration for PF {this.playfieldIdentity.Instance}");
 
             // 2) Hydrate ordinary enemies (if applicable)
+            stage = "ordinary enemy spawn DAO";
             int npcCount = this.HydrateOrdinaryEnemies(config);
 
             // 3) Hydrate vendors
+            stage = "vendor DAO";
             int shopCount = this.HydrateVendors(config);
 
             // 4) Hydrate static dynels
+            stage = "static dynel DAO";
             int staticDynelCount = this.HydrateStaticDynels(config);
 
             string hydrationSummary =
                 $"[Unified hydration] Playfield {this.playfieldIdentity.Instance}: " +
                 $"NPCs/mobs={npcCount}, shops={shopCount}, static dynels={staticDynelCount}.";
-            Console.WriteLine(hydrationSummary);
+            ConsoleLog(hydrationSummary);
             LogUtil.Debug(DebugInfoDetail.Engine, hydrationSummary);
+            }
+            catch (Exception ex)
+            {
+                ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} FAILED stage={stage}: {ex}");
+                throw;
+            }
         }
 
         private int HydrateVendors(DBPlayfieldConfiguration config)
         {
+            ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} -> PlayfieldVendorDao.GetByPlayfieldId");
             var vendors = PlayfieldVendorDao.Instance
                 .GetByPlayfieldId(this.playfieldIdentity.Instance)
                 .ToList();
@@ -134,9 +154,12 @@ namespace ZoneEngine.Core.Playfields
         private int HydrateOrdinaryEnemies(DBPlayfieldConfiguration config)
         {
             // Load all spawns for this playfield
+            ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} -> OrdinaryEnemySpawnDao.GetByPlayfieldId");
             var spawns = OrdinaryEnemySpawnDao.Instance
                 .GetByPlayfieldId(this.playfieldIdentity.Instance)
                 .ToList();
+            ConsoleLog(
+                $"[Unified hydration][DB] PF {this.playfieldIdentity.Instance} ordinary spawn rows={spawns.Count}");
 
             if (spawns.Count == 0)
             {
@@ -152,6 +175,7 @@ namespace ZoneEngine.Core.Playfields
             foreach (var spawn in spawns)
             {
                 // Load profile
+                ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} -> OrdinaryEnemyProfileDao.GetByProfileKey key={spawn.ProfileKey}");
                 var profile = OrdinaryEnemyProfileDao.Instance.GetByProfileKey(spawn.ProfileKey);
 
                 if (profile == null)
@@ -176,6 +200,9 @@ namespace ZoneEngine.Core.Playfields
 
                     this.dynelRegistry.Register(npc);
                     this.activateNpc(npc);
+                    this.DumpHydratedNpc(npc, spawn, profile);
+                    ConsoleLog(
+                        $"[Unified hydration][NPC] PF {this.playfieldIdentity.Instance} sourceSpawn={spawn.SpawnId} runtime={npc.Identity} activated");
                     instantiated++;
                 }
                 catch (Exception ex)
@@ -183,6 +210,8 @@ namespace ZoneEngine.Core.Playfields
                     LogUtil.Debug(
                         DebugInfoDetail.Engine,
                         $"Failed to instantiate ordinary enemy spawn {spawn.SpawnId}: {ex.Message}");
+                    ConsoleLog(
+                        $"[Unified hydration][NPC] PF {this.playfieldIdentity.Instance} sourceSpawn={spawn.SpawnId} FAILED: {ex}");
                     failed++;
                 }
             }
@@ -199,10 +228,11 @@ namespace ZoneEngine.Core.Playfields
             DBOrdinaryEnemyProfile profile)
         {
             // Create NPC entity
+            int runtimeInstance = Pool.Instance.GetFreeInstance<Character>(1000000, IdentityType.CanbeAffected);
             var identity = new Identity
             {
                 Type = IdentityType.CanbeAffected,
-                Instance = spawn.SpawnId
+                Instance = runtimeInstance
             };
             var controller = new NPCController();
             var npc = new Character(this.playfield.Identity, identity, controller);
@@ -213,6 +243,7 @@ namespace ZoneEngine.Core.Playfields
                     spawn.OrientationW),
   */
             controller.Character = npc;
+            npc.Read();
             npc.Playfield = this.playfield;
             npc.Name = profile.EnemyName;
             npc.Coordinates(
@@ -282,6 +313,12 @@ namespace ZoneEngine.Core.Playfields
             DBOrdinaryEnemyProfile profile,
             int level)
         {
+            // CalculateIP assumes valid one-based breed/profession values. A freshly
+            // materialized NPC starts at zero, which underflows breed - 1 and causes
+            // an IndexOutOfRangeException while any dependent stat is recalculated.
+            npc.Stats[StatIds.breed].SetBaseValue(1);
+            npc.Stats[StatIds.profession].SetBaseValue(1);
+
             // Set MonsterData for loot resolution
             npc.Stats[StatIds.monsterdata].Value = (int)profile.MonsterData;
 
@@ -382,6 +419,7 @@ namespace ZoneEngine.Core.Playfields
 
         private int HydrateStaticDynels(DBPlayfieldConfiguration config)
         {
+            ConsoleLog($"[NEW unified hydration][DB] PF {this.playfieldIdentity.Instance} -> PlayfieldStaticDynelDao.GetByPlayfieldId");
             var staticDynels = PlayfieldStaticDynelDao.Instance
                 .GetByPlayfieldId(this.playfieldIdentity.Instance)
                 .ToList();
@@ -432,6 +470,34 @@ namespace ZoneEngine.Core.Playfields
                 $"Static dynel type '{def.DynelType}' not yet implemented (ID {def.StaticDynelId}).");
 
             return null;
+        }
+
+        private static void ConsoleLog(string message)
+        {
+            if (EnableNewContentConsoleDiagnostics)
+            {
+                Console.WriteLine(message);
+            }
+        }
+
+        private void DumpHydratedNpc(
+            ICharacter npc,
+            DBOrdinaryEnemySpawn spawn,
+            DBOrdinaryEnemyProfile profile)
+        {
+            ConsoleLog(
+                $"[NEW unified hydration][NPC DUMP] "
+                + $"PF={this.playfieldIdentity.Instance} "
+                + $"sourceSpawn={spawn.SpawnId} "
+                + $"runtime={npc.Identity} "
+                + $"name='{npc.Name}' "
+                + $"profileKey='{profile.ProfileKey}' "
+                + $"monsterData={profile.MonsterData} "
+                + $"position={npc.Coordinates()} "
+                + $"level={npc.Stats[StatIds.level].Value} "
+                + $"breed={npc.Stats[StatIds.breed].Value} "
+                + $"profession={npc.Stats[StatIds.profession].Value} "
+                + $"registered=true activated=true");
         }
     }
 }

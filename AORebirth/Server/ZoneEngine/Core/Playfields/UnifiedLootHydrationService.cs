@@ -14,6 +14,9 @@ namespace ZoneEngine.Core.Playfields
     /// </summary>
     internal sealed class UnifiedLootHydrationService
     {
+        // Toggle NEW dynamic-loot diagnostics independently from OLD static diagnostics.
+        private const bool EnableNewLootConsoleDiagnostics = true;
+
         private readonly LootTableRegistry registry;
         private readonly int playfieldId;
 
@@ -28,7 +31,12 @@ namespace ZoneEngine.Core.Playfields
         /// </summary>
         internal void HydrateFromDatabase()
         {
+            string stage = "global loot table DAO";
+            ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} START");
+            try
+            {
             // 1) Charger tables globales
+            ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} -> LootTableDefinitionDao.GetGlobal");
             var globalTables = LootTableDefinitionDao.Instance.GetGlobal().ToList();
             foreach (var dbTable in globalTables)
             {
@@ -46,6 +54,8 @@ namespace ZoneEngine.Core.Playfields
             }
 
             // 2) Charger tables playfield-spécifiques
+            stage = "playfield loot table DAO";
+            ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} -> LootTableDefinitionDao.GetByPlayfieldId");
             var pfTables = LootTableDefinitionDao.Instance.GetByPlayfieldId(this.playfieldId).ToList();
             foreach (var dbTable in pfTables)
             {
@@ -63,6 +73,8 @@ namespace ZoneEngine.Core.Playfields
             }
 
             // 3) Charger assignations globales
+            stage = "global loot assignment DAO";
+            ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} -> LootAssignmentDao.GetGlobal");
             var globalAssignments = LootAssignmentDao.Instance.GetGlobal().ToList();
             foreach (var dbAssign in globalAssignments)
             {
@@ -80,6 +92,8 @@ namespace ZoneEngine.Core.Playfields
             }
 
             // 4) Charger assignations playfield-spécifiques
+            stage = "playfield loot assignment DAO";
+            ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} -> LootAssignmentDao.GetByPlayfieldId");
             var pfAssignments = LootAssignmentDao.Instance.GetByPlayfieldId(this.playfieldId).ToList();
             foreach (var dbAssign in pfAssignments)
             {
@@ -99,6 +113,13 @@ namespace ZoneEngine.Core.Playfields
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 $"Playfield {this.playfieldId} loot hydration complete.");
+            ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} COMPLETE");
+            }
+            catch (Exception ex)
+            {
+                ConsoleLog($"[NEW unified loot][DB] PF {this.playfieldId} FAILED stage={stage}: {ex}");
+                throw;
+            }
         }
 
         private LootTableDefinition ConvertDBTableToDefinition(DBLootTableDefinition db)
@@ -148,6 +169,14 @@ namespace ZoneEngine.Core.Playfields
                 return new int[0];
             // Parse JSON array
             return new int[0]; // Stub
+        }
+
+        private static void ConsoleLog(string message)
+        {
+            if (EnableNewLootConsoleDiagnostics)
+            {
+                Console.WriteLine(message);
+            }
         }
 
         private LootAssignmentDefinition ConvertDBAssignmentToDefinition(DBLootAssignment db)

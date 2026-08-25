@@ -31,6 +31,7 @@
 
 namespace AORebirth.Database.Dao
 {
+
     #region Usings ...
 
     using System;
@@ -45,6 +46,27 @@ namespace AORebirth.Database.Dao
     using Dapper;
 
     #endregion
+    public static class DaoDiagnostics
+    {
+        // Independent DAO SQL switch. OLD/NEW hydration switches do not change this value.
+        public static bool EnableConsoleSqlDiagnostics = true;
+
+        public static void Trace(string operation, string sql, object parameters = null)
+        {
+            if (!EnableConsoleSqlDiagnostics)
+            {
+                return;
+            }
+
+            string parameterText = parameters == null
+                ? string.Empty
+                : string.Join(", ", parameters.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Select(property => property.Name + "=" + (property.GetValue(parameters, null) ?? "NULL")));
+            Console.WriteLine(
+                "[DAO SQL][" + operation + "] " + sql
+                + (parameterText.Length == 0 ? string.Empty : " | params: " + parameterText));
+        }
+    }
 
     /// <summary>
     /// </summary>
@@ -166,10 +188,9 @@ namespace AORebirth.Database.Dao
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
-                    rowsAffected = conn.Execute(
-                        SqlMapperUtil.CreateInsertSQL(this.TableName, entity, dontUseId),
-                        entity,
-                        trans);
+                    string sql = SqlMapperUtil.CreateInsertSQL(this.TableName, entity, dontUseId);
+                    DaoDiagnostics.Trace("INSERT", sql, entity);
+                    rowsAffected = conn.Execute(sql, entity, trans);
 
                     // Does this need to be inside of the transaction or outside?? -- Algorithman
 
@@ -251,10 +272,10 @@ namespace AORebirth.Database.Dao
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
-                    rowsAffected = conn.Execute(
-                        SqlMapperUtil.CreateDeleteSQL(this.TableName),
-                        new { id = entityId },
-                        trans);
+                    string sql = SqlMapperUtil.CreateDeleteSQL(this.TableName);
+                    var parameters = new { id = entityId };
+                    DaoDiagnostics.Trace("DELETE", sql, parameters);
+                    rowsAffected = conn.Execute(sql, parameters, trans);
 
                     if (ownsTransaction)
                     {
@@ -323,10 +344,9 @@ namespace AORebirth.Database.Dao
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
-                    rowsAffected = conn.Execute(
-                        SqlMapperUtil.CreateDeleteSQL(this.TableName, whereParameters),
-                        whereParameters,
-                        trans);
+                    string sql = SqlMapperUtil.CreateDeleteSQL(this.TableName, whereParameters);
+                    DaoDiagnostics.Trace("DELETE", sql, whereParameters);
+                    rowsAffected = conn.Execute(sql, whereParameters, trans);
 
                     if (ownsTransaction)
                     {
@@ -381,10 +401,10 @@ namespace AORebirth.Database.Dao
             bool exists = false;
             using (IDbConnection conn = Connector.GetConnection())
             {
-                exists =
-                    conn.Query<int>(
-                        string.Format("SELECT ID FROM {0} where ID = @id", this.TableName),
-                        new { id = entityId }).Count() == 1;
+                string sql = string.Format("SELECT ID FROM {0} where ID = @id", this.TableName);
+                var parameters = new { id = entityId };
+                DaoDiagnostics.Trace("SELECT", sql, parameters);
+                exists = conn.Query<int>(sql, parameters).Count() == 1;
             }
 
             return exists;
@@ -404,10 +424,10 @@ namespace AORebirth.Database.Dao
             T entity = default(T);
             using (IDbConnection conn = Connector.GetConnection())
             {
-                entity =
-                    conn.Query<T>(
-                        SqlMapperUtil.CreateGetSQL(this.TableName, new { Id = entityId }),
-                        new { Id = entityId }).SingleOrDefault();
+                var parameters = new { Id = entityId };
+                string sql = SqlMapperUtil.CreateGetSQL(this.TableName, parameters);
+                DaoDiagnostics.Trace("SELECT", sql, parameters);
+                entity = conn.Query<T>(sql, parameters).SingleOrDefault();
             }
 
             return entity;
@@ -426,7 +446,9 @@ namespace AORebirth.Database.Dao
             IEnumerable<T> entities = null;
             using (IDbConnection conn = Connector.GetConnection())
             {
-                entities = conn.Query<T>(SqlMapperUtil.CreateGetSQL(this.TableName, parameters), parameters);
+                string sql = SqlMapperUtil.CreateGetSQL(this.TableName, parameters);
+                DaoDiagnostics.Trace("SELECT", sql, parameters);
+                entities = conn.Query<T>(sql, parameters);
             }
 
             return entities;
@@ -461,10 +483,10 @@ namespace AORebirth.Database.Dao
                 try
                 {
                     trans = trans ?? conn.BeginTransaction();
-                    rowsAffected = conn.Execute(
-                        SqlMapperUtil.CreateUpdateSQL(this.TableName, parameters ?? entity),
-                        parameters ?? entity,
-                        trans);
+                    object updateParameters = parameters ?? entity;
+                    string sql = SqlMapperUtil.CreateUpdateSQL(this.TableName, updateParameters);
+                    DaoDiagnostics.Trace("UPDATE", sql, updateParameters);
+                    rowsAffected = conn.Execute(sql, updateParameters, trans);
 
                     if (ownsTransaction)
                     {
@@ -619,7 +641,9 @@ namespace AORebirth.Database.Dao
                 IDbTransaction trans = transaction;
                 try
                 {
-                    result = conn.Query<T>(SqlMapperUtil.CreateGetSQL(this.TableName, parameter), parameter, trans);
+                    string sql = SqlMapperUtil.CreateGetSQL(this.TableName, parameter);
+                    DaoDiagnostics.Trace("SELECT", sql, parameter);
+                    result = conn.Query<T>(sql, parameter, trans);
                 }
                 finally
                 {
@@ -656,7 +680,9 @@ namespace AORebirth.Database.Dao
                 IDbTransaction trans = transaction;
                 try
                 {
-                    result = conn.Query<long>(SqlMapperUtil.CreateCountSQL(this.TableName, parameter), parameter, trans).Single();
+                    string sql = SqlMapperUtil.CreateCountSQL(this.TableName, parameter);
+                    DaoDiagnostics.Trace("COUNT", sql, parameter);
+                    result = conn.Query<long>(sql, parameter, trans).Single();
                 }
                 finally
                 {

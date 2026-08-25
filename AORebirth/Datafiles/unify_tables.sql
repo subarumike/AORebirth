@@ -1,263 +1,260 @@
--- Ces tables existent probablement déjà, à vérifier/adapter
+-- Unified hydration schema. Column names intentionally match C# entity properties.
+
 CREATE TABLE IF NOT EXISTS loot_table_definitions (
-    loot_table_key VARCHAR(255) PRIMARY KEY,
-    display_name VARCHAR(255),
-    table_type VARCHAR(50),  -- 'GlobalDefault', 'Family', 'EnemyType', 'SpawnOverride', 'Boss', etc.
-    roll_mode VARCHAR(50),   -- 'All', 'WeightedOne', 'WeightedMany', 'Independent', 'Guaranteed', 'ObservedSnapshot'
-    credits_policy_mode VARCHAR(50),  -- 'None', 'Fixed', 'Range', 'ObservedSet', 'ObservedSamples'
-    credits_min INT,
-    credits_max INT,
-    credits_observed_json JSON,  -- Liste des crédits observés en captures
-    quality_policy VARCHAR(255),
-    item_pool_unresolved BOOLEAN,
-    evidence_json JSON,
-    confidence VARCHAR(50),  -- 'ProvenRepository', 'ProvenCapture', 'CommunityDocumented', etc.
-    enabled BOOLEAN DEFAULT true,
-    playfield_id INT,  -- NEW: null = global, ou PF spécifique
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_playfield (playfield_id),
-    INDEX idx_enabled (enabled)
+    LootTableKey VARCHAR(255) PRIMARY KEY,
+    DisplayName VARCHAR(255),
+    TableType VARCHAR(50),
+    RollMode VARCHAR(50),
+    CreditsPolicyMode VARCHAR(50),
+    CreditsMin INT,
+    CreditsMax INT,
+    CreditsObservedJson JSON,
+    QualityPolicy VARCHAR(255),
+    ItemPoolUnresolved BOOLEAN,
+    EvidenceJson JSON,
+    Confidence VARCHAR(50),
+    Enabled BOOLEAN DEFAULT true,
+    PlayfieldId INT,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_playfield (PlayfieldId),
+    INDEX idx_enabled (Enabled)
 );
 
 CREATE TABLE IF NOT EXISTS loot_roll_groups (
-    roll_group_id INT PRIMARY KEY AUTO_INCREMENT,
-    loot_table_key VARCHAR(255),
-    loot_group_key VARCHAR(255),
-    roll_mode VARCHAR(50),
-    roll_count INT,
-    empty_weight INT,
-    drop_chance_basis_points INT,  -- 0-10000
-    conditions_json JSON,  -- Conditions applicabilité
-    FOREIGN KEY (loot_table_key) REFERENCES loot_table_definitions(loot_table_key) ON DELETE CASCADE,
-    UNIQUE KEY uk_group (loot_table_key, loot_group_key)
+    RollGroupId INT PRIMARY KEY AUTO_INCREMENT,
+    LootTableKey VARCHAR(255),
+    LootGroupKey VARCHAR(255),
+    RollMode VARCHAR(50),
+    RollCount INT,
+    EmptyWeight INT,
+    DropChanceBasisPoints INT,
+    ConditionsJson JSON,
+    FOREIGN KEY (LootTableKey) REFERENCES loot_table_definitions(LootTableKey) ON DELETE CASCADE,
+    UNIQUE KEY uk_group (LootTableKey, LootGroupKey)
 );
 
 CREATE TABLE IF NOT EXISTS loot_entries (
-    loot_entry_id INT PRIMARY KEY AUTO_INCREMENT,
-    roll_group_id INT,
-    selection_key VARCHAR(255),
-    item_template_id INT,
-    high_item_template_id INT,
-    fixed_quality INT,
-    uses_enemy_level_quality BOOLEAN,
-    min_quality INT,
-    max_quality INT,
-    min_quantity INT,
-    max_quantity INT,
-    weight INT,
-    drop_chance_basis_points INT,
-    unique_per_corpse BOOLEAN,
-    semantics VARCHAR(50),  -- 'GuaranteedProven', 'ObservedAvailable', etc.
-    evidence VARCHAR(255),
-    evidence_reference TEXT,
-    linkage_evidence TEXT,
-    probability_evidence TEXT,
-    FOREIGN KEY (roll_group_id) REFERENCES loot_roll_groups(roll_group_id) ON DELETE CASCADE
+    LootEntryId INT PRIMARY KEY AUTO_INCREMENT,
+    RollGroupId INT,
+    SelectionKey VARCHAR(255),
+    ItemTemplateId INT,
+    HighItemTemplateId INT,
+    FixedQuality INT,
+    UsesEnemyLevelQuality BOOLEAN,
+    MinQuality INT,
+    MaxQuality INT,
+    MinQuantity INT,
+    MaxQuantity INT,
+    Weight INT,
+    DropChanceBasisPoints INT,
+    UniquePerCorpse BOOLEAN,
+    Semantics VARCHAR(50),
+    Evidence VARCHAR(255),
+    EvidenceReference TEXT,
+    LinkageEvidence TEXT,
+    ProbabilityEvidence TEXT,
+    FOREIGN KEY (RollGroupId) REFERENCES loot_roll_groups(RollGroupId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS loot_observed_corpse_snapshots (
-    snapshot_id INT PRIMARY KEY AUTO_INCREMENT,
-    loot_table_key VARCHAR(255),
-    snapshot_key VARCHAR(255),
-    credits INT,
-    evidence VARCHAR(255),
-    selection_probability_evidence VARCHAR(255),
-    evidence_reference TEXT,
-    FOREIGN KEY (loot_table_key) REFERENCES loot_table_definitions(loot_table_key) ON DELETE CASCADE,
-    UNIQUE KEY uk_snapshot (loot_table_key, snapshot_key)
+    SnapshotId INT PRIMARY KEY AUTO_INCREMENT,
+    LootTableKey VARCHAR(255),
+    SnapshotKey VARCHAR(255),
+    Credits INT,
+    Evidence VARCHAR(255),
+    SelectionProbabilityEvidence VARCHAR(255),
+    EvidenceReference TEXT,
+    FOREIGN KEY (LootTableKey) REFERENCES loot_table_definitions(LootTableKey) ON DELETE CASCADE,
+    UNIQUE KEY uk_snapshot (LootTableKey, SnapshotKey)
 );
 
 CREATE TABLE IF NOT EXISTS loot_snapshot_entries (
-    snapshot_entry_id INT PRIMARY KEY AUTO_INCREMENT,
-    snapshot_id INT,
-    item_template_id INT,
-    high_item_template_id INT,
-    fixed_quality INT,
-    uses_enemy_level_quality BOOLEAN,
-    min_quality INT,
-    max_quality INT,
-    min_quantity INT,
-    max_quantity INT,
-    semantics VARCHAR(50),
-    evidence VARCHAR(255),
-    FOREIGN KEY (snapshot_id) REFERENCES loot_observed_corpse_snapshots(snapshot_id) ON DELETE CASCADE
+    SnapshotEntryId INT PRIMARY KEY AUTO_INCREMENT,
+    SnapshotId INT,
+    ItemTemplateId INT,
+    HighItemTemplateId INT,
+    FixedQuality INT,
+    UsesEnemyLevelQuality BOOLEAN,
+    MinQuality INT,
+    MaxQuality INT,
+    MinQuantity INT,
+    MaxQuantity INT,
+    Semantics VARCHAR(50),
+    Evidence VARCHAR(255),
+    FOREIGN KEY (SnapshotId) REFERENCES loot_observed_corpse_snapshots(SnapshotId) ON DELETE CASCADE
 );
 
--- Assignations : quelle table loot pour quel ennemi/spawn/famille
 CREATE TABLE IF NOT EXISTS loot_assignments (
-    assignment_key VARCHAR(255) PRIMARY KEY,
-    assignment_id INT UNIQUE AUTO_INCREMENT,
-    target_type VARCHAR(50),  -- 'Global', 'Family', 'EnemyType', 'Spawn', 'Boss', 'Encounter', 'Dungeon'
-    target_key VARCHAR(255),  -- spawn.key, family.key, enemy.type, etc.
-    loot_table_key VARCHAR(255),
-    playfield_id INT,  -- NEW: null = global, ou PF spécifique
-    encounter_key VARCHAR(255),  -- Si type = 'Encounter'
-    min_level INT,
-    max_level INT,
-    priority INT,
-    conditions_json JSON,
-    evidence TEXT,
-    confidence VARCHAR(50),
-    enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (loot_table_key) REFERENCES loot_table_definitions(loot_table_key),
-    INDEX idx_target (target_type, target_key),
-    INDEX idx_playfield (playfield_id),
-    INDEX idx_enabled (enabled)
+    AssignmentKey VARCHAR(255) PRIMARY KEY,
+    AssignmentId INT UNIQUE AUTO_INCREMENT,
+    TargetType VARCHAR(50),
+    TargetKey VARCHAR(255),
+    LootTableKey VARCHAR(255),
+    PlayfieldId INT,
+    EncounterKey VARCHAR(255),
+    MinLevel INT,
+    MaxLevel INT,
+    Priority INT,
+    ConditionsJson JSON,
+    Evidence TEXT,
+    Confidence VARCHAR(50),
+    Enabled BOOLEAN DEFAULT true,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (LootTableKey) REFERENCES loot_table_definitions(LootTableKey),
+    INDEX idx_target (TargetType, TargetKey),
+    INDEX idx_playfield (PlayfieldId),
+    INDEX idx_enabled (Enabled)
 );
 
--- Configuration globale playfield
-CREATE TABLE playfield_configurations (
-    playfield_id INT PRIMARY KEY,
-    playfield_name VARCHAR(255),
-    geometry_resource_id INT,
-    content_profile_key VARCHAR(255),  -- Référence stratégie peuplement
-    loot_profile_key VARCHAR(255),     -- NEW: référence ensemble tables loot pour ce PF
-    is_instanced BOOLEAN DEFAULT false,
-    max_instances INT,
-    respawn_policy_key VARCHAR(255),
-    enabled BOOLEAN DEFAULT true,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_enabled (enabled)
+CREATE TABLE IF NOT EXISTS playfield_configurations (
+    PlayfieldId INT PRIMARY KEY,
+    PlayfieldName VARCHAR(255),
+    GeometryResourceId INT,
+    ContentProfileKey VARCHAR(255),
+    LootProfileKey VARCHAR(255),
+    IsInstanced BOOLEAN DEFAULT false,
+    MaxInstances INT,
+    RespawnPolicyKey VARCHAR(255),
+    Enabled BOOLEAN DEFAULT true,
+    Description TEXT,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_enabled (Enabled)
 );
 
--- Stratégies de contenu
-CREATE TABLE playfield_content_profiles (
-    profile_key VARCHAR(255) PRIMARY KEY,
-    playfield_id INT,
-    content_type ENUM('ORDINARY_ENEMY_CATALOG', 'STATIC_DUNGEON', 'MISSION', 'PRIVATE_CITY', 'MIXED'),
-    suppress_db_mob_spawns BOOLEAN DEFAULT false,
-    loot_table_key_override VARCHAR(255),  -- Tableau loot spécifique si override
-    additional_flags JSON,
-    description TEXT,
-    evidence TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS playfield_content_profiles (
+    ProfileKey VARCHAR(255) PRIMARY KEY,
+    PlayfieldId INT,
+    ContentType ENUM('ORDINARY_ENEMY_CATALOG', 'STATIC_DUNGEON', 'MISSION', 'PRIVATE_CITY', 'MIXED'),
+    SuppressDbMobSpawns BOOLEAN DEFAULT false,
+    LootTableKeyOverride VARCHAR(255),
+    AdditionalFlags JSON,
+    Description TEXT,
+    Evidence TEXT,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Profils d'ennemis ordinaires (unification)
-CREATE TABLE ordinary_enemy_profiles (
-    profile_key VARCHAR(255) PRIMARY KEY,
-    monster_data INT,
-    enemy_name VARCHAR(255),
-    family_key VARCHAR(255),
-    aggression_mode ENUM('PASSIVE', 'RETALIATE', 'AUTO') DEFAULT 'PASSIVE',
-    aggression_radius FLOAT,
-    auto_aggro BOOLEAN DEFAULT false,
-    social_aggro BOOLEAN DEFAULT false,
-    social_aggro_radius FLOAT,
-    corpse_profile_key VARCHAR(255),
-    evidence_state VARCHAR(255),
-    playfield_id INT,  -- nullable pour réutilisabilité cross-playfield
-    loot_table_key VARCHAR(255),  -- NEW: loot pour ce profil (peut être overridé par spawn)
-    enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_playfield (playfield_id),
-    INDEX idx_family (family_key),
-    INDEX idx_enabled (enabled)
+CREATE TABLE IF NOT EXISTS ordinary_enemy_profiles (
+    ProfileKey VARCHAR(255) PRIMARY KEY,
+    MonsterData INT,
+    EnemyName VARCHAR(255),
+    FamilyKey VARCHAR(255),
+    AggressionMode ENUM('PASSIVE', 'RETALIATE', 'AUTO') DEFAULT 'PASSIVE',
+    AggressionRadius FLOAT,
+    AutoAggro BOOLEAN DEFAULT false,
+    SocialAggro BOOLEAN DEFAULT false,
+    SocialAggroRadius FLOAT,
+    CorpseProfileKey VARCHAR(255),
+    EvidenceState VARCHAR(255),
+    PlayfieldId INT,
+    LootTableKey VARCHAR(255),
+    Enabled BOOLEAN DEFAULT true,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_playfield (PlayfieldId),
+    INDEX idx_family (FamilyKey),
+    INDEX idx_enabled (Enabled)
 );
 
--- Spawns ordinaires
-CREATE TABLE ordinary_enemy_spawns (
-    spawn_id INT PRIMARY KEY AUTO_INCREMENT,
-    playfield_id INT NOT NULL,
-    profile_key VARCHAR(255) NOT NULL,
-    spawn_key VARCHAR(255) UNIQUE,  -- "subway.spawn.0x794DF1E5"
-    position_x FLOAT,
-    position_y FLOAT,
-    position_z FLOAT,
-    orientation_x FLOAT,
-    orientation_y FLOAT,
-    orientation_z FLOAT,
-    orientation_w FLOAT,
-    level_definition_key VARCHAR(255),  -- "fixed:10" ou "band:5-15"
-    min_level INT,
-    max_level INT,
-    respawn_seconds FLOAT DEFAULT 240,
-    patrol_route_id INT,
-    health_damage INT DEFAULT 0,
-    use_spawn_as_patrol_start BOOLEAN DEFAULT false,
-    loot_table_key_override VARCHAR(255),  -- NEW: override de loot si spawn spécifique
-    enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (playfield_id) REFERENCES playfield_configurations(playfield_id),
-    FOREIGN KEY (profile_key) REFERENCES ordinary_enemy_profiles(profile_key),
-    FOREIGN KEY (loot_table_key_override) REFERENCES loot_table_definitions(loot_table_key),
-    INDEX idx_playfield (playfield_id),
-    INDEX idx_profile (profile_key),
-    INDEX idx_enabled (enabled)
+CREATE TABLE IF NOT EXISTS ordinary_enemy_spawns (
+    SpawnId INT PRIMARY KEY AUTO_INCREMENT,
+    PlayfieldId INT NOT NULL,
+    ProfileKey VARCHAR(255) NOT NULL,
+    SpawnKey VARCHAR(255) UNIQUE,
+    PositionX FLOAT,
+    PositionY FLOAT,
+    PositionZ FLOAT,
+    OrientationX FLOAT,
+    OrientationY FLOAT,
+    OrientationZ FLOAT,
+    OrientationW FLOAT,
+    LevelDefinitionKey VARCHAR(255),
+    MinLevel INT,
+    MaxLevel INT,
+    RespawnSeconds FLOAT DEFAULT 240,
+    PatrolRouteId INT,
+    HealthDamage INT DEFAULT 0,
+    UseSpawnAsPatrolStart BOOLEAN DEFAULT false,
+    LootTableKeyOverride VARCHAR(255),
+    Enabled BOOLEAN DEFAULT true,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (PlayfieldId) REFERENCES playfield_configurations(PlayfieldId),
+    FOREIGN KEY (ProfileKey) REFERENCES ordinary_enemy_profiles(ProfileKey),
+    FOREIGN KEY (LootTableKeyOverride) REFERENCES loot_table_definitions(LootTableKey),
+    INDEX idx_playfield (PlayfieldId),
+    INDEX idx_profile (ProfileKey),
+    INDEX idx_enabled (Enabled)
 );
 
--- Routes de patrol
-CREATE TABLE npc_patrol_routes (
-    route_id INT PRIMARY KEY AUTO_INCREMENT,
-    playfield_id INT,
-    route_key VARCHAR(255) UNIQUE,
-    use_runtime_start BOOLEAN DEFAULT false,
-    batch_zero_delay BOOLEAN DEFAULT false,
-    created_from_capture_id VARCHAR(255),  -- Audit trail
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (playfield_id) REFERENCES playfield_configurations(playfield_id),
-    INDEX idx_playfield (playfield_id)
+CREATE TABLE IF NOT EXISTS npc_patrol_routes (
+    RouteId INT PRIMARY KEY AUTO_INCREMENT,
+    PlayfieldId INT,
+    RouteKey VARCHAR(255) UNIQUE,
+    UseRuntimeStart BOOLEAN DEFAULT false,
+    BatchZeroDelay BOOLEAN DEFAULT false,
+    CreatedFromCaptureId VARCHAR(255),
+    Description TEXT,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (PlayfieldId) REFERENCES playfield_configurations(PlayfieldId),
+    INDEX idx_playfield (PlayfieldId)
 );
 
-CREATE TABLE npc_patrol_segments (
-    segment_id INT PRIMARY KEY AUTO_INCREMENT,
-    route_id INT NOT NULL,
-    segment_index INT,
-    duration_seconds FLOAT,
-    start_x FLOAT, start_y FLOAT, start_z FLOAT,
-    end_x FLOAT, end_y FLOAT, end_z FLOAT,
-    speed_per_second FLOAT,
-    animation_key INT,
-    FOREIGN KEY (route_id) REFERENCES npc_patrol_routes(route_id) ON DELETE CASCADE,
-    INDEX idx_route (route_id),
-    INDEX idx_segment_index (segment_index)
+CREATE TABLE IF NOT EXISTS npc_patrol_segments (
+    SegmentId INT PRIMARY KEY AUTO_INCREMENT,
+    RouteId INT NOT NULL,
+    SegmentIndex INT,
+    DurationSeconds FLOAT,
+    StartX FLOAT,
+    StartY FLOAT,
+    StartZ FLOAT,
+    EndX FLOAT,
+    EndY FLOAT,
+    EndZ FLOAT,
+    SpeedPerSecond FLOAT,
+    AnimationKey INT,
+    FOREIGN KEY (RouteId) REFERENCES npc_patrol_routes(RouteId) ON DELETE CASCADE,
+    INDEX idx_route (RouteId),
+    INDEX idx_segment_index (SegmentIndex)
 );
 
--- Vendors
-CREATE TABLE playfield_vendors (
-    vendor_id INT PRIMARY KEY AUTO_INCREMENT,
-    playfield_id INT NOT NULL,
-    vendor_template_hash VARCHAR(255),
-    vendor_template_id INT,
-    position_x FLOAT,
-    position_y FLOAT,
-    position_z FLOAT,
-    orientation_x FLOAT,
-    orientation_y FLOAT,
-    orientation_z FLOAT,
-    orientation_w FLOAT,
-    name VARCHAR(255),
-    sell_modifier FLOAT DEFAULT 1.0,
-    buy_modifier FLOAT DEFAULT 1.0,
-    enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (playfield_id) REFERENCES playfield_configurations(playfield_id),
-    INDEX idx_playfield (playfield_id),
-    INDEX idx_enabled (enabled)
+CREATE TABLE IF NOT EXISTS playfield_vendors (
+    VendorId INT PRIMARY KEY AUTO_INCREMENT,
+    PlayfieldId INT NOT NULL,
+    VendorTemplateHash VARCHAR(255),
+    VendorTemplateId INT,
+    PositionX FLOAT,
+    PositionY FLOAT,
+    PositionZ FLOAT,
+    OrientationX FLOAT,
+    OrientationY FLOAT,
+    OrientationZ FLOAT,
+    OrientationW FLOAT,
+    Name VARCHAR(255),
+    SellModifier FLOAT DEFAULT 1.0,
+    BuyModifier FLOAT DEFAULT 1.0,
+    Enabled BOOLEAN DEFAULT true,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (PlayfieldId) REFERENCES playfield_configurations(PlayfieldId),
+    INDEX idx_playfield (PlayfieldId),
+    INDEX idx_enabled (Enabled)
 );
 
--- Objets statiques (portes, objets monde)
-CREATE TABLE playfield_static_dynels (
-    static_dynel_id INT PRIMARY KEY AUTO_INCREMENT,
-    playfield_id INT NOT NULL,
-    dynel_type VARCHAR(255),  -- "door", "object", "NPC_vendor", etc.
-    position_x FLOAT,
-    position_y FLOAT,
-    position_z FLOAT,
-    orientation_x FLOAT,
-    orientation_y FLOAT,
-    orientation_z FLOAT,
-    orientation_w FLOAT,
-    mesh_id INT,
-    visual_info JSON,
-    state_json JSON,  -- initial door state, etc.
-    enabled BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (playfield_id) REFERENCES playfield_configurations(playfield_id),
-    INDEX idx_playfield (playfield_id),
-    INDEX idx_dynel_type (dynel_type)
+CREATE TABLE IF NOT EXISTS playfield_static_dynels (
+    StaticDynelId INT PRIMARY KEY AUTO_INCREMENT,
+    PlayfieldId INT NOT NULL,
+    DynelType VARCHAR(255),
+    PositionX FLOAT,
+    PositionY FLOAT,
+    PositionZ FLOAT,
+    OrientationX FLOAT,
+    OrientationY FLOAT,
+    OrientationZ FLOAT,
+    OrientationW FLOAT,
+    MeshId INT,
+    VisualInfo JSON,
+    StateJson JSON,
+    Enabled BOOLEAN DEFAULT true,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (PlayfieldId) REFERENCES playfield_configurations(PlayfieldId),
+    INDEX idx_playfield (PlayfieldId),
+    INDEX idx_dynel_type (DynelType)
 );
