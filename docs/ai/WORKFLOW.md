@@ -381,10 +381,11 @@ retention, and fail-closed runtime activation with:
 cmd /d /c Tools\run_pf4582_placement_tests.cmd
 ```
 
-The placement source proves 206 placement records only. `NpcId` is the placement
-key. Candidate respawn timing, names, flags, and unknown fields remain metadata;
-they do not authorize movement, combat, loot, scripts, or runtime activation.
-Only explicitly mapped existing runtime definitions may be active.
+The accepted placement source proves 206 placement records. `NpcId` is the
+stable AORebirth source-placement key, not a proven native Funcom field.
+Candidate respawn timing, names, flags, and unknown fields remain metadata; they
+do not authorize movement, combat, loot, scripts, or runtime activation. Only
+explicitly mapped existing runtime definitions may be active.
 
 Audit all 38 numeric PF4582 `TemplateHash` groups against the governed evidence
 ledger without changing runtime activation:
@@ -400,7 +401,38 @@ fails closed on drift or conflicting evidence. The 24 baseline-unresolved hashes
 account for 171 blocked placements. Ten additional blocked Island Reet rows use
 the baseline-mapped ISRE hash, so the complete runtime blocked count remains 181.
 No audit classification authorizes activation; promotion requires a separate
-task with a stable source `TemplateHash` or `NpcId` to AO identity/profile bridge.
+task with a stable source key to AO identity/profile bridge. `TemplateHash` is a
+legacy AORebirth field name. Official EP1 evidence proves that the represented
+value is a packed four-byte `ACGHash_t` scalar/tag, not a cryptographic hash or
+a terminal mob-template identity.
+
+Import reconciliation against the governed local 207-record official snapshot,
+including the additional blocked `NCNN` record, is generated and checked with:
+
+```cmd
+cmd /d /c Tools\reconcile_pf4582_official_source.cmd
+cmd /d /c Tools\reconcile_pf4582_official_source.cmd --check
+cmd /d /c Tools\reconcile_pf4582_official_source.cmd --test
+```
+
+The generated official overlay and `IccShuttleportOfficialPlacementCatalog*.cs`
+are evidence/future-generation layers only. They are not consumed by
+`IccShuttleportSpawn`; the current runtime catalog remains 206 records, 25
+active, and 181 blocked. `NCNN` has no `SourceNpcId`, profile, or activation.
+
+Regenerate and test the corrected structural bridge report with:
+
+```cmd
+cmd /d /c Tools\analyze_pf4582_template_identity_bridge.cmd
+cmd /d /c Tools\analyze_pf4582_template_identity_bridge.cmd --check
+cmd /d /c Tools\analyze_pf4582_template_identity_bridge.cmd --test
+```
+
+The current outcome is `STRUCTURAL_SOURCE_AND_CONSUMER_FOUND`, superseding the
+historical `NO_BRIDGE_LOCATED` result. This proves the official source record,
+parser/native consumer, field locations, vector, and accessors. It does not
+prove an `ACGHash_t`-to-mob-template, `MonsterData`, dynel, or AORebirth profile
+join. Do not call `GetHash` or `GetHashSpawnPoints` terminal identity consumers.
 
 ## AOtomation Messaging Tests
 
