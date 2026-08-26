@@ -400,16 +400,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportPlacementCatalog.g.cs"));
             string spawnText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportSpawn.cs"));
+            string profilePopulationText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportProfilePopulationCatalog.g.cs"));
             string reportText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"docs\generated\pf4582_authoritative_placement_report.json"));
 
             Assert.IsTrue(
                 generatedText.Contains("SourcePlacementCount = 206")
                 && generatedText.Contains("UniqueTemplateHashCount = 38")
-                && generatedText.Contains("MappedTemplateHashCount = 14")
-                && generatedText.Contains("BehaviorProvenPlacementCount = 25")
-                && generatedText.Contains("RuntimeEligiblePlacementCount = 25")
-                && generatedText.Contains("RuntimeActivePlacementCount = 25"),
+                && generatedText.Contains("MappedTemplateHashCount = 31")
+                && generatedText.Contains("BehaviorProvenPlacementCount = 199")
+                && generatedText.Contains("RuntimeEligiblePlacementCount = 199")
+                && generatedText.Contains("RuntimeActivePlacementCount = 199"),
                 "The generated PF4582 placement catalog must preserve the accepted source and activation counts.");
             Assert.AreEqual(
                 206,
@@ -418,9 +420,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     StringSplitOptions.None).Length - 1,
                 "The generated artifact must contain all 206 normalized placement records.");
             Assert.AreEqual(
-                25,
-                spawnText.Split(new[] { "SourceNpcId =" }, StringSplitOptions.None).Length - 1,
-                "Only the 25 previously implemented PF4582 placements may be bound to active runtime definitions.");
+                199,
+                spawnText.Split(new[] { "SourceNpcId = 100" }, StringSplitOptions.None).Length - 1
+                + profilePopulationText.Split(
+                    new[] { "npcs.Add(CreateGeneratedProfileNpc(" },
+                    StringSplitOptions.None).Length - 1,
+                "PF4582 must bind exactly 35 explicit and 164 generated profile placements.");
             Assert.IsTrue(
                 placementText.Contains("TryGetRuntimeActive(")
                 && placementText.Contains("template hash is unresolved")
@@ -428,6 +433,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && placementText.Contains("CandidateRespawnInterpretation")
                 && placementText.Contains("return \"Unresolved\";")
                 && spawnText.Contains("IccShuttleportPlacementCatalog.TryGetRuntimeActive(")
+                && spawnText.Contains("AddGeneratedProfileNpcs(npcs)")
+                && spawnText.Contains("UseTemplateProfile = true")
                 && spawnText.Contains("def.Level < sourcePlacement.MinLevel")
                 && spawnText.Contains("x = sourcePlacement.PositionX")
                 && spawnText.Contains("y = sourcePlacement.PositionY")
