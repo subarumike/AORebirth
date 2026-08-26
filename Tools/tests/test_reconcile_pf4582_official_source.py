@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -293,6 +294,23 @@ class Pf4582OfficialSourceReconciliationTests(unittest.TestCase):
         first = [hashlib.sha256(path.read_bytes()).hexdigest() for path in paths]
         second = [hashlib.sha256(path.read_bytes()).hexdigest() for path in paths]
         self.assertEqual(first, second)
+
+    def test_51_general_shard_is_required_exact_pf4582_mirror(self):
+        reconcile._validate_general_placement_shard(
+            reconcile.DEFAULT_GENERAL_PLACEMENT_SHARD,
+            self.model["OfficialRecords"],
+        )
+
+        payload = json.loads(reconcile.DEFAULT_GENERAL_PLACEMENT_SHARD.read_text(encoding="utf-8"))
+        payload["Records"][0]["PositionX"] += 1.0
+        with tempfile.TemporaryDirectory() as temp_directory:
+            changed_path = Path(temp_directory) / "pf_4582.json"
+            changed_path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaises(reconcile.ReconciliationError):
+                reconcile._validate_general_placement_shard(
+                    changed_path,
+                    self.model["OfficialRecords"],
+                )
 
 
 if __name__ == "__main__":

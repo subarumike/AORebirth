@@ -68,6 +68,14 @@
     <Compile Include="DebuggingSerializerTests.cs" />
     <Compile Include="TestRepositoryRootResolver.cs" />
     <Compile Include="TestRepositoryRootResolverTests.cs" />
+    <Compile Include="OfficialPlayfieldPlacementBuildContractTests.cs" />
+    <Compile Include="OfficialPlayfieldPlacementCatalogTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs">
+      <Link>OfficialPlayfieldPlacement.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacementCatalog.cs">
+      <Link>OfficialPlayfieldPlacementCatalog.cs</Link>
+    </Compile>
     <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="DailyLoginPathContractTests.cs" />
     <Compile Include="BotServiceFoundationTests.cs" />

@@ -27,12 +27,16 @@ retains only the identity/profile fields the audit consumes and records the
 exact SHA-256 of the source dossier so clean worktrees do not require ignored
 raw capture folders.
 
-`official/` contains the byte-identical structured EP1 evidence snapshot and
-its governed manifest. The official source has 207 `HashSpawnPoint_t` records;
-206 reconcile to the accepted cohort and `NCNN` remains an additional official
-blocked placement with no fabricated `SourceNpcId`, profile, or runtime
-activation. `Tools\reconcile_pf4582_official_source.cmd` generates the
-207-record evidence overlay and non-runtime C# catalog.
+`official/` contains the byte-identical historical structured snapshot and its
+governed manifest. The database-wide normalized authority is now
+`docs/generated/playfields/placements/pf_4582.json`; the snapshot, specialized
+reconciliation, and overlay must agree with that shard record-for-record. The
+official source has 207 `HashSpawnPoint_t` records; 206 reconcile to the
+accepted cohort and `NCNN` remains an additional official blocked placement
+with no fabricated `SourceNpcId`, profile, or runtime activation.
+`Tools\reconcile_pf4582_official_source.cmd` maintains the specialized
+crosswalk/evidence overlay and non-runtime C# compatibility catalog. The
+206-record `IccShuttleportPlacementCatalog` remains the separate runtime gate.
 
 The current bridge outcome is `STRUCTURAL_SOURCE_AND_CONSUMER_FOUND`. The prior
 `NO_BRIDGE_LOCATED` outcome is preserved as superseded history. The official

@@ -96,6 +96,32 @@ if not "%ZONE_EXIT%"=="0" (
     exit /b %ZONE_EXIT%
 )
 
+set "ZONE_OUTPUT=%CD%\AORebirth\Built\Debug"
+set "PLACEMENT_OUTPUT=%ZONE_OUTPUT%\Content\Official\PlayfieldPlacements"
+set "PLACEMENT_MANIFEST=%PLACEMENT_OUTPUT%\official-placement-build-manifest.json"
+set "PLACEMENT_PROVENANCE=%PLACEMENT_OUTPUT%\PLACEMENT_PROVENANCE.env"
+set "SOURCE_SHA="
+for /f "usebackq delims=" %%I in (`git rev-parse HEAD`) do set "SOURCE_SHA=%%I"
+if not defined SOURCE_SHA (
+    echo [AORebirth Build] Official placement validation could not resolve the source SHA.
+    popd
+    exit /b 1
+)
+if not exist "%ZONE_OUTPUT%\ZoneEngine.exe" (
+    echo [AORebirth Build] Official placement validation could not find the built ZoneEngine.exe.
+    popd
+    exit /b 1
+)
+
+echo [AORebirth Build] Validating packaged official playfield placements...
+"%ZONE_OUTPUT%\ZoneEngine.exe" --validate-official-placements --source-sha "%SOURCE_SHA%" --placement-manifest-output "%PLACEMENT_MANIFEST%" --placement-provenance-output "%PLACEMENT_PROVENANCE%" --build-platform windows
+set PLACEMENT_EXIT=%ERRORLEVEL%
+if not "%PLACEMENT_EXIT%"=="0" (
+    echo [AORebirth Build] Official placement validation failed with exit code %PLACEMENT_EXIT%.
+    popd
+    exit /b %PLACEMENT_EXIT%
+)
+
 echo [AORebirth Build] Building DatabasePreflight...
 "%MSBUILD%" "Tools\DatabasePreflight\DatabasePreflight.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 set PREFLIGHT_EXIT=%ERRORLEVEL%
