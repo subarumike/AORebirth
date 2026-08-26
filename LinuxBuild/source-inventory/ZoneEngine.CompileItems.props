@@ -484,6 +484,8 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.g.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportOfficialPlacementCatalog.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportOfficialPlacementCatalog.g.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportBasicCombatCatalog.g.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/AndromedaIccHqIdleGestureRuntime.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs" />
