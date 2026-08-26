@@ -568,6 +568,8 @@
     <Compile Include="Core\Playfields\IccShuttleportPlacementCatalog.g.cs" />
     <Compile Include="Core\Playfields\IccShuttleportOfficialPlacementCatalog.cs" />
     <Compile Include="Core\Playfields\IccShuttleportOfficialPlacementCatalog.g.cs" />
+    <Compile Include="Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs" />
+    <Compile Include="Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacementCatalog.cs" />
     <Compile Include="Core\Playfields\IccShuttleportBasicCombatCatalog.g.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />
@@ -790,6 +792,2542 @@
   <ItemGroup>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\official-placement-corpus-manifest.json">
+      <Link>Content\Official\PlayfieldPlacements\official-placement-corpus-manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\official-placement-index.json">
+      <Link>Content\Official\PlayfieldPlacements\official-placement-index.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\official-placement-summary.json">
+      <Link>Content\Official\PlayfieldPlacements\official-placement-summary.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\official-acghash-inventory.json">
+      <Link>Content\Official\PlayfieldPlacements\official-acghash-inventory.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_100.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_100.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_101.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_101.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_102.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_102.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_103.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_103.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_104.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_104.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_105.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_105.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_106.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_106.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_107.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_107.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_109.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_109.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_110.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_110.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_111.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_111.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_120.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_120.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_124.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_124.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_125.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_125.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_127.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_127.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_128.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_128.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_152.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_152.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_320.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_320.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_321.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_321.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_322.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_322.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_324.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_324.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_331.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_331.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_341.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_341.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_346.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_346.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_351.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_351.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_362.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_362.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_382.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_382.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_386.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_386.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_500.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_500.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_501.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_501.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_505.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_505.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_540.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_540.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_545.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_545.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_550.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_550.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_551.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_551.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_556.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_556.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_560.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_560.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_565.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_565.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_566.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_566.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_567.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_567.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_570.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_570.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_585.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_585.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_586.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_586.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_590.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_590.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_595.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_595.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_596.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_596.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_600.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_600.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_605.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_605.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_610.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_610.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_615.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_615.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_620.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_620.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_625.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_625.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_630.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_630.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_635.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_635.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_640.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_640.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_641.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_641.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_646.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_646.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_647.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_647.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_650.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_650.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_655.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_655.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_656.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_656.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_665.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_665.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_670.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_670.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_685.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_685.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_687.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_687.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_695.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_695.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_696.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_696.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_700.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_700.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_705.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_705.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_706.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_706.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_710.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_710.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_716.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_716.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_717.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_717.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_730.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_730.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_735.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_735.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_740.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_740.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_750.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_750.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_760.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_760.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_790.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_790.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_791.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_791.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_795.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_795.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_800.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_800.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_896.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_896.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_950.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_950.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_952.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_952.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_953.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_953.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_954.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_954.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_955.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_955.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1002.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1002.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1003.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1003.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1004.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1004.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1005.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1005.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1011.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1011.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1012.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1012.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1021.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1021.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1031.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1031.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1136.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1136.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1137.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1137.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1180.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1180.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1181.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1181.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1182.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1182.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1183.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1183.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1184.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1184.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1185.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1185.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1186.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1186.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1187.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1187.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1189.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1189.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1190.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1190.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1191.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1191.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1192.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1192.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1193.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1193.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1211.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1211.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1231.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1231.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1232.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1232.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1233.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1233.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1241.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1241.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1242.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1242.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1243.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1243.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1251.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1251.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1321.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1321.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1322.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1322.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1323.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1323.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1324.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1324.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1325.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1325.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1326.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1326.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1327.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1327.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1328.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1328.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1329.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1329.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1330.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1330.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1404.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1404.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1405.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1405.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1406.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1406.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1407.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1407.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1410.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1410.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1421.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1421.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1422.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1422.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1423.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1423.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1424.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1424.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1426.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1426.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1427.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1427.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1428.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1428.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1501.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1501.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1502.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1502.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1503.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1503.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1504.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1504.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1505.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1505.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1506.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1506.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1507.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1507.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1510.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1510.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1511.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1511.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1601.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1601.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1602.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1602.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1603.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1603.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1604.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1604.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1611.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1611.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1612.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1612.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1613.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1613.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1614.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1614.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1621.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1621.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1622.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1622.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1623.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1623.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1624.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1624.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1625.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1625.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1626.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1626.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1627.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1627.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1641.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1641.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1642.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1642.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1643.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1643.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1644.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1644.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1645.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1645.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1646.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1646.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1647.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1647.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1648.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1648.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1651.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1651.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1652.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1652.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1653.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1653.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1661.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1661.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1662.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1662.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1663.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1663.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1671.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1671.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1672.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1672.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1673.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1673.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1674.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1674.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1675.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1675.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1701.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1701.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1702.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1702.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1703.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1703.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1711.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1711.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1712.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1712.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1721.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1721.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1722.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1722.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1741.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1741.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1742.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1742.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1743.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1743.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1826.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1826.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1827.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1827.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1833.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1833.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1836.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1836.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1840.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1840.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1846.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1846.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1862.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1862.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1866.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1866.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1886.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1886.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1887.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1887.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1891.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1891.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1892.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1892.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1893.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1893.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1894.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1894.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1901.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1901.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1902.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1902.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1913.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1913.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1931.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1931.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1933.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1933.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1941.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1941.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_1943.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_1943.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2002.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2002.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2003.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2003.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2004.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2004.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2005.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2005.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2006.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2006.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2010.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2010.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2011.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2011.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2012.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2012.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2013.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2013.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2014.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2014.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2020.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2020.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2021.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2021.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2022.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2022.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2023.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2023.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2024.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2024.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2030.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2030.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2031.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2031.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2032.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2032.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2033.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2033.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2034.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2034.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2040.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2040.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2041.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2041.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2042.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2042.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2043.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2043.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2050.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2050.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2051.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2051.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2052.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2052.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2053.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2053.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2060.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2060.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2061.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2061.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2062.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2062.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2063.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2063.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2064.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2064.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2070.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2070.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2071.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2071.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2072.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2072.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2073.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2073.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_2096.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_2096.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3000.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3000.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3002.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3002.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3003.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3003.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3004.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3004.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3005.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3005.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3006.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3006.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3007.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3007.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3008.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3008.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3009.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3009.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3010.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3010.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3011.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3011.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3012.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3012.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3013.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3013.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3014.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3014.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3015.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3015.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3016.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3016.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3017.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3017.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3018.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3018.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3019.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3019.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3020.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3020.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3021.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3021.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3022.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3022.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3023.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3023.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3024.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3024.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3025.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3025.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3026.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3026.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3027.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3027.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3028.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3028.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3029.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3029.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3030.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3030.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3031.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3031.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3032.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3032.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3033.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3033.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3034.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3034.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3035.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3035.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3036.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3036.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3037.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3037.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3038.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3038.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3039.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3039.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3040.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3040.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3041.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3041.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3042.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3042.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3043.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3043.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3044.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3044.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3045.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3045.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3046.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3046.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3047.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3047.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3048.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3048.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3049.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3049.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3050.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3050.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3051.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3051.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3052.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3052.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3053.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3053.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3054.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3054.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3055.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3055.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3056.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3056.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3057.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3057.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3058.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3058.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3059.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3059.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3060.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3060.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3061.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3061.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3062.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3062.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3063.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3063.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3064.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3064.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3065.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3065.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3066.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3066.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3067.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3067.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3068.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3068.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3069.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3069.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3070.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3070.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3071.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3071.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3080.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3080.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3081.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3081.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3082.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3082.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3083.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3083.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3084.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3084.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3085.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3085.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3086.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3086.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3087.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3087.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3088.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3088.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3089.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3089.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3100.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3100.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3101.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3101.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3102.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3102.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3103.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3103.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3104.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3104.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3105.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3105.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3106.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3106.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3107.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3107.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3108.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3108.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3109.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3109.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3110.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3110.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3111.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3111.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3112.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3112.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3113.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3113.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3114.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3114.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3115.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3115.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3116.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3116.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3117.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3117.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3120.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3120.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3121.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3121.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3122.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3122.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3123.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3123.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3124.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3124.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3125.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3125.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3126.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3126.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3127.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3127.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3128.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3128.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3129.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3129.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3130.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3130.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3131.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3131.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3132.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3132.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3133.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3133.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3134.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3134.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3135.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3135.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3136.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3136.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3137.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3137.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3138.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3138.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3139.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3139.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3140.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3140.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3141.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3141.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3142.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3142.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3143.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3143.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3144.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3144.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3145.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3145.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3146.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3146.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3147.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3147.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3148.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3148.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_3149.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_3149.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4005.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4005.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4006.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4006.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4010.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4010.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4011.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4011.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4021.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4021.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4102.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4102.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4107.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4107.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4121.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4121.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4211.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4211.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4212.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4212.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4213.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4213.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4214.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4214.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4215.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4215.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4220.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4220.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4221.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4221.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4222.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4222.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4223.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4223.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4224.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4224.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4310.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4310.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4311.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4311.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4312.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4312.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4313.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4313.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4314.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4314.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4315.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4315.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4316.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4316.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4318.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4318.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4320.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4320.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4321.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4321.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4322.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4322.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4324.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4324.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4327.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4327.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4328.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4328.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4329.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4329.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4330.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4330.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4331.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4331.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4334.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4334.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4335.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4335.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4336.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4336.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4337.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4337.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4341.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4341.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4342.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4342.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4343.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4343.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4344.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4344.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4345.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4345.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4346.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4346.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4347.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4347.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4348.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4348.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4349.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4349.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4350.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4350.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4351.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4351.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4352.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4352.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4354.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4354.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4355.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4355.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4356.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4356.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4357.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4357.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4360.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4360.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4363.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4363.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4364.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4364.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4365.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4365.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4366.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4366.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4367.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4367.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4368.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4368.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4370.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4370.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4374.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4374.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4376.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4376.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4380.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4380.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4381.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4381.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4382.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4382.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4383.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4383.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4384.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4384.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4385.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4385.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4386.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4386.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4387.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4387.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4388.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4388.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4389.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4389.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4390.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4390.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4391.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4391.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4468.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4468.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4474.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4474.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4475.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4475.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4504.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4504.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4505.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4505.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4530.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4530.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4531.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4531.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4532.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4532.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4533.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4533.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4534.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4534.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4540.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4540.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4541.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4541.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4542.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4542.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4543.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4543.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4544.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4544.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4561.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4561.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4563.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4563.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4564.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4564.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4565.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4565.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4567.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4567.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4568.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4568.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4569.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4569.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4571.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4571.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4572.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4572.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4573.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4573.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4575.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4575.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4576.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4576.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4577.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4577.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4582.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4582.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4604.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4604.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4605.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4605.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4621.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4621.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4622.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4622.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4623.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4623.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4624.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4624.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4625.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4625.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4626.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4626.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4627.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4627.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4628.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4628.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4629.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4629.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4630.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4630.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4676.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4676.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4677.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4677.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4678.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4678.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4679.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4679.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4680.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4680.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4681.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4681.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4682.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4682.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4683.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4683.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4684.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4684.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4685.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4685.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4686.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4686.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4687.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4687.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4688.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4688.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4689.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4689.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4690.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4690.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4691.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4691.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4692.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4692.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4693.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4693.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4694.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4694.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4695.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4695.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4696.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4696.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4697.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4697.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4698.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4698.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4699.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4699.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4704.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4704.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4805.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4805.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4833.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4833.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4872.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4872.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4873.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4873.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4877.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4877.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4880.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4880.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4881.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4881.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4885.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4885.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4894.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4894.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4898.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4898.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4899.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4899.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_4900.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_4900.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_5001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_5001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_5002.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_5002.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6002.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6002.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6003.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6003.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6007.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6007.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6010.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6010.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6011.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6011.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6012.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6012.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6013.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6013.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6014.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6014.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6015.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6015.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6017.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6017.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6020.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6020.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6021.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6021.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6022.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6022.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6024.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6024.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6026.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6026.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6028.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6028.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6035.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6035.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6036.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6036.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6041.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6041.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6050.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6050.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6051.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6051.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6052.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6052.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6055.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6055.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6056.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6056.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6057.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6057.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6060.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6060.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6061.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6061.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6071.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6071.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6101.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6101.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6102.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6102.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6104.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6104.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6111.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6111.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6112.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6112.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6113.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6113.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6115.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6115.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6121.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6121.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6123.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6123.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6125.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6125.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6127.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6127.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6129.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6129.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6131.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6131.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6133.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6133.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6211.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6211.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6300.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6300.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6301.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6301.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6302.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6302.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6303.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6303.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6304.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6304.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6305.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6305.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6306.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6306.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6550.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6550.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6551.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6551.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_6553.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_6553.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7001.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7001.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7010.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7010.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7011.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7011.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7012.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7012.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7013.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7013.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7015.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7015.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7018.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7018.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7019.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7019.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7020.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7020.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7051.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7051.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7054.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7054.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7092.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7092.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_7101.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_7101.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8002.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8002.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8004.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8004.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8006.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8006.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8009.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8009.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8020.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8020.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8030.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8030.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8040.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8040.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8045.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8045.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8046.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8046.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8050.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8050.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8060.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8060.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8070.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8070.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_8080.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_8080.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_9041.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_9041.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_9042.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_9042.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_9050.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_9050.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_9061.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_9061.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_9070.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_9070.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\playfields\placements\pf_9080.json">
+      <Link>Content\Official\PlayfieldPlacements\placements\pf_9080.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Arete\cleaning_robot_patrol_replay.csv">

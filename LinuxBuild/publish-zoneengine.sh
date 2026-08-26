@@ -2,6 +2,7 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "${script_dir}/placement-provenance.sh"
 runtime_id="${1:-linux-x64}"
 self_contained="${2:-false}"
 
@@ -17,6 +18,7 @@ case "${self_contained}" in
 esac
 
 cd "${script_dir}"
+source_sha="$(git -C .. rev-parse HEAD)"
 
 dotnet run --project Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- \
   --repository-root .. \
@@ -51,19 +53,26 @@ if [[ "${self_contained}" == "true" ]]; then
   dotnet Tools/Stage8OfflineSmokeTests/bin/Release/net10.0/Stage8OfflineSmokeTests.dll \
     --repository-root .. \
     --zone-output "artifacts/zoneengine/${runtime_id}/${package_kind}" \
+    --source-sha "${source_sha}" \
+    --build-platform linux \
     --structure-only
 else
   dotnet Tools/Stage8OfflineSmokeTests/bin/Release/net10.0/Stage8OfflineSmokeTests.dll \
     --repository-root .. \
-    --zone-output "artifacts/zoneengine/${runtime_id}/${package_kind}"
+    --zone-output "artifacts/zoneengine/${runtime_id}/${package_kind}" \
+    --source-sha "${source_sha}" \
+    --build-platform linux
 fi
 
-source_sha="$(git -C .. rev-parse HEAD)"
 tracked_source_clean="PASS"
 if ! git -C .. diff --quiet -- || ! git -C .. diff --cached --quiet --; then
   tracked_source_clean="FAIL"
 fi
 publish_dir="artifacts/zoneengine/${runtime_id}/${package_kind}"
+if ! placement_provenance_load "${publish_dir}" "${source_sha}" linux; then
+  echo "Official placement publish provenance validation failed." >&2
+  exit 1
+fi
 dotnet_sdk_version="$(dotnet --version)"
 build_timestamp_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
@@ -80,3 +89,4 @@ TRACKED_SOURCE_CLEAN=${tracked_source_clean}
 BUILD_TIMESTAMP_UTC=${build_timestamp_utc}
 ACCEPTANCE_RESULT=UNVERIFIED
 EOF
+placement_append_build_provenance "${publish_dir}/BUILD_PROVENANCE.env"

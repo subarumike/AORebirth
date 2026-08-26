@@ -17,6 +17,91 @@ set_manifest_value()
     awk -F= -v key="$2" -v value="$3" '$1 == key { print key "=" value; next } { print }' "$1" > "$1.tmp"
     mv -f -- "$1.tmp" "$1"
 }
+create_placement_artifact()
+{
+    local artifact_dir="$1"
+    local corpus_dir="${artifact_dir}/Content/Official/PlayfieldPlacements"
+    local shard_id shard_sha entry_suffix
+    mkdir -p -- "${corpus_dir}/placements"
+    printf '{"fixture":"summary"}\n' > "${corpus_dir}/official-placement-summary.json"
+    printf '{"fixture":"index"}\n' > "${corpus_dir}/official-placement-index.json"
+    printf '{"fixture":"acghash"}\n' > "${corpus_dir}/official-acghash-inventory.json"
+    for shard_id in $(seq 1 630); do
+        printf '{}\n' > "${corpus_dir}/placements/pf_${shard_id}.json"
+    done
+
+    fixture_placement_corpus_version="fixture-corpus-v1"
+    fixture_placement_summary_sha="$(sha256sum "${corpus_dir}/official-placement-summary.json" | awk '{print $1}')"
+    fixture_placement_index_sha="$(sha256sum "${corpus_dir}/official-placement-index.json" | awk '{print $1}')"
+    fixture_placement_acghash_sha="$(sha256sum "${corpus_dir}/official-acghash-inventory.json" | awk '{print $1}')"
+    shard_sha="$(sha256sum "${corpus_dir}/placements/pf_1.json" | awk '{print $1}')"
+    {
+        printf '{\n'
+        printf '  "AcgHashInventorySha256": "%s",\n' "${fixture_placement_acghash_sha}"
+        printf '  "CorpusVersion": "%s",\n' "${fixture_placement_corpus_version}"
+        printf '  "IndexSha256": "%s",\n' "${fixture_placement_index_sha}"
+        printf '  "Metrics": {"ResourceCount": 630},\n'
+        printf '  "Playfields": [\n'
+        for shard_id in $(seq 1 630); do
+            entry_suffix=,
+            [[ "${shard_id}" == "630" ]] && entry_suffix=
+            printf '    {\n'
+            printf '      "Path": "placements/pf_%s.json",\n' "${shard_id}"
+            printf '      "ShardSha256": "%s"\n' "${shard_sha}"
+            printf '    }%s\n' "${entry_suffix}"
+        done
+        printf '  ],\n'
+        printf '  "SummarySha256": "%s"\n' "${fixture_placement_summary_sha}"
+        printf '}\n'
+    } > "${corpus_dir}/official-placement-corpus-manifest.json"
+    fixture_placement_corpus_manifest_sha="$(sha256sum "${corpus_dir}/official-placement-corpus-manifest.json" | awk '{print $1}')"
+    printf '{"SchemaVersion":1,"SourceSHA":"%s","CorpusVersion":"%s","CorpusManifestSha256":"%s","IndexSha256":"%s","SummarySha256":"%s","AcgHashInventorySha256":"%s"}\n' \
+        "${fake_sha}" \
+        "${fixture_placement_corpus_version}" \
+        "${fixture_placement_corpus_manifest_sha}" \
+        "${fixture_placement_index_sha}" \
+        "${fixture_placement_summary_sha}" \
+        "${fixture_placement_acghash_sha}" \
+        > "${corpus_dir}/official-placement-build-manifest.json"
+    fixture_placement_build_manifest_sha="$(sha256sum "${corpus_dir}/official-placement-build-manifest.json" | awk '{print $1}')"
+    cat > "${corpus_dir}/PLACEMENT_PROVENANCE.env" <<EOF
+SOURCE_SHA=${fake_sha}
+BUILD_PLATFORM=linux
+PLACEMENT_CORPUS_VERSION=${fixture_placement_corpus_version}
+PLACEMENT_CORPUS_MANIFEST_SHA256=${fixture_placement_corpus_manifest_sha}
+PLACEMENT_CORPUS_SUMMARY_SHA256=${fixture_placement_summary_sha}
+PLACEMENT_CORPUS_INDEX_SHA256=${fixture_placement_index_sha}
+PLACEMENT_ACGHASH_INVENTORY_SHA256=${fixture_placement_acghash_sha}
+PLACEMENT_BUILD_MANIFEST_SHA256=${fixture_placement_build_manifest_sha}
+PLACEMENT_RESOURCE_COUNT=630
+PLACEMENT_PARSED_RESOURCE_COUNT=627
+PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=3
+PLACEMENT_DISTRICT_COUNT=4146
+PLACEMENT_RECORD_COUNT=32805
+PLACEMENT_UNIQUE_ACGHASH_COUNT=4016
+PLACEMENT_RUNTIME_AUTHORIZED_COUNT=25
+EOF
+    cat >> "${artifact_dir}/BUILD_PROVENANCE.env" <<EOF
+PLACEMENT_CORPUS_VERSION=${fixture_placement_corpus_version}
+PLACEMENT_CORPUS_MANIFEST_SHA256=${fixture_placement_corpus_manifest_sha}
+PLACEMENT_CORPUS_SUMMARY_SHA256=${fixture_placement_summary_sha}
+PLACEMENT_CORPUS_INDEX_SHA256=${fixture_placement_index_sha}
+PLACEMENT_ACGHASH_INVENTORY_SHA256=${fixture_placement_acghash_sha}
+PLACEMENT_BUILD_MANIFEST_SHA256=${fixture_placement_build_manifest_sha}
+PLACEMENT_RESOURCE_COUNT=630
+PLACEMENT_PARSED_RESOURCE_COUNT=627
+PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=3
+PLACEMENT_DISTRICT_COUNT=4146
+PLACEMENT_RECORD_COUNT=32805
+PLACEMENT_UNIQUE_ACGHASH_COUNT=4016
+PLACEMENT_RUNTIME_AUTHORIZED_COUNT=25
+EOF
+    cat >> "${artifact_dir}/LINUX_ACCEPTANCE.env" <<EOF
+PLACEMENT_VALIDATION=PASS
+EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256=${fixture_placement_build_manifest_sha}
+PLACEMENT_BUILD_MANIFEST_SHA256=${fixture_placement_build_manifest_sha}
+EOF
+}
 create_artifact()
 {
     mkdir -p -- "$1"
@@ -30,6 +115,9 @@ SOURCE_SHA_MATCH=PASS
 TRACKED_SOURCE_CLEAN=PASS
 LINUX_ACCEPTANCE=PASS
 EOF
+    if [[ "$2" == "ZoneEngine" ]]; then
+        create_placement_artifact "$1"
+    fi
 }
 create_fixture()
 {
@@ -70,13 +158,26 @@ create_fixture()
     cp -- "${zone_unit_source}" "${input}/zone.service"
     manifest="${input}/release.manifest"
     cat > "${manifest}" <<EOF
-FORMAT=1
+FORMAT=2
 SOURCE_SHA=${fake_sha}
 BUILD_TIMESTAMP_UTC=2026-08-24T00:00:00Z
 LOGINENGINE_ARTIFACT_DIR=${input}/login
 LOGINENGINE_ARTIFACT_SHA256=$(sha256sum "${input}/login/LoginEngine" | awk '{print $1}')
 ZONEENGINE_ARTIFACT_DIR=${input}/zone
 ZONEENGINE_ARTIFACT_SHA256=$(sha256sum "${input}/zone/ZoneEngine" | awk '{print $1}')
+PLACEMENT_CORPUS_VERSION=${fixture_placement_corpus_version}
+PLACEMENT_CORPUS_MANIFEST_SHA256=${fixture_placement_corpus_manifest_sha}
+PLACEMENT_CORPUS_SUMMARY_SHA256=${fixture_placement_summary_sha}
+PLACEMENT_CORPUS_INDEX_SHA256=${fixture_placement_index_sha}
+PLACEMENT_ACGHASH_INVENTORY_SHA256=${fixture_placement_acghash_sha}
+PLACEMENT_BUILD_MANIFEST_SHA256=${fixture_placement_build_manifest_sha}
+PLACEMENT_RESOURCE_COUNT=630
+PLACEMENT_PARSED_RESOURCE_COUNT=627
+PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=3
+PLACEMENT_DISTRICT_COUNT=4146
+PLACEMENT_RECORD_COUNT=32805
+PLACEMENT_UNIQUE_ACGHASH_COUNT=4016
+PLACEMENT_RUNTIME_AUTHORIZED_COUNT=25
 LOGINENGINE_UNIT_PATH=${input}/login.service
 LOGINENGINE_UNIT_SHA256=$(sha256sum "${input}/login.service" | awk '{print $1}')
 ZONEENGINE_UNIT_PATH=${input}/zone.service
@@ -199,6 +300,12 @@ behavior_hash_before="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngi
 create_fixture; expect_preflight_failure "${other_sha}"
 create_fixture; set_manifest_value "${manifest}" LOGINENGINE_ARTIFACT_SHA256 "$(printf bad | sha256sum | awk '{print $1}')"; expect_preflight_failure
 create_fixture; set_manifest_value "${manifest}" ZONEENGINE_ARTIFACT_SHA256 "$(printf bad | sha256sum | awk '{print $1}')"; expect_preflight_failure
+create_fixture; rm -f -- "${input}/zone/Content/Official/PlayfieldPlacements/official-placement-build-manifest.json"; expect_preflight_failure
+create_fixture; printf 'tampered\n' >> "${input}/zone/Content/Official/PlayfieldPlacements/official-placement-summary.json"; expect_preflight_failure
+create_fixture; set_manifest_value "${manifest}" PLACEMENT_BUILD_MANIFEST_SHA256 "$(printf bad | sha256sum | awk '{print $1}')"; expect_preflight_failure
+create_fixture; rm -f -- "${input}/zone/Content/Official/PlayfieldPlacements/placements/pf_630.json"; expect_preflight_failure
+create_fixture; printf 'tampered\n' >> "${input}/zone/Content/Official/PlayfieldPlacements/placements/pf_1.json"; expect_preflight_failure
+create_fixture; sed -i '/^PLACEMENT_VALIDATION=PASS$/d' "${input}/zone/LINUX_ACCEPTANCE.env"; expect_preflight_failure
 create_fixture; rm -f -- "${input}/login.service"; expect_preflight_failure
 create_fixture; rm -f -- "${input}/zone.service"; expect_preflight_failure
 create_fixture; sed -i 's|AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/session-ownership|AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/zone-private|' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
@@ -220,6 +327,7 @@ require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/
 require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/success-output"
 require test "$(tr -d '\r\n\t ' < "${root}/opt/ao-rebirth/loginengine/current/SOURCE_SHA")" = "${fake_sha}"
 require test "$(tr -d '\r\n\t ' < "${root}/opt/ao-rebirth/zoneengine/current/SOURCE_SHA")" = "${fake_sha}"
+require test "$(sha256sum "${root}/opt/ao-rebirth/zoneengine/current/Content/Official/PlayfieldPlacements/official-placement-build-manifest.json" | awk '{print $1}')" = "${fixture_placement_build_manifest_sha}"
 require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-loginengine.service" | awk '{print $1}')" = "$(sha256sum "${input}/login.service" | awk '{print $1}')"
 require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service" | awk '{print $1}')" = "$(sha256sum "${input}/zone.service" | awk '{print $1}')"
 require test -d "${root}/var/lib/ao-rebirth/session-ownership"
@@ -239,5 +347,5 @@ behavior_hash_after="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngin
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 require test "${behavior_hash_before}" = "${behavior_hash_after}"
 tests_run=$((tests_run + 1))
-require test "${tests_run}" = 18
-echo "PASS: production deployment workflow tests (18/18)"
+require test "${tests_run}" = 24
+echo "PASS: production deployment workflow tests (24/24)"

@@ -1,0 +1,260 @@
+{
+  "SchemaVersion": 1,
+  "Description": "Governed offline evidence describing which AORebirth playfields are represented by compiled registered fixed content, explicit dynamic predicates, and the accepted PF4582 placement reconciliation. This is not runtime activation authority.",
+  "OfficialIndexExpectations": {
+    "SchemaVersion": 1,
+    "SourceClientVariant": "EP1_OLD_GRAPHICS_CLIENT",
+    "SourceClientBuild": "18.8.62_EP1",
+    "ResourceType": 1000014,
+    "ResourceCount": 630,
+    "ParsedResourceCount": 627,
+    "MalformedResourceCount": 3,
+    "DistrictCount": 4146,
+    "OfficialSpawnCount": 32805,
+    "MalformedPlayfieldIds": [
+      103,
+      615,
+      4805
+    ]
+  },
+  "PlayfieldsXml": {
+    "Path": "AORebirth/Server/ZoneEngine/XML Data/Playfields.xml",
+    "ExpectedPlayfieldCount": 602,
+    "Authority": "METADATA_REPRESENTATION_ONLY"
+  },
+  "CompileEvidence": {
+    "WindowsProjectPath": "AORebirth/Server/ZoneEngine/ZoneEngine.csproj",
+    "LinuxCompileInventoryPath": "LinuxBuild/source-inventory/ZoneEngine.CompileItems.props",
+    "RuntimeRegistrationPath": "AORebirth/Server/ZoneEngine/Core/Playfields/PlayfieldRuntimeSystems.cs"
+  },
+  "FixedPlayfields": [
+    {
+      "PlayfieldId": 127,
+      "Modules": [
+        {
+          "Name": "SubwayContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 655,
+      "Modules": [
+        {
+          "Name": "AndromedaIccHqContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AndromedaIccHqContentModule.cs"
+        },
+        {
+          "Name": "MontroyalContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/MontroyalContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 735,
+      "Modules": [
+        {
+          "Name": "RomeBlueCityContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/RomeBlueCityContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 1931,
+      "Modules": [
+        {
+          "Name": "TempleOfThreeWindsContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/TempleOfThreeWindsContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4001,
+      "Modules": [
+        {
+          "Name": "NascenceLifeContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4310,
+      "Modules": [
+        {
+          "Name": "NascenceLifeContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4311,
+      "Modules": [
+        {
+          "Name": "NascenceLifeContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4312,
+      "Modules": [
+        {
+          "Name": "NascenceLifeContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4313,
+      "Modules": [
+        {
+          "Name": "NascenceLifeContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4530,
+      "Modules": [
+        {
+          "Name": "JobePlatformContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/JobePlatformContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4531,
+      "Modules": [
+        {
+          "Name": "NascenceLifeContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 4582,
+      "Modules": [
+        {
+          "Name": "IccShuttleportContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/IccShuttleportContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "GOVERNED_PLACEMENT_CATALOG_ENUMERATED"
+    },
+    {
+      "PlayfieldId": 4677,
+      "Modules": [
+        {
+          "Name": "ThrakOmniGardenContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/ThrakOmniGardenContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 6553,
+      "Modules": [
+        {
+          "Name": "AreteContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AreteContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 7001,
+      "Modules": [
+        {
+          "Name": "HoloDeckContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/HoloDeckContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    },
+    {
+      "PlayfieldId": 7010,
+      "Modules": [
+        {
+          "Name": "DojaResearchContentModule",
+          "SourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/DojaResearchContentModule.cs"
+        }
+      ],
+      "ExistingSpawnCountStatus": "NOT_ENUMERATED_OFFLINE"
+    }
+  ],
+  "DynamicScopes": [
+    {
+      "ScopeId": "MISSION_INSTANCE_PLAYFIELDS",
+      "Module": "MissionInstanceContentModule",
+      "ModuleSourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/MissionInstanceContentModule.cs",
+      "PredicateSourcePath": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceService.cs",
+      "Description": "Registered mission-instance content covers the explicit captured/legacy identities and the bounded high-band predicate. The high band is described but deliberately not expanded into inferred per-playfield implementation rows.",
+      "RangeMinimum": 1376256,
+      "RangeMaximum": 1507327,
+      "ExplicitPlayfieldIds": [
+        1413198,
+        1419307,
+        1419310,
+        1419335,
+        1419349,
+        1419360,
+        1419382,
+        1441792,
+        1441800,
+        1441804,
+        1443840,
+        1456133,
+        1460226
+      ],
+      "ExpandRangeIntoInventory": false,
+      "IncludeExplicitPlayfieldIdsInInventory": true,
+      "EnumerationStatus": "EXPLICIT_IDENTITIES_ENUMERATED_RANGE_DESCRIPTOR_ONLY"
+    },
+    {
+      "ScopeId": "PRIVATE_CITY_PLAYFIELDS",
+      "Module": "PrivateCityContentModule",
+      "ModuleSourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/PrivateCityContentModule.cs",
+      "PredicateSourcePath": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/PrivateCityContentModule.cs",
+      "Description": "Registered private-city content covers a bounded identity range. No concrete identity is inferred or expanded from the range.",
+      "RangeMinimum": 1048576,
+      "RangeMaximum": 1245183,
+      "ExplicitPlayfieldIds": [],
+      "ExpandRangeIntoInventory": false,
+      "IncludeExplicitPlayfieldIdsInInventory": false,
+      "EnumerationStatus": "RANGE_DESCRIPTOR_ONLY_NOT_ENUMERATED"
+    }
+  ],
+  "GovernedPlacementReconciliations": [
+    {
+      "PlayfieldId": 4582,
+      "ExistingAoRebirthSpawnCount": 206,
+      "ExistingSpawnsReconciled": 206,
+      "ExistingSpawnsUnmatched": 0,
+      "CurrentActiveOfficialSpawnCount": 25,
+      "OfficialSpawnsWithoutAoRebirthRuntimeEntry": 182,
+      "OfficialSpawnsWithoutAoRebirthPlacement": 1,
+      "Evidence": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.g.cs",
+        "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
+        "docs/generated/pf4582_official_placement_overlay.json"
+      ]
+    }
+  ],
+  "Safety": {
+    "LiveDatabaseQueriesAllowed": false,
+    "RuntimeConsumptionAllowed": false,
+    "ProximityReconciliationAllowed": false,
+    "FilenameInferredImplementationAllowed": false
+  }
+}

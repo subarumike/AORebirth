@@ -9,6 +9,8 @@ readonly EXPECTED_DATABASE="aorebirth_chatengine_stage6"
 readonly DATABASE_CONTAINER="aorebirth-chatengine-mysql-stage6"
 readonly READINESS_TIMEOUT_SECONDS=30
 readonly READINESS_POLL_INTERVAL_SECONDS=1
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../../placement-provenance.sh"
 
 manifest_path=""
 expected_sha=""
@@ -58,6 +60,19 @@ readonly LOGIN_ARTIFACT_DIR="$(manifest_value LOGINENGINE_ARTIFACT_DIR)"
 readonly LOGIN_ARTIFACT_SHA="$(manifest_value LOGINENGINE_ARTIFACT_SHA256)"
 readonly ZONE_ARTIFACT_DIR="$(manifest_value ZONEENGINE_ARTIFACT_DIR)"
 readonly ZONE_ARTIFACT_SHA="$(manifest_value ZONEENGINE_ARTIFACT_SHA256)"
+readonly MANIFEST_PLACEMENT_CORPUS_VERSION="$(manifest_value PLACEMENT_CORPUS_VERSION)"
+readonly MANIFEST_PLACEMENT_CORPUS_MANIFEST_SHA="$(manifest_value PLACEMENT_CORPUS_MANIFEST_SHA256)"
+readonly MANIFEST_PLACEMENT_CORPUS_SUMMARY_SHA="$(manifest_value PLACEMENT_CORPUS_SUMMARY_SHA256)"
+readonly MANIFEST_PLACEMENT_CORPUS_INDEX_SHA="$(manifest_value PLACEMENT_CORPUS_INDEX_SHA256)"
+readonly MANIFEST_PLACEMENT_ACGHASH_INVENTORY_SHA="$(manifest_value PLACEMENT_ACGHASH_INVENTORY_SHA256)"
+readonly MANIFEST_PLACEMENT_BUILD_MANIFEST_SHA="$(manifest_value PLACEMENT_BUILD_MANIFEST_SHA256)"
+readonly MANIFEST_PLACEMENT_RESOURCE_COUNT="$(manifest_value PLACEMENT_RESOURCE_COUNT)"
+readonly MANIFEST_PLACEMENT_PARSED_RESOURCE_COUNT="$(manifest_value PLACEMENT_PARSED_RESOURCE_COUNT)"
+readonly MANIFEST_PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT="$(manifest_value PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT)"
+readonly MANIFEST_PLACEMENT_DISTRICT_COUNT="$(manifest_value PLACEMENT_DISTRICT_COUNT)"
+readonly MANIFEST_PLACEMENT_RECORD_COUNT="$(manifest_value PLACEMENT_RECORD_COUNT)"
+readonly MANIFEST_PLACEMENT_UNIQUE_ACGHASH_COUNT="$(manifest_value PLACEMENT_UNIQUE_ACGHASH_COUNT)"
+readonly MANIFEST_PLACEMENT_RUNTIME_AUTHORIZED_COUNT="$(manifest_value PLACEMENT_RUNTIME_AUTHORIZED_COUNT)"
 readonly LOGIN_UNIT_SOURCE="$(manifest_value LOGINENGINE_UNIT_PATH)"
 readonly LOGIN_UNIT_SHA="$(manifest_value LOGINENGINE_UNIT_SHA256)"
 readonly ZONE_UNIT_SOURCE="$(manifest_value ZONEENGINE_UNIT_PATH)"
@@ -88,14 +103,53 @@ readonly TEST_STATE="${deploy_root}/test-state"
 
 validate_manifest_shape()
 {
-    [[ "${FORMAT}" == "1" ]] || fail "unsupported release manifest format"
+    [[ "${FORMAT}" == "2" ]] || fail "unsupported release manifest format"
     [[ "${SOURCE_SHA}" == "${expected_sha}" ]] || fail "manifest source SHA mismatch"
     [[ "${SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]] || fail "manifest source SHA is invalid"
     [[ "${LOGIN_SERVICE}" == "ao-rebirth-loginengine.service" ]] || fail "unexpected LoginEngine service"
     [[ "${ZONE_SERVICE}" == "ao-rebirth-zoneengine.service" ]] || fail "unexpected ZoneEngine service"
     local unknown
-    unknown="$(cut -d= -f1 "${manifest_path}" | grep -Ev '^(FORMAT|SOURCE_SHA|BUILD_TIMESTAMP_UTC|LOGINENGINE_ARTIFACT_DIR|LOGINENGINE_ARTIFACT_SHA256|ZONEENGINE_ARTIFACT_DIR|ZONEENGINE_ARTIFACT_SHA256|LOGINENGINE_UNIT_PATH|LOGINENGINE_UNIT_SHA256|ZONEENGINE_UNIT_PATH|ZONEENGINE_UNIT_SHA256|LOGINENGINE_SERVICE|ZONEENGINE_SERVICE|PREVIOUS_LOGINENGINE_RELEASE|PREVIOUS_ZONEENGINE_RELEASE)$' | head -n 1 || true)"
+    unknown="$(cut -d= -f1 "${manifest_path}" | grep -Ev '^(FORMAT|SOURCE_SHA|BUILD_TIMESTAMP_UTC|LOGINENGINE_ARTIFACT_DIR|LOGINENGINE_ARTIFACT_SHA256|ZONEENGINE_ARTIFACT_DIR|ZONEENGINE_ARTIFACT_SHA256|PLACEMENT_CORPUS_VERSION|PLACEMENT_CORPUS_MANIFEST_SHA256|PLACEMENT_CORPUS_SUMMARY_SHA256|PLACEMENT_CORPUS_INDEX_SHA256|PLACEMENT_ACGHASH_INVENTORY_SHA256|PLACEMENT_BUILD_MANIFEST_SHA256|PLACEMENT_RESOURCE_COUNT|PLACEMENT_PARSED_RESOURCE_COUNT|PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT|PLACEMENT_DISTRICT_COUNT|PLACEMENT_RECORD_COUNT|PLACEMENT_UNIQUE_ACGHASH_COUNT|PLACEMENT_RUNTIME_AUTHORIZED_COUNT|LOGINENGINE_UNIT_PATH|LOGINENGINE_UNIT_SHA256|ZONEENGINE_UNIT_PATH|ZONEENGINE_UNIT_SHA256|LOGINENGINE_SERVICE|ZONEENGINE_SERVICE|PREVIOUS_LOGINENGINE_RELEASE|PREVIOUS_ZONEENGINE_RELEASE)$' | head -n 1 || true)"
     [[ -z "${unknown}" ]] || fail "unknown manifest key ${unknown}"
+}
+
+require_zone_placement_artifact()
+{
+    local artifact_dir="$1"
+    placement_provenance_load \
+        "${artifact_dir}" \
+        "${SOURCE_SHA}" \
+        linux \
+        "${MANIFEST_PLACEMENT_BUILD_MANIFEST_SHA}" \
+        || fail "ZoneEngine official placement provenance is invalid"
+    placement_require_build_provenance "${artifact_dir}/BUILD_PROVENANCE.env" \
+        || fail "ZoneEngine build provenance lacks official placement evidence"
+    [[ "${PLACEMENT_CORPUS_VERSION}" == "${MANIFEST_PLACEMENT_CORPUS_VERSION}" ]] \
+        || fail "placement corpus version does not match release manifest"
+    [[ "${PLACEMENT_CORPUS_MANIFEST_SHA256}" == "${MANIFEST_PLACEMENT_CORPUS_MANIFEST_SHA}" ]] \
+        || fail "placement corpus manifest digest does not match release manifest"
+    [[ "${PLACEMENT_CORPUS_SUMMARY_SHA256}" == "${MANIFEST_PLACEMENT_CORPUS_SUMMARY_SHA}" ]] \
+        || fail "placement summary digest does not match release manifest"
+    [[ "${PLACEMENT_CORPUS_INDEX_SHA256}" == "${MANIFEST_PLACEMENT_CORPUS_INDEX_SHA}" ]] \
+        || fail "placement index digest does not match release manifest"
+    [[ "${PLACEMENT_ACGHASH_INVENTORY_SHA256}" == "${MANIFEST_PLACEMENT_ACGHASH_INVENTORY_SHA}" ]] \
+        || fail "placement ACGHash inventory digest does not match release manifest"
+    [[ "${PLACEMENT_RESOURCE_COUNT}" == "${MANIFEST_PLACEMENT_RESOURCE_COUNT}" \
+        && "${PLACEMENT_PARSED_RESOURCE_COUNT}" == "${MANIFEST_PLACEMENT_PARSED_RESOURCE_COUNT}" \
+        && "${PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT}" == "${MANIFEST_PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT}" \
+        && "${PLACEMENT_DISTRICT_COUNT}" == "${MANIFEST_PLACEMENT_DISTRICT_COUNT}" \
+        && "${PLACEMENT_RECORD_COUNT}" == "${MANIFEST_PLACEMENT_RECORD_COUNT}" \
+        && "${PLACEMENT_UNIQUE_ACGHASH_COUNT}" == "${MANIFEST_PLACEMENT_UNIQUE_ACGHASH_COUNT}" \
+        && "${PLACEMENT_RUNTIME_AUTHORIZED_COUNT}" == "${MANIFEST_PLACEMENT_RUNTIME_AUTHORIZED_COUNT}" ]] \
+        || fail "placement global counts do not match release manifest"
+    grep -Fx "PLACEMENT_VALIDATION=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "ZoneEngine placement acceptance did not pass"
+    grep -Fx "EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256=${MANIFEST_PLACEMENT_BUILD_MANIFEST_SHA}" \
+        "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "ZoneEngine accepted placement manifest digest does not match"
+    grep -Fx "PLACEMENT_BUILD_MANIFEST_SHA256=${MANIFEST_PLACEMENT_BUILD_MANIFEST_SHA}" \
+        "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "ZoneEngine placement manifest acceptance provenance is missing"
 }
 
 require_regular_file() { [[ -f "$1" && ! -L "$1" ]] || fail "required file is missing or unsafe: $1"; }
@@ -338,6 +392,7 @@ preflight()
     validate_manifest_shape
     require_artifact "${LOGIN_ARTIFACT_DIR}" LoginEngine "${LOGIN_ARTIFACT_SHA}"
     require_artifact "${ZONE_ARTIFACT_DIR}" ZoneEngine "${ZONE_ARTIFACT_SHA}"
+    require_zone_placement_artifact "${ZONE_ARTIFACT_DIR}"
     validate_units
     verify_unit_static
     [[ "${test_mode}" == "1" ]] || id "${EXPECTED_SERVICE_USER}" >/dev/null 2>&1
@@ -369,6 +424,12 @@ current_release_matches()
     [[ "$(tr -d '\r\n\t ' < "${ZONE_CURRENT}/SOURCE_SHA")" == "${SOURCE_SHA}" ]] || return 1
     [[ "$(sha256sum "${LOGIN_CURRENT}/LoginEngine" | awk '{print $1}')" == "${LOGIN_ARTIFACT_SHA}" ]] || return 1
     [[ "$(sha256sum "${ZONE_CURRENT}/ZoneEngine" | awk '{print $1}')" == "${ZONE_ARTIFACT_SHA}" ]] || return 1
+    placement_provenance_load \
+        "${ZONE_CURRENT}" \
+        "${SOURCE_SHA}" \
+        linux \
+        "${MANIFEST_PLACEMENT_BUILD_MANIFEST_SHA}" >/dev/null 2>&1 || return 1
+    placement_require_build_provenance "${ZONE_CURRENT}/BUILD_PROVENANCE.env" >/dev/null 2>&1 || return 1
     [[ "$(sha256sum "${LOGIN_UNIT_TARGET}" | awk '{print $1}')" == "${LOGIN_UNIT_SHA}" ]] || return 1
     [[ "$(sha256sum "${ZONE_UNIT_TARGET}" | awk '{print $1}')" == "${ZONE_UNIT_SHA}" ]] || return 1
     [[ -d "${OWNERSHIP_DIR}" ]] || return 1
@@ -412,6 +473,9 @@ install_release()
         [[ -d "${target}" && ! -L "${target}" ]] || fail "existing release target is unsafe"
         [[ "$(sha256sum "${target}/${apphost}" | awk '{print $1}')" == "${expected_hash}" ]] || fail "existing immutable release differs"
         [[ "$(tr -d '\r\n\t ' < "${target}/SOURCE_SHA")" == "${SOURCE_SHA}" ]] || fail "existing immutable release source differs"
+        if [[ "${apphost}" == "ZoneEngine" ]]; then
+            require_zone_placement_artifact "${target}"
+        fi
         return
     fi
     local staging="${releases}/.${RELEASE_NAME}.staging.$$"
@@ -429,6 +493,9 @@ install_release()
         [[ ! -f "${staging}/createdump" ]] || chmod 0750 "${staging}/createdump"
     fi
     [[ "$(sha256sum "${staging}/${apphost}" | awk '{print $1}')" == "${expected_hash}" ]] || fail "staged ${apphost} hash mismatch"
+    if [[ "${apphost}" == "ZoneEngine" ]]; then
+        require_zone_placement_artifact "${staging}"
+    fi
     mv -T -- "${staging}" "${target}"
 }
 
@@ -471,6 +538,19 @@ LOGINENGINE_RELEASE=${LOGIN_RELEASE_TARGET}
 ZONEENGINE_RELEASE=${ZONE_RELEASE_TARGET}
 LOGINENGINE_ARTIFACT_SHA256=${LOGIN_ARTIFACT_SHA}
 ZONEENGINE_ARTIFACT_SHA256=${ZONE_ARTIFACT_SHA}
+PLACEMENT_CORPUS_VERSION=${MANIFEST_PLACEMENT_CORPUS_VERSION}
+PLACEMENT_CORPUS_MANIFEST_SHA256=${MANIFEST_PLACEMENT_CORPUS_MANIFEST_SHA}
+PLACEMENT_CORPUS_SUMMARY_SHA256=${MANIFEST_PLACEMENT_CORPUS_SUMMARY_SHA}
+PLACEMENT_CORPUS_INDEX_SHA256=${MANIFEST_PLACEMENT_CORPUS_INDEX_SHA}
+PLACEMENT_ACGHASH_INVENTORY_SHA256=${MANIFEST_PLACEMENT_ACGHASH_INVENTORY_SHA}
+PLACEMENT_BUILD_MANIFEST_SHA256=${MANIFEST_PLACEMENT_BUILD_MANIFEST_SHA}
+PLACEMENT_RESOURCE_COUNT=${MANIFEST_PLACEMENT_RESOURCE_COUNT}
+PLACEMENT_PARSED_RESOURCE_COUNT=${MANIFEST_PLACEMENT_PARSED_RESOURCE_COUNT}
+PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=${MANIFEST_PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT}
+PLACEMENT_DISTRICT_COUNT=${MANIFEST_PLACEMENT_DISTRICT_COUNT}
+PLACEMENT_RECORD_COUNT=${MANIFEST_PLACEMENT_RECORD_COUNT}
+PLACEMENT_UNIQUE_ACGHASH_COUNT=${MANIFEST_PLACEMENT_UNIQUE_ACGHASH_COUNT}
+PLACEMENT_RUNTIME_AUTHORIZED_COUNT=${MANIFEST_PLACEMENT_RUNTIME_AUTHORIZED_COUNT}
 LOGINENGINE_UNIT_SHA256=${LOGIN_UNIT_SHA}
 ZONEENGINE_UNIT_SHA256=${ZONE_UNIT_SHA}
 DEPLOYED_AT_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)

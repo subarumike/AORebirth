@@ -433,6 +433,23 @@ migrations; details and exact source references are recorded in
   mappings, and runtime hash-to-dynel join remain unresolved. The 207-record
   official overlay is not runtime-consumed; current runtime remains 25 active
   and 181 blocked.
+- AORebirth now has a deterministic database-wide official static placement
+  evidence layer imported from the official `18.8.62_EP1` old-graphics-client
+  ResourceDatabase extraction. The source cohort is hash-pinned at 630 unique
+  type-`1000014` resource instances: 627 parsed resources, three explicit
+  parser-limited resources, 4,146 districts, 32,805 independent placement
+  records, and 4,016 canonical `ACGHash_t` tags. Resource instance is exposed as
+  playfield ID only under the extraction's 630/630 validated relationship, and
+  the original instance remains provenance. The corpus preserves all duplicate
+  records and creates no synthetic placement records for resources 103, 615,
+  or 4805. The authoritative Windows project and its derived Linux inventory
+  copy the same exact-cased corpus into ZoneEngine artifacts. A shared compiled
+  validation mode verifies all file, shard, count, PF4582, and activation-policy
+  invariants and emits deterministic manifest/provenance evidence; normal
+  startup and spawn materialization do not consume it. Identity, behavior
+  readiness, and runtime activation remain separately governed. PF4582
+  reconciles exactly to the general 207-row shard while its existing runtime
+  stays 25 active and 181 blocked.
 - PF127 Subway is complete for its current capture-backed population,
   navigation, combat, lifecycle, loot, vendor, Karrec, zoning, and teardown
   contracts. New behavior still requires capture evidence.

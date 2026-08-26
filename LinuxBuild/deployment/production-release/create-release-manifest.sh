@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repository_root="$(cd -- "${script_dir}/../../.." && pwd)"
+source "${repository_root}/LinuxBuild/placement-provenance.sh"
 expected_sha=""
 login_artifact_dir=""
 zone_artifact_dir=""
@@ -54,19 +55,45 @@ for pair in "${login_artifact_dir}:LoginEngine" "${zone_artifact_dir}:ZoneEngine
     grep -Fx "LINUX_ACCEPTANCE=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null || fail "${apphost} Linux acceptance did not pass"
 done
 
+placement_provenance_load "${zone_artifact_dir}" "${expected_sha}" linux \
+    || fail "ZoneEngine official placement provenance is invalid"
+placement_require_build_provenance "${zone_artifact_dir}/BUILD_PROVENANCE.env" \
+    || fail "ZoneEngine build provenance lacks official placement evidence"
+grep -Fx "PLACEMENT_VALIDATION=PASS" "${zone_artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+    || fail "ZoneEngine official placement acceptance did not pass"
+grep -Fx "EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}" \
+    "${zone_artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+    || fail "ZoneEngine accepted placement manifest digest does not match"
+grep -Fx "PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}" \
+    "${zone_artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+    || fail "ZoneEngine placement manifest acceptance provenance is missing"
+
 [[ -n "${output}" ]] || fail "manifest output is required"
 output_parent="$(mkdir -p -- "$(dirname -- "${output}")" && cd -- "$(dirname -- "${output}")" && pwd)"
 output="${output_parent}/$(basename -- "${output}")"
 temporary="${output}.tmp.$$"
 trap 'rm -f -- "${temporary}"' EXIT
 cat > "${temporary}" <<EOF
-FORMAT=1
+FORMAT=2
 SOURCE_SHA=${expected_sha}
 BUILD_TIMESTAMP_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 LOGINENGINE_ARTIFACT_DIR=${login_artifact_dir}
 LOGINENGINE_ARTIFACT_SHA256=$(sha256sum "${login_artifact_dir}/LoginEngine" | awk '{print $1}')
 ZONEENGINE_ARTIFACT_DIR=${zone_artifact_dir}
 ZONEENGINE_ARTIFACT_SHA256=$(sha256sum "${zone_artifact_dir}/ZoneEngine" | awk '{print $1}')
+PLACEMENT_CORPUS_VERSION=${PLACEMENT_CORPUS_VERSION}
+PLACEMENT_CORPUS_MANIFEST_SHA256=${PLACEMENT_CORPUS_MANIFEST_SHA256}
+PLACEMENT_CORPUS_SUMMARY_SHA256=${PLACEMENT_CORPUS_SUMMARY_SHA256}
+PLACEMENT_CORPUS_INDEX_SHA256=${PLACEMENT_CORPUS_INDEX_SHA256}
+PLACEMENT_ACGHASH_INVENTORY_SHA256=${PLACEMENT_ACGHASH_INVENTORY_SHA256}
+PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}
+PLACEMENT_RESOURCE_COUNT=${PLACEMENT_RESOURCE_COUNT}
+PLACEMENT_PARSED_RESOURCE_COUNT=${PLACEMENT_PARSED_RESOURCE_COUNT}
+PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=${PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT}
+PLACEMENT_DISTRICT_COUNT=${PLACEMENT_DISTRICT_COUNT}
+PLACEMENT_RECORD_COUNT=${PLACEMENT_RECORD_COUNT}
+PLACEMENT_UNIQUE_ACGHASH_COUNT=${PLACEMENT_UNIQUE_ACGHASH_COUNT}
+PLACEMENT_RUNTIME_AUTHORIZED_COUNT=${PLACEMENT_RUNTIME_AUTHORIZED_COUNT}
 LOGINENGINE_UNIT_PATH=${login_unit}
 LOGINENGINE_UNIT_SHA256=$(sha256sum "${login_unit}" | awk '{print $1}')
 ZONEENGINE_UNIT_PATH=${zone_unit}

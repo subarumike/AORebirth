@@ -17,6 +17,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
     {
         private const string RepositoryRootArgument = "--repository-root";
         private const string ZoneOutputArgument = "--zone-output";
+        private const string SourceShaArgument = "--source-sha";
+        private const string BuildPlatformArgument = "--build-platform";
 
         public static int Main(string[] args)
         {
@@ -24,6 +26,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             {
                 string repositoryRoot = ReadArgument(args, RepositoryRootArgument);
                 string zoneOutput = ReadArgument(args, ZoneOutputArgument);
+                string sourceSha = ReadScalarArgument(args, SourceShaArgument);
+                string buildPlatform = ReadScalarArgument(args, BuildPlatformArgument);
                 repositoryRoot = Stage8RepositoryRootResolver.ResolveExplicit(repositoryRoot);
 
                 Stage8RepositoryRootResolverTests.Run();
@@ -37,6 +41,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 VerifyJavaScriptSerializerCompatibility();
                 VerifyZlibDiagnosticsCompatibility();
                 VerifyZoneCopiedAssets(repositoryRoot, zoneOutput);
+                VerifyOfficialPlacements(zoneOutput, sourceSha, buildPlatform);
                 StaleOnlineRecoveryTests.Run(repositoryRoot);
                 LoginHandoffLifecycleTests.Run();
                 CleanmeisterCorpseMappingTests.Run(repositoryRoot);
@@ -54,6 +59,68 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 Console.Error.WriteLine("FAIL: " + exception.Message);
                 return 1;
             }
+        }
+
+        private static void VerifyOfficialPlacements(
+            string zoneOutput,
+            string sourceSha,
+            string buildPlatform)
+        {
+            Require(
+                sourceSha.Length == 40
+                && sourceSha.All(
+                    character => (character >= '0' && character <= '9')
+                        || (character >= 'a' && character <= 'f')),
+                "Official placement source SHA must be lowercase 40-hex.");
+            Require(
+                buildPlatform == "linux"
+                || buildPlatform == "windows-hosted-linux-publish",
+                "Official placement build platform is unsupported: " + buildPlatform);
+
+            string corpusRoot = Path.Combine(
+                zoneOutput,
+                "Content",
+                "Official",
+                "PlayfieldPlacements");
+            string buildManifestPath = Path.Combine(
+                corpusRoot,
+                "official-placement-build-manifest.json");
+            string provenancePath = Path.Combine(
+                corpusRoot,
+                "PLACEMENT_PROVENANCE.env");
+            if (File.Exists(buildManifestPath))
+            {
+                File.Delete(buildManifestPath);
+            }
+
+            if (File.Exists(provenancePath))
+            {
+                File.Delete(provenancePath);
+            }
+
+            RunZoneValidation(
+                zoneOutput,
+                new[]
+                {
+                    "--validate-official-placements",
+                    "--source-sha",
+                    sourceSha,
+                    "--build-platform",
+                    buildPlatform,
+                    "--placement-manifest-output",
+                    buildManifestPath,
+                    "--placement-provenance-output",
+                    provenancePath,
+                },
+                "OFFICIAL_PLACEMENT_VALIDATION_OK",
+                null);
+
+            Require(
+                File.Exists(buildManifestPath),
+                "Official placement validation did not write its build manifest.");
+            Require(
+                File.Exists(provenancePath),
+                "Official placement validation did not write its provenance.");
         }
 
         private static bool HasArgument(string[] args, string name)
@@ -144,6 +211,23 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
+            string smokeAssembly = Assembly.GetEntryAssembly().Location;
+            string smokeRuntimeConfig = Path.ChangeExtension(
+                smokeAssembly,
+                ".runtimeconfig.json");
+            Require(
+                File.Exists(smokeRuntimeConfig),
+                "Missing Stage 8 runtime configuration: " + smokeRuntimeConfig);
+            startInfo.ArgumentList.Add("exec");
+            startInfo.ArgumentList.Add("--runtimeconfig");
+            startInfo.ArgumentList.Add(smokeRuntimeConfig);
+            string zoneDepsFile = Path.Combine(zoneOutput, "ZoneEngine.deps.json");
+            if (File.Exists(zoneDepsFile))
+            {
+                startInfo.ArgumentList.Add("--depsfile");
+                startInfo.ArgumentList.Add(zoneDepsFile);
+            }
+
             startInfo.ArgumentList.Add(zoneAssembly);
             foreach (string argument in arguments)
             {
@@ -212,6 +296,19 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 if (string.Equals(args[index], name, StringComparison.Ordinal))
                 {
                     return Path.GetFullPath(args[index + 1]);
+                }
+            }
+
+            throw new ArgumentException("Missing required argument: " + name);
+        }
+
+        private static string ReadScalarArgument(string[] args, string name)
+        {
+            for (int index = 0; index < args.Length - 1; index++)
+            {
+                if (string.Equals(args[index], name, StringComparison.Ordinal))
+                {
+                    return args[index + 1];
                 }
             }
 

@@ -2,22 +2,17 @@
 
 ## Active
 
-DailyLogin web/VGTP routing is now scoped as client-patch work, not a Linux
-server rewrite. The AORebirth website serves the DailyLogin app and
-`/daily/claim.php` returns live account board state, but the in-game client
-opens `vgtp://uwg.daily.icc-rk/index.app` through the AO browser layer. The
-newer AORebirth private client patch source from the parallel Linux build tree
-has been reconciled into authoritative Windows `master` at
-`Tools\AOClientRoomSpaceGuard\ProxyDll`. It now builds a versioned v2 combined
-DLL from source commit `b60b7ca6` with both crash-repair/RoomSpace protection
-and endpoint-aware login-key behavior, including AORebirth public and local
-endpoint self-tests. Global hosts/DNS overrides and server-side proxying remain
-forbidden because they would hijack official Rubi-Ka/RK2019 traffic. Next step
-is real disposable-client acceptance for the combined v2 patch before any
-installed-client or website deployment. DailyLogin routing remains out of scope
-until that combined patch is accepted. Evidence:
-`docs/evidence/CLIENT_PATCH_SOURCE_PROVENANCE_20260817.md` and
-`docs/evidence/DAILYLOGIN_VGTP_DIMENSION_ROUTING_20260817.md`.
+Promote the database-wide official type-`1000014` static placement corpus from
+its single checked-in source into both authoritative Windows and exact-SHA
+Linux ZoneEngine artifacts. The shared catalog and compiled validation mode
+must prove 630 resources, 4,146 districts, 32,805 independent placements, and
+4,016 canonical `ACGHash_t` tags with identical per-playfield digests. Resources
+103, 615, and 4805 remain explicitly parser-limited. Placement availability is
+separate from identity, behavior readiness, and runtime authorization: PF4582
+remains 207 official evidence rows upstream of the existing 206-row runtime
+catalog, with exactly 25 authorized, 181 blocked, and `NCNN` unresolved and
+inactive. Complete Windows acceptance and Linux exact-SHA artifact parity
+without client, capture, database, or production deployment operations.
 
 ## Prior active checkpoint
 

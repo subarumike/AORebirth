@@ -12,6 +12,9 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             string manifest = File.ReadAllText(Path.Combine(deploymentRoot, "create-release-manifest.sh"));
             string tests = File.ReadAllText(Path.Combine(deploymentRoot, "tests", "test-upgrade-active-services.sh"));
             string acceptance = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "accept-linux-sha.sh"));
+            string placementProvenance = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "placement-provenance.sh"));
+            string zoneArtifactGate = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "zone-stage9", "upgrade-live-service.sh"));
+            string zoneArtifactTests = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "zone-stage9", "test-artifact-provenance.sh"));
             string zoneUnit = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "systemd", "ao-rebirth-zoneengine.service"));
 
             Require(upgrader.Contains("--dry-run"), "production upgrader lost dry-run mode");
@@ -36,6 +39,9 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("state=${state_value} restarts=${restart_value}"), "readiness timeout service diagnostics are missing");
             Require(upgrader.Contains("ZoneEngine production executable contract failed"), "production upgrader does not require the headless ZoneEngine runtime");
             Require(upgrader.Contains("ZoneEngine validation lifecycle cannot be production ExecStart"), "production upgrader does not reject the listener-free ZoneEngine validation runtime");
+            Require(upgrader.Contains("[[ \"${FORMAT}\" == \"2\" ]]"), "production upgrader does not require the placement-aware manifest format");
+            Require(upgrader.Contains("require_zone_placement_artifact"), "production upgrader does not fail closed on placement provenance");
+            Require(upgrader.Contains("PLACEMENT_BUILD_MANIFEST_SHA256"), "production upgrader does not pin the placement build manifest");
 
             Require(zoneUnit.Contains("Type=notify"), "production ZoneEngine unit does not use readiness notification");
             Require(zoneUnit.Contains("NotifyAccess=main"), "production ZoneEngine unit does not authorize main-process readiness notification");
@@ -51,11 +57,14 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             Require(manifest.Contains("LOGINENGINE_ARTIFACT_SHA256="), "release manifest lacks LoginEngine artifact hash");
             Require(manifest.Contains("ZONEENGINE_ARTIFACT_SHA256="), "release manifest lacks ZoneEngine artifact hash");
+            Require(manifest.Contains("PLACEMENT_CORPUS_MANIFEST_SHA256="), "release manifest lacks placement corpus manifest provenance");
+            Require(manifest.Contains("PLACEMENT_BUILD_MANIFEST_SHA256="), "release manifest lacks placement build manifest provenance");
+            Require(manifest.Contains("PLACEMENT_RECORD_COUNT="), "release manifest lacks placement count provenance");
             Require(manifest.Contains("LOGINENGINE_UNIT_SHA256="), "release manifest lacks LoginEngine unit hash");
             Require(manifest.Contains("ZONEENGINE_UNIT_SHA256="), "release manifest lacks ZoneEngine unit hash");
             Require(manifest.Contains("repository HEAD does not match expected source SHA"), "manifest generator lost immutable SHA gate");
 
-            Require(tests.Contains("production deployment workflow tests (18/18)"), "deployment fixture suite count changed");
+            Require(tests.Contains("production deployment workflow tests (24/24)"), "deployment fixture suite count changed");
             Require(tests.Contains("artifact_install"), "deployment fixture suite lacks artifact rollback failure");
             Require(tests.Contains("unit_install"), "deployment fixture suite lacks unit rollback failure");
             Require(tests.Contains("login_start"), "deployment fixture suite lacks first-service startup failure");
@@ -67,11 +76,24 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(tests.Contains("ZoneEngine --validate-lifecycle --shutdown-file"), "deployment fixture does not reject the listener-free ZoneEngine validation runtime");
             Require(tests.Contains("prior_login_link_target=\"releases/old-login\""), "deployment fixture suite does not preserve an exact relative LoginEngine symlink target");
             Require(tests.Contains("prior_zone_link_target=\"releases/old-zone\""), "deployment fixture suite does not preserve an exact relative ZoneEngine symlink target");
+            Require(tests.Contains("official-placement-build-manifest.json\"; expect_preflight_failure"), "deployment fixture does not reject a missing placement build manifest");
+            Require(tests.Contains("official-placement-summary.json\"; expect_preflight_failure"), "deployment fixture does not reject changed placement data");
+            Require(tests.Contains("placements/pf_630.json\"; expect_preflight_failure"), "deployment fixture does not reject a missing placement shard");
+            Require(tests.Contains("placements/pf_1.json\"; expect_preflight_failure"), "deployment fixture does not reject changed placement shard content");
 
             Require(acceptance.Contains("publish-loginengine.sh"), "Linux exact-SHA acceptance does not publish LoginEngine");
             Require(acceptance.Contains("publish-zoneengine.sh"), "Linux exact-SHA acceptance does not publish ZoneEngine");
             Require(acceptance.Contains("test-upgrade-active-services.sh"), "Linux exact-SHA acceptance does not run deployment tests");
+            Require(acceptance.Contains("test-artifact-provenance.sh"), "Linux exact-SHA acceptance does not run non-production provenance tests");
             Require(acceptance.Contains("create-release-manifest.sh"), "Linux exact-SHA acceptance does not generate the release manifest");
+            Require(acceptance.Contains("--expected-placement-manifest-sha"), "Linux exact-SHA acceptance does not require the Windows placement manifest digest");
+            Require(acceptance.Contains("PLACEMENT_VALIDATION=PASS"), "Linux exact-SHA acceptance does not record placement validation");
+            Require(placementProvenance.Contains("official placement shard count is"), "shared placement provenance gate does not require all shards");
+            Require(placementProvenance.Contains("PLACEMENT_CORPUS_SUMMARY_SHA256"), "shared placement provenance gate does not verify the summary digest");
+            Require(zoneArtifactGate.Contains("placement_provenance_load"), "non-production artifact provenance validation omits placement evidence");
+            Require(zoneArtifactGate.Contains("EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256"), "non-production artifact provenance validation omits accepted Windows parity");
+            Require(zoneArtifactTests.Contains("ZoneEngine placement artifact provenance tests (8/8)"), "non-production provenance fixture suite count changed");
+            Require(zoneArtifactTests.Contains("PLACEMENT_CORPUS_INDEX_SHA256"), "non-production provenance fixtures omit corpus digest validation");
             Console.WriteLine("PASS: governed transactional production deployment contract");
         }
 

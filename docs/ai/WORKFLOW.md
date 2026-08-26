@@ -365,6 +365,55 @@ The upstream ODS is provenance only because its mission cells after level 133
 were precision-coerced. Do not generate the complete graph from that ODS and do
 not make production depend on either spreadsheet file.
 
+## Database-Wide Official Playfield Placement Import
+
+Import the verified official type-`1000014` placement corpus from the read-only
+AO Stripdown extraction with:
+
+```cmd
+cmd /d /c Tools\import_official_playfield_placements.cmd --write
+```
+
+Validate every pinned source artifact and shard, then verify the checked-in
+normalized cohort byte-for-byte without writing with:
+
+```cmd
+cmd /d /c Tools\import_official_playfield_placements.cmd --check
+cmd /d /c Tools\import_official_playfield_placements.cmd --test
+```
+
+The importer verifies all six global source hashes and all 630 source-shard
+hashes before rendering. It preserves 32,805 independent official placement
+records, including duplicate positions and exact duplicate records, and emits
+one normalized shard per resource instance under
+`docs\generated\playfields\placements`. The wrapper then regenerates or checks
+the offline AORebirth representation/reconciliation inventory across the
+official index, `Playfields.xml`, compiled registered content, bounded dynamic
+descriptors, and exact PF4582 bridge. Counts that cannot be enumerated offline
+remain null. Resources 103, 615, and 4805 remain explicit parser-limited shards
+with zero synthetic placements.
+
+The offline AORebirth inventory is declared in
+`docs\reference\playfields\aorebirth-playfield-representation-manifest.json`
+and rendered to
+`docs\generated\playfields\official-playfield-reconciliation.json`. A null
+count means the adapter cannot honestly enumerate that dynamic or external
+representation offline; it must not be treated as zero.
+
+The generated corpus remains an evidence layer and never authorizes identity or
+behavior. The Windows project is the single content-inventory owner and copies
+the four canonical global files plus all 630 exact-cased shards to
+`Content\Official\PlayfieldPlacements`; the governed Linux inventory is derived
+from that project and copies the same files. `ZoneEngine
+--validate-official-placements` loads the packaged files relative to the built
+binary, verifies every pinned digest and global/per-playfield invariant, and
+emits the deterministic `official-placement-build-manifest.json` plus
+`PLACEMENT_PROVENANCE.env`. Normal startup and spawn materialization do not
+consume the catalog. `ResourceInstance -> PlayfieldId` is accepted only for
+this build-validated corpus, with the original resource instance retained. The
+source build label `18.8.62_EP1` means the official old-graphics-client
+extraction source; it is not a gameplay-content or spawn-content partition.
+
 ## PF4582 Authoritative Placement Import
 
 Regenerate the normalized ICC Shuttleport placement catalog and audit report
@@ -380,6 +429,11 @@ retention, and fail-closed runtime activation with:
 ```cmd
 cmd /d /c Tools\run_pf4582_placement_tests.cmd
 ```
+
+The general official placement shard is the authoritative static official
+source for PF4582. The specialized PF4582 source, reconciliation report, and
+overlay remain the governed `SourceNpcId` crosswalk and historical evidence
+layer and must agree with the general shard record-for-record.
 
 The accepted placement source proves 206 placement records. `NpcId` is the
 stable AORebirth source-placement key, not a proven native Funcom field.
@@ -776,7 +830,7 @@ For Linux acceptance, use a controlled disposable or dedicated build workspace,
 not a normal developer checkout and not the production runtime directory:
 
 ```bash
-LinuxBuild/accept-linux-sha.sh --expected-sha <sha> --workspace /srv/ao-rebirth-linux-acceptance
+LinuxBuild/accept-linux-sha.sh --expected-sha <sha> --expected-placement-manifest-sha <windows-manifest-sha256> --workspace /srv/ao-rebirth-linux-acceptance
 ```
 
 The Linux wrapper fetches origin, checks out the exact SHA detached, resets and

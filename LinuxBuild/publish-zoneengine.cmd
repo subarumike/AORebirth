@@ -20,6 +20,9 @@ if "%SELF_CONTAINED%"=="true" (
 
 pushd "%~dp0" || exit /b 1
 
+for /f "usebackq delims=" %%I in (`git -C .. rev-parse HEAD`) do set SOURCE_SHA=%%I
+if "%SOURCE_SHA%"=="" goto :failed
+
 dotnet run --project Tools\SourceInventoryGuard\SourceInventoryGuard.csproj -- --repository-root .. --manifest source-inventory\inventory.json --check
 if errorlevel 1 goto :failed
 
@@ -40,13 +43,12 @@ dotnet build Tools\Stage8OfflineSmokeTests\Stage8OfflineSmokeTests.csproj -c Rel
 if errorlevel 1 goto :failed
 
 if "%SELF_CONTAINED%"=="true" (
-  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" --structure-only
+  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish --structure-only
 ) else (
-  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%"
+  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish
 )
 if errorlevel 1 goto :failed
 
-for /f "usebackq delims=" %%I in (`git -C .. rev-parse HEAD`) do set SOURCE_SHA=%%I
 for /f "usebackq delims=" %%I in (`dotnet --version`) do set DOTNET_SDK_VERSION=%%I
 set TRACKED_SOURCE_CLEAN=PASS
 git -C .. diff --quiet --
@@ -54,6 +56,45 @@ if errorlevel 1 set TRACKED_SOURCE_CLEAN=FAIL
 git -C .. diff --cached --quiet --
 if errorlevel 1 set TRACKED_SOURCE_CLEAN=FAIL
 set PUBLISH_DIR=artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%
+set PLACEMENT_DIR=%PUBLISH_DIR%\Content\Official\PlayfieldPlacements
+set PLACEMENT_BUILD_MANIFEST=%PLACEMENT_DIR%\official-placement-build-manifest.json
+set PLACEMENT_PROVENANCE=%PLACEMENT_DIR%\PLACEMENT_PROVENANCE.env
+if not exist "%PLACEMENT_BUILD_MANIFEST%" goto :failed
+if not exist "%PLACEMENT_PROVENANCE%" goto :failed
+set PLACEMENT_SOURCE_SHA=
+set PLACEMENT_BUILD_PLATFORM=
+for /f "usebackq tokens=1,* delims==" %%A in ("%PLACEMENT_PROVENANCE%") do (
+  if "%%A"=="SOURCE_SHA" set PLACEMENT_SOURCE_SHA=%%B
+  if "%%A"=="BUILD_PLATFORM" set PLACEMENT_BUILD_PLATFORM=%%B
+  if "%%A"=="PLACEMENT_CORPUS_VERSION" set PLACEMENT_CORPUS_VERSION=%%B
+  if "%%A"=="PLACEMENT_CORPUS_MANIFEST_SHA256" set PLACEMENT_CORPUS_MANIFEST_SHA256=%%B
+  if "%%A"=="PLACEMENT_CORPUS_SUMMARY_SHA256" set PLACEMENT_CORPUS_SUMMARY_SHA256=%%B
+  if "%%A"=="PLACEMENT_CORPUS_INDEX_SHA256" set PLACEMENT_CORPUS_INDEX_SHA256=%%B
+  if "%%A"=="PLACEMENT_ACGHASH_INVENTORY_SHA256" set PLACEMENT_ACGHASH_INVENTORY_SHA256=%%B
+  if "%%A"=="PLACEMENT_BUILD_MANIFEST_SHA256" set PLACEMENT_BUILD_MANIFEST_SHA256=%%B
+  if "%%A"=="PLACEMENT_RESOURCE_COUNT" set PLACEMENT_RESOURCE_COUNT=%%B
+  if "%%A"=="PLACEMENT_PARSED_RESOURCE_COUNT" set PLACEMENT_PARSED_RESOURCE_COUNT=%%B
+  if "%%A"=="PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT" set PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=%%B
+  if "%%A"=="PLACEMENT_DISTRICT_COUNT" set PLACEMENT_DISTRICT_COUNT=%%B
+  if "%%A"=="PLACEMENT_RECORD_COUNT" set PLACEMENT_RECORD_COUNT=%%B
+  if "%%A"=="PLACEMENT_UNIQUE_ACGHASH_COUNT" set PLACEMENT_UNIQUE_ACGHASH_COUNT=%%B
+  if "%%A"=="PLACEMENT_RUNTIME_AUTHORIZED_COUNT" set PLACEMENT_RUNTIME_AUTHORIZED_COUNT=%%B
+)
+if not "%PLACEMENT_SOURCE_SHA%"=="%SOURCE_SHA%" goto :failed
+if not "%PLACEMENT_BUILD_PLATFORM%"=="windows-hosted-linux-publish" goto :failed
+if not "%PLACEMENT_RESOURCE_COUNT%"=="630" goto :failed
+if not "%PLACEMENT_PARSED_RESOURCE_COUNT%"=="627" goto :failed
+if not "%PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT%"=="3" goto :failed
+if not "%PLACEMENT_DISTRICT_COUNT%"=="4146" goto :failed
+if not "%PLACEMENT_RECORD_COUNT%"=="32805" goto :failed
+if not "%PLACEMENT_UNIQUE_ACGHASH_COUNT%"=="4016" goto :failed
+if not "%PLACEMENT_RUNTIME_AUTHORIZED_COUNT%"=="25" goto :failed
+if "%PLACEMENT_CORPUS_VERSION%"=="" goto :failed
+if "%PLACEMENT_CORPUS_MANIFEST_SHA256%"=="" goto :failed
+if "%PLACEMENT_CORPUS_SUMMARY_SHA256%"=="" goto :failed
+if "%PLACEMENT_CORPUS_INDEX_SHA256%"=="" goto :failed
+if "%PLACEMENT_ACGHASH_INVENTORY_SHA256%"=="" goto :failed
+if "%PLACEMENT_BUILD_MANIFEST_SHA256%"=="" goto :failed
 > "%PUBLISH_DIR%\SOURCE_SHA" echo %SOURCE_SHA%
 > "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo REPOSITORY=AORebirth
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo COMMIT_SHA=%SOURCE_SHA%
@@ -65,6 +106,19 @@ set PUBLISH_DIR=artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo TRACKED_SOURCE_CLEAN=%TRACKED_SOURCE_CLEAN%
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo BUILD_TIMESTAMP_LOCAL=%DATE% %TIME%
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo ACCEPTANCE_RESULT=UNVERIFIED
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_CORPUS_VERSION=%PLACEMENT_CORPUS_VERSION%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_CORPUS_MANIFEST_SHA256=%PLACEMENT_CORPUS_MANIFEST_SHA256%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_CORPUS_SUMMARY_SHA256=%PLACEMENT_CORPUS_SUMMARY_SHA256%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_CORPUS_INDEX_SHA256=%PLACEMENT_CORPUS_INDEX_SHA256%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_ACGHASH_INVENTORY_SHA256=%PLACEMENT_ACGHASH_INVENTORY_SHA256%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_BUILD_MANIFEST_SHA256=%PLACEMENT_BUILD_MANIFEST_SHA256%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_RESOURCE_COUNT=%PLACEMENT_RESOURCE_COUNT%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_PARSED_RESOURCE_COUNT=%PLACEMENT_PARSED_RESOURCE_COUNT%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT=%PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_DISTRICT_COUNT=%PLACEMENT_DISTRICT_COUNT%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_RECORD_COUNT=%PLACEMENT_RECORD_COUNT%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_UNIQUE_ACGHASH_COUNT=%PLACEMENT_UNIQUE_ACGHASH_COUNT%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo PLACEMENT_RUNTIME_AUTHORIZED_COUNT=%PLACEMENT_RUNTIME_AUTHORIZED_COUNT%
 
 popd
 endlocal

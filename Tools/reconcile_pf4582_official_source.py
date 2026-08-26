@@ -33,6 +33,7 @@ DEFAULT_OFFICIAL_RECORDS = REPOSITORY_ROOT / "docs/reference/pf4582/official/ep1
 DEFAULT_OFFICIAL_SEARCH_REPORT = REPOSITORY_ROOT / "docs/reference/pf4582/official/ep1_18_8_62_pf4582_search_report.json"
 DEFAULT_OFFICIAL_OCCURRENCE_MANIFEST = REPOSITORY_ROOT / "docs/reference/pf4582/official/ep1_18_8_62_pf4582_occurrence_manifest.json"
 DEFAULT_EVIDENCE_MANIFEST = REPOSITORY_ROOT / "docs/reference/pf4582/official/ep1_18_8_62_pf4582_evidence_manifest.json"
+DEFAULT_GENERAL_PLACEMENT_SHARD = REPOSITORY_ROOT / "docs/generated/playfields/placements/pf_4582.json"
 DEFAULT_REPORT = REPOSITORY_ROOT / "docs/generated/pf4582_official_source_reconciliation_report.json"
 DEFAULT_OVERLAY = REPOSITORY_ROOT / "docs/generated/pf4582_official_placement_overlay.json"
 DEFAULT_CSHARP = REPOSITORY_ROOT / "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportOfficialPlacementCatalog.g.cs"
@@ -187,6 +188,82 @@ def _flatten_official(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return records
 
 
+def _validate_general_placement_shard(
+    general_placement_path: Path,
+    official_records: list[dict[str, Any]],
+) -> None:
+    payload = load_json(general_placement_path)
+    for key, value in {
+        "SchemaVersion": 2,
+        "SourceClientVariant": "EP1_OLD_GRAPHICS_CLIENT",
+        "SourceClientBuild": OFFICIAL_BUILD,
+        "ResourceType": 1000014,
+        "ResourceInstance": PLAYFIELD_ID,
+        "PlayfieldId": PLAYFIELD_ID,
+        "FormatVersion": 7,
+        "ParseStatus": "PARSED",
+        "DistrictCount": 2,
+        "OfficialSpawnCount": EXPECTED_OFFICIAL_COUNT,
+    }.items():
+        _require(payload.get(key) == value, f"general PF4582 shard drifted: {key}")
+    general_records = payload.get("Records")
+    _require(
+        isinstance(general_records, list) and len(general_records) == EXPECTED_OFFICIAL_COUNT,
+        "general PF4582 shard must contain exactly 207 records",
+    )
+    general_by_id = {record.get("OfficialSpawnRecordId"): record for record in general_records}
+    _require(len(general_by_id) == EXPECTED_OFFICIAL_COUNT, "general PF4582 identities are not unique")
+    _require(
+        set(general_by_id) == {record["official_record_identity"] for record in official_records},
+        "general and specialized PF4582 identity sets differ",
+    )
+    for official in official_records:
+        identity = official["official_record_identity"]
+        general = general_by_id[identity]
+        point = official["rotation_spawn_point"]
+        expected = {
+            "SourceClientBuild": OFFICIAL_BUILD,
+            "ResourceType": 1000014,
+            "ResourceInstance": PLAYFIELD_ID,
+            "PlayfieldId": PLAYFIELD_ID,
+            "DistrictIndex": official["district_index"],
+            "DistrictName": official["district_name"],
+            "DistrictRecordOrdinal": official["spawn_index"],
+            "RecordOffset": official["record_relative_offset"],
+            "SerializedSize": official["serialized_size"],
+            "PositionX": point["centre"][0],
+            "PositionY": point["centre"][1],
+            "PositionZ": point["centre"][2],
+            "LevelMinimum": official["min_level"],
+            "LevelMaximum": official["max_level"],
+            "Radius": point["radius"],
+            "RotationMidEncoded": point["rotation_mid_encoded"],
+            "RotationWidthEncoded": point["rotation_width_encoded"],
+            "RespawnChance": official["respawn_chance"],
+            "RespawnTime": official["respawn_time"],
+            "AssistanceRadius": official["assistance_radius"],
+            "NativeFlags": official["native_flags"],
+            "MoreFlags": official["more_flags"],
+            "SerializedOptionalFlags": official["serialized_optional_flags"],
+            "UnknownOptionalU8": official["unknown_optional_u8"],
+            "CanonicalAcgHashText": official["acghash_get_hash_as_text"],
+            "OfficialAcgHashWireBytes": official["acghash_raw_bytes_hex"],
+            "OfficialAcgHashNativeUInt32": official["official_scalar_uint32"],
+            "ParseStatus": "PARSED",
+        }
+        for key, value in expected.items():
+            _require(
+                general.get(key) == value,
+                f"general/specialized PF4582 record mismatch: {identity} {key}",
+            )
+        unknown = general.get("UnknownFields")
+        _require(isinstance(unknown, dict), f"general PF4582 record lacks unknown-field evidence: {identity}")
+        _require(
+            unknown.get("RecordOffsetInDatabase") == official["database_offset"],
+            f"general/specialized PF4582 database offset mismatch: {identity}",
+        )
+
+
 def _validate_inputs(
     accepted_path: Path,
     normalized_report_path: Path,
@@ -194,6 +271,7 @@ def _validate_inputs(
     official_search_report_path: Path,
     official_occurrence_manifest_path: Path,
     evidence_manifest_path: Path,
+    general_placement_path: Path = DEFAULT_GENERAL_PLACEMENT_SHARD,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
     _require(sha256_file(accepted_path) == EXPECTED_ACCEPTED_SHA256, "accepted PF4582 JSON digest drifted")
     actual_artifacts = {
@@ -221,6 +299,7 @@ def _validate_inputs(
 
     official_payload = load_json(official_records_path)
     official_records = _flatten_official(official_payload)
+    _validate_general_placement_shard(general_placement_path, official_records)
     _require(official_payload.get("counts", {}).get("official_hash_spawn_points") == 207, "official snapshot count metric drifted")
     _require(official_payload.get("counts", {}).get("accepted_manifest_placements") == 206, "official snapshot accepted count metric drifted")
     _require(official_payload.get("counts", {}).get("unexpected_official_placements") == 1, "official snapshot extra count metric drifted")
@@ -393,6 +472,7 @@ def build_model(
     official_search_report_path: Path = DEFAULT_OFFICIAL_SEARCH_REPORT,
     official_occurrence_manifest_path: Path = DEFAULT_OFFICIAL_OCCURRENCE_MANIFEST,
     evidence_manifest_path: Path = DEFAULT_EVIDENCE_MANIFEST,
+    general_placement_path: Path = DEFAULT_GENERAL_PLACEMENT_SHARD,
 ) -> dict[str, Any]:
     accepted_records, normalized, official_records, manifest = _validate_inputs(
         accepted_path,
@@ -401,6 +481,7 @@ def build_model(
         official_search_report_path,
         official_occurrence_manifest_path,
         evidence_manifest_path,
+        general_placement_path,
     )
     accepted_indexed = [dict(record, _accepted_record_index=index) for index, record in enumerate(accepted_records)]
     accepted_groups = _group_records(accepted_indexed, _accepted_signature)
@@ -846,6 +927,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--official-search-report", type=Path, default=DEFAULT_OFFICIAL_SEARCH_REPORT)
     parser.add_argument("--official-occurrence-manifest", type=Path, default=DEFAULT_OFFICIAL_OCCURRENCE_MANIFEST)
     parser.add_argument("--evidence-manifest", type=Path, default=DEFAULT_EVIDENCE_MANIFEST)
+    parser.add_argument("--general-placement-shard", type=Path, default=DEFAULT_GENERAL_PLACEMENT_SHARD)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--overlay", type=Path, default=DEFAULT_OVERLAY)
     parser.add_argument("--csharp", type=Path, default=DEFAULT_CSHARP)
@@ -860,6 +942,7 @@ def main(argv: list[str] | None = None) -> int:
             args.official_search_report,
             args.official_occurrence_manifest,
             args.evidence_manifest,
+            args.general_placement_shard,
         )
         _write_or_check(args.report, render_json(model["Report"]), args.check)
         _write_or_check(args.overlay, render_json(model["Overlay"]), args.check)

@@ -1,0 +1,121 @@
+{
+  "ImportPolicy": {
+    "AcgHashSemantics": "OFFICIAL_PACKED_FOUR_BYTE_SCALAR_TAG",
+    "CurrentRuntimeActiveOutsideEnumeratedPf4582": null,
+    "ExistingRuntimeBehaviorChanged": false,
+    "IdentityRequiredForPlacementImport": false,
+    "NewRuntimeSpawnsActivated": 0,
+    "PlacementEvidenceOnly": true,
+    "RuntimeActivationRequiresSeparateAuthorization": true
+  },
+  "OffsetMapping": {
+    "RecordOffset": "source HashSpawnRecord.RecordOffsetInResource",
+    "RecordOffsetInDatabasePreservedAt": "Record.UnknownFields.RecordOffsetInDatabase",
+    "ResourceDatabaseGlobalOffsetPreservedAt": "Shard.UnknownFields.DatabaseGlobalOffset",
+    "ResourceOffset": "source resource shard ResourceOffset, local to ResourceFile"
+  },
+  "PF4582ReconciliationArtifacts": [
+    {
+      "RelativePath": "docs/generated/pf4582_official_placement_overlay.json",
+      "Role": "OfficialOverlay",
+      "Sha256": "10830619c5cc995937ceb64310266b90e6a87d94929a4cdc15137e6616561f30"
+    },
+    {
+      "RelativePath": "docs/generated/pf4582_authoritative_placement_report.json",
+      "Role": "AuthoritativeReport",
+      "Sha256": "05bf246e47e31205f99aa3a46cc4af5f3d525d3fec2a9014a5fa2712e7954d86"
+    },
+    {
+      "RelativePath": "docs/reference/pf4582/runtime-evidence-map.json",
+      "Role": "RuntimeEvidenceMap",
+      "Sha256": "02a1b167b97d1caa223aeaa60eaebbaf0a1e99ce6ddce753f7d54eae1f716869"
+    },
+    {
+      "RelativePath": "docs/reference/pf4582/PlayfieldDistrictInfo.json",
+      "Role": "AcceptedPlacementSource",
+      "Sha256": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32"
+    },
+    {
+      "RelativePath": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportOfficialPlacementCatalog.g.cs",
+      "Role": "OfficialCatalogGenerated",
+      "Sha256": "57cf172124f95463ff9e78c11f3e85f9fbc86a5de2d8235470b6c4e54d881164"
+    },
+    {
+      "RelativePath": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportOfficialPlacementCatalog.cs",
+      "Role": "OfficialCatalogModel",
+      "Sha256": "2070784a9d894b7b52f77e4639bc4602e3f5b166deefa2a8ed755c3015ebf0b5"
+    }
+  ],
+  "ResourceDatabaseSha256": {
+    "ResourceDatabase.dat": "3cabdede7b9b2468ed22f10f536fb2f7083ea05ed9483e2d96b22cf080d736a6",
+    "ResourceDatabase.dat.001": "f8884a2c382ce7c95f20b4423567f176ed40675ba9ce8362527288712871ba73",
+    "ResourceDatabase.dat.002": "2024021f966c3c8a8c083e01cbad2335ba33c19a1661a148060391755a608cc1",
+    "ResourceDatabase.idx": "ba152f59096d5358f4d1b6511d3a3d264999e0a59f1ab7bf3a7cc18a4888c273"
+  },
+  "ResourceInstanceRelationship": {
+    "PlayfieldIdDerivedFromValidatedInstance": true,
+    "ResourceInstanceRetained": true,
+    "Status": "PROVEN_FOR_ALL_VALIDATED_CONTROLS",
+    "ValidatedInstanceConflicts": 0,
+    "ValidatedInstanceControls": 630,
+    "ValidatedInstanceMatches": 630
+  },
+  "ResourceType": 1000014,
+  "SchemaVersion": 1,
+  "SourceArtifacts": [
+    {
+      "RelativePath": "Docs/reference/playfield_district_info/official_input_manifest.json",
+      "Role": "OfficialInputManifest",
+      "Sha256": "871a364d181e998ad40417a50941dd9de413b52e9b43a182a2665b47392d374a"
+    },
+    {
+      "RelativePath": "Docs/generated/playfield_district_info/playfield_district_resource_inventory.json",
+      "Role": "ResourceInventory",
+      "Sha256": "b61dc4d1c9a44493f33181d38cf2cd2bfa78bc37f969843d5dbb29fb5ddfd579"
+    },
+    {
+      "RelativePath": "Docs/generated/playfield_district_info/playfield_district_corpus_summary.json",
+      "Role": "CorpusSummary",
+      "Sha256": "c7c746093cbfbbbbaf7d9066e69b8e83d7bb3390a9abe3a7f3798cd4259069d2"
+    },
+    {
+      "RelativePath": "Docs/generated/playfield_district_info/playfield_district_import_index.json",
+      "Role": "ImportIndex",
+      "Sha256": "d6bd940a108c948fe6bc95b7e47d9aef41fe6e7e78608a5710ac9eda226d92a7"
+    },
+    {
+      "RelativePath": "Docs/generated/playfield_district_info/acghash_global_inventory.json",
+      "Role": "AcgHashInventory",
+      "Sha256": "7875578ff0074d14f829ab0de9070f025219574cf2794fe4161bf13e46b03734"
+    },
+    {
+      "RelativePath": "Docs/generated/playfield_district_info/format_version_inventory.json",
+      "Role": "FormatInventory",
+      "Sha256": "f95a3862f71e336693664cf640d10ca4b5571a6cddd9d9dbd4aa9d6700792ab3"
+    },
+    {
+      "RelativePath": "Docs/generated/playfield_district_info/extraction_coverage_report.json",
+      "Role": "CoverageReport",
+      "Sha256": "6a9428330c1008111092ddc528276f6ebf0752db5c032e8af3f1288cf1a93abf"
+    }
+  ],
+  "SourceClientBuild": "18.8.62_EP1",
+  "SourceClientVariant": "EP1_OLD_GRAPHICS_CLIENT",
+  "SourceCorpusBoundary": {
+    "MalformedResources": [
+      103,
+      615,
+      4805
+    ],
+    "ParsedResources": 627,
+    "ResourceShardBytes": 86019468,
+    "ResourceShards": 630,
+    "StaticHashSpawnRecords": 32805
+  },
+  "SourceRepositoryRole": "READ_ONLY_DETERMINISTIC_EXTRACTION_SOURCE",
+  "Terminology": {
+    "ClientVariantRetainedForProvenance": true,
+    "Ep1Ep2AreNotPlayfieldContentBoundaries": true,
+    "Ep1Ep2AreNotSpawnContentBoundaries": true
+  }
+}

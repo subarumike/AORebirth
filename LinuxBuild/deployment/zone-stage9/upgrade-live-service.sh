@@ -15,6 +15,8 @@ readonly APPHOST_MODE="750"
 readonly CREATEDUMP_MODE="750"
 readonly DIRECTORY_MODE="750"
 readonly FILE_MODE="640"
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../../placement-provenance.sh"
 
 fail()
 {
@@ -75,6 +77,18 @@ require_artifact_provenance()
         || fail "Linux acceptance did not prove tracked source clean"
     grep -Fx "LINUX_ACCEPTANCE=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
         || fail "Linux acceptance marker is missing or not PASS"
+    placement_provenance_load "${artifact_dir}" "${expected_source_sha}" linux \
+        || fail "official placement artifact provenance is invalid"
+    placement_require_build_provenance "${artifact_dir}/BUILD_PROVENANCE.env" \
+        || fail "build provenance lacks official placement evidence"
+    grep -Fx "PLACEMENT_VALIDATION=PASS" "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "official placement Linux acceptance did not pass"
+    grep -Fx "EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}" \
+        "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "accepted official placement manifest digest does not match"
+    grep -Fx "PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}" \
+        "${artifact_dir}/LINUX_ACCEPTANCE.env" >/dev/null \
+        || fail "official placement manifest acceptance provenance is missing"
 }
 
 require_identity()

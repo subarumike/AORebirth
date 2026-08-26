@@ -5,6 +5,7 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repository_root="$(cd -- "${script_dir}/.." && pwd)"
 
 expected_sha=""
+expected_placement_manifest_sha=""
 workspace=""
 repo_url=""
 runtime_id="linux-x64"
@@ -12,7 +13,7 @@ self_contained="true"
 
 usage()
 {
-    echo "usage: LinuxBuild/accept-linux-sha.sh --expected-sha <sha> --workspace <controlled-workspace> [--repo-url <url>] [--runtime linux-x64|linux-arm64] [--self-contained true|false]" >&2
+    echo "usage: LinuxBuild/accept-linux-sha.sh --expected-sha <sha> --expected-placement-manifest-sha <sha256> --workspace <controlled-workspace> [--repo-url <url>] [--runtime linux-x64|linux-arm64] [--self-contained true|false]" >&2
 }
 
 fail()
@@ -26,6 +27,10 @@ while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --expected-sha)
             expected_sha="${2:-}"
+            shift 2
+            ;;
+        --expected-placement-manifest-sha)
+            expected_placement_manifest_sha="${2:-}"
             shift 2
             ;;
         --workspace)
@@ -56,6 +61,10 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 [[ "${expected_sha}" =~ ^[0-9a-fA-F]{40}$ ]] || fail "SOURCE_SHA_MISMATCH invalid expected SHA"
+expected_sha="${expected_sha,,}"
+[[ "${expected_placement_manifest_sha}" =~ ^[0-9a-fA-F]{64}$ ]] \
+    || fail "PLACEMENT_MANIFEST_SHA_MISMATCH invalid expected placement manifest SHA"
+expected_placement_manifest_sha="${expected_placement_manifest_sha,,}"
 [[ -n "${workspace}" ]] || fail "LINUX_ACCEPTANCE_WORKSPACE_MISSING"
 case "${runtime_id}" in
     linux-x64|linux-arm64) ;;
@@ -109,12 +118,27 @@ if [[ -n "$(git -C "${repo_dir}" status --porcelain --untracked-files=no)" ]]; t
 fi
 echo "TRACKED_SOURCE_CLEAN=PASS"
 
+# Bind acceptance policy to the exact detached source revision, never to the
+# caller checkout that launched this wrapper.
+source "${repo_dir}/LinuxBuild/placement-provenance.sh"
+
 "${repo_dir}/LinuxBuild/publish-loginengine.sh" "${runtime_id}" "${self_contained}"
 "${repo_dir}/LinuxBuild/publish-zoneengine.sh" "${runtime_id}" "${self_contained}"
 bash "${repo_dir}/LinuxBuild/deployment/production-release/tests/test-upgrade-active-services.sh"
+bash "${repo_dir}/LinuxBuild/deployment/zone-stage9/test-artifact-provenance.sh"
 
 login_publish_dir="${repo_dir}/LinuxBuild/artifacts/loginengine/${runtime_id}/${package_kind}"
 zone_publish_dir="${repo_dir}/LinuxBuild/artifacts/zoneengine/${runtime_id}/${package_kind}"
+if ! placement_provenance_load \
+    "${zone_publish_dir}" \
+    "${expected_sha}" \
+    linux \
+    "${expected_placement_manifest_sha}"; then
+    fail "PLACEMENT_CORPUS_VALIDATION_FAILED"
+fi
+if ! placement_require_build_provenance "${zone_publish_dir}/BUILD_PROVENANCE.env"; then
+    fail "PLACEMENT_BUILD_PROVENANCE_INVALID"
+fi
 dotnet_sdk_version="$(dotnet --version)"
 build_timestamp_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 build_host_type="$(uname -srm)"
@@ -122,6 +146,7 @@ build_host_type="$(uname -srm)"
 write_accepted_provenance()
 {
     local publish_dir="$1"
+    local include_placement="$2"
     printf '%s\n' "${expected_sha}" > "${publish_dir}/SOURCE_SHA"
     cat > "${publish_dir}/BUILD_PROVENANCE.env" <<EOF
 REPOSITORY=AORebirth
@@ -135,6 +160,9 @@ BUILD_HOST_TYPE=${build_host_type}
 BUILD_TIMESTAMP_UTC=${build_timestamp_utc}
 ACCEPTANCE_RESULT=PASS
 EOF
+    if [[ "${include_placement}" == "true" ]]; then
+        placement_append_build_provenance "${publish_dir}/BUILD_PROVENANCE.env"
+    fi
 
     cat > "${publish_dir}/LINUX_ACCEPTANCE.env" <<EOF
 AO_REBIRTH_SOURCE_SHA=${expected_sha}
@@ -149,10 +177,17 @@ RUNTIME_IDENTIFIER=${runtime_id}
 SELF_CONTAINED=${self_contained}
 LINUX_ACCEPTANCE=PASS
 EOF
+    if [[ "${include_placement}" == "true" ]]; then
+        cat >> "${publish_dir}/LINUX_ACCEPTANCE.env" <<EOF
+PLACEMENT_VALIDATION=PASS
+EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256=${expected_placement_manifest_sha}
+PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}
+EOF
+    fi
 }
 
-write_accepted_provenance "${login_publish_dir}"
-write_accepted_provenance "${zone_publish_dir}"
+write_accepted_provenance "${login_publish_dir}" false
+write_accepted_provenance "${zone_publish_dir}" true
 
 release_manifest="${repo_dir}/LinuxBuild/artifacts/production-release/release.manifest"
 bash "${repo_dir}/LinuxBuild/deployment/production-release/create-release-manifest.sh" \
@@ -171,4 +206,9 @@ echo "LINUX_LOGINENGINE_ARTIFACT_DIR=${login_publish_dir}"
 echo "LINUX_ZONEENGINE_ARTIFACT_DIR=${zone_publish_dir}"
 echo "LINUX_ARTIFACT_DIR=${zone_publish_dir}"
 echo "LINUX_RELEASE_MANIFEST=${release_manifest}"
+echo "LINUX_PLACEMENT_BUILD_MANIFEST_SHA256=${PLACEMENT_BUILD_MANIFEST_SHA256}"
+echo "LINUX_PLACEMENT_RESOURCES=${PLACEMENT_RESOURCE_COUNT}"
+echo "LINUX_PLACEMENT_DISTRICTS=${PLACEMENT_DISTRICT_COUNT}"
+echo "LINUX_PLACEMENT_RECORDS=${PLACEMENT_RECORD_COUNT}"
+echo "LINUX_UNIQUE_ACGHASH_TAGS=${PLACEMENT_UNIQUE_ACGHASH_COUNT}"
 echo "LINUX_ACCEPTANCE=PASS"

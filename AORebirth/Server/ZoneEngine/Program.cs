@@ -48,6 +48,7 @@ namespace ZoneEngine
     using AORebirth.Core.Events;
     using AORebirth.Core.Items;
     using AORebirth.Core.Nanos;
+    using AORebirth.Core.Playfields.OfficialPlacements;
     using AORebirth.Database;
 
     using locales;
@@ -927,6 +928,57 @@ namespace ZoneEngine
             return address;
         }
 
+        #endif
+
+        private static int ValidateOfficialPlacements(string[] args)
+        {
+            try
+            {
+                string sourceSha = GetEitherArgumentValue(args, "/source-sha", "--source-sha");
+                string buildPlatform = GetEitherArgumentValue(
+                    args,
+                    "/build-platform",
+                    "--build-platform");
+                string placementManifestOutput = GetEitherArgumentValue(
+                    args,
+                    "/placement-manifest-output",
+                    "--placement-manifest-output");
+                string placementProvenanceOutput = GetEitherArgumentValue(
+                    args,
+                    "/placement-provenance-output",
+                    "--placement-provenance-output");
+
+                string corpusRoot = OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(
+                    AppDomain.CurrentDomain.BaseDirectory);
+                var catalog = new OfficialPlayfieldPlacementCatalog(corpusRoot);
+                catalog.WriteValidationArtifacts(
+                    sourceSha,
+                    buildPlatform,
+                    placementManifestOutput,
+                    placementProvenanceOutput);
+
+                OfficialPlayfieldPlacementCorpusMetrics metrics = catalog.Manifest.Metrics;
+                Console.WriteLine(
+                    "OFFICIAL_PLACEMENT_VALIDATION_OK sourceSha={0} buildPlatform={1} resources={2} districts={3} placements={4} uniqueAcgHash={5} authorized={6}",
+                    sourceSha.ToLowerInvariant(),
+                    buildPlatform.ToLowerInvariant(),
+                    metrics.ResourceCount.Value,
+                    metrics.DistrictCount.Value,
+                    metrics.PlacementCount.Value,
+                    metrics.UniqueAcgHashCount.Value,
+                    metrics.RuntimeActivationAuthorizedCount.Value);
+                return 0;
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine(
+                    "OFFICIAL_PLACEMENT_VALIDATION_FAILED: " + exception.Message);
+                return 1;
+            }
+        }
+
+        #if AOREBIRTH_LINUX
+
         private static void ValidateRequiredRuntimeAssets()
         {
             string[] relativePaths =
@@ -1256,6 +1308,15 @@ namespace ZoneEngine
         /// </param>
         private static void Main(string[] args)
         {
+            if (HasEitherArgument(
+                args,
+                "/validate-official-placements",
+                "--validate-official-placements"))
+            {
+                Environment.ExitCode = ValidateOfficialPlacements(args);
+                return;
+            }
+
             #if AOREBIRTH_LINUX
             if (HasEitherArgument(args, "/validate-startup", "--validate-startup"))
             {

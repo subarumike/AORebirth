@@ -66,6 +66,36 @@ Alternatives considered: Fill missing fields from nearby objects, rendered names
 
 Consequences: Capture-derived data work must fail closed. Smoke tests validate captured data reproduction; they do not create evidence or justify guessed data.
 
+## Official Static Placements Are Evidence, Not Runtime Authorization
+
+Decision: The normalized database-wide type-`1000014`
+`PlayfieldDistrictInfo_t` corpus is the authoritative official static placement
+evidence layer. Importing an `OfficialSpawnRecordId` does not establish a mob
+identity, behavior profile, or runtime activation. Those joins remain separate,
+explicit, and fail closed.
+
+The source label `18.8.62_EP1` records extraction from the official old-graphics-
+client database. EP1 and EP2 are client/graphics variants, not gameplay-content
+or spawn-content partitions. `ACGHash_t` is retained as an official packed
+four-byte scalar/tag with canonical text, official wire bytes, and native
+uint32; it is not called a cryptographic hash, resource ID, dynel ID, or proven
+mob-template identity.
+
+Reason: Placement evidence is useful before identity and behavior are resolved,
+but automatic promotion would turn structural data into guessed gameplay.
+
+Consequences: All official records and duplicates remain independently
+addressable; parser-limited resources remain explicit without synthetic rows;
+unknown runtime state remains nullable; and no imported record may spawn until
+a separate governed mapping and behavior-readiness gate authorizes it.
+
+The one checked-in corpus is packaged unchanged by the authoritative Windows
+project and the derived Linux content inventory. Both built ZoneEngines must
+load and validate it through the same catalog implementation and produce the
+same canonical placement-manifest digest for the same source SHA. Packaged
+availability is not runtime activation; the gameplay spawn path remains under
+its existing separately governed catalogs.
+
 ## Database Safety
 
 Decision: Use only `cellao_codex_clean`; do not change schemas or wipe data without explicit approval.
