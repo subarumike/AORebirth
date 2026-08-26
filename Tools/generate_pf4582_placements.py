@@ -22,9 +22,21 @@ DEFAULT_RUNTIME_SOURCE = (
     REPOSITORY_ROOT
     / "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs"
 )
+DEFAULT_TEMPLATE_PROFILE_AUTHORITY = (
+    REPOSITORY_ROOT / "docs/reference/pf4582/template-hash-evidence.json"
+)
+DEFAULT_MOBTEMPLATE_SOURCE = (
+    REPOSITORY_ROOT
+    / "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/mobtemplate.sql"
+)
 DEFAULT_OUTPUT = (
     REPOSITORY_ROOT
     / "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.g.cs"
+)
+DEFAULT_POPULATION_OUTPUT = (
+    REPOSITORY_ROOT
+    / "AORebirth/Server/ZoneEngine/Core/Playfields/"
+    "IccShuttleportProfilePopulationCatalog.g.cs"
 )
 DEFAULT_REPORT = (
     REPOSITORY_ROOT
@@ -172,11 +184,78 @@ def validate_source(source: Any) -> list[dict[str, Any]]:
     return sorted(normalized, key=lambda record: record["NpcId"])
 
 
+def _split_sql_values(text: str) -> list[str]:
+    values: list[str] = []
+    current: list[str] = []
+    quoted = False
+    escaped = False
+    for character in text:
+        if escaped:
+            current.append(character)
+            escaped = False
+            continue
+        if character == "\\" and quoted:
+            escaped = True
+            current.append(character)
+            continue
+        if character == "'":
+            quoted = not quoted
+            current.append(character)
+            continue
+        if character == "," and not quoted:
+            values.append("".join(current).strip())
+            current = []
+        else:
+            current.append(character)
+    _require(not quoted and not escaped, "malformed quoted mobtemplate values")
+    values.append("".join(current).strip())
+    return values
+
+
+def _sql_string(value: str) -> str:
+    _require(len(value) >= 2 and value[0] == "'" and value[-1] == "'",
+             f"expected mobtemplate SQL string, got {value!r}")
+    return value[1:-1].replace("\\'", "'").replace("\\\\", "\\")
+
+
+def load_mobtemplate_profiles(path: Path) -> dict[str, dict[str, Any]]:
+    marker = ") VALUES ("
+    profiles: dict[str, dict[str, Any]] = {}
+    for line_number, line in enumerate(
+        path.read_text(encoding="utf-8-sig").splitlines(), 1
+    ):
+        if not line.startswith("INSERT INTO `mobtemplate`"):
+            continue
+        _require(marker in line and line.endswith(");"),
+                 f"malformed mobtemplate row at line {line_number}")
+        values = _split_sql_values(line.split(marker, 1)[1][:-2])
+        _require(len(values) == 25,
+                 f"expected 25 mobtemplate values at line {line_number}")
+        profile_hash = _sql_string(values[0])
+        _require(profile_hash not in profiles,
+                 f"duplicate mobtemplate profile {profile_hash}")
+        profiles[profile_hash] = {
+            "Name": _sql_string(values[8]),
+            "MinimumLevel": int(values[1]),
+            "MaximumLevel": int(values[2]),
+        }
+    _require(bool(profiles), "mobtemplate SQL contains no profiles")
+    return profiles
+
+
 def validate_evidence_map(
     evidence_map: Any,
     source_sha256: str,
     records_by_id: dict[int, dict[str, Any]],
-) -> tuple[list[dict[str, Any]], set[int], list[str]]:
+    candidate_authority: Any,
+    mobtemplate_profiles: dict[str, dict[str, Any]],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    set[int],
+    list[str],
+]:
     expected_fields = {
         "schemaVersion",
         "playfieldId",
@@ -184,13 +263,14 @@ def validate_evidence_map(
         "placementSource",
         "runtimeEvidence",
         "runtimeMappings",
+        "templateProfileMappings",
         "unresolvedDynamicSourceNameNpcIds",
         "unresolvedSemantics",
     }
     _require(isinstance(evidence_map, dict), "runtime evidence map must be an object")
     _require(set(evidence_map) == expected_fields,
              "runtime evidence map fields differ from the governed schema")
-    _require(evidence_map["schemaVersion"] == 1, "unsupported evidence-map schema")
+    _require(evidence_map["schemaVersion"] == 2, "unsupported evidence-map schema")
     _require(evidence_map["playfieldId"] == PLAYFIELD_ID,
              "evidence map targets the wrong playfield")
     _require(evidence_map["sourceSha256"] == source_sha256,
@@ -199,10 +279,10 @@ def validate_evidence_map(
              and all(isinstance(value, str) and value for value in evidence_map["runtimeEvidence"]),
              "runtimeEvidence must contain non-empty paths")
 
-    mappings = evidence_map["runtimeMappings"]
-    _require(isinstance(mappings, list), "runtimeMappings must be an array")
+    explicit_mappings = evidence_map["runtimeMappings"]
+    _require(isinstance(explicit_mappings, list), "runtimeMappings must be an array")
     mapped_ids: set[int] = set()
-    for index, mapping in enumerate(mappings):
+    for index, mapping in enumerate(explicit_mappings):
         prefix = f"runtimeMappings[{index}]"
         _require(isinstance(mapping, dict)
                  and set(mapping) == {"npcId", "sourceName", "runtimeProfile"},
@@ -217,6 +297,95 @@ def validate_evidence_map(
                  and mapping["runtimeProfile"].startswith("IccShuttleportSpawn:"),
                  f"{prefix}.runtimeProfile is not an explicit ICC profile")
         mapped_ids.add(npc_id)
+
+    assessments = candidate_authority.get("unresolvedAssessments")
+    _require(isinstance(assessments, list), "template-profile authority is missing assessments")
+    assessment_by_hash = {
+        int(assessment.get("templateHashOriginal")): assessment
+        for assessment in assessments
+    }
+    _require(len(assessment_by_hash) == len(assessments),
+             "template-profile authority contains duplicate hashes")
+    template_profiles = evidence_map["templateProfileMappings"]
+    _require(isinstance(template_profiles, list) and len(template_profiles) == 17,
+             "templateProfileMappings must contain the 17 authorized candidate groups")
+    _require(
+        [mapping.get("templateHash") for mapping in template_profiles]
+        == sorted(mapping.get("templateHash") for mapping in template_profiles),
+        "templateProfileMappings must be ordered by TemplateHash",
+    )
+    generated_mappings: list[dict[str, Any]] = []
+    for index, mapping in enumerate(template_profiles):
+        prefix = f"templateProfileMappings[{index}]"
+        expected = {
+            "templateHash",
+            "sourceName",
+            "runtimeProfile",
+            "mobTemplateHash",
+            "profileEvidenceKey",
+        }
+        _require(isinstance(mapping, dict) and set(mapping) == expected,
+                 f"{prefix} fields differ from the governed schema")
+        template_hash = mapping["templateHash"]
+        _require(_is_int(template_hash), f"{prefix}.templateHash must be an integer")
+        group = sorted(
+            (
+                record for record in records_by_id.values()
+                if record["TemplateHash"] == template_hash
+            ),
+            key=lambda record: record["NpcId"],
+        )
+        _require(bool(group), f"{prefix}.templateHash is absent from PF4582")
+        source_name = mapping["sourceName"]
+        _require(isinstance(source_name, str) and source_name,
+                 f"{prefix}.sourceName must be non-empty")
+        _require(all(record["Name"] == source_name for record in group),
+                 f"{prefix}.sourceName conflicts with the authoritative group")
+        runtime_profile = mapping["runtimeProfile"]
+        _require(runtime_profile == f"IccShuttleportSpawn:{source_name}",
+                 f"{prefix}.runtimeProfile must retain the exact source name")
+        evidence_key = mapping["profileEvidenceKey"]
+        assessment = assessment_by_hash.get(template_hash)
+        _require(
+            assessment is not None
+            and assessment.get("assessmentBasis") == "SINGLE_PLAUSIBLE_PROFILE"
+            and assessment.get("candidateProfileKeys") == [evidence_key],
+            f"{prefix} is not the unique governed candidate profile",
+        )
+        mob_template_hash = mapping["mobTemplateHash"]
+        _require(isinstance(mob_template_hash, str)
+                 and re.fullmatch(r"A[0-9]{3}", mob_template_hash) is not None,
+                 f"{prefix}.mobTemplateHash is invalid")
+        _require(mob_template_hash in mobtemplate_profiles,
+                 f"{prefix}.mobTemplateHash is absent from mobtemplate.sql")
+        if evidence_key.startswith("mobtemplate:"):
+            _require(evidence_key == f"mobtemplate:{mob_template_hash}",
+                     f"{prefix} mobtemplate evidence key conflicts")
+            _require(mobtemplate_profiles[mob_template_hash]["Name"] == source_name,
+                     f"{prefix} mobtemplate name conflicts with the source name")
+        else:
+            _require(
+                evidence_key == "runtime:CombatTestMobArchetype.StowawayRollerrat"
+                and source_name == "Rollerrat"
+                and mob_template_hash == "A012",
+                f"{prefix} unsupported runtime-profile bridge",
+            )
+        for record in group:
+            npc_id = record["NpcId"]
+            _require(npc_id not in mapped_ids,
+                     f"generated runtime mapping duplicates NpcId {npc_id}")
+            mapped_ids.add(npc_id)
+            generated_mappings.append(
+                {
+                    "npcId": npc_id,
+                    "sourceName": source_name,
+                    "runtimeProfile": runtime_profile,
+                    "mobTemplateHash": mob_template_hash,
+                    "minimumLevel": record["MinLevel"],
+                    "maximumLevel": record["MaxLevel"],
+                    "templateHash": template_hash,
+                }
+            )
 
     dynamic_ids = evidence_map["unresolvedDynamicSourceNameNpcIds"]
     _require(isinstance(dynamic_ids, list)
@@ -235,16 +404,30 @@ def validate_evidence_map(
              and semantics == sorted(set(semantics))
              and all(isinstance(value, str) and value for value in semantics),
              "unresolvedSemantics must be a sorted unique string array")
-    return mappings, dynamic_set, semantics
+    all_mappings = list(explicit_mappings) + generated_mappings
+    return (
+        explicit_mappings,
+        template_profiles,
+        all_mappings,
+        dynamic_set,
+        semantics,
+    )
 
 
 def parse_current_runtime_definitions(path: Path) -> list[dict[str, Any]]:
     text = path.read_text(encoding="utf-8")
-    starts = list(re.finditer(r"new ShuttleportNpc\s*\{", text))
+    starts = list(
+        re.finditer(
+            r"new ShuttleportNpc\s*\{(?=\s*SourceNpcId\s*=\s*\d+)",
+            text,
+        )
+    )
     records: list[dict[str, Any]] = []
     for index, start in enumerate(starts):
-        end = starts[index + 1].start() if index + 1 < len(starts) else text.find(
-            "public static void ClearPlayfield", start.end()
+        end = (
+            starts[index + 1].start()
+            if index + 1 < len(starts)
+            else text.find("AddGeneratedProfileNpcs(npcs);", start.end())
         )
         _require(end > start.end(), f"cannot bound runtime definition {index}")
         block = text[start.end():end]
@@ -310,18 +493,43 @@ def build_model(
     source_path: Path = DEFAULT_SOURCE,
     evidence_map_path: Path = DEFAULT_EVIDENCE_MAP,
     runtime_source_path: Path = DEFAULT_RUNTIME_SOURCE,
+    candidate_authority_path: Path = DEFAULT_TEMPLATE_PROFILE_AUTHORITY,
+    mobtemplate_source_path: Path = DEFAULT_MOBTEMPLATE_SOURCE,
 ) -> dict[str, Any]:
     source_sha256 = _sha256(source_path)
     records = validate_source(_load_json(source_path))
     records_by_id = {record["NpcId"]: record for record in records}
     evidence_map = _load_json(evidence_map_path)
-    mappings, dynamic_ids, unresolved_semantics = validate_evidence_map(
-        evidence_map, source_sha256, records_by_id
+    (
+        explicit_mappings,
+        template_profiles,
+        mappings,
+        dynamic_ids,
+        unresolved_semantics,
+    ) = validate_evidence_map(
+        evidence_map,
+        source_sha256,
+        records_by_id,
+        _load_json(candidate_authority_path),
+        load_mobtemplate_profiles(mobtemplate_source_path),
     )
     runtime_definitions = parse_current_runtime_definitions(runtime_source_path)
     existing_matches = validate_current_runtime(
-        runtime_definitions, mappings, records_by_id
+        runtime_definitions, explicit_mappings, records_by_id
     )
+    generated_mappings = [
+        mapping for mapping in mappings if "mobTemplateHash" in mapping
+    ]
+    existing_matches.extend(
+        {
+            "npcId": mapping["npcId"],
+            "sourceName": mapping["sourceName"],
+            "runtimeProfile": mapping["runtimeProfile"],
+            "positionDelta": 0.0,
+        }
+        for mapping in generated_mappings
+    )
+    existing_matches.sort(key=lambda match: match["npcId"])
 
     mapping_by_id = {mapping["npcId"]: mapping for mapping in mappings}
     mapped_profiles: dict[int, str] = {}
@@ -357,6 +565,8 @@ def build_model(
         "sourceSha256": source_sha256,
         "records": enriched,
         "existingMatches": existing_matches,
+        "generatedMappings": generated_mappings,
+        "templateProfiles": template_profiles,
         "unresolvedSemantics": unresolved_semantics,
         "runtimeEvidence": evidence_map["runtimeEvidence"],
     }
@@ -445,6 +655,45 @@ def render_catalog(model: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def render_population_catalog(model: dict[str, Any]) -> str:
+    mappings = sorted(model["generatedMappings"], key=lambda row: row["npcId"])
+    lines = [
+        "// <auto-generated />",
+        "// Generated by Tools/generate_pf4582_placements.py.",
+        "// These bounded profile mappings intentionally add no combat contract, loot, pathing, or respawn behavior.",
+        "namespace AORebirth.Core.Playfields",
+        "{",
+        "    internal static partial class IccShuttleportSpawn",
+        "    {",
+        "        private static void AddGeneratedProfileNpcs(",
+        "            System.Collections.Generic.List<ShuttleportNpc> npcs)",
+        "        {",
+    ]
+    for mapping in mappings:
+        lines.append(
+            "            npcs.Add(CreateGeneratedProfileNpc("
+            + ", ".join(
+                [
+                    str(mapping["npcId"]),
+                    _csharp_string(mapping["sourceName"]),
+                    _csharp_string(mapping["mobTemplateHash"]),
+                    str(mapping["minimumLevel"]),
+                    str(mapping["maximumLevel"]),
+                ]
+            )
+            + "));"
+        )
+    lines.extend(
+        [
+            "        }",
+            "    }",
+            "}",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def render_report(model: dict[str, Any]) -> str:
     records = model["records"]
     positions: dict[tuple[Any, Any, Any], list[int]] = defaultdict(list)
@@ -482,6 +731,7 @@ def render_report(model: dict[str, Any]) -> str:
         "sourceSha256": model["sourceSha256"],
         "importer": "Tools/generate_pf4582_placements.py",
         "normalizedPlacementArtifact": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.g.cs",
+        "generatedProfilePopulationArtifact": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportProfilePopulationCatalog.g.cs",
         "PF4582_SOURCE_PLACEMENTS": len(records),
         "PF4582_UNIQUE_NPC_IDS": len({record["NpcId"] for record in records}),
         "PF4582_DUPLICATE_NPC_IDS": len(records) - len({record["NpcId"] for record in records}),
@@ -496,6 +746,8 @@ def render_report(model: dict[str, Any]) -> str:
         "PF4582_TEMPLATE_HASHES_UNRESOLVED": len(unresolved_hashes),
         "PF4582_RUNTIME_ELIGIBLE": len(eligible_ids),
         "PF4582_RUNTIME_BLOCKED": len(blocked_ids),
+        "PF4582_EXPLICIT_RUNTIME_ACTIVE": len(records) - len(model["generatedMappings"]) - len(blocked_ids),
+        "PF4582_GENERATED_PROFILE_ACTIVE": len(model["generatedMappings"]),
         "existingMatches": model["existingMatches"],
         "existingNotMatched": [],
         "newPlacementNpcIds": new_ids,
@@ -563,13 +815,39 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--evidence-map", type=Path, default=DEFAULT_EVIDENCE_MAP)
     parser.add_argument("--runtime-source", type=Path, default=DEFAULT_RUNTIME_SOURCE)
+    parser.add_argument(
+        "--candidate-authority",
+        type=Path,
+        default=DEFAULT_TEMPLATE_PROFILE_AUTHORITY,
+    )
+    parser.add_argument(
+        "--mobtemplate-source",
+        type=Path,
+        default=DEFAULT_MOBTEMPLATE_SOURCE,
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--population-output",
+        type=Path,
+        default=DEFAULT_POPULATION_OUTPUT,
+    )
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
     try:
-        model = build_model(args.source, args.evidence_map, args.runtime_source)
+        model = build_model(
+            args.source,
+            args.evidence_map,
+            args.runtime_source,
+            args.candidate_authority,
+            args.mobtemplate_source,
+        )
         _write_or_check(args.output, render_catalog(model), args.check)
+        _write_or_check(
+            args.population_output,
+            render_population_catalog(model),
+            args.check,
+        )
         _write_or_check(args.report, render_report(model), args.check)
     except PlacementValidationError as exc:
         print(f"PF4582 placement import failed: {exc}", file=sys.stderr)

@@ -4,7 +4,7 @@
     "CurrentRuntimeActiveOutsideEnumeratedPf4582": null,
     "ExistingRuntimeBehaviorChanged": false,
     "IdentityRequiredForPlacementImport": false,
-    "NewRuntimeSpawnsActivated": 0,
+    "NewRuntimeSpawnsActivated": 174,
     "PlacementEvidenceOnly": true,
     "RuntimeActivationRequiresSeparateAuthorization": true
   },
@@ -23,12 +23,12 @@
     {
       "RelativePath": "docs/generated/pf4582_authoritative_placement_report.json",
       "Role": "AuthoritativeReport",
-      "Sha256": "05bf246e47e31205f99aa3a46cc4af5f3d525d3fec2a9014a5fa2712e7954d86"
+      "Sha256": "128d8db5042519ad458fe47c6c42af4eb2b94935c374c788228efe6b22898634"
     },
     {
       "RelativePath": "docs/reference/pf4582/runtime-evidence-map.json",
       "Role": "RuntimeEvidenceMap",
-      "Sha256": "02a1b167b97d1caa223aeaa60eaebbaf0a1e99ce6ddce753f7d54eae1f716869"
+      "Sha256": "a270e0d4f88b5c67b2c9704fefed41f20d7dccf5e71a551759e651f020b11e01"
     },
     {
       "RelativePath": "docs/reference/pf4582/PlayfieldDistrictInfo.json",

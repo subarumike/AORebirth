@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import re
@@ -37,6 +38,24 @@ EXPECTED_EXACT_DUPLICATE_RECORDS = 2552
 EXPECTED_EXACT_DUPLICATE_GROUPS = 1095
 EXPECTED_CROSS_DISTRICT_DUPLICATE_GROUPS = 1085
 EXPECTED_MALFORMED_PLAYFIELDS = (103, 615, 4805)
+PF4582_PREVIOUS_RUNTIME_ACTIVE_COUNT = 25
+PF4582_EXPLICIT_RUNTIME_ACTIVE_COUNT = 35
+PF4582_GENERATED_PROFILE_ACTIVE_COUNT = 164
+PF4582_RUNTIME_ACTIVE_COUNT = 199
+PF4582_RUNTIME_BLOCKED_COUNT = 7
+PF4582_OFFICIAL_RUNTIME_BLOCKED_COUNT = 8
+PF4582_NEWLY_AUTHORIZED_COUNT = (
+    PF4582_RUNTIME_ACTIVE_COUNT - PF4582_PREVIOUS_RUNTIME_ACTIVE_COUNT
+)
+PF4582_BLOCKED_SOURCE_NPC_TAGS = {
+    1007961: "BDML",
+    1007963: "BEML",
+    1007964: "BTMO",
+    1007965: "BLMM",
+    1007966: "BDMO",
+    1007967: "BJMR",
+    1008051: "BSMG",
+}
 
 EXPECTED_DATABASE_SHA256 = {
     "ResourceDatabase.dat": "3cabdede7b9b2468ed22f10f536fb2f7083ea05ed9483e2d96b22cf080d736a6",
@@ -88,11 +107,11 @@ PF4582_ARTIFACTS = {
     ),
     "AuthoritativeReport": (
         PurePosixPath("docs/generated/pf4582_authoritative_placement_report.json"),
-        "05bf246e47e31205f99aa3a46cc4af5f3d525d3fec2a9014a5fa2712e7954d86",
+        "128d8db5042519ad458fe47c6c42af4eb2b94935c374c788228efe6b22898634",
     ),
     "RuntimeEvidenceMap": (
         PurePosixPath("docs/reference/pf4582/runtime-evidence-map.json"),
-        "02a1b167b97d1caa223aeaa60eaebbaf0a1e99ce6ddce753f7d54eae1f716869",
+        "a270e0d4f88b5c67b2c9704fefed41f20d7dccf5e71a551759e651f020b11e01",
     ),
     "AcceptedPlacementSource": (
         PurePosixPath("docs/reference/pf4582/PlayfieldDistrictInfo.json"),
@@ -619,14 +638,239 @@ def _compare_pf4582_record(source: Mapping[str, Any], overlay: Mapping[str, Any]
     _require(rotation.get("rotation_width_encoded") == source["RotationWidthEncoded"], f"PF4582 rotation-width mismatch: {identity}")
 
 
+def _pf4582_template_tag(template_hash: Any) -> str:
+    _require(
+        type(template_hash) is int and 0 <= template_hash <= 0xFFFFFFFF,
+        "PF4582 template hash is invalid",
+    )
+    try:
+        template_tag = template_hash.to_bytes(4, "little").decode("ascii")
+    except (UnicodeDecodeError, OverflowError) as exc:
+        raise PlacementImportError("PF4582 template hash is not an ASCII tag") from exc
+    _require(
+        re.fullmatch(r"[A-Z]{4}", template_tag) is not None,
+        "PF4582 template tag shape drift",
+    )
+    return template_tag
+
+
+def _build_pf4582_runtime_authorizations(
+    artifacts: Mapping[str, Any],
+) -> dict[int, Mapping[str, str]]:
+    """Derive the exact authorized PF4582 identity/profile set from pinned artifacts."""
+    overlay = artifacts.get("OfficialOverlay")
+    report = artifacts.get("AuthoritativeReport")
+    runtime_map = artifacts.get("RuntimeEvidenceMap")
+    _require(isinstance(overlay, dict), "PF4582 official overlay is missing")
+    _require(isinstance(report, dict), "PF4582 authoritative report is missing")
+    _require(isinstance(runtime_map, dict), "PF4582 runtime evidence map is missing")
+    _require(runtime_map.get("schemaVersion") == 2, "PF4582 runtime evidence schema drift")
+    _require(
+        report.get("PF4582_RUNTIME_ELIGIBLE") == PF4582_RUNTIME_ACTIVE_COUNT,
+        "PF4582 runtime-eligible count drift",
+    )
+    _require(
+        report.get("PF4582_RUNTIME_BLOCKED") == PF4582_RUNTIME_BLOCKED_COUNT,
+        "PF4582 accepted runtime-blocked count drift",
+    )
+    _require(
+        report.get("PF4582_EXPLICIT_RUNTIME_ACTIVE")
+        == PF4582_EXPLICIT_RUNTIME_ACTIVE_COUNT,
+        "PF4582 explicit runtime-active count drift",
+    )
+    _require(
+        report.get("PF4582_GENERATED_PROFILE_ACTIVE")
+        == PF4582_GENERATED_PROFILE_ACTIVE_COUNT,
+        "PF4582 generated-profile count drift",
+    )
+
+    overlay_records = overlay.get("Records")
+    _require(
+        isinstance(overlay_records, list) and len(overlay_records) == 207,
+        "PF4582 overlay count drift",
+    )
+    overlay_by_npc_id = {
+        row.get("SourceNpcId"): row
+        for row in overlay_records
+        if row.get("SourceNpcId") is not None
+    }
+    _require(
+        len(overlay_by_npc_id) == 206,
+        "PF4582 overlay SourceNpcIds are not unique",
+    )
+    ncnn_rows = [
+        row
+        for row in overlay_records
+        if row.get("SourceNpcId") is None
+    ]
+    _require(
+        len(ncnn_rows) == 1
+        and ncnn_rows[0].get("CanonicalAcgHashText") == "NCNN",
+        "PF4582 NCNN blocked record drift",
+    )
+
+    eligible_ids = report.get("runtimeEligibleNpcIds")
+    _require(
+        isinstance(eligible_ids, list)
+        and len(eligible_ids) == PF4582_RUNTIME_ACTIVE_COUNT
+        and all(type(value) is int for value in eligible_ids)
+        and eligible_ids == sorted(set(eligible_ids)),
+        "PF4582 runtime-eligible identity set drift",
+    )
+    eligible_set = set(eligible_ids)
+    matches = report.get("existingMatches")
+    _require(
+        isinstance(matches, list) and len(matches) == PF4582_RUNTIME_ACTIVE_COUNT,
+        "PF4582 accepted runtime match count drift",
+    )
+    match_by_id: dict[int, Mapping[str, Any]] = {}
+    for index, match in enumerate(matches):
+        _require(
+            isinstance(match, dict)
+            and set(match)
+            == {"npcId", "sourceName", "runtimeProfile", "positionDelta"},
+            f"PF4582 runtime match fields drift: {index}",
+        )
+        npc_id = match.get("npcId")
+        _require(type(npc_id) is int and npc_id not in match_by_id,
+                 f"PF4582 runtime match identity drift: {index}")
+        _require(isinstance(match.get("sourceName"), str) and match["sourceName"],
+                 f"PF4582 runtime match source name is invalid: {npc_id}")
+        _require(isinstance(match.get("runtimeProfile"), str) and match["runtimeProfile"],
+                 f"PF4582 runtime match profile is invalid: {npc_id}")
+        match_by_id[npc_id] = match
+    _require(set(match_by_id) == eligible_set,
+             "PF4582 runtime report identity crosswalk drift")
+
+    explicit_mappings = runtime_map.get("runtimeMappings")
+    _require(
+        isinstance(explicit_mappings, list)
+        and len(explicit_mappings) == PF4582_EXPLICIT_RUNTIME_ACTIVE_COUNT,
+        "PF4582 explicit runtime evidence mapping count drift",
+    )
+    authorizations: dict[int, Mapping[str, str]] = {}
+    for index, mapping in enumerate(explicit_mappings):
+        _require(
+            isinstance(mapping, dict)
+            and set(mapping) == {"npcId", "sourceName", "runtimeProfile"},
+            f"PF4582 explicit runtime mapping fields drift: {index}",
+        )
+        npc_id = mapping.get("npcId")
+        _require(type(npc_id) is int and npc_id not in authorizations,
+                 f"PF4582 explicit runtime identity drift: {index}")
+        match = match_by_id.get(npc_id)
+        overlay_row = overlay_by_npc_id.get(npc_id)
+        _require(
+            match is not None
+            and match.get("sourceName") == mapping.get("sourceName")
+            and match.get("runtimeProfile") == mapping.get("runtimeProfile"),
+            f"PF4582 explicit runtime profile crosswalk drift: {npc_id}",
+        )
+        _require(overlay_row is not None,
+                 f"PF4582 explicit runtime overlay identity is missing: {npc_id}")
+        template_tag = overlay_row.get("CanonicalAcgHashText")
+        _require(isinstance(template_tag, str) and re.fullmatch(r"[A-Z]{4}", template_tag),
+                 f"PF4582 explicit runtime tag is invalid: {npc_id}")
+        authorizations[npc_id] = {
+            "runtimeProfile": mapping["runtimeProfile"],
+            "sourceName": mapping["sourceName"],
+            "templateTag": template_tag,
+        }
+
+    template_profiles = runtime_map.get("templateProfileMappings")
+    _require(
+        isinstance(template_profiles, list) and len(template_profiles) == 17,
+        "PF4582 template-profile mapping count drift",
+    )
+    template_profile_by_tag: dict[str, Mapping[str, Any]] = {}
+    for index, mapping in enumerate(template_profiles):
+        expected_fields = {
+            "templateHash",
+            "sourceName",
+            "runtimeProfile",
+            "mobTemplateHash",
+            "profileEvidenceKey",
+        }
+        _require(
+            isinstance(mapping, dict) and set(mapping) == expected_fields,
+            f"PF4582 template-profile mapping fields drift: {index}",
+        )
+        template_tag = _pf4582_template_tag(mapping.get("templateHash"))
+        _require(template_tag not in template_profile_by_tag,
+                 f"PF4582 duplicate template-profile tag: {template_tag}")
+        source_name = mapping.get("sourceName")
+        _require(
+            isinstance(source_name, str)
+            and source_name
+            and mapping.get("runtimeProfile") == f"IccShuttleportSpawn:{source_name}"
+            and isinstance(mapping.get("mobTemplateHash"), str)
+            and re.fullmatch(r"A[0-9]{3}", mapping["mobTemplateHash"]) is not None
+            and isinstance(mapping.get("profileEvidenceKey"), str)
+            and mapping["profileEvidenceKey"],
+            f"PF4582 template-profile identity bridge is invalid: {template_tag}",
+        )
+        template_profile_by_tag[template_tag] = mapping
+
+    used_template_tags: set[str] = set()
+    for npc_id in sorted(eligible_set - set(authorizations)):
+        match = match_by_id[npc_id]
+        overlay_row = overlay_by_npc_id.get(npc_id)
+        _require(overlay_row is not None,
+                 f"PF4582 generated runtime overlay identity is missing: {npc_id}")
+        template_tag = overlay_row.get("CanonicalAcgHashText")
+        mapping = template_profile_by_tag.get(template_tag)
+        _require(
+            mapping is not None
+            and match.get("sourceName") == mapping.get("sourceName")
+            and match.get("runtimeProfile") == mapping.get("runtimeProfile"),
+            f"PF4582 generated runtime profile crosswalk drift: {npc_id}",
+        )
+        used_template_tags.add(template_tag)
+        authorizations[npc_id] = {
+            "runtimeProfile": mapping["runtimeProfile"],
+            "sourceName": mapping["sourceName"],
+            "templateTag": template_tag,
+        }
+
+    _require(
+        len(authorizations) == PF4582_RUNTIME_ACTIVE_COUNT
+        and set(authorizations) == eligible_set,
+        "PF4582 exact runtime authorization set drift",
+    )
+    _require(
+        len(eligible_set) - PF4582_EXPLICIT_RUNTIME_ACTIVE_COUNT
+        == PF4582_GENERATED_PROFILE_ACTIVE_COUNT
+        and used_template_tags == set(template_profile_by_tag),
+        "PF4582 generated runtime authorization coverage drift",
+    )
+    blocked_ids = set(overlay_by_npc_id) - eligible_set
+    _require(
+        blocked_ids == set(PF4582_BLOCKED_SOURCE_NPC_TAGS),
+        "PF4582 blocked SourceNpcId set drift",
+    )
+    for npc_id, expected_tag in PF4582_BLOCKED_SOURCE_NPC_TAGS.items():
+        _require(
+            overlay_by_npc_id[npc_id].get("CanonicalAcgHashText") == expected_tag,
+            f"PF4582 blocked identity tag drift: {npc_id}",
+        )
+    _require(
+        set(runtime_map.get("unresolvedDynamicSourceNameNpcIds", ())) == blocked_ids,
+        "PF4582 unresolved dynamic identity set drift",
+    )
+    _require(
+        set(report.get("runtimeBlockedNpcIds", ())) == blocked_ids
+        and set(report.get("newPlacementNpcIds", ())) == blocked_ids,
+        "PF4582 blocked report identity set drift",
+    )
+    return authorizations
+
+
 def build_pf4582_crosswalk(
     repo_root: Path,
     pf4582_records: Iterable[Mapping[str, Any]],
 ) -> tuple[dict[str, Mapping[str, Any]], Mapping[str, str]]:
     artifacts, hashes = _load_pf4582_artifacts(repo_root)
     overlay = artifacts["OfficialOverlay"]
-    report = artifacts["AuthoritativeReport"]
-    runtime_map = artifacts["RuntimeEvidenceMap"]
     _require(isinstance(overlay, dict) and overlay.get("SchemaVersion") == 1, "PF4582 overlay schema drift")
     overlay_records = overlay.get("Records")
     _require(isinstance(overlay_records, list) and len(overlay_records) == 207, "PF4582 overlay count drift")
@@ -638,24 +882,16 @@ def build_pf4582_crosswalk(
     for identity, source_record in source_by_id.items():
         _compare_pf4582_record(source_record, overlay_by_id[identity])
 
-    _require(report.get("PF4582_RUNTIME_ELIGIBLE") == 25, "PF4582 runtime-eligible count drift")
-    _require(report.get("PF4582_RUNTIME_BLOCKED") == 181, "PF4582 accepted runtime-blocked count drift")
-    eligible_ids = report.get("runtimeEligibleNpcIds")
-    _require(isinstance(eligible_ids, list) and len(eligible_ids) == 25, "PF4582 runtime-eligible identity set drift")
-    _require(len(set(eligible_ids)) == 25, "PF4582 runtime-eligible identities are not unique")
-    runtime_mappings = runtime_map.get("runtimeMappings")
-    _require(isinstance(runtime_mappings, list) and len(runtime_mappings) == 25, "PF4582 runtime evidence mapping count drift")
-    profiles = {row.get("npcId"): row.get("runtimeProfile") for row in runtime_mappings}
-    _require(len(profiles) == 25 and set(profiles) == set(eligible_ids), "PF4582 profile/runtime-active crosswalk drift")
-    _require(all(isinstance(value, str) and value for value in profiles.values()), "PF4582 runtime profile is invalid")
+    authorizations = _build_pf4582_runtime_authorizations(artifacts)
 
     source_npc_ids = [row.get("SourceNpcId") for row in overlay_records if row.get("SourceNpcId") is not None]
     _require(len(source_npc_ids) == 206 and len(set(source_npc_ids)) == 206, "PF4582 SourceNpcId crosswalk drift")
     crosswalk: dict[str, Mapping[str, Any]] = {}
     for identity, row in overlay_by_id.items():
         source_npc_id = row.get("SourceNpcId")
-        active = source_npc_id in profiles if source_npc_id is not None else False
-        profile = profiles.get(source_npc_id)
+        authorization = authorizations.get(source_npc_id)
+        active = authorization is not None
+        profile = authorization.get("runtimeProfile") if authorization is not None else None
         crosswalk[identity] = {
             "SourceNpcId": source_npc_id,
             "ExistingAoRebirthProfile": profile,
@@ -841,7 +1077,7 @@ def _build_source_manifest(
             "CurrentRuntimeActiveOutsideEnumeratedPf4582": None,
             "ExistingRuntimeBehaviorChanged": False,
             "IdentityRequiredForPlacementImport": False,
-            "NewRuntimeSpawnsActivated": 0,
+            "NewRuntimeSpawnsActivated": PF4582_NEWLY_AUTHORIZED_COUNT,
             "PlacementEvidenceOnly": True,
             "RuntimeActivationRequiresSeparateAuthorization": True,
         },
@@ -1016,8 +1252,14 @@ def build_import_model(
         for record in normalized_records
         if record["PlayfieldId"] != 4582
     )
-    _require(active_pf4582 == 25, "PF4582 current runtime crosswalk count drift")
-    _require(authorized == 25, "runtime activation authorization expanded")
+    _require(
+        active_pf4582 == PF4582_RUNTIME_ACTIVE_COUNT,
+        "PF4582 current runtime crosswalk count drift",
+    )
+    _require(
+        authorized == PF4582_RUNTIME_ACTIVE_COUNT,
+        "runtime activation authorization count drift",
+    )
     _require(outside_active_non_null == 0, "non-PF4582 current runtime state was inferred")
 
     ncnn_id = f"{SOURCE_CLIENT_BUILD}:{RESOURCE_TYPE}:4582:district-1:record-50"
@@ -1040,7 +1282,7 @@ def build_import_model(
         ],
         "Metrics": {
             "ExistingRuntimeBehaviorChanged": False,
-            "NewRuntimeSpawnsActivated": 0,
+            "NewRuntimeSpawnsActivated": PF4582_NEWLY_AUTHORIZED_COUNT,
             "NormalizedPlacementShardBytes": normalized_shard_bytes,
             "OfficialCrossDistrictDuplicateGroups": source_metrics["OFFICIAL_CROSS_DISTRICT_DUPLICATE_GROUPS"],
             "OfficialDistricts": EXPECTED_DISTRICT_COUNT,
@@ -1059,7 +1301,7 @@ def build_import_model(
             "ResourcesParsedSupported": 622,
             "SourcePlacementShardBytes": corpus.source_shard_bytes,
         },
-        "Outcome": "OFFICIAL_STATIC_PLACEMENT_EVIDENCE_IMPORTED_RUNTIME_UNCHANGED",
+        "Outcome": "OFFICIAL_STATIC_PLACEMENT_EVIDENCE_IMPORTED_WITH_BOUNDED_PF4582_RUNTIME_AUTHORIZATION",
         "PF4582Regression": {
             "DistrictRecordCounts": [142, 65],
             "Districts": 2,
@@ -1080,7 +1322,7 @@ def build_import_model(
         "ResourceType": RESOURCE_TYPE,
         "RuntimeGovernance": {
             "CurrentRuntimeActiveOutsideEnumeratedPf4582": None,
-            "ExistingPf4582RuntimeActive": 25,
+            "ExistingPf4582RuntimeActive": PF4582_RUNTIME_ACTIVE_COUNT,
             "MassRuntimeActivation": False,
             "RuntimeActivationAuthorizedRecords": authorized,
             "UnresolvedPlacementsRemainInactive": True,
@@ -1146,6 +1388,323 @@ def build_import_model(
         source_shard_bytes=corpus.source_shard_bytes,
         normalized_shard_bytes=normalized_shard_bytes,
     )
+
+
+PF4582_RUNTIME_AUTHORIZATION_FIELDS = frozenset(
+    {
+        "BehaviorReady",
+        "BehaviorReadiness",
+        "CurrentRuntimeActive",
+        "ExistingAoRebirthProfile",
+        "IdentityResolved",
+        "IdentityResolutionStatus",
+        "RuntimeActivationAuthorized",
+    }
+)
+
+
+def _pf4582_static_record_projection(record: Mapping[str, Any]) -> Mapping[str, Any]:
+    return {
+        key: copy.deepcopy(value)
+        for key, value in record.items()
+        if key not in PF4582_RUNTIME_AUTHORIZATION_FIELDS
+    }
+
+
+def refresh_pf4582_runtime_authorization(
+    shard: Mapping[str, Any],
+    artifacts: Mapping[str, Any],
+) -> tuple[Mapping[str, Any], int]:
+    """Refresh only the governed PF4582 runtime authorization projection."""
+    authorizations = _build_pf4582_runtime_authorizations(artifacts)
+    _require(shard.get("PlayfieldId") == 4582, "local refresh requires the PF4582 shard")
+    records = shard.get("Records")
+    _require(isinstance(records, list) and len(records) == 207, "tracked PF4582 shard count drift")
+    source_ids = [record.get("SourceNpcId") for record in records if record.get("SourceNpcId") is not None]
+    _require(len(source_ids) == 206 and len(set(source_ids)) == 206, "tracked PF4582 SourceNpcId set drift")
+    _require(
+        set(authorizations).issubset(source_ids),
+        "runtime authorization references an unknown PF4582 SourceNpcId",
+    )
+
+    before_static = [_pf4582_static_record_projection(record) for record in records]
+    refreshed = copy.deepcopy(shard)
+    newly_authorized = 0
+    for record in refreshed["Records"]:
+        source_npc_id = record.get("SourceNpcId")
+        authorization = authorizations.get(source_npc_id)
+        if authorization is None:
+            expected_tag = PF4582_BLOCKED_SOURCE_NPC_TAGS.get(source_npc_id)
+            _require(
+                (
+                    source_npc_id is None
+                    and record.get("CanonicalAcgHashText") == "NCNN"
+                )
+                or (
+                    expected_tag is not None
+                    and record.get("CanonicalAcgHashText") == expected_tag
+                ),
+                f"unexpected unmapped PF4582 identity: {record.get('OfficialSpawnRecordId')}",
+            )
+            _require(
+                record.get("BehaviorReady") is False
+                and record.get("CurrentRuntimeActive") is not True
+                and record.get("ExistingAoRebirthProfile") is None
+                and record.get("IdentityResolved") is False
+                and record.get("RuntimeActivationAuthorized") is False,
+                f"unmapped PF4582 record is active: {record.get('OfficialSpawnRecordId')}",
+            )
+            continue
+        profile = authorization["runtimeProfile"]
+        _require(
+            record.get("CanonicalAcgHashText") == authorization["templateTag"],
+            f"PF4582 authorized identity tag mismatch: {source_npc_id}",
+        )
+        _require(
+            record.get("ExistingAoRebirthProfile") in (None, profile),
+            f"PF4582 authorized runtime profile mismatch: {source_npc_id}",
+        )
+        if record.get("RuntimeActivationAuthorized") is True:
+            _require(
+                record.get("CurrentRuntimeActive") is True
+                and record.get("IdentityResolved") is True
+                and record.get("BehaviorReady") is True
+                and record.get("ExistingAoRebirthProfile") == profile,
+                f"PF4582 active authorization state is inconsistent: {source_npc_id}",
+            )
+        if record.get("RuntimeActivationAuthorized") is not True:
+            newly_authorized += 1
+        record.update(
+            {
+                "BehaviorReady": True,
+                "BehaviorReadiness": "EXISTING_RUNTIME_BEHAVIOR_RETAINED",
+                "CurrentRuntimeActive": True,
+                "ExistingAoRebirthProfile": profile,
+                "IdentityResolved": True,
+                "IdentityResolutionStatus": "EXISTING_AOREBIRTH_PROFILE_RECONCILED",
+                "RuntimeActivationAuthorized": True,
+            }
+        )
+
+    after_static = [
+        _pf4582_static_record_projection(record) for record in refreshed["Records"]
+    ]
+    _require(before_static == after_static, "PF4582 static placement payload changed during local refresh")
+    active = [
+        record
+        for record in refreshed["Records"]
+        if record.get("RuntimeActivationAuthorized") is True
+    ]
+    _require(
+        len(active) == PF4582_RUNTIME_ACTIVE_COUNT,
+        "PF4582 local runtime authorization count drift",
+    )
+    _require(
+        {record["SourceNpcId"] for record in active} == set(authorizations),
+        "PF4582 local runtime authorization identity set drift",
+    )
+    _require(
+        newly_authorized in (0, PF4582_NEWLY_AUTHORIZED_COUNT),
+        "PF4582 local refresh was neither idempotent nor the bounded governed promotion",
+    )
+    return refreshed, newly_authorized
+
+
+def _load_tracked_placement_model(
+    repo_root: Path,
+) -> tuple[
+    Mapping[str, Any],
+    dict[int, Mapping[str, Any]],
+    Mapping[str, Any],
+    Mapping[str, Any],
+    Mapping[str, Any],
+    Mapping[str, Any],
+]:
+    source_manifest_path = _path(repo_root, OUTPUT_SOURCE_MANIFEST)
+    index_path = _path(repo_root, OUTPUT_INDEX)
+    summary_path = _path(repo_root, OUTPUT_SUMMARY)
+    acghash_path = _path(repo_root, OUTPUT_ACGHASH)
+    corpus_manifest_path = _path(repo_root, OUTPUT_CORPUS_MANIFEST)
+    source_manifest = _load_json(source_manifest_path)
+    index = _load_json(index_path)
+    summary = _load_json(summary_path)
+    acghash_inventory = _load_json(acghash_path)
+    corpus_manifest = _load_json(corpus_manifest_path)
+
+    _require(
+        _sha256_file(source_manifest_path) == corpus_manifest.get("SourceManifestSha256"),
+        "tracked source-manifest digest mismatch",
+    )
+    _require(
+        _sha256_file(index_path) == corpus_manifest.get("IndexSha256"),
+        "tracked placement-index digest mismatch",
+    )
+    _require(
+        _sha256_file(summary_path) == corpus_manifest.get("SummarySha256"),
+        "tracked placement-summary digest mismatch",
+    )
+    _require(
+        _sha256_file(acghash_path) == corpus_manifest.get("AcgHashInventorySha256"),
+        "tracked ACGHash-inventory digest mismatch",
+    )
+
+    index_rows = index.get("Playfields")
+    manifest_rows = corpus_manifest.get("Playfields")
+    _require(
+        isinstance(index_rows, list) and len(index_rows) == EXPECTED_RESOURCE_COUNT,
+        "tracked placement-index resource count drift",
+    )
+    _require(
+        isinstance(manifest_rows, list) and len(manifest_rows) == EXPECTED_RESOURCE_COUNT,
+        "tracked corpus-manifest resource count drift",
+    )
+    manifest_by_id = {row.get("PlayfieldId"): row for row in manifest_rows}
+    _require(len(manifest_by_id) == EXPECTED_RESOURCE_COUNT, "tracked manifest playfield IDs are not unique")
+
+    placement_shards: dict[int, Mapping[str, Any]] = {}
+    for row in index_rows:
+        playfield_id = row.get("PlayfieldId")
+        _require(type(playfield_id) is int, "tracked placement-index PlayfieldId is invalid")
+        expected_relative = OUTPUT_PLACEMENT_ROOT / f"pf_{playfield_id}.json"
+        _require(row.get("Path") == expected_relative.as_posix(), f"tracked shard path drift: {playfield_id}")
+        shard_path = _path(repo_root, expected_relative)
+        payload = shard_path.read_bytes()
+        digest = _sha256_bytes(payload)
+        _require(digest == row.get("Sha256"), f"tracked index shard digest mismatch: {playfield_id}")
+        manifest_row = manifest_by_id.get(playfield_id)
+        _require(
+            manifest_row is not None and digest == manifest_row.get("ShardSha256"),
+            f"tracked manifest shard digest mismatch: {playfield_id}",
+        )
+        shard = _load_json(shard_path)
+        _require(shard.get("PlayfieldId") == playfield_id, f"tracked shard identity drift: {playfield_id}")
+        _require(
+            payload == _json_bytes(shard, compact=True),
+            f"tracked shard is not canonical JSON: {playfield_id}",
+        )
+        placement_shards[playfield_id] = shard
+
+    return (
+        source_manifest,
+        placement_shards,
+        index,
+        summary,
+        acghash_inventory,
+        corpus_manifest,
+    )
+
+
+def build_runtime_authorization_refresh_model(
+    *, repo_root: Path = REPOSITORY_ROOT
+) -> ImportModel:
+    """Rebuild runtime authorization from AORebirth-local governed artifacts only."""
+    repo_root = repo_root.resolve()
+    (
+        source_manifest,
+        placement_shards,
+        index,
+        summary,
+        acghash_inventory,
+        corpus_manifest,
+    ) = _load_tracked_placement_model(repo_root)
+
+    artifacts, pf4582_hashes = _load_pf4582_artifacts(repo_root)
+
+    refreshed_pf4582, _ = refresh_pf4582_runtime_authorization(
+        placement_shards[4582], artifacts
+    )
+    placement_shards = dict(placement_shards)
+    placement_shards[4582] = refreshed_pf4582
+    shard_payloads = {
+        playfield_id: _json_bytes(shard, compact=True)
+        for playfield_id, shard in placement_shards.items()
+    }
+    normalized_shard_bytes = sum(len(payload) for payload in shard_payloads.values())
+
+    source_manifest = copy.deepcopy(source_manifest)
+    artifact_rows = source_manifest.get("PF4582ReconciliationArtifacts")
+    _require(isinstance(artifact_rows, list), "tracked PF4582 reconciliation manifest is missing")
+    artifact_by_role = {row.get("Role"): row for row in artifact_rows}
+    _require(set(artifact_by_role) == set(PF4582_ARTIFACTS), "tracked PF4582 artifact roles drift")
+    for role, (relative, _) in PF4582_ARTIFACTS.items():
+        row = artifact_by_role[role]
+        _require(row.get("RelativePath") == relative.as_posix(), f"tracked PF4582 artifact path drift: {role}")
+        row["Sha256"] = pf4582_hashes[role]
+    source_manifest["ImportPolicy"]["ExistingRuntimeBehaviorChanged"] = False
+    source_manifest["ImportPolicy"]["NewRuntimeSpawnsActivated"] = PF4582_NEWLY_AUTHORIZED_COUNT
+    source_manifest_hash = _sha256_bytes(_json_bytes(source_manifest, compact=False))
+
+    index = copy.deepcopy(index)
+    index["SourceManifestSha256"] = source_manifest_hash
+    for row in index["Playfields"]:
+        row["Sha256"] = _sha256_bytes(shard_payloads[row["PlayfieldId"]])
+
+    summary = copy.deepcopy(summary)
+    summary["Metrics"]["ExistingRuntimeBehaviorChanged"] = False
+    summary["Metrics"]["NewRuntimeSpawnsActivated"] = PF4582_NEWLY_AUTHORIZED_COUNT
+    summary["Metrics"]["NormalizedPlacementShardBytes"] = normalized_shard_bytes
+    summary["Metrics"]["Pf4582ExistingRuntimeActive"] = PF4582_RUNTIME_ACTIVE_COUNT
+    summary["Outcome"] = (
+        "OFFICIAL_STATIC_PLACEMENT_EVIDENCE_IMPORTED_WITH_BOUNDED_PF4582_RUNTIME_AUTHORIZATION"
+    )
+    summary["RuntimeGovernance"]["ExistingPf4582RuntimeActive"] = PF4582_RUNTIME_ACTIVE_COUNT
+    summary["RuntimeGovernance"]["MassRuntimeActivation"] = False
+    summary["RuntimeGovernance"]["RuntimeActivationAuthorizedRecords"] = PF4582_RUNTIME_ACTIVE_COUNT
+    summary["RuntimeGovernance"]["UnresolvedPlacementsRemainInactive"] = True
+
+    corpus_manifest = copy.deepcopy(corpus_manifest)
+    corpus_manifest["IndexSha256"] = _sha256_bytes(_json_bytes(index, compact=False))
+    corpus_manifest["Metrics"]["RuntimeActivationAuthorizedCount"] = PF4582_RUNTIME_ACTIVE_COUNT
+    for row in corpus_manifest["Playfields"]:
+        playfield_id = row["PlayfieldId"]
+        shard = placement_shards[playfield_id]
+        row["RuntimeActivationAuthorizedCount"] = sum(
+            record.get("RuntimeActivationAuthorized") is True
+            for record in shard["Records"]
+        )
+        row["ShardSha256"] = _sha256_bytes(shard_payloads[playfield_id])
+    corpus_manifest["Policy"]["ExistingRuntimeBehaviorChanged"] = False
+    corpus_manifest["Policy"]["MassPlacementActivation"] = False
+    corpus_manifest["Policy"]["UnresolvedAcgHashActivated"] = False
+    corpus_manifest["SourceManifestSha256"] = source_manifest_hash
+    corpus_manifest["SummarySha256"] = _sha256_bytes(_json_bytes(summary, compact=False))
+
+    return ImportModel(
+        source_manifest=source_manifest,
+        placement_shards=placement_shards,
+        index=index,
+        summary=summary,
+        acghash_inventory=acghash_inventory,
+        corpus_manifest=corpus_manifest,
+        source_shard_bytes=summary["Metrics"]["SourcePlacementShardBytes"],
+        normalized_shard_bytes=normalized_shard_bytes,
+    )
+
+
+def runtime_authorization_changed_outputs(
+    outputs: Mapping[Path, bytes],
+    *,
+    repo_root: Path = REPOSITORY_ROOT,
+) -> dict[Path, bytes]:
+    allowed = {
+        _path(repo_root, OUTPUT_SOURCE_MANIFEST),
+        _path(repo_root, OUTPUT_INDEX),
+        _path(repo_root, OUTPUT_SUMMARY),
+        _path(repo_root, OUTPUT_CORPUS_MANIFEST),
+        _path(repo_root, OUTPUT_PLACEMENT_ROOT / "pf_4582.json"),
+    }
+    changed = {
+        path: payload
+        for path, payload in outputs.items()
+        if not path.is_file() or path.read_bytes() != payload
+    }
+    unexpected = set(changed) - allowed
+    _require(
+        not unexpected,
+        "local runtime refresh changed non-PF4582 corpus payloads: "
+        + ", ".join(sorted(path.relative_to(repo_root).as_posix() for path in unexpected)),
+    )
+    return changed
 
 
 def build_candidate_outputs(model: ImportModel, *, repo_root: Path = REPOSITORY_ROOT) -> dict[Path, bytes]:
@@ -1216,12 +1775,17 @@ def write_candidate_outputs(
         for relative in relative_outputs
         if relative.startswith(OUTPUT_PLACEMENT_ROOT.as_posix() + "/")
     )
-    artifact_order = placement_order + [
-        OUTPUT_ACGHASH.as_posix(),
-        OUTPUT_SUMMARY.as_posix(),
-        OUTPUT_SOURCE_MANIFEST.as_posix(),
-        OUTPUT_CORPUS_MANIFEST.as_posix(),
-        OUTPUT_INDEX.as_posix(),
+    artifact_order = [
+        relative
+        for relative in placement_order
+        + [
+            OUTPUT_ACGHASH.as_posix(),
+            OUTPUT_SUMMARY.as_posix(),
+            OUTPUT_SOURCE_MANIFEST.as_posix(),
+            OUTPUT_CORPUS_MANIFEST.as_posix(),
+            OUTPUT_INDEX.as_posix(),
+        ]
+        if relative in relative_outputs
     ]
     validators = {relative: _validate_json_output for relative in relative_outputs}
     try:
@@ -1253,9 +1817,17 @@ def _self_test(model: ImportModel, outputs: Mapping[Path, bytes]) -> None:
         "self-test placement count failed",
     )
     _require(len(model.acghash_inventory["Tags"]) == EXPECTED_UNIQUE_ACGHASH_COUNT, "self-test ACGHash count failed")
-    _require(model.corpus_manifest["Metrics"]["RuntimeActivationAuthorizedCount"] == 25, "self-test authorized placement count failed")
+    _require(
+        model.corpus_manifest["Metrics"]["RuntimeActivationAuthorizedCount"]
+        == PF4582_RUNTIME_ACTIVE_COUNT,
+        "self-test authorized placement count failed",
+    )
     _require(model.summary["Metrics"]["OfficialRecordsDroppedByDeduplication"] == 0, "self-test dedup safety failed")
-    _require(model.summary["Metrics"]["NewRuntimeSpawnsActivated"] == 0, "self-test runtime safety failed")
+    _require(
+        model.summary["Metrics"]["NewRuntimeSpawnsActivated"]
+        == PF4582_NEWLY_AUTHORIZED_COUNT,
+        "self-test bounded runtime authorization failed",
+    )
     _require(model.summary["Metrics"]["ExistingRuntimeBehaviorChanged"] is False, "self-test runtime mutation failed")
     malformed = [model.placement_shards[value] for value in EXPECTED_MALFORMED_PLAYFIELDS]
     _require(all(not shard["Records"] for shard in malformed), "self-test malformed synthesis failed")
@@ -1282,15 +1854,24 @@ def _self_test(model: ImportModel, outputs: Mapping[Path, bytes]) -> None:
         _require(payload.endswith(b"\n"), f"self-test trailing newline failed: {path}")
 
 
-def _print_metrics(model: ImportModel, outputs: Mapping[Path, bytes]) -> None:
+def _print_metrics(
+    model: ImportModel,
+    outputs: Mapping[Path, bytes],
+    *,
+    local_refresh: bool = False,
+) -> None:
     generated_total_bytes = sum(len(payload) for payload in outputs.values())
-    print("SOURCE_CORPUS_VERIFICATION=PASS")
+    print(
+        "LOCAL_TRACKED_CORPUS_VERIFICATION=PASS"
+        if local_refresh
+        else "SOURCE_CORPUS_VERIFICATION=PASS"
+    )
     print(f"SOURCE_RESOURCE_SHARDS={EXPECTED_RESOURCE_COUNT}")
     print(f"SOURCE_PLACEMENT_RECORDS={EXPECTED_RECORD_COUNT}")
     print(f"SOURCE_SHARD_BYTES={model.source_shard_bytes}")
     print(f"NORMALIZED_SHARD_BYTES={model.normalized_shard_bytes}")
     print(f"GENERATED_TOTAL_BYTES={generated_total_bytes}")
-    print("NEW_RUNTIME_SPAWNS_ACTIVATED=0")
+    print(f"NEW_RUNTIME_SPAWNS_ACTIVATED={PF4582_NEWLY_AUTHORIZED_COUNT}")
     print("EXISTING_RUNTIME_BEHAVIOR_CHANGED=NO")
 
 
@@ -1302,19 +1883,42 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_SOURCE_ROOT,
         help="explicit read-only AO Stripdown repository root",
     )
+    parser.add_argument(
+        "--refresh-runtime-authorization",
+        action="store_true",
+        help="refresh only governed PF4582 authorization from AORebirth-local tracked artifacts",
+    )
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--write", action="store_true", help="transactionally publish the verified cohort")
     action.add_argument("--check", action="store_true", help="verify tracked outputs exactly match the source")
     action.add_argument("--self-test", "--test", dest="self_test", action="store_true", help="run full source-backed importer self-tests")
     args = parser.parse_args(argv)
     try:
-        model = build_import_model(args.source_root)
+        model = (
+            build_runtime_authorization_refresh_model()
+            if args.refresh_runtime_authorization
+            else build_import_model(args.source_root)
+        )
         outputs = build_candidate_outputs(model)
         _self_test(model, outputs)
-        _print_metrics(model, outputs)
+        _print_metrics(
+            model,
+            outputs,
+            local_refresh=args.refresh_runtime_authorization,
+        )
         if args.write:
-            transaction_id = write_candidate_outputs(model, outputs)
-            print(f"OUTPUT_WRITE=PASS transaction={transaction_id}")
+            changed_outputs = (
+                runtime_authorization_changed_outputs(outputs)
+                if args.refresh_runtime_authorization
+                else outputs
+            )
+            if changed_outputs:
+                transaction_id = write_candidate_outputs(model, changed_outputs)
+                check_candidate_outputs(model, outputs)
+                print(f"OUTPUT_WRITE=PASS transaction={transaction_id}")
+            else:
+                check_candidate_outputs(model, outputs)
+                print("OUTPUT_WRITE=PASS transaction=already-current")
         elif args.check:
             check_candidate_outputs(model, outputs)
             print("OUTPUT_CHECK=PASS")

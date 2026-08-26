@@ -38,13 +38,51 @@ namespace AORebirth.Core.Playfields
             }
 
             int removed = 0;
-            foreach (TCorpseState corpse in pendingCorpseSpawns
-                .Where(x => shouldDespawn(corpseName(x.Value), deadNpcIdentity(x.Value)))
-                .Select(x => x.Value)
-                .ToList())
+            List<KeyValuePair<int, TCorpseState>> pendingSnapshot;
+            lock (pendingCorpseSpawns)
             {
-                pendingCorpseSpawns.Remove(deadNpcIdentity(corpse).Instance);
-                removed++;
+                pendingSnapshot = pendingCorpseSpawns.ToList();
+            }
+
+            var missingStateCandidates = new List<KeyValuePair<int, TCorpseState>>();
+            var despawnCandidates = new List<KeyValuePair<int, TCorpseState>>();
+            foreach (KeyValuePair<int, TCorpseState> pendingCorpseSpawn in pendingSnapshot)
+            {
+                TCorpseState corpse = pendingCorpseSpawn.Value;
+                if (ReferenceEquals(corpse, null))
+                {
+                    missingStateCandidates.Add(pendingCorpseSpawn);
+                    continue;
+                }
+
+                if (shouldDespawn(corpseName(corpse), deadNpcIdentity(corpse)))
+                {
+                    despawnCandidates.Add(pendingCorpseSpawn);
+                }
+            }
+
+            lock (pendingCorpseSpawns)
+            {
+                foreach (KeyValuePair<int, TCorpseState> candidate in missingStateCandidates)
+                {
+                    TCorpseState current;
+                    if (pendingCorpseSpawns.TryGetValue(candidate.Key, out current)
+                        && IsSamePendingCorpseState(current, candidate.Value))
+                    {
+                        pendingCorpseSpawns.Remove(candidate.Key);
+                    }
+                }
+
+                foreach (KeyValuePair<int, TCorpseState> candidate in despawnCandidates)
+                {
+                    TCorpseState current;
+                    if (pendingCorpseSpawns.TryGetValue(candidate.Key, out current)
+                        && IsSamePendingCorpseState(current, candidate.Value))
+                    {
+                        pendingCorpseSpawns.Remove(candidate.Key);
+                        removed++;
+                    }
+                }
             }
 
             foreach (int corpseInstance in corpses
@@ -86,14 +124,70 @@ namespace AORebirth.Core.Playfields
             Action<Identity, Identity> traceCorpseFullUpdate,
             Action<ICharacter, Identity> sendCorpseFullUpdate)
         {
-            foreach (TCorpseState corpse in pendingCorpseSpawns
-                .Where(x => spawnsAtUtc(x.Value) <= DateTime.UtcNow)
-                .Select(x => x.Value)
-                .ToList())
+            var dueCorpseSpawns = new List<TCorpseState>();
+            var missingStateKeys = new List<int>();
+            List<KeyValuePair<int, TCorpseState>> pendingSnapshot;
+            DateTime utcNow = DateTime.UtcNow;
+            lock (pendingCorpseSpawns)
+            {
+                pendingSnapshot = pendingCorpseSpawns.ToList();
+            }
+
+            var missingStateCandidates = new List<KeyValuePair<int, TCorpseState>>();
+            var dueCandidates = new List<KeyValuePair<int, TCorpseState>>();
+            foreach (KeyValuePair<int, TCorpseState> pendingCorpseSpawn in pendingSnapshot)
+            {
+                TCorpseState corpse = pendingCorpseSpawn.Value;
+                if (ReferenceEquals(corpse, null))
+                {
+                    missingStateCandidates.Add(pendingCorpseSpawn);
+                    continue;
+                }
+
+                if (spawnsAtUtc(corpse) <= utcNow)
+                {
+                    dueCandidates.Add(pendingCorpseSpawn);
+                }
+            }
+
+            lock (pendingCorpseSpawns)
+            {
+                foreach (KeyValuePair<int, TCorpseState> candidate in missingStateCandidates)
+                {
+                    TCorpseState current;
+                    if (pendingCorpseSpawns.TryGetValue(candidate.Key, out current)
+                        && IsSamePendingCorpseState(current, candidate.Value))
+                    {
+                        pendingCorpseSpawns.Remove(candidate.Key);
+                        missingStateKeys.Add(candidate.Key);
+                    }
+                }
+
+                foreach (KeyValuePair<int, TCorpseState> candidate in dueCandidates)
+                {
+                    TCorpseState current;
+                    if (pendingCorpseSpawns.TryGetValue(candidate.Key, out current)
+                        && IsSamePendingCorpseState(current, candidate.Value))
+                    {
+                        pendingCorpseSpawns.Remove(candidate.Key);
+                        dueCorpseSpawns.Add(candidate.Value);
+                    }
+                }
+            }
+
+            foreach (int missingStateKey in missingStateKeys)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        "Skipping corpse spawn; pending corpse state is missing deadNpcInstance={0}",
+                        missingStateKey));
+            }
+
+            foreach (TCorpseState corpse in dueCorpseSpawns)
             {
                 Identity corpseId = corpseIdentity(corpse);
                 Identity deadNpcId = deadNpcIdentity(corpse);
-                pendingCorpseSpawns.Remove(deadNpcId.Instance);
 
                 ICharacter target = findDeadNpc(deadNpcId);
                 if (target == null)
@@ -129,6 +223,15 @@ namespace AORebirth.Core.Playfields
                 traceCorpseFullUpdate(corpseId, deadNpcId);
                 sendCorpseFullUpdate(target, corpseId);
             }
+        }
+
+        private static bool IsSamePendingCorpseState<TCorpseState>(
+            TCorpseState current,
+            TCorpseState snapshot)
+        {
+            return typeof(TCorpseState).IsValueType
+                ? EqualityComparer<TCorpseState>.Default.Equals(current, snapshot)
+                : ReferenceEquals(current, snapshot);
         }
     }
 }

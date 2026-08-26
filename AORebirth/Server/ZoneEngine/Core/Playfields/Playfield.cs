@@ -544,7 +544,10 @@ namespace AORebirth.Core.Playfields
 
         private void CancelPendingNpcCorpseSpawn(Identity deadNpcIdentity)
         {
-            this.pendingCorpseSpawns.Remove(deadNpcIdentity.Instance);
+            lock (this.pendingCorpseSpawns)
+            {
+                this.pendingCorpseSpawns.Remove(deadNpcIdentity.Instance);
+            }
         }
 
         public void RegisterNpcHome(ICharacter character)
@@ -3765,26 +3768,34 @@ namespace AORebirth.Core.Playfields
 
         internal void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
         {
-            if (target == null
-                || this.pendingCorpseSpawns.ContainsKey(target.Identity.Instance)
-                || this.corpseInventoryService.ContainsDeadNpc(
-                    this.Identity.Instance,
-                    target.Identity))
+            if (target == null)
             {
                 return;
             }
 
             DateTime spawnsAtUtc = DateTime.UtcNow + NpcCorpseLifecycleRules.CorpseSpawnDelay;
-            this.pendingCorpseSpawns[target.Identity.Instance] =
-                new CorpseState
+            lock (this.pendingCorpseSpawns)
+            {
+                if (this.disposed
+                    || this.pendingCorpseSpawns.ContainsKey(target.Identity.Instance)
+                    || this.corpseInventoryService.ContainsDeadNpc(
+                        this.Identity.Instance,
+                        target.Identity))
                 {
-                    CorpseIdentity = corpseIdentity,
-                    DeadNpcIdentity = target.Identity,
-                    Name = "Remains of " + target.Name,
-                    LootClass = CombatCorpseLootClass.Empty,
-                    CreatedAtUtc = DateTime.UtcNow,
-                    SpawnsAtUtc = spawnsAtUtc
-                };
+                    return;
+                }
+
+                this.pendingCorpseSpawns[target.Identity.Instance] =
+                    new CorpseState
+                    {
+                        CorpseIdentity = corpseIdentity,
+                        DeadNpcIdentity = target.Identity,
+                        Name = "Remains of " + target.Name,
+                        LootClass = CombatCorpseLootClass.Empty,
+                        CreatedAtUtc = DateTime.UtcNow,
+                        SpawnsAtUtc = spawnsAtUtc
+                    };
+            }
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                 PlayfieldLifecycleTrace.StageCorpseSpawnScheduled,
@@ -3812,13 +3823,17 @@ namespace AORebirth.Core.Playfields
             }
 
             CorpseState pending;
-            if (this.pendingCorpseSpawns.TryGetValue(
-                    deadNpcIdentity.Instance,
-                    out pending)
-                && pending.DeadNpcIdentity == deadNpcIdentity
-                && pending.CorpseIdentity == corpseIdentity)
+            lock (this.pendingCorpseSpawns)
             {
-                return true;
+                if (this.pendingCorpseSpawns.TryGetValue(
+                        deadNpcIdentity.Instance,
+                        out pending)
+                    && pending != null
+                    && pending.DeadNpcIdentity == deadNpcIdentity
+                    && pending.CorpseIdentity == corpseIdentity)
+                {
+                    return true;
+                }
             }
 
             CorpseState available;
@@ -4892,7 +4907,10 @@ namespace AORebirth.Core.Playfields
                 {
                     try
                     {
-                        this.pendingCorpseSpawns.Clear();
+                        lock (this.pendingCorpseSpawns)
+                        {
+                            this.pendingCorpseSpawns.Clear();
+                        }
                         this.pendingCorpseCreditAwards.Clear();
                         this.pendingMissionCorpseCompletionResumes.Clear();
                         this.corpseInventoryService.ClearPlayfield(this.Identity.Instance);

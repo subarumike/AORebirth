@@ -5,21 +5,102 @@
   "sourceSha256": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32",
   "importer": "Tools/generate_pf4582_placements.py",
   "normalizedPlacementArtifact": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportPlacementCatalog.g.cs",
+  "generatedProfilePopulationArtifact": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportProfilePopulationCatalog.g.cs",
   "PF4582_SOURCE_PLACEMENTS": 206,
   "PF4582_UNIQUE_NPC_IDS": 206,
   "PF4582_DUPLICATE_NPC_IDS": 0,
   "PF4582_UNIQUE_TEMPLATE_HASHES": 38,
-  "PF4582_EXISTING_MATCHED": 25,
+  "PF4582_EXISTING_MATCHED": 199,
   "PF4582_EXISTING_NOT_MATCHED": 0,
-  "PF4582_NEW_PLACEMENTS": 181,
+  "PF4582_NEW_PLACEMENTS": 7,
   "PF4582_DUPLICATE_POSITION_RECORDS": 14,
   "PF4582_DUPLICATE_POSITION_GROUPS": 5,
   "PF4582_DUPLICATE_POSITION_EXCESS": 9,
-  "PF4582_TEMPLATE_HASHES_MAPPED": 14,
-  "PF4582_TEMPLATE_HASHES_UNRESOLVED": 24,
-  "PF4582_RUNTIME_ELIGIBLE": 25,
-  "PF4582_RUNTIME_BLOCKED": 181,
+  "PF4582_TEMPLATE_HASHES_MAPPED": 31,
+  "PF4582_TEMPLATE_HASHES_UNRESOLVED": 7,
+  "PF4582_RUNTIME_ELIGIBLE": 199,
+  "PF4582_RUNTIME_BLOCKED": 7,
+  "PF4582_EXPLICIT_RUNTIME_ACTIVE": 35,
+  "PF4582_GENERATED_PROFILE_ACTIVE": 164,
   "existingMatches": [
+    {
+      "npcId": 1007845,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007846,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007847,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007848,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007849,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007850,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007851,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007852,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.053146
+    },
+    {
+      "npcId": 1007853,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.021458
+    },
+    {
+      "npcId": 1007854,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.054897
+    },
+    {
+      "npcId": 1007855,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.048078
+    },
+    {
+      "npcId": 1007856,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.03625
+    },
+    {
+      "npcId": 1007857,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.061555
+    },
     {
       "npcId": 1007858,
       "sourceName": "Island Reet",
@@ -27,10 +108,970 @@
       "positionDelta": 3.220481
     },
     {
+      "npcId": 1007859,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.049877
+    },
+    {
+      "npcId": 1007860,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.046815
+    },
+    {
+      "npcId": 1007861,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.050109
+    },
+    {
+      "npcId": 1007862,
+      "sourceName": "Shore Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Shore Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007863,
+      "sourceName": "Shore Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Shore Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007864,
+      "sourceName": "Shore Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Shore Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007865,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007866,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007867,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007868,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007869,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007870,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007871,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007872,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007873,
+      "sourceName": "Surf Lizard",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007874,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007875,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007876,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007877,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007878,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007879,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007880,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007881,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007882,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007883,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007884,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007885,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007886,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007887,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007888,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007889,
+      "sourceName": "Tropical Stalker",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007890,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007891,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007892,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007893,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007894,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007895,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007896,
+      "sourceName": "Reef Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007897,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007898,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007899,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007900,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007901,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007902,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007903,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007904,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007905,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007906,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007907,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007908,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007909,
+      "sourceName": "Cliff Malle",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007910,
+      "sourceName": "Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007911,
+      "sourceName": "Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007912,
+      "sourceName": "Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007913,
+      "sourceName": "Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007914,
+      "sourceName": "Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007915,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007916,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007917,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007918,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007919,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007920,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007921,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007922,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007923,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007924,
+      "sourceName": "Cargo Droid",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007925,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007926,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007927,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007928,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007929,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007930,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007931,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007932,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007933,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007934,
+      "sourceName": "Waste collector",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007935,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007936,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007937,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007938,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007939,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007940,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007941,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007942,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007943,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007944,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007945,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007946,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007947,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007948,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007949,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007950,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007951,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007952,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007953,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007954,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007955,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007956,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007957,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007958,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007959,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007960,
+      "sourceName": "Alien Spider - Zix",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007968,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007969,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007970,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007971,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007972,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007973,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007974,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007975,
+      "sourceName": "Cross-Wired Junkbot",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007976,
+      "sourceName": "Stowaway Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007977,
+      "sourceName": "Stowaway Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007978,
+      "sourceName": "Stowaway Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007979,
+      "sourceName": "Stowaway Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007980,
+      "sourceName": "Stowaway Rollerrat",
+      "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007981,
+      "sourceName": "Shuttle Saboteur",
+      "runtimeProfile": "IccShuttleportSpawn:Shuttle Saboteur",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007982,
+      "sourceName": "Shuttle Saboteur",
+      "runtimeProfile": "IccShuttleportSpawn:Shuttle Saboteur",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007983,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007984,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
+    },
+    {
       "npcId": 1007985,
       "sourceName": "ICC Bio-Inspector",
       "runtimeProfile": "IccShuttleportSpawn:ICC Bio-Inspector",
       "positionDelta": 3.267368
+    },
+    {
+      "npcId": 1007986,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007987,
+      "sourceName": "Island Reet",
+      "runtimeProfile": "IccShuttleportSpawn:Island Reet",
+      "positionDelta": 0.050822
+    },
+    {
+      "npcId": 1007988,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007989,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007990,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007991,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007992,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007993,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007994,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007995,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007996,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007997,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007998,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1007999,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008000,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008001,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008002,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008003,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008004,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008005,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008006,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008007,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008008,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008009,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008010,
+      "sourceName": "Scout - Jaax'Sinuh",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008011,
+      "sourceName": "Specialist - Cha'Heru",
+      "runtimeProfile": "IccShuttleportSpawn:Specialist - Cha'Heru",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008012,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008013,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008014,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008015,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008016,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008017,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008018,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008019,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008020,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008021,
+      "sourceName": "Giant Snake",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008022,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008023,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008024,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008025,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
+    },
+    {
+      "npcId": 1008026,
+      "sourceName": "Climbing Salamander",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "positionDelta": 0.0
     },
     {
       "npcId": 1008027,
@@ -97,6 +1138,12 @@
       "sourceName": "Adri Afeli",
       "runtimeProfile": "IccShuttleportSpawn:Adri Afeli",
       "positionDelta": 0.786511
+    },
+    {
+      "npcId": 1008038,
+      "sourceName": "Beach Leet",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "positionDelta": 0.0
     },
     {
       "npcId": 1008039,
@@ -173,186 +1220,12 @@
   ],
   "existingNotMatched": [],
   "newPlacementNpcIds": [
-    1007845,
-    1007846,
-    1007847,
-    1007848,
-    1007849,
-    1007850,
-    1007851,
-    1007852,
-    1007853,
-    1007854,
-    1007855,
-    1007856,
-    1007857,
-    1007859,
-    1007860,
-    1007861,
-    1007862,
-    1007863,
-    1007864,
-    1007865,
-    1007866,
-    1007867,
-    1007868,
-    1007869,
-    1007870,
-    1007871,
-    1007872,
-    1007873,
-    1007874,
-    1007875,
-    1007876,
-    1007877,
-    1007878,
-    1007879,
-    1007880,
-    1007881,
-    1007882,
-    1007883,
-    1007884,
-    1007885,
-    1007886,
-    1007887,
-    1007888,
-    1007889,
-    1007890,
-    1007891,
-    1007892,
-    1007893,
-    1007894,
-    1007895,
-    1007896,
-    1007897,
-    1007898,
-    1007899,
-    1007900,
-    1007901,
-    1007902,
-    1007903,
-    1007904,
-    1007905,
-    1007906,
-    1007907,
-    1007908,
-    1007909,
-    1007910,
-    1007911,
-    1007912,
-    1007913,
-    1007914,
-    1007915,
-    1007916,
-    1007917,
-    1007918,
-    1007919,
-    1007920,
-    1007921,
-    1007922,
-    1007923,
-    1007924,
-    1007925,
-    1007926,
-    1007927,
-    1007928,
-    1007929,
-    1007930,
-    1007931,
-    1007932,
-    1007933,
-    1007934,
-    1007935,
-    1007936,
-    1007937,
-    1007938,
-    1007939,
-    1007940,
-    1007941,
-    1007942,
-    1007943,
-    1007944,
-    1007945,
-    1007946,
-    1007947,
-    1007948,
-    1007949,
-    1007950,
-    1007951,
-    1007952,
-    1007953,
-    1007954,
-    1007955,
-    1007956,
-    1007957,
-    1007958,
-    1007959,
-    1007960,
     1007961,
     1007963,
     1007964,
     1007965,
     1007966,
     1007967,
-    1007968,
-    1007969,
-    1007970,
-    1007971,
-    1007972,
-    1007973,
-    1007974,
-    1007975,
-    1007976,
-    1007977,
-    1007978,
-    1007979,
-    1007980,
-    1007981,
-    1007982,
-    1007983,
-    1007984,
-    1007986,
-    1007987,
-    1007988,
-    1007989,
-    1007990,
-    1007991,
-    1007992,
-    1007993,
-    1007994,
-    1007995,
-    1007996,
-    1007997,
-    1007998,
-    1007999,
-    1008000,
-    1008001,
-    1008002,
-    1008003,
-    1008004,
-    1008005,
-    1008006,
-    1008007,
-    1008008,
-    1008009,
-    1008010,
-    1008011,
-    1008012,
-    1008013,
-    1008014,
-    1008015,
-    1008016,
-    1008017,
-    1008018,
-    1008019,
-    1008020,
-    1008021,
-    1008022,
-    1008023,
-    1008024,
-    1008025,
-    1008026,
-    1008038,
     1008051
   ],
   "duplicatePositionGroups": [
@@ -417,6 +1290,18 @@
     }
   ],
   "mappedTemplateHashes": [
+    {
+      "templateHash": 1095584067,
+      "templateTag": "CIMA",
+      "runtimeProfile": "IccShuttleportSpawn:Cliff Malle",
+      "sourceSpawnCount": 13
+    },
+    {
+      "templateHash": 1095979092,
+      "templateTag": "TPSA",
+      "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker",
+      "sourceSpawnCount": 16
+    },
     {
       "templateHash": 1096042831,
       "templateTag": "OITA",
@@ -490,66 +1375,114 @@
       "sourceSpawnCount": 1
     },
     {
+      "templateHash": 1230522714,
+      "templateTag": "ZIXI",
+      "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix",
+      "sourceSpawnCount": 26
+    },
+    {
+      "templateHash": 1246118721,
+      "templateTag": "ACFJ",
+      "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh",
+      "sourceSpawnCount": 23
+    },
+    {
+      "templateHash": 1262571596,
+      "templateTag": "LPAK",
+      "runtimeProfile": "IccShuttleportSpawn:Shuttle Saboteur",
+      "sourceSpawnCount": 2
+    },
+    {
+      "templateHash": 1263749447,
+      "templateTag": "GISK",
+      "runtimeProfile": "IccShuttleportSpawn:Giant Snake",
+      "sourceSpawnCount": 10
+    },
+    {
+      "templateHash": 1263751763,
+      "templateTag": "SRSK",
+      "runtimeProfile": "IccShuttleportSpawn:Shore Snake",
+      "sourceSpawnCount": 3
+    },
+    {
+      "templateHash": 1280462675,
+      "templateTag": "SORL",
+      "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat",
+      "sourceSpawnCount": 5
+    },
+    {
+      "templateHash": 1280525906,
+      "templateTag": "RFSL",
+      "runtimeProfile": "IccShuttleportSpawn:Reef Salamander",
+      "sourceSpawnCount": 7
+    },
+    {
+      "templateHash": 1314079299,
+      "templateTag": "CBSN",
+      "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander",
+      "sourceSpawnCount": 7
+    },
+    {
+      "templateHash": 1329812567,
+      "templateTag": "WTCO",
+      "runtimeProfile": "IccShuttleportSpawn:Waste collector",
+      "sourceSpawnCount": 10
+    },
+    {
+      "templateHash": 1330725958,
+      "templateTag": "FDQO",
+      "runtimeProfile": "IccShuttleportSpawn:Beach Leet",
+      "sourceSpawnCount": 9
+    },
+    {
       "templateHash": 1330925122,
       "templateTag": "BNTO",
       "runtimeProfile": "IccShuttleportSpawn:Brandon Thorn",
       "sourceSpawnCount": 1
     },
     {
+      "templateHash": 1380204867,
+      "templateTag": "CADR",
+      "runtimeProfile": "IccShuttleportSpawn:Cargo Droid",
+      "sourceSpawnCount": 10
+    },
+    {
+      "templateHash": 1380273228,
+      "templateTag": "LLER",
+      "runtimeProfile": "IccShuttleportSpawn:Rollerrat",
+      "sourceSpawnCount": 5
+    },
+    {
       "templateHash": 1414742857,
       "templateTag": "ICST",
       "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard",
       "sourceSpawnCount": 12
+    },
+    {
+      "templateHash": 1430934083,
+      "templateTag": "CRJU",
+      "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot",
+      "sourceSpawnCount": 8
+    },
+    {
+      "templateHash": 1497649731,
+      "templateTag": "CRDY",
+      "runtimeProfile": "IccShuttleportSpawn:Specialist - Cha'Heru",
+      "sourceSpawnCount": 1
+    },
+    {
+      "templateHash": 1514951251,
+      "templateTag": "SRLZ",
+      "runtimeProfile": "IccShuttleportSpawn:Surf Lizard",
+      "sourceSpawnCount": 9
     }
   ],
   "unresolvedTemplateHashes": [
-    {
-      "templateHash": 1095584067,
-      "templateTag": "CIMA",
-      "sourceName": "Cliff Malle",
-      "sourceSpawnCount": 13
-    },
-    {
-      "templateHash": 1095979092,
-      "templateTag": "TPSA",
-      "sourceName": "Tropical Stalker",
-      "sourceSpawnCount": 16
-    },
     {
       "templateHash": 1196249922,
       "templateTag": "BSMG",
       "sourceName": "Dreadknot the Toxictwister",
       "sourceSpawnCount": 1
-    },
-    {
-      "templateHash": 1230522714,
-      "templateTag": "ZIXI",
-      "sourceName": "Alien Spider - Zix",
-      "sourceSpawnCount": 26
-    },
-    {
-      "templateHash": 1246118721,
-      "templateTag": "ACFJ",
-      "sourceName": "Scout - Jaax'Sinuh",
-      "sourceSpawnCount": 23
-    },
-    {
-      "templateHash": 1262571596,
-      "templateTag": "LPAK",
-      "sourceName": "Shuttle Saboteur",
-      "sourceSpawnCount": 2
-    },
-    {
-      "templateHash": 1263749447,
-      "templateTag": "GISK",
-      "sourceName": "Giant Snake",
-      "sourceSpawnCount": 10
-    },
-    {
-      "templateHash": 1263751763,
-      "templateTag": "SRSK",
-      "sourceName": "Shore Snake",
-      "sourceSpawnCount": 3
     },
     {
       "templateHash": 1280132162,
@@ -564,34 +1497,10 @@
       "sourceSpawnCount": 1
     },
     {
-      "templateHash": 1280462675,
-      "templateTag": "SORL",
-      "sourceName": "Stowaway Rollerrat",
-      "sourceSpawnCount": 5
-    },
-    {
-      "templateHash": 1280525906,
-      "templateTag": "RFSL",
-      "sourceName": "Reef Salamander",
-      "sourceSpawnCount": 7
-    },
-    {
       "templateHash": 1296911426,
       "templateTag": "BLMM",
       "sourceName": "Oozefoot the Noxious Malle",
       "sourceSpawnCount": 1
-    },
-    {
-      "templateHash": 1314079299,
-      "templateTag": "CBSN",
-      "sourceName": "Climbing Salamander",
-      "sourceSpawnCount": 7
-    },
-    {
-      "templateHash": 1329812567,
-      "templateTag": "WTCO",
-      "sourceName": "Waste collector",
-      "sourceSpawnCount": 10
     },
     {
       "templateHash": 1330463810,
@@ -606,76 +1515,13 @@
       "sourceSpawnCount": 1
     },
     {
-      "templateHash": 1330725958,
-      "templateTag": "FDQO",
-      "sourceName": "Beach Leet",
-      "sourceSpawnCount": 9
-    },
-    {
-      "templateHash": 1380204867,
-      "templateTag": "CADR",
-      "sourceName": "Cargo Droid",
-      "sourceSpawnCount": 10
-    },
-    {
-      "templateHash": 1380273228,
-      "templateTag": "LLER",
-      "sourceName": "Rollerrat",
-      "sourceSpawnCount": 5
-    },
-    {
       "templateHash": 1380796994,
       "templateTag": "BJMR",
       "sourceName": "Sparky the Stabber",
       "sourceSpawnCount": 1
-    },
-    {
-      "templateHash": 1430934083,
-      "templateTag": "CRJU",
-      "sourceName": "Cross-Wired Junkbot",
-      "sourceSpawnCount": 8
-    },
-    {
-      "templateHash": 1497649731,
-      "templateTag": "CRDY",
-      "sourceName": "Specialist - Cha'Heru",
-      "sourceSpawnCount": 1
-    },
-    {
-      "templateHash": 1514951251,
-      "templateTag": "SRLZ",
-      "sourceName": "Surf Lizard",
-      "sourceSpawnCount": 9
     }
   ],
   "runtimeEligibleNpcIds": [
-    1007858,
-    1007985,
-    1008027,
-    1008028,
-    1008029,
-    1008030,
-    1008031,
-    1008032,
-    1008033,
-    1008034,
-    1008035,
-    1008036,
-    1008037,
-    1008039,
-    1008040,
-    1008041,
-    1008042,
-    1008043,
-    1008044,
-    1008045,
-    1008046,
-    1008047,
-    1008048,
-    1008049,
-    1008050
-  ],
-  "runtimeBlockedNpcIds": [
     1007845,
     1007846,
     1007847,
@@ -689,6 +1535,7 @@
     1007855,
     1007856,
     1007857,
+    1007858,
     1007859,
     1007860,
     1007861,
@@ -791,12 +1638,6 @@
     1007958,
     1007959,
     1007960,
-    1007961,
-    1007963,
-    1007964,
-    1007965,
-    1007966,
-    1007967,
     1007968,
     1007969,
     1007970,
@@ -814,6 +1655,7 @@
     1007982,
     1007983,
     1007984,
+    1007985,
     1007986,
     1007987,
     1007988,
@@ -855,15 +1697,48 @@
     1008024,
     1008025,
     1008026,
+    1008027,
+    1008028,
+    1008029,
+    1008030,
+    1008031,
+    1008032,
+    1008033,
+    1008034,
+    1008035,
+    1008036,
+    1008037,
     1008038,
+    1008039,
+    1008040,
+    1008041,
+    1008042,
+    1008043,
+    1008044,
+    1008045,
+    1008046,
+    1008047,
+    1008048,
+    1008049,
+    1008050
+  ],
+  "runtimeBlockedNpcIds": [
+    1007961,
+    1007963,
+    1007964,
+    1007965,
+    1007966,
+    1007967,
     1008051
   ],
   "PF4582_PLACEMENT_KNOWN": 206,
-  "PF4582_BEHAVIOR_PROVEN": 25,
-  "PF4582_RUNTIME_ACTIVE": 25,
+  "PF4582_BEHAVIOR_PROVEN": 199,
+  "PF4582_RUNTIME_ACTIVE": 199,
   "runtimeEvidence": [
     "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
-    "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json"
+    "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
+    "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/mobtemplate.sql",
+    "docs/reference/pf4582/template-hash-evidence.json"
   ],
   "unresolvedDynamicSourceNames": [
     {

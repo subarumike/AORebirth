@@ -566,6 +566,7 @@
     <Compile Include="Core\Playfields\IccShuttleportSpawn.cs" />
     <Compile Include="Core\Playfields\IccShuttleportPlacementCatalog.cs" />
     <Compile Include="Core\Playfields\IccShuttleportPlacementCatalog.g.cs" />
+    <Compile Include="Core\Playfields\IccShuttleportProfilePopulationCatalog.g.cs" />
     <Compile Include="Core\Playfields\IccShuttleportOfficialPlacementCatalog.cs" />
     <Compile Include="Core\Playfields\IccShuttleportOfficialPlacementCatalog.g.cs" />
     <Compile Include="Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs" />

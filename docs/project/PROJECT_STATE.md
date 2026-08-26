@@ -408,16 +408,16 @@ migrations; details and exact source references are recorded in
   X 3607.6, Y 52.4, Z 785.7 without integer rounding.
 - PF4582 ICC Shuttleport has a checked-in authoritative placement layer with
   all 206 source records, 206 unique `NpcId` values, 38 template hashes, and
-  all duplicate-position records preserved. The 25 previously implemented
-  placements are reconciled and remain the only runtime-active rows; 181 new
-  placements and 24 unresolved template hashes remain fail-closed. Source
-  names, flags, and candidate respawn timing remain placement metadata rather
-  than behavioral authority. The pinned deterministic TemplateHash audit
-  verifies all 14 baseline mappings at repository-governance level and classifies
-  the 24 unresolved hashes as 0 proven, 17 candidate, 1 ambiguous, and 6 with no
-  reliable identity evidence. Those 24 hashes account for 171 blocked rows; 10
-  additional blocked Island Reet rows use the baseline-mapped ISRE hash. No audit
-  result grants runtime activation.
+  all duplicate-position records preserved. Under the explicit practical
+  completion authorization, 199 placements now materialize: the original 25,
+  10 additional exact `ISRE` Island Reets, and 164 placements from 17 unique
+  same-name template mappings. Only the 11 `ISRE` placements receive the
+  captured Island Reet combat contract. The 164 additional template-backed
+  placements retain their exact template identity, source minimum level, and
+  position in Social mode without invented combat, loot, pathing, or respawn
+  behavior. Seven unresolved template hashes remain fail-closed. Source names,
+  flags, and candidate respawn timing remain placement metadata rather than
+  behavioral authority.
 - PF4582 now also has a governed, byte-identical local snapshot of the completed
   official EP1 structural investigation. The exact type-1000014 / instance-4582
   resource contains 207 `HashSpawnPoint_t` records across districts of 142 and
@@ -431,8 +431,11 @@ migrations; details and exact source references are recorded in
   `NO_BRIDGE_LOCATED`: the packed four-byte `ACGHash_t` type, parser, native
   field, vector, and accessors are proven, while terminal mob identity, static
   mappings, and runtime hash-to-dynel join remain unresolved. The 207-record
-  official overlay is not runtime-consumed; current runtime remains 25 active
-  and 181 blocked.
+  official overlay authorizes 199 records and blocks eight, including `NCNN`;
+  PF4582 runtime materialization remains governed by its specialized catalog.
+  The heartbeat corpse-spawn queue now uses one synchronization boundary for
+  scheduling and draining, preventing concurrent queue corruption while
+  preserving same-key replacements.
 - AORebirth now has a deterministic database-wide official static placement
   evidence layer imported from the official `18.8.62_EP1` old-graphics-client
   ResourceDatabase extraction. The source cohort is hash-pinned at 630 unique
@@ -445,11 +448,12 @@ migrations; details and exact source references are recorded in
   or 4805. The authoritative Windows project and its derived Linux inventory
   copy the same exact-cased corpus into ZoneEngine artifacts. A shared compiled
   validation mode verifies all file, shard, count, PF4582, and activation-policy
-  invariants and emits deterministic manifest/provenance evidence; normal
-  startup and spawn materialization do not consume it. Identity, behavior
-  readiness, and runtime activation remain separately governed. PF4582
-  reconciles exactly to the general 207-row shard while its existing runtime
-  stays 25 active and 181 blocked.
+  invariants and emits deterministic manifest/provenance evidence. Normal
+  startup and spawn materialization do not consume the general database-wide
+  catalog. Identity, behavior readiness, and runtime activation remain
+  separately governed; PF4582 reconciles exactly to the general 207-row shard
+  while its specialized checked-in runtime catalog materializes 199 of 206
+  accepted placements and blocks seven.
 - PF127 Subway is complete for its current capture-backed population,
   navigation, combat, lifecycle, loot, vendor, Karrec, zoning, and teardown
   contracts. New behavior still requires capture evidence.

@@ -2,17 +2,17 @@
 
 ## Active
 
-Promote the database-wide official type-`1000014` static placement corpus from
-its single checked-in source into both authoritative Windows and exact-SHA
-Linux ZoneEngine artifacts. The shared catalog and compiled validation mode
-must prove 630 resources, 4,146 districts, 32,805 independent placements, and
-4,016 canonical `ACGHash_t` tags with identical per-playfield digests. Resources
-103, 615, and 4805 remain explicitly parser-limited. Placement availability is
-separate from identity, behavior readiness, and runtime authorization: PF4582
-remains 207 official evidence rows upstream of the existing 206-row runtime
-catalog, with exactly 25 authorized, 181 blocked, and `NCNN` unresolved and
-inactive. Complete Windows acceptance and Linux exact-SHA artifact parity
-without client, capture, database, or production deployment operations.
+Finish and deploy the practical PF4582 ICC Shuttleport population. The
+specialized runtime catalog now materializes 199 of its 206 accepted placements:
+the original 25 definitions, 10 additional exact `ISRE` Island Reets using the
+captured Island Reet combat contract, and 164 exact same-name unique-template
+placements in template-backed Social mode without invented combat, loot,
+pathing, or respawn behavior. Seven unresolved source records remain blocked.
+The reconciled 207-row official overlay authorizes the same 199 and blocks eight,
+including `NCNN`. The concurrent corpse-spawn queue regression that crashed the
+PF4582 heartbeat is fixed. Complete only the governed Windows and Linux
+acceptance gates, deploy ZoneEngine alone, and leave all gameplay/client testing
+to Mike.
 
 ## Prior active checkpoint
 

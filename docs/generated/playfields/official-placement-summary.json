@@ -73,8 +73,8 @@
   ],
   "Metrics": {
     "ExistingRuntimeBehaviorChanged": false,
-    "NewRuntimeSpawnsActivated": 0,
-    "NormalizedPlacementShardBytes": 75503584,
+    "NewRuntimeSpawnsActivated": 174,
+    "NormalizedPlacementShardBytes": 75511365,
     "OfficialCrossDistrictDuplicateGroups": 1085,
     "OfficialDistricts": 4146,
     "OfficialDuplicatePositionGroups": 2869,
@@ -85,14 +85,14 @@
     "OfficialSpawnRecords": 32805,
     "OfficialUniqueAcgHashTags": 4016,
     "ParsedResources": 627,
-    "Pf4582ExistingRuntimeActive": 25,
+    "Pf4582ExistingRuntimeActive": 199,
     "PlayfieldShards": 630,
     "ResourcesMalformed": 3,
     "ResourcesParsedEmpty": 5,
     "ResourcesParsedSupported": 622,
     "SourcePlacementShardBytes": 86019468
   },
-  "Outcome": "OFFICIAL_STATIC_PLACEMENT_EVIDENCE_IMPORTED_RUNTIME_UNCHANGED",
+  "Outcome": "OFFICIAL_STATIC_PLACEMENT_EVIDENCE_IMPORTED_WITH_BOUNDED_PF4582_RUNTIME_AUTHORIZATION",
   "PF4582Regression": {
     "DistrictRecordCounts": [
       142,
@@ -116,9 +116,9 @@
   "ResourceType": 1000014,
   "RuntimeGovernance": {
     "CurrentRuntimeActiveOutsideEnumeratedPf4582": null,
-    "ExistingPf4582RuntimeActive": 25,
+    "ExistingPf4582RuntimeActive": 199,
     "MassRuntimeActivation": false,
-    "RuntimeActivationAuthorizedRecords": 25,
+    "RuntimeActivationAuthorizedRecords": 199,
     "UnresolvedPlacementsRemainInactive": true
   },
   "SchemaVersion": 1,

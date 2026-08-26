@@ -4928,7 +4928,7 @@
       "Path": "docs/generated/playfields/placements/pf_4582.json",
       "PlayfieldId": 4582,
       "ResourceInstance": 4582,
-      "Sha256": "85702615ce9703a94d5f4f608a0e921b9bddc067042e282c7e51185190805a8c"
+      "Sha256": "94429fd9d220d3984c2c4500869e17fa2500b6c299261b109dbb2052580cb509"
     },
     {
       "DistrictCount": 3,
@@ -6305,5 +6305,5 @@
   "SchemaVersion": 1,
   "SourceClientBuild": "18.8.62_EP1",
   "SourceClientVariant": "EP1_OLD_GRAPHICS_CLIENT",
-  "SourceManifestSha256": "3f097651f7903ad46dd0c8aa8f4cf321ea5f8152d6805fded0be16cfe374e2b6"
+  "SourceManifestSha256": "d21c7b64fa2c80aed8cc9711b3c53c14e37ceff685dc0caa69df515b899af402"
 }

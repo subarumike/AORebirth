@@ -299,6 +299,11 @@
     <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="PlayfieldObjectLifecycleRuntimeServiceTests.cs" />
+    <Compile Include="PlayfieldObjectLifecycleRuntimeServiceTestStubs.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs">
+      <Link>PlayfieldObjectLifecycleRuntimeService.cs</Link>
+    </Compile>
     <Compile Include="PlayfieldHydrationCharacterizationTests.cs" />
     <Compile Include="PlayfieldHydrationIPlayfieldTestStub.cs" />
     <Compile Include="PlayfieldHydrationSeamTests.cs" />

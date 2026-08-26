@@ -196,8 +196,14 @@ class OfficialPlacementImporterSourceTests(unittest.TestCase):
         records = self.model.placement_shards[4582]["Records"]
         self.assertEqual(len(records), 207)
         self.assertEqual(sum(record["SourceNpcId"] is not None for record in records), 206)
-        self.assertEqual(sum(record["CurrentRuntimeActive"] is True for record in records), 25)
-        self.assertEqual(sum(record["ExistingAoRebirthProfile"] is not None for record in records), 25)
+        self.assertEqual(
+            sum(record["CurrentRuntimeActive"] is True for record in records),
+            importer.PF4582_RUNTIME_ACTIVE_COUNT,
+        )
+        self.assertEqual(
+            sum(record["ExistingAoRebirthProfile"] is not None for record in records),
+            importer.PF4582_RUNTIME_ACTIVE_COUNT,
+        )
         ncnn = next(
             record
             for record in records
@@ -256,10 +262,22 @@ class OfficialPlacementImporterSourceTests(unittest.TestCase):
             self.assertIs(record["IdentityResolved"], active_and_profile_backed)
             self.assertIs(record["BehaviorReady"], active_and_profile_backed)
             self.assertIs(record["RuntimeActivationAuthorized"], active_and_profile_backed)
-        self.assertEqual(sum(record["IdentityResolved"] is True for record in self.records), 25)
-        self.assertEqual(sum(record["BehaviorReady"] is True for record in self.records), 25)
-        self.assertEqual(sum(record["RuntimeActivationAuthorized"] is True for record in self.records), 25)
-        self.assertEqual(self.model.summary["Metrics"]["NewRuntimeSpawnsActivated"], 0)
+        self.assertEqual(
+            sum(record["IdentityResolved"] is True for record in self.records),
+            importer.PF4582_RUNTIME_ACTIVE_COUNT,
+        )
+        self.assertEqual(
+            sum(record["BehaviorReady"] is True for record in self.records),
+            importer.PF4582_RUNTIME_ACTIVE_COUNT,
+        )
+        self.assertEqual(
+            sum(record["RuntimeActivationAuthorized"] is True for record in self.records),
+            importer.PF4582_RUNTIME_ACTIVE_COUNT,
+        )
+        self.assertEqual(
+            self.model.summary["Metrics"]["NewRuntimeSpawnsActivated"],
+            importer.PF4582_NEWLY_AUTHORIZED_COUNT,
+        )
         self.assertIs(self.model.summary["Metrics"]["ExistingRuntimeBehaviorChanged"], False)
 
     def test_general_catalog_is_packaged_but_not_wired_to_runtime_materialization(self) -> None:
@@ -335,7 +353,7 @@ class OfficialPlacementImporterSourceTests(unittest.TestCase):
                 "DistrictCount": 4146,
                 "PlacementCount": 32805,
                 "UniqueAcgHashCount": 4016,
-                "RuntimeActivationAuthorizedCount": 25,
+                "RuntimeActivationAuthorizedCount": importer.PF4582_RUNTIME_ACTIVE_COUNT,
             },
         )
         self.assertEqual(manifest["ParserLimitedPlayfieldIds"], [103, 615, 4805])
@@ -381,7 +399,7 @@ class OfficialPlacementImporterSourceTests(unittest.TestCase):
                 row["RuntimeActivationAuthorizedCount"]
                 for row in manifest["Playfields"]
             ),
-            25,
+            importer.PF4582_RUNTIME_ACTIVE_COUNT,
         )
         expected_hashes = {
             "SourceManifestSha256": importer._sha256_bytes(
