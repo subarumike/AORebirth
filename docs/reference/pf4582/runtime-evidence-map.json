@@ -1,15 +1,27 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "playfieldId": 4582,
   "sourceSha256": "b747aea145cb36e3f9be5b2cacc7aaebca3d24017a14540ac1f29f4bd1296b32",
   "placementSource": "docs/reference/pf4582/PlayfieldDistrictInfo.json",
   "runtimeEvidence": [
     "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
-    "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json"
+    "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-dossier.json",
+    "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/mobtemplate.sql",
+    "docs/reference/pf4582/template-hash-evidence.json"
   ],
   "runtimeMappings": [
+    { "npcId": 1007852, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007853, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007854, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007855, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007856, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007857, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
     { "npcId": 1007858, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007859, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007860, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
+    { "npcId": 1007861, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
     { "npcId": 1007985, "sourceName": "ICC Bio-Inspector", "runtimeProfile": "IccShuttleportSpawn:ICC Bio-Inspector" },
+    { "npcId": 1007987, "sourceName": "Island Reet", "runtimeProfile": "IccShuttleportSpawn:Island Reet" },
     { "npcId": 1008027, "sourceName": "Brandon Thorn", "runtimeProfile": "IccShuttleportSpawn:Brandon Thorn" },
     { "npcId": 1008028, "sourceName": "Manager Travis Molen", "runtimeProfile": "IccShuttleportSpawn:Manager Travis Molen" },
     { "npcId": 1008029, "sourceName": "Omni-Tek Equipment Vendor", "runtimeProfile": "IccShuttleportSpawn:Omni-Trans Equipment Vendor" },
@@ -33,6 +45,25 @@
     { "npcId": 1008048, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
     { "npcId": 1008049, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" },
     { "npcId": 1008050, "sourceName": "ICC Shuttle Guard", "runtimeProfile": "IccShuttleportSpawn:ICC Shuttle Guard" }
+  ],
+  "templateProfileMappings": [
+    { "templateHash": 1095584067, "sourceName": "Cliff Malle", "runtimeProfile": "IccShuttleportSpawn:Cliff Malle", "mobTemplateHash": "A035", "profileEvidenceKey": "mobtemplate:A035" },
+    { "templateHash": 1095979092, "sourceName": "Tropical Stalker", "runtimeProfile": "IccShuttleportSpawn:Tropical Stalker", "mobTemplateHash": "A033", "profileEvidenceKey": "mobtemplate:A033" },
+    { "templateHash": 1230522714, "sourceName": "Alien Spider - Zix", "runtimeProfile": "IccShuttleportSpawn:Alien Spider - Zix", "mobTemplateHash": "A026", "profileEvidenceKey": "mobtemplate:A026" },
+    { "templateHash": 1246118721, "sourceName": "Scout - Jaax'Sinuh", "runtimeProfile": "IccShuttleportSpawn:Scout - Jaax'Sinuh", "mobTemplateHash": "A002", "profileEvidenceKey": "mobtemplate:A002" },
+    { "templateHash": 1262571596, "sourceName": "Shuttle Saboteur", "runtimeProfile": "IccShuttleportSpawn:Shuttle Saboteur", "mobTemplateHash": "A014", "profileEvidenceKey": "mobtemplate:A014" },
+    { "templateHash": 1263749447, "sourceName": "Giant Snake", "runtimeProfile": "IccShuttleportSpawn:Giant Snake", "mobTemplateHash": "A030", "profileEvidenceKey": "mobtemplate:A030" },
+    { "templateHash": 1263751763, "sourceName": "Shore Snake", "runtimeProfile": "IccShuttleportSpawn:Shore Snake", "mobTemplateHash": "A003", "profileEvidenceKey": "mobtemplate:A003" },
+    { "templateHash": 1280462675, "sourceName": "Stowaway Rollerrat", "runtimeProfile": "IccShuttleportSpawn:Stowaway Rollerrat", "mobTemplateHash": "A012", "profileEvidenceKey": "mobtemplate:A012" },
+    { "templateHash": 1280525906, "sourceName": "Reef Salamander", "runtimeProfile": "IccShuttleportSpawn:Reef Salamander", "mobTemplateHash": "A034", "profileEvidenceKey": "mobtemplate:A034" },
+    { "templateHash": 1314079299, "sourceName": "Climbing Salamander", "runtimeProfile": "IccShuttleportSpawn:Climbing Salamander", "mobTemplateHash": "A013", "profileEvidenceKey": "mobtemplate:A013" },
+    { "templateHash": 1329812567, "sourceName": "Waste collector", "runtimeProfile": "IccShuttleportSpawn:Waste collector", "mobTemplateHash": "A029", "profileEvidenceKey": "mobtemplate:A029" },
+    { "templateHash": 1330725958, "sourceName": "Beach Leet", "runtimeProfile": "IccShuttleportSpawn:Beach Leet", "mobTemplateHash": "A004", "profileEvidenceKey": "mobtemplate:A004" },
+    { "templateHash": 1380204867, "sourceName": "Cargo Droid", "runtimeProfile": "IccShuttleportSpawn:Cargo Droid", "mobTemplateHash": "A027", "profileEvidenceKey": "mobtemplate:A027" },
+    { "templateHash": 1380273228, "sourceName": "Rollerrat", "runtimeProfile": "IccShuttleportSpawn:Rollerrat", "mobTemplateHash": "A012", "profileEvidenceKey": "runtime:CombatTestMobArchetype.StowawayRollerrat" },
+    { "templateHash": 1430934083, "sourceName": "Cross-Wired Junkbot", "runtimeProfile": "IccShuttleportSpawn:Cross-Wired Junkbot", "mobTemplateHash": "A009", "profileEvidenceKey": "mobtemplate:A009" },
+    { "templateHash": 1497649731, "sourceName": "Specialist - Cha'Heru", "runtimeProfile": "IccShuttleportSpawn:Specialist - Cha'Heru", "mobTemplateHash": "A016", "profileEvidenceKey": "mobtemplate:A016" },
+    { "templateHash": 1514951251, "sourceName": "Surf Lizard", "runtimeProfile": "IccShuttleportSpawn:Surf Lizard", "mobTemplateHash": "A000", "profileEvidenceKey": "mobtemplate:A000" }
   ],
   "unresolvedDynamicSourceNameNpcIds": [
     1007961,

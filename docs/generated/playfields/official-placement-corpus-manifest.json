@@ -1,14 +1,14 @@
 {
   "AcgHashInventorySha256": "f1daa42453a4f9a7c542c193efe10717d2ddc6fe4c0e1beaaba48e92a07afab6",
   "CorpusVersion": "18.8.62_EP1-static-placement-v2",
-  "IndexSha256": "ca9193f3f940db232733eab1cd0a5d86595ac316e2b42c50b331ce6981ad49f0",
+  "IndexSha256": "f6b3a4def439a75b90b8aae8de3d7f22008bbd4e2c1d069d18b0f9b913ac7f48",
   "Metrics": {
     "DistrictCount": 4146,
     "ParsedResourceCount": 627,
     "ParserLimitedResourceCount": 3,
     "PlacementCount": 32805,
     "ResourceCount": 630,
-    "RuntimeActivationAuthorizedCount": 25,
+    "RuntimeActivationAuthorizedCount": 199,
     "UniqueAcgHashCount": 4016
   },
   "ParserLimitedPlayfieldIds": [
@@ -4943,8 +4943,8 @@
       "Path": "placements/pf_4582.json",
       "PlacementCount": 207,
       "PlayfieldId": 4582,
-      "RuntimeActivationAuthorizedCount": 25,
-      "ShardSha256": "85702615ce9703a94d5f4f608a0e921b9bddc067042e282c7e51185190805a8c",
+      "RuntimeActivationAuthorizedCount": 199,
+      "ShardSha256": "94429fd9d220d3984c2c4500869e17fa2500b6c299261b109dbb2052580cb509",
       "SourceResourceSha256": "24ee42fd0c43ab69f6c832826085555fd622e147af6d72a97903f769a08ea8d3"
     },
     {
@@ -6327,6 +6327,6 @@
   "SchemaVersion": 1,
   "SourceClientBuild": "18.8.62_EP1",
   "SourceClientVariant": "EP1_OLD_GRAPHICS_CLIENT",
-  "SourceManifestSha256": "3f097651f7903ad46dd0c8aa8f4cf321ea5f8152d6805fded0be16cfe374e2b6",
-  "SummarySha256": "745c7f2c6689854aabc28605a77110ef9e124b95762bb40f643b76a8079f88ca"
+  "SourceManifestSha256": "d21c7b64fa2c80aed8cc9711b3c53c14e37ceff685dc0caa69df515b899af402",
+  "SummarySha256": "55a617c79eecfc7590d278e6b65d2353159d391f1587023c9b6ad566be76838e"
 }

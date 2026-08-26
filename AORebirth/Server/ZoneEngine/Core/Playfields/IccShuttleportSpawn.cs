@@ -29,7 +29,7 @@ namespace AORebirth.Core.Playfields
     /// Capture ICC Shuttleport [PF 4582] - 20260818-214552: stable social/vendor NPCs and deduplicated guard positions.
     /// Ordinary enemy, respawn, corpse, and loot behavior remains in the promoted capture evidence for a combat-backed pass.
     /// </summary>
-    internal static class IccShuttleportSpawn
+    internal static partial class IccShuttleportSpawn
     {
         private const int IccShuttleportPlayfieldId = 4582;
 
@@ -70,10 +70,105 @@ namespace AORebirth.Core.Playfields
             public int[][] Meshes;
             public float[][] Waypoints;
             public Func<CapturedEnemyCombatContract> CombatContractFactory;
+            public bool UseTemplateProfile;
         }
 
-        private static readonly ShuttleportNpc[] Npcs =
+        private static readonly ShuttleportNpc[] Npcs = CreateNpcDefinitions();
+
+        private static ShuttleportNpc[] CreateNpcDefinitions()
         {
+            var npcs = new List<ShuttleportNpc>
+            {
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007852,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 940.830017f, Y = 24.1345406f, Z = 751.827026f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007853,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 952.520996f, Y = 24.0f, Z = 756.895569f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007854,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 989.725586f, Y = 21.519722f, Z = 768.244385f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007855,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 877.954834f, Y = 21.9867554f, Z = 750.890198f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007856,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 821.429443f, Y = 20.5794868f, Z = 729.794861f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007857,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 823.457397f, Y = 20.8813877f, Z = 741.959656f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
             new ShuttleportNpc
             {
                 SourceNpcId = 1007858,
@@ -83,6 +178,66 @@ namespace AORebirth.Core.Playfields
                 NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
                 Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
                 X = 953.147461f, Y = 23.9720612f, Z = 747.212952f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007859,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 819.902161f, Y = 20.9173393f, Z = 734.053284f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007860,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 802.531616f, Y = 21.817358f, Z = 736.470154f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007861,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 807.921021f, Y = 21.7159061f, Z = 755.742615f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[] { new[] { 0, 0 } },
+                Meshes = new[] { new[] { 1, 95857, 0, 2 } },
+                Waypoints = null,
+                CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet,
+            },
+            new ShuttleportNpc
+            {
+                SourceNpcId = 1007987,
+                Name = "Island Reet",
+                TemplateHash = "A001",
+                Level = 1, Health = 12, MonsterData = 30365, Scale = 90, VisualFlags = 31, HeadMesh = 0, RunSpeed = 6,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 512, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 1,
+                X = 953.617615f, Y = 24.4119282f, Z = 762.746155f,
                 Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = new[] { new[] { 0, 0 } },
                 Meshes = new[] { new[] { 1, 95857, 0, 2 } },
@@ -401,7 +556,40 @@ namespace AORebirth.Core.Playfields
                 Meshes = new[] { new[] { 0, 265793, 286562, 2 }, new[] { 0, 40627, 0, 4 }, new[] { 1, 262556, 0, 2 }, new[] { 3, 286446, 0, 0 } },
                 Waypoints = null,
             },
-        };
+            };
+            AddGeneratedProfileNpcs(npcs);
+            return npcs.ToArray();
+        }
+
+        private static ShuttleportNpc CreateGeneratedProfileNpc(
+            int sourceNpcId,
+            string sourceName,
+            string templateHash,
+            int minimumLevel,
+            int maximumLevel)
+        {
+            if (minimumLevel > maximumLevel)
+            {
+                throw new InvalidOperationException(
+                    "PF4582 generated profile has invalid source level bounds npcId="
+                    + sourceNpcId);
+            }
+
+            return new ShuttleportNpc
+            {
+                SourceNpcId = sourceNpcId,
+                Name = sourceName,
+                TemplateHash = templateHash,
+                Level = minimumLevel,
+                Hx = 0f,
+                Hy = 0f,
+                Hz = 0f,
+                Hw = 1f,
+                Waypoints = null,
+                CombatContractFactory = null,
+                UseTemplateProfile = true,
+            };
+        }
 
         public static void ClearPlayfield(int playfieldInstance)
         {
@@ -515,42 +703,45 @@ namespace AORebirth.Core.Playfields
             mob.FirstName = string.Empty;
             mob.LastName = string.Empty;
             mob.Playfield = playfield;
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterdata, (uint)def.MonsterData);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.life, (uint)def.Health);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, (uint)def.Health);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)def.Level);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)def.VisualFlags);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)def.NpcFamily);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.losheight, (uint)def.LosHeight);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.flags, (uint)def.CharacterFlags);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)def.Side);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.breed, (uint)def.Breed);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.sex, (uint)def.Gender);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.race, (uint)def.Race);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.fatness, (uint)def.Fatness);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.accountflags, 0);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.expansion, 0);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.profession, 0);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualprofession, 0);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.currentmovementmode, (uint)def.MovementMode);
-            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.prevmovementmode, (uint)def.MovementMode);
-            if (def.Scale > 0)
+            if (!def.UseTemplateProfile)
             {
-                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterscale, (uint)def.Scale);
-            }
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterdata, (uint)def.MonsterData);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.life, (uint)def.Health);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, (uint)def.Health);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)def.Level);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)def.VisualFlags);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)def.NpcFamily);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.losheight, (uint)def.LosHeight);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.flags, (uint)def.CharacterFlags);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)def.Side);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.breed, (uint)def.Breed);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.sex, (uint)def.Gender);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.race, (uint)def.Race);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.fatness, (uint)def.Fatness);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.accountflags, 0);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.expansion, 0);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.profession, 0);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualprofession, 0);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.currentmovementmode, (uint)def.MovementMode);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.prevmovementmode, (uint)def.MovementMode);
+                if (def.Scale > 0)
+                {
+                    mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterscale, (uint)def.Scale);
+                }
 
-            if (def.HeadMesh > 0)
-            {
-                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.headmesh, (uint)def.HeadMesh);
-            }
+                if (def.HeadMesh > 0)
+                {
+                    mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.headmesh, (uint)def.HeadMesh);
+                }
 
-            if (def.RunSpeed > 0)
-            {
-                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, (uint)def.RunSpeed);
-            }
+                if (def.RunSpeed > 0)
+                {
+                    mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, (uint)def.RunSpeed);
+                }
 
-            ApplyAppearance(mob, def);
-            ApplyWaypoints(mob, npcController, def);
+                ApplyAppearance(mob, def);
+                ApplyWaypoints(mob, npcController, def);
+            }
             mob.Coordinates(
                 new Coordinate
                 {

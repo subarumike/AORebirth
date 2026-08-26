@@ -4,6 +4,7 @@ call "%~dp0select_python_runtime.cmd"
 if errorlevel 1 exit /b 1
 pushd "%~dp0.."
 if /I "%~1"=="--test" goto :test
+if /I "%~1"=="--test-runtime-authorization-refresh" goto :test_runtime_authorization_refresh
 if /I "%~1"=="--write" goto :write
 if /I "%~1"=="--check" goto :check
 %AO_REBIRTH_PYTHON% Tools\import_official_playfield_placements.py %*
@@ -35,6 +36,14 @@ if errorlevel 1 goto :fail
 %AO_REBIRTH_PYTHON% Tools\aorebirth_playfield_reconciliation.py --check
 if errorlevel 1 goto :fail
 %AO_REBIRTH_PYTHON% -m unittest Tools.tests.test_aorebirth_playfield_reconciliation
+if errorlevel 1 goto :fail
+popd
+exit /b 0
+
+:test_runtime_authorization_refresh
+%AO_REBIRTH_PYTHON% Tools\import_official_playfield_placements.py --refresh-runtime-authorization --check
+if errorlevel 1 goto :fail
+%AO_REBIRTH_PYTHON% -m unittest Tools.tests.test_refresh_official_playfield_runtime_authorization
 if errorlevel 1 goto :fail
 popd
 exit /b 0

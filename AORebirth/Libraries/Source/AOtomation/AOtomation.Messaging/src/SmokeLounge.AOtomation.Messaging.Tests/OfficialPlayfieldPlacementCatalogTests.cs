@@ -104,7 +104,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(32805, Convert.ToInt32(metrics["PlacementCount"]));
                 Assert.AreEqual(4016, Convert.ToInt32(metrics["UniqueAcgHashCount"]));
                 Assert.AreEqual(
-                    25,
+                    199,
                     Convert.ToInt32(metrics["RuntimeActivationAuthorizedCount"]));
                 string provenanceText = File.ReadAllText(provenance);
                 StringAssert.Contains(provenanceText, "SOURCE_SHA=" + new string('0', 40));

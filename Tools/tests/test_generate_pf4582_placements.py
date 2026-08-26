@@ -15,6 +15,43 @@ if str(TOOLS) not in sys.path:
 import generate_pf4582_placements as generator
 
 
+ISLAND_REET_NPC_IDS = {
+    1007852,
+    1007853,
+    1007854,
+    1007855,
+    1007856,
+    1007857,
+    1007858,
+    1007859,
+    1007860,
+    1007861,
+    1007987,
+}
+
+EXPECTED_GENERATED_PROFILE_GROUPS = {
+    "CIMA": ("Cliff Malle", "A035", 13),
+    "TPSA": ("Tropical Stalker", "A033", 16),
+    "ZIXI": ("Alien Spider - Zix", "A026", 26),
+    "ACFJ": ("Scout - Jaax'Sinuh", "A002", 23),
+    "LPAK": ("Shuttle Saboteur", "A014", 2),
+    "GISK": ("Giant Snake", "A030", 10),
+    "SRSK": ("Shore Snake", "A003", 3),
+    "SORL": ("Stowaway Rollerrat", "A012", 5),
+    "RFSL": ("Reef Salamander", "A034", 7),
+    "CBSN": ("Climbing Salamander", "A013", 7),
+    "WTCO": ("Waste collector", "A029", 10),
+    "FDQO": ("Beach Leet", "A004", 9),
+    "CADR": ("Cargo Droid", "A027", 10),
+    "LLER": ("Rollerrat", "A012", 5),
+    "CRJU": ("Cross-Wired Junkbot", "A009", 8),
+    "CRDY": ("Specialist - Cha'Heru", "A016", 1),
+    "SRLZ": ("Surf Lizard", "A000", 9),
+}
+
+BLOCKED_TEMPLATE_TAGS = {"BSMG", "BDML", "BEML", "BDMO", "BTMO", "BJMR", "BLMM"}
+
+
 class Pf4582PlacementImportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -93,29 +130,30 @@ class Pf4582PlacementImportTests(unittest.TestCase):
         self.assertEqual(expected, actual)
         self.assertTrue(all(not self.records_by_id[npc_id]["RuntimeActive"] for npc_id in expected))
 
-    def test_only_explicit_existing_placements_are_runtime_eligible(self) -> None:
+    def test_only_governed_placements_are_runtime_eligible(self) -> None:
         eligible = [record for record in self.records if record["RuntimeEligible"]]
         blocked = [record for record in self.records if not record["RuntimeEligible"]]
-        self.assertEqual(25, len(eligible))
-        self.assertEqual(181, len(blocked))
+        self.assertEqual(199, len(eligible))
+        self.assertEqual(7, len(blocked))
         self.assertTrue(
             all(record["TemplateMapped"] and record["BehaviorProven"] for record in eligible)
         )
         self.assertTrue(all(record["RuntimeActive"] for record in eligible))
+        self.assertEqual(BLOCKED_TEMPLATE_TAGS, {record["TemplateTag"] for record in blocked})
 
     def test_mapped_and_unresolved_template_hash_counts_are_explicit(self) -> None:
         mapped = {record["TemplateHash"] for record in self.records if record["TemplateMapped"]}
         unresolved = {
             record["TemplateHash"] for record in self.records if not record["TemplateMapped"]
         }
-        self.assertEqual(14, len(mapped))
-        self.assertEqual(24, len(unresolved))
+        self.assertEqual(31, len(mapped))
+        self.assertEqual(7, len(unresolved))
         self.assertTrue(mapped.isdisjoint(unresolved))
 
     def test_existing_runtime_reconciliation_is_complete_and_bounded(self) -> None:
-        self.assertEqual(25, len(self.model["existingMatches"]))
+        self.assertEqual(199, len(self.model["existingMatches"]))
         self.assertEqual(
-            25,
+            199,
             len({match["npcId"] for match in self.model["existingMatches"]}),
         )
         self.assertLessEqual(
@@ -123,24 +161,97 @@ class Pf4582PlacementImportTests(unittest.TestCase):
             5.0,
         )
 
-    def test_island_reet_existing_combat_binding_is_unchanged(self) -> None:
+    def test_all_official_island_reets_reuse_the_proven_runtime_profile(self) -> None:
         runtime_text = generator.DEFAULT_RUNTIME_SOURCE.read_text(encoding="utf-8")
-        self.assertIn("SourceNpcId = 1007858", runtime_text)
-        self.assertIn(
-            "CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet",
-            runtime_text,
+        reet_records = {
+            record["NpcId"]: record
+            for record in self.records
+            if record["RuntimeProfile"] == "IccShuttleportSpawn:Island Reet"
+        }
+        self.assertEqual(ISLAND_REET_NPC_IDS, set(reet_records))
+        self.assertTrue(
+            all(
+                record["TemplateTag"] == "ISRE"
+                and record["BehaviorProven"]
+                and record["RuntimeEligible"]
+                and record["RuntimeActive"]
+                for record in reet_records.values()
+            )
+        )
+        for npc_id in ISLAND_REET_NPC_IDS:
+            self.assertIn(f"SourceNpcId = {npc_id}", runtime_text)
+        self.assertEqual(
+            11,
+            runtime_text.count(
+                "CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet"
+            ),
         )
         self.assertIn("CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(", runtime_text)
+
+    def test_generated_profile_groups_are_exact_and_have_no_combat_contracts(self) -> None:
+        generated = self.model["generatedMappings"]
+        self.assertEqual(164, len(generated))
+        actual_groups = {}
+        for template_hash, group in {
+            mapping["templateHash"]: [
+                candidate
+                for candidate in generated
+                if candidate["templateHash"] == mapping["templateHash"]
+            ]
+            for mapping in self.model["templateProfiles"]
+        }.items():
+            first = group[0]
+            tag = self.records_by_id[first["npcId"]]["TemplateTag"]
+            actual_groups[tag] = (
+                first["sourceName"],
+                first["mobTemplateHash"],
+                len(group),
+            )
+            self.assertTrue(
+                all(
+                    candidate["sourceName"] == first["sourceName"]
+                    and candidate["runtimeProfile"]
+                    == f"IccShuttleportSpawn:{first['sourceName']}"
+                    and candidate["mobTemplateHash"] == first["mobTemplateHash"]
+                    and candidate["minimumLevel"]
+                    == self.records_by_id[candidate["npcId"]]["MinLevel"]
+                    and candidate["maximumLevel"]
+                    == self.records_by_id[candidate["npcId"]]["MaxLevel"]
+                    for candidate in group
+                )
+            )
+        self.assertEqual(EXPECTED_GENERATED_PROFILE_GROUPS, actual_groups)
+        population = generator.render_population_catalog(self.model)
+        self.assertEqual(164, population.count("npcs.Add(CreateGeneratedProfileNpc("))
+        self.assertNotIn("CombatContractFactory", population)
 
     def test_generation_is_byte_deterministic_and_artifacts_are_current(self) -> None:
         first_catalog = generator.render_catalog(self.model)
         second_catalog = generator.render_catalog(generator.build_model())
+        first_population = generator.render_population_catalog(self.model)
+        second_population = generator.render_population_catalog(generator.build_model())
         first_report = generator.render_report(self.model)
         second_report = generator.render_report(generator.build_model())
         self.assertEqual(first_catalog, second_catalog)
+        self.assertEqual(first_population, second_population)
         self.assertEqual(first_report, second_report)
         self.assertEqual(first_catalog, generator.DEFAULT_OUTPUT.read_text(encoding="utf-8"))
+        self.assertEqual(
+            first_population,
+            generator.DEFAULT_POPULATION_OUTPUT.read_text(encoding="utf-8"),
+        )
         self.assertEqual(first_report, generator.DEFAULT_REPORT.read_text(encoding="utf-8"))
+
+    def test_generated_population_catalog_is_compiled_by_zone_engine(self) -> None:
+        project = (
+            generator.REPOSITORY_ROOT / "AORebirth/Server/ZoneEngine/ZoneEngine.csproj"
+        ).read_text(encoding="utf-8")
+        compile_item = (
+            '<Compile Include="Core\\Playfields\\'
+            'IccShuttleportProfilePopulationCatalog.g.cs" />'
+        )
+        self.assertEqual(1, project.count(compile_item))
+        self.assertTrue(generator.DEFAULT_POPULATION_OUTPUT.is_file())
 
     def test_report_preserves_required_invariants_and_exact_metrics(self) -> None:
         report = json.loads(generator.render_report(self.model))
@@ -148,16 +259,18 @@ class Pf4582PlacementImportTests(unittest.TestCase):
         self.assertEqual(206, report["PF4582_UNIQUE_NPC_IDS"])
         self.assertEqual(0, report["PF4582_DUPLICATE_NPC_IDS"])
         self.assertEqual(38, report["PF4582_UNIQUE_TEMPLATE_HASHES"])
-        self.assertEqual(25, report["PF4582_EXISTING_MATCHED"])
-        self.assertEqual(181, report["PF4582_NEW_PLACEMENTS"])
+        self.assertEqual(199, report["PF4582_EXISTING_MATCHED"])
+        self.assertEqual(7, report["PF4582_NEW_PLACEMENTS"])
         self.assertEqual(14, report["PF4582_DUPLICATE_POSITION_RECORDS"])
-        self.assertEqual(14, report["PF4582_TEMPLATE_HASHES_MAPPED"])
-        self.assertEqual(24, report["PF4582_TEMPLATE_HASHES_UNRESOLVED"])
-        self.assertEqual(25, report["PF4582_RUNTIME_ELIGIBLE"])
-        self.assertEqual(181, report["PF4582_RUNTIME_BLOCKED"])
+        self.assertEqual(31, report["PF4582_TEMPLATE_HASHES_MAPPED"])
+        self.assertEqual(7, report["PF4582_TEMPLATE_HASHES_UNRESOLVED"])
+        self.assertEqual(199, report["PF4582_RUNTIME_ELIGIBLE"])
+        self.assertEqual(7, report["PF4582_RUNTIME_BLOCKED"])
+        self.assertEqual(35, report["PF4582_EXPLICIT_RUNTIME_ACTIVE"])
+        self.assertEqual(164, report["PF4582_GENERATED_PROFILE_ACTIVE"])
         self.assertEqual(206, report["PF4582_PLACEMENT_KNOWN"])
-        self.assertEqual(25, report["PF4582_BEHAVIOR_PROVEN"])
-        self.assertEqual(25, report["PF4582_RUNTIME_ACTIVE"])
+        self.assertEqual(199, report["PF4582_BEHAVIOR_PROVEN"])
+        self.assertEqual(199, report["PF4582_RUNTIME_ACTIVE"])
         self.assertEqual(
             {
                 "NO_HAND_TRANSCRIPTION": "YES",
@@ -200,6 +313,12 @@ class Pf4582PlacementImportTests(unittest.TestCase):
                 evidence,
                 self.model["sourceSha256"],
                 self.records_by_id,
+                json.loads(
+                    generator.DEFAULT_TEMPLATE_PROFILE_AUTHORITY.read_text(
+                        encoding="utf-8"
+                    )
+                ),
+                generator.load_mobtemplate_profiles(generator.DEFAULT_MOBTEMPLATE_SOURCE),
             )
 
 

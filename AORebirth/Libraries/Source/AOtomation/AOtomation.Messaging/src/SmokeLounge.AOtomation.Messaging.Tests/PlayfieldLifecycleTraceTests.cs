@@ -6066,12 +6066,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Playfield must delegate corpse spawn/despawn scheduling, due checks, and cleanup ordering through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 objectLifecycleText.Contains("internal int DespawnCorpses<TCorpseState>(")
-                && objectLifecycleText.Contains("pendingCorpseSpawns.Remove(deadNpcIdentity(corpse).Instance);")
+                && objectLifecycleText.Contains("pendingCorpseSpawns.Remove(candidate.Key);")
                 && objectLifecycleText.Contains("despawnCorpse(corpseInstance);"),
                 "PlayfieldObjectLifecycleRuntimeService must own explicit corpse-despawn predicate routing.");
             AssertTextBefore(
                 objectLifecycleText,
-                "pendingCorpseSpawns.Remove(deadNpcIdentity(corpse).Instance);",
+                "pendingCorpseSpawns.Remove(candidate.Key);",
                 "despawnCorpse(corpseInstance);");
             Assert.IsTrue(
                 objectLifecycleText.Contains("internal void DespawnCorpse(")
@@ -6098,6 +6098,36 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && objectLifecycleText.Contains("traceCorpseFullUpdate(corpseId, deadNpcId);")
                 && objectLifecycleText.Contains("sendCorpseFullUpdate(target, corpseId);"),
                 "PlayfieldObjectLifecycleRuntimeService must own pending corpse spawn callback ordering.");
+            string cancelPendingCorpseSpawn = ExtractMethodBlock(
+                playfieldText,
+                "private void CancelPendingNpcCorpseSpawn");
+            string scheduleCorpseSpawn = ExtractMethodBlock(
+                playfieldText,
+                "internal void ScheduleCorpseSpawn");
+            string hasExactCorpseLease = ExtractMethodBlock(
+                playfieldText,
+                "internal bool HasExactCorpseLease");
+            string disposePlayfield = ExtractMethodBlock(
+                playfieldText,
+                "protected override void Dispose");
+            string despawnCorpses = ExtractMethodBlock(
+                objectLifecycleText,
+                "internal int DespawnCorpses<TCorpseState>");
+            string processPendingCorpseSpawnsRuntime = ExtractMethodBlock(
+                objectLifecycleText,
+                "internal void ProcessPendingCorpseSpawns<TCorpseState>");
+            Assert.IsTrue(
+                cancelPendingCorpseSpawn.Contains("lock (this.pendingCorpseSpawns)")
+                && scheduleCorpseSpawn.Contains("lock (this.pendingCorpseSpawns)")
+                && hasExactCorpseLease.Contains("lock (this.pendingCorpseSpawns)")
+                && disposePlayfield.Contains("lock (this.pendingCorpseSpawns)")
+                && despawnCorpses.Contains("lock (pendingCorpseSpawns)")
+                && despawnCorpses.Contains("pendingSnapshot = pendingCorpseSpawns.ToList();")
+                && despawnCorpses.Contains("IsSamePendingCorpseState(current, candidate.Value)")
+                && processPendingCorpseSpawnsRuntime.Contains("lock (pendingCorpseSpawns)")
+                && processPendingCorpseSpawnsRuntime.Contains("pendingSnapshot = pendingCorpseSpawns.ToList();")
+                && processPendingCorpseSpawnsRuntime.Contains("IsSamePendingCorpseState(current, candidate.Value)"),
+                "Pending corpse paths must lock snapshots and conditional removals while preserving same-key replacements.");
             AssertTextBefore(
                 objectLifecycleText,
                 "if (!registerCorpse(target, corpseId))",

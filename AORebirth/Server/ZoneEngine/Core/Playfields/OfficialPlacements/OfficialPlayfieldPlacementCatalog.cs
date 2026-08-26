@@ -37,7 +37,7 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
 
         private const int ExpectedUniqueAcgHashCount = 4016;
 
-        private const int ExpectedRuntimeActivationAuthorizedCount = 25;
+        private const int ExpectedRuntimeActivationAuthorizedCount = 199;
 
         private const int Pf4582PlayfieldId = 4582;
 
