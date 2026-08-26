@@ -221,7 +221,7 @@ placement_provenance_load()
     [[ "${PLACEMENT_UNIQUE_ACGHASH_COUNT}" == "4016" ]] \
         || placement_provenance_error "official ACGHash inventory count drifted" \
         || return 1
-    [[ "${PLACEMENT_RUNTIME_AUTHORIZED_COUNT}" == "25" ]] \
+    [[ "${PLACEMENT_RUNTIME_AUTHORIZED_COUNT}" == "199" ]] \
         || placement_provenance_error "official placement runtime authorization count drifted" \
         || return 1
 

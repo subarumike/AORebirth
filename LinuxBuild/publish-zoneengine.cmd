@@ -88,7 +88,7 @@ if not "%PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT%"=="3" goto :failed
 if not "%PLACEMENT_DISTRICT_COUNT%"=="4146" goto :failed
 if not "%PLACEMENT_RECORD_COUNT%"=="32805" goto :failed
 if not "%PLACEMENT_UNIQUE_ACGHASH_COUNT%"=="4016" goto :failed
-if not "%PLACEMENT_RUNTIME_AUTHORIZED_COUNT%"=="25" goto :failed
+if not "%PLACEMENT_RUNTIME_AUTHORIZED_COUNT%"=="199" goto :failed
 if "%PLACEMENT_CORPUS_VERSION%"=="" goto :failed
 if "%PLACEMENT_CORPUS_MANIFEST_SHA256%"=="" goto :failed
 if "%PLACEMENT_CORPUS_SUMMARY_SHA256%"=="" goto :failed
