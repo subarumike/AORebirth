@@ -6702,6 +6702,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\mobspawns_stats.sql"));
+            string simpleCharFullUpdateText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
 
             Assert.IsTrue(
                 npcHandlerText.Contains("mob.Textures0 != 0")
@@ -6719,6 +6723,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 mobSpawnStatsText.Contains("(2029842938, 954, 64, 40111)")
                 && mobSpawnStatsText.Contains("(2029842939, 954, 64, 40635)"),
                 "Guard and Guide must retain their capture-proven headmesh stats.");
+            Assert.IsTrue(
+                mobSpawnStatsText.Contains("(2029842938, 954, 4, 4)")
+                && mobSpawnStatsText.Contains("(2029842938, 954, 59, 1)")
+                && mobSpawnStatsText.Contains("(2029842939, 954, 0, 277352961)")
+                && mobSpawnStatsText.Contains("(2029842939, 954, 59, 3)"),
+                "Guard and Guide must retain their capture-proven breed, gender, and character flags.");
+            Assert.IsTrue(
+                simpleCharFullUpdateText.Contains("charId.Instance == 2029842938")
+                && simpleCharFullUpdateText.Contains("charId.Instance == 2029842939")
+                && simpleCharFullUpdateText.Contains("scfu.Unknown1[0] = 0x80;")
+                && simpleCharFullUpdateText.Contains("SimpleCharFullUpdateFlags.UnknownFlag7")
+                && simpleCharFullUpdateText.Contains("scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;"),
+                "Guard and Guide must retain their capture-proven SCFU flag and Unknown1 shape.");
             Assert.IsFalse(
                 mobSpawnsText.Contains("0000009CAF0000000004")
                 || mobSpawnsText.Contains("0000009EBB0000000004"),
