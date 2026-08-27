@@ -43,6 +43,10 @@ namespace AOSharpCaptureAnalyzer
         private const string IccShuttleportTerminalScfuUnknown4PacketHex =
             "0460000A0001011E00000DB106E4F490271B3A6B0000C35079F44553003A022A4F43001B8089445F32B04212D169444EFEBA000000003F4E424D000000003F17A29C0000A4CB1353636F7574202D204A6161782753696E7568001008120100000000DC000000000A00C83B0003D786005F001F000000001C00000000000000008000000003010001000100010001000000020000F00000C35079F4453A000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F100000FC40003D7150003D71644585A4A44585A4A0003D7120003D71348465253484652530003D70F0003D71055475051554750510000000000";
 
+        // Capture 20260826-222425 / PF 3081, raw-packets.csv sequence 12.
+        private const string BorealisOrdinaryStatPacketHex =
+            "003A000A0001002900000DB970CBBEF32B333D6E0000C35070CBBEF301000000010000020900000000";
+
         private static int Main(string[] args)
         {
             Console.WriteLine(
@@ -196,18 +200,32 @@ namespace AOSharpCaptureAnalyzer
 
             string outputPath = Path.Combine(captureFolder, "scfu-appearance.csv");
             string errorPath = Path.Combine(captureFolder, "scfu-decode-errors.csv");
+            string statOutputPath = Path.Combine(captureFolder, "npc-stat-observations.csv");
+            string statErrorPath = Path.Combine(captureFolder, "npc-stat-decode-errors.csv");
             string pendingOutputPath = Path.Combine(captureFolder, "scfu-appearance.pending.csv");
             string pendingErrorPath = Path.Combine(captureFolder, "scfu-decode-errors.pending.csv");
+            string pendingStatOutputPath = Path.Combine(captureFolder, "npc-stat-observations.pending.csv");
+            string pendingStatErrorPath = Path.Combine(captureFolder, "npc-stat-decode-errors.pending.csv");
             DeleteIfExists(pendingOutputPath);
             DeleteIfExists(pendingErrorPath);
+            DeleteIfExists(pendingStatOutputPath);
+            DeleteIfExists(pendingStatErrorPath);
             int rows = 0;
+            int statPackets = 0;
+            int statRows = 0;
+            int statFailures = 0;
+            int statIncomplete = 0;
             int failures = packetSet.SourceFailures;
             int incomplete = 0;
             using (var output = new StreamWriter(pendingOutputPath, false, new UTF8Encoding(false)))
             using (var errors = new StreamWriter(pendingErrorPath, false, new UTF8Encoding(false)))
+            using (var statOutput = new StreamWriter(pendingStatOutputPath, false, new UTF8Encoding(false)))
+            using (var statErrors = new StreamWriter(pendingStatErrorPath, false, new UTF8Encoding(false)))
             {
                 output.WriteLine(RawScfuAppearanceCsv.Header);
                 errors.WriteLine("CapturedUtc,Direction,Sequence,DecodeStatus,DecodeError,RawPacketHex,RawBodyHex");
+                statOutput.WriteLine(RawStatObservationCsv.Header);
+                statErrors.WriteLine("CapturedUtc,Direction,Sequence,DecodeStatus,DecodeError,RawPacketHex");
                 foreach (CapturedPacket capturedPacket in packetSet.Packets)
                 {
                     RawSimpleCharFullUpdate message;
@@ -247,13 +265,62 @@ namespace AOSharpCaptureAnalyzer
                                 Csv(PacketBodyHex(capturedPacket.Packet))));
                     }
                 }
+
+                foreach (CapturedPacket capturedPacket in packetSet.AllPackets)
+                {
+                    if (!RawStatDecoder.IsStatPacket(capturedPacket.Packet))
+                    {
+                        continue;
+                    }
+
+                    statPackets++;
+                    RawStatMessage statMessage;
+                    string statDecodeError;
+                    bool statDecoded = RawStatDecoder.TryDecodePacket(
+                        capturedPacket.Packet,
+                        out statMessage,
+                        out statDecodeError);
+                    if (!statDecoded)
+                    {
+                        statFailures++;
+                    }
+                    else if (!statMessage.DecodeFullyConsumed)
+                    {
+                        statIncomplete++;
+                    }
+
+                    foreach (string statRow in RawStatObservationCsv.FormatRows(
+                        capturedPacket.Metadata,
+                        capturedPacket.Packet,
+                        statMessage,
+                        statDecodeError))
+                    {
+                        statOutput.WriteLine(statRow);
+                        statRows++;
+                    }
+
+                    if (!statDecoded)
+                    {
+                        statErrors.WriteLine(
+                            string.Join(
+                                ",",
+                                Csv(capturedPacket.Metadata.CapturedUtc),
+                                Csv(capturedPacket.Metadata.Direction),
+                                Csv(capturedPacket.Metadata.Sequence),
+                                Csv("decode_failed"),
+                                Csv(statDecodeError),
+                                Csv(RawScfuFormatting.ToHex(capturedPacket.Packet))));
+                    }
+                }
             }
 
-            int result = failures + incomplete;
+            int result = failures + incomplete + statFailures + statIncomplete;
             if (result == 0)
             {
                 PromoteFile(pendingOutputPath, outputPath);
                 PromoteFile(pendingErrorPath, errorPath);
+                PromoteFile(pendingStatOutputPath, statOutputPath);
+                PromoteFile(pendingStatErrorPath, statErrorPath);
             }
             else
             {
@@ -266,11 +333,15 @@ namespace AOSharpCaptureAnalyzer
             Console.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "{0}: SCFU rows={1} failures={2} incomplete={3} packetLog={4} rawFallback={5} outsideWindowPacketLog={6} outsideWindowRawIndex={7}",
+                    "{0}: SCFU rows={1} failures={2} incomplete={3} Stat packets={4} rows={5} failures={6} incomplete={7} packetLog={8} rawFallback={9} outsideWindowPacketLog={10} outsideWindowRawIndex={11}",
                     Path.GetFileName(captureFolder),
                     rows,
                     failures,
                     incomplete,
+                    statPackets,
+                    statRows,
+                    statFailures,
+                    statIncomplete,
                     packetSet.PacketLogRows,
                     packetSet.RawFallbackRows,
                     packetSet.PacketLogRowsOutsideCaptureWindow,
@@ -633,6 +704,12 @@ namespace AOSharpCaptureAnalyzer
             foreach (SourcePacketRecord selected in selectedRecords)
             {
                 result.ResolvedRawPacketCount++;
+                result.AllPackets.Add(
+                    new CapturedPacket
+                    {
+                        Metadata = selected.Metadata,
+                        Packet = selected.Packet
+                    });
                 if (IsSimpleCharFullUpdatePacket(selected.Packet))
                 {
                     if (selected.SelectedFromRawFallback)
@@ -1103,6 +1180,16 @@ namespace AOSharpCaptureAnalyzer
         {
             try
             {
+                RawStatMessage borealisStat = RawStatDecoder.DecodePacket(
+                    FromHex(BorealisOrdinaryStatPacketHex));
+                Assert(borealisStat.DecodeFullyConsumed, "Borealis ordinary Stat complete decode");
+                AssertEqual(0xC350, borealisStat.Identity.Type, "Borealis ordinary Stat identity type");
+                AssertEqual(0x70CBBEF3, borealisStat.Identity.Instance, "Borealis ordinary Stat identity instance");
+                AssertEqual(1, borealisStat.HeaderUnknown, "Borealis ordinary Stat header byte");
+                AssertEqual(1, borealisStat.Stats.Length, "Borealis ordinary Stat count");
+                AssertEqual(0x209, borealisStat.Stats[0].StatId, "Borealis ordinary Stat id");
+                AssertEqual(0, (int)borealisStat.Stats[0].Value, "Borealis ordinary Stat zero value");
+
                 byte[] abmouthPacket = FromHex(AbmouthPacketHex);
                 RawSimpleCharFullUpdate abmouth = RawSimpleCharFullUpdateDecoder.DecodePacket(abmouthPacket);
                 AssertEqual(224, abmouthPacket.Length, "Abmouth packet length");
@@ -1664,10 +1751,12 @@ namespace AOSharpCaptureAnalyzer
             internal CapturePacketSet()
             {
                 this.Packets = new List<CapturedPacket>();
+                this.AllPackets = new List<CapturedPacket>();
                 this.FailureMessages = new List<string>();
             }
 
             internal List<CapturedPacket> Packets { get; private set; }
+            internal List<CapturedPacket> AllPackets { get; private set; }
             internal List<string> FailureMessages { get; private set; }
             internal int PacketLogRows { get; set; }
             internal int RawFallbackRows { get; set; }

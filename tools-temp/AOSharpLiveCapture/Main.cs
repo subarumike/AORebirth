@@ -24,6 +24,7 @@ namespace AOSharpLiveCapture
 {
     public class Main : AOPluginEntry
     {
+        private const int UnsetStatSentinel = 1234567890;
         private static readonly object LifecycleSyncRoot = new object();
         private const int LocalEnemyCombatContextSeconds = 10;
         private const int CaptureStopQuietPeriodSeconds = 2;
@@ -142,6 +143,7 @@ namespace AOSharpLiveCapture
         private StreamWriter enemyMovementLog;
         private StreamWriter movementPacketsLog;
         private StreamWriter enemyStatUpdatesLog;
+        private StreamWriter npcStatObservationsLog;
         private StreamWriter enemyFightEventsLog;
         private StreamWriter playerCombatLog;
         private StreamWriter playerCombatStateLog;
@@ -169,6 +171,11 @@ namespace AOSharpLiveCapture
         private int rawSimpleCharFullUpdateIncompleteDecodeCount;
         private int rawNpcSimpleCharFullUpdateCount;
         private int scfuAppearanceRowCount;
+        private int rawStatPacketCount;
+        private int rawStatDecodeCount;
+        private int rawStatDecodeErrorCount;
+        private int rawStatIncompleteDecodeCount;
+        private int rawStatObservationRowCount;
         private int rawPacketLogRowCount;
         private int rawPacketIndexRowCount;
         private int rawPacketPreservedCount;
@@ -827,6 +834,7 @@ namespace AOSharpLiveCapture
             string csvPath = Path.Combine(this.sessionDirectory, "dynels.csv");
             string jsonPath = Path.Combine(this.sessionDirectory, "dynels.json");
             string summaryPath = Path.Combine(this.sessionDirectory, "dynels-summary.txt");
+            string npcStatsPath = Path.Combine(this.sessionDirectory, "npc-client-state-stats.csv");
 
             if (!force && File.Exists(csvPath) && new FileInfo(csvPath).Length > 0)
             {
@@ -846,6 +854,7 @@ namespace AOSharpLiveCapture
             this.WriteDynelCsv(csvPath, rows);
             this.WriteDynelJson(jsonPath, capturedUtc, rows);
             this.WriteDynelSummary(summaryPath, capturedUtc, rows);
+            this.WriteNpcClientStateStats(npcStatsPath, capturedUtc, dynels);
 
             this.TryLogEvent(
                 "DYNEL-DUMP",
@@ -859,6 +868,91 @@ namespace AOSharpLiveCapture
                     summaryPath));
 
             return new DynelDumpResult(rows.Length, csvPath, jsonPath, summaryPath);
+        }
+
+        private void WriteNpcClientStateStats(string path, DateTime capturedUtc, IEnumerable<Dynel> dynels)
+        {
+            Stat[] stats = Enum.GetValues(typeof(Stat))
+                .Cast<Stat>()
+                .GroupBy(value => (int)value)
+                .Select(group => group.OrderBy(value => value.ToString(), StringComparer.Ordinal).First())
+                .OrderBy(value => (int)value)
+                .ToArray();
+
+            using (StreamWriter output = CreateWriter(path))
+            {
+                output.WriteLine("CapturedUtc,Identity,Name,NpcKind,Stat,StatId,Value,EvidenceClassification,CoverageStatus,Detail");
+                foreach (Dynel dynel in (dynels ?? new Dynel[0])
+                    .Where(value => value != null)
+                    .OrderBy(value => Safe(() => ((int)value.Identity.Type).ToString("D10", CultureInfo.InvariantCulture)))
+                    .ThenBy(value => Safe(() => value.Identity.Instance.ToString("D10", CultureInfo.InvariantCulture))))
+                {
+                    if (!SafeBool(() => dynel.Identity.Type == IdentityType.SimpleChar))
+                    {
+                        continue;
+                    }
+
+                    SimpleChar character;
+                    try
+                    {
+                        character = dynel.Cast<SimpleChar>();
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    bool isNpc = SafeBool(() => character.IsNpc);
+                    bool isPet = SafeBool(() => character.IsPet);
+                    if (!isNpc && !isPet)
+                    {
+                        continue;
+                    }
+
+                    foreach (Stat stat in stats)
+                    {
+                        string valueText = string.Empty;
+                        string evidenceClassification;
+                        string coverageStatus;
+                        string detail = string.Empty;
+                        try
+                        {
+                            int value = character.GetStat(stat);
+                            if (value == UnsetStatSentinel)
+                            {
+                                evidenceClassification = "sentinel/default";
+                                coverageStatus = "not observed";
+                            }
+                            else
+                            {
+                                valueText = value.ToString(CultureInfo.InvariantCulture);
+                                evidenceClassification = "client-state-observed";
+                                coverageStatus = "captured";
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            evidenceClassification = "not-observed";
+                            coverageStatus = "not protocol-exposed";
+                            detail = exception.GetType().Name;
+                        }
+
+                        output.WriteLine(
+                            string.Join(
+                                ",",
+                                Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                                Csv(Safe(() => character.Identity.ToString())),
+                                Csv(Safe(() => character.Name)),
+                                Csv(isPet ? "pet" : "npc"),
+                                Csv(stat.ToString()),
+                                Csv(((int)stat).ToString(CultureInfo.InvariantCulture)),
+                                Csv(valueText),
+                                Csv(evidenceClassification),
+                                Csv(coverageStatus),
+                                Csv(detail)));
+                    }
+                }
+            }
         }
 
         private DynelDumpRow CreateDynelDumpRow(DateTime capturedUtc, int index, Dynel dynel, LocalPlayer localPlayer)
@@ -2014,6 +2108,13 @@ namespace AOSharpLiveCapture
                 this.rawSimpleCharFullUpdatePacketCount++;
             }
 
+            if (packet != null
+                && packet.Length >= 20
+                && n3TypeValue == RawStatDecoder.StatMessageType)
+            {
+                this.rawStatPacketCount++;
+            }
+
             string rawHex = ToHex(packet);
             bool packetLogWritten = false;
             bool packetIndexWritten = false;
@@ -2132,6 +2233,22 @@ namespace AOSharpLiveCapture
                         packet));
             }
 
+            if (n3TypeValue == RawStatDecoder.StatMessageType)
+            {
+                this.RunRawPacketProjectionStage(
+                    "stat",
+                    direction,
+                    sequence,
+                    globalOrdinal,
+                    () => this.DecodeAndExportRawStat(
+                        capturedUtc,
+                        elapsedMilliseconds,
+                        direction,
+                        globalOrdinal,
+                        sequence,
+                        packet));
+            }
+
             this.RunRawPacketProjectionStage(
                 "movement",
                 direction,
@@ -2234,6 +2351,7 @@ namespace AOSharpLiveCapture
                 SimpleCharFullUpdateMessage adapted = AdaptRawSimpleCharFullUpdate(message);
                 this.CacheEnemyFullUpdate(direction, sequence, adapted);
                 this.TrackEnemyFromSimpleCharFullUpdate(direction, sequence, adapted);
+                this.PreserveNpcAppearanceFromRaw(message, capturedUtc, direction, sequence);
             }
 
             if (!decoded || !message.DecodeFullyConsumed)
@@ -2299,6 +2417,82 @@ namespace AOSharpLiveCapture
         private static Identity ToAoIdentity(RawScfuIdentity raw)
         {
             return new Identity((IdentityType)raw.Type, raw.Instance);
+        }
+
+        private void PreserveNpcAppearanceFromRaw(
+            RawSimpleCharFullUpdate message,
+            DateTime capturedUtc,
+            string direction,
+            int sequence)
+        {
+            lock (this.syncRoot)
+            {
+                bool created;
+                EnemyEntityState state = this.GetOrCreateEnemyState(
+                    ToAoIdentity(message.Identity),
+                    capturedUtc,
+                    out created);
+                state.HeadMesh = PreferEnemyStateString(
+                    state.HeadMesh,
+                    message.HeadMesh.HasValue
+                        ? message.HeadMesh.Value.ToString(CultureInfo.InvariantCulture)
+                        : string.Empty);
+                state.Textures = RawScfuFormatting.FormatTextures(message.Textures);
+                state.Meshes = RawScfuFormatting.FormatMeshes(message.Meshes);
+                state.TextureOverrides = RawScfuFormatting.FormatTextureOverrides(message.TextureOverrides);
+                state.ActiveNanos = RawScfuFormatting.FormatActiveNanos(message.ActiveNanos);
+                state.AppearanceValue = message.AppearanceValue.ToString(CultureInfo.InvariantCulture);
+                state.Owner = message.Owner.HasValue ? message.Owner.Value.ToString() : string.Empty;
+                state.OpaqueAppearanceBytes = RawScfuFormatting.ToHex(message.OpaqueExtension);
+                state.AppearanceEvidenceSource = "raw-scfu";
+                state.AppearanceDirection = direction;
+                state.AppearanceSequence = sequence;
+            }
+        }
+
+        private void DecodeAndExportRawStat(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            string direction,
+            long globalOrdinal,
+            int sequence,
+            byte[] packet)
+        {
+            RawStatMessage message;
+            string decodeError;
+            bool decoded = RawStatDecoder.TryDecodePacket(packet, out message, out decodeError);
+            if (decoded)
+            {
+                this.rawStatDecodeCount++;
+                if (!message.DecodeFullyConsumed)
+                {
+                    this.rawStatIncompleteDecodeCount++;
+                }
+            }
+            else
+            {
+                this.rawStatDecodeErrorCount++;
+            }
+
+            var metadata = new RawScfuCaptureMetadata
+            {
+                CapturedUtc = capturedUtc.ToString("o", CultureInfo.InvariantCulture),
+                ElapsedMilliseconds = elapsedMilliseconds.ToString("0.###", CultureInfo.InvariantCulture),
+                Direction = direction,
+                GlobalOrdinal = globalOrdinal.ToString(CultureInfo.InvariantCulture),
+                Sequence = sequence.ToString(CultureInfo.InvariantCulture)
+            };
+
+            lock (this.syncRoot)
+            {
+                foreach (string row in RawStatObservationCsv.FormatRows(metadata, packet, message, decodeError))
+                {
+                    this.npcStatObservationsLog.WriteLine(row);
+                    this.rawStatObservationRowCount++;
+                }
+
+                this.npcStatObservationsLog.Flush();
+            }
         }
 
         private void ExportNpcLifecyclePacket(string direction, int sequence, byte[] packet)
@@ -5056,7 +5250,15 @@ namespace AOSharpLiveCapture
 
         private static string PreferEnemyStateString(string current, string value)
         {
-            return string.IsNullOrEmpty(value) ? current : value;
+            return string.IsNullOrEmpty(value)
+                   || string.Equals(
+                       value,
+                       UnsetStatSentinel.ToString(CultureInfo.InvariantCulture),
+                       StringComparison.Ordinal)
+                   || (value.StartsWith("<", StringComparison.Ordinal)
+                       && value.EndsWith(">", StringComparison.Ordinal))
+                       ? current
+                       : value;
         }
 
         private void TrackEnemyFromStatMessage(string direction, int sequence, StatMessage message)
@@ -5327,6 +5529,11 @@ namespace AOSharpLiveCapture
 
         private bool ApplyEnemyStat(EnemyEntityState state, Stat stat, int value)
         {
+            if (value == UnsetStatSentinel)
+            {
+                return false;
+            }
+
             switch (stat)
             {
                 case Stat.Health:
@@ -6063,6 +6270,40 @@ namespace AOSharpLiveCapture
                         this.rawSimpleCharFullUpdateIncompleteDecodeCount));
             }
 
+            if (this.rawStatPacketCount != this.rawStatDecodeCount + this.rawStatDecodeErrorCount)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Raw Stat accounting mismatch: raw={0}, decoded={1}, errors={2}.",
+                        this.rawStatPacketCount,
+                        this.rawStatDecodeCount,
+                        this.rawStatDecodeErrorCount));
+            }
+
+            if (this.rawStatDecodeErrorCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Ordinary Stat decoding failed for {0} raw packet(s); offline decoding is required.",
+                        this.rawStatDecodeErrorCount));
+            }
+
+            if (this.rawStatIncompleteDecodeCount > 0)
+            {
+                issues.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Ordinary Stat decoding left undecoded tails for {0} raw packet(s); offline decoding is required.",
+                        this.rawStatIncompleteDecodeCount));
+            }
+
+            if (this.rawStatPacketCount > 0 && this.rawStatObservationRowCount == 0)
+            {
+                issues.Add("Raw ordinary Stat packets were preserved, but npc-stat-observations.csv has no rows.");
+            }
+
             if (this.enemyFullUpdateRowCount != this.rawNpcSimpleCharFullUpdateCount)
             {
                 issues.Add(
@@ -6704,6 +6945,23 @@ namespace AOSharpLiveCapture
             AppendJsonField(json, indent + "  ", "catMesh", state.CatMesh, true);
             AppendJsonField(json, indent + "  ", "visualFlags", state.VisualFlags, true);
             AppendJsonField(json, indent + "  ", "headMesh", state.HeadMesh, true);
+            AppendJsonField(json, indent + "  ", "textures", state.Textures, true);
+            AppendJsonField(json, indent + "  ", "meshes", state.Meshes, true);
+            AppendJsonField(json, indent + "  ", "textureOverrides", state.TextureOverrides, true);
+            AppendJsonField(json, indent + "  ", "activeNanos", state.ActiveNanos, true);
+            AppendJsonField(json, indent + "  ", "appearanceValue", state.AppearanceValue, true);
+            AppendJsonField(json, indent + "  ", "owner", state.Owner, true);
+            AppendJsonField(json, indent + "  ", "opaqueAppearanceBytes", state.OpaqueAppearanceBytes, true);
+            AppendJsonField(json, indent + "  ", "appearanceEvidenceSource", state.AppearanceEvidenceSource, true);
+            AppendJsonField(json, indent + "  ", "appearanceDirection", state.AppearanceDirection, true);
+            AppendJsonField(
+                json,
+                indent + "  ",
+                "appearanceSequence",
+                state.AppearanceSequence.HasValue
+                    ? state.AppearanceSequence.Value.ToString(CultureInfo.InvariantCulture)
+                    : string.Empty,
+                true);
             AppendJsonField(json, indent + "  ", "runSpeed", state.RunSpeed, true);
             AppendJsonField(json, indent + "  ", "npcFamily", state.NpcFamily, true);
             AppendJsonField(json, indent + "  ", "losHeight", state.LosHeight, true);
@@ -6956,6 +7214,9 @@ namespace AOSharpLiveCapture
                 json.Append("    \"rawSimpleCharFullUpdatePackets\": ");
                 json.Append(this.rawSimpleCharFullUpdatePacketCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
+                json.Append("    \"rawStatPackets\": ");
+                json.Append(this.rawStatPacketCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
                 json.Append("    \"rawPacketLogRows\": ");
                 json.Append(this.rawPacketLogRowCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine(",");
@@ -6988,6 +7249,18 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("    \"scfuAppearanceRows\": ");
                 json.Append(this.scfuAppearanceRowCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawStatDecoded\": ");
+                json.Append(this.rawStatDecodeCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawStatDecodeErrors\": ");
+                json.Append(this.rawStatDecodeErrorCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawStatIncompleteDecodes\": ");
+                json.Append(this.rawStatIncompleteDecodeCount.ToString(CultureInfo.InvariantCulture));
+                json.AppendLine(",");
+                json.Append("    \"rawStatObservationRows\": ");
+                json.Append(this.rawStatObservationRowCount.ToString(CultureInfo.InvariantCulture));
                 json.AppendLine();
                 json.AppendLine("  },");
                 json.AppendLine("  \"captureCounts\": {");
@@ -7699,6 +7972,26 @@ namespace AOSharpLiveCapture
             public string VisualFlags { get; set; }
 
             public string HeadMesh { get; set; }
+
+            public string Textures { get; set; }
+
+            public string Meshes { get; set; }
+
+            public string TextureOverrides { get; set; }
+
+            public string ActiveNanos { get; set; }
+
+            public string AppearanceValue { get; set; }
+
+            public string Owner { get; set; }
+
+            public string OpaqueAppearanceBytes { get; set; }
+
+            public string AppearanceEvidenceSource { get; set; }
+
+            public string AppearanceDirection { get; set; }
+
+            public int? AppearanceSequence { get; set; }
 
             public string RunSpeed { get; set; }
 
@@ -8456,6 +8749,8 @@ namespace AOSharpLiveCapture
             this.movementPacketsLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,SourceType,SourceInstance,SourceIdentity,SourceName,TargetType,TargetInstance,TargetIdentity,TargetName,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,Speed,Animation,Flags,PathCount,RawParams,RawTailHex");
             this.enemyStatUpdatesLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
             this.enemyStatUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
+            this.npcStatObservationsLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-stat-observations.csv"));
+            this.npcStatObservationsLog.WriteLine(RawStatObservationCsv.Header);
             this.enemyFightEventsLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-fight-events.log"));
             this.playerCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat.csv"));
             this.playerCombatLog.WriteLine("SchemaVersion,CapturedUtc,MonotonicTicks,MonotonicFrequency,Direction,Sequence,MessageType,EventPhase,AttackerRole,AttackerIdentity,TargetRole,TargetIdentity,AttackKind,Amount,HitType,DamageType,DamageTypeSource,Stat,WeaponSlot,WeaponInstance,AmmoCount,EquipmentSnapshotId,ActiveWeaponCorrelation,PlayerPositionX,PlayerPositionY,PlayerPositionZ,TargetPositionX,TargetPositionY,TargetPositionZ,EvidenceSource,Detail");
@@ -8657,6 +8952,7 @@ namespace AOSharpLiveCapture
                 this.FlushWriterNoThrow(this.enemyMovementLog, false);
                 this.FlushWriterNoThrow(this.movementPacketsLog, false);
                 this.FlushWriterNoThrow(this.enemyStatUpdatesLog, false);
+                this.FlushWriterNoThrow(this.npcStatObservationsLog, false);
                 this.FlushWriterNoThrow(this.enemyFightEventsLog, false);
                 this.FlushWriterNoThrow(this.playerCombatLog, false);
                 this.FlushWriterNoThrow(this.playerCombatStateLog, false);
@@ -8698,6 +8994,7 @@ namespace AOSharpLiveCapture
                 this.enemyMovementLog = this.CloseWriterNoThrow(this.enemyMovementLog, false);
                 this.movementPacketsLog = this.CloseWriterNoThrow(this.movementPacketsLog, false);
                 this.enemyStatUpdatesLog = this.CloseWriterNoThrow(this.enemyStatUpdatesLog, false);
+                this.npcStatObservationsLog = this.CloseWriterNoThrow(this.npcStatObservationsLog, false);
                 this.enemyFightEventsLog = this.CloseWriterNoThrow(this.enemyFightEventsLog, false);
                 this.playerCombatLog = this.CloseWriterNoThrow(this.playerCombatLog, false);
                 this.playerCombatStateLog = this.CloseWriterNoThrow(this.playerCombatStateLog, false);
