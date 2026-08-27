@@ -645,6 +645,19 @@ cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <
 
 Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
 
+For database-wide generic NPC evidence harvesting, ordinary Stat replay,
+official-placement reconciliation, field-level coverage, and fail-closed
+promotion candidates, use:
+
+```cmd
+cmd /d /c Tools\harvest_npc_observations.cmd
+```
+
+The schema and identity boundary are documented in
+`docs/reference/NPC_OBSERVATION_HARVESTER.md`. The workflow reads the accepted
+capture inventory and all current repository capture roots, including
+repository-level `Captures`, without pruning accepted history or raw evidence.
+
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
 

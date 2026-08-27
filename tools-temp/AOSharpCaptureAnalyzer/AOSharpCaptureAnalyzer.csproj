@@ -31,6 +31,9 @@
     <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
+    <Compile Include="..\AOSharpCaptureProtocol\RawStatDecoder.cs">
+      <Link>RawStatDecoder.cs</Link>
+    </Compile>
     <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
       <Link>PlayfieldCollisionGeometry.cs</Link>
     </Compile>

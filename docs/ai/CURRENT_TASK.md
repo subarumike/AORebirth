@@ -2,17 +2,15 @@
 
 ## Active
 
-Finish and deploy the practical PF4582 ICC Shuttleport population. The
-specialized runtime catalog now materializes 199 of its 206 accepted placements:
-the original 25 definitions, 10 additional exact `ISRE` Island Reets using the
-captured Island Reet combat contract, and 164 exact same-name unique-template
-placements in template-backed Social mode without invented combat, loot,
-pathing, or respawn behavior. Seven unresolved source records remain blocked.
-The reconciled 207-row official overlay authorizes the same 199 and blocks eight,
-including `NCNN`. The concurrent corpse-spawn queue regression that crashed the
-PF4582 heartbeat is fixed. Complete only the governed Windows and Linux
-acceptance gates, deploy ZoneEngine alone, and leave all gameplay/client testing
-to Mike.
+Implement and validate the first production-grade database-wide
+`NpcObservationHarvester`. Preserve exact raw SCFU appearance and ordinary Stat
+evidence, reject the unset sentinel from authoritative promotion state, include
+all governed capture roots without pruning accepted history, reconcile captured
+NPCs against all official placements with ambiguity failing closed, and report
+field-level observation coverage independently from capture integrity and
+promotion readiness. Use the completed PF3081 Borealis Guide/Guard capture as
+the mandatory appearance and missing-NPC-stat regression fixture. Do not mass
+activate or rewrite runtime NPC definitions from unresolved evidence.
 
 ## Prior active checkpoint
 

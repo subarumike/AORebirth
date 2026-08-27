@@ -9,6 +9,20 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- NPC observation harvesting foundation: the deterministic database-wide
+  `NpcObservationHarvester` now replays retained raw SCFU and ordinary Stat
+  packets, preserves exact appearance arrays and field provenance, rejects AO's
+  `1234567890` unset sentinel from authoritative state, inventories all 358
+  accepted captures across repository and historical roots without pruning,
+  and reconciles 3,325 captured NPC observations against 32,805 governed
+  official placements. Exact playfield plus float32-coordinate matching found
+  no unique or ambiguous placement bridges in the current corpus, so all
+  promotion candidates remain blocked and no runtime NPC definition was mass
+  rewritten. The PF3081 Borealis Guide and Guard appearance regressions pass;
+  ordinary Stat replay passes; seven historical captures retain explicit raw
+  integrity/SCFU replay failures rather than being treated as field-complete.
+  Evidence schema and workflow: `docs/reference/NPC_OBSERVATION_HARVESTER.md`.
+
 - Playfield hydration Stage 0/1: the current mixed loader and `Playfield`
   constructor remain the sole production authority behind a narrow legacy-only
   composition seam. Static definition, validation, provenance, canonical
