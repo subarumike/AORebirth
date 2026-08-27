@@ -272,6 +272,7 @@ namespace AORebirth.Core.Playfields
             NascenceDungeon1Spawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             NascenceDungeon2Spawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             ThrakOmniGardenSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            AbanGardenSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             ScarlettDalquistSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             RomeBlueCitySpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             AndromedaIccHqSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);

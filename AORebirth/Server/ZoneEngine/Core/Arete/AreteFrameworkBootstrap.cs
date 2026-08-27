@@ -52,6 +52,7 @@ namespace ZoneEngine.Core.Arete
             Path.Combine("Content", "Subway", "tailor", "manifest.json"),
             Path.Combine("Content", "Thrak", "garden-key", "manifest.json"),
             Path.Combine("Content", "Thrak", "garden-vendors", "manifest.json"),
+            Path.Combine("Content", "Aban", "garden-vendors", "manifest.json"),
             Path.Combine("Content", "Doja", "nascense-chip", "manifest.json"),
             Path.Combine("Content", "Nascence", "rosenblatt-hiathlin", "manifest.json"),
             Path.Combine("Content", "Nascence", "life-dialogs", "manifest.json"),

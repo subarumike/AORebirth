@@ -197,6 +197,7 @@
     <Compile Include="Core\Thrak\Quests\ThrakGardenKeySilvertailTransform.cs" />
     <Compile Include="Core\Thrak\Quests\ThrakGardenKeyTradeAdapter.cs" />
     <Compile Include="Core\Thrak\Vendors\ThrakGardenVendorInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Vendors\AbanGardenVendorInteractionRules.cs" />
     <Compile Include="Core\Doja\DojaChipInteractionRules.cs" />
     <Compile Include="Core\Doja\DojaChipPacketSender.cs" />
     <Compile Include="Core\Doja\DojaChipQuestRuntime.cs" />
@@ -529,6 +530,7 @@
     <Compile Include="Core\MessageHandlers\RexB18DInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\CapturedSubwayVendorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\CapturedThrakGardenVendorInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAbanGardenVendorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\CapturedHoloDeckVendorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\ShopUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SimpleItemFullUpdateMessageHandler.cs" />
@@ -631,6 +633,7 @@
     <Compile Include="Core\Playfields\NascenceFrontierOutdoorMobRuntime.cs" />
     <Compile Include="Core\Playfields\NascenceLifeStarterBridgePatrolRuntime.cs" />
     <Compile Include="Core\Playfields\ThrakOmniGardenSpawn.cs" />
+    <Compile Include="Core\Playfields\AbanGardenSpawn.cs" />
     <Compile Include="Core\Playfields\ScarlettDalquistSpawn.cs" />
     <Compile Include="Core\Playfields\Content\DojaResearchContentModule.cs" />
     <Compile Include="Core\Playfields\PerkResetServiceProviderSpawn.cs" />
@@ -746,6 +749,9 @@
     <Compile Include="Core\Playfields\CapturedThrakGardenVendorContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedThrakGardenVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedThrakGardenVendorRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedAbanGardenVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAbanGardenVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAbanGardenVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedHoloDeckVendorContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedHoloDeckVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedHoloDeckVendorRuntimeService.cs" />
@@ -3493,6 +3499,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Thrak\garden-vendors\dialogue\thrak-garden-vendors.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Aban\garden-vendors\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Aban\garden-vendors\dialogue\aban-garden-vendors.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Thrak\garden-key\dialogue\thrak-garden-key.dialogue.json">

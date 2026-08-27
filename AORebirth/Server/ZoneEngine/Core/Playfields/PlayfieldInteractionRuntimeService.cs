@@ -155,6 +155,11 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (CapturedAbanGardenVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             if (CapturedHoloDeckVendorInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;

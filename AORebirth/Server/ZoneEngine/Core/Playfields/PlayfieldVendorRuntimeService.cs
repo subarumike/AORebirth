@@ -18,6 +18,9 @@ namespace ZoneEngine.Core.Playfields
         private readonly CapturedThrakGardenVendorRuntimeService capturedThrakGarden =
             new CapturedThrakGardenVendorRuntimeService();
 
+        private readonly CapturedAbanGardenVendorRuntimeService capturedAbanGarden =
+            new CapturedAbanGardenVendorRuntimeService();
+
         private readonly CapturedHoloDeckVendorRuntimeService capturedHoloDeck =
             new CapturedHoloDeckVendorRuntimeService();
 
@@ -64,6 +67,21 @@ namespace ZoneEngine.Core.Playfields
             PlayfieldDynelRegistry dynelRegistry)
         {
             this.capturedThrakGarden.Clear(playfieldIdentity, dynelRegistry);
+        }
+
+        internal void AttachCapturedAbanGardenVendors(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry)
+        {
+            this.capturedAbanGarden.Attach(playfield, playfieldIdentity, dynelRegistry);
+        }
+
+        internal void ClearCapturedAbanGardenVendors(
+            Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry)
+        {
+            this.capturedAbanGarden.Clear(playfieldIdentity, dynelRegistry);
         }
 
         internal void SpawnCapturedHoloDeckVendors(
