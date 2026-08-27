@@ -70,7 +70,7 @@ Client-state enumeration uses the checked AOSharp `Stat` enum in numeric order a
 
 ## Identity and matching boundary
 
-The current deterministic match requires the resource playfield plus exact IEEE-754 single-precision X/Y/Z coordinates. It does not use proximity, display name, appearance similarity, or ACGHash to choose a placement. Multiple official records at the same exact coordinate remain ambiguous. ACGHash remains an official packed tag, not a proven runtime NPC identity.
+The authoritative match requires the resource playfield plus exact IEEE-754 single-precision X/Y/Z coordinates. Multiple official records at the same exact coordinate remain ambiguous. If no exact match exists, official spawn-radius containment is reported only as a heuristic candidate set and remains `ambiguous` even when the set has one record; it is never promoted as a unique identity bridge. Display name, appearance similarity, unconstrained proximity, and ACGHash never choose a placement. ACGHash remains an official packed tag, not a proven runtime NPC identity.
 
 ## Three independent gates
 

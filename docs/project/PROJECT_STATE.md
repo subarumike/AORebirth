@@ -16,9 +16,11 @@ completion matrices and dated evidence retain detailed provenance.
   accepted captures across repository and historical roots without pruning,
   and reconciles 3,325 captured NPC observations against 32,805 governed
   official placements. Exact playfield plus float32-coordinate matching found
-  no unique or ambiguous placement bridges in the current corpus, so all
-  promotion candidates remain blocked and no runtime NPC definition was mass
-  rewritten. The PF3081 Borealis Guide and Guard appearance regressions pass;
+  no unique placement bridges; official-radius containment identified 222
+  heuristic candidate sets that remain explicitly ambiguous, with 3,103
+  observations unmatched. All promotion candidates therefore remain blocked
+  and no runtime NPC definition was mass rewritten. The PF3081 Borealis Guide
+  and Guard appearance regressions pass;
   ordinary Stat replay passes; seven historical captures retain explicit raw
   integrity/SCFU replay failures rather than being treated as field-complete.
   Evidence schema and workflow: `docs/reference/NPC_OBSERVATION_HARVESTER.md`.

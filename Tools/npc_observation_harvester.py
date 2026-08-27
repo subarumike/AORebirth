@@ -498,7 +498,9 @@ def reconcile(
     observations: Iterable[NpcObservation], placements: Iterable[dict[str, Any]]
 ) -> tuple[list[dict[str, Any]], dict[str, list[str]]]:
     official_by_coordinate: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
+    official_by_playfield: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for placement in placements:
+        official_by_playfield[int(placement["PlayfieldId"])].append(placement)
         key = coordinate_key(
             int(placement["PlayfieldId"]),
             (float(placement["PositionX"]), float(placement["PositionY"]), float(placement["PositionZ"])),
@@ -512,7 +514,25 @@ def reconcile(
         candidates = sorted(
             official_by_coordinate.get(key, []), key=lambda row: row["OfficialSpawnRecordId"]
         ) if key else []
-        status = "unique" if len(candidates) == 1 else "ambiguous" if len(candidates) > 1 else "unmatched"
+        match_basis = "playfield+exact-float32-coordinate" if candidates else "insufficient-placement-evidence"
+        heuristic = False
+        if not candidates and observation.resource_playfield_id is not None and observation.position is not None:
+            radius_candidates = []
+            for placement in official_by_playfield.get(observation.resource_playfield_id, []):
+                radius = optional_float(placement.get("Radius"))
+                if radius is None or radius <= 0:
+                    continue
+                distance_squared = sum(
+                    (observation.position[index] - float(placement["Position" + axis])) ** 2
+                    for index, axis in enumerate("XYZ")
+                )
+                if distance_squared <= radius * radius:
+                    radius_candidates.append(placement)
+            if radius_candidates:
+                candidates = sorted(radius_candidates, key=lambda row: row["OfficialSpawnRecordId"])
+                match_basis = "playfield+official-radius-containment-heuristic"
+                heuristic = True
+        status = "ambiguous" if heuristic else "unique" if len(candidates) == 1 else "ambiguous" if len(candidates) > 1 else "unmatched"
         candidate_ids = [row["OfficialSpawnRecordId"] for row in candidates]
         if status == "unique":
             placement_to_observations[candidate_ids[0]].append(observation.observation_id)
@@ -525,7 +545,8 @@ def reconcile(
                 "position": list(observation.position) if observation.position else None,
                 "status": status,
                 "candidateOfficialSpawnRecordIds": candidate_ids,
-                "matchBasis": "playfield+exact-float32-coordinate" if key else "insufficient-placement-evidence",
+                "matchBasis": match_basis,
+                "heuristic": heuristic,
                 "acgHashUsedAsIdentity": False,
             }
         )
@@ -837,7 +858,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "friendlyNpcGenericPath": True,
         "acgHashIdentityAssumed": False,
         "retentionNonDestructive": True,
-        "coordinateMatchModel": "playfield+exact-float32-coordinate",
+        "coordinateMatchModel": "exact-float32 authoritative; official-radius containment heuristic remains ambiguous",
         "captureRoots": sorted(capture_roots),
     }
     atomic_json(output_dir / "summary.json", summary)
