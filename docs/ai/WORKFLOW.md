@@ -658,6 +658,21 @@ The schema and identity boundary are documented in
 capture inventory and all current repository capture roots, including
 repository-level `Captures`, without pruning accepted history or raw evidence.
 
+For the phase-aware official placement identity audit, all candidate coordinate
+transforms, runtime/base mapping evidence, conservative repeated-observation
+clusters, and non-mutating promotion eligibility, use:
+
+```cmd
+cmd /d /c Tools\resolve_npc_placement_identity.cmd
+```
+
+Run it twice without changing inputs to establish deterministic repeat output.
+The workflow writes ignored machine evidence under
+`build-verify\npc-placement-identity-resolver` and never edits runtime NPC
+definitions. Its proof boundary, resource provenance, output schemas, and
+current zero-match result are documented in
+`docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md`.
+
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
 

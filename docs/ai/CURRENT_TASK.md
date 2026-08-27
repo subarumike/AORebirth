@@ -2,15 +2,26 @@
 
 ## Active
 
-Implement and validate the first production-grade database-wide
-`NpcObservationHarvester`. Preserve exact raw SCFU appearance and ordinary Stat
-evidence, reject the unset sentinel from authoritative promotion state, include
-all governed capture roots without pruning accepted history, reconcile captured
-NPCs against all official placements with ambiguity failing closed, and report
-field-level observation coverage independently from capture integrity and
-promotion readiness. Use the completed PF3081 Borealis Guide/Guard capture as
-the mandatory appearance and missing-NPC-stat regression fixture. Do not mass
-activate or rewrite runtime NPC definitions from unresolved evidence.
+Implement and validate the deterministic `NpcPlacementIdentityResolver` over
+all 358 accepted captures and all 32,805 official placements. Audit the full
+retained resource hierarchy, coordinate hypotheses, district metadata,
+placement indirection, runtime/base-playfield evidence, and conservative
+repeated-observation clusters without guessing identity or modifying runtime
+NPC definitions.
+
+## Current resolver checkpoint
+
+- Official provenance and 146 normalized field paths are expanded; missing raw
+  upstream/opaque bytes and the fixed-projection retention gap are explicit.
+- Direct X/Y/Z is the strongest coordinate diagnostic, and exact PF4582 X/Z
+  repetition corroborates those axes/scale, but no full transform is proven.
+- Current capture artifacts contain zero same-epoch runtime/model identity
+  pairs; capture-level resource labels are rejected when row runtime epochs
+  conflict.
+- Production result remains zero unique-proven matches. All 3,325 promotion
+  eligibility records are blocked; ACGHash is never runtime identity.
+- Governed workflow and evidence schema:
+  `docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md`.
 
 ## Prior active checkpoint
 

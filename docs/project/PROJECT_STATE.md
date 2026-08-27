@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-25
+Updated: 2026-08-27
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,24 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- NPC placement identity resolution: the deterministic
+  `NpcPlacementIdentityResolver` now expands all 32,805 normalized official
+  placements and 146 retained field paths, quantitatively tests coordinate and
+  district-transform hypotheses, distinguishes row runtime epochs from frozen
+  capture resource labels, clusters all 3,325 observations conservatively, and
+  emits only non-mutating promotion eligibility. The current proof result is
+  zero unique placements: 680 radius/proxy candidate sets remain ambiguous,
+  2,365 observations are unmatched, and 280 phase/mapping or repeated-lineage
+  conflicts are rejected. Direct X/Y/Z is the strongest diagnostic; PF4582 exact X/Z
+  repetition strongly corroborates those axes and scale, but Y remains
+  different and no full coordinate transform, runtime-to-official-base map,
+  district map, template join, or placement-specific runtime identifier is
+  proven. Borealis Guide and Guard appearances remain exact, with one PF954
+  radius candidate each after the PF3081 mixed-zone capture is partitioned,
+  but neither is unique. All 3,325 promotion records remain blocked, ACGHash is
+  excluded from runtime identity, and no runtime NPC definition changed.
+  Evidence: `docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md`.
 
 - NPC observation harvesting foundation: the deterministic database-wide
   `NpcObservationHarvester` now replays retained raw SCFU and ordinary Stat
