@@ -38,6 +38,7 @@ namespace AORebirth.Core.NPCHandler
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Playfields;
+    using AORebirth.Core.Textures;
     using AORebirth.Core.Vector;
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
@@ -255,6 +256,20 @@ namespace AORebirth.Core.NPCHandler
                 foreach (DBMobSpawnStat stat in stats)
                 {
                     cmob.Stats.SetBaseValueWithoutTriggering(stat.Stat, (uint)stat.Value);
+                }
+
+                if (mob.Textures0 != 0
+                    || mob.Textures1 != 0
+                    || mob.Textures2 != 0
+                    || mob.Textures3 != 0
+                    || mob.Textures4 != 0)
+                {
+                    cmob.Textures.Clear();
+                    cmob.Textures.Add(new AOTextures(0, mob.Textures0));
+                    cmob.Textures.Add(new AOTextures(1, mob.Textures1));
+                    cmob.Textures.Add(new AOTextures(2, mob.Textures2));
+                    cmob.Textures.Add(new AOTextures(3, mob.Textures3));
+                    cmob.Textures.Add(new AOTextures(4, mob.Textures4));
                 }
 
                 cmob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualprofession, cmob.Stats[StatIds.profession].BaseValue);

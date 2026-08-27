@@ -183,6 +183,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAllocationService.cs">
       <Link>MissionAcgAllocationService.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon1Rules.cs">
+      <Link>NascenceDungeon1Rules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon2Rules.cs">
+      <Link>NascenceDungeon2Rules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingResolver.cs">
       <Link>MissionAcgBindingResolver.cs</Link>
     </Compile>

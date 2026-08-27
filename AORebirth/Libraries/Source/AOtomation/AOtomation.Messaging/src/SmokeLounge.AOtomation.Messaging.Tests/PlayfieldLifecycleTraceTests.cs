@@ -6687,6 +6687,45 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LegacyDbMobSpawnAppearanceUsesCapturedTexturesAndHeadMeshStats()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string npcHandlerText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AORebirth.Core\NPCHandler\NonPlayerCharacterHandler.cs"));
+            string mobSpawnsText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\mobspawns.sql"));
+            string mobSpawnStatsText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\mobspawns_stats.sql"));
+
+            Assert.IsTrue(
+                npcHandlerText.Contains("mob.Textures0 != 0")
+                && npcHandlerText.Contains("cmob.Textures.Add(new AOTextures(0, mob.Textures0));")
+                && npcHandlerText.Contains("cmob.Textures.Add(new AOTextures(1, mob.Textures1));")
+                && npcHandlerText.Contains("cmob.Textures.Add(new AOTextures(2, mob.Textures2));")
+                && npcHandlerText.Contains("cmob.Textures.Add(new AOTextures(3, mob.Textures3));")
+                && npcHandlerText.Contains("cmob.Textures.Add(new AOTextures(4, mob.Textures4));"),
+                "Legacy DB mob spawns with captured texture columns must hydrate all five SCFU texture slots.");
+            Assert.IsTrue(
+                mobSpawnsText.Contains("'Guard', 0, 30848, 42260, 30831, 42261")
+                && mobSpawnsText.Contains("'Guide', 0, 42239, 42260, 42240, 42261"),
+                "Guard and Guide must retain their capture-proven texture slots.");
+            Assert.IsTrue(
+                mobSpawnStatsText.Contains("(2029842938, 954, 64, 40111)")
+                && mobSpawnStatsText.Contains("(2029842939, 954, 64, 40635)"),
+                "Guard and Guide must retain their capture-proven headmesh stats.");
+            Assert.IsFalse(
+                mobSpawnsText.Contains("0000009CAF0000000004")
+                || mobSpawnsText.Contains("0000009EBB0000000004"),
+                "Captured head meshes must use Stat 64 rather than ignored legacy DB mesh blobs.");
+        }
+
+        [TestMethod]
         public void PlayfieldContentDataProviderDoesNotOwnRuntimeSystemsOrPacketFlows()
         {
             string repositoryRoot = FindRepositoryRoot();
