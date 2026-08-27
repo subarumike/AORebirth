@@ -35,6 +35,7 @@ CREATE TABLE  `mobspawns` (
 -- Target AORebirth DB playfield: 954 Neutral Training
 -- Dedup: 247 raw dynel rows -> 82 non-player dynels -> 75 NPC spawns.
 -- Imported fields: identity, name, position, level, health, MonsterData, MonsterScale, VisualFlags, CharRadius.
+-- Guide/Guard appearance: Borealis Backyard 2 [PF 3081] capture 20260826-222425.
 -- Not imported: placeholder CATMesh/DisplayCATMesh values, terminal/door events, positionless NPC-owned vendor.
 -- ============================================================
 INSERT INTO `mobspawns`
@@ -46,8 +47,8 @@ VALUES
     (2029842935, 954, 135.0505, 3.097257, 50.65466, 0, 0, 0, 1, 'Eleet', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
     (2029842936, 954, 194.1444, 3.613899, 153.591, 0, 0, 0, 1, 'Secondhand Peddler', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
     (2029842937, 954, 245.1716, 6.051475, 109.0419, 0, 0, 0, 1, 'Biofreak Carcass', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
-    (2029842938, 954, 245.7111, 5.81, 77.14748, 0, 0, 0, 1, 'Guard', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
-    (2029842939, 954, 232.5756, 6.01, 75.39314, 0, 0, 0, 1, 'Guide', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
+    (2029842938, 954, 245.7111, 5.81, 77.14748, 0, 0, 0, 1, 'Guard', 0, 30848, 42260, 30831, 42261, X'', X'', X'', X'', X'0000009CAF0000000004', ''),
+    (2029842939, 954, 232.5756, 6.01, 75.39314, 0, 0, 0, 1, 'Guide', 0, 42239, 42260, 42240, 42261, X'', X'', X'', X'', X'0000009EBB0000000004', ''),
     (2029842940, 954, 81.97951, 3.37906, 174.6959, 0, 0, 0, 1, 'Eyemutant Ruffian', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
     (2029842941, 954, 52.86177, 4.922349, 102.6726, 0, 0, 0, 1, 'Blackout the TechnoMaster', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),
     (2029842942, 954, 97.46694, 3.493475, 81.9572, 0, 0, 0, 1, 'Contagious Rollerrat', 0, 0, 0, 0, 0, X'', X'', X'', X'', X'', ''),

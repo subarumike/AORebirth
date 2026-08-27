@@ -4,8 +4,8 @@ This report is generated from the tracked fail-closed retention ledger.
 Absence from this report never authorizes deletion; unaccepted local captures default to retain.
 The inventory generator does not delete or prune raw capture folders.
 
-- Tracked captures: **353**
-- Retain: **353**
+- Tracked captures: **358**
+- Retain: **358**
 - Archive required: **0**
 - Discard approved: **0**
 
@@ -717,3 +717,13 @@ The inventory generator does not delete or prune raw capture folders.
 | 20260821-225854 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
 <!-- retention-capture-id: 20260821-230553 -->
 | 20260821-230553 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
+<!-- retention-capture-id: 20260823-025415 -->
+| 20260823-025415 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
+<!-- retention-capture-id: 20260823-030123 -->
+| 20260823-030123 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
+<!-- retention-capture-id: 20260823-030524 -->
+| 20260823-030524 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
+<!-- retention-capture-id: 20260823-032812 -->
+| 20260823-032812 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
+<!-- retention-capture-id: 20260826-222425 -->
+| 20260826-222425 | retain | unreviewed | unknown | NO |  | Capture has not been reviewed for raw-evidence disposal. | Default fail-closed retention; no discard review recorded. |
