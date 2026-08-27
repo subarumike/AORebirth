@@ -23,6 +23,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Nascence.Quests;
+    using ZoneEngine.Core.Nascence.Vendors;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Subway.Quests;
     using ZoneEngine.Core.Thrak.Quests;
@@ -450,6 +451,48 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 ThrakGardenVendorInteractionRules.SonLenInstance,
                 ThrakGardenVendorInteractionRules.SonLenIdentityText);
 
+        private static readonly ContentDrivenNpcDialogueRegistration OrMadaFuriousFistsRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.FuriousFistsName,
+                AbanGardenVendorInteractionRules.FuriousFistsInstance,
+                AbanGardenVendorInteractionRules.FuriousFistsIdentityText);
+
+        private static readonly ContentDrivenNpcDialogueRegistration OrMadaProtectionNearPreservationRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.ProtectionName,
+                AbanGardenVendorInteractionRules.ProtectionNearPreservationInstance,
+                AbanGardenVendorInteractionRules.ProtectionNearPreservationIdentityText);
+
+        private static readonly ContentDrivenNpcDialogueRegistration OrMadaPreservationRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.PreservationName,
+                AbanGardenVendorInteractionRules.PreservationInstance,
+                AbanGardenVendorInteractionRules.PreservationIdentityText);
+
+        private static readonly ContentDrivenNpcDialogueRegistration OrMadaFlamingBarrelsRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.FlamingBarrelsName,
+                AbanGardenVendorInteractionRules.FlamingBarrelsInstance,
+                AbanGardenVendorInteractionRules.FlamingBarrelsIdentityText);
+
+        private static readonly ContentDrivenNpcDialogueRegistration OrMadaProtectionNearGearRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.ProtectionName,
+                AbanGardenVendorInteractionRules.ProtectionNearGearInstance,
+                AbanGardenVendorInteractionRules.ProtectionNearGearIdentityText);
+
+        private static readonly ContentDrivenNpcDialogueRegistration OrMadaGearAndAmmoRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.GearAndAmmoName,
+                AbanGardenVendorInteractionRules.GearAndAmmoInstance,
+                AbanGardenVendorInteractionRules.GearAndAmmoIdentityText);
+
+        private static readonly ContentDrivenNpcDialogueRegistration ElMadaRegistration =
+            CreateAbanGardenVendorRegistration(
+                AbanGardenVendorInteractionRules.ElMadaName,
+                AbanGardenVendorInteractionRules.ElMadaInstance,
+                AbanGardenVendorInteractionRules.ElMadaIdentityText);
+
         // Capture 20260821-222107: Scarlett Dalquist — Nascense DOJA chip turn-in (PF 7010).
         private static readonly ContentDrivenNpcDialogueRegistration ScarlettDalquistRegistration =
             new ContentDrivenNpcDialogueRegistration
@@ -630,6 +673,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
             CraigOrGearAndAmmoRegistration,
             CraigOrProtectionRegistration,
             SonLenRegistration,
+            OrMadaFuriousFistsRegistration,
+            OrMadaProtectionNearPreservationRegistration,
+            OrMadaPreservationRegistration,
+            OrMadaFlamingBarrelsRegistration,
+            OrMadaProtectionNearGearRegistration,
+            OrMadaGearAndAmmoRegistration,
+            ElMadaRegistration,
             ScarlettDalquistRegistration,
             RosenblattRegistration,
             RodriguezRegistration,
@@ -683,6 +733,23 @@ namespace ZoneEngine.Core.Arete.Dialogue
                        PlayfieldId = ThrakGardenVendorInteractionRules.PlayfieldId,
                        GateEnvironmentVariableName = null,
                        LogPrefix = "THRAK_GARDEN_VENDOR"
+                   };
+        }
+
+        private static ContentDrivenNpcDialogueRegistration CreateAbanGardenVendorRegistration(
+            string displayName,
+            int sourceNpcInstance,
+            string npcIdentityText)
+        {
+            return new ContentDrivenNpcDialogueRegistration
+                   {
+                       Name = displayName,
+                       ExpectedNpcName = displayName,
+                       NpcIdentity = AbanGardenVendorInteractionRules.CreateIdentity(sourceNpcInstance),
+                       NpcIdentityText = npcIdentityText,
+                       PlayfieldId = AbanGardenVendorInteractionRules.PlayfieldId,
+                       GateEnvironmentVariableName = null,
+                       LogPrefix = "ABAN_GARDEN_VENDOR"
                    };
         }
 
@@ -1264,6 +1331,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            answerIndex,
                            liveTradeNpcIdentity)
                        || TryHandleThrakGardenVendorSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex)
+                       || TryHandleAbanGardenVendorSideEffect(
                            source,
                            registration,
                            previousNodeId,
@@ -1894,6 +1966,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 // No dialog window — chat-only gate (capture-backed Son-Len refuse).
                 FaceNpcTowardSource(npc, source);
                 SendSonLenNoKeyChat(source, registration.NpcIdentity);
+                return true;
+            }
+            else if (IsRegistration(registration, ElMadaRegistration)
+                     && !NascenceAbanFalaQuestRuntime.HasAbanGardenKey(source))
+            {
+                // No dialog window — no invented Aban no-key chat lines.
+                FaceNpcTowardSource(npc, source);
                 return true;
             }
             else if (IsRegistration(registration, VeronicaEscobarRegistration)
@@ -3544,6 +3623,40 @@ namespace ZoneEngine.Core.Arete.Dialogue
                    || IsRegistration(registration, CraigOrProtectionRegistration);
         }
 
+        private static bool TryHandleAbanGardenVendorSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsAbanGardenOrMadaRegistration(registration)
+                || !string.Equals(
+                    previousNodeId,
+                    AbanGardenVendorInteractionRules.OrMadaRootNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                || answerIndex != 0)
+            {
+                return false;
+            }
+
+            // Capture 20260823-205320: "Yes, I am here to do business..." opens the vendor shop.
+            CapturedAbanGardenVendorInteractionHandler.Default.TryOpenShop(
+                source,
+                registration.NpcIdentity);
+            return false;
+        }
+
+        private static bool IsAbanGardenOrMadaRegistration(
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            return IsRegistration(registration, OrMadaFuriousFistsRegistration)
+                   || IsRegistration(registration, OrMadaProtectionNearPreservationRegistration)
+                   || IsRegistration(registration, OrMadaPreservationRegistration)
+                   || IsRegistration(registration, OrMadaFlamingBarrelsRegistration)
+                   || IsRegistration(registration, OrMadaProtectionNearGearRegistration)
+                   || IsRegistration(registration, OrMadaGearAndAmmoRegistration);
+        }
+
         private static string ResolveRequestedStartNodeId(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration)
@@ -4190,7 +4303,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             ContentDrivenNpcDialogueRegistration runtimeRegistration =
                 FindCapturedSubwayVendorRuntimeRegistration(npc)
-                ?? FindWindcallerRuntimeRegistration(npc);
+                ?? FindWindcallerRuntimeRegistration(npc)
+                ?? FindCapturedAbanGardenVendorRuntimeRegistration(npc);
             if (runtimeRegistration != null)
             {
                 return runtimeRegistration;
@@ -4301,6 +4415,31 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return registration == null ? null : BindRegistration(registration, runtime.NpcIdentity);
         }
 
+        private static ContentDrivenNpcDialogueRegistration FindCapturedAbanGardenVendorRuntimeRegistration(
+            ICharacter npc)
+        {
+            if (npc == null || npc.Playfield == null)
+            {
+                return null;
+            }
+
+            CapturedAbanGardenVendorRuntimeDefinition runtime;
+            if (!CapturedAbanGardenVendorRuntimeRegistry.TryGet(npc.Identity.Instance, out runtime)
+                || runtime == null
+                || runtime.Content == null
+                || !CapturedAbanGardenVendorRuntimeRegistry.Same(
+                    runtime.PlayfieldIdentity,
+                    npc.Playfield.Identity))
+            {
+                return null;
+            }
+
+            ContentDrivenNpcDialogueRegistration registration = Registrations.FirstOrDefault(
+                candidate => IsAbanGardenVendorRegistration(candidate)
+                             && candidate.NpcIdentity.Instance == runtime.Content.SourceNpcInstance);
+            return registration == null ? null : BindRegistration(registration, runtime.NpcIdentity);
+        }
+
         private static ContentDrivenNpcDialogueRegistration BindRegistration(
             ContentDrivenNpcDialogueRegistration registration,
             Identity npcIdentity)
@@ -4329,7 +4468,15 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ContentDrivenNpcDialogueRegistration registration)
         {
             return IsWindcallerQuestRegistration(registration)
-                   || IsRegistration(registration, SubwayTailorRegistration);
+                   || IsRegistration(registration, SubwayTailorRegistration)
+                   || IsAbanGardenVendorRegistration(registration);
+        }
+
+        private static bool IsAbanGardenVendorRegistration(
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            return IsAbanGardenOrMadaRegistration(registration)
+                   || IsRegistration(registration, ElMadaRegistration);
         }
 
         private static bool IsRegistration(

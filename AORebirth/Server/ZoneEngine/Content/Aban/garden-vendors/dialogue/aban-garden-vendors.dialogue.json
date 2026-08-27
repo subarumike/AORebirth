@@ -1,0 +1,302 @@
+{
+  "Identity": {
+    "Id": "aban-garden-vendors-dialogue-20260823-205320",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260823-205320"
+  },
+  "SourceCaptures": [
+    "20260823-205320"
+  ],
+  "Npcs": [
+    {
+      "Id": "or_mada_furious_fists_7A2013B7",
+      "NpcIdentity": "SimpleChar:7A2013B7",
+      "Name": "Or-Mada of the Furious Fists",
+      "RootNodeId": "or_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "or_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "om001_0",
+              "Index": 0,
+              "Text": "Yes, I am here to do business. I hope you take credits...",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "om001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "or_mada_protection_a_7A2013B4",
+      "NpcIdentity": "SimpleChar:7A2013B4",
+      "Name": "Or-Mada of Protection",
+      "RootNodeId": "or_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "or_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "om001_0",
+              "Index": 0,
+              "Text": "Yes, I am here to do business. I hope you take credits...",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "om001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "or_mada_preservation_7A2013B5",
+      "NpcIdentity": "SimpleChar:7A2013B5",
+      "Name": "Or-Mada of Preservation",
+      "RootNodeId": "or_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "or_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "om001_0",
+              "Index": 0,
+              "Text": "Yes, I am here to do business. I hope you take credits...",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "om001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "or_mada_flaming_barrels_7A2013B8",
+      "NpcIdentity": "SimpleChar:7A2013B8",
+      "Name": "Or-Mada of Flaming Barrels",
+      "RootNodeId": "or_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "or_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "om001_0",
+              "Index": 0,
+              "Text": "Yes, I am here to do business. I hope you take credits...",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "om001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "or_mada_protection_b_7A2013B6",
+      "NpcIdentity": "SimpleChar:7A2013B6",
+      "Name": "Or-Mada of Protection",
+      "RootNodeId": "or_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "or_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "om001_0",
+              "Index": 0,
+              "Text": "Yes, I am here to do business. I hope you take credits...",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "om001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "or_mada_gear_ammo_7A2013B9",
+      "NpcIdentity": "SimpleChar:7A2013B9",
+      "Name": "Or-Mada of Gear & Ammo",
+      "RootNodeId": "or_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "or_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "om001_0",
+              "Index": 0,
+              "Text": "Yes, I am here to do business. I hope you take credits...",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "om001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "el_mada_7A2013BA",
+      "NpcIdentity": "SimpleChar:7A2013BA",
+      "Name": "El-Mada, Official of Consistency",
+      "RootNodeId": "el_mada_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "el_mada_001",
+          "PromptText": "...",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "em001_0",
+              "Index": 0,
+              "Text": "What are you doing here?",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "el_mada_stub",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "em001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "el_mada_stub",
+          "PromptText": "El-Mada regards you calmly.",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "emstub_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260823-205320",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

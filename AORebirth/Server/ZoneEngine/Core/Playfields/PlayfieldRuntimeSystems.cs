@@ -244,6 +244,10 @@ namespace ZoneEngine.Core.Playfields
                 this.playfield,
                 playfieldIdentity,
                 this.dynelRegistry);
+            this.vendors.AttachCapturedAbanGardenVendors(
+                this.playfield,
+                playfieldIdentity,
+                this.dynelRegistry);
             this.vendors.SpawnCapturedHoloDeckVendors(
                 this.playfield,
                 playfieldIdentity,
@@ -258,6 +262,7 @@ namespace ZoneEngine.Core.Playfields
         {
             this.windcallerKarrecNpcs.Clear(this.playfield.Identity, this.DeactivateNpc);
             this.vendors.ClearCapturedThrakGardenVendors(this.playfield.Identity, this.dynelRegistry);
+            this.vendors.ClearCapturedAbanGardenVendors(this.playfield.Identity, this.dynelRegistry);
             this.vendors.ClearCapturedHoloDeckVendors(this.playfield.Identity, this.dynelRegistry);
             this.vendors.ClearCapturedAreteAlexAreaVendors(this.playfield.Identity, this.dynelRegistry);
             this.vendors.ClearCapturedSubwayVendors(this.playfield.Identity, this.dynelRegistry);
