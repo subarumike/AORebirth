@@ -494,7 +494,23 @@ namespace ZoneEngine.Core.Packets
                                 };
             }
 
-            if (hasOrdinaryRuntime
+            bool isCapturedNeutralTrainingGuard = charPlayfield == 954
+                                                  && charId.Instance == 2029842938;
+            bool isCapturedNeutralTrainingGuide = charPlayfield == 954
+                                                  && charId.Instance == 2029842939;
+            if (isCapturedNeutralTrainingGuard || isCapturedNeutralTrainingGuide)
+            {
+                // Borealis Backyard 2 [PF 3081], capture 20260826-222425.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.UnknownFlag7
+                    | SimpleCharFullUpdateFlags.IsPet;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+                if (isCapturedNeutralTrainingGuide)
+                {
+                    scfu.Unknown1[0] = 0x80;
+                }
+            }
+            else if (hasOrdinaryRuntime
                 && ordinaryRuntime.Profile.Appearance.ScfuProfile
                 == OrdinaryEnemyScfuProfile.CapturedThief)
             {
