@@ -48,6 +48,7 @@ def official(record_id: str, position=(1.0, 2.0, 3.0)):
         "PositionX": position[0],
         "PositionY": position[1],
         "PositionZ": position[2],
+        "Radius": 0.0,
     }
 
 
