@@ -2712,6 +2712,14 @@
     <FullName />
     <Default>0</Default>
   </Stat>
+  <Stat id="695" Name="Commendations">
+    <FullName />
+    <Default>0</Default>
+  </Stat>
+  <Stat id="696" Name="DailyMissionResets">
+    <FullName />
+    <Default>0</Default>
+  </Stat>
   <Stat id="700" Name="ACGItemSeed">
     <FullName />
     <Default>1234567890</Default>

@@ -91,6 +91,13 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
+            // Reserved Nascence SL cave interior — ACG-band id, not an RK mission.
+            if (AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(playfieldInstance)
+                || AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(playfieldInstance))
+            {
+                return false;
+            }
+
             if (AORebirth.Core.Playfields.MissionInstanceShapeCatalog.IsCapturedShapePlayfield(playfieldInstance))
             {
                 return true;

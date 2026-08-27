@@ -516,6 +516,25 @@ namespace ZoneEngine.Core.Packets
                     | SimpleCharFullUpdateFlags.IsPet;
                 scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
             }
+            else if (character.Controller is NPCController
+                     && NascenceDungeon1Spawn.NeedsCapturedScfuIsPet(charName))
+            {
+                // Capture 20260824-220326: Rafter/Croaker/Crippler/Havaris SCFU Flags include IsPet.
+                // Side=Monster (chat combat taunts). Wailing Spirit / Smelly Weaver omit IsPet.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet
+                    | SimpleCharFullUpdateFlags.UnknownDataFlag;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
+            else if (character.Controller is NPCController
+                     && NascenceDungeon2Spawn.NeedsCapturedScfuIsPet(charName))
+            {
+                // Capture 20260823-182854: D2 trash/boss SCFU Flags include IsPet.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet
+                    | SimpleCharFullUpdateFlags.UnknownDataFlag;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
             else if (!hasWindcallerNpcRuntime
                      && !hasCapturedVendorRuntime
                      && !hasEncounterRuntime
@@ -595,6 +614,45 @@ namespace ZoneEngine.Core.Packets
                 else if (NascenceLifeSpawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
                 {
                     // Capture 20260723-221330 Barking Chimera / Yuttos Nascence Geosurvey Dog ExtTex.
+                    // Capture 20260822-082554 Papagena ExtTex + IsPet SCFU flags + Unknown1.
+                    // Capture 20260822-224319 Ecclesiast Aban Fala ExtTex + Side=Clan + IsPet flags.
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                    if (NascenceLifeSpawn.RequiresScfuVersion58(charName))
+                    {
+                        scfu.Version = 58;
+                    }
+
+                    if (NascenceLifeSpawn.IsPapagenaName(charName))
+                    {
+                        scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                            | SimpleCharFullUpdateFlags.IsPet
+                            | SimpleCharFullUpdateFlags.UnknownFlag7;
+                        scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+                        byte[] papagenaUnknown1;
+                        if (NascenceLifeSpawn.TryGetPapagenaScfuUnknown1(out papagenaUnknown1))
+                        {
+                            scfu.Unknown1 = papagenaUnknown1;
+                        }
+
+                        scfu.CharacterInfo =
+                            new SimpleNpcInfo
+                            {
+                                Family = NascenceLifeSpawn.PapagenaNpcFamily,
+                                LosHeight = 0
+                            };
+                    }
+                    else if (NascenceSwampClanMobRuntime.IsSwampClanMobName(charName))
+                    {
+                        NascenceSwampClanMobRuntime.ApplyScfuOverrides(scfu, charName);
+                    }
+                }
+                else if (NascenceDungeon1Spawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
+                    // Capture 20260823-171238 Wailing Spirit ExtTex (head_spirit + redeemed body).
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                }
+                else if (NascenceDungeon2Spawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
                     scfu.ExtendedTextureOverrideData = alexExtendedTextures;
                 }
                 else if (petMasterInstance != 0
@@ -636,6 +694,25 @@ namespace ZoneEngine.Core.Packets
                         Time1 = nano.TickCounter,
                         Time2 = nano.TickInterval
                     }).ToArray();
+
+            if (NascenceLifeSpawn.IsPapagenaName(charName))
+            {
+                scfu.ActiveNanos =
+                    NascenceLifeSpawn.GetPapagenaScfuActiveNanos().Select(
+                        nano =>
+                            new ActiveNano
+                            {
+                                NanoIdentity =
+                                    new Identity
+                                    {
+                                        Type = IdentityType.NanoProgram,
+                                        Instance = nano.NanoIdentityInstance
+                                    },
+                                NanoInstance = nano.NanoInstance,
+                                Time1 = nano.Time1,
+                                Time2 = nano.Time2
+                            }).ToArray();
+            }
 
             if (character.Waypoints != null && character.Waypoints.Count > 1)
             {

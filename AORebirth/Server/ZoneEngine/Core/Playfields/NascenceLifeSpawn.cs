@@ -3,6 +3,7 @@ namespace AORebirth.Core.Playfields
     #region Usings ...
 
     using System;
+    using System.Text;
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
@@ -18,6 +19,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Playfields.Content;
 
     using Coordinate = AORebirth.Core.Vector.Coordinate;
@@ -61,8 +63,12 @@ namespace AORebirth.Core.Playfields
             public int[][] Textures;
             public int[][] Meshes;
             public string CaptureFolder;
+            // Capture 20260823-000659 focusedEnemyIdentities full-circle patrol (aocap tag).
+            public string PatrolCaptureInstance = null;
             // Optional patrol path; leave null unless a spawn sets identity-local points.
             public float[][] Waypoints = null;
+            // Soft-respawn delay after death when no living mob remains near this spawn point.
+            public double RespawnSeconds = 0;
         }
 
         // Capture 20260723-221330 SCFU ExtTex for Barking Chimera 798E09BC / Yuttos 798C1F0D (identical wire).
@@ -73,20 +79,202 @@ namespace AORebirth.Core.Playfields
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x30, 0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
             };
 
+        // Capture 20260822-082554 SCFU 7A18D461 HasExtendedTextures: "grey" material + texture 236639 only.
+        private static readonly byte[] PapagenaExtendedTextureOverrideData =
+            {
+                0x00, 0x00, 0x07, 0xE2, 0x67, 0x72, 0x65, 0x79, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x9C, 0x5F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+            };
+
+        // Capture 20260822-224319 SCFU 7A1B033F HasExtendedTextures: "druid" + "druid 2 side(cloak)" texture 235151.
+        private static readonly byte[] AbanFalaExtendedTextureOverrideData =
+            {
+                0x00, 0x00, 0x0B, 0xD3, 0x64, 0x72, 0x75, 0x69, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x96, 0x8F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x64, 0x72, 0x75, 0x69, 0x64, 0x20, 0x32, 0x20, 0x73, 0x69, 0x64, 0x65, 0x28, 0x63, 0x6C, 0x6F,
+                0x61, 0x6B, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x03, 0x96, 0x8F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+
+        // Capture 20260822-224319 SCFU 7A1B033F Unknown1 (same wire shape as Papagena Unknown1).
+        private static readonly byte[] AbanFalaScfuUnknown1 =
+            {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00,
+                0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00
+            };
+
+        // Capture CharacterFlags / NpcFamily for Redeemed Village Clan NPCs (20260822-224319).
+        internal const short AbanFalaNpcFamily = 201;
+        private const int AbanFalaCharacterFlags = 277352961;
+        internal const int AbanFalaAppearanceValue = 1225;
+        private const int RedeemedVillageClanCharacterFlags = 268964353;
+        private const int RedeemedVillageClanTextureDruid = 235151;
+        private const int RedeemedVillageClanTextureWarrior = 213984;
+        private const int RedeemedVillageClanTextureNanoman = 213996;
+
+        // Capture 20260822-082554 SCFU 7A18D461 Unknown1 + NanoProgram ActiveNanos (fire visuals on wire).
+        private static readonly byte[] PapagenaScfuUnknown1 =
+            {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00,
+                0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00
+            };
+
+        private static readonly PapagenaScfuActiveNano[] PapagenaScfuActiveNanos =
+            {
+                new PapagenaScfuActiveNano(0x3A900, 0, 7050327, 3733851),
+                new PapagenaScfuActiveNano(0x3B26E, 0, 7050327, 3733851),
+                new PapagenaScfuActiveNano(0x3B26C, 0, 10875952, 7559476),
+                new PapagenaScfuActiveNano(0x3B26A, 0, 10010029, 6693553),
+                new PapagenaScfuActiveNano(0x3B268, 0, 4414580, 1098104),
+                new PapagenaScfuActiveNano(0x3B266, 0, 9644023, 6327547),
+            };
+
+        internal const short PapagenaNpcFamily = 207;
+
+        private const int BarkingChimeraNpcFamily = 187;
+        private const int GeosurveyDogNpcFamily = 200;
+        private const int SwiftSilvertailNpcFamily = 172;
+        // Capture 20260823-103458 SCFU npcFamily.
+        private const int NascenceSpiritHunterNpcFamily = 211;
+        private const int SoulDredgeNpcFamily = 207;
+        // Capture 20260823-112044 SCFU npcFamily.
+        private const int DiseaseRiddenRafterNpcFamily = 175;
+        private const int TempterusNpcFamily = 202;
+        private const int PredatorStrikerNpcFamily = 207;
+        private const int CripplerOfGrowthNpcFamily = 207;
+
+        // Capture 20260822-221109 SCFU Swift Silvertail textures.
+        private const int SwiftSilvertailTextureSlot0 = 0x384DD;
+        private const int SwiftSilvertailTextureSlot1 = 0x3931A;
+
+        // Capture 20260822-221109 kill XP (50% buff removed from wire deltas).
+        private const int BarkingChimeraKillXp = 250;
+        private const int GeosurveyDogKillXp = 275;
+        private const int SwiftSilvertailKillXp = 300;
+        // Capture 20260823-103458 player XP Stat deltas (pre-level-up kills).
+        private const int NascenceSpiritHunterKillXp = 830;
+        private const int CascadingSpiritKillXp = 830;
+        private const int SoulDredgeKillXp = 890;
+        // Capture 20260823-112044 player XP Stat deltas.
+        private const int DiseaseRiddenRafterKillXp = 890;
+        private const int TempterusKillXp = 763;
+        private const int PredatorStrikerKillXp = 500;
+        private const int DeadlyPredatorKillXp = 500;
+        private const int SpinetoothHatchlingKillXp = 500;
+        private const int WeaverOfMaliceKillXp = 500;
+        // Capture 20260826-052537 Death Parameter2=500.
+        private const int HiathlinKillXp = 500;
+        private const int OmathonKillXp = 500;
+
+        // Capture 20260822-221109 starter-bridge local patrol box on PF 4310.
+        private const float StarterBridgeMinX = 790f;
+        private const float StarterBridgeMaxX = 900f;
+        private const float StarterBridgeMinZ = 1090f;
+        private const float StarterBridgeMaxZ = 1260f;
+        private const double StarterBridgeCapturedAttackRange = 4.0d;
+        // Mike: Cascading Spirit social aggro radius 10m (capture 20260823-103458 cave pack).
+        private const float CascadingSpiritSocialAggroRadiusMeters = 10f;
+        // Mike: Predator Striker social aggro radius 10m (capture 20260826-054154 pocket).
+        private const float PredatorStrikerSocialAggroRadiusMeters = 10f;
+
+        // Capture 20260826-192602: login crash when char loads at ~900/1640 fork visibility.
+        // Tight bubble only — Demonic Subjugator @ 733/1565 stays outside (~183m).
+        private const float FrontierForkCrashCenterX = 900.2f;
+        private const float FrontierForkCrashCenterZ = 1640.7f;
+        private const float FrontierForkCrashMobRadiusMeters = 85f;
+        private const float FrontierForkWeaverSkipRadiusMeters = 150f;
+        // Northwest branch from fork (Demonic entrance): keep crash-mob spawns outside skip bubble.
+        private const float FrontierForkDemonicCorridorMinZ = 1635f;
+        // Malah-Ana pocket @ ~953/1650 is inside the 150m fork bubble but outside the Spinetooth pocket.
+        private const float FrontierSpinetoothDeferredMinX = 972f;
+        private const float FrontierSpinetoothDeferredMinZ = 1585f;
+        private const float FrontierSpinetoothDeferredMaxZ = 1720f;
+        private const double FrontierForkDeferredLoginGraceSeconds = 8d;
+        private const double FrontierForkDeferredBatchIntervalSeconds = 1d;
+        private const int FrontierForkDeferredSpawnBatchSize = 3;
+
+        private static readonly object FrontierForkDeferredSync = new object();
+
+        private static readonly List<int> FrontierForkDeferredNpcIndices = new List<int>();
+
+        private static readonly HashSet<int> FrontierForkDeferredSpawnedKeys = new HashSet<int>();
+
+        private static readonly Dictionary<int, DateTime> FrontierForkLoginReadyAtUtc = new Dictionary<int, DateTime>();
+
+        private static DateTime FrontierForkDeferredLastBatchAtUtc = DateTime.MinValue;
+
+        internal sealed class PapagenaScfuActiveNano
+        {
+            public PapagenaScfuActiveNano(int nanoIdentityInstance, int time1, int time2, int nanoInstance)
+            {
+                NanoIdentityInstance = nanoIdentityInstance;
+                Time1 = time1;
+                Time2 = time2;
+                NanoInstance = nanoInstance;
+            }
+
+            public int NanoIdentityInstance { get; private set; }
+
+            public int Time1 { get; private set; }
+
+            public int Time2 { get; private set; }
+
+            public int NanoInstance { get; private set; }
+        }
+
         // Capture CharacterFlags: Dreaming Silvertail 277352961; animal mobs 268964353.
         private const int DreamingSilvertailCharacterFlags = 277352961;
         private const int DefaultAnimalCharacterFlags = 268964353;
 
-        // Barking Chimera patrol intentionally disabled: shared absolute FollowTarget waypoints
-        // stacked many Chimeras on the same path points and yanked them away on attack/patrol.
-        // Re-enable only with per-spawn (identity-local or spawn-relative) paths, never shared world paths.
-
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
         {
             if (string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+                || string.Equals(name, "Slivering Chimera", StringComparison.OrdinalIgnoreCase))
             {
+                // Capture 20260723-221330 Barking + 20260825-202932 Slivering: low2:208969 ExtTex.
                 data = (byte[])BarkingChimeraExtendedTextureOverrideData.Clone();
+                return true;
+            }
+
+            // Geosurvey Dog ExtTex disabled — same blob as Chimera but crashes client near Demonic exit.
+
+            if (string.Equals(name, "Papagena", StringComparison.OrdinalIgnoreCase))
+            {
+                data = (byte[])PapagenaExtendedTextureOverrideData.Clone();
+                return true;
+            }
+
+            if (IsAbanFalaName(name) || IsCurBeatName(name))
+            {
+                data = BuildDualMaterialExtTex("druid", "druid 2 side(cloak)", RedeemedVillageClanTextureDruid);
+                return true;
+            }
+
+            if (IsHumeOcraName(name) || IsLuxWeiName(name))
+            {
+                data = BuildDualMaterialExtTex("varrior", "varrior 2 side(cloak)", RedeemedVillageClanTextureWarrior);
+                return true;
+            }
+
+            if (IsPathDunaName(name))
+            {
+                data = BuildDualMaterialExtTex(
+                    "nanoman 2 side cloak",
+                    "nanoman",
+                    RedeemedVillageClanTextureNanoman);
+                return true;
+            }
+
+            if (NascenceSwampClanMobRuntime.TryGetExtendedTextureOverride(name, out data))
+            {
+                return true;
+            }
+
+            // NascenceFrontierOutdoorMobRuntime ExtTex: Deadly sabre (SCFU v58); Striker/Stalking off (crash).
+            if (NascenceFrontierOutdoorMobRuntime.TryGetExtendedTextureOverride(name, out data))
+            {
                 return true;
             }
 
@@ -94,26 +282,579 @@ namespace AORebirth.Core.Playfields
             return false;
         }
 
-        // Capture 20260723-225021 / 20260723-221330: credits=0 empty corpses were still opened on live.
-        // Subway EmptyCorpseLifetime=0 must not apply here or corpses despawn before click.
+        // Capture 20260826-054154 Deadly Predator SCFU Version=58 (0x07E2 sabre ExtTex).
+        internal static bool RequiresScfuVersion58(string name)
+        {
+            return string.Equals(name, "Deadly Predator", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Barking Chimera starter-bridge patrol: per-spawn capture routes via
+        // NascenceLifeStarterBridgePatrolRuntime (20260823-000659 movement-packets.csv).
+
+        internal static bool IsRedeemedVillageClanNpcName(string name)
+        {
+            return IsAbanFalaName(name)
+                   || IsCurBeatName(name)
+                   || IsHumeOcraName(name)
+                   || IsPathDunaName(name)
+                   || IsLuxWeiName(name);
+        }
+
+        private static bool ShouldSkipFrontierForkCrashSpawn(LifeNpc def)
+        {
+            if (def == null || def.PlayfieldId != NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                return false;
+            }
+
+            // Geosurvey Dog crashes client on visibility (capture 20260826 @ 900/1640 fork).
+            if (string.Equals(def.Name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Hwall: PF4310 outdoor SCFU not wired yet (client crash in Malah-Ana pocket).
+            if (def.Name != null && def.Name.StartsWith("Hwall", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            float dx = def.X - FrontierForkCrashCenterX;
+            float dz = def.Z - FrontierForkCrashCenterZ;
+            float distSq = (dx * dx) + (dz * dz);
+
+            if (string.Equals(def.Name, "Weaver of Malice", StringComparison.OrdinalIgnoreCase))
+            {
+                float weaverRadiusSq = FrontierForkWeaverSkipRadiusMeters * FrontierForkWeaverSkipRadiusMeters;
+                return distSq <= weaverRadiusSq;
+            }
+
+            if (!IsFrontierForkScfuCrashMobName(def.Name))
+            {
+                return false;
+            }
+
+            if (IsFrontierForkDemonicCorridorExempt(def))
+            {
+                return false;
+            }
+
+            float mobRadiusSq = FrontierForkCrashMobRadiusMeters * FrontierForkCrashMobRadiusMeters;
+            return distSq <= mobRadiusSq;
+        }
+
+        private static bool IsWithinFrontierForkWeaverSkipBubble(LifeNpc def)
+        {
+            if (def == null || def.PlayfieldId != NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                return false;
+            }
+
+            float dx = def.X - FrontierForkCrashCenterX;
+            float dz = def.Z - FrontierForkCrashCenterZ;
+            float distSq = (dx * dx) + (dz * dz);
+            float weaverRadiusSq = FrontierForkWeaverSkipRadiusMeters * FrontierForkWeaverSkipRadiusMeters;
+            return distSq <= weaverRadiusSq;
+        }
+
+        private static bool ShouldDeferFrontierForkSpawn(LifeNpc def)
+        {
+            if (def == null || def.PlayfieldId != NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                return false;
+            }
+
+            if (!IsWithinFrontierForkWeaverSkipBubble(def))
+            {
+                return false;
+            }
+
+            // PF4310 fork bubble: stagger Weaver + Spinetooth visibility (capture 20260826-212737).
+            return string.Equals(def.Name, "Weaver of Malice", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(def.Name, "Spinetooth Hatchling", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsPlayerInFrontierSpinetoothZone(ICharacter character)
+        {
+            if (character == null || !(character.Controller is PlayerController))
+            {
+                return false;
+            }
+
+            Coordinate pos = character.Coordinates();
+            return pos.coordinate.x >= FrontierSpinetoothDeferredMinX
+                   && pos.coordinate.z >= FrontierSpinetoothDeferredMinZ
+                   && pos.coordinate.z <= FrontierSpinetoothDeferredMaxZ;
+        }
+
+        private static bool AnyPlayerReadyForFrontierForkDeferredSpawn(Playfield playfield, out DateTime utcNow)
+        {
+            utcNow = DateTime.UtcNow;
+            if (playfield == null)
+            {
+                return false;
+            }
+
+            foreach (ICharacter character in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
+            {
+                if (character == null || !(character.Controller is PlayerController))
+                {
+                    continue;
+                }
+
+                DateTime loginReadyAtUtc;
+                lock (FrontierForkDeferredSync)
+                {
+                    if (!FrontierForkLoginReadyAtUtc.TryGetValue(character.Identity.Instance, out loginReadyAtUtc))
+                    {
+                        continue;
+                    }
+                }
+
+                if ((utcNow - loginReadyAtUtc).TotalSeconds < FrontierForkDeferredLoginGraceSeconds)
+                {
+                    continue;
+                }
+
+                if (IsPlayerInFrontierSpinetoothZone(character))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static void NotifyFrontierForkPlayerLoginReady(ICharacter character)
+        {
+            if (character == null
+                || character.Playfield == null
+                || character.Playfield.Identity.Instance != NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                return;
+            }
+
+            lock (FrontierForkDeferredSync)
+            {
+                FrontierForkLoginReadyAtUtc[character.Identity.Instance] = DateTime.UtcNow;
+            }
+        }
+
+        internal static void ClearFrontierForkPlayerLoginReady(int characterInstance)
+        {
+            if (characterInstance == 0)
+            {
+                return;
+            }
+
+            lock (FrontierForkDeferredSync)
+            {
+                FrontierForkLoginReadyAtUtc.Remove(characterInstance);
+            }
+        }
+
+        private static int FrontierForkDeferredSpawnKey(LifeNpc def)
+        {
+            unchecked
+            {
+                return (def.Name.GetHashCode() * 397) ^ def.X.GetHashCode() ^ def.Z.GetHashCode();
+            }
+        }
+
+        internal static void TickFrontierForkDeferredSpawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            if (playfield == null || activateNpc == null)
+            {
+                return;
+            }
+
+            if (playfieldIdentity.Instance != NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                return;
+            }
+
+            int[] pendingIndices;
+            lock (FrontierForkDeferredSync)
+            {
+                if (FrontierForkDeferredNpcIndices.Count == 0)
+                {
+                    return;
+                }
+
+                pendingIndices = FrontierForkDeferredNpcIndices.ToArray();
+            }
+
+            DateTime utcNow;
+            if (!AnyPlayerReadyForFrontierForkDeferredSpawn(playfield, out utcNow))
+            {
+                return;
+            }
+
+            lock (FrontierForkDeferredSync)
+            {
+                if ((utcNow - FrontierForkDeferredLastBatchAtUtc).TotalSeconds
+                    < FrontierForkDeferredBatchIntervalSeconds)
+                {
+                    return;
+                }
+            }
+
+            int spawned = 0;
+            for (int i = 0; i < pendingIndices.Length && spawned < FrontierForkDeferredSpawnBatchSize; i++)
+            {
+                LifeNpc def = Npcs[pendingIndices[i]];
+                int spawnKey = FrontierForkDeferredSpawnKey(def);
+                lock (FrontierForkDeferredSync)
+                {
+                    if (!FrontierForkDeferredSpawnedKeys.Add(spawnKey))
+                    {
+                        continue;
+                    }
+                }
+
+                try
+                {
+                    if (SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                    {
+                        spawned++;
+                        int totalSpawned;
+                        lock (FrontierForkDeferredSync)
+                        {
+                            totalSpawned = FrontierForkDeferredSpawnedKeys.Count;
+                        }
+
+                        LogUtil.Debug(
+                            DebugInfoDetail.Engine,
+                            "NascenceLifeSpawn pf=4310 deferred visibility npc=" + def.Name
+                            + " x=" + def.X.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                            + " z=" + def.Z.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                            + " capture=" + (def.CaptureFolder ?? "none")
+                            + " n=" + totalSpawned + "/" + pendingIndices.Length);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "NascenceLifeSpawn deferred SpawnOne threw npc=" + def.Name
+                        + " ex=" + ex.GetType().Name + ": " + ex.Message);
+                }
+            }
+
+            if (spawned > 0)
+            {
+                lock (FrontierForkDeferredSync)
+                {
+                    FrontierForkDeferredLastBatchAtUtc = utcNow;
+                }
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "NascenceLifeSpawn pf=4310 deferred batch done spawned=" + spawned);
+            }
+        }
+
+        private static bool IsFrontierForkDemonicCorridorExempt(LifeNpc def)
+        {
+            return def.X <= FrontierForkCrashCenterX
+                && def.Z >= FrontierForkDemonicCorridorMinZ;
+        }
+
+        private static bool IsFrontierForkScfuCrashMobName(string name)
+        {
+            return string.Equals(name, "Slivering Chimera", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Stalking Predator", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Deadly Predator", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Predator Striker", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal static bool TryGetRedeemedVillageClanScfuUnknown1(out byte[] data)
+        {
+            data = (byte[])AbanFalaScfuUnknown1.Clone();
+            return true;
+        }
+
+        internal static int ResolveRedeemedVillageClanCharacterFlags(string name)
+        {
+            return IsAbanFalaName(name) ? AbanFalaCharacterFlags : RedeemedVillageClanCharacterFlags;
+        }
+
+        private static bool IsCurBeatName(string name)
+        {
+            return string.Equals(name, "Cur-Beat", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsHumeOcraName(string name)
+        {
+            return string.Equals(name, "Diviner Aban Hume-Ocra", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsPathDunaName(string name)
+        {
+            return string.Equals(name, "Devoted Aban Path-Duna", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLuxWeiName(string name)
+        {
+            return string.Equals(name, "Sipius Aban Lux-Wei", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static byte[] BuildDualMaterialExtTex(string primaryMaterial, string secondaryMaterial, int textureId)
+        {
+            byte[] buffer = new byte[92];
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x0B;
+            buffer[3] = 0xD3;
+            WriteAsciiField(buffer, 4, primaryMaterial, 32);
+            WriteTextureId(buffer, 36, textureId);
+            WriteAsciiField(buffer, 48, secondaryMaterial, 32);
+            WriteTextureId(buffer, 80, textureId);
+            return buffer;
+        }
+
+        private static void WriteAsciiField(byte[] buffer, int offset, string text, int fieldLength)
+        {
+            if (buffer == null || string.IsNullOrEmpty(text) || fieldLength <= 0)
+            {
+                return;
+            }
+
+            byte[] ascii = Encoding.ASCII.GetBytes(text);
+            int copy = Math.Min(ascii.Length, fieldLength - 1);
+            Array.Copy(ascii, 0, buffer, offset, copy);
+        }
+
+        private static void WriteTextureId(byte[] buffer, int offset, int textureId)
+        {
+            buffer[offset] = 0;
+            buffer[offset + 1] = (byte)((textureId >> 16) & 0xFF);
+            buffer[offset + 2] = (byte)((textureId >> 8) & 0xFF);
+            buffer[offset + 3] = (byte)(textureId & 0xFF);
+        }
+
+        internal static bool IsPapagenaName(string name)
+        {
+            return string.Equals(name, "Papagena", StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal static bool IsAbanFalaName(string name)
+        {
+            return string.Equals(name, "Ecclesiast Aban Fala", StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal static bool TryGetAbanFalaScfuUnknown1(out byte[] data)
+        {
+            data = (byte[])AbanFalaScfuUnknown1.Clone();
+            return true;
+        }
+
+        internal static bool TryGetPapagenaScfuUnknown1(out byte[] data)
+        {
+            data = (byte[])PapagenaScfuUnknown1.Clone();
+            return true;
+        }
+
+        internal static PapagenaScfuActiveNano[] GetPapagenaScfuActiveNanos()
+        {
+            return PapagenaScfuActiveNanos;
+        }
+
         internal static bool UsesCaptureOpenableEmptyCorpse(string name)
         {
             return string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "Dreaming Silvertail", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase);
+                || string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Soul Dredge", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Disease-Ridden Rafter", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Tempterus", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Predator Striker", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "The Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Deadly Predator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Corrupting Imp", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Slivering Chimera", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Stalking Predator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hiathlin Prime", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hesosas", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Omathon", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Papagena", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Papageno", StringComparison.OrdinalIgnoreCase)
+                || NascenceDungeon1Rules.IsDungeonCorpseName(name)
+                || NascenceDungeon2Rules.IsDungeonCorpseName(name);
         }
 
         // Mike: empty loot closes too fast — keep opened empty corpse ~2s before cleanup.
         internal static readonly TimeSpan OpenableEmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(2);
 
-        // Mike: Barking Chimera soft-respawn 30s after death (spawn-local, not shared patrol).
-        private const double BarkingChimeraRespawnSeconds = 30.0;
-        private const float BarkingChimeraAliveProximityMetersSq = 6.25f; // 2.5m, same as Alex-pad
+        // Mike: starter-bridge corpse despawn 3 minutes (capture-backed Nascence Life farm mobs).
+        internal static readonly TimeSpan CaptureCorpseLifetime = TimeSpan.FromMinutes(3);
+
+        // Mike: Spirit Hunter corpse 30m; Cascading Spirit corpse 2m (20260823-103458).
+        internal static readonly TimeSpan SpiritHunterCorpseLifetime = TimeSpan.FromMinutes(30);
+        internal static readonly TimeSpan CascadingSpiritCorpseLifetime = TimeSpan.FromMinutes(2);
+        // Mike: Tempterus corpse 10m; Predator Striker 3m; Papageno (Omni) 30m (20260823-112044).
+        internal static readonly TimeSpan TempterusCorpseLifetime = TimeSpan.FromMinutes(10);
+        internal static readonly TimeSpan PredatorStrikerCorpseLifetime = TimeSpan.FromMinutes(3);
+        internal static readonly TimeSpan PapagenaCorpseLifetime = TimeSpan.FromMinutes(30);
+        internal static readonly TimeSpan PapagenoCorpseLifetime = TimeSpan.FromMinutes(30);
+        // Capture 20260826-052537 + Mike: Hiathlin corpse 2m; Omathon/Hesosas corpse 20m / respawn 30m.
+        internal static readonly TimeSpan HiathlinCorpseLifetime = TimeSpan.FromMinutes(2);
+        internal static readonly TimeSpan OmathonCorpseLifetime = TimeSpan.FromMinutes(20);
+        internal static readonly TimeSpan HesosasCorpseLifetime = TimeSpan.FromMinutes(20);
+        // Capture 20260825-202932 Demonic Subjugator boss corpse.
+        internal static readonly TimeSpan DemonicSubjugatorCorpseLifetime = TimeSpan.FromMinutes(30);
+
+        internal static bool TryGetCaptureCorpseLifetime(string name, out TimeSpan lifetime)
+        {
+            if (string.Equals(name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = SpiritHunterCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = CascadingSpiritCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Tempterus", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = TempterusCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Predator Striker", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = PredatorStrikerCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "The Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Demonic Subjugator", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = DemonicSubjugatorCorpseLifetime;
+                return true;
+            }
+
+            if (IsPapagenaName(name))
+            {
+                lifetime = PapagenaCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Papageno", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = PapagenoCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hiathlin Prime", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = HiathlinCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Omathon", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = OmathonCorpseLifetime;
+                return true;
+            }
+
+            if (string.Equals(name, "Hesosas", StringComparison.OrdinalIgnoreCase))
+            {
+                lifetime = HesosasCorpseLifetime;
+                return true;
+            }
+
+            if (UsesCaptureOpenableEmptyCorpse(name))
+            {
+                lifetime = CaptureCorpseLifetime;
+                return true;
+            }
+
+            lifetime = TimeSpan.Zero;
+            return false;
+        }
+
+        // Mike: starter-bridge Chimera / Silvertail soft-respawn 2 minutes after death.
+        private const double BarkingChimeraRespawnSeconds = 120.0;
+        private const double SwiftSilvertailRespawnSeconds = 120.0;
+        // Mike: Spirit Hunter / Cascading Spirit soft-respawn 10 minutes.
+        private const double SpiritHunterRespawnSeconds = 600.0;
+        private const double CascadingSpiritRespawnSeconds = 600.0;
+        // Mike: Tempterus 5m (capture 112044 ~310s); Predator Striker 2m.
+        private const double TempterusRespawnSeconds = 300.0;
+        private const double PredatorStrikerRespawnSeconds = 120.0;
+        private const double DeadlyPredatorRespawnSeconds = 600.0;
+        private const double PapagenaRespawnSeconds = 1200.0;
+        private const double PapagenaPadRespawnSeconds = 120.0;
+        // Capture 20260823-112044 Papageno (Omni): Mike stated 20m respawn / 30m corpse.
+        private const double PapagenoRespawnSeconds = 1200.0;
+        // Capture 20260826-052537 + Mike: Hiathlin respawn 5m; Omathon/Hesosas respawn 30m.
+        private const double HiathlinRespawnSeconds = 300.0;
+        private const double OmathonRespawnSeconds = 1800.0;
+        private const double HesosasRespawnSeconds = 1800.0;
+        private const float SoftRespawnAliveProximityMetersSq = 6.25f; // 2.5m, same as Alex-pad
         private static readonly object ChimeraRespawnSync = new object();
         private static readonly Dictionary<int, DateTime[]> ChimeraNextRespawnUtcByPlayfield =
             new Dictionary<int, DateTime[]>();
+        private static readonly object SilvertailRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> SilvertailNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object SpiritHunterRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> SpiritHunterNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object CascadingSpiritRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> CascadingSpiritNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object TempterusRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> TempterusNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object PredatorStrikerRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> PredatorStrikerNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object DeadlyPredatorRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> DeadlyPredatorNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object PapagenaAreaRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> PapagenaAreaNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object PapagenoRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> PapagenoNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object HiathlinRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> HiathlinNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object OmathonRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> OmathonNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static readonly object HesosasRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> HesosasNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
         private static int[] chimeraSpawnIndices;
+        private static int[] silvertailSpawnIndices;
+        private static int[] spiritHunterSpawnIndices;
+        private static int[] cascadingSpiritSpawnIndices;
+        private static int[] tempterusSpawnIndices;
+        private static int[] predatorStrikerSpawnIndices;
+        private static int[] deadlyPredatorSpawnIndices;
+        private static int[] papagenaAreaSpawnIndices;
+        private static int[] papagenoSpawnIndices;
+        private static int[] hiathlinSpawnIndices;
+        private static int[] omathonSpawnIndices;
+        private static int[] hesosasSpawnIndices;
 
         private static int[] ChimeraSpawnIndices
         {
@@ -138,11 +879,333 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        private static int[] SilvertailSpawnIndices
+        {
+            get
+            {
+                if (silvertailSpawnIndices != null)
+                {
+                    return silvertailSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                silvertailSpawnIndices = list.ToArray();
+                return silvertailSpawnIndices;
+            }
+        }
+
+        private static int[] SpiritHunterSpawnIndices
+        {
+            get
+            {
+                if (spiritHunterSpawnIndices != null)
+                {
+                    return spiritHunterSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                spiritHunterSpawnIndices = list.ToArray();
+                return spiritHunterSpawnIndices;
+            }
+        }
+
+        private static int[] CascadingSpiritSpawnIndices
+        {
+            get
+            {
+                if (cascadingSpiritSpawnIndices != null)
+                {
+                    return cascadingSpiritSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                cascadingSpiritSpawnIndices = list.ToArray();
+                return cascadingSpiritSpawnIndices;
+            }
+        }
+
+        private static int[] TempterusSpawnIndices
+        {
+            get
+            {
+                if (tempterusSpawnIndices != null)
+                {
+                    return tempterusSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Tempterus", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                tempterusSpawnIndices = list.ToArray();
+                return tempterusSpawnIndices;
+            }
+        }
+
+        private static int[] PredatorStrikerSpawnIndices
+        {
+            get
+            {
+                if (predatorStrikerSpawnIndices != null)
+                {
+                    return predatorStrikerSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Predator Striker", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                predatorStrikerSpawnIndices = list.ToArray();
+                return predatorStrikerSpawnIndices;
+            }
+        }
+
+        private static int[] DeadlyPredatorSpawnIndices
+        {
+            get
+            {
+                if (deadlyPredatorSpawnIndices != null)
+                {
+                    return deadlyPredatorSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Deadly Predator", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                deadlyPredatorSpawnIndices = list.ToArray();
+                return deadlyPredatorSpawnIndices;
+            }
+        }
+
+        private static int[] PapagenaAreaSpawnIndices
+        {
+            get
+            {
+                if (papagenaAreaSpawnIndices != null)
+                {
+                    return papagenaAreaSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    LifeNpc def = Npcs[i];
+                    if (IsPapagenaName(def.Name)
+                        || string.Equals(def.CaptureFolder, "20260822-104635", StringComparison.Ordinal))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                papagenaAreaSpawnIndices = list.ToArray();
+                return papagenaAreaSpawnIndices;
+            }
+        }
+
+        private static int[] PapagenoSpawnIndices
+        {
+            get
+            {
+                if (papagenoSpawnIndices != null)
+                {
+                    return papagenoSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Papageno", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                papagenoSpawnIndices = list.ToArray();
+                return papagenoSpawnIndices;
+            }
+        }
+
+        private static int[] HiathlinSpawnIndices
+        {
+            get
+            {
+                if (hiathlinSpawnIndices != null)
+                {
+                    return hiathlinSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(Npcs[i].Name, "Hiathlin Prime", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                hiathlinSpawnIndices = list.ToArray();
+                return hiathlinSpawnIndices;
+            }
+        }
+
+        private static int[] OmathonSpawnIndices
+        {
+            get
+            {
+                if (omathonSpawnIndices != null)
+                {
+                    return omathonSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Omathon", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                omathonSpawnIndices = list.ToArray();
+                return omathonSpawnIndices;
+            }
+        }
+
+        private static int[] HesosasSpawnIndices
+        {
+            get
+            {
+                if (hesosasSpawnIndices != null)
+                {
+                    return hesosasSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Hesosas", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                hesosasSpawnIndices = list.ToArray();
+                return hesosasSpawnIndices;
+            }
+        }
+
         public static void ClearPlayfield(int playfieldInstance)
         {
             lock (ChimeraRespawnSync)
             {
                 ChimeraNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (SilvertailRespawnSync)
+            {
+                SilvertailNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (SpiritHunterRespawnSync)
+            {
+                SpiritHunterNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (CascadingSpiritRespawnSync)
+            {
+                CascadingSpiritNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (TempterusRespawnSync)
+            {
+                TempterusNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (PredatorStrikerRespawnSync)
+            {
+                PredatorStrikerNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (DeadlyPredatorRespawnSync)
+            {
+                DeadlyPredatorNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (PapagenaAreaRespawnSync)
+            {
+                PapagenaAreaNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (PapagenoRespawnSync)
+            {
+                PapagenoNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (HiathlinRespawnSync)
+            {
+                HiathlinNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (OmathonRespawnSync)
+            {
+                OmathonNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            lock (HesosasRespawnSync)
+            {
+                HesosasNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+
+            if (playfieldInstance == NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                lock (FrontierForkDeferredSync)
+                {
+                    FrontierForkDeferredNpcIndices.Clear();
+                    FrontierForkDeferredSpawnedKeys.Clear();
+                    FrontierForkLoginReadyAtUtc.Clear();
+                    FrontierForkDeferredLastBatchAtUtc = DateTime.MinValue;
+                }
             }
         }
 
@@ -221,7 +1284,561 @@ namespace AORebirth.Core.Playfields
 
                 float dx = candidate.Coordinates().x - def.X;
                 float dz = candidate.Coordinates().z - def.Z;
-                if ((dx * dx) + (dz * dz) <= BarkingChimeraAliveProximityMetersSq)
+                if ((dx * dx) + (dz * dz) <= SoftRespawnAliveProximityMetersSq)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void TickSwiftSilvertailRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            if (playfield == null || activateNpc == null)
+            {
+                return;
+            }
+
+            int pf = playfieldIdentity.Instance;
+            if (pf != NascenceLifeContentModule.FrontierPlayfieldId
+                && pf != NascenceLifeContentModule.WildsPlayfieldId
+                && pf != NascenceLifeContentModule.CorePlayfieldId
+                && pf != NascenceLifeContentModule.Nascence4313PlayfieldId)
+            {
+                return;
+            }
+
+            int[] indices = SilvertailSpawnIndices;
+            DateTime[] timers;
+            lock (SilvertailRespawnSync)
+            {
+                if (!SilvertailNextRespawnUtcByPlayfield.TryGetValue(pf, out timers)
+                    || timers == null
+                    || timers.Length != indices.Length)
+                {
+                    timers = new DateTime[indices.Length];
+                    for (int i = 0; i < timers.Length; i++)
+                    {
+                        timers[i] = DateTime.MaxValue;
+                    }
+
+                    SilvertailNextRespawnUtcByPlayfield[pf] = timers;
+                }
+            }
+
+            for (int slot = 0; slot < indices.Length; slot++)
+            {
+                LifeNpc def = Npcs[indices[slot]];
+                if (def.PlayfieldId != pf)
+                {
+                    continue;
+                }
+
+                if (HasLivingSwiftSilvertailNear(playfield, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+                else if (timers[slot] == DateTime.MaxValue)
+                {
+                    timers[slot] = DateTime.UtcNow.AddSeconds(SwiftSilvertailRespawnSeconds);
+                }
+                else if (!(timers[slot] > DateTime.UtcNow)
+                         && SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+            }
+        }
+
+        private static bool HasLivingSwiftSilvertailNear(Playfield playfield, LifeNpc def)
+        {
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
+            {
+                if (candidate == null
+                    || candidate.Controller is PlayerController
+                    || !string.Equals(candidate.Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0)
+                {
+                    continue;
+                }
+
+                float dx = candidate.Coordinates().x - def.X;
+                float dz = candidate.Coordinates().z - def.Z;
+                if ((dx * dx) + (dz * dz) <= SoftRespawnAliveProximityMetersSq)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void TickSpiritHunterRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                SpiritHunterSpawnIndices,
+                SpiritHunterRespawnSync,
+                SpiritHunterNextRespawnUtcByPlayfield,
+                SpiritHunterRespawnSeconds,
+                "Nascence Spirit Hunter");
+        }
+
+        public static void TickCascadingSpiritRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                CascadingSpiritSpawnIndices,
+                CascadingSpiritRespawnSync,
+                CascadingSpiritNextRespawnUtcByPlayfield,
+                CascadingSpiritRespawnSeconds,
+                "Cascading Spirit");
+        }
+
+        public static void TickTempterusRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                TempterusSpawnIndices,
+                TempterusRespawnSync,
+                TempterusNextRespawnUtcByPlayfield,
+                TempterusRespawnSeconds,
+                "Tempterus");
+        }
+
+        public static void TickPredatorStrikerRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                PredatorStrikerSpawnIndices,
+                PredatorStrikerRespawnSync,
+                PredatorStrikerNextRespawnUtcByPlayfield,
+                PredatorStrikerRespawnSeconds,
+                "Predator Striker");
+        }
+
+        public static void TickDeadlyPredatorRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                DeadlyPredatorSpawnIndices,
+                DeadlyPredatorRespawnSync,
+                DeadlyPredatorNextRespawnUtcByPlayfield,
+                DeadlyPredatorRespawnSeconds,
+                "Deadly Predator");
+        }
+
+        public static void TickPapagenoRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                PapagenoSpawnIndices,
+                PapagenoRespawnSync,
+                PapagenoNextRespawnUtcByPlayfield,
+                PapagenoRespawnSeconds,
+                "Papageno");
+        }
+
+        public static void TickHiathlinRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawnByDefName(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                HiathlinSpawnIndices,
+                HiathlinRespawnSync,
+                HiathlinNextRespawnUtcByPlayfield,
+                HiathlinRespawnSeconds);
+        }
+
+        public static void TickOmathonRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                OmathonSpawnIndices,
+                OmathonRespawnSync,
+                OmathonNextRespawnUtcByPlayfield,
+                OmathonRespawnSeconds,
+                "Omathon");
+        }
+
+        public static void TickHesosasRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            TickNamedSoftRespawn(
+                playfield,
+                playfieldIdentity,
+                activateNpc,
+                HesosasSpawnIndices,
+                HesosasRespawnSync,
+                HesosasNextRespawnUtcByPlayfield,
+                HesosasRespawnSeconds,
+                "Hesosas");
+        }
+
+        private static void TickNamedSoftRespawnByDefName(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc,
+            int[] indices,
+            object sync,
+            Dictionary<int, DateTime[]> timersByPlayfield,
+            double respawnSeconds)
+        {
+            if (playfield == null || activateNpc == null || indices == null || indices.Length == 0)
+            {
+                return;
+            }
+
+            int pf = playfieldIdentity.Instance;
+            if (pf != NascenceLifeContentModule.FrontierPlayfieldId
+                && pf != NascenceLifeContentModule.WildsPlayfieldId
+                && pf != NascenceLifeContentModule.CorePlayfieldId
+                && pf != NascenceLifeContentModule.Nascence4313PlayfieldId)
+            {
+                return;
+            }
+
+            DateTime[] timers;
+            lock (sync)
+            {
+                if (!timersByPlayfield.TryGetValue(pf, out timers)
+                    || timers == null
+                    || timers.Length != indices.Length)
+                {
+                    timers = new DateTime[indices.Length];
+                    for (int i = 0; i < timers.Length; i++)
+                    {
+                        timers[i] = DateTime.MaxValue;
+                    }
+
+                    timersByPlayfield[pf] = timers;
+                }
+            }
+
+            for (int slot = 0; slot < indices.Length; slot++)
+            {
+                LifeNpc def = Npcs[indices[slot]];
+                if (def.PlayfieldId != pf)
+                {
+                    continue;
+                }
+
+                if (HasLivingNamedNpcNear(playfield, def, def.Name))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+                else if (timers[slot] == DateTime.MaxValue)
+                {
+                    timers[slot] = DateTime.UtcNow.AddSeconds(respawnSeconds);
+                }
+                else if (!(timers[slot] > DateTime.UtcNow)
+                         && SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+            }
+        }
+
+        private static void TickNamedSoftRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc,
+            int[] indices,
+            object sync,
+            Dictionary<int, DateTime[]> timersByPlayfield,
+            double respawnSeconds,
+            string npcName)
+        {
+            if (playfield == null || activateNpc == null || indices == null || indices.Length == 0)
+            {
+                return;
+            }
+
+            int pf = playfieldIdentity.Instance;
+            if (pf != NascenceLifeContentModule.FrontierPlayfieldId
+                && pf != NascenceLifeContentModule.WildsPlayfieldId
+                && pf != NascenceLifeContentModule.CorePlayfieldId
+                && pf != NascenceLifeContentModule.Nascence4313PlayfieldId)
+            {
+                return;
+            }
+
+            DateTime[] timers;
+            lock (sync)
+            {
+                if (!timersByPlayfield.TryGetValue(pf, out timers)
+                    || timers == null
+                    || timers.Length != indices.Length)
+                {
+                    timers = new DateTime[indices.Length];
+                    for (int i = 0; i < timers.Length; i++)
+                    {
+                        timers[i] = DateTime.MaxValue;
+                    }
+
+                    timersByPlayfield[pf] = timers;
+                }
+            }
+
+            for (int slot = 0; slot < indices.Length; slot++)
+            {
+                LifeNpc def = Npcs[indices[slot]];
+                if (def.PlayfieldId != pf)
+                {
+                    continue;
+                }
+
+                if (HasLivingNamedNpcNear(playfield, def, npcName))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+                else if (timers[slot] == DateTime.MaxValue)
+                {
+                    timers[slot] = DateTime.UtcNow.AddSeconds(respawnSeconds);
+                }
+                else if (!(timers[slot] > DateTime.UtcNow)
+                         && SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+            }
+        }
+
+        private static bool HasLivingNamedNpcNear(Playfield playfield, LifeNpc def, string npcName)
+        {
+            float proximitySq = SoftRespawnAliveProximityMetersSq;
+            if (string.Equals(npcName, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(npcName, "Hiathlin Prime", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(npcName, "Omathon", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(npcName, "Deadly Predator", StringComparison.OrdinalIgnoreCase))
+            {
+                // PF4310 patrol / pocket bosses can drift from spawn anchor.
+                proximitySq = 8100f; // 90m
+            }
+
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
+            {
+                if (candidate == null
+                    || candidate.Controller is PlayerController
+                    || !string.Equals(candidate.Name, npcName, StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0)
+                {
+                    continue;
+                }
+
+                float dx = candidate.Coordinates().x - def.X;
+                float dz = candidate.Coordinates().z - def.Z;
+                if ((dx * dx) + (dz * dz) <= proximitySq)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Mike: Cascading Spirit social aggro within 10m (capture 20260823-103458 cave pack).
+        /// </summary>
+        public static ICharacter[] FindCascadingSpiritSocialAggroAllies(ICharacter npc, ICharacter target)
+        {
+            if (npc == null
+                || target == null
+                || npc.Playfield == null
+                || !string.Equals(npc.Name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ICharacter[0];
+            }
+
+            Playfield playfield = npc.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return new ICharacter[0];
+            }
+
+            var allies = new List<ICharacter>();
+            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, CascadingSpiritSocialAggroRadiusMeters);
+            for (int i = 0; i < inRange.Count; i++)
+            {
+                ICharacter candidate = inRange[i];
+                if (candidate == null
+                    || candidate.Identity.Instance == npc.Identity.Instance
+                    || !(candidate.Controller is NPCController)
+                    || !string.Equals(candidate.Name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0
+                    || candidate.FightingTarget.Instance != 0)
+                {
+                    continue;
+                }
+
+                allies.Add(candidate);
+            }
+
+            return allies.ToArray();
+        }
+
+        /// <summary>
+        /// Mike: Predator Striker social aggro within 10m (capture 20260826-054154 pocket).
+        /// </summary>
+        public static ICharacter[] FindPredatorStrikerSocialAggroAllies(ICharacter npc, ICharacter target)
+        {
+            if (npc == null
+                || target == null
+                || npc.Playfield == null
+                || !string.Equals(npc.Name, "Predator Striker", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ICharacter[0];
+            }
+
+            Playfield playfield = npc.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return new ICharacter[0];
+            }
+
+            var allies = new List<ICharacter>();
+            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, PredatorStrikerSocialAggroRadiusMeters);
+            for (int i = 0; i < inRange.Count; i++)
+            {
+                ICharacter candidate = inRange[i];
+                if (candidate == null
+                    || candidate.Identity.Instance == npc.Identity.Instance
+                    || !(candidate.Controller is NPCController)
+                    || !string.Equals(candidate.Name, "Predator Striker", StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0
+                    || candidate.FightingTarget.Instance != 0)
+                {
+                    continue;
+                }
+
+                allies.Add(candidate);
+            }
+
+            return allies.ToArray();
+        }
+
+        public static void TickPapagenaAreaRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            if (playfield == null || activateNpc == null)
+            {
+                return;
+            }
+
+            int pf = playfieldIdentity.Instance;
+            if (pf != NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                return;
+            }
+
+            int[] indices = PapagenaAreaSpawnIndices;
+            DateTime[] timers;
+            lock (PapagenaAreaRespawnSync)
+            {
+                if (!PapagenaAreaNextRespawnUtcByPlayfield.TryGetValue(pf, out timers)
+                    || timers == null
+                    || timers.Length != indices.Length)
+                {
+                    timers = new DateTime[indices.Length];
+                    for (int i = 0; i < timers.Length; i++)
+                    {
+                        timers[i] = DateTime.MaxValue;
+                    }
+
+                    PapagenaAreaNextRespawnUtcByPlayfield[pf] = timers;
+                }
+            }
+
+            for (int slot = 0; slot < indices.Length; slot++)
+            {
+                LifeNpc def = Npcs[indices[slot]];
+                if (def.PlayfieldId != pf)
+                {
+                    continue;
+                }
+
+                double respawnSeconds = IsPapagenaName(def.Name)
+                    ? PapagenaRespawnSeconds
+                    : PapagenaPadRespawnSeconds;
+
+                if (HasLivingMobNear(playfield, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+                else if (timers[slot] == DateTime.MaxValue)
+                {
+                    timers[slot] = DateTime.UtcNow.AddSeconds(respawnSeconds);
+                }
+                else if (!(timers[slot] > DateTime.UtcNow)
+                         && SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+            }
+        }
+
+        private static bool HasLivingMobNear(Playfield playfield, LifeNpc def)
+        {
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
+            {
+                if (candidate == null
+                    || candidate.Controller is PlayerController
+                    || !string.Equals(candidate.Name, def.Name, StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0)
+                {
+                    continue;
+                }
+
+                float dx = candidate.Coordinates().x - def.X;
+                float dz = candidate.Coordinates().z - def.Z;
+                if ((dx * dx) + (dz * dz) <= SoftRespawnAliveProximityMetersSq)
                 {
                     return true;
                 }
@@ -311,58 +1928,101 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Garden 160734 — patrol cluster @ 806/1189 (route 1/3).
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
-                Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 801.6231f, Y = 31.56786f, Z = 1129.49622f,
-                Hx = -0.0236401837f, Hy = 0.9518418f, Hz = -0.0258387476f, Hw = 0.304582834f,
+                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
+                X = 806.3f, Y = 29.7f, Z = 1189.1f,
+                Hx = 0.102776475f, Hy = -0.57205826f, Hz = 0.0179232024f, Hw = 0.813550949f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 805.997f, 29.410f, 1193.337f },
+                    new[] { 817.752f, 29.079f, 1187.273f },
+                },
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
                 Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 800.006653f, Y = 31.8195724f, Z = 1140.99878f,
-                Hx = 0.009077307f, Hy = 0.9384965f, Hz = -0.0411957279f, Hw = 0.3427024f,
+                X = 806.5f, Y = 29.7f, Z = 1189.5f,
+                Hx = 0.012532426f, Hy = -0.335815579f, Hz = 0.03512459f, Hw = 0.94118917f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 789.936f, 31.561f, 1195.725f },
+                    new[] { 796.934f, 31.674f, 1181.981f },
+                },
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
+                PlayfieldId = 4310,
+                Name = "Barking Chimera",
+                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
+                X = 806.1f, Y = 29.7f, Z = 1188.7f,
+                Hx = 0f, Hy = 0.9368594f, Hz = 0f, Hw = 0.349706143f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 810.740f, 29.316f, 1177.945f },
+                    new[] { 830.257f, 31.155f, 1181.520f },
+                },
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                // Garden 160734 — patrol cluster @ 803/1213 (route 1/3).
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
                 Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 797.4636f, Y = 31.6989822f, Z = 1137.09949f,
-                Hx = 0.0218827482f, Hy = -0.4985364f, Hz = 0.00372411148f, Hw = 0.866584539f,
+                X = 802.8f, Y = 29.2f, Z = 1213.2f,
+                Hx = 0.00485091656f, Hy = 0.06504547f, Hz = -0.07421241f, Hw = 0.995107055f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 815.7023f, 29.9654f, 1207.0614f },
+                    new[] { 825.2365f, 31.3955f, 1200.2180f },
+                },
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
-                Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 798.784058f, Y = 31.2747478f, Z = 1146.1875f,
-                Hx = -0.123434789f, Hy = -0.521226764f, Hz = 0.07649574f, Hw = 0.8409726f,
+                Level = 5, Health = 150, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
+                X = 802.9f, Y = 29.2f, Z = 1213.0f,
+                Hx = 0f, Hy = -0.168575823f, Hz = 0f, Hw = 0.9856887f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 802.2364f, 30.5391f, 1184.5519f },
+                    new[] { 807.8224f, 29.7839f, 1177.8626f },
+                },
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
-                Level = 7, Health = 210, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 812.357849f, Y = 29.4696751f, Z = 1199.39172f,
-                Hx = 0.0425954573f, Hy = -0.57115835f, Hz = 0.0609642528f, Hw = 0.8174638f,
+                Level = 5, Health = 150, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
+                X = 802.7f, Y = 29.2f, Z = 1213.4f,
+                Hx = 0f, Hy = -0.52254647f, Hz = 0f, Hw = 0.8526108f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 825.517f, 33.010f, 1146.048f },
+                    new[] { 841.762f, 32.410f, 1142.206f },
+                },
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
@@ -379,64 +2039,9 @@ namespace AORebirth.Core.Playfields
             {
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
-                Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 839.994263f, Y = 32.41f, Z = 1163.60571f,
-                Hx = 0.012532426f, Hy = -0.335815579f, Hz = 0.03512459f, Hw = 0.94118917f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 832.9226f, Y = 31.39936f, Z = 1112.11914f,
-                Hx = -0.05329775f, Hy = -0.182693735f, Hz = -0.02893404f, Hw = 0.9812977f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 5, Health = 150, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 833.1536f, Y = 32.41f, Z = 1147.37561f,
-                Hx = 0f, Hy = -0.168575823f, Hz = 0f, Hw = 0.9856887f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 837.2839f, Y = 32.55868f, Z = 1124.33264f,
-                Hx = 0.102776475f, Hy = -0.57205826f, Hz = 0.0179232024f, Hw = 0.813550949f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
                 Level = 7, Health = 210, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
                 X = 845.581848f, Y = 41.7555733f, Z = 1119.59875f,
                 Hx = -0.113041125f, Hy = -0.7208961f, Hz = -0.09206367f, Hw = 0.677535832f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 858.564941f, Y = 32.41f, Z = 1129.86133f,
-                Hx = 0f, Hy = 0.9368594f, Hz = 0f, Hw = 0.349706143f,
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
@@ -467,138 +2072,6 @@ namespace AORebirth.Core.Playfields
             {
                 PlayfieldId = 4310,
                 Name = "Barking Chimera",
-                Level = 5, Health = 150, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 824.589233f, Y = 33.01f, Z = 1149.45435f,
-                Hx = 0f, Hy = -0.52254647f, Hz = 0f, Hw = 0.8526108f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 812.1899f, Y = 31.8100014f, Z = 1153.59827f,
-                Hx = 0f, Hy = -0.517937243f, Hz = 0f, Hw = 0.8554186f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 791.6495f, Y = 30.6756248f, Z = 1199.9696f,
-                Hx = -0.07097294f, Hy = -0.9938572f, Hz = -0.0764534846f, Hw = 0.0369537622f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 786.2057f, Y = 31.491827f, Z = 1199.972f,
-                Hx = -0.0694403946f, Hy = -0.992927134f, Hz = -0.07784804f, Hw = 0.0566873737f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 792.1826f, Y = 32.3868446f, Z = 1171.02832f,
-                Hx = -0.0729095f, Hy = -0.9776364f, Hz = -0.014670331f, Hw = 0.19671303f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 796.502258f, Y = 31.7389011f, Z = 1179.06018f,
-                Hx = 0.005314837f, Hy = 0.0712661445f, Hz = -0.0741806254f, Hw = 0.994680941f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 7, Health = 210, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 795.511169f, Y = 29.5036964f, Z = 1203.92078f,
-                Hx = -0.0394788049f, Hy = -0.9170823f, Hz = -0.09655934f, Hw = 0.384808749f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 7, Health = 210, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 803.072937f, Y = 30.2965984f, Z = 1186.09009f,
-                Hx = -0.140426084f, Hy = -0.9567671f, Hz = -0.03698792f, Hw = 0.252010345f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 5, Health = 150, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 797.5988f, Y = 32.1744156f, Z = 1164.67932f,
-                Hx = -0.0498541631f, Hy = -0.6684897f, Hz = -0.0551867336f, Hw = 0.739993632f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 824.9189f, Y = 29.5538311f, Z = 1180.48779f,
-                Hx = -0.0473911539f, Hy = 0.6354634f, Hz = 0.05731572f, Hw = 0.768541f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 7, Health = 210, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 793.202759f, Y = 32.2338257f, Z = 1175.68335f,
-                Hx = -0.07415868f, Hy = -0.994386733f, Hz = -0.005612699f, Hw = 0.07525996f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 796.9241f, Y = 31.6756287f, Z = 1181.88953f,
-                Hx = 0.00485091656f, Hy = 0.06504547f, Hz = -0.07421241f, Hw = 0.995107055f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Barking Chimera",
                 Level = 8, Health = 240, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
                 X = 845.5315f, Y = 32.41f, Z = 1137.07373f,
                 Hx = 0f, Hy = 0.9330358f, Hz = 0f, Hw = 0.35978356f,
@@ -609,24 +2082,86 @@ namespace AORebirth.Core.Playfields
             new LifeNpc
             {
                 PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 7, Health = 210, MonsterData = 209173, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 823.823853f, Y = 30.1292858f, Z = 1167.0686f,
-                Hx = 0.06190039f, Hy = 0.148934349f, Hz = 0.0839879f, Hw = 0.9833275f,
+                Name = "Nascence Spirit Hunter",
+                Level = 12, Health = 975, MonsterData = 209215, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 857.9946f, Y = 17.345f, Z = 1435.7676f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-230406",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A19FD9E",
             },
             new LifeNpc
             {
                 PlayfieldId = 4310,
-                Name = "Barking Chimera",
-                Level = 6, Health = 180, MonsterData = 209173, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 820.3805f, Y = 31.3058929f, Z = 1159.389f,
-                Hx = 0.00708977459f, Hy = 0.992688954f, Hz = 0.07403095f, Hw = 0.09506733f,
+                Name = "Cascading Spirit",
+                Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 853.9039f, Y = 16.865f, Z = 1340.2701f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-230406",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A1B444F",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Cascading Spirit",
+                Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 839.4312f, Y = 7.21f, Z = 1370.654f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A1C3B73",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Cascading Spirit",
+                Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 869.8517f, Y = 9.365f, Z = 1364.7692f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A1C3B88",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Cascading Spirit",
+                Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 840.1165f, Y = 7.21f, Z = 1370.1171f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A2260E0",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Nascence Spirit Hunter",
+                Level = 12, Health = 975, MonsterData = 209215, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 862.5264f, Y = 7.21f, Z = 1376.4276f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A226153",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Cascading Spirit",
+                Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 854.4845f, Y = 16.865f, Z = 1342.1422f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A233B75",
             },
             new LifeNpc
             {
@@ -644,11 +2179,12 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4310,
                 Name = "Cascading Spirit",
                 Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 910.6001f, Y = 21.865f, Z = 1373.40747f,
+                X = 906.8674f, Y = 16.865f, Z = 1369.0242f,
                 Hx = 0f, Hy = -0.756919265f, Hz = 0f, Hw = 0.6535084f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A1C3CA1",
             },
             new LifeNpc
             {
@@ -666,22 +2202,24 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4310,
                 Name = "Cascading Spirit",
                 Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 879.510437f, Y = 9.365f, Z = 1366.3927f,
+                X = 877.6614f, Y = 9.365f, Z = 1369.1194f,
                 Hx = 0f, Hy = -0.397909284f, Hz = 0f, Hw = 0.917424738f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A1C3B42",
             },
             new LifeNpc
             {
                 PlayfieldId = 4310,
                 Name = "Cascading Spirit",
                 Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 876.6606f, Y = 9.365f, Z = 1357.41931f,
+                X = 876.0099f, Y = 9.365f, Z = 1357.9469f,
                 Hx = 0f, Hy = 0.8991294f, Hz = 0f, Hw = 0.437682927f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A233B6C",
             },
             new LifeNpc
             {
@@ -743,11 +2281,12 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4310,
                 Name = "Cascading Spirit",
                 Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 863.6624f, Y = 9.845f, Z = 1418.43823f,
+                X = 865.7973f, Y = 9.845f, Z = 1420.8308f,
                 Hx = 0f, Hy = -0.93436414f, Hz = 0f, Hw = 0.356319547f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A233A2E",
             },
             new LifeNpc
             {
@@ -798,11 +2337,12 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4310,
                 Name = "Cascading Spirit",
                 Level = 10, Health = 250, MonsterData = 217008, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 848.896362f, Y = 16.865f, Z = 1341.54822f,
+                X = 848.916f, Y = 16.865f, Z = 1341.5485f,
                 Hx = 0f, Hy = -0.76239866f, Hz = 0f, Hw = 0.6471076f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A1C3B70",
             },
             new LifeNpc
             {
@@ -839,6 +2379,7 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260825-202932 Corrupting Imp 7A2ED7B9 SAW 134 VQIR; patrol near boss.
                 PlayfieldId = 4310,
                 Name = "Corrupting Imp",
                 Level = 20, Health = 950, MonsterData = 40515, Scale = 99, VisualFlags = 31, HeadMesh = 0,
@@ -846,7 +2387,12 @@ namespace AORebirth.Core.Playfields
                 Hx = 0f, Hy = -0.960809469f, Hz = 0f, Hw = 0.27720958f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 775.64f, 31.80f, 1560.05f },
+                    new[] { 779.44f, 31.34f, 1565.29f },
+                },
+                CaptureFolder = "20260825-202932",
             },
             new LifeNpc
             {
@@ -943,17 +2489,6 @@ namespace AORebirth.Core.Playfields
                 Level = 10, Health = 250, MonsterData = 209333, Scale = 95, VisualFlags = 31, HeadMesh = 0,
                 X = 830.412048f, Y = 49.5189934f, Z = 1210.2074f,
                 Hx = 0f, Hy = -0.5051915f, Hz = 0f, Hw = 0.8630073f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Crippler of Growth",
-                Level = 10, Health = 250, MonsterData = 209333, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 852.0092f, Y = 49.56143f, Z = 1304.20044f,
-                Hx = 0f, Hy = -0.253662169f, Hz = 0f, Hw = 0.967292845f,
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
@@ -1191,47 +2726,243 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260826-054154 Deadly Predator 7A2FFA29 @ striker pocket edge (~747/1968).
                 PlayfieldId = 4310,
                 Name = "Deadly Predator",
                 Level = 20, Health = 2375, MonsterData = 209022, Scale = 128, VisualFlags = 31, HeadMesh = 0,
-                X = 747.832f, Y = 30.8255939f, Z = 1968.407f,
-                Hx = -0.0167237986f, Hy = 0.900533855f, Hz = -0.04348213f, Hw = 0.4322828f,
+                X = 747.658936f, Y = 30.809124f, Z = 1968.21631f,
+                Hx = 0f, Hy = 0.900533855f, Hz = 0f, Hw = 0.4322828f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-054154",
             },
             new LifeNpc
             {
+                // Capture 20260825-202932 Deadly Predator 7A2ED7B6 ExtTex sabre self 235170 SAW 171.
                 PlayfieldId = 4310,
                 Name = "Deadly Predator",
                 Level = 20, Health = 2375, MonsterData = 209022, Scale = 128, VisualFlags = 31, HeadMesh = 0,
-                X = 737.471558f, Y = 26.2740288f, Z = 1585.73315f,
+                X = 737.1644f, Y = 26.258f, Z = 1584.936f,
                 Hx = 0.000331116054f, Hy = 0.6274317f, Hz = -0.0306506716f, Hw = 0.778068066f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260825-202932",
             },
             new LifeNpc
             {
+                // Capture 20260823-112044 Disease-Ridden Rafter 7A226106 Side=Monster.
                 PlayfieldId = 4310,
                 Name = "Disease-Ridden Rafter",
                 Level = 9, Health = 180, MonsterData = 212186, Scale = 125, VisualFlags = 31, HeadMesh = 0,
-                X = 731.7516f, Y = 32.3260078f, Z = 1355.41174f,
-                Hx = -0.05579865f, Hy = -0.659141064f, Hz = 0.0491666235f, Hw = 0.7483329f,
+                X = 720.0085f, Y = 31.8100014f, Z = 1356.88525f,
+                Hx = -0.01602128f, Hy = 0.73755366f, Hz = 0.01466116f, Hw = 0.6749392f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 720.0085f, 31.8100014f, 1356.88525f },
+                    new[] { 732.1141f, 32.3813438f, 1355.809f },
+                },
+                CaptureFolder = "20260823-112044",
             },
             new LifeNpc
             {
+                // Capture 20260823-112044 Disease-Ridden Rafter 7A233C9B near Papageno.
+                PlayfieldId = 4310,
+                Name = "Disease-Ridden Rafter",
+                Level = 8, Health = 160, MonsterData = 212186, Scale = 125, VisualFlags = 31, HeadMesh = 0,
+                X = 680.027832f, Y = 30.1591129f, Z = 1360.96619f,
+                Hx = 0.03018842f, Hy = 0.88050664f, Hz = -0.09919795f, Hw = 0.4625543f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 680.027832f, 30.1591129f, 1360.96619f },
+                    new[] { 685.252747f, 30.0100021f, 1357.39661f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                // Capture 20260822-082554 SCFU 7A18D419: Omni questgiver (blue name), flags=277352961.
                 PlayfieldId = 4310,
                 Name = "Dr. Rosenblatt",
-                Level = 100, Health = 6829, MonsterData = 26131, Scale = 112, VisualFlags = 31, HeadMesh = 40253,
+                Level = 100, Health = 6829, MonsterData = 26131, Scale = 112, VisualFlags = 31,
+                CharacterFlags = 277352961, HeadMesh = 40253,
                 X = 882.7177f, Y = 28.8100014f, Z = 1572.25793f,
                 Hx = 0f, Hy = -0.06911527f, Hz = 0f, Hw = 0.997608364f,
                 Textures = new[] { new[] { 0, 248006 }, new[] { 1, 247963 }, new[] { 2, 247978 }, new[] { 3, 247917 }, new[] { 4, 248056 } },
                 Meshes = new[] { new[] { 0, 234533, 0, 0 }, new[] { 0, 40253, 0, 4 } },
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260822-082554",
+            },
+            new LifeNpc
+            {
+                // Capture 20260822-103209 fight + 082554 SCFU 7A18D461: monsterscale=194, ExtTex "grey" fire, no mesh layer.
+                // Clan Papagena — not the Omni Papageno target.
+                PlayfieldId = 4310,
+                Name = "Papagena",
+                Level = 15, Health = 840, MonsterData = 236640, Scale = 194, VisualFlags = 31, HeadMesh = 0,
+                X = 955.5843f, Y = 33.3049965f, Z = 1266.085f,
+                Hx = 0f, Hy = 0.183506534f, Hz = 0f, Hw = 0.9830185f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 955.5843f, 33.3049965f, 1266.085f },
+                    new[] { 958.32312f, 33.9243622f, 1264.25464f },
+                },
+                CaptureFolder = "20260822-103209",
+            },
+            new LifeNpc
+            {
+                // Capture 20260823-112044 SCFU 7A226136 Papageno OmniTek MD=208640 mesh 209532;
+                // Capture 20260825-204815 SCFU 7A2ED761 mesh 209541 SAW 139/139/139/101 AttackInfo=32.
+                // waypoints (681.29,30.81,1343.87)->(688.60,32.41,1320.36); Clan Silvertail disc kill target.
+                PlayfieldId = 4310,
+                Name = "Papageno",
+                Level = 15, Health = 840, MonsterData = 208640, Scale = 194, VisualFlags = 31, HeadMesh = 0,
+                CharacterFlags = DefaultAnimalCharacterFlags,
+                X = 681.2867f, Y = 30.809f, Z = 1343.86975f,
+                Hx = 0f, Hy = 0.988645f, Hz = 0f, Hw = 0.150269851f,
+                Textures = null,
+                Meshes = new[] { new[] { 1, 209541, 0, 2 } },
+                Waypoints = new[]
+                {
+                    new[] { 681.2867f, 30.809f, 1343.86975f },
+                    new[] { 688.60f, 32.41f, 1320.36f },
+                },
+                CaptureFolder = "20260825-204815",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Frail Rafter",
+                Level = 10, Health = 300, MonsterData = 212186, Scale = 125, VisualFlags = 31, HeadMesh = 0,
+                X = 916.5201f, Y = 28.838072f, Z = 1268.65063f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260822-104635",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Frail Rafter",
+                Level = 10, Health = 300, MonsterData = 212186, Scale = 125, VisualFlags = 31, HeadMesh = 0,
+                X = 992.7034f, Y = 29.521513f, Z = 1291.54272f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260822-104635",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Swift Silvertail",
+                Level = 6, Health = 270, MonsterData = 208922, Scale = 93, VisualFlags = 31, HeadMesh = 0,
+                X = 966.397034f, Y = 27.61f, Z = 1297.86719f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260822-104635",
+            },
+            new LifeNpc
+            {
+                // Garden 160734 Hai-Tempterus patrol cluster — 4 distinct capture routes @ ~994/1271.
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 9, Health = 225, MonsterData = 209182, Scale = 142, VisualFlags = 31, HeadMesh = 0,
+                X = 989.706f, Y = 30.272f, Z = 1248.109f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 989.706f, 30.272f, 1248.109f },
+                    new[] { 993.992f, 29.709f, 1273.231f },
+                },
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 9, Health = 225, MonsterData = 209182, Scale = 142, VisualFlags = 31, HeadMesh = 0,
+                X = 990.984f, Y = 31.774f, Z = 1231.224f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 990.984f, 31.774f, 1231.224f },
+                    new[] { 999.211f, 31.098f, 1263.571f },
+                },
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 8, Health = 200, MonsterData = 209182, Scale = 141, VisualFlags = 31, HeadMesh = 0,
+                X = 973.784f, Y = 31.210f, Z = 1215.306f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 973.784f, 31.210f, 1215.306f },
+                    new[] { 991.287f, 31.709f, 1232.448f },
+                },
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 9, Health = 225, MonsterData = 209182, Scale = 142, VisualFlags = 31, HeadMesh = 0,
+                X = 1012.224f, Y = 33.740f, Z = 1259.360f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 1012.224f, 33.740f, 1259.360f },
+                    new[] { 1013.781f, 36.362f, 1238.263f },
+                },
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 8, Health = 200, MonsterData = 209182, Scale = 141, VisualFlags = 31, HeadMesh = 0,
+                X = 943.0371f, Y = 27.835f, Z = 1235.41211f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260822-104635",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 9, Health = 225, MonsterData = 209182, Scale = 142, VisualFlags = 31, HeadMesh = 0,
+                X = 952.894531f, Y = 28.183382f, Z = 1232.35547f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260822-104635",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Hai-Tempterus",
+                Level = 9, Health = 225, MonsterData = 209182, Scale = 142, VisualFlags = 31, HeadMesh = 0,
+                X = 956.829f, Y = 29.807936f, Z = 1221.108f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260822-104635",
             },
             new LifeNpc
             {
@@ -1390,487 +3121,594 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFD73
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 780.718262f, Y = 31.210001f, Z = 1752.508910f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFD74
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 655.7766f, Y = 52.6449966f, Z = 1856.12476f,
-                Hx = 0f, Hy = -0.27611953f, Hz = 0f, Hw = 0.9611233f,
+                X = 781.519100f, Y = 31.210001f, Z = 1767.033810f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-225804",
             },
             new LifeNpc
             {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE4E
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 784.334656f, Y = 31.210001f, Z = 1737.349370f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE46
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 784.384033f, Y = 30.323670f, Z = 1777.581420f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 812.571167f, 26.915647f, 1787.342650f },
+                    new[] { 775.703125f, 31.210001f, 1774.565920f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE4C
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 788.887146f, Y = 31.210001f, Z = 1756.482790f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 811.693237f, 31.210001f, 1732.054570f },
+                    new[] { 804.681946f, 31.210001f, 1728.911130f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE4D
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 789.502400f, Y = 31.210001f, Z = 1730.788570f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE48
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 792.868300f, Y = 30.049507f, Z = 1770.924930f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFD70
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 794.684300f, Y = 31.210001f, Z = 1721.945310f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE49
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 794.703200f, Y = 31.210001f, Z = 1729.588620f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 798.418152f, 31.210001f, 1725.845460f },
+                    new[] { 791.719666f, 31.210001f, 1732.654910f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE4B
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 795.614258f, Y = 30.579650f, Z = 1764.644650f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 816.271729f, 28.835663f, 1751.613770f },
+                    new[] { 811.101868f, 28.724684f, 1761.466920f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE47
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 803.885132f, Y = 27.919825f, Z = 1774.106000f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE50
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 806.303900f, Y = 31.210001f, Z = 1719.103150f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE4F
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 811.136000f, Y = 31.210001f, Z = 1734.692000f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 792.114380f, 31.210001f, 1756.957030f },
+                    new[] { 790.121948f, 31.210001f, 1750.718140f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE45
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 815.574036f, Y = 31.210001f, Z = 1724.869510f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 785.971313f, 31.210001f, 1739.974610f },
+                    new[] { 790.208252f, 31.210001f, 1731.844730f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE51
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 816.596069f, Y = 31.210001f, Z = 1721.473750f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE4A
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 816.881200f, Y = 27.639343f, Z = 1766.979740f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE52
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 823.816900f, Y = 31.210001f, Z = 1729.878420f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE43
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 825.670900f, Y = 27.198381f, Z = 1754.772460f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A2FFE42
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 828.399353f, Y = 29.865330f, Z = 1740.701900f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A30AA96
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 829.845300f, Y = 26.371036f, Z = 1773.528930f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 837.538635f, 26.454039f, 1759.734740f },
+                    new[] { 824.579163f, 26.410002f, 1782.945560f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-225804 garden Hiathlin 7A30AA95
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 844.433533f, Y = 31.210001f, Z = 1739.721680f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 844.497314f, 31.210001f, 1734.318240f },
+                    new[] { 844.345276f, 30.748772f, 1746.559200f },
+                },
+                CaptureFolder = "20260826-225804",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED793
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 669.8592f, Y = 52.6449966f, Z = 1856.17236f,
-                Hx = 0f, Hy = 0.309086561f, Hz = 0f, Hw = 0.9510339f,
+                X = 711.748962f, Y = 33.05171f, Z = 1956.02954f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED794
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 709.331238f, Y = 32.17127f, Z = 1964.31689f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED795
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 671.866f, Y = 36.5488777f, Z = 1967.51208f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED796
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 695.489563f, Y = 32.95223f, Z = 1970.88745f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED797
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 700.7891f, Y = 34.09587f, Z = 1945.67529f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED799
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 17, Health = 740, MonsterData = 209196, Scale = 98, VisualFlags = 31, HeadMesh = 0,
-                X = 664.5936f, Y = 43.4343872f, Z = 1879.39343f,
-                Hx = 0f, Hy = 0.866026938f, Hz = 0f, Hw = 0.499997348f,
+                X = 667.7074f, Y = 35.41f, Z = 1941.89893f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED79A
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 681.897339f, Y = 31.8776226f, Z = 1924.42249f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED79C
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 700.0698f, Y = 33.3209839f, Z = 1958.9917f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 705.874756f, 33.9330254f, 1949.19739f },
+                    new[] { 698.997375f, 33.4654083f, 1960.73645f },
+                },
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7AA
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 17, Health = 740, MonsterData = 209196, Scale = 98, VisualFlags = 31, HeadMesh = 0,
-                X = 670.355042f, Y = 41.14103f, Z = 1870.66174f,
-                Hx = 0f, Hy = -0.88501364f, Hz = 0f, Hw = 0.4655651f,
+                X = 695.1429f, Y = 34.3428078f, Z = 1944.95081f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 709.141907f, 30.6925449f, 1899.47803f },
+                    new[] { 710.468445f, 30.9951954f, 1910.63464f },
+                },
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 647.9381f, Y = 51.885f, Z = 1877.556f,
-                Hx = 0f, Hy = 0.871629834f, Hz = 0f, Hw = 0.490164727f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 812.5447f, Y = 31.210001f, Z = 1725.77051f,
-                Hx = 0f, Hy = -0.799372435f, Hz = 0f, Hw = 0.60083586f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 789.039f, Y = 31.210001f, Z = 1758.0863f,
-                Hx = 0f, Hy = 0.03530803f, Hz = 0f, Hw = 0.9993765f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 802.484436f, Y = 31.210001f, Z = 1732.1842f,
-                Hx = 0f, Hy = 0.833514154f, Hz = 0f, Hw = 0.552498043f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 782.1261f, Y = 31.210001f, Z = 1766.106f,
-                Hx = 0f, Hy = 0.9119854f, Hz = 0f, Hw = 0.4102227f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 779.3374f, Y = 31.210001f, Z = 1752.5957f,
-                Hx = 0f, Hy = 0.6952419f, Hz = 0f, Hw = 0.7187758f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 783.565735f, Y = 31.210001f, Z = 1737.62366f,
-                Hx = 0f, Hy = 0.6328457f, Hz = 0f, Hw = 0.7742779f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 788.090942f, Y = 31.210001f, Z = 1730.88586f,
-                Hx = 0f, Hy = 0.395065218f, Hz = 0f, Hw = 0.9186531f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 795.110168f, Y = 31.210001f, Z = 1721.54114f,
-                Hx = 0f, Hy = 0.177027211f, Hz = 0f, Hw = 0.984205961f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 805.580139f, Y = 31.210001f, Z = 1719.0979f,
-                Hx = 0f, Hy = -0.0393752865f, Hz = 0f, Hw = 0.9992245f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 808.1019f, Y = 31.210001f, Z = 1727.92383f,
-                Hx = 0f, Hy = 0.593515f, Hz = 0f, Hw = 0.8048229f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 815.931946f, Y = 31.210001f, Z = 1721.73071f,
-                Hx = 0f, Hy = -0.216768369f, Hz = 0f, Hw = 0.976223052f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 823.5172f, Y = 31.210001f, Z = 1730.01648f,
-                Hx = 0f, Hy = -0.504765332f, Hz = 0f, Hw = 0.863256633f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 829.1001f, Y = 29.7933064f, Z = 1741.29236f,
-                Hx = 0f, Hy = -0.7662013f, Hz = 0f, Hw = 0.6426006f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 844.417f, Y = 31.09849f, Z = 1740.77173f,
-                Hx = 0f, Hy = 0.999980569f, Hz = 0f, Hw = 0.00623122f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 825.822266f, Y = 27.24478f, Z = 1754.46313f,
-                Hx = 0f, Hy = -0.8424425f, Hz = 0f, Hw = 0.538786232f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 817.047668f, Y = 27.45709f, Z = 1768.14258f,
-                Hx = 0f, Hy = -0.935698569f, Hz = 0f, Hw = 0.352800429f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 836.228943f, Y = 26.10209f, Z = 1762.081f,
-                Hx = 0f, Hy = 0.967775762f, Hz = 0f, Hw = 0.25181368f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 803.7242f, Y = 28.07465f, Z = 1773.23474f,
-                Hx = 0f, Hy = 0.9999974f, Hz = 0f, Hw = -0.0022759852f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 793.3675f, Y = 29.8730564f, Z = 1771.602f,
-                Hx = 0f, Hy = 0.986967146f, Hz = 0f, Hw = 0.160921961f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 811.175232f, Y = 31.210001f, Z = 1723.02319f,
-                Hx = 0f, Hy = 0.656905055f, Hz = 0f, Hw = 0.7539733f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 14, Health = 530, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 809.0716f, Y = 26.7337322f, Z = 1786.12988f,
-                Hx = 0f, Hy = 0.5798867f, Hz = 0f, Hw = 0.814697146f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 677.4404f, Y = 37.884716f, Z = 1886.10681f,
-                Hx = 0f, Hy = 0.503694534f, Hz = 0f, Hw = 0.8638818f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7AB
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 675.4793f, Y = 40.9663239f, Z = 1880.74463f,
-                Hx = 0f, Hy = 0.9999091f, Hz = 0f, Hw = 0.0134830447f,
+                X = 665.294067f, Y = 43.3049965f, Z = 1879.081f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7AC
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 700.8883f, Y = 33.75026f, Z = 1957.56079f,
-                Hx = 0f, Hy = -0.2653132f, Hz = 0f, Hw = 0.9641623f,
+                X = 673.4858f, Y = 41.1285057f, Z = 1872.72876f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 675.890625f, 41.0083046f, 1881.69299f },
+                    new[] { 672.58374f, 41.078476f, 1885.9873f },
+                },
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 702.2326f, Y = 32.8322029f, Z = 1937.379f,
-                Hx = 0f, Hy = -0.3536856f, Hz = 0f, Hw = 0.935364366f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 667.695862f, Y = 35.41f, Z = 1942.24927f,
-                Hx = 0f, Hy = -0.3921835f, Hz = 0f, Hw = 0.919887f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 671.3849f, Y = 36.4642f, Z = 1967.03345f,
-                Hx = 0f, Hy = 0.983696163f, Hz = 0f, Hw = 0.179838538f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 700.852f, Y = 34.08644f, Z = 1944.78479f,
-                Hx = 0f, Hy = -0.9869769f, Hz = 0f, Hw = 0.160861731f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7AD
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 17, Health = 740, MonsterData = 209196, Scale = 98, VisualFlags = 31, HeadMesh = 0,
-                X = 711.5008f, Y = 33.08912f, Z = 1955.48462f,
-                Hx = 0f, Hy = -0.7334501f, Hz = 0f, Hw = 0.6797433f,
+                X = 670.1218f, Y = 52.6449966f, Z = 1856.219f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7AE
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
-                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 694.5962f, Y = 32.9694748f, Z = 1970.528f,
-                Hx = 0f, Hy = 0.998580635f, Hz = 0f, Hw = 0.05326054f,
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 655.6686f, Y = 52.6449966f, Z = 1857.03162f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7AF
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
-                Level = 17, Health = 740, MonsterData = 209196, Scale = 98, VisualFlags = 31, HeadMesh = 0,
-                X = 708.915955f, Y = 32.3685455f, Z = 1963.417f,
-                Hx = 0f, Hy = -0.9355087f, Hz = 0f, Hw = 0.353303581f,
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 673.4858f, Y = 41.1285057f, Z = 1872.72876f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 675.890625f, 41.0083046f, 1881.69299f },
+                    new[] { 672.58374f, 41.078476f, 1885.9873f },
+                },
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7B0
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
-                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 673.6141f, Y = 41.1292229f, Z = 1872.813f,
-                Hx = 0f, Hy = -0.909099f, Hz = 0f, Hw = 0.41658017f,
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 673.4858f, Y = 41.1285057f, Z = 1872.72876f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-230406",
+                Waypoints = new[]
+                {
+                    new[] { 675.890625f, 41.0083046f, 1881.69299f },
+                    new[] { 672.58374f, 41.078476f, 1885.9873f },
+                },
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 17, Health = 740, MonsterData = 209196, Scale = 98, VisualFlags = 31, HeadMesh = 0,
-                X = 700.666138f, Y = 33.3366966f, Z = 1939.06067f,
-                Hx = 0f, Hy = -0.3483315f, Hz = 0f, Hw = 0.937371433f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 694.4202f, Y = 30.4998074f, Z = 1912.80518f,
-                Hx = 0f, Hy = -0.1855896f, Hz = 0f, Hw = 0.982627332f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin",
-                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 681.960144f, Y = 31.79365f, Z = 1923.86267f,
-                Hx = 0f, Hy = -0.925891936f, Hz = 0f, Hw = 0.377788454f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2ED7B1
                 PlayfieldId = 4310,
                 Name = "Hiathlin",
                 Level = 17, Health = 740, MonsterData = 209196, Scale = 98, VisualFlags = 31, HeadMesh = 0,
-                X = 658.4672f, Y = 36.83804f, Z = 1936.06909f,
-                Hx = 0f, Hy = -0.9916824f, Hz = 0f, Hw = 0.1287091f,
+                X = 676.8149f, Y = 37.8474274f, Z = 1886.10266f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-230406",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 pocket Hiathlin 7A2F8BE0
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 15, Health = 600, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 665.047058f, Y = 35.2877235f, Z = 1944.84351f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 710.078857f, 31.210001f, 1925.35474f },
+                    new[] { 703.997925f, 32.3718987f, 1935.81262f },
+                },
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 pocket Hiathlin 7A2F8BE5
+                PlayfieldId = 4310,
+                Name = "Hiathlin",
+                Level = 16, Health = 670, MonsterData = 209196, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 678.308167f, Y = 34.5136452f, Z = 1938.12378f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 695.958801f, 30.1410866f, 1908.84558f },
+                    new[] { 690.914185f, 31.4733429f, 1921.75562f },
+                },
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 Hesosas 7A2ED792
+                PlayfieldId = 4310,
+                Name = "Hesosas",
+                Level = 18, Health = 2025, MonsterData = 209196, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                X = 710.5007f, Y = 32.98488f, Z = 1957.72339f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 Hiathlin Prime 7A2ED7A7
                 PlayfieldId = 4310,
                 Name = "Hiathlin Prime",
-                Level = 21, Health = 1020, MonsterData = 209196, Scale = 99, VisualFlags = 31, HeadMesh = 0,
-                X = 600.7067f, Y = 86.815f, Z = 1826.89917f,
-                Hx = 0f, Hy = -0.972833f, Hz = 0f, Hw = 0.231507987f,
+                Level = 29, Health = 1572, MonsterData = 209196, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                X = 591.0072f, Y = 84.44859f, Z = 1820.082f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
+                // Capture 20260826-055143 Hiathlin Prime 7A2ED7A8
+                PlayfieldId = 4310,
+                Name = "Hiathlin Prime",
+                Level = 28, Health = 1504, MonsterData = 209196, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                X = 604.3509f, Y = 86.815f, Z = 1832.94983f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-055143",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-055143 Hiathlin Prime 7A2ED7A9
                 PlayfieldId = 4310,
                 Name = "Hiathlin Prime",
                 Level = 26, Health = 1368, MonsterData = 209196, Scale = 100, VisualFlags = 31, HeadMesh = 0,
-                X = 619.881348f, Y = 75.77046f, Z = 1837.75879f,
-                Hx = 0f, Hy = 0.8562659f, Hz = 0f, Hw = 0.5165353f,
+                X = 620.648743f, Y = 75.65764f, Z = 1837.41638f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Hiathlin Prime",
-                Level = 30, Health = 1640, MonsterData = 209196, Scale = 100, VisualFlags = 31, HeadMesh = 0,
-                X = 590.663269f, Y = 84.4648361f, Z = 1819.72192f,
-                Hx = 0f, Hy = -0.5682291f, Hz = 0f, Hw = 0.822870433f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-055143",
             },
             new LifeNpc
             {
@@ -2019,28 +3857,6 @@ namespace AORebirth.Core.Playfields
             new LifeNpc
             {
                 PlayfieldId = 4310,
-                Name = "Nascence Spirit Hunter",
-                Level = 12, Health = 975, MonsterData = 209215, Scale = 96, VisualFlags = 31, HeadMesh = 0,
-                X = 839.9991f, Y = 7.61144066f, Z = 1353.38123f,
-                Hx = 0f, Hy = -0.930074f, Hz = 0f, Hw = 0.3673723f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Nascence Spirit Hunter",
-                Level = 12, Health = 975, MonsterData = 209215, Scale = 96, VisualFlags = 31, HeadMesh = 0,
-                X = 886.4476f, Y = 11.1831331f, Z = 1376.75671f,
-                Hx = 0f, Hy = -0.8525298f, Hz = 0f, Hw = 0.522678554f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
                 Name = "Omathon",
                 Level = 15, Health = 1500, MonsterData = 209196, Scale = 145, VisualFlags = 31, HeadMesh = 0,
                 X = 802.67334f, Y = 31.210001f, Z = 1747.513f,
@@ -2048,6 +3864,35 @@ namespace AORebirth.Core.Playfields
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
+            },
+            new LifeNpc
+            {
+                // Capture 20260823-112044 Predator Striker 7A226107 fought near Papageno (loot+respawn).
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 10, Health = 250, MonsterData = 209022, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 706.4015f, Y = 30.6967926f, Z = 1351.44971f,
+                Hx = 0.00336162f, Hy = 0.99621147f, Hz = 0.07429365f, Hw = 0.04507653f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                // Capture 20260823-112044 Predator Striker 7A202DB0 fought (AttackInfo Amount=8).
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 10, Health = 250, MonsterData = 209022, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 782.2719f, Y = 26.2491436f, Z = 1309.10071f,
+                Hx = 0.06680033f, Hy = -0.4383286f, Hz = -0.03268887f, Hw = 0.89573276f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 782.2719f, 26.2491436f, 1309.10071f },
+                    new[] { 770.6011f, 28.0296783f, 1318.04944f },
+                },
+                CaptureFolder = "20260823-112044",
             },
             new LifeNpc
             {
@@ -2137,13 +3982,122 @@ namespace AORebirth.Core.Playfields
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
             },
+            // Capture 20260826-054154 Predator Striker pocket ~755-810/1900-1965 (12 spawns; patrol in OutdoorMobRuntime).
             new LifeNpc
             {
                 PlayfieldId = 4310,
                 Name = "Predator Striker",
                 Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 774.3574f, Y = 31.210001f, Z = 1928.18591f,
-                Hx = 0f, Hy = -0.9947921f, Hz = 0f, Hw = 0.10192474f,
+                X = 794.750061f, Y = 31.210001f, Z = 1902.32019f,
+                Hx = 0f, Hy = 0.0198501f, Hz = 0f, Hw = 0.9998029f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 756.767f, Y = 31.210001f, Z = 1909.91064f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 772.6582f, Y = 31.210001f, Z = 1919.97949f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 776.882935f, Y = 31.210001f, Z = 1929.22363f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 762.076965f, Y = 31.210001f, Z = 1942.66f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 802.872253f, Y = 31.210001f, Z = 1945.83679f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 790.3375f, Y = 31.210001f, Z = 1936.46448f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 766.3778f, Y = 31.210001f, Z = 1953.64856f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 800.4486f, Y = 31.70385f, Z = 1964.01709f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 755.2589f, Y = 31.210001f, Z = 1906.75f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 808.7332f, Y = 31.210001f, Z = 1924.254f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 759.6166f, Y = 31.210001f, Z = 1920.06677f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null, Meshes = null, CaptureFolder = "20260826-054154",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 10, Health = 250, MonsterData = 209022, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 767.686768f, Y = 28.9124489f, Z = 1294.529f,
+                Hx = 0.142293423f, Hy = 0.969489753f, Hz = -0.0289858077f, Hw = 0.1974893f,
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
@@ -2152,84 +4106,7 @@ namespace AORebirth.Core.Playfields
             {
                 PlayfieldId = 4310,
                 Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 791.166138f, Y = 31.210001f, Z = 1937.78491f,
-                Hx = 0f, Hy = -0.002065808f, Hz = 0f, Hw = 0.999997854f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 768.6301f, Y = 31.210001f, Z = 1929.32849f,
-                Hx = 0f, Hy = -0.703103542f, Hz = 0f, Hw = 0.711087465f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 756.6271f, Y = 30.4522552f, Z = 1959.95532f,
-                Hx = 0.143583149f, Hy = 0.9797627f, Hz = 0.138189629f, Hw = 0.0187787376f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 766.7366f, Y = 31.210001f, Z = 1952.96521f,
-                Hx = 0f, Hy = 0.6383045f, Hz = 0f, Hw = 0.769784033f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 801.6139f, Y = 31.6375084f, Z = 1963.04285f,
-                Hx = -0.03635054f, Hy = -0.992057f, Hz = 0.0224505439f, Hw = 0.11831104f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 819.122253f, Y = 31.210001f, Z = 1929.23181f,
-                Hx = 0f, Hy = -0.32135734f, Hz = 0f, Hw = 0.946958f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 795.26355f, Y = 31.210001f, Z = 1908.3302f,
-                Hx = 0f, Hy = 0.9999542f, Hz = 0f, Hw = -0.009567336f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                Level = 13, Health = 460, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
                 X = 727.0008f, Y = 32.7817841f, Z = 1592.11169f,
                 Hx = -0.00492549874f, Hy = 0.509932637f, Hz = -0.0512838624f, Hw = 0.8586701f,
                 Textures = null,
@@ -2250,61 +4127,6 @@ namespace AORebirth.Core.Playfields
             new LifeNpc
             {
                 PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 758.93396f, Y = 31.210001f, Z = 1915.348f,
-                Hx = 0f, Hy = 0.07518691f, Hz = 0f, Hw = 0.997169435f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 10, Health = 250, MonsterData = 209022, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 767.686768f, Y = 28.9124489f, Z = 1294.529f,
-                Hx = 0.142293423f, Hy = 0.969489753f, Hz = -0.0289858077f, Hw = 0.1974893f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 772.4324f, Y = 31.210001f, Z = 1918.88867f,
-                Hx = 0f, Hy = -0.9947897f, Hz = 0f, Hw = 0.101948291f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 791.477966f, Y = 31.210001f, Z = 1928.90784f,
-                Hx = 0f, Hy = 0.793569f, Hz = 0f, Hw = 0.6084802f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Predator Striker",
-                Level = 15, Health = 600, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
-                X = 772.581848f, Y = 31.210001f, Z = 1889.00928f,
-                Hx = 0f, Hy = -0.568614244f, Hz = 0f, Hw = 0.8226043f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
                 Name = "Sabina Florenta",
                 Level = 100, Health = 8195, MonsterData = 259890, Scale = 112, VisualFlags = 31, HeadMesh = 223849,
                 X = 884.188843f, Y = 28.8443241f, Z = 1575.22693f,
@@ -2312,6 +4134,18 @@ namespace AORebirth.Core.Playfields
                 Textures = new[] { new[] { 0, 248006 }, new[] { 1, 247963 }, new[] { 2, 247978 }, new[] { 3, 247917 }, new[] { 4, 248056 } },
                 Meshes = new[] { new[] { 0, 234532, 0, 0 }, new[] { 0, 223849, 0, 4 } },
                 CaptureFolder = "20260718-170408",
+            },
+            // Capture 20260826-160734 — not previously in LifeSpawn (no Hwall / no Spinetooth).
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Rainbow Feathers",
+                Level = 15, Health = 1500, MonsterData = 209182, Scale = 242, VisualFlags = 31, HeadMesh = 0,
+                X = 888.914063f, Y = 30.0100021f, Z = 1250.3916f,
+                Hx = 0f, Hy = 0.650363743f, Hz = 0f, Hw = 0.759622931f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
@@ -2357,25 +4191,37 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260825-202932 Slivering Chimera 7A2ED7C1 ExtTex low2:208969 SAW 88 HP 368.
                 PlayfieldId = 4310,
                 Name = "Slivering Chimera",
-                Level = 12, Health = 312, MonsterData = 209173, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                Level = 12, Health = 368, MonsterData = 209173, Scale = 96, VisualFlags = 31, HeadMesh = 0,
                 X = 778.767f, Y = 27.61f, Z = 1609.97363f,
                 Hx = 0f, Hy = 0.198784322f, Hz = 0f, Hw = 0.9800433f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 786.0128f, 29.5924f, 1602.8093f },
+                    new[] { 795.7056f, 31.7217f, 1606.3458f },
+                },
+                CaptureFolder = "20260825-202932",
             },
             new LifeNpc
             {
+                // Capture 20260825-202932 Slivering Chimera 7A2ED7C4.
                 PlayfieldId = 4310,
                 Name = "Slivering Chimera",
-                Level = 15, Health = 480, MonsterData = 209173, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                Level = 12, Health = 368, MonsterData = 209173, Scale = 96, VisualFlags = 31, HeadMesh = 0,
                 X = 785.8796f, Y = 29.4451218f, Z = 1603.605f,
                 Hx = -0.0383969247f, Hy = 0.6390103f, Hz = 0.156461075f, Hw = 0.7521379f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 775.5828f, 27.894f, 1602.1064f },
+                    new[] { 781.5366f, 28.4405f, 1616.5199f },
+                },
+                CaptureFolder = "20260825-202932",
             },
             new LifeNpc
             {
@@ -2390,6 +4236,52 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260825-202932 Slivering Chimera 7A2ED6B6 @ demonic fork mouth.
+                PlayfieldId = 4310,
+                Name = "Slivering Chimera",
+                Level = 15, Health = 480, MonsterData = 209173, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 811.2371f, Y = 31.21f, Z = 1656.7668f,
+                Hx = 0f, Hy = 0.34553647f, Hz = 0f, Hw = 0.938405335f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 802.203f, 30.340f, 1649.725f },
+                    new[] { 813.361f, 31.210f, 1657.542f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Predator Striker 7A2ED7BF @ demonic fork mouth.
+                PlayfieldId = 4310,
+                Name = "Predator Striker",
+                Level = 14, Health = 530, MonsterData = 209022, Scale = 97, VisualFlags = 31, HeadMesh = 0,
+                X = 809.1596f, Y = 31.9899f, Z = 1640.8262f,
+                Hx = 0f, Hy = 0.6274317f, Hz = 0f, Hw = 0.7786681f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 802.856f, 31.210f, 1626.312f },
+                    new[] { 809.984f, 31.914f, 1643.277f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            // Capture 20260826-160734 — not previously in LifeSpawn.
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Starry Feathers",
+                Level = 15, Health = 1500, MonsterData = 209189, Scale = 387, VisualFlags = 31, HeadMesh = 0,
+                X = 682.484741f, Y = 32.7887077f, Z = 1270.67664f,
+                Hx = 0f, Hy = -0.166885644f, Hz = 0f, Hw = 0.9859763f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
                 PlayfieldId = 4310,
                 Name = "Soul Dredge",
                 Level = 15, Health = 1500, MonsterData = 209215, Scale = 97, VisualFlags = 31, HeadMesh = 0,
@@ -2401,36 +4293,105 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260826-135727 Swift Silvertail 7A2ED6BF @ Spinetooth zone entry.
                 PlayfieldId = 4310,
-                Name = "Spinetooth Hatchling",
-                Level = 20, Health = 950, MonsterData = 226557, Scale = 99, VisualFlags = 31, HeadMesh = 0,
-                X = 1022.86749f, Y = 28.8791046f, Z = 1641.27429f,
-                Hx = 0f, Hy = -0.9507933f, Hz = 0f, Hw = 0.309825838f,
+                Name = "Swift Silvertail",
+                Level = 10, Health = 450, MonsterData = 208922, Scale = 95, VisualFlags = 31, HeadMesh = 0,
+                X = 896.613f, Y = 30.708f, Z = 1614.367f,
+                Hx = -0.0510836765f, Hy = 0.6849761f, Hz = 0.0540506355f, Hw = 0.724759758f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 896.613f, 30.708f, 1614.367f },
+                    new[] { 899.060f, 31.210f, 1584.261f },
+                },
+                CaptureFolder = "20260826-135727",
             },
             new LifeNpc
             {
+                // Capture 20260826-051307 Spinetooth 7A2ED6F5 @ north loop.
                 PlayfieldId = 4310,
                 Name = "Spinetooth Hatchling",
                 Level = 20, Health = 950, MonsterData = 226557, Scale = 99, VisualFlags = 31, HeadMesh = 0,
-                X = 982.58606f, Y = 31.210001f, Z = 1610.51086f,
-                Hx = 0f, Hy = 0.553366065f, Hz = 0f, Hw = 0.8329382f,
+                X = 980.916138f, Y = 30.1901321f, Z = 1656.24475f,
+                Hx = 0f, Hy = 0.9808188f, Hz = 0f, Hw = 0.194921732f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 980.916138f, 30.1901321f, 1656.24475f },
+                    new[] { 984.4677f, 30.0100021f, 1644.71875f },
+                },
+                CaptureFolder = "20260826-051307",
             },
             new LifeNpc
             {
+                // Capture 20260826-051307 Spinetooth 7A2ED6F4 @ west pocket.
                 PlayfieldId = 4310,
                 Name = "Spinetooth Hatchling",
                 Level = 20, Health = 950, MonsterData = 226557, Scale = 99, VisualFlags = 31, HeadMesh = 0,
-                X = 983.386536f, Y = 29.9239788f, Z = 1648.16565f,
-                Hx = 0f, Hy = 0.9884741f, Hz = 0f, Hw = 0.1513904f,
+                X = 978.669067f, Y = 31.210001f, Z = 1604.36829f,
+                Hx = 0f, Hy = 0.085654214f, Hz = 0f, Hw = 0.9963249f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                Waypoints = new[]
+                {
+                    new[] { 978.669067f, 31.210001f, 1604.36829f },
+                    new[] { 979.681763f, 31.210001f, 1610.21423f },
+                },
+                CaptureFolder = "20260826-051307",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-051307 Spinetooth 7A2ED6F3 @ east pocket.
+                PlayfieldId = 4310,
+                Name = "Spinetooth Hatchling",
+                Level = 20, Health = 950, MonsterData = 226557, Scale = 99, VisualFlags = 31, HeadMesh = 0,
+                X = 1019.60406f, Y = 29.09971f, Z = 1636.85632f,
+                Hx = 0f, Hy = 0.3125347f, Hz = 0f, Hw = 0.949906349f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 1019.60406f, 29.09971f, 1636.85632f },
+                    new[] { 1023.84265f, 28.9718666f, 1642.6062f },
+                },
+                CaptureFolder = "20260826-051307",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Stalking Predator 7A2ED6BC.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 13, Health = 460, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 808.8242f, Y = 32.0691f, Z = 1666.4951f,
+                Hx = -0.0196583718f, Hy = 0.96176064f, Hz = -0.07172443f, Hw = 0.2636013f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 810.019f, 32.111f, 1668.380f },
+                    new[] { 810.717f, 31.705f, 1647.417f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Stalking Predator 7A2F8970.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 11, Health = 320, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 840.4116f, Y = 31.9013f, Z = 1686.4675f,
+                Hx = 0.0282715876f, Hy = 0.867516041f, Hz = -0.100414135f, Hw = 0.486347228f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 832.234f, 31.838f, 1683.955f },
+                    new[] { 850.801f, 31.809f, 1672.036f },
+                },
+                CaptureFolder = "20260825-202932",
             },
             new LifeNpc
             {
@@ -2456,6 +4417,91 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260825-202932 Stalking Predator 7A2ED6B7.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 13, Health = 460, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 852.0815f, Y = 31.202f, Z = 1676.2471f,
+                Hx = 0f, Hy = 0.509932637f, Hz = 0f, Hw = 0.8601921f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 856.148f, 32.154f, 1669.708f },
+                    new[] { 873.640f, 29.768f, 1676.816f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Stalking Predator 7A2ED6B8.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 12, Health = 390, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 858.8698f, Y = 31.3838f, Z = 1692.8748f,
+                Hx = 0f, Hy = 0.250692964f, Hz = 0f, Hw = 0.968076f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 871.169f, 30.139f, 1676.044f },
+                    new[] { 896.555f, 29.753f, 1682.269f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Stalking Predator 7A2ED6B9.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 12, Health = 390, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 869.3756f, Y = 30.01f, Z = 1688.6782f,
+                Hx = 0f, Hy = 0.04034139f, Hz = 0f, Hw = 0.999186f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 879.169f, 29.410f, 1665.192f },
+                    new[] { 896.555f, 29.753f, 1682.269f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Stalking Predator 7A2ED6BA.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 11, Health = 320, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 881.4546f, Y = 29.7961f, Z = 1658.1475f,
+                Hx = 0f, Hy = -0.00346746529f, Hz = 0f, Hw = 0.999994f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 824.339f, 31.103f, 1664.744f },
+                    new[] { 827.097f, 31.543f, 1679.124f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 Stalking Predator 7A2F8962.
+                PlayfieldId = 4310,
+                Name = "Stalking Predator",
+                Level = 11, Health = 320, MonsterData = 209022, Scale = 96, VisualFlags = 31, HeadMesh = 0,
+                X = 877.7025f, Y = 29.41f, Z = 1673.3356f,
+                Hx = 0f, Hy = 0.6849761f, Hz = 0f, Hw = 0.7286f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 813.569f, 32.008f, 1670.831f },
+                    new[] { 825.321f, 31.191f, 1664.130f },
+                },
+                CaptureFolder = "20260825-202932",
+            },
+            new LifeNpc
+            {
                 PlayfieldId = 4310,
                 Name = "Swift Silvertail",
                 Level = 17, Health = 1332, MonsterData = 208922, Scale = 98, VisualFlags = 31, HeadMesh = 0,
@@ -2472,28 +4518,6 @@ namespace AORebirth.Core.Playfields
                 Level = 12, Health = 702, MonsterData = 208922, Scale = 96, VisualFlags = 31, HeadMesh = 0,
                 X = 629.169556f, Y = 53.885f, Z = 1866.9425f,
                 Hx = 0f, Hy = 0.809404969f, Hz = 0f, Hw = 0.5872509f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Swift Silvertail",
-                Level = 10, Health = 450, MonsterData = 208922, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 896.4068f, Y = 30.6770172f, Z = 1651.239f,
-                Hx = -0.0510836765f, Hy = 0.6849761f, Hz = 0.0540506355f, Hw = 0.724759758f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Swift Silvertail",
-                Level = 8, Health = 360, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 783.1905f, Y = 28.6456451f, Z = 1259.67383f,
-                Hx = -0.05945165f, Hy = -0.177072227f, Hz = 0.0857192054f, Hw = 0.9786537f,
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
@@ -2524,45 +4548,13 @@ namespace AORebirth.Core.Playfields
             {
                 PlayfieldId = 4310,
                 Name = "Swift Silvertail",
-                Level = 6, Health = 270, MonsterData = 208922, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 796.074768f, Y = 29.8349342f, Z = 1254.71814f,
-                Hx = -0.09947748f, Hy = 0.882358134f, Hz = -0.03140881f, Hw = 0.4588702f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Swift Silvertail",
-                Level = 8, Health = 360, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 807.579346f, Y = 31.8100014f, Z = 1256.94775f,
-                Hx = 0f, Hy = -0.9545999f, Hz = 0f, Hw = 0.297891f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Swift Silvertail",
                 Level = 7, Health = 315, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 810.554138f, Y = 32.41f, Z = 1269.71216f,
+                X = 807.4224f, Y = 32.0287f, Z = 1265.9959f,
                 Hx = 0f, Hy = 0.792831659f, Hz = 0f, Hw = 0.6094407f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "Swift Silvertail",
-                Level = 7, Health = 315, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
-                X = 795.7993f, Y = 31.1858959f, Z = 1276.93713f,
-                Hx = -0.03532397f, Hy = 0.473568469f, Hz = 0.06546188f, Hw = 0.8776103f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-103458",
+                PatrolCaptureInstance = "7A226731",
             },
             new LifeNpc
             {
@@ -2624,11 +4616,44 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4310,
                 Name = "Swift Silvertail",
                 Level = 6, Health = 270, MonsterData = 208922, Scale = 93, VisualFlags = 31, HeadMesh = 0,
-                X = 799.6833f, Y = 30.320713f, Z = 1190.30188f,
+                X = 786.519f, Y = 29.036f, Z = 1229.889f,
                 Hx = 0.10369987f, Hy = 0.6226327f, Hz = -0.0113409711f, Hw = 0.7755297f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Swift Silvertail",
+                Level = 8, Health = 360, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
+                X = 765.531f, Y = 31.351f, Z = 1252.481f,
+                Hx = 0.158704013f, Hy = 0.9455033f, Hz = 0.0277024843f, Hw = 0.282964915f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Swift Silvertail",
+                Level = 8, Health = 360, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
+                X = 806.400f, Y = 29.410f, Z = 1224.275f,
+                Hx = -0.09947748f, Hy = 0.882358134f, Hz = -0.03140881f, Hw = 0.4588702f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-160734",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Swift Silvertail",
+                Level = 8, Health = 360, MonsterData = 208922, Scale = 94, VisualFlags = 31, HeadMesh = 0,
+                X = 812.620f, Y = 32.410f, Z = 1288.259f,
+                Hx = 0f, Hy = -0.9545999f, Hz = 0f, Hw = 0.297891f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-160734",
             },
             new LifeNpc
             {
@@ -2676,47 +4701,277 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
+                // Capture 20260823-112044 Tempterus pack (OmniTek flyers) — replace single old slot.
                 PlayfieldId = 4310,
                 Name = "Tempterus",
                 Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
-                X = 721.1043f, Y = 31.9774876f, Z = 1359.97229f,
-                Hx = 0f, Hy = 0.930585563f, Hz = 0f, Hw = 0.3660744f,
+                X = 684.326965f, Y = 33.09908f, Z = 1263.43445f,
+                Hx = 0f, Hy = -0.40794244f, Hz = 0f, Hw = 0.9130076f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260823-112044",
             },
             new LifeNpc
             {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 659.886536f, Y = 32.41f, Z = 1267.16284f,
+                Hx = 0f, Hy = 0.72313225f, Hz = 0f, Hw = 0.6907096f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 659.886536f, 32.41f, 1267.16284f },
+                    new[] { 664.2028f, 32.41f, 1266.96472f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 689.012146f, Y = 33.01f, Z = 1267.427f,
+                Hx = 0f, Hy = -0.9991893f, Hz = 0f, Hw = 0.04025825f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 689.012146f, 33.01f, 1267.427f },
+                    new[] { 688.723f, 33.118454f, 1263.84412f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 9, Health = 225, MonsterData = 209189, Scale = 237, VisualFlags = 31, HeadMesh = 0,
+                X = 634.4851f, Y = 32.64147f, Z = 1274.63367f,
+                Hx = 0f, Hy = 0.6736884f, Hz = 0f, Hw = 0.7390155f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
+                X = 677.780151f, Y = 32.3819f, Z = 1278.00745f,
+                Hx = 0f, Hy = 0.29466066f, Hz = 0f, Hw = 0.95560193f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
+                X = 685.434631f, Y = 32.63119f, Z = 1283.11536f,
+                Hx = 0f, Hy = 0.9971637f, Hz = 0f, Hw = 0.07526346f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 685.434631f, 32.63119f, 1283.11536f },
+                    new[] { 685.948547f, 33.3314934f, 1279.73071f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
+                X = 650.785156f, Y = 30.5857315f, Z = 1285.83f,
+                Hx = 0f, Hy = -0.99926496f, Hz = 0f, Hw = 0.03833538f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 650.785156f, 30.5857315f, 1285.83f },
+                    new[] { 650.330933f, 32.2f, 1279.99487f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 9, Health = 225, MonsterData = 209189, Scale = 237, VisualFlags = 31, HeadMesh = 0,
+                X = 627.9273f, Y = 32.45312f, Z = 1287.74084f,
+                Hx = 0f, Hy = 0.4257429f, Hz = 0f, Hw = 0.90484417f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 645.1165f, Y = 29.2592144f, Z = 1290.00757f,
+                Hx = 0f, Hy = 0.5848823f, Hz = 0f, Hw = 0.8111182f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 641.7504f, Y = 27.1053982f, Z = 1297.12708f,
+                Hx = 0f, Hy = -0.8046756f, Hz = 0f, Hw = 0.5937148f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 641.7504f, 27.1053982f, 1297.12708f },
+                    new[] { 638.5365f, 28.8364258f, 1296.10718f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 644.667969f, Y = 24.5189152f, Z = 1303.99585f,
+                Hx = 0f, Hy = 0.78351575f, Hz = 0f, Hw = 0.6213719f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 644.667969f, 24.5189152f, 1303.99585f },
+                    new[] { 646.6487f, 24.28283f, 1303.53247f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
+                X = 680.0311f, Y = 30.7910652f, Z = 1316.99377f,
+                Hx = 0f, Hy = 0.9749727f, Hz = 0f, Hw = 0.22232439f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 680.0311f, 30.7910652f, 1316.99377f },
+                    new[] { 683.634338f, 32.2454529f, 1309.504f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 713.163757f, Y = 32.41f, Z = 1335.629f,
+                Hx = 0f, Hy = 0.8064957f, Hz = 0f, Hw = 0.5912399f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                // Fought 7A226210 / loot path; near Disease-Ridden + Papageno.
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 9, Health = 225, MonsterData = 209189, Scale = 237, VisualFlags = 31, HeadMesh = 0,
+                X = 721.0239f, Y = 31.9694767f, Z = 1359.99927f,
+                Hx = 0f, Hy = 0.93011946f, Hz = 0f, Hw = 0.36725715f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 721.0239f, 31.9694767f, 1359.99927f },
+                    new[] { 731.900452f, 31.2660313f, 1348.37354f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 9, Health = 225, MonsterData = 209189, Scale = 237, VisualFlags = 31, HeadMesh = 0,
+                X = 659.3258f, Y = 31.210001f, Z = 1371.60693f,
+                Hx = 0f, Hy = -0.9227075f, Hz = 0f, Hw = 0.38550082f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 8, Health = 200, MonsterData = 209189, Scale = 236, VisualFlags = 31, HeadMesh = 0,
+                X = 680.0515f, Y = 30.8609562f, Z = 1373.58154f,
+                Hx = 0f, Hy = 0.7737947f, Hz = 0f, Hw = 0.63343644f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 680.0515f, 30.8609562f, 1373.58154f },
+                    new[] { 688.2116f, 31.23235f, 1371.93738f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
+                X = 680.0539f, Y = 31.7655258f, Z = 1383.60962f,
+                Hx = 0f, Hy = 0.76431894f, Hz = 0f, Hw = 0.6448384f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 680.0539f, 31.7655258f, 1383.60962f },
+                    new[] { 692.989441f, 32.41f, 1381.4f },
+                },
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4310,
+                Name = "Tempterus",
+                Level = 10, Health = 250, MonsterData = 209189, Scale = 238, VisualFlags = 31, HeadMesh = 0,
+                X = 681.1344f, Y = 32.41f, Z = 1391.806f,
+                Hx = 0f, Hy = 0.8940439f, Hz = 0f, Hw = 0.4479793f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260823-112044",
+            },
+            new LifeNpc
+            {
+                // Capture 20260825-202932 SCFU 7A2ED7C3 boss: MD 223690 HP 3800 Scale 99 RunSpeed 69 npcFamily 174.
                 PlayfieldId = 4310,
                 Name = "The Demonic Subjugator",
                 Level = 20, Health = 3800, MonsterData = 223690, Scale = 99, VisualFlags = 31, HeadMesh = 0,
-                X = 733.1211f, Y = 32.41f, Z = 1566.25366f,
-                Hx = 0f, Hy = -0.905781567f, Hz = 0f, Hw = 0.4237449f,
+                X = 733.1152f, Y = 32.41f, Z = 1565.043f,
+                Hx = 0f, Hy = -0.9351043f, Hz = 0f, Hw = 0.3543726f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
+                CaptureFolder = "20260825-202932",
             },
             new LifeNpc
             {
+                // Capture 20260823-103221 SCFU 7A226263: bridge spawn was wrong; Lady stands at cave ledge.
                 PlayfieldId = 4310,
                 Name = "The Lady",
                 Level = 15, Health = 1500, MonsterData = 217022, Scale = 145, VisualFlags = 31, HeadMesh = 0,
-                X = 819.721f, Y = 17.345f, Z = 1393.61853f,
-                Hx = 0f, Hy = 0.9339151f, Hz = 0f, Hw = 0.35749498f,
+                X = 818.644958f, Y = 17.345f, Z = 1392.973f,
+                Hx = 0f, Hy = 0.875993431f, Hz = 0f, Hw = 0.482323021f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-170408",
-            },
-            new LifeNpc
-            {
-                PlayfieldId = 4310,
-                Name = "The Lady",
-                Level = 15, Health = 1500, MonsterData = 217022, Scale = 145, VisualFlags = 31, HeadMesh = 0,
-                X = 817.885254f, Y = 29.762764f, Z = 1165.924f,
-                Hx = 0f, Hy = 0.9251146f, Hz = 0f, Hw = 0.379688025f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
+                CaptureFolder = "20260823-103221",
             },
             new LifeNpc
             {
@@ -2739,6 +4994,18 @@ namespace AORebirth.Core.Playfields
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-170408",
+            },
+            new LifeNpc
+            {
+                // Capture 20260826-212737 outdoor Weaver probe (7A2ED6A8 @ 1043/1666).
+                PlayfieldId = 4310,
+                Name = "Weaver of Malice",
+                Level = 15, Health = 600, MonsterData = 209354, Scale = 39, VisualFlags = 31, HeadMesh = 0,
+                X = 1043.56824f, Y = 31.3046932f, Z = 1666.442f,
+                Hx = 0f, Hy = -0.265198827f, Hz = 0f, Hw = 0.964193761f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260826-212737",
             },
             new LifeNpc
             {
@@ -2943,11 +5210,12 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4310,
                 Name = "Yuttos Nascence Geosurvey Dog",
                 Level = 10, Health = 150, MonsterData = 209173, Scale = 95, VisualFlags = 31, HeadMesh = 0,
-                X = 800.0171f, Y = 32.41f, Z = 1159.321f,
+                X = 799.5469f, Y = 29.2789f, Z = 1208.9022f,
                 Hx = 0f, Hy = 0.994135857f, Hz = 0f, Hw = 0.108138159f,
                 Textures = null,
                 Meshes = null,
-                CaptureFolder = "20260718-230406",
+                CaptureFolder = "20260823-000659",
+                PatrolCaptureInstance = "7A202B50",
             },
             new LifeNpc
             {
@@ -7387,11 +9655,12 @@ namespace AORebirth.Core.Playfields
                 PlayfieldId = 4312,
                 Name = "Ecclesiast Aban Fala",
                 Level = 40, Health = 9280, MonsterData = 214078, Scale = 140, VisualFlags = 31, HeadMesh = 0,
+                CharacterFlags = AbanFalaCharacterFlags,
                 X = 1893.47546f, Y = 68.465004f, Z = 690.309143f,
                 Hx = 0f, Hy = 0.5387633f, Hz = 0f, Hw = 0.8424551f,
                 Textures = null,
                 Meshes = new[] { new[] { 1, 234636, 0, 2 } },
-                CaptureFolder = "20260718-180726",
+                CaptureFolder = "20260822-224319",
             },
             new LifeNpc
             {
@@ -9477,6 +11746,28 @@ namespace AORebirth.Core.Playfields
                 Meshes = null,
                 CaptureFolder = "20260723-221330",
             },
+            new LifeNpc
+            {
+                // Capture 20260822-224319 SCFU SimpleChar:7A2013BC Garden of Aban.
+                PlayfieldId = NascenceLifeContentModule.GardenOfAbanPlayfieldId,
+                Name = "Sipius Aban Lux-Wei",
+                Level = 40,
+                Health = 2320,
+                MonsterData = 214067,
+                Scale = 140,
+                VisualFlags = 31,
+                HeadMesh = 0,
+                X = 468.5054f,
+                Y = 116.985f,
+                Z = 495.266968f,
+                Hx = 0f,
+                Hy = -0.944331765f,
+                Hz = 0f,
+                Hw = 0.328994632f,
+                Textures = null,
+                Meshes = new[] { new[] { 1, 234635, 0, 2 } },
+                CaptureFolder = "20260822-224319",
+            },
         };
 
         public static void SpawnForPlayfield(
@@ -9495,12 +11786,24 @@ namespace AORebirth.Core.Playfields
                 && pf != NascenceLifeContentModule.CorePlayfieldId
                 && pf != NascenceLifeContentModule.Nascence4313PlayfieldId
                 && pf != NascenceLifeContentModule.JobeResearchPlayfieldId
-                && pf != NascenceLifeContentModule.GoldmanAretePlayfieldId)
+                && pf != NascenceLifeContentModule.GoldmanAretePlayfieldId
+                && pf != NascenceLifeContentModule.GardenOfAbanPlayfieldId)
             {
                 return;
             }
 
             int spawned = 0;
+            if (pf == NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                lock (FrontierForkDeferredSync)
+                {
+                    FrontierForkDeferredNpcIndices.Clear();
+                    FrontierForkDeferredSpawnedKeys.Clear();
+                    FrontierForkLoginReadyAtUtc.Clear();
+                    FrontierForkDeferredLastBatchAtUtc = DateTime.MinValue;
+                }
+            }
+
             for (int i = 0; i < Npcs.Length; i++)
             {
                 LifeNpc def = Npcs[i];
@@ -9509,9 +11812,34 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                if (SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                if (ShouldDeferFrontierForkSpawn(def))
                 {
-                    spawned++;
+                    lock (FrontierForkDeferredSync)
+                    {
+                        FrontierForkDeferredNpcIndices.Add(i);
+                    }
+
+                    continue;
+                }
+
+                if (ShouldSkipFrontierForkCrashSpawn(def))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    if (SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                    {
+                        spawned++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "NascenceLifeSpawn SpawnOne threw npc=" + def.Name
+                        + " ex=" + ex.GetType().Name + ": " + ex.Message);
                 }
             }
 
@@ -9606,35 +11934,359 @@ namespace AORebirth.Core.Playfields
             // Match OrdinaryEnemyRuntimeService.SetHeadMesh (Value+BaseValue + layer-4 mesh).
             ApplyCaptureHeadMesh(mob, def.HeadMesh);
 
+            if (IsPapagenaName(def.Name))
+            {
+                // Capture 20260823-112044 SCFU Side=Clan (Data Disk quest clan target).
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)PapagenaNpcFamily);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Clan);
+                mob.Stats[StatIds.side].Value = (int)Side.Clan;
+            }
+            else if (IsRedeemedVillageClanNpcName(def.Name))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)AbanFalaNpcFamily);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Clan);
+                mob.Stats[StatIds.side].Value = (int)Side.Clan;
+            }
+            else if (string.Equals(def.Name, "Papageno", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044 SCFU npcFamily=207 Side=Omni.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)PapagenaNpcFamily);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Omni);
+                mob.Stats[StatIds.side].Value = (int)Side.Omni;
+            }
+            else if (string.Equals(def.Name, "Dr. Rosenblatt", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260822-082554 Omni-side questgiver — blue name (Side=Omni).
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Omni);
+                mob.Stats[StatIds.side].Value = (int)Side.Omni;
+            }
+            else if (string.Equals(def.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)BarkingChimeraNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)GeosurveyDogNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)SwiftSilvertailNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)NascenceSpiritHunterNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Soul Dredge", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)SoulDredgeNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Disease-Ridden Rafter", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)DiseaseRiddenRafterNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Tempterus", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044 SCFU Side=OmniTek npcFamily=202.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)TempterusNpcFamily);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Omni);
+                mob.Stats[StatIds.side].Value = (int)Side.Omni;
+            }
+            else if (string.Equals(def.Name, "Predator Striker", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)PredatorStrikerNpcFamily);
+            }
+            else if (string.Equals(def.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)CripplerOfGrowthNpcFamily);
+            }
+
+            NascenceSwampClanMobRuntime.ApplySpawnStats(mob, def.Name);
+            NascenceFrontierOutdoorMobRuntime.ApplySpawnStats(mob, def.Name);
+
+            uint killXp = ResolveCaptureKillXp(def.Name);
+            if (killXp > 0)
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.xp, killXp);
+            }
+
+            if (string.Equals(def.Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase)
+                && (def.Textures == null || def.Textures.Length == 0))
+            {
+                mob.Textures.Clear();
+                mob.Textures.Add(new AOTextures(0, SwiftSilvertailTextureSlot0));
+                mob.Textures.Add(new AOTextures(1, SwiftSilvertailTextureSlot1));
+            }
+
             string combatFailure;
-            CapturedEnemyCombatContract combatContract =
-                string.Equals(def.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
-                    ? BuildBarkingChimeraCombatContract()
-                    : CapturedEnemyCombatContract.Unresolved(
-                        "NascenceLifeSpawn capture-backed actor has no source-local WIFU/attack-start/AttackInfo contract mapped; source NPC="
-                        + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
+            CapturedEnemyCombatContract combatContract;
+            if (string.Equals(def.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildBarkingChimeraCombatContract();
+            }
+            else if (string.Equals(def.Name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildGeosurveyDogCombatContract();
+            }
+            else if (string.Equals(def.Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildSwiftSilvertailCombatContract();
+            }
+            else if (string.Equals(def.Name, "Papagena", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildPapagenaCombatContract();
+            }
+            else if (string.Equals(def.Name, "Papageno", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildPapagenoCombatContract();
+            }
+            else if (string.Equals(def.Name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildNascenceSpiritHunterCombatContract();
+            }
+            else if (string.Equals(def.Name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildCascadingSpiritCombatContract();
+            }
+            else if (string.Equals(def.Name, "Soul Dredge", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildSoulDredgeCombatContract();
+            }
+            else if (string.Equals(def.Name, "Disease-Ridden Rafter", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildDiseaseRiddenRafterCombatContract();
+            }
+            else if (string.Equals(def.Name, "Tempterus", StringComparison.OrdinalIgnoreCase))
+            {
+                combatContract = BuildTempterusCombatContract();
+            }
+            else if (string.Equals(def.Name, "Predator Striker", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!NascenceFrontierOutdoorMobRuntime.TryGetCombatContract(def.Name, out combatContract))
+                {
+                    combatContract = BuildPredatorStrikerCombatContract();
+                }
+            }
+            else if (string.Equals(def.Name, "The Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(def.Name, "Demonic Subjugator", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260825-202932 7A2ED7C3 SAW 171/171/171/134 VQIR + AttackInfo 36|69.
+                if (!NascenceFrontierOutdoorMobRuntime.TryGetCombatContract(def.Name, out combatContract))
+                {
+                    combatContract = CapturedEnemyCombatContract.Unresolved(
+                        "Demonic Subjugator combat contract missing",
                         true);
+                }
+            }
+            else if (string.Equals(def.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044: SAW + Attack engaged, but no mob AttackInfo before death.
+                combatContract = BuildCripplerOfGrowthCombatContractSawOnly();
+            }
+            else if (NascenceFrontierOutdoorMobRuntime.TryGetCombatContract(def.Name, out combatContract))
+            {
+                // Corrupting Imp, Stalking/Deadly Predator, Malah-Ana, Weaver, Slivering, etc.
+            }
+            else
+            {
+                combatContract = CapturedEnemyCombatContract.Unresolved(
+                    "NascenceLifeSpawn capture-backed actor has no source-local WIFU/attack-start/AttackInfo contract mapped; source NPC="
+                    + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
+                    true);
+            }
+
             if (string.Equals(def.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
             {
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 16u);
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 38u);
+                ApplyRunSpeed(mob, 24);
+            }
+            else if (string.Equals(def.Name, "Papagena", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, 52u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 4u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 8u);
+            }
+            else if (string.Equals(def.Name, "Papageno", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044 AttackInfo Amount=32; SCFU RunSpeedBase=52.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, 52u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 32u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 32u);
+            }
+            else if (string.Equals(def.Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 6u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 7u);
+                ApplyRunSpeed(mob, 21);
+            }
+            else if (string.Equals(def.Name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 16u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 38u);
+                ApplyRunSpeed(mob, 44);
+            }
+            else if (string.Equals(def.Name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-103458 AttackInfo Amount=10; SCFU RunSpeedBase=41.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 10u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 10u);
+                ApplyRunSpeed(mob, 41);
+            }
+            else if (string.Equals(def.Name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-103458 AttackInfo Amount=8; SCFU RunSpeedBase=34.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 8u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 8u);
+                ApplyRunSpeed(mob, 34);
+            }
+            else if (string.Equals(def.Name, "Soul Dredge", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-103458 AttackInfo Amount=13; SCFU RunSpeedBase=53.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 13u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 13u);
+                ApplyRunSpeed(mob, 53);
+            }
+            else if (string.Equals(def.Name, "Disease-Ridden Rafter", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044 AttackInfo Amount=21; SCFU RunSpeedBase=31.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 21u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 21u);
+                ApplyRunSpeed(mob, 31);
+            }
+            else if (string.Equals(def.Name, "Tempterus", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044 AttackInfo Amount=10..12; SCFU RunSpeedBase=28. Flying Y observed in fight.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 10u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 12u);
+                ApplyRunSpeed(mob, 28);
+            }
+            else if (string.Equals(def.Name, "Predator Striker", StringComparison.OrdinalIgnoreCase)
+                     && string.Equals(def.CaptureFolder, "20260823-112044", StringComparison.Ordinal))
+            {
+                // Capture 20260823-112044 AttackInfo Amount=8; SCFU RunSpeedBase=34.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 8u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 8u);
+                ApplyRunSpeed(mob, 34);
+            }
+            else if (string.Equals(def.Name, "The Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(def.Name, "Demonic Subjugator", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260825-202932 AttackInfo Amount 36|69; SCFU RunSpeedBase=69 npcFamily=174.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, 174u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 36u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 69u);
+                ApplyRunSpeed(mob, 69);
+            }
+            else if (string.Equals(def.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260823-112044 SCFU RunSpeedBase=34; no landed AttackInfo Amount.
+                ApplyRunSpeed(mob, 34);
             }
 
-            CapturedEnemyCombatRuntime.Prepare(
-                mob,
-                npcController,
-                combatContract,
-                out combatFailure);
+            if (!CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
+                    mob,
+                    npcController,
+                    combatContract,
+                    out combatFailure))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "NascenceLifeSpawn combat not ready npc=" + def.Name + " reason=" + combatFailure);
+            }
 
-            // Do not auto-apply shared Chimera patrols. Explicit per-def Waypoints only.
-            ApplyWaypoints(mob, npcController, def.Waypoints);
+            mob.DoNotDoTimers = false;
+
+            if (!NascenceLifeStarterBridgePatrolRuntime.TryApply(
+                    def.PatrolCaptureInstance,
+                    def.PlayfieldId,
+                    def.X,
+                    def.Y,
+                    def.Z,
+                    mob,
+                    npcController))
+            {
+                float[][] waypoints = def.Waypoints;
+                // Keep per-spawn capture waypoints; outdoor resolver fills gaps only.
+                if (waypoints == null)
+                {
+                    bool staticCaptureHiathlin =
+                        string.Equals(def.Name, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                        && (string.Equals(def.CaptureFolder, "20260826-225804", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(def.CaptureFolder, "20260826-055143", StringComparison.OrdinalIgnoreCase));
+                    if (!staticCaptureHiathlin)
+                    {
+                        float[][] outdoorWaypoints;
+                        if (NascenceFrontierOutdoorMobRuntime.TryResolvePatrolWaypoints(
+                                def.Name,
+                                def.X,
+                                def.Y,
+                                def.Z,
+                                out outdoorWaypoints))
+                        {
+                            waypoints = outdoorWaypoints;
+                        }
+                    }
+                }
+
+                ApplyWaypoints(mob, npcController, waypoints);
+                if (waypoints != null
+                    && waypoints.Length > 0
+                    && npcController.State == CharacterState.Patrolling)
+                {
+                    if (string.Equals(def.Name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+                    {
+                        npcController.Run();
+                    }
+                    else
+                    {
+                        npcController.Walk();
+                    }
+
+                    npcController.StartPatrolling();
+                }
+            }
+
             activateNpc(mob);
+
+            if (string.Equals(def.Name, "Spinetooth Hatchling", StringComparison.OrdinalIgnoreCase)
+                && def.PlayfieldId == NascenceLifeContentModule.FrontierPlayfieldId)
+            {
+                NascenceFrontierSpinetoothMobCombat.RegisterAggressive(mob.Identity);
+            }
+
+            // Match AreteLandingSpawn / OrdinaryEnemy: register spatial visibility interest so
+            // clients receive SCFU for Nascence life NPCs (ActivateNpc alone is dynel-only).
+            try
+            {
+                playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "NascenceLifeSpawn visibility announce failed npc=" + def.Name
+                    + " ex=" + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            if (string.Equals(def.Name, "Deadly Predator", StringComparison.OrdinalIgnoreCase))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "NascenceLifeSpawn Deadly Predator spawned id="
+                    + mob.Identity.ToString(true)
+                    + " x=" + def.X.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                    + " y=" + def.Y.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                    + " z=" + def.Z.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                    + " capture=" + (def.CaptureFolder ?? "none"));
+            }
+
             return true;
         }
 
         /// <summary>
-        /// Capture 20260723-225021 Barking Chimera fight 798C1F4F: SAW (5 specials BGVX/YAPK/LWEK/MXLP/TKRQ)
-        /// + Attack + AttackInfo ammo=-1 hitType=3 damage 16-38; SAW unknowns 56/56/56/56/0; recharge from first landed interval.
+        /// Capture 20260823-000659 fight 7A202B33: SAW 56/56/56/56/0 + Attack + AttackInfo slots 0/4/3 ammo=-1 hitType=3.
+        /// FixedAttackInfo (not parallel replay): parallel stream initial delays blocked retaliation in playtests.
+        /// Patrol: disabled here — shared 2-point replay synced all mobs; needs per-spawn routes from capture.
         /// </summary>
         private static CapturedEnemyCombatContract BuildBarkingChimeraCombatContract()
         {
@@ -9649,31 +12301,23 @@ namespace AORebirth.Core.Playfields
 
             int[] damageObservations =
                 {
-                    25, 26, 29, 34, 27, 30, 22, 27, 28, 20, 30, 21, 35, 26, 31, 35, 36, 16, 37, 22, 19, 36,
-                    27, 32, 30, 32, 37, 25, 31, 22, 29, 36, 27, 32, 24, 21, 32, 26, 27, 33, 24, 37, 19, 26,
-                    31, 21, 34, 25, 29, 30, 28, 38, 30
+                    19, 19, 19, 19, 19, 19, 25, 26, 29, 34, 27, 30, 22, 27, 28, 20, 30, 21, 35, 26, 31, 35,
+                    36, 16, 37, 22, 19, 36, 27, 32, 30, 32, 37, 25, 31, 22, 29, 36, 27, 32, 24, 21, 32, 26,
+                    27, 33, 24, 37, 19, 26, 31, 21, 34, 25, 29, 30, 28, 38, 30
                 };
-            double[] attackStartDelays =
-                {
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-                };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0, 0.0, 0.0 };
             double[] firstHitDelays =
                 {
-                    5.084861, 9.095807, 9.545543, 9.830757, 3.351970, 7.903126, 3.997122, 6.451340,
-                    4.096567, 9.008532, 9.790527, 5.014908, 3.003818, 4.133419, 6.609437
+                    3.351970, 4.096567, 5.084861, 6.451340, 7.903126
                 };
             double[] landedIntervals =
                 {
-                    3.032315, 8.230959, 9.852612, 4.731078, 2.879224, 4.532096, 3.008146, 3.520829,
-                    4.231391, 4.735585, 7.172459, 7.932109, 2.943068, 4.389520, 15.237053, 4.439573,
-                    8.087505, 5.430544, 4.703398, 4.653643, 4.321511, 3.880607, 5.828328, 8.601800,
-                    4.402286, 7.942136, 6.145209, 3.736697, 5.017904, 7.120029, 5.722469, 4.579176,
-                    2.618384, 13.082830, 5.783704, 4.897980, 4.389295, 3.705713
+                    4.321511, 4.579176, 4.653643, 4.703398, 4.735585, 5.017904, 5.430544, 6.145209
                 };
 
             return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
-                "20260723-225021: Barking Chimera fight+loot 798C1F4F SAW/Attack/AttackInfo",
-                unchecked((int)0x798C1F4F),
+                "20260823-000659: Barking Chimera fight 7A202B33 SAW 56/Attack/AttackInfo",
+                unchecked((int)0x7A202B33),
                 NpcAiProfile.Passive,
                 16,
                 38,
@@ -9684,6 +12328,65 @@ namespace AORebirth.Core.Playfields
                 56,
                 56,
                 56,
+                0,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                3,
+                unchecked((int)0x544B5251),
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        private static void ApplyRunSpeed(Character mob, int runSpeed)
+        {
+            mob.Stats[StatIds.runspeed].BaseValue = (uint)runSpeed;
+            mob.Stats[StatIds.runspeed].Value = runSpeed;
+        }
+
+        /// <summary>
+        /// Capture 20260723-225021 Papagena fight 7A1B402D + 082554 SAW BGVX/YAPK/LWEK/MXLP/TKRQ, unknowns 139/139/139/101;
+        /// AttackInfo hitType=3 ammo=-1 damage span from capture packets.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildPapagenaCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(232045, 232046, 0x42475658, "BGVX"),
+                new CapturedEnemySpecialAttackDefinition(232042, 232043, 0x5941504B, "YAPK"),
+                new CapturedEnemySpecialAttackDefinition(232039, 232040, 0x4C57454B, "LWEK"),
+                new CapturedEnemySpecialAttackDefinition(232036, 232037, 0x4D584C50, "MXLP"),
+                new CapturedEnemySpecialAttackDefinition(232033, 232034, 0x544B5251, "TKRQ"),
+            };
+
+            int[] damageObservations = { 8, 8, 4 };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0 };
+            double[] firstHitDelays = { 1.354298, 2.068602, 4.276108 };
+            double[] landedIntervals = { 3.115287, 2.20831, 2.456722 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260822-103209: Papagena fight 7A1B402D SAW/Attack/AttackInfo",
+                unchecked((int)0x7A1B402D),
+                NpcAiProfile.Passive,
+                4,
+                8,
+                landedIntervals[0],
+                specials,
+                0,
+                139,
+                139,
+                139,
+                101,
                 0,
                 0,
                 0,
@@ -9700,7 +12403,59 @@ namespace AORebirth.Core.Playfields
                 landedIntervals,
                 0,
                 false,
-                null,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-112044 Papageno Omni (7A226136) + 20260825-204815 (7A2ED761):
+        /// SAW 139/139/139/101 specials BGVX/YAPK/LWEK/MXLP; AttackInfo Amount=32 ammo=-1.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildPapagenoCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(233069, 233070, 0x42475658, "BGVX"),
+                new CapturedEnemySpecialAttackDefinition(233066, 233067, 0x5941504B, "YAPK"),
+                new CapturedEnemySpecialAttackDefinition(233063, 233064, 0x4C57454B, "LWEK"),
+                new CapturedEnemySpecialAttackDefinition(233060, 233061, 0x4D584C50, "MXLP"),
+            };
+
+            int[] damageObservations = { 32, 32, 32, 32 };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0 };
+            double[] firstHitDelays = { 2.5, 2.8, 3.0 };
+            double[] landedIntervals = { 3.0, 3.2, 2.9 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260825-204815: Papageno Omni 7A2ED761 SAW/Attack/AttackInfo (also 20260823-112044)",
+                unchecked((int)0x7A2ED761),
+                NpcAiProfile.Passive,
+                32,
+                32,
+                landedIntervals[0],
+                specials,
+                0,
+                139,
+                139,
+                139,
+                101,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x42475658,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
                 true);
         }
 
@@ -9739,6 +12494,479 @@ namespace AORebirth.Core.Playfields
             }
 
             controller.State = CharacterState.Patrolling;
+        }
+
+        private static uint ResolveCaptureKillXp(string name)
+        {
+            if (string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)BarkingChimeraKillXp;
+            }
+
+            if (string.Equals(name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)GeosurveyDogKillXp;
+            }
+
+            if (string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)SwiftSilvertailKillXp;
+            }
+
+            if (string.Equals(name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)NascenceSpiritHunterKillXp;
+            }
+
+            if (string.Equals(name, "Cascading Spirit", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)CascadingSpiritKillXp;
+            }
+
+            if (string.Equals(name, "Soul Dredge", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)SoulDredgeKillXp;
+            }
+
+            if (string.Equals(name, "Disease-Ridden Rafter", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)DiseaseRiddenRafterKillXp;
+            }
+
+            if (string.Equals(name, "Tempterus", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)TempterusKillXp;
+            }
+
+            if (string.Equals(name, "Predator Striker", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)PredatorStrikerKillXp;
+            }
+
+            if (string.Equals(name, "Deadly Predator", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)DeadlyPredatorKillXp;
+            }
+
+            if (string.Equals(name, "Spinetooth Hatchling", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)SpinetoothHatchlingKillXp;
+            }
+
+            if (string.Equals(name, "Weaver of Malice", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)WeaverOfMaliceKillXp;
+            }
+
+            if (string.Equals(name, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hiathlin Prime", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)HiathlinKillXp;
+            }
+
+            if (string.Equals(name, "Omathon", StringComparison.OrdinalIgnoreCase))
+            {
+                return (uint)OmathonKillXp;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Capture 20260822-221109 Swift Silvertail fight: SAW unknowns 67/67/67/67 + AttackInfo damage 6-7.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildSwiftSilvertailCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(232045, 232046, 0x42475658, "BGVX"),
+                new CapturedEnemySpecialAttackDefinition(232042, 232043, 0x5941504B, "YAPK"),
+                new CapturedEnemySpecialAttackDefinition(232039, 232040, 0x4C57454B, "LWEK"),
+                new CapturedEnemySpecialAttackDefinition(232036, 232037, 0x4D584C50, "MXLP"),
+                new CapturedEnemySpecialAttackDefinition(232033, 232034, 0x544B5251, "TKRQ"),
+            };
+
+            int[] damageObservations = { 6, 7, 6, 7, 7, 6 };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0 };
+            double[] firstHitDelays = { 2.5, 3.0, 2.8 };
+            double[] landedIntervals = { 4.0, 4.5, 4.2 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260822-221109: Swift Silvertail SAW/Attack/AttackInfo",
+                unchecked((int)0x7A1B4453),
+                NpcAiProfile.Passive,
+                6,
+                7,
+                landedIntervals[0],
+                specials,
+                0,
+                67,
+                67,
+                67,
+                67,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x42475658,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260822-221109 Geosurvey Dog shares Chimera wire family; uses Chimera SAW pattern.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildGeosurveyDogCombatContract()
+        {
+            return BuildBarkingChimeraCombatContract();
+        }
+
+        /// <summary>
+        /// Capture 20260823-103458 Nascence Spirit Hunter fight (e.g. 7A19FD9E):
+        /// SAW 120/120/120/81 specials RIJL/DATJ/UZBM/CHCF/IFOH; AttackInfo Amount=10 HitType=Normal ammo=-1.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildNascenceSpiritHunterCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(236699, 236700, 0x52494A4C, "RIJL"),
+                new CapturedEnemySpecialAttackDefinition(236696, 236697, 0x4441544A, "DATJ"),
+                new CapturedEnemySpecialAttackDefinition(236693, 236694, 0x555A424D, "UZBM"),
+                new CapturedEnemySpecialAttackDefinition(211013, 211014, 0x43484346, "CHCF"),
+                new CapturedEnemySpecialAttackDefinition(211010, 211011, 0x49464F48, "IFOH"),
+            };
+
+            int[] damageObservations =
+                {
+                    10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10
+                };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+            double[] firstHitDelays = { 3.0, 3.2, 2.9, 3.1, 3.4 };
+            double[] landedIntervals = { 4.049, 3.805, 4.653, 4.82, 4.004, 4.892, 4.485, 3.962, 2.924 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260823-103458: Nascence Spirit Hunter SAW 120/Attack/AttackInfo",
+                unchecked((int)0x7A19FD9E),
+                NpcAiProfile.Passive,
+                10,
+                10,
+                landedIntervals[0],
+                specials,
+                0,
+                120,
+                120,
+                120,
+                81,
+                0,
+                0,
+                0,
+                -1,
+                3,
+                0,
+                3,
+                0x4441544A,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-103458 Cascading Spirit fight (e.g. 7A1C3B42):
+        /// SAW 68/68/68/68 specials RLNV/TMDT/QRHO/QHBG/ZAFF; AttackInfo Amount=8 slot mostly 4.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildCascadingSpiritCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(213154, 213157, 0x524C4E56, "RLNV"),
+                new CapturedEnemySpecialAttackDefinition(213145, 213148, 0x544D4454, "TMDT"),
+                new CapturedEnemySpecialAttackDefinition(213135, 213138, 0x5152484F, "QRHO"),
+                new CapturedEnemySpecialAttackDefinition(213129, 213131, 0x51484247, "QHBG"),
+                new CapturedEnemySpecialAttackDefinition(210259, 210260, 0x5A414646, "ZAFF"),
+            };
+
+            int[] damageObservations = { 8, 8, 8, 8, 8, 8, 8 };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0 };
+            double[] firstHitDelays = { 2.5, 2.8, 2.7 };
+            double[] landedIntervals = { 2.915, 2.772, 5.865 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260823-103458: Cascading Spirit SAW 68/Attack/AttackInfo",
+                unchecked((int)0x7A1C3B42),
+                NpcAiProfile.Passive,
+                8,
+                8,
+                landedIntervals[0],
+                specials,
+                0,
+                68,
+                68,
+                68,
+                68,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x524C4E56,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-103458 Soul Dredge fight 7A20292F:
+        /// SAW 139/139/139/101 same special family as Hunter; AttackInfo Amount=13.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildSoulDredgeCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(236699, 236700, 0x52494A4C, "RIJL"),
+                new CapturedEnemySpecialAttackDefinition(236696, 236697, 0x4441544A, "DATJ"),
+                new CapturedEnemySpecialAttackDefinition(236693, 236694, 0x555A424D, "UZBM"),
+                new CapturedEnemySpecialAttackDefinition(211013, 211014, 0x43484346, "CHCF"),
+                new CapturedEnemySpecialAttackDefinition(211010, 211011, 0x49464F48, "IFOH"),
+            };
+
+            int[] damageObservations = { 13, 13, 13, 13, 13, 13, 13, 13, 13 };
+            double[] attackStartDelays = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+            double[] firstHitDelays = { 2.8, 3.0, 2.9, 3.1, 3.2 };
+            double[] landedIntervals = { 3.548, 2.849, 4.03, 5.509, 4.556, 4.398, 4.465, 4.494 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260823-103458: Soul Dredge SAW 139/Attack/AttackInfo",
+                unchecked((int)0x7A20292F),
+                NpcAiProfile.Passive,
+                13,
+                13,
+                landedIntervals[0],
+                specials,
+                0,
+                139,
+                139,
+                139,
+                101,
+                0,
+                0,
+                0,
+                -1,
+                3,
+                0,
+                3,
+                0x4441544A,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-112044 Disease-Ridden Rafter (Shadowlands Rafter fight family):
+        /// SAW 64/64/64/64 specials BGVX/YAPK/LWEK/MXLP/TKRQ (templates 233069..233058);
+        /// AttackInfo Amount=21 ammo=-1 slot=4 HitType wire=3 WeaponInstance=BGVX.
+        /// Keep this SAW pattern — Rafters recur across Shadowlands.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildDiseaseRiddenRafterCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(233069, 233070, 0x42475658, "BGVX"),
+                new CapturedEnemySpecialAttackDefinition(233066, 233067, 0x5941504B, "YAPK"),
+                new CapturedEnemySpecialAttackDefinition(233063, 233064, 0x4C57454B, "LWEK"),
+                new CapturedEnemySpecialAttackDefinition(233060, 233061, 0x4D584C50, "MXLP"),
+                new CapturedEnemySpecialAttackDefinition(233057, 233058, 0x544B5251, "TKRQ"),
+            };
+
+            int[] damageObservations = { 21 };
+            double[] attackStartDelays = { 0.0 };
+            double[] firstHitDelays = { 3.0 };
+            double[] landedIntervals = { 4.0 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260823-112044: Disease-Ridden Rafter SAW 64/Attack/AttackInfo",
+                unchecked((int)0x7A19FDA0),
+                NpcAiProfile.Passive,
+                21,
+                21,
+                landedIntervals[0],
+                specials,
+                0,
+                64,
+                64,
+                64,
+                64,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x42475658,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-112044 Tempterus (Unredeemed flyer name in task):
+        /// SAW 60/60/60/60 specials JIBR/VIMD/EGXN/RYJT/GYOV; AttackInfo Amount=10..12.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildTempterusCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(213168, 213169, 0x4A494252, "JIBR"),
+                new CapturedEnemySpecialAttackDefinition(213165, 213166, 0x56494D44, "VIMD"),
+                new CapturedEnemySpecialAttackDefinition(213162, 213163, 0x4547584E, "EGXN"),
+                new CapturedEnemySpecialAttackDefinition(213159, 213160, 0x52594A54, "RYJT"),
+                new CapturedEnemySpecialAttackDefinition(210262, 210263, 0x47594F56, "GYOV"),
+            };
+
+            int[] damageObservations = { 10, 12 };
+            double[] attackStartDelays = { 0.0, 0.0 };
+            double[] firstHitDelays = { 2.8, 3.0 };
+            double[] landedIntervals = { 1.318, 4.0 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260823-112044: Tempterus SAW 60/Attack/AttackInfo",
+                unchecked((int)0x7A22621E),
+                NpcAiProfile.Passive,
+                10,
+                12,
+                landedIntervals[0],
+                specials,
+                0,
+                60,
+                60,
+                60,
+                60,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x4A494252,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-112044 Predator Striker:
+        /// SAW 68/68/68/68 specials RIJL/DATJ/UZBM/CHCF/IFOH (same family as Spirit Hunter);
+        /// AttackInfo Amount=8 ammo=-1 slot=4 HitType wire=3.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildPredatorStrikerCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(236699, 236700, 0x52494A4C, "RIJL"),
+                new CapturedEnemySpecialAttackDefinition(236696, 236697, 0x4441544A, "DATJ"),
+                new CapturedEnemySpecialAttackDefinition(236693, 236694, 0x555A424D, "UZBM"),
+                new CapturedEnemySpecialAttackDefinition(211013, 211014, 0x43484346, "CHCF"),
+                new CapturedEnemySpecialAttackDefinition(211010, 211011, 0x49464F48, "IFOH"),
+            };
+
+            int[] damageObservations = { 8, 8 };
+            double[] attackStartDelays = { 0.0, 0.0 };
+            double[] firstHitDelays = { 2.8, 3.0 };
+            double[] landedIntervals = { 4.0, 36.941 };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260823-112044: Predator Striker SAW 68/Attack/AttackInfo",
+                unchecked((int)0x7A202DB0),
+                NpcAiProfile.Passive,
+                8,
+                8,
+                4.0,
+                specials,
+                0,
+                68,
+                68,
+                68,
+                68,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x52494A4C,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                StarterBridgeCapturedAttackRange,
+                true);
+        }
+
+        /// <summary>
+        /// Capture 20260823-112044 Crippler of Growth 7A226132: SAW RIJL family unknowns 68
+        /// and Attack start observed, but no AttackInfo Amount before death (one-shot fight).
+        /// Loot/corpse mesh are capture-backed; re-fight needed for damage Amount.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildCripplerOfGrowthCombatContractSawOnly()
+        {
+            return CapturedEnemyCombatContract.Unresolved(
+                "20260823-112044: Crippler of Growth SAW RIJL/DATJ/UZBM/CHCF/IFOH unknowns 68 captured; "
+                + "AttackInfo Amount not observed before death — re-fight for damage",
+                true);
         }
     }
 }

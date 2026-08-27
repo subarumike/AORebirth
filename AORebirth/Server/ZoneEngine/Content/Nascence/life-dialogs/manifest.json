@@ -2,5 +2,7 @@
   "DialoguePacks": [
     "dialogue/nascence-life-dialogs.dialogue.json"
   ],
-  "QuestPacks": []
+  "QuestPacks": [
+    "quests/nascence-life.quests.json"
+  ]
 }

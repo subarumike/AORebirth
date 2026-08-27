@@ -251,7 +251,7 @@ namespace AORebirth.Core.Playfields
                 {
                     if (capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
                     {
-                        this.AnnounceCapturedEnemyAttackPacket(attacker, capturedContract);
+                        this.AnnounceCapturedEnemyAttackStartContext(attacker, capturedContract);
                         this.nextCombatTicks[attacker.Identity.Instance] =
                             DateTime.UtcNow + TimeSpan.FromSeconds(firstHitDelaySeconds);
                     }
@@ -409,7 +409,7 @@ namespace AORebirth.Core.Playfields
                         }
 
                         TimeSpan capturedAttackToFirstHit = scheduledFirstHit - pendingAttackStart;
-                        this.AnnounceCapturedEnemyAttackPacket(attacker, pendingContract);
+                        this.AnnounceCapturedEnemyAttackStartContext(attacker, pendingContract);
                         this.nextCombatTicks[attacker.Identity.Instance] =
                             DateTime.UtcNow + capturedAttackToFirstHit;
                         capturedAttackStartReleased = true;
@@ -590,14 +590,17 @@ namespace AORebirth.Core.Playfields
             }
 
             this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
+            // AttackInfo-only: client emits "hit you for N points of melee damage" from AttackInfo.
+            // Sending HealthDamage alongside suppresses that chat line while stats still update server-side.
+            CombatDamageSource damageSource = attackSource.UsesEquippedWeapon
+                                                  ? CombatDamageSource.WeaponAutoAttack
+                                                  : CombatDamageSource.UnarmedAutoAttack;
             this.AnnounceCombatDamage(
                 attacker,
                 target,
                 damage,
                 attackSource,
-                attackSource.UsesEquippedWeapon
-                    ? CombatDamageSource.WeaponAutoAttack
-                    : CombatDamageSource.UnarmedAutoAttack);
+                damageSource);
             target.Stats[StatIds.health].Value = newHealth;
             if (attackSource.CompletesCapturedOpeningAttack)
             {
@@ -1681,6 +1684,10 @@ namespace AORebirth.Core.Playfields
             }
 
             this.AnnounceHealthDamageIfNeeded(attacker, target, damage, source);
+
+            // Capture/live AO: AttackInfo alone drives "hit you for N points of melee damage"
+            // into the Combat chat window. Do not also send ChatText — that duplicates the line
+            // into General.
         }
 
         private void AnnounceHealthDamageIfNeeded(
@@ -1896,12 +1903,15 @@ namespace AORebirth.Core.Playfields
                 }
 
                 bool unarmedFixed = !capturedContract.CapturedUsesEquippedWeapon;
-                int attackInfoWeaponSlot = unarmedFixed
-                                               ? this.GetUnarmedAttackInfoWeaponSlot(attacker)
-                                               : capturedContract.AttackInfoWeaponSlot;
-                int attackInfoWeaponInstance = unarmedFixed
-                                                   ? this.GetUnarmedAttackInfoWeaponInstance(attacker)
-                                                   : capturedContract.AttackInfoWeaponInstance;
+                bool useCapturedAttackInfoWire = capturedContract.CapturedUsesEquippedWeapon
+                                                 || capturedContract.AttackInfoWeaponInstance != 0
+                                                 || capturedContract.AttackInfoHitType != 0;
+                int attackInfoWeaponSlot = useCapturedAttackInfoWire
+                                               ? capturedContract.AttackInfoWeaponSlot
+                                               : this.GetUnarmedAttackInfoWeaponSlot(attacker);
+                int attackInfoWeaponInstance = useCapturedAttackInfoWire
+                                                   ? capturedContract.AttackInfoWeaponInstance
+                                                   : this.GetUnarmedAttackInfoWeaponInstance(attacker);
                 int attackInfoAmmoCount = capturedContract.AttackInfoAmmoCount != 0
                                               ? capturedContract.AttackInfoAmmoCount
                                               : (unarmedFixed

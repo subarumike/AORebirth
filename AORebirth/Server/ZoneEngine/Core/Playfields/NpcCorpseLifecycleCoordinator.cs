@@ -51,14 +51,18 @@ namespace AORebirth.Core.Playfields
 
         internal void ScheduleDeadNpcDespawn(ICharacter target)
         {
-            this.deadNpcDespawnTicks[target.Identity.Instance] =
-                DateTime.UtcNow + NpcCorpseLifecycleRules.DeadNpcDespawnDelay;
+            this.ScheduleDeadNpcDespawn(target, NpcCorpseLifecycleRules.DeadNpcDespawnDelay);
+        }
+
+        internal void ScheduleDeadNpcDespawn(ICharacter target, TimeSpan delay)
+        {
+            this.deadNpcDespawnTicks[target.Identity.Instance] = DateTime.UtcNow + delay;
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                 PlayfieldLifecycleTrace.StageDeadNpcDespawnScheduled,
                 "DeadNpcDespawnScheduled",
                 target.Identity,
-                "delayMs=" + ((int)NpcCorpseLifecycleRules.DeadNpcDespawnDelay.TotalMilliseconds));
+                "delayMs=" + ((int)delay.TotalMilliseconds));
         }
 
         internal void FinalizeNpcDespawn(ICharacter target)

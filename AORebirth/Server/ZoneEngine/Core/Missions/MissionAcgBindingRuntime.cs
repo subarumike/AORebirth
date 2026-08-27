@@ -798,6 +798,15 @@ namespace ZoneEngine.Core.Missions
 
         internal static bool ClaimsGeneratedLivePlayfield(int livePlayfield2)
         {
+            // Nascence SL cave reserves a dyn id so RK missions cannot lease it, but it is
+            // NOT a generated mission PF2 — treating it as claimed blocks AcquireAggro via
+            // MissionAcgSpatialRuntime.TryValidateCombatPair.
+            if (AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(livePlayfield2)
+                || AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(livePlayfield2))
+            {
+                return false;
+            }
+
             EnsureInitialized();
             lock (Sync)
             {

@@ -220,17 +220,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         actualDamage));
             }
 
-            if (affected.Controller != null
-                && affected.Controller.Client != null
-                && source.Identity != affected.Identity)
-            {
-                ChatTextMessageHandler.Default.SendCombat(
-                    affected,
-                    string.Format(
-                        "<font color=#FF0000>{0} hit you for {1} points of damage.</font>",
-                        string.IsNullOrWhiteSpace(source.Name) ? "Something" : source.Name,
-                        actualDamage));
-            }
+            // Incoming hit text: AttackInfo alone fills Combat chat; ChatText would also flood General.
 
             if (source.Identity != affected.Identity)
             {

@@ -236,6 +236,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 /* PvPDuelScore */
                 AddStat3232(client, statGroup1, 684);
 
+                /* Commendations (ICC; capture 20260822-073726) */
+                AddStat3232(client, statGroup1, (int)StatIds.commendations);
+
+                /* DailyMissionResets / Freelancers Inc. Tokens (stat 696) */
+                AddStat3232(client, statGroup1, (int)StatIds.dailymissionresets);
+
                 AddStat3232(client, statGroup1, 0x289);
                 AddStat3232(client, statGroup1, 0x28a);
 

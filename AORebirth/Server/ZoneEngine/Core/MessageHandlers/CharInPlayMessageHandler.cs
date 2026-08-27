@@ -201,12 +201,42 @@ namespace ZoneEngine.Core.MessageHandlers
                 ZoneEngine.Core.Doja.DojaChipQuestRuntime.TryResendActiveMissionsForLogin(
                     client.Controller.Character);
 
+            bool rosenblattMissionResent =
+                ZoneEngine.Core.Nascence.Quests.RosenblattHiathlinQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+
+            bool rosenblattPapagenaMissionResent =
+                ZoneEngine.Core.Nascence.Quests.RosenblattPapagenaQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+            ZoneEngine.Core.Nascence.Quests.RosenblattPapagenoQuestRuntime.TryResendActiveMissionsForLogin(
+                client.Controller.Character);
+            ZoneEngine.Core.Nascence.Quests.RosenblattCascadingSpiritQuestRuntime.TryResendActiveMissionsForLogin(
+                client.Controller.Character);
+            ZoneEngine.Core.Nascence.Quests.RosenblattSpinetoothQuestRuntime.TryResendActiveMissionsForLogin(
+                client.Controller.Character);
+            ZoneEngine.Core.Nascence.Quests.RosenblattDemonicQuestRuntime.TryResendActiveMissionsForLogin(
+                client.Controller.Character);
+            bool nascenceLifeRodriguezMissionResent =
+                ZoneEngine.Core.Nascence.Quests.NascenceLifeRodriguezQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+            bool nascenceLifeFalkerMissionResent =
+                ZoneEngine.Core.Nascence.Quests.NascenceLifeJoshuaFalkerQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+            bool nascenceLifeDonnaMissionResent =
+                ZoneEngine.Core.Nascence.Quests.NascenceLifeDonnaRedQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+            bool nascenceAbanFalaMissionResent =
+                ZoneEngine.Core.Nascence.Quests.NascenceAbanFalaQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+
             bool areteTipResent =
                 ZoneEngine.Core.Arete.Quests.RexMarcusChainCoordinator.TryResendActiveTipsForLogin(
                     client.Controller.Character);
 
             // Sacred Thrak garden key is permanent; restore if quest/account already earned it.
             ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryRestoreGardenKeyIfMissing(
+                client.Controller.Character);
+            ZoneEngine.Core.Nascence.Quests.NascenceAbanFalaQuestRuntime.TryRestoreAbanGardenKeyIfMissing(
                 client.Controller.Character);
 
             int pfInstance = client.Controller.Character.Playfield != null
@@ -221,12 +251,13 @@ namespace ZoneEngine.Core.MessageHandlers
                 areteTipResent);
 
             ZoneEngine.Core.Missions.MissionDiagnostics.Log(
-                "CHARINPLAY char={0} pf={1} windowResent={2} thrakResent={3} dojaResent={4}",
+                "CHARINPLAY char={0} pf={1} windowResent={2} thrakResent={3} dojaResent={4} rosenblattResent={5}",
                 client.Controller.Character.Identity.Instance,
                 pfInstance,
                 missionWindowResent,
                 thrakMissionResent,
-                dojaMissionResent);
+                dojaMissionResent,
+                rosenblattMissionResent);
 
             // Mission interiors: re-send exact instance-local captured objects after CharInPlay.
             if (client.Controller.Character.Playfield != null
@@ -236,6 +267,26 @@ namespace ZoneEngine.Core.MessageHandlers
                 ZoneEngine.Core.Missions.MissionAcgRuntimeManager.ClearSent(
                     client.Controller.Character);
                 ZoneEngine.Core.Missions.MissionAcgRuntimeManager.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                     && AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(
+                         client.Controller.Character.Playfield.Identity.Instance))
+            {
+                AORebirth.Core.Playfields.NascenceDungeon1SearchRuntime.ClearForCharacter(
+                    client.Controller.Character);
+                AORebirth.Core.Playfields.NascenceDungeon1DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                     && AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(
+                         client.Controller.Character.Playfield.Identity.Instance))
+            {
+                AORebirth.Core.Playfields.NascenceDungeon2SearchRuntime.ClearForCharacter(
+                    client.Controller.Character);
+                AORebirth.Core.Playfields.NascenceDungeon2DoorReplay.SendForCharacter(
                     client,
                     client.Controller.Character);
             }

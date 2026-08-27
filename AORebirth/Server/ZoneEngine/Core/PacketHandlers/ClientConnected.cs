@@ -56,6 +56,7 @@ namespace ZoneEngine.Core.PacketHandlers
     using ZoneEngine;
     using ZoneEngine.Core.Perks;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Playfields.Content;
     using ZoneEngine.Script;
 
     using Utility;
@@ -143,9 +144,39 @@ namespace ZoneEngine.Core.PacketHandlers
                     },
                     false);
             }
+
+            // Capture 20260823-171238 / 182854: MissionEntrance door status on Nascence Frontier zone-in.
+            if (client.Controller.Character.Playfield != null
+                && NascenceDungeon1Rules.IsSourcePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                DoorStatusUpdateMessageHandler.Default.SendCapturedNascenceDungeonEntranceStatus(
+                    client.Controller.Character);
+                DoorStatusUpdateMessageHandler.Default.SendCapturedNascenceDungeon2EntranceStatus(
+                    client.Controller.Character);
+            }
+
             // Live 20260725-184103: DoorFullUpdate flood starts immediately after PAF
             // (before SCFU/FullCharacter). Delayed-only replay left the map grey/wrong.
+            // Nascence SL cave uses a reserved id inside the mission ACG band — do not
+            // treat it as an RK mission interior for door replay.
             if (client.Controller.Character.Playfield != null
+                && NascenceDungeon1Rules.IsDungeonPlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                NascenceDungeon1DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                && NascenceDungeon2Rules.IsDungeonPlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                NascenceDungeon2DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
                 && MissionInstanceService.IsMissionInstancePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))
             {
@@ -333,6 +364,15 @@ client.Controller.Character.Playfield.Identity,
                         "ClientConnected",
                         isPlayfieldTransfer ? "zone-transfer-after-fullchar" : "zone-login-after-fullchar");
 
+                    if (!isPlayfieldTransfer
+                        && client.Controller.Character.Playfield != null
+                        && client.Controller.Character.Playfield.Identity.Instance
+                        == NascenceLifeContentModule.FrontierPlayfieldId)
+                    {
+                        NascenceLifeSpawn.NotifyFrontierForkPlayerLoginReady(
+                            client.Controller.Character);
+                    }
+
                     if (isPlayfieldTransfer)
                     {
                         var transferDynel = client.Controller.Character as Dynel;
@@ -363,12 +403,34 @@ client.Controller.Character.Playfield.Identity,
                     ZoneEngine.Core.Doja.DojaChipQuestRuntime.TryResendActiveMissionsForLogin(
                         client.Controller.Character);
 
+                    ZoneEngine.Core.Nascence.Quests.RosenblattHiathlinQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+
+                    ZoneEngine.Core.Nascence.Quests.RosenblattPapagenaQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.RosenblattPapagenoQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.RosenblattCascadingSpiritQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.RosenblattSpinetoothQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.RosenblattDemonicQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.NascenceLifeRodriguezQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.NascenceLifeJoshuaFalkerQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.NascenceLifeDonnaRedQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+
                     // Arete Rex→Marcus→Flint tip journal (Talk to Flint Novak) — same relog wipe as Thrak.
                     ZoneEngine.Core.Arete.Quests.RexMarcusChainCoordinator.TryResendActiveTipsForLogin(
                         client.Controller.Character);
 
                     // Sacred Thrak garden key is permanent; restore if already earned and missing.
                     ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryRestoreGardenKeyIfMissing(
+                        client.Controller.Character);
+                    ZoneEngine.Core.Nascence.Quests.NascenceAbanFalaQuestRuntime.TryRestoreAbanGardenKeyIfMissing(
                         client.Controller.Character);
                 },
                 () =>

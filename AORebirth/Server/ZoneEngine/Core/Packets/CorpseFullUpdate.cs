@@ -294,6 +294,33 @@ namespace ZoneEngine.Core.Packets
                     corpseCredits);
             }
 
+            // Prefer D2 capture templates on the D2 playfield (shared names/MDs with D1).
+            byte[] nascenceDungeonCorpse = NascenceDungeon2CorpseCapture.TryBuild(
+                deadNpc,
+                corpseIdentity,
+                receiver,
+                serverId,
+                corpseCatMesh,
+                corpseMonsterData,
+                corpseCredits);
+            if (nascenceDungeonCorpse != null)
+            {
+                return nascenceDungeonCorpse;
+            }
+
+            nascenceDungeonCorpse = NascenceDungeon1CorpseCapture.TryBuild(
+                deadNpc,
+                corpseIdentity,
+                receiver,
+                serverId,
+                corpseCatMesh,
+                corpseMonsterData,
+                corpseCredits);
+            if (nascenceDungeonCorpse != null)
+            {
+                return nascenceDungeonCorpse;
+            }
+
             // L7 gold 20260725-002423 Tilda Konecny corpse body (not Thief — corpses vanished).
             if (deadNpc != null
                 && ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsAggressive(deadNpc.Identity))

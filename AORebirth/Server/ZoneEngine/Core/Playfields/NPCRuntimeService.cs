@@ -221,6 +221,17 @@ namespace AORebirth.Core.Playfields
                 maximumNpcDistanceFromHome =
                     AreteRoboticGuardDogRuntime.MaximumNpcDistanceFromHomeMeters;
             }
+            else if (NascenceDungeon1Rules.IsDungeonPlayfield(this.playfield.Identity.Instance))
+            {
+                // Keep trash from chasing across ACG rooms into the boss wing.
+                maximumNpcDistanceFromHome =
+                    NascenceDungeon1Rules.MaximumNpcLeashDistanceFromHomeMeters;
+            }
+            else if (NascenceDungeon2Rules.IsDungeonPlayfield(this.playfield.Identity.Instance))
+            {
+                maximumNpcDistanceFromHome =
+                    NascenceDungeon2Rules.MaximumNpcLeashDistanceFromHomeMeters;
+            }
             this.npcHomeStates[character.Identity.Instance] =
                 new NpcHomeState
                 {
@@ -258,6 +269,8 @@ namespace AORebirth.Core.Playfields
                 this.ActivateNpc);
             this.nascenceCoreHecklers.SpawnForPlayfield(this.playfield, playfieldIdentity);
             NascenceLifeSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            NascenceDungeon1Spawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            NascenceDungeon2Spawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             ThrakOmniGardenSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             ScarlettDalquistSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             RomeBlueCitySpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
@@ -429,6 +442,62 @@ namespace AORebirth.Core.Playfields
                 this.playfield,
                 playfieldIdentity,
                 this.ActivateNpc);
+            NascenceLifeSpawn.TickSwiftSilvertailRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickSpiritHunterRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickCascadingSpiritRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickTempterusRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickPredatorStrikerRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickDeadlyPredatorRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickPapagenoRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickHiathlinRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickOmathonRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickHesosasRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickPapagenaAreaRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceLifeSpawn.TickFrontierForkDeferredSpawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceDungeon1Spawn.TickRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            NascenceDungeon2Spawn.TickRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
             AndromedaIccHqIdleGestureRuntime.ProcessDue(utcNow);
             this.capturedTempleEncounters.ProcessDue(utcNow, this.AcquireAggro);
         }
@@ -493,6 +562,11 @@ namespace AORebirth.Core.Playfields
             this.playfield.StopFightingDeadTarget(target.Identity);
             this.playfield.StopDyingNpcCombatState(target);
             this.playfield.SendNpcDeathAnimation(target);
+
+            // Do not HideDeadNpcFromVisibility here — that despawns the living model before
+            // the Death anim plays (Mike: vanish then corpse). Dead SCFU is already skipped and
+            // D2 uses a short ScheduleDeadNpcDespawn so the fallen pose can finish.
+
             if (!isOperationalNpc || operationalDeathPersisted)
             {
                 this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
@@ -509,6 +583,8 @@ namespace AORebirth.Core.Playfields
                         attacker,
                         target,
                         this.playfield.AwardCombatXp);
+                    NascenceSwampClanMobRuntime.TryApplyKillFactionPenalty(attacker, target);
+                    NascenceDungeon2FactionRuntime.TryApplyKillFactionGain(attacker, target);
                     if (isOperationalNpc
                         && !ZoneEngine.Core.Missions.MissionAcgOperationalRuntime
                             .TryAdvanceNpcDeathHookCheckpoint(
@@ -642,7 +718,8 @@ namespace AORebirth.Core.Playfields
             if (npcController != null)
             {
                 npcController.StopFollow();
-                if (character.Waypoints != null && character.Waypoints.Count > 0)
+                if ((character.Waypoints != null && character.Waypoints.Count > 0)
+                    || npcController.HasCapturedPatrolReplaySegments())
                 {
                     npcController.State = CharacterState.Patrolling;
                 }
@@ -799,6 +876,20 @@ namespace AORebirth.Core.Playfields
                 this.AcquireAggro(attacker, ally, false);
             }
 
+            foreach (ICharacter ally in NascenceLifeSpawn.FindCascadingSpiritSocialAggroAllies(
+                target,
+                attacker))
+            {
+                this.AcquireAggro(attacker, ally, false);
+            }
+
+            foreach (ICharacter ally in NascenceLifeSpawn.FindPredatorStrikerSocialAggroAllies(
+                target,
+                attacker))
+            {
+                this.AcquireAggro(attacker, ally, false);
+            }
+
             // Capture 20260722-235510: ICC Peacekeeper attacks the hostile that aggroed the player.
             if (PlayerVersusPlayerCombatRules.IsPlayerControlledCombatant(attacker))
             {
@@ -930,6 +1021,11 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (NascenceDungeon2MobCombat.TryDropCombatOutsideRoom(character, this.playfield))
+            {
+                return;
+            }
+
             if (this.TryProcessLeashReturn(character, utcNow))
             {
                 return;
@@ -954,6 +1050,12 @@ namespace AORebirth.Core.Playfields
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
                                          ?? LoreleiOasisMobRuntime.FindAutomaticAggroTarget(character)
                                          ?? AreteRoboticGuardDogRuntime.FindAutomaticAggroTarget(character)
+                                         ?? NascenceDungeon1MobCombat.FindAutomaticAggroTarget(
+                                                character)
+                                         ?? NascenceFrontierSpinetoothMobCombat.FindAutomaticAggroTarget(
+                                                character)
+                                         ?? NascenceDungeon2MobCombat.FindAutomaticAggroTarget(
+                                                character)
                                          ?? ZoneEngine.Core.Missions.MissionInstanceMobCombat.FindAutomaticAggroTarget(
                                              character);
             if (automaticTarget != null)
@@ -1050,6 +1152,10 @@ namespace AORebirth.Core.Playfields
 
             this.capturedSubwayEncounters.NotifyCombatStarted(target, attacker, DateTime.UtcNow);
             this.capturedTempleEncounters.NotifyCombatStarted(target, attacker, DateTime.UtcNow);
+            NascenceFrontierSpinetoothMobCombat.TryNotifyAggroChat(target, attacker);
+
+            // Client already shows red Combat lines ("Attacked by X!" / "Attacking X...").
+            // Do not send FormatFeedback "{player} attacked by {npc}!" — that paints yellow system chat.
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -1234,6 +1340,17 @@ namespace AORebirth.Core.Playfields
 
         private void ScheduleDeadNpcDespawn(ICharacter target)
         {
+            // D2: short live-body despawn after death anim (~1.5s fallen pose), then pool remove.
+            if (target != null
+                && target.Playfield != null
+                && NascenceDungeon2Rules.IsDungeonPlayfield(target.Playfield.Identity.Instance))
+            {
+                this.corpseLifecycle.ScheduleDeadNpcDespawn(
+                    target,
+                    TimeSpan.FromSeconds(1.5));
+                return;
+            }
+
             this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
         }
 

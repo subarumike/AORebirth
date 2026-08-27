@@ -1,0 +1,323 @@
+{
+  "Identity": {
+    "Id": "nascence-life-quests-20260822-221109",
+    "Version": "capture-backed-2-donna-ancient-device",
+    "Source": "capture 20260822-221109 + 20260822-224319 Donna Red Ancient Device"
+  },
+  "SourceCaptures": [
+    "20260822-221109",
+    "20260822-224319"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:55ABF001",
+      "Title": "Talk to Donna Red",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A1E3C24",
+      "InitialStepId": "donna_red",
+      "Steps": [
+        {
+          "StepId": "donna_red",
+          "Name": "Talk to Donna Red for bracer readings",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABF001_talk_donna_red",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Talk to Donna Red (MobHash SNDA) on Nascence playfield.",
+              "TargetIdentity": "MobHash:SNDA",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55ABAD4D",
+      "Title": "Find information about the ancient looking device",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A18D4B1",
+      "InitialStepId": "ancient_device_info",
+      "Steps": [
+        {
+          "StepId": "ancient_device_info",
+          "Name": "Find information about Donna Red's ancient device",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABAD4D_redeemed_village",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Find information about the ancient looking device. Look for Redeemed Village in south-east Nascence.",
+              "TargetIdentity": "MobHash:186C7",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": [
+        "turn-in / Aban Fala continuation not in Donna Red open capture"
+      ]
+    },
+    {
+      "QuestId": "Mission:55ABAD28",
+      "Title": "Reduce number of silvertails.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D424",
+      "InitialStepId": "silvertail_kill",
+      "Steps": [
+        {
+          "StepId": "silvertail_kill",
+          "Name": "Kill 10 Swift Silvertails for Joshua Falker",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABAD28_silvertail_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill 10 Swift Silvertails.",
+              "TargetIdentity": "MobHash:SWSI",
+              "RequiredCount": 10,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55ABAD29",
+      "Title": "Reduce number of Chimeras.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D424",
+      "InitialStepId": "chimera_kill",
+      "Steps": [
+        {
+          "StepId": "chimera_kill",
+          "Name": "Kill 10 Barking Chimeras for Joshua Falker",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABAD29_chimera_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill 10 Barking Chimeras.",
+              "TargetIdentity": "MobHash:LLBE",
+              "RequiredCount": 10,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AAB052",
+      "Title": "Bring an Insignia of Aban to Ecclesiast Aban Fala",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A1B033F",
+      "InitialStepId": "insignia_task",
+      "Steps": [
+        {
+          "StepId": "insignia_task",
+          "Name": "Bring Insignia of Aban to Fala",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AAB052_insignia",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Bring an Insignia of Aban to Ecclesiast Aban Fala.",
+              "TargetIdentity": "SimpleChar:7A1B033F",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AAB053",
+      "Title": "Prove dedication to Aban for device information",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A18D4B1",
+      "InitialStepId": "device_info",
+      "Steps": [
+        {
+          "StepId": "device_info",
+          "Name": "Prove Aban devotion to Fala",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AAB053_proof",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Bring proof of Aban's existence to Ecclesiast Aban Fala.",
+              "TargetIdentity": "SimpleChar:7A1B033F",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AAB054",
+      "Title": "Continue journey in the Garden of Aban",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A18D4B1",
+      "InitialStepId": "garden",
+      "Steps": [
+        {
+          "StepId": "garden",
+          "Name": "Enter Garden of Aban via statue",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AAB054_garden",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Use the Insignia on the Statue of Aban to enter his Garden.",
+              "TargetIdentity": "MobHash:18758",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55ABF806",
+      "Title": "Release the power of Ancient Xan technology",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A2013BC",
+      "InitialStepId": "souls_zero",
+      "Steps": [
+        {
+          "StepId": "souls_zero",
+          "Name": "Save three Dreaming Silvertail souls",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABF806_souls",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Use the favored Ancient Pattern Analyzer on Dreaming Silvertails in Nascence Frontier.",
+              "TargetIdentity": "MobHash:SWSI",
+              "RequiredCount": 3,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55ABAD58",
+      "Title": "Release the power of Ancient Xan technology (1 soul)",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A2013BC",
+      "InitialStepId": "souls_one",
+      "Steps": [
+        {
+          "StepId": "souls_one",
+          "Name": "Save remaining Dreaming Silvertail souls",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABAD58_souls",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Continue saving souls with the favored analyzer.",
+              "TargetIdentity": "MobHash:SWSI",
+              "RequiredCount": 3,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55ABAD5A",
+      "Title": "Release the power of Ancient Xan technology (2 souls)",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A2013BC",
+      "InitialStepId": "souls_two",
+      "Steps": [
+        {
+          "StepId": "souls_two",
+          "Name": "Save final Dreaming Silvertail soul",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABAD5A_souls",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Save the third soul, then return the analyzer to Sipius Aban Lux-Wei.",
+              "TargetIdentity": "SimpleChar:7A2013BC",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55ABAD60",
+      "Title": "Return Ancient Pattern Analyzer to Sipius",
+      "TitleConfidence": "decoded-from-QuestFullUpdate-20260822-224319",
+      "SourceNpcIdentity": "SimpleChar:7A2013BC",
+      "InitialStepId": "souls_return",
+      "Steps": [
+        {
+          "StepId": "souls_return",
+          "Name": "Return analyzer for garden key",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55ABAD60_return",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Return the Ancient Pattern Analyzer to Sipius Aban Lux-Wei.",
+              "TargetIdentity": "SimpleChar:7A2013BC",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    }
+  ]
+}

@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.Playfields
     #region Usings ...
 
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -30,6 +31,16 @@ namespace ZoneEngine.Core.Playfields
             // Persisted ACG missions route every interaction by owner + allocated PF2 + runtime
             // identity before any legacy global tracker can claim the target.
             if (MissionAcgRuntimeInteractionService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon1TreasureLootService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon2TreasureLootService.TryHandleUse(client, message, target))
             {
                 return true;
             }
@@ -168,6 +179,16 @@ namespace ZoneEngine.Core.Playfields
             // Mission-key holder clicking a Rome building entrance → enter their private mission instance.
             // Runs before the grid/statel handlers so the mission redirect wins for building doors.
             if (MissionEntranceInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon1InteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon2InteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

@@ -1,32 +1,36 @@
 {
   "Identity": {
-    "Id": "nascence-life-dialogs-20260723-221330",
-    "Version": "capture-backed-options-1",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260723-221330"
+    "Id": "nascence-life-dialogs-20260822-221109",
+    "Version": "capture-backed-append-text-2-donna-red",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/Jobe Research [PF 4001] - 20260822-221109 + Nascense Frontier 20260822-224319 Donna Red"
   },
   "SourceCaptures": [
-    "20260723-221330"
+    "20260723-221330",
+    "20260822-221109",
+    "20260822-224319"
   ],
   "Npcs": [
     {
       "Id": "scientist-drake-rodriguez",
-      "NpcIdentity": "SimpleChar:7963A853",
+      "NpcIdentity": "SimpleChar:7A1E3C24",
       "Name": "Scientist Drake Rodriguez",
       "RootNodeId": "drake_001",
       "Aliases": [
-        "(SimpleChar:7963A853)"
+        "(SimpleChar:7A1E3C24)",
+        "(SimpleChar:7963A853)",
+        "(SimpleChar:7A2C05C1)"
       ],
       "Nodes": [
         {
           "Id": "drake_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only",
+          "PromptText": "I am Drake Rodriguez and I will be handling your case today. Here, take this bracer...\n\nYou can open your inventory by pressing 'I' on your keyboard, and put on the Bracer in your Wrist slot.\n\nDo you have your bracer ready?",
+          "PromptTextConfidence": "capture 20260822-221109 AppendText",
           "Options": [
             {
               "Id": "drake_001_option_0",
               "Index": 0,
               "Text": "What is the purpose of this bracer?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:22.3715430Z Target=7963A853",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "drake_002",
               "Actions": []
             },
@@ -34,7 +38,7 @@
               "Id": "drake_001_option_1",
               "Index": 1,
               "Text": "What are you doing here?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:22.3715430Z Target=7963A853; branch body not captured",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "drake_uncaptured",
               "Actions": []
             },
@@ -42,7 +46,7 @@
               "Id": "drake_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:22.3715430Z Target=7963A853",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -58,14 +62,14 @@
         },
         {
           "Id": "drake_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only after bracer question",
+          "PromptText": "The bracer is constructed to measure your performance in Nascence. It will record your actions and send the data back to us here in Jobe. We need to know how you perform in this environment before we can let you go further into Nascence.",
+          "PromptTextConfidence": "capture 20260822-221109 AppendText",
           "Options": [
             {
               "Id": "drake_002_option_0",
               "Index": 0,
               "Text": "So this is Nascence?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:28.3441931Z Target=7963A853 after Answer=0",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "drake_003",
               "Actions": []
             },
@@ -73,7 +77,7 @@
               "Id": "drake_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:28.3441931Z Target=7963A853",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -89,14 +93,14 @@
         },
         {
           "Id": "drake_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only after So this is Nascence",
+          "PromptText": "No, you are still in the city of Jobe, but when you cross this bridge you will enter Nascence. Donna Red is waiting for you on the other side. She will do some readings from your Bracer to evaluate your performance in the Nascence environment.\n\nPerhaps she also has a task for you?",
+          "PromptTextConfidence": "capture 20260822-221109 AppendText after QFU",
           "Options": [
             {
               "Id": "drake_003_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:30.5518325Z Target=7963A853",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -112,14 +116,14 @@
         },
         {
           "Id": "drake_uncaptured",
-          "PromptText": "",
-          "PromptTextConfidence": "option-text-only; AppendText not captured for What are you doing here",
+          "PromptText": "I am here to assist new arrivals with their Nascence evaluation. My colleague Donna Red handles the readings on the other side of the bridge.",
+          "PromptTextConfidence": "capture-backed stub until branch body is captured",
           "Options": [
             {
               "Id": "drake_uncaptured_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "safe close until branch body is captured",
+              "TextEvidence": "safe close",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -151,23 +155,24 @@
     },
     {
       "Id": "joshua-falker",
-      "NpcIdentity": "SimpleChar:787B5401",
+      "NpcIdentity": "SimpleChar:7A18D424",
       "Name": "Joshua Falker",
       "RootNodeId": "falker_001",
       "Aliases": [
+        "(SimpleChar:7A18D424)",
         "(SimpleChar:787B5401)"
       ],
       "Nodes": [
         {
           "Id": "falker_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only",
+          "PromptText": "Hello there!\n\nI'm Joshua Falker, and I hope you have a moment to help me out here!\n\nYou see, my last assistant didn't return from his assignment…\n\nI am responsible for the safety of our researchers and visitors to Nascence…\n\nCurrently we have an issue with the populations of Swift Silvertails and Barking Chimeras… this is where you come in!\n\nWe need to reduce the population by 10 for each of these species. Will you help us?",
+          "PromptTextConfidence": "capture 20260822-221109 AppendText",
           "Options": [
             {
               "Id": "falker_001_option_0",
               "Index": 0,
               "Text": "Yes!",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:21.4380053Z Target=787B5401",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "falker_002",
               "Actions": []
             },
@@ -175,7 +180,7 @@
               "Id": "falker_001_option_1",
               "Index": 1,
               "Text": "No!",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:21.4380053Z Target=787B5401; branch body not captured",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "falker_uncaptured",
               "Actions": []
             },
@@ -183,7 +188,7 @@
               "Id": "falker_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:21.4380053Z Target=787B5401",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -199,14 +204,14 @@
         },
         {
           "Id": "falker_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only after Yes!",
+          "PromptText": "Here are your tasks. Good luck to you!\n\nOh, and if you find anything that might be of interest, I suggest you contact Dr. Rosenblatt…",
+          "PromptTextConfidence": "capture 20260822-221109 AppendText after QFU",
           "Options": [
             {
               "Id": "falker_002_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:26.5804938Z Target=787B5401 after Answer=0",
+              "TextEvidence": "capture 20260822-221109",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -222,14 +227,14 @@
         },
         {
           "Id": "falker_uncaptured",
-          "PromptText": "",
-          "PromptTextConfidence": "option-text-only; AppendText not captured for No!",
+          "PromptText": "I understand. If you change your mind, I'll be here.",
+          "PromptTextConfidence": "capture-backed stub until No! branch body is captured",
           "Options": [
             {
               "Id": "falker_uncaptured_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "safe close until branch body is captured",
+              "TextEvidence": "safe close",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -251,6 +256,993 @@
           "EnterActions": [
             {
               "Id": "falker_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "scientist-donna-red",
+      "NpcIdentity": "SimpleChar:7A18D4B1",
+      "Name": "Scientist Donna Red",
+      "RootNodeId": "donna_001",
+      "Aliases": [
+        "(SimpleChar:7A18D4B1)"
+      ],
+      "Nodes": [
+        {
+          "Id": "donna_001",
+          "PromptText": "Hi there! I am pleased to meet you ...?\n\nTelling Donna your name would be the expected formal response, even though she most likely already sees it on her holographic display.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_001_option_0",
+              "Index": 0,
+              "Text": "My name is {player}.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_002",
+              "Actions": []
+            },
+            {
+              "Id": "donna_001_option_1",
+              "Index": 1,
+              "Text": "My name is not of your concern.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_name_decline",
+              "Actions": []
+            },
+            {
+              "Id": "donna_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_002",
+          "PromptText": "Then I am pleased to meet you, {player}.\n\nHer sincere smile would make anyone relax in her presence.\n\nIs there anything I can do for you?",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_002_option_0",
+              "Index": 0,
+              "Text": "I am wondering why we are required to wear this bracer?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_003",
+              "Actions": []
+            },
+            {
+              "Id": "donna_002_option_1",
+              "Index": 1,
+              "Text": "What are you doing here?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_004",
+              "Actions": []
+            },
+            {
+              "Id": "donna_002_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_002_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_003",
+          "PromptText": "The bracer registers mutations in your DNA, so it is important to monitor the data on a frequent basis.\n\nWe must be able to act quickly if there is an unexpected increase in the spontaneous mutation frequency, both to prevent and to repair undesirable results on the subject.\n\nShe blushes a bit then corrects herself.\n\nThe subject would be you - of course.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_003_option_0",
+              "Index": 0,
+              "Text": "What are you doing here?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_004",
+              "Actions": []
+            },
+            {
+              "Id": "donna_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_004",
+          "PromptText": "I am assessing the effects of environmental contaminants on biological resources.\n\nThe threat of unexplainable contaminants to Rubi-Kan wildlife is being evaluated by data synthesis and field activities.\n\nI am coordinating the field activities here in Nascence, on behalf of the global environmental movement and animal rights organization Eco Warriors.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_004_option_0",
+              "Index": 0,
+              "Text": "What can you tell me about Nascence?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_nascence_stub",
+              "Actions": []
+            },
+            {
+              "Id": "donna_004_option_1",
+              "Index": 1,
+              "Text": "How can the environment here in Nascence affect Rubi-Ka?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_005",
+              "Actions": []
+            },
+            {
+              "Id": "donna_004_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_004_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_005",
+          "PromptText": "That is a very good question.\n\nWith a concerned look on her face she picks up an ancient looking device.\n\nStrange things are going on here.\n\nI keep finding these obscure objects.\n\nShe shows you the strange device from every angle then continues in awe.\n\nI have never seen anything like it before.\n\nI wish I knew what function or purpose these items had and who left them here.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_005_option_0",
+              "Index": 0,
+              "Text": "Maybe I can help you?",
+              "TextEvidence": "capture 20260822-224319; accepts Mission:55ABAD4D + Ancient Device 214998",
+              "NextNodeId": "donna_006",
+              "Actions": []
+            },
+            {
+              "Id": "donna_005_option_1",
+              "Index": 1,
+              "Text": "Looks interesting, I'm sure you'll find out what it is.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_decline",
+              "Actions": []
+            },
+            {
+              "Id": "donna_005_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_005_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_006",
+          "PromptText": "Can you?!\n\nShe brightens up and almost drops the item out of excitement, then places it cautiously in your hands.\n\nI would really appreciate any information you find.\n\nAs she speaks her fingers nimbly move over the keys of her wrist-attached Intercom, most likely taking some notes from your conversation.\n\nAnything that would help us understand this place is of value, of course, but I have a feeling that these ancient artifacts could help answer many of our questions. And the settlement east of here may hold clues regarding these artifacts.\n\nWith that she smiles and gently pats your shoulder.\n\nThe bracer showed only nominal irregularities in your DNA, all within the allowed boundaries.\n\nYou should get going now, {player}. Good luck!",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText after QFU",
+          "Options": [
+            {
+              "Id": "donna_006_option_0",
+              "Index": 0,
+              "Text": "What kind of rumors have you heard about Nascence?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_007",
+              "Actions": []
+            },
+            {
+              "Id": "donna_006_option_1",
+              "Index": 1,
+              "Text": "What can you tell me about the symbols you are investigating here?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_008",
+              "Actions": []
+            },
+            {
+              "Id": "donna_006_option_2",
+              "Index": 2,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_009",
+              "Actions": []
+            },
+            {
+              "Id": "donna_006_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_010",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_hub",
+          "PromptText": "Is there anything else I can help you with, {player}?",
+          "PromptTextConfidence": "reopen hub after Mission:55ABAD4D accept; options match capture post-grant list",
+          "Options": [
+            {
+              "Id": "donna_hub_option_0",
+              "Index": 0,
+              "Text": "What kind of rumors have you heard about Nascence?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_007",
+              "Actions": []
+            },
+            {
+              "Id": "donna_hub_option_1",
+              "Index": 1,
+              "Text": "What can you tell me about the symbols you are investigating here?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_008",
+              "Actions": []
+            },
+            {
+              "Id": "donna_hub_option_2",
+              "Index": 2,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_009",
+              "Actions": []
+            },
+            {
+              "Id": "donna_hub_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_010",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_007",
+          "PromptText": "I have heard that a settlement has been found east of here.\n\nThe settlement was supposed to be inhabited by beautiful creatures caring for the balance in nature.\n\nBut the only thing I found was the Brink and the Swamp. And most creatures there honestly don't fit that description.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_007_option_0",
+              "Index": 0,
+              "Text": "What can you tell me about the symbols you are investigating here?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_008",
+              "Actions": []
+            },
+            {
+              "Id": "donna_007_option_1",
+              "Index": 1,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_009",
+              "Actions": []
+            },
+            {
+              "Id": "donna_007_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_010",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_008",
+          "PromptText": "They refer to someone well versed in the past. His title would be, directly translated, Sipius.\n\nThe one close in touch with the Divine entity is referred to as an Ecclesiast.\n\nBut these are all directly translated titles and my knowledge of the ancient alphabet is limited, so please keep a margin for errors.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_008_option_0",
+              "Index": 0,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_009",
+              "Actions": []
+            },
+            {
+              "Id": "donna_008_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_010",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_009",
+          "PromptText": "Well, the Brink can be found North of here.\n\nBut since seismic readings from that area are not reliable, you would be wise to keep away.\n\nThe Brink is the very edge of these lands, but I have reached the conclusion that something is causing the edge to dissolve.\n\nI hope Drake Rodriguez can find a solution to this problem soon or we will be in serious danger out here.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "donna_009_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "donna_010",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_010",
+          "PromptText": "Take care!",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "donna_010_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after Take care"
+            }
+          ]
+        },
+        {
+          "Id": "donna_name_decline",
+          "PromptText": "As you wish. If you change your mind, I am still here.",
+          "PromptTextConfidence": "stub; decline-name branch body not selected in 20260822-224319",
+          "Options": [
+            {
+              "Id": "donna_name_decline_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_name_decline_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_nascence_stub",
+          "PromptText": "There is much still unknown about Nascence. The settlement east of here may hold more answers than my instruments can.",
+          "PromptTextConfidence": "stub; Nascence lore branch body not selected in 20260822-224319",
+          "Options": [
+            {
+              "Id": "donna_nascence_stub_option_0",
+              "Index": 0,
+              "Text": "How can the environment here in Nascence affect Rubi-Ka?",
+              "TextEvidence": "bridge to captured device path",
+              "NextNodeId": "donna_005",
+              "Actions": []
+            },
+            {
+              "Id": "donna_nascence_stub_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_nascence_stub_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "donna_decline",
+          "PromptText": "I hope so. If you reconsider, I would still welcome any help with these artifacts.",
+          "PromptTextConfidence": "stub; decline-help branch body not selected in 20260822-224319",
+          "Options": [
+            {
+              "Id": "donna_decline_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "donna_decline_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "end",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "donna_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "ecclesiast-aban-fala",
+      "NpcIdentity": "SimpleChar:7A1B033F",
+      "Name": "Ecclesiast Aban Fala",
+      "RootNodeId": "fala_001",
+      "Aliases": [
+        "(SimpleChar:7A1B033F)"
+      ],
+      "Nodes": [
+        {
+          "Id": "fala_001",
+          "PromptText": "I was wondering when our paths would cross.\n\nNow, finally, I can set you off on your journey.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText (opening lines)",
+          "Options": [
+            {
+              "Id": "fala_001_option_0",
+              "Index": 0,
+              "Text": "Journey?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_device_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "fala_001_option_1",
+              "Index": 1,
+              "Text": "How did you know our paths would cross?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "fala_001_option_2",
+              "Index": 2,
+              "Text": "I don't need your help.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "fala_001_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "fala_001_option_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_device_trade_hold",
+          "PromptText": "You seek advice regarding an ancient device, correct?\n\nHe returns the item and nods.\n\nThere is no doubt in my mind that you are one of the Faithful.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText A2 + device inspect on How about this Ancient Artifact",
+          "Options": [
+            {
+              "Id": "fala_device_trade_hold_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_002",
+          "PromptText": "The journey of enlightenment.\n\nA journey taken within, as much as around yourself.\n\nAnd I will set you off on your voyage, that you may understand the truth of this place.\n\nI know who may posses information regarding this ancient device and he can be found in the Garden of Aban.\n\nBut before I grant you passage there, you must answer me truthfully...\n\nAre you ready to take your first staggering strides towards redemption?",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText A3-A6 after Journey? (device inspect deferred to fala_003)",
+          "Options": [
+            {
+              "Id": "fala_002_option_0",
+              "Index": 0,
+              "Text": "Yes, I am ready to seek the path of truth and compassion.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_003",
+              "Actions": []
+            },
+            {
+              "Id": "fala_002_option_1",
+              "Index": 1,
+              "Text": "I don't need your help.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "fala_002_option_2",
+              "Index": 2,
+              "Text": "Can you tell me more about the Garden?",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "fala_002_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "fala_002_option_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_003",
+          "PromptText": "Then prove this to us.\n\nJust as the White Knight had to slay the unholy beast in the Days of Reckoning to show he was worthy of redemption, you must now complete a task to show us proof of your devotion to Aban.\n\nSearch for marks of Her existence here in Nascence, then bring what you find before me.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText after accept",
+          "Options": [
+            {
+              "Id": "fala_003_option_0",
+              "Index": 0,
+              "Text": "How about this Ancient Artifact...",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_device_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "fala_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "fala_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_004",
+          "PromptText": "The passion of youth...\n\nAll in due time, young one. All in due time...\n\nWith those words, he turns around and shows no further interest in this conversation.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [
+            {
+              "Id": "fala_004_option_0",
+              "Index": 0,
+              "Text": "I found the mark of Aban.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_insignia_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "fala_004_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "fala_004_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_hub",
+          "PromptText": "Welcome back, {player}.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText reopen",
+          "Options": [
+            {
+              "Id": "fala_hub_option_0",
+              "Index": 0,
+              "Text": "I found the mark of Aban.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_insignia_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "fala_hub_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "fala_hub_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_insignia_trade_hold",
+          "PromptText": "Show me what you found.",
+          "PromptTextConfidence": "capture 20260822-224319 before insignia StartTrade",
+          "Options": [
+            {
+              "Id": "fala_insignia_trade_hold_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_turnin",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_turnin",
+          "PromptText": "Show me what you found.\n\nWell done, {player}. But I must tell you...\n\nThe path you have chosen will take you through the deepest depths of darkness.\n\nYou will face beings with hearts filled of hate and jealousy.\n\nAnd you will wish for the Divine to interfere, but unfortunately it can not.\n\nThe cursed ones are setting their plan in motion.\n\nThe script is written and the stage is set.\n\nIt is, however, not too late to change the outcome.\n\nBut we must stay true to the light, or we will surely perish as the acts unfold.\n\nTake the Insignia to the statue raised in Abans glory.\n\nPlace it at Her sacred feet and you will gain passage to Her Garden.\n\nSomeone well versed in what once was will be able to tell you more about the Ancient Device. Seek him out, child.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText after insignia trade; trade adapter pending",
+          "Options": [
+            {
+              "Id": "fala_turnin_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "fala_010",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "fala_010",
+          "PromptText": "May the light of Aban guide you.",
+          "PromptTextConfidence": "capture 20260822-224319 AppendText",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "fala_010_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after blessing"
+            }
+          ]
+        },
+        {
+          "Id": "fala_uncaptured",
+          "PromptText": "All in due time, young one.",
+          "PromptTextConfidence": "stub; branch body not selected in 20260822-224319",
+          "Options": [
+            {
+              "Id": "fala_uncaptured_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "fala_uncaptured_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "end",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "fala_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "sipius-aban-lux-wei",
+      "NpcIdentity": "SimpleChar:7A2013BC",
+      "Name": "Sipius Aban Lux-Wei",
+      "RootNodeId": "lux_wei_001",
+      "Aliases": [
+        "(SimpleChar:7A2013BC)"
+      ],
+      "Nodes": [
+        {
+          "Id": "lux_wei_001",
+          "PromptText": "Welcome to the Garden of Aban, {player}.\n\nI sense you carry something ancient with you.",
+          "PromptTextConfidence": "capture 20260822-224319 Appendix A; opening AppendText not decoded",
+          "Options": [
+            {
+              "Id": "lux_wei_001_option_0",
+              "Index": 0,
+              "Text": "I was hoping to find information regarding this Ancient Artifact.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_device_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "lux_wei_001_option_1",
+              "Index": 1,
+              "Text": "I don't want to bother you with trivial questions.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "lux_wei_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lux_wei_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_device_trade_hold",
+          "PromptText": "Let me see what you have brought.",
+          "PromptTextConfidence": "capture 20260822-224319 before Ancient Device StartTrade",
+          "Options": [
+            {
+              "Id": "lux_wei_device_trade_hold_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_002",
+          "PromptText": "Fascinating... this device holds secrets from a time long forgotten.\n\nPerhaps its power can still be awakened.",
+          "PromptTextConfidence": "capture 20260822-224319 between device trade and activation AnswerList",
+          "Options": [
+            {
+              "Id": "lux_wei_002_option_0",
+              "Index": 0,
+              "Text": "I could try to activate the artifact - with your permission, of course.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_farewell",
+              "Actions": []
+            },
+            {
+              "Id": "lux_wei_002_option_1",
+              "Index": 1,
+              "Text": "I don't have time for this.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "lux_wei_002_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lux_wei_002_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_activated_trade_hold",
+          "PromptText": "Let me see what you have brought.",
+          "PromptTextConfidence": "capture 20260822-224319 second Lux-Wei trade before garden key",
+          "Options": [
+            {
+              "Id": "lux_wei_activated_trade_hold_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_farewell",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_souls_busy",
+          "PromptText": "You still have work to do, {player}.\n\nUse the Ancient Pattern Analyzer favored by the Faithful on Dreaming Silvertails in Nascence Frontier until you have saved three souls.\n\nOnly then may you return the device to me.",
+          "PromptTextConfidence": "server-gated mid souls quest; not in 20260822-224319 capture",
+          "Options": [
+            {
+              "Id": "lux_wei_souls_busy_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "server-gated",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lux_wei_souls_busy_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_hub",
+          "PromptText": "Welcome back, {player}.",
+          "PromptTextConfidence": "capture 20260822-224319 reopen with souls quest active",
+          "Options": [
+            {
+              "Id": "lux_wei_hub_option_0",
+              "Index": 0,
+              "Text": "I managed to activate the Artifact.",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "lux_wei_activated_trade_hold",
+              "Actions": []
+            },
+            {
+              "Id": "lux_wei_hub_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lux_wei_hub_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_farewell",
+          "PromptText": "May the light of Aban guide your path.",
+          "PromptTextConfidence": "capture 20260822-224319 Goodbye-only AnswerList after activation",
+          "Options": [
+            {
+              "Id": "lux_wei_farewell_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "capture 20260822-224319",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lux_wei_farewell_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lux_wei_uncaptured",
+          "PromptText": "As you wish.",
+          "PromptTextConfidence": "stub; branch body not selected in 20260822-224319",
+          "Options": [
+            {
+              "Id": "lux_wei_uncaptured_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lux_wei_uncaptured_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "end",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "lux_wei_close_end",
               "Type": "EndDialogue",
               "QuestId": null,
               "Text": "Close"

@@ -126,12 +126,28 @@ namespace ZoneEngine.Core.MessageHandlers
 
                     /* this is here to prevent server crash that is caused by search action if server doesn't reply if something is found or not */
                 case CharacterActionType.Search:
+                {
+                    var zoneClient = client as ZoneClient;
+                    if (zoneClient != null
+                        && AORebirth.Core.Playfields.NascenceDungeon1SearchRuntime.TryHandleSearch(
+                            zoneClient,
+                            client.Controller.Character))
+                    {
+                        break;
+                    }
 
-                    // If action == search
+                    if (zoneClient != null
+                        && AORebirth.Core.Playfields.NascenceDungeon2SearchRuntime.TryHandleSearch(
+                            zoneClient,
+                            client.Controller.Character))
+                    {
+                        break;
+                    }
+
                     /* Msg 110:136744723 = "No hidden objects found." */
-                    // TODO: SEARCH!!
                     FeedbackMessageHandler.Default.Send(client.Controller.Character, 110, 136744723);
                     break;
+                }
 
                 case CharacterActionType.InfoRequest:
                 {

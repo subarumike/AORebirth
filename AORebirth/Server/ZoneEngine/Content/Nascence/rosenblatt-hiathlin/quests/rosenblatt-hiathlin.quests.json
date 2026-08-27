@@ -1,0 +1,320 @@
+{
+  "Identity": {
+    "Id": "rosenblatt-hiathlin-quests-20260822-070136",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260822-070136"
+  },
+  "SourceCaptures": [
+    "20260822-070136",
+    "20260822-082554",
+    "20260822-083345"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:55AA388F",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "hiathlin_hunt",
+      "Steps": [
+        {
+          "StepId": "hiathlin_hunt",
+          "Name": "Kill Hiathlins and collect body parts for Dr. Rosenblatt",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA388F_hiathlin_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill 5 regular Hiathlins.",
+              "TargetIdentity": "Hiathlin",
+              "RequiredCount": 5,
+              "Conditions": []
+            },
+            {
+              "ObjectiveId": "mission_55AA388F_hiathlin_prime_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill 1 Hiathlin Prime.",
+              "TargetIdentity": "Hiathlin Prime",
+              "RequiredCount": 1,
+              "Conditions": []
+            },
+            {
+              "ObjectiveId": "mission_55AA388F_turnin",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Bring 6 Hiathlin body parts to Dr. Rosenblatt.",
+              "TargetIdentity": "SimpleChar:7A18D419",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA3890",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "journal_progress",
+      "Steps": [
+        {
+          "StepId": "journal_progress",
+          "Name": "Client journal stage (4 Hiathlins remaining)",
+          "Objectives": [],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA3891",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "journal_progress",
+      "Steps": [
+        {
+          "StepId": "journal_progress",
+          "Name": "Client journal stage (3 Hiathlins remaining)",
+          "Objectives": [],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA3892",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "journal_progress",
+      "Steps": [
+        {
+          "StepId": "journal_progress",
+          "Name": "Client journal stage (2 Hiathlins remaining)",
+          "Objectives": [],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA3893",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "journal_progress",
+      "Steps": [
+        {
+          "StepId": "journal_progress",
+          "Name": "Client journal stage (1 Hiathlin remaining)",
+          "Objectives": [],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA3894",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "journal_progress",
+      "Steps": [
+        {
+          "StepId": "journal_progress",
+          "Name": "Client journal stage (regular Hiathlins complete)",
+          "Objectives": [],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA3895",
+      "Title": "Intelligent levitation.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "journal_progress",
+      "Steps": [
+        {
+          "StepId": "journal_progress",
+          "Name": "Client journal stage (turn-in ready)",
+          "Objectives": [],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA38B0",
+      "Title": "Remove Papagena",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "papagena_kill",
+      "Steps": [
+        {
+          "StepId": "papagena_kill",
+          "Name": "Remove Papagena for Dr. Rosenblatt",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA38B0_papagena_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill Papagena.",
+              "TargetIdentity": "Papagena",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55B0B8A3",
+      "Title": "Remove Papageno",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "papageno_kill",
+      "Steps": [
+        {
+          "StepId": "papageno_kill",
+          "Name": "Remove Papageno for Dr. Rosenblatt (Clan / Silvertail disc)",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55B0B8A3_papageno_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill Papageno.",
+              "TargetIdentity": "Papageno",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA38B5",
+      "Title": "Collect Essence of the Haunted.",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "cascading_hunt",
+      "Steps": [
+        {
+          "StepId": "cascading_hunt",
+          "Name": "Kill Cascading Spirit and deliver Essence to Dr. Rosenblatt",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA38B5_cascading_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill a Cascading Spirit.",
+              "TargetIdentity": "Cascading Spirit",
+              "RequiredCount": 1,
+              "Conditions": []
+            },
+            {
+              "ObjectiveId": "mission_55AA38B5_turnin",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Deliver Essence of the Haunted to Dr. Rosenblatt.",
+              "TargetIdentity": "SimpleChar:7A18D419",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA38B6",
+      "Title": "Spinetooth trouble",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "spinetooth_kill",
+      "Steps": [
+        {
+          "StepId": "spinetooth_kill",
+          "Name": "Get rid of a Spinetooth Hatchling for Dr. Rosenblatt",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA38B6_spinetooth_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill a Spinetooth Hatchling.",
+              "TargetIdentity": "Spinetooth Hatchling",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55AA38B7",
+      "Title": "Destroy the Demonic Subjugator",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:7A18D419",
+      "InitialStepId": "demonic_kill",
+      "Steps": [
+        {
+          "StepId": "demonic_kill",
+          "Name": "Destroy the Demonic Subjugator for Dr. Rosenblatt",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55AA38B7_demonic_kill",
+              "Type": "CapturedKillObjective",
+              "Description": "Kill the Demonic Subjugator.",
+              "TargetIdentity": "Demonic Subjugator",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    }
+  ]
+}

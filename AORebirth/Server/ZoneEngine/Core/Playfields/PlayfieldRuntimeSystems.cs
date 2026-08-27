@@ -130,6 +130,8 @@ namespace ZoneEngine.Core.Playfields
                 new JobePlatformContentModule(),
                 new NascenceCoreContentModule(),
                 new NascenceLifeContentModule(),
+                new NascenceDungeon1ContentModule(),
+                new NascenceDungeon2ContentModule(),
                 new ThrakOmniGardenContentModule(),
                 new DojaResearchContentModule(),
                 new RomeBlueCityContentModule(),
@@ -616,6 +618,23 @@ namespace ZoneEngine.Core.Playfields
             return this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity);
         }
 
+        internal void ForceCharacterVisibilityToRecipient(
+            ICharacter source,
+            ICharacter recipient,
+            Action<ICharacter, MessageBody> sendVisibilityMessage)
+        {
+            if (source == null || recipient == null)
+            {
+                return;
+            }
+
+            this.visibilityInterest.Register(source);
+            this.visibilityPackets.SendCharacterVisibilityEntry(
+                source,
+                recipient,
+                messageBody => sendVisibilityMessage(recipient, messageBody));
+        }
+
         internal float VisibilityEnterRadius
         {
             get { return this.visibilityInterest.Policy.EnterRadius; }
@@ -838,6 +857,9 @@ namespace ZoneEngine.Core.Playfields
                 this.ProcessNpcPatrolTick,
                 processFollow,
                 processPlayerCollision);
+            ZoneEngine.Core.Nascence.Quests.NascenceLifeRodriguezQuestRuntime.TickProximityBracerGrant(
+                this.playfield,
+                this.Characters());
             this.doorStatuses.ProcessCharacters(this.Characters(), DateTime.UtcNow);
         }
 

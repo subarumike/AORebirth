@@ -207,14 +207,18 @@ namespace ZoneEngine.Core.MessageHandlers
             character.Stats[StatIds.secondaryitemtemplate].Value = sourceItem.LowID;
 
             if (!NascenceStatueTeleportCatalog.IsZoneReturnStatueTemplate(statueTemplateId)
-                || !NascenceStatueTeleportCatalog.TryMatchReturnKey(statueTemplateId, sourceItem.LowID))
+                || !NascenceStatueTeleportCatalog.TryMatchReturnKeyItem(
+                    statueTemplateId,
+                    sourceItem.LowID,
+                    sourceItem.HighID))
             {
                 return false;
             }
 
             // Consume matched insignia used on the return statue (before teleport/dispose).
-            // Sacred Thrak garden key (226994) is permanent.
-            if (!ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(sourceItem.LowID, sourceItem.HighID))
+            if (NascenceStatueTeleportCatalog.ShouldConsumeGardenPassageItem(
+                    sourceItem.LowID,
+                    sourceItem.HighID))
             {
                 this.ConsumeSourceInsignia(character, message, sourceItem);
             }

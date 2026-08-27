@@ -8,6 +8,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
 
+    using ZoneEngine.Core.Thrak.Quests;
+
     #endregion
 
     public static class NascenceStatueTeleportCatalog
@@ -212,6 +214,27 @@ namespace ZoneEngine.Core.MessageHandlers
             return false;
         }
 
+        public static bool TryMatchReturnKeyItem(int statueTemplateId, int itemLowId, int itemHighId)
+        {
+            return TryMatchReturnKey(statueTemplateId, itemLowId)
+                   || (itemHighId > 0 && TryMatchReturnKey(statueTemplateId, itemHighId));
+        }
+
+        /// <summary>
+        /// Sacred Thrak key (226994) and Aban garden key (226824) are permanent on statue use.
+        /// </summary>
+        public static bool IsPermanentGardenPassageItem(int itemLowId, int itemHighId)
+        {
+            return ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(itemLowId, itemHighId)
+                   || itemLowId == 226824
+                   || itemHighId == 226824;
+        }
+
+        public static bool ShouldConsumeGardenPassageItem(int itemLowId, int itemHighId)
+        {
+            return !IsPermanentGardenPassageItem(itemLowId, itemHighId);
+        }
+
         private static readonly int[] GardenReturnInsigniaTemplateIds =
             new[]
             {
@@ -225,6 +248,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 214789, // Insignia of Thrak
                 226994, // Sacred Thrak garden key (permanent; not consumed)
                 214788, // Insignia of Aban
+                226824, // The Key to the Garden of Aban (permanent; not consumed)
                 214782, // Insignia of Shere
                 214781, // Insignia of Enel
             };
@@ -236,6 +260,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 new ShadowlandsReturnKeyPair(222955, 214789),
                 new ShadowlandsReturnKeyPair(222955, 226994), // Sacred Thrak garden key (permanent)
                 new ShadowlandsReturnKeyPair(222954, 214788),
+                new ShadowlandsReturnKeyPair(222954, 226824),
                 new ShadowlandsReturnKeyPair(223577, 214782),
                 new ShadowlandsReturnKeyPair(244831, 214782),
                 new ShadowlandsReturnKeyPair(223559, 214781),

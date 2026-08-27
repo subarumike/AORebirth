@@ -1,0 +1,448 @@
+{
+  "Identity": {
+    "Id": "rosenblatt-hiathlin-dialogue-20260822-070136",
+    "Version": "capture-backed-2-papagena-omni",
+    "Source": "capture 20260822-070136 + Papagena Omni 20260822-082554"
+  },
+  "SourceCaptures": [
+    "20260822-070136",
+    "20260822-082554",
+    "20260822-083345"
+  ],
+  "Npcs": [
+    {
+      "Id": "dr_rosenblatt_7A18D419",
+      "NpcIdentity": "SimpleChar:7A18D419",
+      "Name": "Dr. Rosenblatt",
+      "RootNodeId": "rosenblatt_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "rosenblatt_001",
+          "PromptText": "Hi! I'm Dr. Rosenblatt, and as an expert in Physics and Macromolecular Science, the Hiathlins and their ability to levitate has caught my interest. You see, they don't have the typical features that most flying creatures have, such as wings, and we hope that they might hold the key to finding out how to use aircraft here. It's vital that we examine as much of their protoplasm as we can, in order to access this information.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "r001_0",
+              "Index": 0,
+              "Text": "Yes?",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "rosenblatt_002",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "r001_1",
+              "Index": 1,
+              "Text": "Actually I found this disc...",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "rosenblatt_disc_look",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "r001_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_002",
+          "PromptText": "You seem to be strong and healthy; maybe you can help me get hold of a few samples?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "r002_0",
+              "Index": 0,
+              "Text": "Yes?",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "rosenblatt_003",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "r002_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_003",
+          "PromptText": "Dr. Rosenblatt wants you to kill 5 Hiathlins and 1 Hiathlin Prime, and bring back body parts. Will you help him?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "r003_0",
+              "Index": 0,
+              "Text": "Yes!",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "rosenblatt_004",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "r003_1",
+              "Index": 1,
+              "Text": "Actually I found this disc...",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "rosenblatt_disc_look",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "r003_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_004",
+          "PromptText": "Oki, here's what you do. First you kill 5 Hiathlins, take the body parts you get from them, then you kill a Hiathlin Prime, and do the same. Then return to me with all 6 parts. Easy as that!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "r004_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_disc_look",
+          "PromptText": "A disc? What could that be... Let me have a look!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "rdl_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "rosenblatt_papagena_offer",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_papagena_offer",
+          "PromptText": "Oh, this message was rather old. And they wanted me to remove Papagena... I certainly don't have time for that right now. But maybe you can help?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "rpo_0",
+              "Index": 0,
+              "Text": "I'll help you!",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "rosenblatt_papagena_accepted",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rpo_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_papagena_accepted",
+          "PromptText": "A good thing that you will.<BR><BR>Here are your instructions.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "rpa_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_papageno_offer",
+          "PromptText": "Oh, this message was rather old. And they wanted me to remove Papageno... I certainly don't have time for that right now. But maybe you can help?",
+          "PromptTextConfidence": "adapted-from-papagena-capture-clan-side-20260825-204815",
+          "Options": [
+            {
+              "Id": "rpo_clan_0",
+              "Index": 0,
+              "Text": "I'll help you!",
+              "TextEvidence": "20260825-204815",
+              "NextNodeId": "rosenblatt_papageno_accepted",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rpo_clan_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260825-204815",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_papageno_accepted",
+          "PromptText": "A good thing that you will.<BR><BR>Here are your instructions.",
+          "PromptTextConfidence": "adapted-from-papagena-capture-clan-side-20260825-204815",
+          "Options": [
+            {
+              "Id": "rpa_clan_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260825-204815",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_cascading_offer",
+          "PromptText": "Dr. Rosenblatt asked you to collect Essence of the Haunted from a Cascading Spirit. Will you help?",
+          "PromptTextConfidence": "decoded-from-QuestFullUpdate",
+          "Options": [
+            {
+              "Id": "rco_0",
+              "Index": 0,
+              "Text": "I'll help you!",
+              "TextEvidence": "20260822-083345",
+              "NextNodeId": "rosenblatt_cascading_accepted",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rco_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-083345",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_cascading_accepted",
+          "PromptText": "Kill a Cascading Spirit and bring back the Essence of the Haunted.",
+          "PromptTextConfidence": "decoded-from-QuestFullUpdate",
+          "Options": [
+            {
+              "Id": "rca_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-083345",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_spinetooth_offer",
+          "PromptText": "Oh, this message was rather old. And they wanted me to get rid of a Spinetooth Hatchling... I certainly don't have time for that right now. But maybe you can help?",
+          "PromptTextConfidence": "adapted-from-papagena-capture-pattern",
+          "Options": [
+            {
+              "Id": "rso_0",
+              "Index": 0,
+              "Text": "I'll help you!",
+              "TextEvidence": "20260822-083846",
+              "NextNodeId": "rosenblatt_spinetooth_accepted",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rso_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-083846",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_spinetooth_accepted",
+          "PromptText": "A good thing that you will.<BR><BR>Here are your instructions.",
+          "PromptTextConfidence": "adapted-from-papagena-capture-pattern",
+          "Options": [
+            {
+              "Id": "rsa_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-083846",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_demonic_offer",
+          "PromptText": "Oh, this message was rather old. And they wanted me to destroy the Demonic Subjugator... I certainly don't have time for that right now. But maybe you can help?",
+          "PromptTextConfidence": "adapted-from-papagena-capture-pattern",
+          "Options": [
+            {
+              "Id": "rdo_0",
+              "Index": 0,
+              "Text": "I'll help you!",
+              "TextEvidence": "20260822-084957",
+              "NextNodeId": "rosenblatt_demonic_accepted",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rdo_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-084957",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_demonic_accepted",
+          "PromptText": "A good thing that you will.<BR><BR>Here are your instructions.",
+          "PromptTextConfidence": "adapted-from-papagena-capture-pattern",
+          "Options": [
+            {
+              "Id": "rda_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-084957",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_return_001",
+          "PromptText": "And how may I help you?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "rr001_0",
+              "Index": 0,
+              "Text": "Actually I found this disc...",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "rosenblatt_disc_look",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rr001_1",
+              "Index": 1,
+              "Text": "I am back with the Hiathlin body parts that you asked for.",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "rosenblatt_turnin_trade",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rr001_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_turnin_trade",
+          "PromptText": "Really? Well, hand them over!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "rtt_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "rosenblatt_turnin_done",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "rosenblatt_turnin_done",
+          "PromptText": "Thank you. It will be interesting to see if we can learn anything from them! It would be good to be able to use vehicles here, eh?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "rtd_0",
+              "Index": 0,
+              "Text": "Actually I found this disc...",
+              "TextEvidence": "20260822-082554",
+              "NextNodeId": "rosenblatt_disc_look",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "rtd_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260822-070136",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

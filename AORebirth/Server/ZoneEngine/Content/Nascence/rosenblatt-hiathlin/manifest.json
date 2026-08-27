@@ -1,0 +1,8 @@
+{
+  "DialoguePacks": [
+    "dialogue/rosenblatt-hiathlin.dialogue.json"
+  ],
+  "QuestPacks": [
+    "quests/rosenblatt-hiathlin.quests.json"
+  ]
+}

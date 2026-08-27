@@ -305,6 +305,11 @@ namespace ZoneEngine.Core.Controllers
             return this.capturedPatrolReplaySegments != null && this.capturedPatrolReplaySegments.Length > 0;
         }
 
+        public bool HasCapturedPatrolReplaySegments()
+        {
+            return this.HasCapturedPatrolReplay();
+        }
+
         public bool TryGetCapturedPatrolReplayProjection(
             out Vector3 currentPosition,
             out Vector3 destination)
@@ -336,6 +341,9 @@ namespace ZoneEngine.Core.Controllers
             DateTime now = DateTime.UtcNow;
             if (this.nextCapturedPatrolReplayUtc != DateTime.MinValue && now < this.nextCapturedPatrolReplayUtc)
             {
+                // Keep server position advancing along the active FollowTarget segment so SCFU
+                // and the next useRuntimeStart handoff match what the client is already animating.
+                this.UpdateMotionSegmentPosition(now);
                 return true;
             }
 

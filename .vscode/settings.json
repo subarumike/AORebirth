@@ -6,5 +6,8 @@
   "github.gitProtocol": "https",
   "git.defaultBranchName": "master",
   "git.branchProtection": ["master"],
-  "git.detectSubmodules": true
+  "git.detectSubmodules": true,
+  "files.exclude": {
+    "password decoder": true
+  }
 }

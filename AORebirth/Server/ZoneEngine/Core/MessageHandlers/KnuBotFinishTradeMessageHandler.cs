@@ -10,16 +10,21 @@ namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
+    using System;
+
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using Utility;
+
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.KnuBot;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Doja;
+    using ZoneEngine.Core.Nascence.Quests;
     using ZoneEngine.Core.Subway.Quests;
     using ZoneEngine.Core.Thrak.Quests;
 
@@ -39,23 +44,76 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (WindcallerKarrecTradeAdapter.TryFinishTrade(
-                messageWrapper.Client.Controller.Character,
-                messageWrapper.MessageBody))
+            KnuBotFinishTradeMessage body = messageWrapper.MessageBody;
+            if (messageWrapper.Client.Controller == null || messageWrapper.Client.Controller.Character == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "KnuBotFinishTrade ignored because character is unavailable target="
+                    + body.Target.ToString(true));
+                return;
+            }
+
+            ICharacter source = messageWrapper.Client.Controller.Character;
+            messageWrapper.Client.Server.Info(
+                messageWrapper.Client,
+                "KnuBotFinishTrade target={0} decline={1} by={2}",
+                body.Target,
+                body.Decline,
+                source.Identity);
+
+            // Disc turn-ins before Hiathlin body-part trade (same NPC; Hiathlin must not steal discs).
+            if (RosenblattPapagenaTradeAdapter.TryFinishTrade(source, body))
             {
                 return;
             }
 
-            if (ThrakGardenKeyTradeAdapter.TryFinishTrade(
-                messageWrapper.Client.Controller.Character,
-                messageWrapper.MessageBody))
+            if (RosenblattCascadingSpiritTradeAdapter.TryFinishTrade(source, body))
             {
                 return;
             }
 
-            if (DojaChipTradeAdapter.TryFinishTrade(
-                messageWrapper.Client.Controller.Character,
-                messageWrapper.MessageBody))
+            if (RosenblattSpinetoothTradeAdapter.TryFinishTrade(source, body))
+            {
+                return;
+            }
+
+            if (RosenblattDemonicTradeAdapter.TryFinishTrade(source, body))
+            {
+                return;
+            }
+
+            try
+            {
+                if (RosenblattHiathlinTradeAdapter.TryFinishTrade(source, body))
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.ErrorException(
+                    ex,
+                    false,
+                    "RosenblattHiathlin FinishTrade failed by=" + source.Identity.ToString(true));
+            }
+
+            if (WindcallerKarrecTradeAdapter.TryFinishTrade(source, body))
+            {
+                return;
+            }
+
+            if (NascenceAbanFalaTradeAdapter.TryFinishTrade(source, body))
+            {
+                return;
+            }
+
+            if (ThrakGardenKeyTradeAdapter.TryFinishTrade(source, body))
+            {
+                return;
+            }
+
+            if (DojaChipTradeAdapter.TryFinishTrade(source, body))
             {
                 return;
             }
@@ -143,20 +201,31 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            ICharacter npc = Pool.Instance.GetObject<ICharacter>(messageWrapper.MessageBody.Target);
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(body.Target);
             if (npc == null)
             {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "KnuBotFinishTrade unresolved npc target="
+                    + body.Target.ToString(true)
+                    + " by="
+                    + source.Identity.ToString(true));
                 return;
             }
 
             NPCController controller = npc.Controller as NPCController;
             if (controller == null || controller.KnuBot == null)
             {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "KnuBotFinishTrade no knubot target="
+                    + body.Target.ToString(true)
+                    + " by="
+                    + source.Identity.ToString(true));
                 return;
             }
 
             BaseKnuBot knu = controller.KnuBot;
-            KnuBotFinishTradeMessage body = messageWrapper.MessageBody;
             knu.FinishTrade(body.Amount, body.Decline != 0);
         }
     }

@@ -217,8 +217,9 @@ namespace ZoneEngine.Core.Playfields
 
         internal ReadOnlyCollection<ICharacter> FindCharactersInRange(IDynel dynel, float range)
         {
-            this.RefreshFromPool();
-
+            // Do NOT RefreshFromPool here. Auto-aggro runs under HeartBeatTimer after
+            // Characters() already refreshed; re-entering RefreshFromPool mid-tick clears
+            // the registry under sync and has frozen PF 4310 outdoor packs.
             var result = new List<ICharacter>();
             if (dynel == null || dynel.RawCoordinates == null)
             {
@@ -226,7 +227,13 @@ namespace ZoneEngine.Core.Playfields
             }
 
             Coordinate coord = dynel.Coordinates();
-            foreach (ICharacter entity in this.Characters())
+            List<ICharacter> snapshot;
+            lock (this.sync)
+            {
+                snapshot = this.characters.Values.ToList();
+            }
+
+            foreach (ICharacter entity in snapshot)
             {
                 if (entity == dynel
                     || entity.Identity.Type != IdentityType.CanbeAffected

@@ -8,6 +8,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Nascence.Quests;
     using ZoneEngine.Core.Thrak.Quests;
 
     #endregion
@@ -36,6 +37,13 @@ namespace AORebirth.Core.Playfields
             RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
             FlintBioComQuestRuntime.TryObserveNpcDeath(attacker, target);
             KneecappingQuestRuntime.TryObserveNpcDeath(attacker, target);
+            RosenblattPapagenaQuestRuntime.TryObserveNpcDeath(attacker, target);
+            RosenblattPapagenoQuestRuntime.TryObserveNpcDeath(attacker, target);
+            RosenblattCascadingSpiritQuestRuntime.TryObserveNpcDeath(attacker, target);
+            RosenblattSpinetoothQuestRuntime.TryObserveNpcDeath(attacker, target);
+            RosenblattDemonicQuestRuntime.TryObserveNpcDeath(attacker, target);
+            RosenblattHiathlinQuestRuntime.TryObserveNpcDeath(attacker, target);
+            NascenceLifeJoshuaFalkerQuestRuntime.TryObserveNpcDeath(attacker, target);
             ThrakGardenKeySilvertailTransform.TryObserveCursedDeath(attacker, target);
         }
     }
