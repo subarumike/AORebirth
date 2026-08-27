@@ -96,6 +96,27 @@ same canonical placement-manifest digest for the same source SHA. Packaged
 availability is not runtime activation; the gameplay spawn path remains under
 its existing separately governed catalogs.
 
+## Capture Playfield Labels Are Session Context
+
+Decision: A capture folder/resource label is session-level evidence, not a
+per-observation official placement partition. Runtime `PlayfieldId` on each
+SCFU row, capture-start `Playfield.ModelIdentity`, final `PlayfieldInit`, and
+teleport destination identities remain separate fields with separate epochs.
+A runtime-to-official-base mapping is proven only when the same zone epoch
+retains runtime `R`, the full model identity `(1000014,N)`, and the governed
+resource-instance relationship. A packet destination proxy is corroborating,
+not automatic type-1000014 equivalence.
+
+Reason: Multi-zone captures prove that the capture-start resource label can be
+applied to later SCFU rows from another runtime phase. Current capture artifacts
+do not record runtime and model identity atomically.
+
+Consequences: Placement resolution must reject phase conflicts, must not infer
+district from base playfield, and must not promote exact/near coordinate
+candidates until both base mapping and coordinate transform are independently
+proven. Folder names, numeric runtime equality, destination proxies, names,
+appearance, and ACGHash cannot create that proof.
+
 ## Database Safety
 
 Decision: Use only `cellao_codex_clean`; do not change schemas or wipe data without explicit approval.

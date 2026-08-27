@@ -72,6 +72,15 @@ Client-state enumeration uses the checked AOSharp `Stat` enum in numeric order a
 
 The authoritative match requires the resource playfield plus exact IEEE-754 single-precision X/Y/Z coordinates. Multiple official records at the same exact coordinate remain ambiguous. If no exact match exists, official spawn-radius containment is reported only as a heuristic candidate set and remains `ambiguous` even when the set has one record; it is never promoted as a unique identity bridge. Display name, appearance similarity, unconstrained proximity, and ACGHash never choose a placement. ACGHash remains an official packed tag, not a proven runtime NPC identity.
 
+The later phase-aware audit found that the harvester's resource playfield is a
+capture-level label and can become stale across zoning while row-level SCFU
+`PlayfieldId` changes. Therefore the harvester's 222 radius candidates are a
+preliminary fail-closed inventory, not proof that every row was compared with
+the correct official partition. Use `Tools\resolve_npc_placement_identity.cmd`
+and `docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md` for production identity
+decisions; it rejects phase conflicts and still produces zero unique-proven
+matches.
+
 ## Three independent gates
 
 - Capture integrity answers whether the retained raw stream reconciled and decoded structurally.
