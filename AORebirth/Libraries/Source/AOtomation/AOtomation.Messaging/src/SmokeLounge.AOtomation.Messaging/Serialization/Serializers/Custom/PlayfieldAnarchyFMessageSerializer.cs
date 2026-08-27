@@ -161,13 +161,15 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                    firstWord == (int)IdentityType.Terminal ||
                    firstWord == (int)IdentityType.VendingMachine ||
                    firstWord == unchecked((int)0x0000C77D) ||
-                   firstWord == unchecked((int)0x0000C79F);
+                   firstWord == unchecked((int)0x0000C79F) ||
+                   // Capture 20260823-171238 Nascence ACGEntrance (0xC7A1) dungeon generator stamp.
+                   firstWord == unchecked((int)0x0000C7A1);
         }
 
         private static bool RequiresGeneratorPayload(IdentityType type)
         {
             int value = (int)type;
-            return value == 0x0000C79E || value == 0x0000C79F;
+            return value == 0x0000C79E || value == 0x0000C79F || value == 0x0000C7A1;
         }
     }
 }

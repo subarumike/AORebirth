@@ -133,10 +133,15 @@ namespace ZoneEngine.Core.Playfields
             ValidatePosition(center, "center");
             if (float.IsNaN(radius)
                 || float.IsInfinity(radius)
-                || radius <= 0.0f
-                || radius > PlayfieldVisibilityInterestPolicy.MaximumLeaveRadius)
+                || radius <= 0.0f)
             {
                 throw new ArgumentOutOfRangeException("radius");
+            }
+
+            // Clamp instead of throw: oversized dungeon-wide radii must still stream NPCs.
+            if (radius > PlayfieldVisibilityInterestPolicy.MaximumLeaveRadius)
+            {
+                radius = PlayfieldVisibilityInterestPolicy.MaximumLeaveRadius;
             }
 
             int minimumX = this.CellCoordinate((double)center.X - radius);

@@ -495,6 +495,48 @@ namespace ZoneEngine.Core
                 { 209173, 208966 },
                 // Capture 20260723-221330: Swift/Dreaming Silvertail corpse CATMesh.
                 { 208922, 208937 },
+                // Capture 20260822-070136: Hiathlin / Hiathlin Prime corpse CATMesh.
+                { 209196, 208982 },
+                // Capture 20260822-082554: Papagena corpse CATMesh (CorpseFullUpdate FCE016).
+                { 236640, 236637 },
+                // Capture 20260823-112044: Papageno Omni corpse CATMesh (CorpseFullUpdate FCE011).
+                { 208640, 208356 },
+                // Capture 20260823-103458: Nascence Spirit Hunter / Soul Dredge corpse CATMesh.
+                { 209215, 214776 },
+                // Capture 20260823-103458: Cascading Spirit corpse CATMesh.
+                { 217008, 216891 },
+                // Capture 20260823-112044: Disease-Ridden Rafter corpse CATMesh (Shadowlands Rafter family).
+                { 212186, 210952 },
+                // Nascence D1 Coral Rafter / Havaris (MD 212846): same Rafter family corpse mesh.
+                // Unmapped MD-as-CATMesh crashes the client (CorpseFullUpdate generic path).
+                { 212846, 210952 },
+                // Capture 20260823-112044: Tempterus corpse CATMesh.
+                { 209189, 208978 },
+                // Capture 20260823-112044: Predator Striker corpse CATMesh.
+                { 209022, 208940 },
+                // Capture 20260825-202932: The Demonic Subjugator corpse CATMesh.
+                { 223690, 216837 },
+                // Capture 20260823-112044: Crippler of Growth corpse CATMesh.
+                { 209333, 209275 },
+                // Nascence D1 Crippler of Destiny — same Crippler family corpse mesh.
+                { 209340, 209275 },
+                // Capture 20260823-171238: Wailing Spirit corpse CATMesh (513B ExtTex tail).
+                { 217022, 214925 },
+                // Capture 20260823-171238: Croaker of Desolation/Solitude corpse CATMesh.
+                { 209319, 209264 },
+                { 209326, 209264 },
+                // Capture 20260823-171238: Smelly Weaver corpse CATMesh (460B Material tail).
+                { 209347, 209288 },
+                // Capture 20260823-182854: Nascence Dungeon 2 corpse CATMesh.
+                { 209082, 208950 }, // Bound Dryad
+                { 209458, 209423 }, // Infernal Vortexoid
+                { 209252, 209046 }, // Malah-Fama
+                // Capture 20260826-051307: Malah-Ana / Spinetooth Hatchling outdoor corpse CATMesh.
+                { 209229, 209046 }, // Malah-Ana
+                { 226557, 302574 }, // Spinetooth Hatchling
+                { 209354, 209288 }, // Weaver of Malice
+                { 209136, 208955 }, // Burning Shadow
+                { 209125, 208955 }, // Icy Shadow
                 // L7 gold 20260725-002423 / Find Person 20260725-185432 mission trash corpses.
                 { 26159, 17909 },
                 { 26139, 5914 },
@@ -534,7 +576,9 @@ namespace ZoneEngine.Core
                 return mappedCatMesh;
             }
 
-            return monsterData;
+            // Never use living MonsterData as CATMesh — crashes the current client renderer
+            // (see CorpseFullUpdate). Caller falls back to a known-safe mesh.
+            return 0;
         }
 
         public static int CorpseMonsterDataFor(int monsterData, int corpseCatMesh)

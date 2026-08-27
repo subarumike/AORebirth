@@ -40,6 +40,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Nascence.Quests;
     using ZoneEngine.ChatCommands;
     using ZoneEngine.Script;
 
@@ -101,6 +102,30 @@ namespace ZoneEngine.Core.MessageHandlers
             if (commandName == "pet")
             {
                 PetCommandService.HandleChatPetCommand(client, cmdArgs);
+                return;
+            }
+
+            if (commandName == "abandonaban")
+            {
+                if (NascenceAbanFalaQuestRuntime.TryGmResetAbanQuest(client.Controller.Character))
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        "Aban Fala garden-key quests cleared from journal. Talk to Ecclesiast Aban Fala to restart.");
+                }
+
+                return;
+            }
+
+            if (commandName == "abandonhiathlin")
+            {
+                if (RosenblattHiathlinQuestRuntime.TryGmResetQuest(client.Controller.Character))
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        "Dr. Rosenblatt Hiathlin quest reset. Talk to Dr. Rosenblatt to accept again.");
+                }
+
                 return;
             }
 

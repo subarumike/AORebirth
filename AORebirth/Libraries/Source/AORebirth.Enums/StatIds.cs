@@ -2740,6 +2740,16 @@ namespace AORebirth.Enums
         pvpduelscore = 684,
 
         /// <summary>
+        /// ICC Commendations (capture 20260822-073726 holodeck vendor purchase).
+        /// </summary>
+        commendations = 695,
+
+        /// <summary>
+        /// Freelancers Inc. Tokens (client e_DailyMissionResets; inspect probe confirmed stat 696).
+        /// </summary>
+        dailymissionresets = 696,
+
+        /// <summary>
         /// </summary>
         acgitemseed = 700,
 

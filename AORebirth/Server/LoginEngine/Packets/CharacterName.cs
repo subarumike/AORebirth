@@ -378,6 +378,12 @@ namespace LoginEngine.Packets
             // NPCFamily / 455
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 455, StatValue = 0 });
 
+            // ICC Commendations (capture-proven stat 695)
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 695, StatValue = 0 });
+
+            // Freelancers Inc. Tokens (stat 696 / DailyMissionResets)
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 696, StatValue = 0 });
+
             stats.Add(
                 new DBStats
                 {

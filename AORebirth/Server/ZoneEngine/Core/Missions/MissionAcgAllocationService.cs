@@ -61,6 +61,11 @@ namespace ZoneEngine.Core.Missions
             }
 
             this.unavailablePlayfields.Add(LegacySharedPlayfield2);
+            // Reserved for Nascence SL cave ACG interior (not an RK mission lease).
+            this.unavailablePlayfields.Add(
+                AORebirth.Core.Playfields.NascenceDungeon1Rules.DungeonPlayfieldId);
+            this.unavailablePlayfields.Add(
+                AORebirth.Core.Playfields.NascenceDungeon2Rules.DungeonPlayfieldId);
             for (int i = 0; i < catalog.Layouts.Count; i++)
             {
                 this.unavailablePlayfields.Add(catalog.Layouts[i].SourcePlayfield2);

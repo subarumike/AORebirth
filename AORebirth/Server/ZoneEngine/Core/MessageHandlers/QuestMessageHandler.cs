@@ -11,6 +11,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Nascence.Quests;
 
     #endregion
 
@@ -106,6 +107,24 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 if (stored == null)
                 {
+                    if (NascenceAbanFalaQuestRuntime.TryHandleJournalDelete(character, deleteMission))
+                    {
+                        MissionDiagnostics.Log(
+                            "JOURNAL-DELETE-ABAN char={0} mission={1:X8}",
+                            character.Identity.Instance,
+                            deleteMission.Instance);
+                        return;
+                    }
+
+                    if (NascenceLifeJoshuaFalkerQuestRuntime.TryHandleJournalDelete(character, deleteMission))
+                    {
+                        MissionDiagnostics.Log(
+                            "JOURNAL-DELETE-FALKER char={0} mission={1:X8}",
+                            character.Identity.Instance,
+                            deleteMission.Instance);
+                        return;
+                    }
+
                     MissionDiagnostics.Log(
                         "JOURNAL-DELETE-IGNORE char={0} mission={1:X8} reason=not-owned-terminal-mission",
                         character.Identity.Instance,

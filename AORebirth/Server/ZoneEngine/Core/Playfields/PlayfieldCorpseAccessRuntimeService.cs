@@ -18,6 +18,7 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Nascence.Quests;
 
     #endregion
 
@@ -274,6 +275,11 @@ namespace AORebirth.Core.Playfields
             }
 
             Item item = lootItem(corpseLootItem);
+            if (TryRejectQuestDatadiscDuplicate(looter, item, sendChatText, sendUseActionFinished))
+            {
+                return true;
+            }
+
             if (characterHasUniqueItemAlready(looter, item))
             {
                 LogUtil.Debug(
@@ -340,6 +346,7 @@ namespace AORebirth.Core.Playfields
 
             setLooted(corpseLootItem, true);
             setOpened(corpse, true);
+            RosenblattHiathlinQuestRuntime.TryObserveBodyPartLoot(looter, item);
             sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);
             sendChatText(
                 looter,
@@ -446,6 +453,52 @@ namespace AORebirth.Core.Playfields
         {
             sendCorpseInventoryUpdate(looter, corpse);
             scheduleCorpseCreditAward(looter, corpse);
+        }
+
+        private static bool TryRejectQuestDatadiscDuplicate(
+            ICharacter looter,
+            Item item,
+            Action<ICharacter, string> sendChatText,
+            Action<ICharacter> sendUseActionFinished)
+        {
+            if (looter == null || item == null)
+            {
+                return false;
+            }
+
+            if (RosenblattPapagenaInteractionRules.IsSwiftSilvertailDatadisc(item.LowID, item.HighID)
+                && RosenblattPapagenaQuestRuntime.HasDatadisc(looter))
+            {
+                sendChatText(looter, "You already have this unique item.");
+                sendUseActionFinished(looter);
+                return true;
+            }
+
+            if (RosenblattCascadingSpiritInteractionRules.IsBarkingChimeraDatadisc(item.LowID, item.HighID)
+                && RosenblattCascadingSpiritQuestRuntime.HasChimeraDatadisc(looter))
+            {
+                sendChatText(looter, "You already have this unique item.");
+                sendUseActionFinished(looter);
+                return true;
+            }
+
+            if (RosenblattSpinetoothInteractionRules.IsPredatorDatadisc(item.LowID, item.HighID)
+                && RosenblattSpinetoothQuestRuntime.HasDatadisc(looter))
+            {
+                sendChatText(looter, "You already have this unique item.");
+                sendUseActionFinished(looter);
+                return true;
+            }
+
+            if (RosenblattDemonicInteractionRules.IsWeaverDatadisc(item.LowID, item.HighID)
+                && RosenblattDemonicQuestRuntime.HasDatadisc(looter))
+            {
+                sendChatText(looter, "You already have this unique item.");
+                sendUseActionFinished(looter);
+                return true;
+            }
+
+            return false;
         }
     }
 }

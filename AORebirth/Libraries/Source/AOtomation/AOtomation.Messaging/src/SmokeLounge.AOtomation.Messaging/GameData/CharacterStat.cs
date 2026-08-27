@@ -1236,6 +1236,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         PVPDuelScore = 0x000002AC, 
 
+        Commendations = 0x000002B7, 
+
+        DailyMissionResets = 0x000002B8, 
+
         ACGItemSeed = 0x000002BC, 
 
         ACGItemLevel = 0x000002BD, 

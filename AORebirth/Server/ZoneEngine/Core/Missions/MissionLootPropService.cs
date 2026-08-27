@@ -77,8 +77,13 @@ namespace ZoneEngine.Core.Missions
             }
 
             ICharacter character = client.Controller != null ? client.Controller.Character : null;
-            if (character == null || character.Playfield == null
-                || !MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
+            if (character == null || character.Playfield == null)
+            {
+                return false;
+            }
+
+            int playfieldInstance = character.Playfield.Identity.Instance;
+            if (!MissionInstanceService.IsMissionInstancePlayfield(playfieldInstance))
             {
                 return false;
             }

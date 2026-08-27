@@ -100,6 +100,29 @@ namespace ZoneEngine.Core.Playfields
                 return new List<StatelData>();
             }
 
+            // Capture 20260824-125154: Nascence Dungeon 1 dyn ACG PF 0x1F900B — no PFData row.
+            if (NascenceDungeon1Rules.IsDungeonPlayfield(playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nascence Dungeon 1 instance created without PFData statels instance={0} evidence=20260823-171238",
+                        playfieldIdentity.Instance));
+                return new List<StatelData>();
+            }
+
+            if (NascenceDungeon2Rules.IsDungeonPlayfield(playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nascence Dungeon 2 instance created without PFData statels instance={0} evidence=20260823-182854",
+                        playfieldIdentity.Instance));
+                return new List<StatelData>();
+            }
+
             return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
         }
 

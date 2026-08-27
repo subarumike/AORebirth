@@ -201,6 +201,44 @@
     <Compile Include="Core\Doja\DojaChipPacketSender.cs" />
     <Compile Include="Core\Doja\DojaChipQuestRuntime.cs" />
     <Compile Include="Core\Doja\DojaChipTradeAdapter.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattHiathlinInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattHiathlinPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattHiathlinQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattHiathlinTradeAdapter.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenaInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenaPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenaQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenaTradeAdapter.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenoInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenoPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattPapagenoQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattCascadingSpiritInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattCascadingSpiritPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattCascadingSpiritQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattCascadingSpiritTradeAdapter.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattSpinetoothInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattSpinetoothPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattSpinetoothQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattSpinetoothTradeAdapter.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattDemonicInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattDemonicPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattDemonicQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattDemonicTradeAdapter.cs" />
+    <Compile Include="Core\Nascence\Quests\RosenblattClientActionLock.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeRodriguezInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeRodriguezPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeRodriguezQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeJoshuaFalkerInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeJoshuaFalkerPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeJoshuaFalkerQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeDonnaRedInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeDonnaRedPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceLifeDonnaRedQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceAbanFalaCombineRules.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceAbanFalaInteractionRules.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceAbanFalaPacketSender.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceAbanFalaQuestRuntime.cs" />
+    <Compile Include="Core\Nascence\Quests\NascenceAbanFalaTradeAdapter.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\PlayerSpecialAttackRules.cs" />
@@ -539,6 +577,8 @@
     <Compile Include="Core\Playfields\Content\JobePlatformContentModule.cs" />
     <Compile Include="Core\Playfields\Content\NascenceCoreContentModule.cs" />
     <Compile Include="Core\Playfields\Content\NascenceLifeContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\NascenceDungeon1ContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\NascenceDungeon2ContentModule.cs" />
     <Compile Include="Core\Playfields\Content\ThrakOmniGardenContentModule.cs" />
     <Compile Include="Core\Playfields\Content\RomeBlueCityContentModule.cs" />
     <Compile Include="Core\Playfields\Content\AndromedaIccHqContentModule.cs" />
@@ -556,7 +596,40 @@
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerContentProvider.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerSpawnOrchestrator.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1AcgLayout.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1CorpseCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1DoorCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1BossRoomRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1HavarisScfuWire.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1DoorReplay.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1RevealZones.cs" />
+    <Compile Include="Core\Playfields\NascenceFrontierSpinetoothMobCombat.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1MobCombat.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1Rules.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1TreasureLootService.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1SearchRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1Spawn.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon1SpawnData.cs" />
+    <Compile Include="Core\MessageHandlers\NascenceDungeon1InteractionHandler.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2AcgLayout.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2CorpseCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2DoorCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2BossRoomRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2HavarisScfuWire.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2DoorReplay.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2RevealZones.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2MobCombat.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2Rules.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2FactionRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2TreasureLootService.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2SearchRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2Spawn.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon2SpawnData.cs" />
+    <Compile Include="Core\MessageHandlers\NascenceDungeon2InteractionHandler.cs" />
     <Compile Include="Core\Playfields\NascenceLifeSpawn.cs" />
+    <Compile Include="Core\Playfields\NascenceSwampClanMobRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceFrontierOutdoorMobRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceLifeStarterBridgePatrolRuntime.cs" />
     <Compile Include="Core\Playfields\ThrakOmniGardenSpawn.cs" />
     <Compile Include="Core\Playfields\ScarlettDalquistSpawn.cs" />
     <Compile Include="Core\Playfields\Content\DojaResearchContentModule.cs" />
@@ -624,6 +697,7 @@
     <Compile Include="Core\Playfields\NpcCombatSpatialPolicy.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
+    <Compile Include="Core\Playfields\NpcCombatPlayerFeedback.cs" />
     <Compile Include="Core\Playfields\NpcDamageLineOfSightRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleRules.cs" />
@@ -3436,10 +3510,22 @@
     <Content Include="Content\Doja\nascense-chip\quests\doja-nascense.quests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Nascence\rosenblatt-hiathlin\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Nascence\rosenblatt-hiathlin\dialogue\rosenblatt-hiathlin.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Nascence\rosenblatt-hiathlin\quests\rosenblatt-hiathlin.quests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Nascence\life-dialogs\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Nascence\life-dialogs\dialogue\nascence-life-dialogs.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Nascence\life-dialogs\quests\nascence-life.quests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Andromeda\zyvania-bagh\manifest.json">

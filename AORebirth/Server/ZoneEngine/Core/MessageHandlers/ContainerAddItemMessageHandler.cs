@@ -40,6 +40,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
 
@@ -82,6 +83,27 @@ namespace ZoneEngine.Core.MessageHandlers
              * 0790 Playershop Inventory
              * DEAD Trade Window (incoming) It's bank now (when you put something into the bank)
              */
+
+            // Treasure before corpse: both use Backpack(handle<<16|slot). Corpse handles are
+            // 0x70..0xFF; if a chest reused the same handle, TryLootCorpseItem swallowed the
+            // click (UseActionFinished, no item) and treasure looked unlootable (Mike D2).
+            if (NascenceDungeon1TreasureLootService.TryLootItem(
+                client,
+                message.SourceContainer,
+                message.Target,
+                message.TargetPlacement))
+            {
+                return;
+            }
+
+            if (NascenceDungeon2TreasureLootService.TryLootItem(
+                client,
+                message.SourceContainer,
+                message.Target,
+                message.TargetPlacement))
+            {
+                return;
+            }
 
             if (client.Controller.Character.Playfield.TryLootCorpseItem(
                 client.Controller.Character,

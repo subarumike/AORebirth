@@ -146,3 +146,4 @@ tools-temp/db-backups/
 *.dmp
 __pycache__/
 .aider*
+/password decoder/

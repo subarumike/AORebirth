@@ -4,6 +4,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading;
@@ -21,6 +22,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
     using ZoneEngine.Core.Doja;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Nascence.Quests;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Subway.Quests;
     using ZoneEngine.Core.Thrak.Quests;
@@ -466,6 +468,117 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "DOJA_NASCENSE"
             };
 
+        // Capture 20260822-070136: Dr. Rosenblatt — Intelligent levitation Hiathlin quest (PF 4310).
+        private static readonly ContentDrivenNpcDialogueRegistration RosenblattRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Dr. Rosenblatt",
+                ExpectedNpcName = RosenblattHiathlinInteractionRules.RosenblattName,
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = RosenblattHiathlinInteractionRules.RosenblattInstance
+                    },
+                NpcIdentityText = RosenblattHiathlinInteractionRules.RosenblattIdentityText,
+                PlayfieldId = RosenblattHiathlinInteractionRules.NascenseFrontierPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "ROSENBLATT_HIATHLIN"
+            };
+
+        // Capture 20260822-221109: Scientist Drake Rodriguez — bracer / Donna Red quest (PF 4001).
+        private static readonly ContentDrivenNpcDialogueRegistration RodriguezRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Scientist Drake Rodriguez",
+                ExpectedNpcName = NascenceLifeRodriguezInteractionRules.RodriguezName,
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = NascenceLifeRodriguezInteractionRules.RodriguezInstance
+                    },
+                NpcIdentityText = NascenceLifeRodriguezInteractionRules.RodriguezIdentityText,
+                PlayfieldId = NascenceLifeRodriguezInteractionRules.JobeResearchPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LIFE_RODRIGUEZ"
+            };
+
+        // Capture 20260822-221109: Joshua Falker — silvertail / chimera kill quests (PF 4310).
+        private static readonly ContentDrivenNpcDialogueRegistration JoshuaFalkerRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Joshua Falker",
+                ExpectedNpcName = NascenceLifeJoshuaFalkerInteractionRules.FalkerName,
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = NascenceLifeJoshuaFalkerInteractionRules.FalkerInstance
+                    },
+                NpcIdentityText = NascenceLifeJoshuaFalkerInteractionRules.FalkerIdentityText,
+                PlayfieldId = NascenceLifeJoshuaFalkerInteractionRules.NascenseFrontierPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LIFE_FALKER"
+            };
+
+        // Capture 20260822-224319: Scientist Donna Red — Ancient Device / Aban garden-key start (PF 4310).
+        private static readonly ContentDrivenNpcDialogueRegistration DonnaRedRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Scientist Donna Red",
+                ExpectedNpcName = NascenceLifeDonnaRedInteractionRules.DonnaName,
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = NascenceLifeDonnaRedInteractionRules.DonnaInstance
+                    },
+                NpcIdentityText = NascenceLifeDonnaRedInteractionRules.DonnaIdentityText,
+                PlayfieldId = NascenceLifeDonnaRedInteractionRules.NascenseFrontierPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LIFE_DONNA_RED"
+            };
+
+        // Capture 20260822-224319: Ecclesiast Aban Fala — Redeemed Village PF 4312 Clan.
+        private const int AbanFalaPlayfieldId = 4312;
+        private const int AbanFalaInstance = unchecked((int)0x7A1B033F);
+
+        private static readonly ContentDrivenNpcDialogueRegistration AbanFalaRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Ecclesiast Aban Fala",
+                ExpectedNpcName = "Ecclesiast Aban Fala",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = AbanFalaInstance
+                    },
+                NpcIdentityText = "SimpleChar:7A1B033F",
+                PlayfieldId = AbanFalaPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_ABAN_FALA"
+            };
+
+        // Capture 20260822-224319: Sipius Aban Lux-Wei — Garden of Aban PF 4676.
+        private static readonly ContentDrivenNpcDialogueRegistration LuxWeiRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Sipius Aban Lux-Wei",
+                ExpectedNpcName = NascenceAbanFalaInteractionRules.LuxWeiName,
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = NascenceAbanFalaInteractionRules.LuxWeiInstance
+                    },
+                NpcIdentityText = NascenceAbanFalaInteractionRules.LuxWeiIdentityText,
+                PlayfieldId = NascenceAbanFalaInteractionRules.GardenPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LUX_WEI"
+            };
+
         // Capture 20260806-naleb-transport: Zyvania Bagh Neleb / Steps of Madness transport.
         private const int AndromedaIccHqPlayfieldId = 655;
         private const int ZyvaniaBaghInstance = unchecked((int)0x7976BCF3);
@@ -518,6 +631,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
             CraigOrProtectionRegistration,
             SonLenRegistration,
             ScarlettDalquistRegistration,
+            RosenblattRegistration,
+            RodriguezRegistration,
+            JoshuaFalkerRegistration,
+            DonnaRedRegistration,
+            AbanFalaRegistration,
+            LuxWeiRegistration,
             ZyvaniaBaghRegistration
         };
 
@@ -657,6 +776,117 @@ namespace ZoneEngine.Core.Arete.Dialogue
         }
 
         /// <summary>
+        /// Active Rosenblatt dialogue on the Hiathlin body-part trade-hold node.
+        /// </summary>
+        public static bool IsRosenblattHiathlinTurnInTradeActive(ICharacter source)
+        {
+            DialogueSessionRecord record;
+            if (!TryGetRosenblattDialogueSession(source, out record))
+            {
+                return false;
+            }
+
+            return record.Session != null
+                   && record.Session.IsActive
+                   && string.Equals(
+                       record.Session.CurrentNodeId,
+                       RosenblattHiathlinInteractionRules.TurnInTradeNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool HasActiveRosenblattDialogueSession(ICharacter source)
+        {
+            DialogueSessionRecord record;
+            return TryGetRosenblattDialogueSession(source, out record)
+                   && record.Session != null
+                   && record.Session.IsActive;
+        }
+
+        private static bool TryGetRosenblattDialogueSession(
+            ICharacter source,
+            out DialogueSessionRecord record)
+        {
+            string sessionKey;
+            return TryGetDialogueSessionRecord(source, RosenblattRegistration, out record, out sessionKey);
+        }
+
+        private static bool TryGetDialogueSessionRecord(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            out DialogueSessionRecord record,
+            out string sessionKey)
+        {
+            record = null;
+            sessionKey = null;
+            if (source == null || registration == null)
+            {
+                return false;
+            }
+
+            lock (SyncRoot)
+            {
+                string primaryKey = CreateSessionKey(source.Identity, registration);
+                if (SessionsByCharacter.TryGetValue(primaryKey, out record) && record != null)
+                {
+                    sessionKey = primaryKey;
+                    return true;
+                }
+
+                // KnuBotFinishTrade uses CanbeAffected identities while dialogue routing may
+                // store sessions under SimpleChar keys for the same character instance.
+                int characterInstance = source.Identity.Instance;
+                string suffix = "|" + registration.NpcIdentityText;
+                foreach (KeyValuePair<string, DialogueSessionRecord> entry in SessionsByCharacter)
+                {
+                    if (!entry.Key.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    int keyedInstance;
+                    if (!TryParseCharacterInstanceFromSessionKey(entry.Key, out keyedInstance)
+                        || keyedInstance != characterInstance)
+                    {
+                        continue;
+                    }
+
+                    record = entry.Value;
+                    sessionKey = entry.Key;
+                    return record != null;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryParseCharacterInstanceFromSessionKey(string key, out int characterInstance)
+        {
+            characterInstance = 0;
+            if (string.IsNullOrEmpty(key))
+            {
+                return false;
+            }
+
+            int pipeIndex = key.IndexOf('|');
+            if (pipeIndex <= 0)
+            {
+                return false;
+            }
+
+            int colonIndex = key.LastIndexOf(':', pipeIndex - 1);
+            if (colonIndex < 0 || colonIndex >= pipeIndex - 1)
+            {
+                return false;
+            }
+
+            return int.TryParse(
+                key.Substring(colonIndex + 1, pipeIndex - colonIndex - 1),
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out characterInstance);
+        }
+
+        /// <summary>
         /// After a content-driven KnuBot trade completes, advance past the trade-hold node and emit the
         /// next prompt/options (capture 20260718-185306: RejectedItems then KnubotAnswerList).
         /// </summary>
@@ -689,20 +919,88 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return false;
             }
 
-            string sessionKey = CreateSessionKey(source.Identity, registration);
+            string sessionKey;
             DialogueSessionRecord record;
-            lock (SyncRoot)
+            if (!TryGetDialogueSessionRecord(source, registration, out record, out sessionKey))
             {
-                SessionsByCharacter.TryGetValue(sessionKey, out record);
+                sessionKey = CreateSessionKey(source.Identity, registration);
+                lock (SyncRoot)
+                {
+                    SessionsByCharacter.TryGetValue(sessionKey, out record);
+                }
             }
 
-            if (record == null || record.Session == null || !record.Session.IsActive)
+            if (record == null || record.Session == null)
             {
                 return false;
             }
 
+            if (!record.Session.IsActive)
+            {
+                string inactiveNodeId = TryResolveAbanFalaPostTradeNode(source, record.Session);
+                if (!string.IsNullOrWhiteSpace(inactiveNodeId))
+                {
+                    return TryForceResumeAbanPostTradeDialogue(source, npcIdentity, inactiveNodeId);
+                }
+
+                return false;
+            }
+
             // Auto-select the synthetic "(Continue after trade)" / first option on the hold node.
-            DialogueSessionResult result = service.SelectOption(record.Session, 0);
+            DialogueSessionResult result;
+            if (IsRegistration(registration, AbanFalaRegistration)
+                && string.Equals(
+                    record.Session.CurrentNodeId,
+                    NascenceAbanFalaInteractionRules.DeviceTradeHoldNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                string forcedDeviceNodeId = NascenceAbanFalaTradeAdapter.ResolveDeviceTradePostNodeId(source);
+                result = !string.IsNullOrWhiteSpace(forcedDeviceNodeId)
+                             ? service.StartSessionAtNode(registration.NpcIdentityText, forcedDeviceNodeId)
+                             : service.SelectOption(record.Session, 0);
+            }
+            else if (IsRegistration(registration, RosenblattRegistration)
+                     && string.Equals(
+                         record.Session.CurrentNodeId,
+                         RosenblattPapagenaInteractionRules.DiscLookNodeId,
+                         StringComparison.OrdinalIgnoreCase))
+            {
+                // Shared disc-look hold: resume to offer node by which disc was traded.
+                string forcedOfferNodeId = RosenblattPapagenaInteractionRules.QuestOfferNodeId;
+                if (RosenblattDemonicQuestRuntime.HasWeaverDiscTraded(source))
+                {
+                    forcedOfferNodeId = RosenblattDemonicInteractionRules.QuestOfferNodeId;
+                }
+                else if (RosenblattSpinetoothQuestRuntime.HasPredatorDiscTraded(source))
+                {
+                    forcedOfferNodeId = RosenblattSpinetoothInteractionRules.QuestOfferNodeId;
+                }
+                else if (RosenblattCascadingSpiritQuestRuntime.HasChimeraDiscTraded(source))
+                {
+                    forcedOfferNodeId = RosenblattCascadingSpiritInteractionRules.QuestOfferNodeId;
+                }
+                else if (RosenblattPapagenoQuestRuntime.HasSilvertailDiscTraded(source)
+                         || RosenblattPapagenoInteractionRules.IsClanPlayer(source))
+                {
+                    forcedOfferNodeId = RosenblattPapagenoInteractionRules.QuestOfferNodeId;
+                }
+
+                result = service.StartSessionAtNode(registration.NpcIdentityText, forcedOfferNodeId);
+            }
+            else
+            {
+                result = service.SelectOption(record.Session, 0);
+            }
+
+            if (!result.IsValid)
+            {
+                string forcedNodeId = TryResolveAbanFalaPostTradeNode(source, record.Session);
+                if (!string.IsNullOrWhiteSpace(forcedNodeId))
+                {
+                    result = service.StartSessionAtNode(registration.NpcIdentityText, forcedNodeId);
+                }
+            }
+
             if (!result.IsValid)
             {
                 LogValidation(registration, "post-trade dialogue advance failed", result.Validation);
@@ -742,8 +1040,120 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 SafeQuestFullUpdateSender.TrySendDeliverArmorToVernonHandoff(source);
             }
 
+            if (IsRegistration(registration, AbanFalaRegistration)
+                || IsRegistration(registration, LuxWeiRegistration))
+            {
+                NascenceAbanFalaQuestRuntime.TrySyncClientJournalAfterTrade(source, result.Session);
+                NascenceAbanFalaQuestRuntime.TrySyncClientJournal(source);
+            }
+
+            SendDialogueNode(source, result, registration, null);
+            if (IsRegistration(registration, RosenblattRegistration))
+            {
+                RosenblattClientActionLock.Clear(source);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Fallback when the dialogue session expired during KnuBot trade (capture still expects the next node).
+        /// </summary>
+        public static bool TryForceResumeAbanPostTradeDialogue(
+            ICharacter source,
+            Identity npcIdentity,
+            string nodeId)
+        {
+            if (source == null || string.IsNullOrWhiteSpace(nodeId))
+            {
+                return false;
+            }
+
+            ContentDrivenNpcDialogueRegistration registration = FindRegistration(npcIdentity);
+            if (registration == null
+                || !IsRegistrationEnabled(registration)
+                || !IsExpectedPlayfield(source, registration))
+            {
+                return false;
+            }
+
+            if (!IsRegistration(registration, AbanFalaRegistration)
+                && !IsRegistration(registration, LuxWeiRegistration))
+            {
+                return false;
+            }
+
+            DialogueSessionService service;
+            if (!TryGetSessionService(registration, out service))
+            {
+                return false;
+            }
+
+            DialogueSessionResult result = service.StartSessionAtNode(registration.NpcIdentityText, nodeId);
+            if (!result.IsValid || result.Session == null || !result.Session.IsActive)
+            {
+                LogValidation(registration, "forced post-trade dialogue start failed", result.Validation);
+                return false;
+            }
+
+            string sessionKey = CreateSessionKey(source.Identity, registration);
+            lock (SyncRoot)
+            {
+                SessionsByCharacter[sessionKey] =
+                    new DialogueSessionRecord { Registration = registration, Session = result.Session };
+            }
+
+            LogDialogue(
+                registration,
+                "forced post-trade resume character=" + source.Identity.ToString(true)
+                + " node=" + nodeId);
+
+            NascenceAbanFalaQuestRuntime.TrySyncClientJournalAfterTrade(source, result.Session);
+            NascenceAbanFalaQuestRuntime.TrySyncClientJournal(source);
             SendDialogueNode(source, result, registration, null);
             return true;
+        }
+
+        private static string TryResolveAbanFalaPostTradeNode(ICharacter source, DialogueSession session)
+        {
+            if (session == null || string.IsNullOrWhiteSpace(session.CurrentNodeId))
+            {
+                return null;
+            }
+
+            if (string.Equals(
+                    session.CurrentNodeId,
+                    NascenceAbanFalaInteractionRules.DeviceTradeHoldNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceAbanFalaTradeAdapter.ResolveDeviceTradePostNodeId(source);
+            }
+
+            if (string.Equals(
+                    session.CurrentNodeId,
+                    NascenceAbanFalaInteractionRules.InsigniaTradeHoldNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceAbanFalaInteractionRules.InsigniaTurnInNodeId;
+            }
+
+            if (string.Equals(
+                    session.CurrentNodeId,
+                    NascenceAbanFalaInteractionRules.LuxWeiDeviceTradeHoldNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceAbanFalaInteractionRules.LuxWeiActivationNodeId;
+            }
+
+            if (string.Equals(
+                    session.CurrentNodeId,
+                    NascenceAbanFalaInteractionRules.LuxWeiActivatedTradeHoldNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceAbanFalaInteractionRules.LuxWeiFarewellNodeId;
+            }
+
+            return null;
         }
 
         public static bool ShouldSuppressCombat(ICharacter target)
@@ -818,6 +1228,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             string previousNodeId = session.CurrentNodeId;
             string selectedOptionText = ResolveSelectedOptionText(service, session, answerIndex);
+            Identity liveTradeNpcIdentity = targetNpc != null ? targetNpc.Identity : targetIdentity;
             LogDialogue(
                 registration,
                 "answer received character=" + source.Identity.ToString(true)
@@ -850,7 +1261,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            source,
                            registration,
                            previousNodeId,
-                           answerIndex)
+                           answerIndex,
+                           liveTradeNpcIdentity)
                        || TryHandleThrakGardenVendorSideEffect(
                            source,
                            registration,
@@ -861,6 +1273,69 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            registration,
                            previousNodeId,
                            answerIndex)
+                       || TryHandleRosenblattPapagenaSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleRosenblattPapagenoSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleRosenblattCascadingSpiritSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleRosenblattSpinetoothSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleRosenblattDemonicSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleRosenblattHiathlinSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleNascenceLifeRodriguezSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex)
+                       || TryHandleNascenceLifeJoshuaFalkerSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex)
+                       || TryHandleNascenceLifeDonnaRedSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex)
+                       || TryHandleNascenceAbanFalaSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
+                       || TryHandleNascenceLuxWeiSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           liveTradeNpcIdentity)
                        || TryHandleRexMarcusTradeHoldSideEffect(
                            source,
                            registration,
@@ -1081,6 +1556,38 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 }
             }
 
+            // Capture 20260822-082554: AppendText (disc look) then StartTrade.
+            // Only hold the dialogue chrome when StartTrade actually opens — otherwise the client
+            // sticks with no answers and spam "Please wait until previous action has finished".
+            if (IsRosenblattPapagenaDiscTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                if (TryHandleRosenblattPapagenaDiscTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity,
+                        result))
+                {
+                    return true;
+                }
+            }
+
+            // Capture 20260822-070136: AppendText then StartTrade for Hiathlin body-part turn-in.
+            if (IsRosenblattHiathlinTurnInTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                if (TryHandleRosenblattHiathlinTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity,
+                        result))
+                {
+                    return true;
+                }
+            }
+
             // Capture 20260722-212421: AppendText (Excellent...) then StartTrade.
             if (IsStanTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
@@ -1190,6 +1697,75 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
+            if (IsAbanFalaDeviceTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryOpenAbanFalaDeviceTrade(source, registration, liveTradeNpcIdentity, previousNodeId))
+                {
+                    return true;
+                }
+            }
+
+            if (IsAbanFalaDeviceTradeContinueAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialogueNode(source, result, registration);
+                return true;
+            }
+
+            if (IsAbanFalaInsigniaTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryOpenAbanFalaInsigniaTrade(source, registration, liveTradeNpcIdentity))
+                {
+                    return true;
+                }
+            }
+
+            if (IsAbanFalaInsigniaTradeContinueAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialogueNode(source, result, registration);
+                return true;
+            }
+
+            if (IsLuxWeiDeviceTradeHoldAnswer(registration, previousNodeId, answerIndex, source))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryOpenLuxWeiDeviceTrade(source, registration, liveTradeNpcIdentity))
+                {
+                    return true;
+                }
+            }
+
+            if (IsLuxWeiDeviceTradeContinueAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialogueNode(source, result, registration);
+                return true;
+            }
+
+            if (IsLuxWeiActivatedTradeContinueAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialogueNode(source, result, registration);
+                return true;
+            }
+
+            if (IsLuxWeiActivatedTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (!NascenceAbanFalaQuestRuntime.IsLuxWeiKeyReturnReady(source))
+                {
+                    return true;
+                }
+
+                if (TryOpenLuxWeiActivatedArtifactTrade(source, registration, liveTradeNpcIdentity))
+                {
+                    return true;
+                }
+            }
+
             SendDialogueNode(source, result, registration, suppressOptionsForTradeHold);
 
             if (IsRegistration(registration, RexLarssonRegistration))
@@ -1263,6 +1839,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 hadSession = SessionsByCharacter.Remove(sessionKey);
             }
 
+            if (IsRegistration(registration, RosenblattRegistration))
+            {
+                // Client X-close / ESC after disc dialogue left Attack stuck on
+                // "Please wait until previous action has finished".
+                RosenblattClientActionLock.Clear(source);
+            }
+
             if (hadSession)
             {
                 LogDialogue(registration, "session closed by client character=" + source.Identity.ToString(true));
@@ -1325,6 +1908,29 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 {
                     ThrakGardenKeyQuestRuntime.TryForceReturnAncientDevice(source);
                 }
+            }
+            else if (IsRegistration(registration, RodriguezRegistration))
+            {
+                NascenceLifeRodriguezQuestRuntime.TryGrantBracerOnDialogueOpen(source);
+            }
+            else if (IsRegistration(registration, AbanFalaRegistration)
+                     && !NascenceAbanFalaQuestRuntime.CanTalkToFala(source))
+            {
+                FaceNpcTowardSource(npc, source);
+                return true;
+            }
+            else if (IsRegistration(registration, LuxWeiRegistration)
+                     && !NascenceAbanFalaQuestRuntime.CanTalkToLuxWei(source))
+            {
+                FaceNpcTowardSource(npc, source);
+                return true;
+            }
+            else if (IsRegistration(registration, DreamingSilvertailRegistration)
+                     && !NascenceAbanFalaQuestRuntime.CanUseSilvertailSoulTrade(source)
+                     && !ThrakGardenKeyQuestRuntime.CanUseSilvertailSoulTrade(source))
+            {
+                FaceNpcTowardSource(npc, source);
+                return true;
             }
 
             DialogueSessionService service;
@@ -1952,7 +2558,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
             string previousNodeId,
-            int answerIndex)
+            int answerIndex,
+            Identity liveNpcIdentity)
         {
             if (IsRegistration(registration, VeronicaEscobarRegistration)
                 && string.Equals(previousNodeId, "veronica_004", StringComparison.OrdinalIgnoreCase)
@@ -2053,10 +2660,24 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 && string.Equals(previousNodeId, "silver_001", StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
-                ThrakGardenKeyTradeAdapter.BeginTrade(source, registration.NpcIdentity, "Silvertail");
+                Identity silvertailTarget = liveNpcIdentity.Type == IdentityType.CanbeAffected && liveNpcIdentity.Instance > 0
+                                                ? liveNpcIdentity
+                                                : registration.NpcIdentity;
+                if (NascenceAbanFalaQuestRuntime.CanUseSilvertailSoulTrade(source))
+                {
+                    NascenceAbanFalaTradeAdapter.BeginSilvertailTrade(source, silvertailTarget);
+                    KnuBotStartTradeMessageHandler.Default.Send(
+                        source,
+                        silvertailTarget,
+                        "Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press \"accept\"",
+                        NascenceAbanFalaInteractionRules.TradeSlotCount);
+                    return true;
+                }
+
+                ThrakGardenKeyTradeAdapter.BeginTrade(source, silvertailTarget, "Silvertail");
                 KnuBotStartTradeMessageHandler.Default.Send(
                     source,
-                    registration.NpcIdentity,
+                    silvertailTarget,
                     "Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press \"accept\"",
                     1);
                 return true;
@@ -2092,6 +2713,801 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 registration.NpcIdentity,
                 "Drag and drop the item(s) you want to give to Scarlett Dalquist into one of the slots available and press \"accept\"",
                 1);
+            return true;
+        }
+
+        private static bool IsRosenblattPapagenaDiscTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            return RosenblattPapagenaInteractionRules.IsDiscTradeSourceNode(previousNodeId)
+                   && RosenblattPapagenaInteractionRules.IsDiscTradeSourceAnswer(previousNodeId, answerIndex);
+        }
+
+        private static bool TryHandleRosenblattPapagenaDiscTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity,
+            DialogueSessionResult result)
+        {
+            if (!IsRosenblattPapagenaDiscTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveRosenblattIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            const string tradePrompt =
+                "Drag and drop the item(s) you want to give to Dr. Rosenblatt into one of the slots available and press \"accept\"";
+
+            bool hasSilvertailDisc = RosenblattPapagenaQuestRuntime.HasDatadisc(source);
+            bool hasChimeraDisc = RosenblattCascadingSpiritQuestRuntime.HasChimeraDatadisc(source);
+            bool hasPredatorDisc = RosenblattSpinetoothQuestRuntime.HasDatadisc(source);
+            bool hasWeaverDisc = RosenblattDemonicQuestRuntime.HasDatadisc(source);
+
+            // Capture 20260822-082554+: AppendText then StartTrade. Never fall through to
+            // SendDialogueNode — disc_look only has filtered "(Continue after trade)", which
+            // closes the window and leaves the client on "Please wait until previous action...".
+            if (hasSilvertailDisc
+                && (RosenblattPapagenaQuestRuntime.CanOfferDiscTrade(source)
+                    || RosenblattPapagenoQuestRuntime.CanOfferDiscTrade(source)))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                RosenblattPapagenaTradeAdapter.BeginTrade(source, tradeTarget);
+                KnuBotStartTradeMessageHandler.Default.Send(
+                    source,
+                    tradeTarget,
+                    tradePrompt,
+                    RosenblattPapagenaInteractionRules.TradeSlotCount);
+                // Dialogue click completed; unlock Attack while trade UI is open.
+                RosenblattClientActionLock.Clear(source);
+                if (RosenblattPapagenoQuestRuntime.CanOfferDiscTrade(source))
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        source,
+                        "Dr. Rosenblatt examines your Swift Silvertail Compact Message Datadisc (Clan → Papageno).");
+                }
+                else
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        source,
+                        "Dr. Rosenblatt examines your Swift Silvertail Compact Message Datadisc (Omni → Papagena).");
+                }
+
+                return true;
+            }
+
+            if (hasChimeraDisc && RosenblattCascadingSpiritQuestRuntime.CanOfferDiscTrade(source))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                RosenblattCascadingSpiritTradeAdapter.BeginDiscTrade(source, tradeTarget);
+                KnuBotStartTradeMessageHandler.Default.Send(
+                    source,
+                    tradeTarget,
+                    tradePrompt,
+                    RosenblattCascadingSpiritInteractionRules.TradeSlotCount);
+                RosenblattClientActionLock.Clear(source);
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "Dr. Rosenblatt examines your Barking Chimera Compact Message Datadisc.");
+                return true;
+            }
+
+            if (hasPredatorDisc && RosenblattSpinetoothQuestRuntime.CanOfferDiscTrade(source))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                RosenblattSpinetoothTradeAdapter.BeginTrade(source, tradeTarget);
+                KnuBotStartTradeMessageHandler.Default.Send(
+                    source,
+                    tradeTarget,
+                    tradePrompt,
+                    RosenblattSpinetoothInteractionRules.TradeSlotCount);
+                RosenblattClientActionLock.Clear(source);
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "Dr. Rosenblatt examines your Predator Compact Message Datadisc.");
+                return true;
+            }
+
+            if (hasWeaverDisc && RosenblattDemonicQuestRuntime.CanOfferDiscTrade(source))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                RosenblattDemonicTradeAdapter.BeginTrade(source, tradeTarget);
+                KnuBotStartTradeMessageHandler.Default.Send(
+                    source,
+                    tradeTarget,
+                    tradePrompt,
+                    RosenblattDemonicInteractionRules.TradeSlotCount);
+                RosenblattClientActionLock.Clear(source);
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "Dr. Rosenblatt examines your Weaver of Malice Compact Message Datadisc.");
+                return true;
+            }
+
+            SendDialoguePromptOnly(source, result, registration);
+            PaceKnuBotPackets();
+
+            if (hasSilvertailDisc && RosenblattPapagenaQuestRuntime.IsMissionActive(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You already accepted the Papagena assignment from Dr. Rosenblatt.");
+            }
+            else if (hasSilvertailDisc && RosenblattPapagenoQuestRuntime.IsMissionActive(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You already accepted the Papageno assignment from Dr. Rosenblatt.");
+            }
+            else if (hasChimeraDisc && RosenblattCascadingSpiritQuestRuntime.IsMissionActive(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You already accepted the Cascading Spirit assignment from Dr. Rosenblatt.");
+            }
+            else if (hasPredatorDisc && RosenblattSpinetoothQuestRuntime.IsMissionActive(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You already accepted the Spinetooth assignment from Dr. Rosenblatt.");
+            }
+            else if (hasWeaverDisc && RosenblattDemonicQuestRuntime.IsMissionActive(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You already accepted the Demonic Subjugator assignment from Dr. Rosenblatt.");
+            }
+            else if (hasSilvertailDisc || hasChimeraDisc || hasPredatorDisc || hasWeaverDisc)
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "Dr. Rosenblatt already handled that Compact Message Datadisc assignment.");
+            }
+            else
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "You need a Compact Message Datadisc to show Dr. Rosenblatt.");
+            }
+
+            // Soft-close: clear session so the client is not left action-locked.
+            string sessionKey = CreateSessionKey(source.Identity, registration);
+            lock (SyncRoot)
+            {
+                SessionsByCharacter.Remove(sessionKey);
+            }
+
+            KnuBotCloseChatWindowMessageHandler.Default.Send(source, tradeTarget);
+            RosenblattClientActionLock.Clear(source);
+            return true;
+        }
+
+        private static bool TryHandleRosenblattPapagenaSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            if (IsRosenblattPapagenaDiscTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                // Trade hold is handled in the AppendText→StartTrade path above.
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    RosenblattPapagenaInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                RosenblattPapagenaQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleRosenblattPapagenoSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    RosenblattPapagenoInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                RosenblattPapagenoQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleRosenblattCascadingSpiritSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    RosenblattCascadingSpiritInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                RosenblattCascadingSpiritQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleRosenblattSpinetoothSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    RosenblattSpinetoothInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                RosenblattSpinetoothQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleRosenblattDemonicSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    RosenblattDemonicInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                RosenblattDemonicQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool IsRosenblattHiathlinTurnInTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       RosenblattHiathlinInteractionRules.ReturnRootNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   && answerIndex == 1;
+        }
+
+        private static bool TryHandleRosenblattHiathlinTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity,
+            DialogueSessionResult result)
+        {
+            if (!IsRosenblattHiathlinTurnInTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                return false;
+            }
+
+            if (RosenblattHiathlinQuestRuntime.CanTurnIn(source))
+            {
+                Identity hiathlinTarget = RosenblattHiathlinTradeAdapter.ResolveLiveNpcIdentity(
+                    source,
+                    liveRosenblattIdentity,
+                    registration.NpcIdentity);
+                if (hiathlinTarget.Type != IdentityType.CanbeAffected || hiathlinTarget.Instance == 0)
+                {
+                    hiathlinTarget = registration.NpcIdentity;
+                }
+
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                RosenblattHiathlinTradeAdapter.BeginTrade(source, hiathlinTarget);
+                KnuBotStartTradeMessageHandler.Default.Send(
+                    source,
+                    hiathlinTarget,
+                    "Drag and drop the item(s) you want to give to Dr. Rosenblatt into one of the slots available and press \"accept\"",
+                    RosenblattHiathlinInteractionRules.TradeSlotCount);
+                return true;
+            }
+
+            if (RosenblattCascadingSpiritQuestRuntime.CanTurnIn(source))
+            {
+                Identity essenceTarget = RosenblattHiathlinTradeAdapter.ResolveLiveNpcIdentity(
+                    source,
+                    liveRosenblattIdentity,
+                    registration.NpcIdentity);
+                if (essenceTarget.Type != IdentityType.CanbeAffected || essenceTarget.Instance == 0)
+                {
+                    essenceTarget = registration.NpcIdentity;
+                }
+
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                RosenblattCascadingSpiritTradeAdapter.BeginEssenceTrade(source, essenceTarget);
+                KnuBotStartTradeMessageHandler.Default.Send(
+                    source,
+                    essenceTarget,
+                    "Drag and drop the item(s) you want to give to Dr. Rosenblatt into one of the slots available and press \"accept\"",
+                    RosenblattCascadingSpiritInteractionRules.TradeSlotCount);
+                return true;
+            }
+
+            if (RosenblattCascadingSpiritQuestRuntime.IsMissionActive(source))
+            {
+                ChatTextMessageHandler.Default.Send(
+                    source,
+                    "Kill a Cascading Spirit and bring Essence of the Haunted to Dr. Rosenblatt.");
+                return false;
+            }
+
+            ChatTextMessageHandler.Default.Send(
+                source,
+                "You must kill 5 Hiathlins and 1 Hiathlin Prime, then bring 6 body parts to Dr. Rosenblatt.");
+            return false;
+        }
+
+        private static bool TryHandleRosenblattHiathlinSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveRosenblattIdentity)
+        {
+            if (!IsRegistration(registration, RosenblattRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    RosenblattHiathlinInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                RosenblattHiathlinQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            // Trade hold is handled in the AppendText→StartTrade path above.
+            return false;
+        }
+
+        private static bool TryHandleNascenceLifeRodriguezSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, RodriguezRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    NascenceLifeRodriguezInteractionRules.QuestOfferSourceNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                NascenceLifeRodriguezQuestRuntime.AcceptQuest(source);
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    NascenceLifeRodriguezInteractionRules.QuestOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                NascenceLifeRodriguezQuestRuntime.AcceptQuest(source);
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleNascenceLifeJoshuaFalkerSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, JoshuaFalkerRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    NascenceLifeJoshuaFalkerInteractionRules.QuestAcceptNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                NascenceLifeJoshuaFalkerQuestRuntime.AcceptBothKillQuests(source);
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleNascenceLifeDonnaRedSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, DonnaRedRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    NascenceLifeDonnaRedInteractionRules.QuestAcceptNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                NascenceLifeDonnaRedQuestRuntime.AcceptQuest(source);
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleNascenceAbanFalaSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveNpcIdentity)
+        {
+            if (!IsRegistration(registration, AbanFalaRegistration))
+            {
+                return false;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    NascenceAbanFalaInteractionRules.RedemptionNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                NascenceAbanFalaQuestRuntime.AcceptRedemptionQuests(source);
+                return false;
+            }
+
+            if (IsAbanFalaDeviceTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                return TryOpenAbanFalaDeviceTrade(source, registration, liveNpcIdentity, previousNodeId);
+            }
+
+            if (IsAbanFalaInsigniaTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                return TryOpenAbanFalaInsigniaTrade(source, registration, liveNpcIdentity);
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleNascenceLuxWeiSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveNpcIdentity)
+        {
+            if (!IsRegistration(registration, LuxWeiRegistration))
+            {
+                return false;
+            }
+
+            if (IsLuxWeiDeviceTradeHoldAnswer(registration, previousNodeId, answerIndex, source))
+            {
+                return TryOpenLuxWeiDeviceTrade(source, registration, liveNpcIdentity);
+            }
+
+            if (IsLuxWeiActivatedTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                if (!NascenceAbanFalaQuestRuntime.IsLuxWeiKeyReturnReady(source))
+                {
+                    return false;
+                }
+
+                return TryOpenLuxWeiActivatedArtifactTrade(source, registration, liveNpcIdentity);
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    NascenceAbanFalaInteractionRules.LuxWeiActivationNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && answerIndex == 0)
+            {
+                NascenceAbanFalaQuestRuntime.CompleteLuxWeiActivation(source);
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool IsLuxWeiDeviceTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            ICharacter source)
+        {
+            if (!IsRegistration(registration, LuxWeiRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (source != null && NascenceAbanFalaQuestRuntime.IsSoulsQuestActive(source))
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.LuxWeiRootNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLuxWeiDeviceTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsLuxWeiDeviceTradeHoldAnswer(registration, previousNodeId, answerIndex, null);
+        }
+
+        private static bool IsLuxWeiDeviceTradeContinueAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsRegistration(registration, LuxWeiRegistration)
+                   && string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.LuxWeiDeviceTradeHoldNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   && answerIndex == 0;
+        }
+
+        private static bool IsLuxWeiActivatedTradeContinueAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsRegistration(registration, LuxWeiRegistration)
+                   && string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.LuxWeiActivatedTradeHoldNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   && answerIndex == 0;
+        }
+
+        private static bool IsLuxWeiActivatedTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, LuxWeiRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.LuxWeiHubNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool TryOpenLuxWeiActivatedArtifactTrade(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            Identity liveNpcIdentity)
+        {
+            if (!NascenceAbanFalaQuestRuntime.IsLuxWeiKeyReturnReady(source))
+            {
+                return false;
+            }
+
+            Identity target = liveNpcIdentity.Type == IdentityType.CanbeAffected && liveNpcIdentity.Instance > 0
+                                  ? liveNpcIdentity
+                                  : registration.NpcIdentity;
+            NascenceAbanFalaTradeAdapter.BeginLuxWeiActivatedArtifactTrade(source, target);
+            KnuBotStartTradeMessageHandler.Default.Send(
+                source,
+                target,
+                "Drag and drop the item(s) you want to give to Sipius Aban Lux-Wei into one of the slots available and press \"accept\"",
+                NascenceAbanFalaInteractionRules.TradeSlotCount);
+            return true;
+        }
+
+        private static bool TryOpenLuxWeiDeviceTrade(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            Identity liveNpcIdentity)
+        {
+            Identity target = liveNpcIdentity.Type == IdentityType.CanbeAffected && liveNpcIdentity.Instance > 0
+                                  ? liveNpcIdentity
+                                  : registration.NpcIdentity;
+            NascenceAbanFalaTradeAdapter.BeginLuxWeiDeviceTrade(source, target);
+            KnuBotStartTradeMessageHandler.Default.Send(
+                source,
+                target,
+                "Drag and drop the item(s) you want to give to Sipius Aban Lux-Wei into one of the slots available and press \"accept\"",
+                NascenceAbanFalaInteractionRules.TradeSlotCount);
+            return true;
+        }
+
+        private static bool IsAbanFalaDeviceTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, AbanFalaRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.JourneyNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.ArtifactOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsAbanFalaDeviceTradeContinueAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsRegistration(registration, AbanFalaRegistration)
+                   && string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.DeviceTradeHoldNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   && answerIndex == 0;
+        }
+
+        private static bool IsAbanFalaInsigniaTradeContinueAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsRegistration(registration, AbanFalaRegistration)
+                   && string.Equals(
+                       previousNodeId,
+                       NascenceAbanFalaInteractionRules.InsigniaTradeHoldNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   && answerIndex == 0;
+        }
+
+        private static bool IsAbanFalaInsigniaTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, AbanFalaRegistration))
+            {
+                return false;
+            }
+
+            return (string.Equals(
+                        previousNodeId,
+                        "fala_004",
+                        StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(
+                        previousNodeId,
+                        NascenceAbanFalaInteractionRules.ReopenHubNodeId,
+                        StringComparison.OrdinalIgnoreCase))
+                   && answerIndex == 0;
+        }
+
+        private static bool TryOpenAbanFalaDeviceTrade(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            Identity liveNpcIdentity,
+            string dialogueSourceNodeId)
+        {
+            Identity target = liveNpcIdentity.Type == IdentityType.CanbeAffected && liveNpcIdentity.Instance > 0
+                                  ? liveNpcIdentity
+                                  : registration.NpcIdentity;
+            NascenceAbanFalaTradeAdapter.BeginDeviceTrade(source, target, dialogueSourceNodeId);
+            KnuBotStartTradeMessageHandler.Default.Send(
+                source,
+                target,
+                "Drag and drop the item(s) you want to give to Ecclesiast Aban Fala into one of the slots available and press \"accept\"",
+                NascenceAbanFalaInteractionRules.TradeSlotCount);
+            return true;
+        }
+
+        private static bool TryOpenAbanFalaInsigniaTrade(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            Identity liveNpcIdentity)
+        {
+            Identity target = liveNpcIdentity.Type == IdentityType.CanbeAffected && liveNpcIdentity.Instance > 0
+                                  ? liveNpcIdentity
+                                  : registration.NpcIdentity;
+            NascenceAbanFalaTradeAdapter.BeginInsigniaTrade(source, target);
+            KnuBotStartTradeMessageHandler.Default.Send(
+                source,
+                target,
+                "Drag and drop the item(s) you want to give to Ecclesiast Aban Fala into one of the slots available and press \"accept\"",
+                NascenceAbanFalaInteractionRules.TradeSlotCount);
             return true;
         }
 
@@ -2177,6 +3593,44 @@ namespace ZoneEngine.Core.Arete.Dialogue
             if (IsRegistration(registration, DoctorMasonRegistration))
             {
                 return DoctorMasonQuestRuntime.ResolveMasonStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, RosenblattRegistration))
+            {
+                string hiathlinStart = RosenblattHiathlinQuestRuntime.ResolveStartNodeId(source);
+                if (!string.IsNullOrEmpty(hiathlinStart))
+                {
+                    return hiathlinStart;
+                }
+
+                // Cascading ResolveStartNodeId also clears a stuck completed journal.
+                string cascadingStart = RosenblattCascadingSpiritQuestRuntime.ResolveStartNodeId(source);
+                if (!string.IsNullOrEmpty(cascadingStart))
+                {
+                    return cascadingStart;
+                }
+
+                return null;
+            }
+
+            if (IsRegistration(registration, DonnaRedRegistration))
+            {
+                return NascenceLifeDonnaRedQuestRuntime.ResolveStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, AbanFalaRegistration))
+            {
+                return NascenceAbanFalaQuestRuntime.ResolveStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, LuxWeiRegistration))
+            {
+                return NascenceAbanFalaQuestRuntime.ResolveLuxWeiStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, DreamingSilvertailRegistration))
+            {
+                return "silver_001";
             }
 
             if (IsRegistration(registration, LoreleiBartenderRegistration))
@@ -2308,9 +3762,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             DialogueSessionRecord record;
-            lock (SyncRoot)
+            string sessionKey;
+            if (!TryGetDialogueSessionRecord(source, registration, out record, out sessionKey))
             {
-                SessionsByCharacter.TryGetValue(CreateSessionKey(source.Identity, registration), out record);
+                return false;
             }
 
             return record != null && record.Session != null && record.Session.IsActive;
@@ -2326,9 +3781,10 @@ namespace ZoneEngine.Core.Arete.Dialogue
             foreach (ContentDrivenNpcDialogueRegistration registration in Registrations)
             {
                 DialogueSessionRecord record;
-                lock (SyncRoot)
+                string sessionKey;
+                if (!TryGetDialogueSessionRecord(source, registration, out record, out sessionKey))
                 {
-                    SessionsByCharacter.TryGetValue(CreateSessionKey(source.Identity, registration), out record);
+                    continue;
                 }
 
                 if (record != null && record.Session != null && record.Session.IsActive)
@@ -2405,7 +3861,17 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             if (choices.Length == 0)
             {
-                KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
+                // Trade-hold nodes often only expose filtered "(Continue after trade)".
+                // A fake "Goodbye" AnswerList maps to option index 0 on the real node
+                // (Continue after trade) and leaves Attack stuck on Please wait.
+                // Soft-close + UseActionFinished instead.
+                string emptySessionKey = CreateSessionKey(source.Identity, registration);
+                CloseSession(source, emptySessionKey, registration, true);
+                LogDialogue(
+                    registration,
+                    "closed empty-choice node="
+                    + (result.CurrentNode == null ? "<none>" : result.CurrentNode.Id)
+                    + " character=" + source.Identity.ToString(true));
                 return;
             }
 
@@ -2415,6 +3881,37 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 "sent node=" + (result.CurrentNode == null ? "<none>" : result.CurrentNode.Id)
                 + " options=" + choices.Length
                 + " character=" + source.Identity.ToString(true));
+
+            TrySyncNascenceLifeDialogueJournal(source, registration);
+
+            // Each KnuBot answer click waits for UseActionFinished; without it Attack spam
+            // "Please wait until previous action has finished" (Mike Rosenblatt disc flow).
+            if (IsRegistration(registration, RosenblattRegistration))
+            {
+                RosenblattClientActionLock.Clear(source);
+            }
+        }
+
+        private static void TrySyncNascenceLifeDialogueJournal(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (source == null || registration == null)
+            {
+                return;
+            }
+
+            if (IsRegistration(registration, DonnaRedRegistration))
+            {
+                NascenceLifeDonnaRedQuestRuntime.TryResendActiveMissionsForLogin(source);
+                return;
+            }
+
+            if (IsRegistration(registration, AbanFalaRegistration)
+                || IsRegistration(registration, LuxWeiRegistration))
+            {
+                NascenceAbanFalaQuestRuntime.TrySyncClientJournal(source);
+            }
         }
 
         private static void SendDialoguePromptOnly(
@@ -2530,6 +4027,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
             {
                 KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
             }
+
+            if (IsRegistration(registration, RosenblattRegistration))
+            {
+                RosenblattClientActionLock.Clear(source);
+            }
+
+            TrySyncNascenceLifeDialogueJournal(source, registration);
 
             LogDialogue(registration, "session ended character=" + source.Identity.ToString(true));
         }

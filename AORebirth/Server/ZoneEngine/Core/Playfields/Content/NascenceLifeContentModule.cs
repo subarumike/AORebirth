@@ -11,7 +11,8 @@ namespace ZoneEngine.Core.Playfields.Content
     /// <summary>
     /// Nascence Life — outdoor Shadowlands starter zones (capture-backed mob/NPC population).
     /// Playfields: 4310 Frontier, 4311 Wilds, 4312 Core/Swamp, 4313,
-    /// 4001 Jobe Research (Drake), 4531 Goldman/Arete Harbor.
+    /// 4001 Jobe Research (Drake), 4531 Goldman/Arete Harbor,
+    /// 4676 Garden of Aban (Sipius Aban Lux-Wei).
     /// Heckler population on 4312 remains in NascenceCoreHecklerSpawnOrchestrator.
     /// </summary>
     public sealed class NascenceLifeContentModule : IPlayfieldContentModule
@@ -30,6 +31,9 @@ namespace ZoneEngine.Core.Playfields.Content
         // Capture 20260723-221330 Goldman Harbor / Arete (capturePlayfieldObjectId 11B3).
         internal const int GoldmanAretePlayfieldId = 4531;
 
+        // Capture 20260822-224319 Sipius Aban Lux-Wei SCFU on PF 4676.
+        internal const int GardenOfAbanPlayfieldId = 4676;
+
         public bool Supports(Identity playfieldIdentity)
         {
             int pf = playfieldIdentity.Instance;
@@ -38,7 +42,8 @@ namespace ZoneEngine.Core.Playfields.Content
                    || pf == CorePlayfieldId
                    || pf == Nascence4313PlayfieldId
                    || pf == JobeResearchPlayfieldId
-                   || pf == GoldmanAretePlayfieldId;
+                   || pf == GoldmanAretePlayfieldId
+                   || pf == GardenOfAbanPlayfieldId;
         }
 
         public void Register(PlayfieldContentRegistration registration)

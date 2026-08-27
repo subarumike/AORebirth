@@ -732,15 +732,7 @@ namespace ZoneEngine.Core.Thrak.Quests
                 return true;
             }
 
-            if (!HasAccountGardenKeyFlag(source)
-                && MissionRuntime.Service.GetFlag(
-                       source.Identity.Instance,
-                       ThrakGardenKeyInteractionRules.QuestReturn,
-                       ThrakGardenKeyInteractionRules.KeyGrantedFlag) == null
-                && MissionRuntime.Service.GetFlag(
-                       source.Identity.Instance,
-                       ThrakGardenKeyInteractionRules.QuestSouls,
-                       ThrakGardenKeyInteractionRules.KeyGrantedFlag) == null)
+            if (!CanRestoreSacredGardenKey(source))
             {
                 return false;
             }
@@ -837,6 +829,7 @@ namespace ZoneEngine.Core.Thrak.Quests
 
         /// <summary>
         /// After a client-side consumable DeleteItem on the sacred key, put it back immediately.
+        /// Only for characters that already earned the key (never a free grant).
         /// </summary>
         internal static bool TryForceReturnGardenKey(ICharacter source)
         {
@@ -850,10 +843,12 @@ namespace ZoneEngine.Core.Thrak.Quests
                 return true;
             }
 
-            return TryRestoreItem(
-                source,
-                ThrakGardenKeyInteractionRules.SacredGardenKeyItemId,
-                1);
+            return TryRestoreGardenKeyIfMissing(source);
+        }
+
+        internal static bool CanRestoreSacredGardenKey(ICharacter source)
+        {
+            return HasCompletedGardenKeyQuest(source);
         }
 
         /// <summary>
@@ -1105,6 +1100,26 @@ namespace ZoneEngine.Core.Thrak.Quests
                    && InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
                        source,
                        ThrakGardenKeyInteractionRules.FavoredAncientPatternAnalyzerItemId);
+        }
+
+        /// <summary>
+        /// Dreaming Silvertail soul trade during Thrak garden-key souls phase (capture 20260718-185306).
+        /// </summary>
+        internal static bool CanUseSilvertailSoulTrade(ICharacter source)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            if (!IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestSouls)
+                && !IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestSouls1)
+                && !IsMissionActive(source, ThrakGardenKeyInteractionRules.QuestSouls2))
+            {
+                return false;
+            }
+
+            return GetSoulCount(source) < 3 && HasFavoredAnalyzer(source);
         }
 
         internal static bool HasInspectedAnalyzer(ICharacter source)

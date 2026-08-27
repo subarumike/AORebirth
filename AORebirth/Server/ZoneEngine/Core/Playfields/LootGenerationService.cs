@@ -171,12 +171,16 @@ namespace AORebirth.Core.Playfields
                 {
                     this.RollObservedCorpseSnapshot(result, table, context, random);
                 }
-                else
+
+                // Independent / weighted groups stack with observed snapshots (e.g. Compact Message Datadisc 30%).
+                LootGroupDefinition[] rollGroups = table.RollGroups ?? new LootGroupDefinition[0];
+                foreach (LootGroupDefinition group in rollGroups.OrderBy(x => x.LootGroupKey, StringComparer.Ordinal))
                 {
-                    foreach (LootGroupDefinition group in table.RollGroups.OrderBy(x => x.LootGroupKey, StringComparer.Ordinal))
-                    {
-                        this.RollGroup(result, table, group, context, random);
-                    }
+                    this.RollGroup(result, table, group, context, random);
+                }
+
+                if (table.ObservedCorpseSnapshots.Length == 0)
+                {
                     ApplyCredits(result, table.CreditsPolicy, random);
                 }
             }

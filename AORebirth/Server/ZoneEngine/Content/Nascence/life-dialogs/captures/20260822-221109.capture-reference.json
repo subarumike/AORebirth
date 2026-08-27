@@ -1,0 +1,143 @@
+{
+  "Identity": {
+    "Id": "nascence-life-capture-20260822-221109",
+    "Version": "capture-backed-1",
+    "Source": "Jobe Research [PF 4001] - 20260822-221109",
+    "PlayfieldRuntime": 4310,
+    "PlayfieldResource": 4001,
+    "XpNote": "All kill XP values below are base (capture deltas halved for 50% XP buff)"
+  },
+  "Mobs": {
+    "BarkingChimera": {
+      "Name": "Barking Chimera",
+      "MonsterData": 209173,
+      "NpcFamily": 187,
+      "VisualFlags": 31,
+      "CharacterFlags": 268964353,
+      "MonsterScale": "93-94",
+      "RunSpeed": "19-29",
+      "HealthByLevel": { "5": 150, "6": 180, "7": 210, "8": 240 },
+      "KillXpBase": 250,
+      "KillXpBaseLevel7Plus": 275,
+      "RespawnSeconds": 110,
+      "Textures": ["53019:38517", "53019:39691"],
+      "ExtTexOverride": "same as 20260723-221330 BarkingChimeraExtendedTextureOverrideData",
+      "Combat": {
+        "SpecialAttackWeaponUnknowns": [48, 48, 48, 48, 0],
+        "AttackInfoDamageMin": 16,
+        "AttackInfoDamageMax": 38,
+        "HitType": 3,
+        "Ammo": -1
+      },
+      "LootItemIds": [
+        { "low": 214789, "high": 214789, "ql": 1 },
+        { "low": 214788, "high": 214788, "ql": 1 },
+        { "low": 225981, "high": 225982, "ql": 8 },
+        { "low": 225977, "high": 225978, "ql": 5 },
+        { "low": 232839, "high": 232840, "ql": "5-7" },
+        { "low": 232834, "high": 232835, "ql": 7 },
+        { "low": 259951, "high": 259951, "ql": 1 }
+      ],
+      "MobHashQuest": "LLBE (0x4C4C4245)"
+    },
+    "YuttosNascenceGeosurveyDog": {
+      "Name": "Yuttos Nascence Geosurvey Dog",
+      "MonsterData": 209173,
+      "NpcFamily": 200,
+      "Level": 10,
+      "Health": 150,
+      "MonsterScale": 95,
+      "RunSpeed": 44,
+      "KillXpBase": 275,
+      "Textures": ["53019:38517", "53019:39691"],
+      "ExtTexOverride": "same as Barking Chimera",
+      "LootItemIds": [{ "low": 223768, "high": 223768, "ql": 1 }],
+      "Pathing": "FollowTarget NpcPath Unknown1=25; sample waypoints (827.77,31.78,1159.72)->(828.25,32.2,1157.67)"
+    },
+    "SwiftSilvertail": {
+      "Name": "Swift Silvertail",
+      "MonsterData": 208922,
+      "NpcFamily": 172,
+      "MonsterScale": 93,
+      "RunSpeed": "19-23",
+      "HealthByLevel": { "5": 225, "6": 270, "7": 315, "8": 360 },
+      "KillXpBase": 300,
+      "RespawnSeconds": 110,
+      "Textures": ["53019:384DD", "53019:3931A"],
+      "Combat": {
+        "SelfBuffNanoId": 230582,
+        "SpecialAttackWeaponUnknowns": [67, 67, 67, 67, 0],
+        "AttackInfoDamageMin": 6,
+        "AttackInfoDamageMax": 7,
+        "HealthDamageObserved": 30
+      },
+      "LootItemIds": [
+        { "low": 42640, "high": 42641, "ql": "5-10" },
+        { "low": 227168, "high": 227169, "ql": "6-7" },
+        { "low": 225979, "high": 225980, "ql": 7 },
+        { "low": 232839, "high": 232840, "ql": 9 },
+        { "low": 223421, "high": 223422, "ql": 7 },
+        { "low": 259949, "high": 259949, "ql": 1 }
+      ],
+      "MobHashQuest": "SWSI (0x53575349)"
+    }
+  },
+  "Quests": {
+    "BracerRodriguez": {
+      "QuestId": "Mission:55ABF001",
+      "Npc": "Scientist Drake Rodriguez",
+      "NpcIdentityCapture": "SimpleChar:7A1E3C24",
+      "Title": "Talk to Donna Red",
+      "XpReward": 420,
+      "Objective": "Talk to Donna Red (MobHash SNDA 0x534E4441) PF 10D6 (987,0,1759)",
+      "BracerGrant": "ContainerAdd slot=28 after dialogue open",
+      "DialogueFlow": [
+        "I am Drake Rodriguez and I will be handling your case today. Here, take this bracer...",
+        "You can open your inventory by pressing 'I'...",
+        "Do you have your bracer ready?",
+        ["What is the purpose of this bracer?", "What are you doing here?", "Goodbye"],
+        "The bracer is constructed to measure your performance in Nascence...",
+        ["So this is Nascence?", "Goodbye"],
+        "QFU Mission:55ABF001",
+        "No, you are still in the city of Jobe, but when you cross this bridge... Donna Red...",
+        ["Goodbye"]
+      ]
+    },
+    "JoshuaFalkerSilvertail": {
+      "QuestId": "Mission:55ABAD28",
+      "Npc": "Joshua Falker",
+      "NpcIdentityCapture": "SimpleChar:7A18D424",
+      "Title": "Reduce number of silvertails.",
+      "KillTarget": "Swift Silvertail",
+      "KillCount": 10,
+      "MobHash": "SWSI",
+      "XpReward": 10080,
+      "RewardItem": { "low": 218351, "high": 218352, "ql": 7 },
+      "MissionIconId": 11330
+    },
+    "JoshuaFalkerChimera": {
+      "QuestId": "Mission:55ABAD29",
+      "Npc": "Joshua Falker",
+      "Title": "Reduce number of Chimeras.",
+      "KillTarget": "Barking Chimera",
+      "KillCount": 10,
+      "MobHash": "LLBE",
+      "XpReward": 10080,
+      "RewardItem": { "low": 218822, "high": 218823, "ql": 7 },
+      "MissionIconId": 11330
+    },
+    "FalkerDialogueFlow": [
+      "Hello there!",
+      "I'm Joshua Falker, and I hope you have a moment to help me out here!",
+      "You see, my last assistant didn't return from his assignment…",
+      "I am responsible for the safety of our researchers and visitors to Nascence…",
+      "Currently we have an issue with the populations of Swift Silvertails and Barking Chimeras… this is where you come in!",
+      "We need to reduce the population by 10 for each of these species. Will you help us?",
+      ["Yes!", "No!", "Goodbye"],
+      "QFU Mission:55ABAD28 + Mission:55ABAD29",
+      "Here are your tasks. Good luck to you!",
+      "Oh, and if you find anything that might be of interest, I suggest you contact Dr. Rosenblatt…",
+      ["Goodbye"]
+    ]
+  }
+}

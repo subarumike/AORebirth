@@ -11,12 +11,15 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using AORebirth.Core.Components;
+    using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Doja;
+    using ZoneEngine.Core.Nascence.Quests;
     using ZoneEngine.Core.Subway.Quests;
     using ZoneEngine.Core.Thrak.Quests;
 
@@ -35,6 +38,13 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(KnuBotTradeMessage message, IZoneClient client)
         {
+            ICharacter character = client.Controller.Character;
+            if (RosenblattHiathlinTradeAdapter.ShouldClaimTradeMessage(character, message)
+                && RosenblattHiathlinTradeAdapter.TryStageTradeItem(character, message))
+            {
+                return;
+            }
+
             // Alex brain Tip 4 inspect BEFORE BioCom Deliver (same steal as FinishTrade).
             if (PersonalizedRobotBrainQuestRuntime.TryStageBrainTradeItem(client.Controller.Character, message))
             {
@@ -159,8 +169,29 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            // Aban before Thrak: Dreaming Silvertail is shared; Thrak staging stole Aban soul trades.
+            if (NascenceAbanFalaTradeAdapter.ShouldClaimTradeBeforeThrak(
+                    client.Controller.Character,
+                    message)
+                && NascenceAbanFalaTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
             // Thrak: generic Remove permanently ate Ancient Pattern Analyzer on Hyp inspection.
             if (ThrakGardenKeyTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (NascenceAbanFalaTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (NascenceAbanFalaTradeAdapter.IsAbanChainTradeNpc(
+                client.Controller.Character,
+                message.Target))
             {
                 return;
             }
@@ -178,6 +209,78 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (DojaChipTradeAdapter.IsDojaTradeNpc(
+                client.Controller.Character,
+                message.Target))
+            {
+                return;
+            }
+
+            if (RosenblattHiathlinTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (RosenblattHiathlinTradeAdapter.HasActiveSession(client.Controller.Character)
+                && RosenblattHiathlinTradeAdapter.IsRosenblattTradeNpc(
+                    client.Controller.Character,
+                    message.Target))
+            {
+                return;
+            }
+
+            if (RosenblattPapagenaTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (RosenblattPapagenaTradeAdapter.HasActiveSession(client.Controller.Character)
+                && RosenblattPapagenaTradeAdapter.IsRosenblattDiscTradeNpc(
+                    client.Controller.Character,
+                    message.Target))
+            {
+                return;
+            }
+
+            if (RosenblattCascadingSpiritTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (RosenblattCascadingSpiritTradeAdapter.HasActiveSession(client.Controller.Character)
+                && RosenblattCascadingSpiritTradeAdapter.IsRosenblattTradeNpc(
+                    client.Controller.Character,
+                    message.Target))
+            {
+                return;
+            }
+
+            if (RosenblattSpinetoothTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (RosenblattSpinetoothTradeAdapter.HasActiveSession(client.Controller.Character)
+                && RosenblattSpinetoothTradeAdapter.IsRosenblattDiscTradeNpc(
+                    client.Controller.Character,
+                    message.Target))
+            {
+                return;
+            }
+
+            if (RosenblattDemonicTradeAdapter.TryStageTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
+            if (RosenblattDemonicTradeAdapter.HasActiveSession(client.Controller.Character)
+                && RosenblattDemonicTradeAdapter.IsRosenblattDiscTradeNpc(
+                    client.Controller.Character,
+                    message.Target))
+            {
+                return;
+            }
+
+            if (RosenblattHiathlinTradeAdapter.IsRosenblattTradeNpc(
                 client.Controller.Character,
                 message.Target))
             {

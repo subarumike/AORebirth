@@ -314,6 +314,25 @@ namespace ZoneEngine.Core
                 throw new Exception("Character " + charId + " not found.");
             }
 
+            // Remap earlier rebirth dungeon attempts (live dyn 0x1F804E / stub 362) onto the
+            // reserved ACG-band id the client will generate.
+            if (NascenceDungeon1Rules.IsLegacyDungeonPlayfield(character.Playfield))
+            {
+                character.Playfield = NascenceDungeon1Rules.DungeonPlayfieldId;
+                CharacterDao.Instance.Save(character);
+                CharacterDao.Instance.SetPlayfield(
+                    charId,
+                    (int)IdentityType.Playfield,
+                    character.Playfield);
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "NascenceDungeon1 remap legacy dungeon pf -> {0} char={1}",
+                        character.Playfield,
+                        charId));
+            }
+
             bool isZoningReload = this.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning;
             this.IsPlayfieldTransferLogin = false;
             this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
@@ -976,6 +995,11 @@ namespace ZoneEngine.Core
             catch (ObjectDisposedException)
             {
             }
+            catch (NullReferenceException)
+            {
+                // Ionic.Zlib.ZlibBaseStream.Close() NRE when the codec/base stream was already
+                // torn down by an abortive client disconnect — safe to ignore.
+            }
             finally
             {
                 this.zStream = null;
@@ -995,6 +1019,9 @@ namespace ZoneEngine.Core
             {
             }
             catch (ObjectDisposedException)
+            {
+            }
+            catch (NullReferenceException)
             {
             }
             finally

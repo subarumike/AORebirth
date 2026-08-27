@@ -45,6 +45,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
+    using AORebirth.Core.Playfields;
+
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -165,6 +167,218 @@ namespace ZoneEngine.Core.MessageHandlers
                                        Instance = CapturedMissionTeleportPlayfield2Instance
                                    };
                     x.Payload = new byte[0];
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260824-125154: PF 4310 Lord/Lady cave walk-in ACG dungeon entry.
+        /// Live: Playfield=(ACGEntrance:C00010D6) ChangePlayfield=(Playfield2:1F900B)
+        /// Playfield2=(100002:1) — not the dyn PF instance.
+        /// </summary>
+        internal void SendCapturedNascenceDungeon1Entry(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = NascenceDungeon1Rules.BuildingGeneratorType,
+                                      Instance = NascenceDungeon1Rules.BuildingInstance
+                                  };
+                    x.GameServerId = 0;
+                    x.SgId = 0;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = new Identity
+                                   {
+                                       Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
+                                       Instance = CapturedMissionTeleportPlayfield2Instance
+                                   };
+                    x.Payload = new byte[0];
+                },
+                false);
+        }
+
+        internal void SendCapturedNascenceDungeon2Entry(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = NascenceDungeon2Rules.BuildingGeneratorType,
+                                      Instance = NascenceDungeon2Rules.BuildingInstance
+                                  };
+                    x.GameServerId = 0;
+                    x.SgId = 0;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = new Identity
+                                   {
+                                       Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
+                                       Instance = CapturedMissionTeleportPlayfield2Instance
+                                   };
+                    x.Payload = new byte[0];
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260824-132534: dyn ACG cave → Nascence Frontier (4310).
+        /// Playfield=(Playfield1:4310) ChangePlayfield=(Playfield2:4310)
+        /// Playfield2=(100007:1) payload = outdoor ACGEntrance XYZ + 00000001.
+        /// </summary>
+        internal void SendCapturedNascenceDungeon1Exit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            Vector3 outdoorDoorWorld)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = IdentityType.Playfield1,
+                                      Instance = destinationPlayfieldId
+                                  };
+                    x.GameServerId = 0;
+                    x.SgId = 0;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = new Identity
+                                   {
+                                       Type = (IdentityType)NascenceDungeon1Rules.ExitTeleportPlayfield2Type,
+                                       Instance = NascenceDungeon1Rules.ExitTeleportPlayfield2Instance
+                                   };
+                    x.Payload = BuildOutdoorDoorExitPayload(outdoorDoorWorld);
+                },
+                false);
+        }
+
+        internal void SendCapturedNascenceDungeon2Exit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            Vector3 outdoorDoorWorld)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = IdentityType.Playfield1,
+                                      Instance = destinationPlayfieldId
+                                  };
+                    x.GameServerId = 0;
+                    x.SgId = 0;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = new Identity
+                                   {
+                                       Type = (IdentityType)NascenceDungeon2Rules.ExitTeleportPlayfield2Type,
+                                       Instance = NascenceDungeon2Rules.ExitTeleportPlayfield2Instance
+                                   };
+                    x.Payload = BuildOutdoorDoorExitPayload(outdoorDoorWorld);
                 },
                 false);
         }
@@ -616,6 +830,20 @@ namespace ZoneEngine.Core.MessageHandlers
             WriteSingle(payload, 0, (float)destination.x);
             WriteSingle(payload, 4, (float)destination.y);
             WriteSingle(payload, 8, (float)destination.z);
+            return payload;
+        }
+
+        /// <summary>Capture 20260824-132534: 3 BE floats + BE int32 1.</summary>
+        private static byte[] BuildOutdoorDoorExitPayload(Vector3 outdoorDoorWorld)
+        {
+            var payload = new byte[16];
+            WriteSingle(payload, 0, (float)outdoorDoorWorld.x);
+            WriteSingle(payload, 4, (float)outdoorDoorWorld.y);
+            WriteSingle(payload, 8, (float)outdoorDoorWorld.z);
+            payload[12] = 0;
+            payload[13] = 0;
+            payload[14] = 0;
+            payload[15] = 1;
             return payload;
         }
 

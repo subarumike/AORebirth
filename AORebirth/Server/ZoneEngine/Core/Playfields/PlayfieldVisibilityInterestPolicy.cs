@@ -10,8 +10,8 @@ namespace ZoneEngine.Core.Playfields
         internal const string CellSizeEnvironmentVariable = "AO_REBIRTH_VISIBILITY_CELL_SIZE";
 
         internal const float MinimumEnterRadius = 16.0f;
-        internal const float MaximumEnterRadius = 256.0f;
-        internal const float MaximumLeaveRadius = 384.0f;
+        internal const float MaximumEnterRadius = 4096.0f;
+        internal const float MaximumLeaveRadius = 4096.0f;
         internal const float MinimumCellSize = 8.0f;
         internal const float MaximumCellSize = 128.0f;
 

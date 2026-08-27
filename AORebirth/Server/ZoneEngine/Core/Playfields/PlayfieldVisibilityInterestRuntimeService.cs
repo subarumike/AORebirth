@@ -9,6 +9,8 @@ namespace ZoneEngine.Core.Playfields
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Core.Controllers;
+
     internal sealed class PlayfieldVisibilityInterestRuntimeService
     {
         private readonly PlayfieldVisibilityInterestPolicy policy;
@@ -156,26 +158,83 @@ namespace ZoneEngine.Core.Playfields
 
         private static bool IsPinnedVisibility(ICharacter recipient, ICharacter source)
         {
-            return recipient != null
-                   && source != null
-                   && source.Stats[StatIds.petmaster].Value > 0
-                   && source.Stats[StatIds.petmaster].Value == recipient.Identity.Instance;
+            if (recipient != null
+                && source != null
+                && source.Stats[StatIds.petmaster].Value > 0
+                && source.Stats[StatIds.petmaster].Value == recipient.Identity.Instance)
+            {
+                return true;
+            }
+
+            // Nascence D2: pin living NPCs dungeon-wide for PF map. Never pin dead (health<=0)
+            // or post-death SCFU re-floods standing 0-HP models and cancels Death anim.
+            if (recipient != null
+                && source != null
+                && recipient.Playfield != null
+                && AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(
+                    recipient.Playfield.Identity.Instance)
+                && source.Controller is NPCController
+                && source.Stats[StatIds.health].Value > 0)
+            {
+                return true;
+            }
+
+            // Capture 20260823-171238 Havaris @ (125,64,174): tight ACG radius hides boss
+            // while nanobot combat still hits - pin when viewer is in D1 boss wing.
+            if (recipient != null
+                && source != null
+                && recipient.Playfield != null
+                && source.Playfield != null
+                && string.Equals(source.Name, "Havaris", StringComparison.OrdinalIgnoreCase)
+                && AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(
+                    recipient.Playfield.Identity.Instance)
+                && (float)recipient.RawCoordinates.X
+                    < AORebirth.Core.Playfields.NascenceDungeon1Rules.BossWingMaxWorldX)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // Gold 20260725-151009: zone-in SCFU wave is start-room only; far NPCs stream later.
         // Default 80m enter lights almost the whole L7 mish → PF Map fully explored (mobs as
         // "seen" positions). Keep mobs, but only stream nearby ones like live.
+        // Nascence D1 is excluded from IsMissionInstancePlayfield but needs the same tight radius
+        // or the grey floorplan + red dots paint the whole cave on open.
         private const float MissionInstanceEnterRadius = 32.0f;
 
         private const float MissionInstanceLeaveRadius = 48.0f;
+
+        // Havaris ~(125,64,174); boss-wing players may start up to X~299 — need ~180m horizontal span.
+        private const float NascenceDungeon1BossWingEnterRadius = 192.0f;
+
+        private const float NascenceDungeon1BossWingLeaveRadius = 208.0f;
+
+        // D2 capture PF map shows every mob on every floor with no proximity gate.
+        // Must stay <= MaximumLeaveRadius or UniformSpatialIndex.Query throws and
+        // SelectInitialValues / reconcile abort — mobs only Force-appear in combat (~2s flicker).
+        private const float NascenceDungeon2DungeonWideEnterRadius = 2000.0f;
+
+        private const float NascenceDungeon2DungeonWideLeaveRadius = 2100.0f;
 
         private float ResolveEnterRadius(ICharacter recipient)
         {
             if (recipient != null
                 && recipient.Playfield != null
-                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                && AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(
                     recipient.Playfield.Identity.Instance))
             {
+                return NascenceDungeon2DungeonWideEnterRadius;
+            }
+
+            if (UsesTightAcgVisibility(recipient))
+            {
+                if (IsNascenceDungeon1BossWing(recipient))
+                {
+                    return NascenceDungeon1BossWingEnterRadius;
+                }
+
                 return MissionInstanceEnterRadius;
             }
 
@@ -186,13 +245,53 @@ namespace ZoneEngine.Core.Playfields
         {
             if (recipient != null
                 && recipient.Playfield != null
-                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                && AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(
                     recipient.Playfield.Identity.Instance))
             {
+                return NascenceDungeon2DungeonWideLeaveRadius;
+            }
+
+            if (UsesTightAcgVisibility(recipient))
+            {
+                if (IsNascenceDungeon1BossWing(recipient))
+                {
+                    return NascenceDungeon1BossWingLeaveRadius;
+                }
+
                 return MissionInstanceLeaveRadius;
             }
 
             return this.policy.LeaveRadius;
+        }
+
+        private static bool IsNascenceDungeon1BossWing(ICharacter recipient)
+        {
+            if (recipient == null || recipient.Playfield == null)
+            {
+                return false;
+            }
+
+            if (!AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(
+                    recipient.Playfield.Identity.Instance))
+            {
+                return false;
+            }
+
+            return (float)recipient.RawCoordinates.X
+                   < AORebirth.Core.Playfields.NascenceDungeon1Rules.BossWingMaxWorldX;
+        }
+
+        private static bool UsesTightAcgVisibility(ICharacter recipient)
+        {
+            if (recipient == null || recipient.Playfield == null)
+            {
+                return false;
+            }
+
+            int pf = recipient.Playfield.Identity.Instance;
+            return ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(pf)
+                   || AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(pf)
+                   || AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(pf);
         }
     }
 }

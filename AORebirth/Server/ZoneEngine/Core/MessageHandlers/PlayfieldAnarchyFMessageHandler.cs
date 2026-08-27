@@ -48,6 +48,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
+    using AORebirth.Core.Playfields;
+
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     #endregion
@@ -117,7 +119,35 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.PlayfieldX = Playfields.GetPlayfieldX(character.Playfield.Identity.Instance);
                 x.PlayfieldZ = Playfields.GetPlayfieldZ(character.Playfield.Identity.Instance);
 
-                if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
+                // Capture 20260824-125154: ACGEntrance C7A1:C00010D6 + j222 generator payload.
+                // Must run before IsMissionInstancePlayfield (dyn id is not an RK mission lease).
+                if (NascenceDungeon1Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
+                {
+                    x.PlayfieldX = 0;
+                    x.PlayfieldZ = 0;
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = NascenceDungeon1Rules.BuildingGeneratorType,
+                                         Instance = NascenceDungeon1Rules.BuildingInstance
+                                     };
+                    x.Unknown3 = 0;
+                    x.Unknown4 = 0;
+                    x.GeneratorPayload = NascenceDungeon1AcgLayout.CreateGeneratorPayload();
+                }
+                else if (NascenceDungeon2Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
+                {
+                    x.PlayfieldX = 0;
+                    x.PlayfieldZ = 0;
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = NascenceDungeon2Rules.BuildingGeneratorType,
+                                         Instance = NascenceDungeon2Rules.BuildingInstance
+                                     };
+                    x.Unknown3 = 0;
+                    x.Unknown4 = 0;
+                    x.GeneratorPayload = NascenceDungeon2AcgLayout.CreateGeneratorPayload();
+                }
+                else if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
                 {
                     // Remapped live PFs are not in Playfields.xml → GetPlayfieldX/Z returns 100000
                     // (unknown-size fallback). That makes the client treat the interior as a huge

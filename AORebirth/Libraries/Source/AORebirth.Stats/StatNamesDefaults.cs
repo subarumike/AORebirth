@@ -748,6 +748,8 @@ namespace AORebirth.Stats
             NameList.Add(684, "PVPDuelScore");
             NameList.Add(685, "MissionBits14");
             NameList.Add(686, "MissionBits15");
+            NameList.Add(695, "Commendations");
+            NameList.Add(696, "DailyMissionResets");
             NameList.Add(700, "ACGItemSeed");
             NameList.Add(701, "ACGItemLevel");
             NameList.Add(702, "ACGItemTemplateID");

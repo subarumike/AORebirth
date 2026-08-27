@@ -214,6 +214,12 @@ namespace ZoneEngine.Core
                 return new TradeSkillMatch { Entry = entry, Swapped = false };
             }
 
+            entry = ZoneEngine.Core.Nascence.Quests.NascenceAbanFalaCombineRules.TryMatch(sourceHighId, targetHighId);
+            if (entry != null)
+            {
+                return new TradeSkillMatch { Entry = entry, Swapped = false };
+            }
+
             return null;
         }
 

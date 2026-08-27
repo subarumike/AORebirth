@@ -15,6 +15,7 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
     using AORebirth.Core.Requirements;
     using AORebirth.Core.Statels;
     using AORebirth.Core.Textures;
@@ -1072,11 +1073,11 @@ namespace ZoneEngine.Core
                 (int)itemPosition.Type,
                 itemPosition.Instance);
 
-            // Sacred Thrak garden key (226994) is permanent — never consumed on Use.
-            bool isSacredGardenKey =
-                ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(item.LowID, item.HighID);
+            // Permanent garden passage keys are never consumed on Use.
+            bool isPermanentGardenPassage =
+                NascenceStatueTeleportCatalog.IsPermanentGardenPassageItem(item.LowID, item.HighID);
 
-            if (!isSacredGardenKey
+            if (!isPermanentGardenPassage
                 && ItemLoader.ItemList[item.HighID].IsConsumable()
                 && !this.IsHealthAndNanoRecharger(item))
             {
@@ -1408,18 +1409,16 @@ namespace ZoneEngine.Core
             {
             }
 
-            // Client may send DeleteItem when using a CanFlags-consumable template; sacred key stays.
+            // Client may send DeleteItem when using a CanFlags-consumable template; permanent keys stay.
             if (existing != null
-                && ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(existing.LowID, existing.HighID))
+                && NascenceStatueTeleportCatalog.IsPermanentGardenPassageItem(
+                    existing.LowID,
+                    existing.HighID))
             {
                 return false;
             }
 
-            // Parameter1/2 sometimes carry the template ids on client-initiated deletes.
-            if (ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(message.Parameter1, message.Parameter2))
-            {
-                return false;
-            }
+            // Parameter fields alone must not block deletes — only an actual carried permanent key does.
 
             ItemDao.Instance.Delete(
                 new
@@ -1676,6 +1675,18 @@ namespace ZoneEngine.Core
                     return true;
 
                 case InventoryContainerInteractionRouteMode.BackpackContainer:
+                    // World dungeon treasure (C749) must not hit backpack close — that snaps the
+                    // open loot UI shut and leaves the chest unopenable (Mike D2).
+                    if (target != null
+                        && target.Type == IdentityType.Container
+                        && (NascenceDungeon1TreasureLootService.IsTreasureChest(target)
+                            || NascenceDungeon2TreasureLootService.IsTreasureChest(target)
+                            || NascenceDungeon1RevealZones.IsKnownChestInstance(target.Instance)
+                            || NascenceDungeon2RevealZones.IsKnownChestInstance(target.Instance)))
+                    {
+                        return false;
+                    }
+
                     IInventoryPage backpackPage;
                     if (client.Controller.Character.BaseInventory.TryGetBackpackPage(target, out backpackPage))
                     {
@@ -1762,19 +1773,30 @@ namespace ZoneEngine.Core
                 bool zoneStatueUse =
                     NascenceStatueTeleportCatalog.IsShadowlandsZonePlayfield(playfieldId)
                     && message.Target[1].Type == IdentityType.Terminal;
+                int statueTemplateId = temp.Template != null ? temp.Template.ID : 0;
+                bool matchedGardenKey =
+                    zoneStatueUse
+                    && NascenceStatueTeleportCatalog.IsZoneReturnStatueTemplate(statueTemplateId)
+                    && NascenceStatueTeleportCatalog.TryMatchReturnKeyItem(
+                        statueTemplateId,
+                        item.LowID,
+                        item.HighID);
+
+                // Pool template id can disagree with DB/catalog; defer to Nascence handler.
+                if (zoneStatueUse && !matchedGardenKey)
+                {
+                    return false;
+                }
 
                 // Consume insignias used on a Shadowlands zone statue BEFORE the teleport.
                 // Real AO order is DeleteItem → N3Teleport (capture 20260716-using insignia).
-                // The teleport reloads the character's inventory, so consuming afterwards operated on a
-                // stale item reference and never removed the insignia.
-                // Sacred Thrak garden key (226994) is permanent and must NOT be consumed.
-                if (zoneStatueUse
-                    && !ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(item.LowID, item.HighID))
+                // Sacred Thrak garden key (226994) and Aban garden key (226824) are permanent.
+                if (matchedGardenKey
+                    && NascenceStatueTeleportCatalog.ShouldConsumeGardenPassageItem(item.LowID, item.HighID))
                 {
                     Item concreteItem = item as Item;
                     if (concreteItem != null)
                     {
-                        int statueTemplateId = temp.Template != null ? temp.Template.ID : 0;
                         this.ConsumeInventoryStackItem(
                             character,
                             message.Target[0],
@@ -2098,15 +2120,9 @@ namespace ZoneEngine.Core
             IInventoryPage backpackPage;
             if (!character.BaseInventory.TryGetBackpackPageByHandle(handle, out backpackPage))
             {
-                LogUtil.Debug(
-                    DebugInfoDetail.Network,
-                    string.Format(
-                        "Rejected ClientMoveItemToInventory backpack move because handle is unknown char={0} source={1} handle={2} targetPlacement={3}",
-                        character.Identity,
-                        message.SourceContainer,
-                        handle,
-                        message.TargetPlacement));
-                return true;
+                // Unknown handle is normal for world treasure / corpse loot bags — do not
+                // claim the move (return false) or treasure/corpse handlers never get a turn.
+                return false;
             }
 
             IItem itemFrom = backpackPage[fromPlacement];

@@ -40,16 +40,16 @@ namespace AORebirth.Core.Inventory
 
             ItemTemplate lowTemplate;
             if (ItemLoader.ItemList.TryGetValue(item.LowID, out lowTemplate)
-                && lowTemplate.Stats.ContainsKey(0)
-                && IsUniqueFlags(lowTemplate.Stats[0]))
+                && lowTemplate != null
+                && IsUniqueFlags(lowTemplate.getItemAttribute(0)))
             {
                 return true;
             }
 
             ItemTemplate highTemplate;
             if (ItemLoader.ItemList.TryGetValue(item.HighID, out highTemplate)
-                && highTemplate.Stats.ContainsKey(0)
-                && IsUniqueFlags(highTemplate.Stats[0]))
+                && highTemplate != null
+                && IsUniqueFlags(highTemplate.getItemAttribute(0)))
             {
                 return true;
             }

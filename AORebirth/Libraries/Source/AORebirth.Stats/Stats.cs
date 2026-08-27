@@ -613,6 +613,10 @@ namespace AORebirth.Stats
 
         /// <summary>
         /// </summary>
+        private readonly Stat commendations;
+
+        /// <summary>
+        /// </summary>
         private readonly StatSkill computerLiteracy;
 
         /// <summary>
@@ -770,6 +774,10 @@ namespace AORebirth.Stats
         /// <summary>
         /// </summary>
         private readonly Stat dmsModifier;
+
+        /// <summary>
+        /// </summary>
+        private readonly Stat dailyMissionResets;
 
         /// <summary>
         /// </summary>
@@ -3043,6 +3051,7 @@ namespace AORebirth.Stats
             this.collisionRadius = new Stat(this, 357, 1234567890, false, false, false);
             this.commandRange = new Stat(this, 456, 1234567890, false, false, false);
             this.compulsion = new Stat(this, 328, 1234567890, false, false, false);
+            this.commendations = new Stat(this, 695, 0, false, false, false);
             this.computerLiteracy = new StatSkill(this, 161, 5, true, false, false);
             this.concealment = new StatSkill(this, 164, 5, true, false, false);
             this.conditionState = new Stat(this, 530, 1234567890, false, false, false);
@@ -3083,6 +3092,7 @@ namespace AORebirth.Stats
             this.districtNanoInterval = new Stat(this, 591, 1234567890, false, false, false);
             this.dms = new Stat(this, 29, 1234567890, false, false, false);
             this.dmsModifier = new Stat(this, 277, 0, false, false, false);
+            this.dailyMissionResets = new Stat(this, 696, 0, false, false, false);
             this.dodge = new StatSkill(this, 154, 5, true, false, false);
             this.doorBlockTime = new Stat(this, 335, 1234567890, false, false, false);
             this.doorFlags = new Stat(this, 259, 1234567890, false, false, false);
@@ -4291,6 +4301,8 @@ namespace AORebirth.Stats
             this.all.Add(this.pvpSoloScore);
             this.all.Add(this.pvpTeamScore);
             this.all.Add(this.pvpDuelScore);
+            this.all.Add(this.commendations);
+            this.all.Add(this.dailyMissionResets);
             this.all.Add(this.acgItemSeed);
             this.all.Add(this.acgItemLevel);
             this.all.Add(this.acgItemTemplateId);
@@ -5754,6 +5766,16 @@ namespace AORebirth.Stats
 
         /// <summary>
         /// </summary>
+        public Stat Commendations
+        {
+            get
+            {
+                return this.commendations;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
         public Stat ComputerLiteracy
         {
             get
@@ -6149,6 +6171,16 @@ namespace AORebirth.Stats
             get
             {
                 return this.dmsModifier;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public Stat DailyMissionResets
+        {
+            get
+            {
+                return this.dailyMissionResets;
             }
         }
 

@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -23,6 +24,26 @@ namespace ZoneEngine.Core.MessageHandlers
                     character.Identity,
                     message.SourceContainer,
                     message.TargetPlacement));
+
+            // Live loot clicks are ClientMoveItemToInventory (not inbound ContainerAddItem).
+            // Treasure must win before corpse — same Backpack(handle<<16|slot) packing.
+            if (NascenceDungeon1TreasureLootService.TryLootItem(
+                client,
+                message.SourceContainer,
+                character.Identity,
+                message.TargetPlacement))
+            {
+                return;
+            }
+
+            if (NascenceDungeon2TreasureLootService.TryLootItem(
+                client,
+                message.SourceContainer,
+                character.Identity,
+                message.TargetPlacement))
+            {
+                return;
+            }
 
             if (character.Playfield.TryLootCorpseItem(
                 character,

@@ -18,6 +18,7 @@ namespace ZoneEngine.Core.Playfields
     using Utility;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Packets;
 
     #endregion
@@ -190,7 +191,25 @@ namespace ZoneEngine.Core.Playfields
                 return false;
             }
 
+            // Dead NPCs must not get a fresh SCFU — that resets the Death anim to a standing
+            // 0-HP model (Mike D2: killed mobs keep standing). Despawn + corpse handle removal.
+            if (temp.Stats[StatIds.health].Value <= 0
+                && temp.Controller is NPCController)
+            {
+                return false;
+            }
+
             if (this.TrySendGuardianVisibilityScfu(
+                    temp,
+                    recipient,
+                    sendVisibilityMessage,
+                    diagnosticSnapshot,
+                    joiningCharacter))
+            {
+                return true;
+            }
+
+            if (this.TrySendHavarisVisibilityScfu(
                     temp,
                     recipient,
                     sendVisibilityMessage,
@@ -393,6 +412,106 @@ namespace ZoneEngine.Core.Playfields
                 if (diagnosticSnapshot != null)
                 {
                     diagnosticSnapshot.RecordFailure(diagnosticEnemy, "guardian_visibility_sequence", exception);
+                }
+
+                throw;
+            }
+        }
+
+        private bool TrySendHavarisVisibilityScfu(
+            Character npc,
+            ICharacter recipient,
+            Action<MessageBody> sendVisibilityMessage,
+            SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
+            bool joiningCharacter)
+        {
+            if (!NascenceDungeon1HavarisScfuWire.IsHavaris(npc)
+                && !NascenceDungeon2HavarisScfuWire.IsHavaris(npc))
+            {
+                return false;
+            }
+
+            ZoneClient recipientClient = recipient.Controller != null
+                ? recipient.Controller.Client as ZoneClient
+                : null;
+            if (recipientClient == null)
+            {
+                return false;
+            }
+
+            SubwayVisibilityDiagnosticEnemy diagnosticEnemy =
+                diagnosticSnapshot == null ? null : diagnosticSnapshot.BeginEnemy(npc);
+            try
+            {
+                CharInPlayMessage charInPlay = null;
+                this.packetSequences.RunVisibilityPacketPairSequence(
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        joiningCharacter
+                            ? PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast
+                            : PlayfieldLifecycleTrace.StageExistingCharacterSimpleCharFullUpdate,
+                        PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
+                        npc.Identity,
+                        "recipient=" + recipient.Identity + " havarisWire=true"),
+                    () =>
+                    {
+                        using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                            diagnosticSnapshot,
+                            diagnosticEnemy,
+                            SubwayVisibilityDiagnosticPacketKind.SimpleCharFullUpdate,
+                            0))
+                        {
+                            if (NascenceDungeon2HavarisScfuWire.IsHavaris(npc))
+                            {
+                                NascenceDungeon2HavarisScfuWire.SendToRecipient(recipientClient, npc);
+                            }
+                            else
+                            {
+                                NascenceDungeon1HavarisScfuWire.SendToRecipient(recipientClient, npc);
+                            }
+                        }
+
+                        this.SendWeaponDefinitionsForVisibility(
+                            npc,
+                            recipient,
+                            sendVisibilityMessage,
+                            diagnosticSnapshot,
+                            diagnosticEnemy);
+                    },
+                    () => { charInPlay = new CharInPlayMessage { Identity = npc.Identity, Unknown = 0x00 }; },
+                    () => PlayfieldLifecycleTrace.Record(
+                        PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
+                        joiningCharacter
+                            ? PlayfieldLifecycleTrace.StageJoiningCharacterCharInPlayBroadcast
+                            : PlayfieldLifecycleTrace.StageExistingCharacterCharInPlay,
+                        PlayfieldLifecycleTrace.MessageCharInPlay,
+                        npc.Identity,
+                        "recipient=" + recipient.Identity),
+                    () =>
+                    {
+                        using (SubwayVisibilitySnapshotDiagnostics.BeginPacket(
+                            diagnosticSnapshot,
+                            diagnosticEnemy,
+                            SubwayVisibilityDiagnosticPacketKind.CharInPlay,
+                            0))
+                        {
+                            sendVisibilityMessage(charInPlay);
+                        }
+                    });
+
+                this.visibilityInterest.MarkVisibleEntry(recipient, npc);
+                if (diagnosticSnapshot != null)
+                {
+                    diagnosticSnapshot.MarkEnemyQueued(diagnosticEnemy);
+                }
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                if (diagnosticSnapshot != null)
+                {
+                    diagnosticSnapshot.RecordFailure(diagnosticEnemy, "havaris_visibility_sequence", exception);
                 }
 
                 throw;

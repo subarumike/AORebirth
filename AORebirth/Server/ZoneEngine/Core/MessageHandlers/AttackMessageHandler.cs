@@ -144,6 +144,15 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            Playfield attackPlayfield = character.Playfield as Playfield;
+            if (attackPlayfield != null && !attackPlayfield.IsPlayerAttackInRange(character, target))
+            {
+                this.CancelPlayerAttack(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored: out of weapon range.");
+                return;
+            }
+
             this.StartPlayerAttack(character, message.Target);
             this.EngageNpcTarget(character, target);
             this.SendCombatStartSpecialAttackWeapon(character);
