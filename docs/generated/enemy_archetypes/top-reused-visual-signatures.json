@@ -1,0 +1,561 @@
+{
+  "deterministicDigest": "6b8c9b999ac7ca23f688a7fb64dae1a7fbc5651693bce8fad2187658004149c3",
+  "schemaVersion": 1,
+  "top20": [
+    {
+      "archetypeId": "archetype-36410b296d8f7bd4",
+      "baseModelFamily": "base-model-3e97233ecefc21ca",
+      "capturedObservations": 20,
+      "catMeshes": [
+        208356
+      ],
+      "monsterData": [
+        208640,
+        208641,
+        208642,
+        208643,
+        208644,
+        208645,
+        208646
+      ],
+      "observedLevelMaximum": 40,
+      "observedLevelMinimum": 30,
+      "observedNames": [
+        "Craig-Or",
+        "Craig-Or of Flaming Barrels",
+        "Craig-Or of Gear & Ammo",
+        "Craig-Or of Preservation",
+        "Craig-Or of Protection",
+        "Craig-Or of the Furious Fists",
+        "Hypnagogic Urga-Lum Thrak",
+        "Son-Len, Official of Power",
+        "Visionist Eckel-Lum Thrak"
+      ],
+      "officialNames": [
+        "sl_barad-or",
+        "sl_celeth-or",
+        "sl_craig-or",
+        "sl_cron-or",
+        "sl_nen-or",
+        "sl_non-or",
+        "sl_orad-or"
+      ],
+      "officialVisualRecords": 7,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-9d1b7110c7a11b80",
+      "baseModelFamily": "base-model-437d84b872e2caea",
+      "capturedObservations": 3,
+      "catMeshes": [
+        208376
+      ],
+      "monsterData": [
+        208647,
+        208648,
+        208649,
+        208650,
+        208651,
+        208652,
+        208653
+      ],
+      "observedLevelMaximum": 40,
+      "observedLevelMinimum": 32,
+      "observedNames": [
+        "Follower Gulu-Man Thrak",
+        "Sun-Len"
+      ],
+      "officialNames": [
+        "sl_aile-len",
+        "sl_calath-len",
+        "sl_celeth-len",
+        "sl_culuth-len",
+        "sl_eile-len",
+        "sl_son-len",
+        "sl_sun-len"
+      ],
+      "officialVisualRecords": 7,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-465562c30f4842e6",
+      "baseModelFamily": "base-model-156d48914d0ee033",
+      "capturedObservations": 0,
+      "catMeshes": [
+        208814
+      ],
+      "monsterData": [
+        208842,
+        208849,
+        208856,
+        208863,
+        208870,
+        208877,
+        208884
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_celeth-suir",
+        "sl_erath-suir",
+        "sl_gorath-suir",
+        "sl_goroth-suir",
+        "sl_leon-suir",
+        "sl_meerek-suir",
+        "sl_myrkon-suir"
+      ],
+      "officialVisualRecords": 7,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-2bf3e47867d6669d",
+      "baseModelFamily": "base-model-57097d0b2e384347",
+      "capturedObservations": 1,
+      "catMeshes": [
+        208395
+      ],
+      "monsterData": [
+        208523,
+        208531,
+        208544,
+        208551,
+        208635,
+        208636
+      ],
+      "observedLevelMaximum": 40,
+      "observedLevelMinimum": 40,
+      "observedNames": [
+        "Prophet Yutt Thrak"
+      ],
+      "officialNames": [
+        "sl_calan-cur",
+        "sl_calun-cur",
+        "sl_celeth-cur",
+        "sl_eron-cur",
+        "sl_fallon-cur",
+        "sl_felen-cur"
+      ],
+      "officialVisualRecords": 6,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-428d46d9615d1af5",
+      "baseModelFamily": "base-model-1ce88fe7f53ba3d9",
+      "capturedObservations": 0,
+      "catMeshes": [
+        208657
+      ],
+      "monsterData": [
+        208732,
+        208739,
+        208746,
+        208753,
+        208760,
+        208767
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_buran-kuir",
+        "sl_celeth-kuir",
+        "sl_evok-kuir",
+        "sl_ivok-kuir",
+        "sl_karon-kuir",
+        "sl_kurd-kuir"
+      ],
+      "officialVisualRecords": 6,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-340a9c7e3b511f49",
+      "baseModelFamily": "base-model-eabe3a2bce3de26c",
+      "capturedObservations": 0,
+      "catMeshes": [
+        209046
+      ],
+      "monsterData": [
+        209229,
+        209238,
+        209245,
+        209252
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_malah-ana",
+        "sl_malah-behn",
+        "sl_malah-curran",
+        "sl_malah-dren"
+      ],
+      "officialVisualRecords": 4,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-927f9460b2b52d56",
+      "baseModelFamily": "base-model-ffdb079c25b1a96a",
+      "capturedObservations": 0,
+      "catMeshes": [
+        208155
+      ],
+      "monsterData": [
+        208558,
+        208604,
+        208612,
+        208630
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_cama-el",
+        "sl_celeth-el",
+        "sl_cor-el",
+        "sl_yor-el"
+      ],
+      "officialVisualRecords": 4,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-d04ef84dda1c1148",
+      "baseModelFamily": "base-model-4da46932b49139b9",
+      "capturedObservations": 0,
+      "catMeshes": [
+        208961
+      ],
+      "monsterData": [
+        209143,
+        209150,
+        209158,
+        209165
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_essence eremite",
+        "sl_rippled eremite",
+        "sl_rotting eremite",
+        "sl_sparkling eremite"
+      ],
+      "officialVisualRecords": 4,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-3c10e29bfe9ed548",
+      "baseModelFamily": "base-model-24aa866257ded054",
+      "capturedObservations": 0,
+      "catMeshes": [
+        209288
+      ],
+      "monsterData": [
+        209347,
+        209354,
+        209361
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_weaver of decay",
+        "sl_weaver of shadow",
+        "sl_weaver of spirits"
+      ],
+      "officialVisualRecords": 3,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-adedbfad15f1cbaf",
+      "baseModelFamily": "base-model-5b9223ff8df87610",
+      "capturedObservations": 0,
+      "catMeshes": [
+        208955
+      ],
+      "monsterData": [
+        209117,
+        209125,
+        209136
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_burning shadow",
+        "sl_faded shadow",
+        "sl_icy shadow"
+      ],
+      "officialVisualRecords": 3,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-e072636bc8bb5239",
+      "baseModelFamily": "base-model-ffdb079c25b1a96a",
+      "capturedObservations": 0,
+      "catMeshes": [
+        208155
+      ],
+      "monsterData": [
+        247044,
+        247045,
+        247048
+      ],
+      "observedLevelMaximum": null,
+      "observedLevelMinimum": null,
+      "observedNames": [],
+      "officialNames": [
+        "sl_celeth-el_shoot",
+        "sl_cor-el_shoot",
+        "sl_yor-el_shoot"
+      ],
+      "officialVisualRecords": 3,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-4d9a0ec31c8218d6",
+      "baseModelFamily": "base-model-5107cd42384a8b00",
+      "capturedObservations": 58,
+      "catMeshes": [
+        23365
+      ],
+      "monsterData": [
+        203740,
+        215049
+      ],
+      "observedLevelMaximum": 5,
+      "observedLevelMinimum": 2,
+      "observedNames": [
+        "Dockworker",
+        "Protester",
+        "Violent Protester"
+      ],
+      "officialNames": [
+        "jobe_traknavar",
+        "workman stiker"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-1296981b7504c3fe",
+      "baseModelFamily": "base-model-34946272afc99eba",
+      "capturedObservations": 31,
+      "catMeshes": [
+        208966
+      ],
+      "monsterData": [
+        209173,
+        209180
+      ],
+      "observedLevelMaximum": 10,
+      "observedLevelMinimum": 5,
+      "observedNames": [
+        "Barking Chimera",
+        "Yuttos Nascence Geosurvey Dog"
+      ],
+      "officialNames": [
+        "sl_crawlos",
+        "sl_creepos"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-dbcdac694d276e41",
+      "baseModelFamily": "base-model-0642eed599c22908",
+      "capturedObservations": 19,
+      "catMeshes": [
+        15929
+      ],
+      "monsterData": [
+        17720,
+        218695
+      ],
+      "observedLevelMaximum": 220,
+      "observedLevelMinimum": 13,
+      "observedNames": [
+        "Advanced Predator M-30",
+        "Grammarr",
+        "Killer Mechdog",
+        "Lilengi160",
+        "Luna",
+        "PROJECT:GHOST",
+        "Phobius",
+        "Pleaseblocks",
+        "Predator M-30",
+        "Ravening M-60",
+        "Robotic Guard Dog"
+      ],
+      "officialNames": [
+        "mech dog - skin",
+        "sl_pet_predators"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-fd408060ca9e93c8",
+      "baseModelFamily": "base-model-2d48cd832b6623d3",
+      "capturedObservations": 15,
+      "catMeshes": [
+        208982
+      ],
+      "monsterData": [
+        209196,
+        209203
+      ],
+      "observedLevelMaximum": 17,
+      "observedLevelMinimum": 15,
+      "observedNames": [
+        "Hiathlin"
+      ],
+      "officialNames": [
+        "sl_hiathlin",
+        "sl_hoathlan"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-9be075a84e6629f8",
+      "baseModelFamily": "base-model-a9f77c13e12e09b8",
+      "capturedObservations": 13,
+      "catMeshes": [
+        209275
+      ],
+      "monsterData": [
+        209333,
+        209340
+      ],
+      "observedLevelMaximum": 10,
+      "observedLevelMinimum": 10,
+      "observedNames": [
+        "Crippler of Growth"
+      ],
+      "officialNames": [
+        "sl_crippler of growth",
+        "sl_crippler of life"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-9e74c23392ae4a2a",
+      "baseModelFamily": "base-model-9f15325ce21ff23e",
+      "capturedObservations": 11,
+      "catMeshes": [
+        23378
+      ],
+      "monsterData": [
+        26135,
+        295564
+      ],
+      "observedLevelMaximum": 142,
+      "observedLevelMinimum": 9,
+      "observedNames": [
+        "Seasoned OT Adventurer",
+        "Shuttle Saboteur",
+        "Vernon Godfray"
+      ],
+      "officialNames": [
+        "opifex thin male",
+        "opifex thin male - vernon torvalds"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-2edd27cb8c8d919d",
+      "baseModelFamily": "base-model-2765091f762fd92b",
+      "capturedObservations": 4,
+      "catMeshes": [
+        5907
+      ],
+      "monsterData": [
+        204985,
+        242322
+      ],
+      "observedLevelMaximum": 111,
+      "observedLevelMinimum": 40,
+      "observedNames": [
+        "Brandon Thorn",
+        "Young Man"
+      ],
+      "officialNames": [
+        "sl_david_marlin",
+        "solitusmale_ah_youngman"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-0736d54b26316917",
+      "baseModelFamily": "base-model-d1d09906c34cd1e4",
+      "capturedObservations": 3,
+      "catMeshes": [
+        21715
+      ],
+      "monsterData": [
+        22821,
+        218783
+      ],
+      "observedLevelMaximum": 205,
+      "observedLevelMinimum": 200,
+      "observedNames": [
+        "Devastator Drone",
+        "Engineer Slayerdroid II"
+      ],
+      "officialNames": [
+        "omni slayer droid",
+        "sl_pet_slayers"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    },
+    {
+      "archetypeId": "archetype-8fd9935d3896d8d5",
+      "baseModelFamily": "base-model-996d0a814bd5a8fd",
+      "capturedObservations": 3,
+      "catMeshes": [
+        201417
+      ],
+      "monsterData": [
+        201533,
+        278499
+      ],
+      "observedLevelMaximum": 103,
+      "observedLevelMinimum": 92,
+      "observedNames": [
+        "Simple Missile Turret",
+        "Solar Turret"
+      ],
+      "officialNames": [
+        "lctower_guard_small",
+        "unicorn commtower"
+      ],
+      "officialVisualRecords": 2,
+      "placementState": "unresolved",
+      "resolvedAcgPlacements": 0
+    }
+  ]
+}

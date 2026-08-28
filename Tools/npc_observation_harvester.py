@@ -308,6 +308,7 @@ def observation_from_scfu(record: CaptureRecord, row: Mapping[str, str]) -> NpcO
     }
     fields: dict[str, dict[str, Any]] = {}
     scalar_fields = {
+        "level": ("Level", True),
         "headMesh": ("HeadMesh", True),
         "visualFlags": ("VisualFlags", True),
         "appearanceValue": ("AppearanceValue", True),
@@ -323,7 +324,7 @@ def observation_from_scfu(record: CaptureRecord, row: Mapping[str, str]) -> NpcO
     }
     for name, (column, always_observed) in scalar_fields.items():
         raw = row.get(column, "")
-        numeric = optional_int(raw) if name in {"headMesh", "visualFlags", "appearanceValue", "monsterData", "monsterScale"} else raw
+        numeric = optional_int(raw) if name in {"level", "headMesh", "visualFlags", "appearanceValue", "monsterData", "monsterScale"} else raw
         merge_field(fields, name, evidence(numeric, "packet-observed", provenance, observed=always_observed or bool(raw)))
     merge_field(fields, "textures", evidence(parse_pipe_triplets(row.get("Textures", ""), ("place", "id", "unknown")), "packet-observed", provenance))
     merge_field(fields, "meshes", evidence(parse_meshes(row.get("Meshes", "")), "packet-observed", provenance))

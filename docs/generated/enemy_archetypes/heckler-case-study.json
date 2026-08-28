@@ -1,0 +1,29 @@
+{
+  "baseModelFamilies": [
+    "base-model-6fda5cc83f212282"
+  ],
+  "caseStudy": "Heckler",
+  "catMeshes": [
+    290605
+  ],
+  "directSeedArchetypes": [
+    "archetype-8d7394be06cd7ea9"
+  ],
+  "levelMaximum": null,
+  "levelMinimum": null,
+  "monsterData": [
+    290647
+  ],
+  "observedNames": [],
+  "officialNames": [
+    "heckler_of_celebration"
+  ],
+  "placementState": "unresolved-official-acg-to-monsterdata-join",
+  "resolvedAcgPlacements": null,
+  "resourcePlayfields": [],
+  "runtimePlayfields": [],
+  "seedRule": "name token 'heckler' only seeds official/runtime records; family expansion follows visual signatures",
+  "visualArchetypes": [
+    "archetype-8d7394be06cd7ea9"
+  ]
+}

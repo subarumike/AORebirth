@@ -96,6 +96,32 @@ same canonical placement-manifest digest for the same source SHA. Packaged
 availability is not runtime activation; the gameplay spawn path remains under
 its existing separately governed catalogs.
 
+## Visual Archetypes Do Not Require Exact ACG Placement Identity
+
+Decision: Model reusable NPC visuals as a hierarchy of structural base-model
+family, exact visual archetype, contextual name/level variant, optional ACG
+placement association, and runtime observation. Official MonsterData and
+CATMesh resources establish visual identity; names, levels, loot, ACGHash,
+placement rows, and runtime identities do not.
+
+The canonical exact signature includes the shipped CATMesh resource, HeadMesh
+state, MonsterData animation map, and MonsterData feature state. A broader
+structural family uses decoded joint hierarchy and mesh-topology structure.
+SCFU texture and mesh overrides create runtime visual variants while preserving
+missing, explicit zero, and the rejected `1234567890` sentinel as distinct
+states.
+
+Reason: The official client proves the server-authored MonsterData-to-CATMesh
+resource chain but contains no ACGHash-to-MonsterData resolver. Requiring exact
+runtime-to-ACG placement identity would therefore block a valid visual census
+and encourage a guessed join.
+
+Consequences: Runtime observations may associate to an official visual
+archetype through MonsterData or CATMesh without resolving an exact placement.
+Every ACG association remains classified as direct official, indirect official,
+ambiguous, or unresolved. Missing placement joins are reported as not observed,
+never as zero, and never authorize spawning or gameplay behavior.
+
 ## Capture Playfield Labels Are Session Context
 
 Decision: A capture folder/resource label is session-level evidence, not a
