@@ -72827,7 +72827,7 @@
       "officialVisualRecordCount": 1
     }
   ],
-  "deterministicDigest": "6b8c9b999ac7ca23f688a7fb64dae1a7fbc5651693bce8fad2187658004149c3",
+  "deterministicDigest": "8331f65ba07f8dd9e2eca0f8ad16d477549c5fa13450615e54adf4beb8068b2a",
   "schemaVersion": 1,
   "signatureMethod": {
     "baseModelFamily": "CATMesh joint hierarchy plus decoded mesh topology counts",

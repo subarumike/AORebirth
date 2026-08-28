@@ -720,6 +720,22 @@ not edit resource databases, runtime NPC definitions, or placement activation.
 The three complete bulk indexes use deterministic `.json.gz`; the summary,
 report, and representative raw forensics remain directly readable.
 
+For the deterministic population reconstruction over official ACG topology,
+accepted runtime observations, phase-aware resolver evidence, and reusable
+visual archetypes, use:
+
+```cmd
+cmd /d /c Tools\run_spawn_population_reconstruction.cmd
+cmd /d /c Tools\run_spawn_population_reconstruction.cmd --check
+```
+
+The workflow refreshes the governed harvester and resolver inputs, validates
+the archetype census, runs the focused population tests, and writes complete
+deterministic catalogs under `docs/generated/spawn_populations`. It preserves
+exact, local-population, playfield-population, unassociated, and conflict
+scopes. Spatial-only candidates remain blocked, and the workflow never edits
+captures, placement activation, runtime NPC definitions, or database state.
+
 For the phase-aware official placement identity audit, all candidate coordinate
 transforms, runtime/base mapping evidence, conservative repeated-observation
 clusters, and non-mutating promotion eligibility, use:

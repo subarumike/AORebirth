@@ -1,0 +1,2513 @@
+{
+  "archetypes": [
+    {
+      "archetypeId": "archetype-dbb46cbb8be5546a",
+      "associatedAcgPlacements": 37,
+      "levelMaximum": 41,
+      "levelMinimum": 2,
+      "localPopulations": 22,
+      "names": [
+        "Gnarl the Roller",
+        "Grudgespine the Screaming Roller",
+        "Hatespine the Corrupted Roller",
+        "Rollerrat",
+        "Scourge Rollerrat",
+        "Stowaway Rollerrat",
+        "Tormented Rollerrat"
+      ],
+      "observationCount": 111,
+      "playfields": [
+        4582,
+        6553
+      ],
+      "runtimePopulations": 29
+    },
+    {
+      "archetypeId": "archetype-ec5555cf58e2220d",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 250,
+      "levelMinimum": 10,
+      "localPopulations": 2,
+      "names": [
+        "Adri Afeli",
+        "Adventurer of IPS",
+        "Basic Quality Weaponsdealer",
+        "Cody Monkie",
+        "Doctor of IPS",
+        "Ed Burton",
+        "Exchange Officer of IPS",
+        "Farno Kilharha",
+        "ICC Peacekeeper",
+        "ICC Peacekeeper Commander",
+        "Levon Karubian",
+        "Lieutenant Antonio Neal",
+        "Marco Spida",
+        "Miiir Specialist",
+        "Neutral Clothing Salesman",
+        "Novice Laseraim",
+        "Omni-Med Surgeon",
+        "OT Food Provider",
+        "Patrick Sun",
+        "Peacekeeper Constad",
+        "Perk-Reset Service Provider"
+      ],
+      "observationCount": 51,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 17
+    },
+    {
+      "archetypeId": "archetype-0511d362f6791ebb",
+      "associatedAcgPlacements": 2,
+      "levelMaximum": 210,
+      "levelMinimum": 6,
+      "localPopulations": 1,
+      "names": [
+        "Advanced Quality Weaponsdealer",
+        "Careless Citizen",
+        "Christopher Villalba",
+        "Clan Bartender",
+        "Dion Giscombe",
+        "Emery Ratti",
+        "Guard",
+        "Jamison Clasen",
+        "Josef Pippin",
+        "Malcom Thompon",
+        "Male Prison Guard",
+        "Martial Artist of IPS",
+        "Max Barchus",
+        "Miiir Specialist",
+        "Newland Militia Guard",
+        "Omni-Pol Guard",
+        "Pedro Peasley",
+        "Scotty Cicali",
+        "Sergio Zembower",
+        "Shane Streller",
+        "Sherwood Bannister"
+      ],
+      "observationCount": 42,
+      "playfields": [
+        3081
+      ],
+      "runtimePopulations": 15
+    },
+    {
+      "archetypeId": "archetype-1ccaaac2abc51af3",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 195,
+      "levelMinimum": 3,
+      "localPopulations": 1,
+      "names": [
+        "Agent of IPS",
+        "Bartender",
+        "Bureaucrat of IPS",
+        "Dockworker",
+        "Female Captain",
+        "Furniture Merchant",
+        "Lady Sheila Black",
+        "Lorelei the Bartender",
+        "Seasoned OT Agent",
+        "Soft Clan Techwrecker"
+      ],
+      "observationCount": 24,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 13
+    },
+    {
+      "archetypeId": "archetype-73143d6a69558639",
+      "associatedAcgPlacements": 15,
+      "levelMaximum": 5,
+      "levelMinimum": 1,
+      "localPopulations": 4,
+      "names": [
+        "32-V Docker",
+        "34-I Helper",
+        "Cargo Droid",
+        "Engineer Automaton I",
+        "IIV-X Advanced Docker",
+        "Microhead ElectroStor-5K340-Z37",
+        "Micromind Hyper-VZ230-T4"
+      ],
+      "observationCount": 88,
+      "playfields": [
+        3081,
+        4582,
+        6553
+      ],
+      "runtimePopulations": 11
+    },
+    {
+      "archetypeId": "archetype-15284a6aaca17059",
+      "associatedAcgPlacements": 4,
+      "levelMaximum": 220,
+      "levelMinimum": 5,
+      "localPopulations": 5,
+      "names": [
+        "Antonio Stacklund",
+        "Bruiser",
+        "Chang Meloche",
+        "Earl Dublin",
+        "Emery Annunziata",
+        "Ervin Babilonia",
+        "Fidel Timmer",
+        "ICC Immigration Officer Bill",
+        "Levi McDannold",
+        "Representative of IPS",
+        "Transportation Officer Darren Plush",
+        "Vendor Antonio Stacklund"
+      ],
+      "observationCount": 47,
+      "playfields": [
+        4582,
+        6553
+      ],
+      "runtimePopulations": 11
+    },
+    {
+      "archetypeId": "archetype-0adbc252bc94694e",
+      "associatedAcgPlacements": 13,
+      "levelMaximum": 7,
+      "levelMinimum": 1,
+      "localPopulations": 8,
+      "names": [
+        "Garbage Flea",
+        "Mutated Garbage Flea"
+      ],
+      "observationCount": 100,
+      "playfields": [],
+      "runtimePopulations": 10
+    },
+    {
+      "archetypeId": "archetype-d310666d074bba2c",
+      "associatedAcgPlacements": 33,
+      "levelMaximum": 5,
+      "levelMinimum": 1,
+      "localPopulations": 5,
+      "names": [
+        "Burning Cleaning Robot",
+        "Cleaning Robot",
+        "Cleanmeister Intelligence Robot",
+        "Malfunctioning Cleaning Robot"
+      ],
+      "observationCount": 390,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-b457cf088c8fd9a2",
+      "associatedAcgPlacements": 27,
+      "levelMaximum": 4,
+      "levelMinimum": 2,
+      "localPopulations": 6,
+      "names": [
+        "Supreme Collector of Waste",
+        "Waste collector",
+        "Waste Collector"
+      ],
+      "observationCount": 130,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-85316bb23b707f3e",
+      "associatedAcgPlacements": 8,
+      "levelMaximum": 109,
+      "levelMinimum": 5,
+      "localPopulations": 4,
+      "names": [
+        "Cross-Wired Junkbot",
+        "Engineer Guardbot",
+        "Sparepart the Corroded"
+      ],
+      "observationCount": 87,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-e959fe7bf87d9380",
+      "associatedAcgPlacements": 2,
+      "levelMaximum": 250,
+      "levelMinimum": 6,
+      "localPopulations": 2,
+      "names": [
+        "Carol Schieffer",
+        "Clan Protester",
+        "Delois Guiney",
+        "Fia Lou",
+        "Food Provider",
+        "ICC Peacekeeper",
+        "Janee Forejt",
+        "Jessika Capo",
+        "Keli Peasley",
+        "Luna Erke",
+        "Melissia Toussand",
+        "Omni-Pol Guard",
+        "Secondhand Peddler"
+      ],
+      "observationCount": 69,
+      "playfields": [],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-79fce60dbc95f0ba",
+      "associatedAcgPlacements": 13,
+      "levelMaximum": 40,
+      "levelMinimum": 5,
+      "localPopulations": 3,
+      "names": [
+        "Dockworker",
+        "Enforcer of IPS",
+        "Engineer of IPS",
+        "Rex Larsson",
+        "Shady Guy"
+      ],
+      "observationCount": 39,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-615c258585f61187",
+      "associatedAcgPlacements": 12,
+      "levelMaximum": 40,
+      "levelMinimum": 5,
+      "localPopulations": 2,
+      "names": [
+        "Dockworker",
+        "Melvina Sandine",
+        "Trader of IPS"
+      ],
+      "observationCount": 33,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-36410b296d8f7bd4",
+      "associatedAcgPlacements": 6,
+      "levelMaximum": 40,
+      "levelMinimum": 30,
+      "localPopulations": 6,
+      "names": [
+        "Craig-Or",
+        "Craig-Or of Flaming Barrels",
+        "Craig-Or of Gear & Ammo",
+        "Craig-Or of Preservation",
+        "Craig-Or of Protection",
+        "Craig-Or of the Furious Fists",
+        "Hypnagogic Urga-Lum Thrak",
+        "Son-Len, Official of Power",
+        "Visionist Eckel-Lum Thrak"
+      ],
+      "observationCount": 20,
+      "playfields": [
+        4310,
+        4677
+      ],
+      "runtimePopulations": 9
+    },
+    {
+      "archetypeId": "archetype-4d9a0ec31c8218d6",
+      "associatedAcgPlacements": 12,
+      "levelMaximum": 5,
+      "levelMinimum": 2,
+      "localPopulations": 2,
+      "names": [
+        "Dockworker",
+        "Protester",
+        "Violent Protester"
+      ],
+      "observationCount": 58,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 8
+    },
+    {
+      "archetypeId": "archetype-dbcdac694d276e41",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 220,
+      "levelMinimum": 13,
+      "localPopulations": 0,
+      "names": [
+        "Advanced Predator M-30",
+        "Grammarr",
+        "Killer Mechdog",
+        "Lilengi160",
+        "Luna",
+        "Phobius",
+        "Pleaseblocks",
+        "Predator M-30",
+        "PROJECT:GHOST",
+        "Ravening M-60",
+        "Robotic Guard Dog"
+      ],
+      "observationCount": 19,
+      "playfields": [],
+      "runtimePopulations": 8
+    },
+    {
+      "archetypeId": "archetype-96421bebf1e93b95",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 2,
+      "levelMinimum": 1,
+      "localPopulations": 1,
+      "names": [
+        "Beach Leet",
+        "Eleet",
+        "Flurryflutter the Phearsome Smasher",
+        "Flurryflutter the Troubled Smasher",
+        "Leet",
+        "Redeye the Pheared",
+        "Redeyeflutter of the Phat Loot Wrecker",
+        "Redeyeflutter the Dood Wrecker",
+        "Shinyflutter the Phearsome",
+        "Shinyfoot the Supa Pheared Smasher",
+        "Swiftfoot the Frantic Exterminator"
+      ],
+      "observationCount": 156,
+      "playfields": [
+        3081,
+        4582
+      ],
+      "runtimePopulations": 7
+    },
+    {
+      "archetypeId": "archetype-80873d61835db8d0",
+      "associatedAcgPlacements": 4,
+      "levelMaximum": 19,
+      "levelMinimum": 1,
+      "localPopulations": 3,
+      "names": [
+        "Concrete Adder",
+        "Giant Snake",
+        "Shore Snake",
+        "Slipcoil Banetwister",
+        "Slipslidder Banetwister",
+        "Slipslidder of the Jungle",
+        "Writhecoil Venomscale",
+        "Writhefang the Envenomedscale"
+      ],
+      "observationCount": 33,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 7
+    },
+    {
+      "archetypeId": "archetype-0198fd6b97381e87",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 125,
+      "levelMinimum": 1,
+      "localPopulations": 0,
+      "names": [
+        "\u0010\u000bAgent Deth",
+        "\u0010\fKillzJoo",
+        "ALLOFF",
+        "Anger Manifestation",
+        "Frenzy Embodiment",
+        "Fury Externalization",
+        "lube",
+        "Redface",
+        "tongue",
+        "Wrath Incarnation"
+      ],
+      "observationCount": 20,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 7
+    },
+    {
+      "archetypeId": "archetype-b866af61a08d0c44",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 250,
+      "levelMinimum": 100,
+      "localPopulations": 2,
+      "names": [
+        "Bodyguard Logan Fixx",
+        "Omni Unicorn Squadleader Fixx",
+        "Unicorn Squadleader"
+      ],
+      "observationCount": 9,
+      "playfields": [
+        4582,
+        6553
+      ],
+      "runtimePopulations": 7
+    },
+    {
+      "archetypeId": "archetype-6111a6c75e2f6b9a",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 220,
+      "levelMinimum": 4,
+      "localPopulations": 1,
+      "names": [
+        "Arbiter's Guardian",
+        "Colonist",
+        "Kneebreaker Alfonzo Rizzolo",
+        "Obedience Enforcement"
+      ],
+      "observationCount": 22,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 6
+    },
+    {
+      "archetypeId": "archetype-78591b98b055ce86",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 167,
+      "levelMinimum": 10,
+      "localPopulations": 1,
+      "names": [
+        "ICC Bio-Inspector",
+        "Male Captain",
+        "Nano-Technician of IPS",
+        "Omni-AF Private"
+      ],
+      "observationCount": 14,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 6
+    },
+    {
+      "archetypeId": "archetype-8c72aa9b6d8e8410",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 103,
+      "levelMinimum": 2,
+      "localPopulations": 0,
+      "names": [
+        "Bureaucrat Secretary",
+        "Bureaucrat Worker",
+        "Infected Attendant",
+        "LazyHo"
+      ],
+      "observationCount": 11,
+      "playfields": [
+        127,
+        4310,
+        4582,
+        4677
+      ],
+      "runtimePopulations": 6
+    },
+    {
+      "archetypeId": "archetype-861c23c180f04da1",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 200,
+      "levelMinimum": 15,
+      "localPopulations": 0,
+      "names": [
+        "Guide",
+        "Natalia Akcora",
+        "Rookie OT Agent",
+        "Tailor"
+      ],
+      "observationCount": 7,
+      "playfields": [
+        3081
+      ],
+      "runtimePopulations": 6
+    },
+    {
+      "archetypeId": "archetype-ecf542041356fc81",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 42,
+      "levelMinimum": 1,
+      "localPopulations": 0,
+      "names": [
+        "Blood Reet",
+        "Chiffchaff Reet",
+        "Desert Reet",
+        "Greedy Desert Reet",
+        "Island Reet",
+        "Kea Reet",
+        "Lolly the Reet",
+        "Night Reet",
+        "Royal Reet",
+        "Shrike Reet"
+      ],
+      "observationCount": 112,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-3094215222742ec5",
+      "associatedAcgPlacements": 2,
+      "levelMaximum": 25,
+      "levelMinimum": 25,
+      "localPopulations": 2,
+      "names": [
+        "ICC Shuttle Guard"
+      ],
+      "observationCount": 83,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-5fa315a89431ea03",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 55,
+      "levelMinimum": 25,
+      "localPopulations": 0,
+      "names": [
+        "Ancient Nightcrawler",
+        "Bloodcreeper",
+        "Nightcrawler",
+        "Young Nightcrawler"
+      ],
+      "observationCount": 43,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-970e69eede2a8d73",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 133,
+      "levelMinimum": 19,
+      "localPopulations": 0,
+      "names": [
+        "Babette Ganes",
+        "Irish Fahrni",
+        "Janae Seaman",
+        "Keesha McKesson",
+        "Meta-Physicist of IPS",
+        "Rashida Ardman",
+        "Trinh Alsaqri",
+        "Velva Age"
+      ],
+      "observationCount": 22,
+      "playfields": [],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-c377031d20e78883",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 215,
+      "levelMinimum": 14,
+      "localPopulations": 0,
+      "names": [
+        "\u0010\u0006Karl",
+        "\u0010\u0019Agent Life",
+        "Belamorte",
+        "helf",
+        "lips",
+        "Medinos",
+        "PROJECT:TAMAGOTCHI",
+        "Restite",
+        "Sanoo",
+        "Steve",
+        "Stitches",
+        "Valentyia"
+      ],
+      "observationCount": 15,
+      "playfields": [],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-675a400d618d45a4",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 210,
+      "levelMinimum": 5,
+      "localPopulations": 0,
+      "names": [
+        "\u0010\bMezzJoo",
+        "\u0010\u0016George",
+        "BobIrwin",
+        "Deranged Mindreaver",
+        "Distracting Sphere",
+        "Lookatme",
+        "mmmmm",
+        "Yidira"
+      ],
+      "observationCount": 11,
+      "playfields": [],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-8d98e4a970fbfd61",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 220,
+      "levelMinimum": 220,
+      "localPopulations": 0,
+      "names": [
+        "Grammarr",
+        "Lilengi160",
+        "Phobius",
+        "Pleaseblocks",
+        "PROJECT:AEGIS",
+        "Spielmann",
+        "Widowmaker Battle Drone"
+      ],
+      "observationCount": 11,
+      "playfields": [],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-9e74c23392ae4a2a",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 142,
+      "levelMinimum": 9,
+      "localPopulations": 0,
+      "names": [
+        "Seasoned OT Adventurer",
+        "Shuttle Saboteur",
+        "Vernon Godfray"
+      ],
+      "observationCount": 11,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 5
+    },
+    {
+      "archetypeId": "archetype-29a43a4dd931124c",
+      "associatedAcgPlacements": 23,
+      "levelMaximum": 13,
+      "levelMinimum": 10,
+      "localPopulations": 2,
+      "names": [
+        "Scout - Jaax'Sinuh"
+      ],
+      "observationCount": 786,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-f53286bb8bf71f4b",
+      "associatedAcgPlacements": 3,
+      "levelMaximum": 1,
+      "levelMinimum": 1,
+      "localPopulations": 1,
+      "names": [
+        "Surf Lizard"
+      ],
+      "observationCount": 49,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-e7701042d17f2a78",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 144,
+      "levelMinimum": 1,
+      "localPopulations": 1,
+      "names": [
+        "Barry the Food Vendor",
+        "Cedrick Gaviglia",
+        "Chauncey Varela",
+        "Clan Protester",
+        "Douglass Guynes",
+        "Eliseo Ye",
+        "Emiel Dijkman",
+        "Jake Carnalla",
+        "Joseph Schuemann",
+        "Mitchell Dorph",
+        "Omni-Med Guard",
+        "Russel Aronstein",
+        "Sherwood Bannister"
+      ],
+      "observationCount": 30,
+      "playfields": [],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-ce8829ab29cf3fa0",
+      "associatedAcgPlacements": 5,
+      "levelMaximum": 20,
+      "levelMinimum": 1,
+      "localPopulations": 1,
+      "names": [
+        "Wounded Clan Protester",
+        "Wounded Dockworker"
+      ],
+      "observationCount": 25,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-bd11785106eca776",
+      "associatedAcgPlacements": 2,
+      "levelMaximum": 40,
+      "levelMinimum": 6,
+      "localPopulations": 3,
+      "names": [
+        "Cedric Harding",
+        "Neutral Observer"
+      ],
+      "observationCount": 13,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-41d5f3d60b79c9d4",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 40,
+      "levelMinimum": 40,
+      "localPopulations": 2,
+      "names": [
+        "Omni-Tek Equipment Vendor",
+        "Omni-Trans Equipment Vendor"
+      ],
+      "observationCount": 10,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-8d9ff5cff808d08a",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Logistics Manager Fausto",
+        "Robin Marksward"
+      ],
+      "observationCount": 9,
+      "playfields": [],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-14940783511bfba2",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 43,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Fixer of IPS",
+        "Leonora Marty",
+        "Novice Contract Killer",
+        "Novice Sharpshooter"
+      ],
+      "observationCount": 7,
+      "playfields": [],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-11ccad8b101b6790",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 9,
+      "localPopulations": 0,
+      "names": [
+        "Clan Protester",
+        "Fidel Timmer",
+        "Keeper of IPS"
+      ],
+      "observationCount": 5,
+      "playfields": [],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-778e3814738b9465",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 100,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Flint Novak",
+        "Louie Demesa",
+        "Maintainance Technician"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-037b27818a2f7688",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 100,
+      "levelMinimum": 100,
+      "localPopulations": 2,
+      "names": [
+        "Clan Field Surgeon Elsa Oosta",
+        "Field Surgeon Elsa Oosta"
+      ],
+      "observationCount": 4,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-2edd27cb8c8d919d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 111,
+      "levelMinimum": 40,
+      "localPopulations": 0,
+      "names": [
+        "Brandon Thorn",
+        "Young Man"
+      ],
+      "observationCount": 4,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-d206486972f41835",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 200,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Andre Bottle",
+        "Dr. Mason"
+      ],
+      "observationCount": 4,
+      "playfields": [],
+      "runtimePopulations": 4
+    },
+    {
+      "archetypeId": "archetype-0e9188147d7cc6b1",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 43,
+      "levelMinimum": 2,
+      "localPopulations": 1,
+      "names": [
+        "Burntongue the Smouldering Salamander",
+        "Climbing Salamander",
+        "Fireclaw the Burning Mudpuppy",
+        "Lumma the Smouldering Salamander",
+        "Muddevil Salamander",
+        "Reef Salamander",
+        "Salamander",
+        "Scorchclaw the Burning Mudpuppy"
+      ],
+      "observationCount": 37,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-529e5a3f2758414f",
+      "associatedAcgPlacements": 26,
+      "levelMaximum": 8,
+      "levelMinimum": 3,
+      "localPopulations": 1,
+      "names": [
+        "Alien Spider - Zix"
+      ],
+      "observationCount": 30,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-2a25c85e06aa5efe",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 43,
+      "levelMinimum": 1,
+      "localPopulations": 0,
+      "names": [
+        "Bio-X Terminator",
+        "Bio-X39 Public Enemy",
+        "Biofreak Carcass",
+        "Discontinued Bio-X39"
+      ],
+      "observationCount": 13,
+      "playfields": [
+        3081
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-dc7ee8be5d26f2bb",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 40,
+      "levelMinimum": 40,
+      "localPopulations": 2,
+      "names": [
+        "Clan Equipment Vendor"
+      ],
+      "observationCount": 9,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-e0625a0174a3b5d0",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 100,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Manager Travis Molen",
+        "Remi Gallois",
+        "Stanley Goodman"
+      ],
+      "observationCount": 6,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-1d665dd847940e3e",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 6,
+      "levelMinimum": 6,
+      "localPopulations": 0,
+      "names": [
+        "Surveillance Droid"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-6855da7b4a991de0",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Desmond Calitri"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-d23831c7e2fdf5e1",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 25,
+      "levelMinimum": 25,
+      "localPopulations": 0,
+      "names": [
+        "Shipping Manifest Terminal"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-facdafbee665c856",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 15,
+      "levelMinimum": 15,
+      "localPopulations": 0,
+      "names": [
+        "Marcus Stone"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-99a425b158b5ddea",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Alex Gibbs"
+      ],
+      "observationCount": 4,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-0736d54b26316917",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 205,
+      "levelMinimum": 200,
+      "localPopulations": 0,
+      "names": [
+        "Devastator Drone",
+        "Engineer Slayerdroid II"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-419d04b32b808f78",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 35,
+      "levelMinimum": 18,
+      "localPopulations": 0,
+      "names": [
+        "Merchant",
+        "Omni-AF Officer Milne"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-dc833ee60bb06607",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 42,
+      "levelMinimum": 42,
+      "localPopulations": 0,
+      "names": [
+        "Guard Turret"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 3
+    },
+    {
+      "archetypeId": "archetype-3b4aebab11e2f018",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 8,
+      "localPopulations": 0,
+      "names": [
+        "Angry Minibull",
+        "Minibull",
+        "Minibull Calf",
+        "Minimammoth Calf",
+        "Virulent Minibull",
+        "Young Minibull",
+        "Young Minimammoth"
+      ],
+      "observationCount": 32,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-674e695b11c8b9d6",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 45,
+      "levelMinimum": 45,
+      "localPopulations": 0,
+      "names": [
+        "Slitter Scorpiod"
+      ],
+      "observationCount": 30,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-9121379f899acf74",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 15,
+      "levelMinimum": 5,
+      "localPopulations": 0,
+      "names": [
+        "Cursed Silvertail",
+        "Dreaming Silvertail",
+        "Swift Silvertail",
+        "Swiftwind"
+      ],
+      "observationCount": 22,
+      "playfields": [
+        4310,
+        4677
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-f3ff192cbd679eda",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 13,
+      "levelMinimum": 10,
+      "localPopulations": 1,
+      "names": [
+        "Specialist - Cha'Heru"
+      ],
+      "observationCount": 20,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-16e7de83fd288137",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 250,
+      "levelMinimum": 250,
+      "localPopulations": 0,
+      "names": [
+        "Unicorn Guard"
+      ],
+      "observationCount": 18,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-2e876150301b49d6",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 75,
+      "levelMinimum": 75,
+      "localPopulations": 0,
+      "names": [
+        "Zyvania Bagh"
+      ],
+      "observationCount": 9,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-559eefa4ddbb2b9e",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 1,
+      "localPopulations": 0,
+      "names": [
+        "Minibronto"
+      ],
+      "observationCount": 9,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-b3aa834fd31b161e",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 29,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Shade-Y42 Escapee",
+        "Shade-Y42 Fugitive",
+        "Shadow"
+      ],
+      "observationCount": 9,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-3dd7001b0c2f361e",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 40,
+      "levelMinimum": 40,
+      "localPopulations": 2,
+      "names": [
+        "Omni-Tek Recruitment Officer"
+      ],
+      "observationCount": 8,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-7946ac028ed6d5fb",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 40,
+      "levelMinimum": 40,
+      "localPopulations": 2,
+      "names": [
+        "Clan Recruiter"
+      ],
+      "observationCount": 8,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-83abf734f9dd4c70",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 43,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Aquaan"
+      ],
+      "observationCount": 8,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-5b5c7b2e38f635a9",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 118,
+      "levelMinimum": 53,
+      "localPopulations": 0,
+      "names": [
+        "A-2000 Soldier",
+        "Engineer Warbot",
+        "Funny Robot"
+      ],
+      "observationCount": 7,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-78ef28f6aa8aaddd",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 220,
+      "levelMinimum": 220,
+      "localPopulations": 0,
+      "names": [
+        "Appointment",
+        "Carlo Pinnetti",
+        "PROJECT:YAKUZA"
+      ],
+      "observationCount": 6,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-9bc22ae818acdc0b",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 84,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Blazing Clan Contract Killer",
+        "Britteny Kuiper",
+        "Burma Washer",
+        "Dionna Drapkin"
+      ],
+      "observationCount": 6,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-dc7492ce53f857b7",
+      "associatedAcgPlacements": 2,
+      "levelMaximum": 21,
+      "levelMinimum": 18,
+      "localPopulations": 1,
+      "names": [
+        "Incomplete Rebuild"
+      ],
+      "observationCount": 6,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-24e4bda8200eb23d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 215,
+      "levelMinimum": 215,
+      "localPopulations": 0,
+      "names": [
+        "Appointment",
+        "CEO Guardian",
+        "PROJECT:NINJA"
+      ],
+      "observationCount": 5,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-282384356bc1cf67",
+      "associatedAcgPlacements": 2,
+      "levelMaximum": 19,
+      "levelMinimum": 17,
+      "localPopulations": 1,
+      "names": [
+        "Empty Shell"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-6d58b05e693ebe8a",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 27,
+      "levelMinimum": 3,
+      "localPopulations": 0,
+      "names": [
+        "Ailing Chirop",
+        "Large Chirop",
+        "Sturdy Chirop"
+      ],
+      "observationCount": 5,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-10d66300bdcd4ef8",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 220,
+      "levelMinimum": 220,
+      "localPopulations": 0,
+      "names": [
+        "Unicorn Duty Sergeant"
+      ],
+      "observationCount": 4,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-37ab48889a88128b",
+      "associatedAcgPlacements": 3,
+      "levelMaximum": 21,
+      "levelMinimum": 17,
+      "localPopulations": 1,
+      "names": [
+        "Fragmented Soul"
+      ],
+      "observationCount": 4,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-b528e4aca61afa30",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Mario Carles"
+      ],
+      "observationCount": 4,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-0ce56f79721ec588",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 200,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Hologram of Adeline Guerra",
+        "Novice Techno-Architect"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-9aac61b32bd169d1",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 200,
+      "levelMinimum": 191,
+      "localPopulations": 0,
+      "names": [
+        "Bureaucrat Bodyguard",
+        "Sensualcrat"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-b2759c1e2b81a6be",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 200,
+      "levelMinimum": 5,
+      "localPopulations": 0,
+      "names": [
+        "Janos",
+        "Windcaller Karrec"
+      ],
+      "observationCount": 3,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-cd0b1f3813011b65",
+      "associatedAcgPlacements": 3,
+      "levelMaximum": 20,
+      "levelMinimum": 19,
+      "localPopulations": 1,
+      "names": [
+        "Infector"
+      ],
+      "observationCount": 3,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-d277053159e84e65",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Sarah Greene"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-29c346949254fd9c",
+      "associatedAcgPlacements": 1,
+      "levelMaximum": 22,
+      "levelMinimum": 19,
+      "localPopulations": 1,
+      "names": [
+        "Melded Patterns"
+      ],
+      "observationCount": 2,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-45d8807c4bc1a7dd",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Novice Clan Techno-Architect",
+        "Shade of IPS"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-b3a074ecad99856d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 188,
+      "levelMinimum": 25,
+      "localPopulations": 0,
+      "names": [
+        "Boris the Peacekeeper",
+        "Old Geezer"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-b468e86e19106c64",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 100,
+      "levelMinimum": 100,
+      "localPopulations": 0,
+      "names": [
+        "Kate Hayes - Rubi-Ka Tours"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-beb49cf5cd522736",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 35,
+      "localPopulations": 0,
+      "names": [
+        "Field Commander Ericson",
+        "Soldier of IPS"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-cf3407bde447043d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 25,
+      "levelMinimum": 9,
+      "localPopulations": 0,
+      "names": [
+        "Clan Guard Elina Jones",
+        "Fresh Agent"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 2
+    },
+    {
+      "archetypeId": "archetype-1296981b7504c3fe",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 5,
+      "localPopulations": 0,
+      "names": [
+        "Barking Chimera",
+        "Yuttos Nascence Geosurvey Dog"
+      ],
+      "observationCount": 31,
+      "playfields": [
+        4677
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-6013a94af1503a9d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 5,
+      "levelMinimum": 4,
+      "localPopulations": 0,
+      "names": [
+        "Tropical Stalker"
+      ],
+      "observationCount": 21,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-93d7527f953f946c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 4,
+      "levelMinimum": 3,
+      "localPopulations": 0,
+      "names": [
+        "Cliff Malle",
+        "Oozefoot the Noxious Malle",
+        "Slimeskin the Abominable Malle"
+      ],
+      "observationCount": 19,
+      "playfields": [
+        4582
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-fd408060ca9e93c8",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 17,
+      "levelMinimum": 15,
+      "localPopulations": 0,
+      "names": [
+        "Hiathlin"
+      ],
+      "observationCount": 15,
+      "playfields": [
+        4310
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-2eebec02607f0d57",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 23,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Slum Runner"
+      ],
+      "observationCount": 14,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-4f0ea484c8735862",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 38,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Probe 5000-1",
+        "Probe 5000-2",
+        "Probe 5000-3"
+      ],
+      "observationCount": 13,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-9be075a84e6629f8",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Crippler of Growth"
+      ],
+      "observationCount": 13,
+      "playfields": [
+        4677
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-872ac3af60c48d31",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 43,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Rollerrat Matriarch",
+        "Rollerrat Queen"
+      ],
+      "observationCount": 11,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-707d3bc2d36bcebe",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 22,
+      "levelMinimum": 18,
+      "localPopulations": 0,
+      "names": [
+        "Young Bronto"
+      ],
+      "observationCount": 9,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-efb664337dd10187",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 15,
+      "levelMinimum": 15,
+      "localPopulations": 0,
+      "names": [
+        "Predator Striker"
+      ],
+      "observationCount": 7,
+      "playfields": [
+        4310
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-4f0a62d1398466a4",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 21,
+      "levelMinimum": 18,
+      "localPopulations": 0,
+      "names": [
+        "Molested Molecules"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-597059f37e285478",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 8,
+      "localPopulations": 0,
+      "names": [
+        "Hai-Tempterus"
+      ],
+      "observationCount": 5,
+      "playfields": [
+        4677
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-ed9c81d3d9d2846c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 160,
+      "levelMinimum": 160,
+      "localPopulations": 0,
+      "names": [
+        "Ted \"Gridman\" Johnson"
+      ],
+      "observationCount": 5,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-27d5fd67ab1adee9",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 42,
+      "levelMinimum": 38,
+      "localPopulations": 0,
+      "names": [
+        "Breed-B37 Public Enemy",
+        "Failed - B40"
+      ],
+      "observationCount": 4,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-9df5052a31d8859c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 59,
+      "levelMinimum": 50,
+      "localPopulations": 0,
+      "names": [
+        "Scab Hyena",
+        "Voracious Scab Hyena"
+      ],
+      "observationCount": 4,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-d2298caf115908a2",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 53,
+      "levelMinimum": 50,
+      "localPopulations": 0,
+      "names": [
+        "17-I scooplet"
+      ],
+      "observationCount": 4,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-3db640d5f01c86b7",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 17,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Rubyeyes",
+        "Silvertails"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-8fd9935d3896d8d5",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 103,
+      "levelMinimum": 92,
+      "localPopulations": 0,
+      "names": [
+        "Simple Missile Turret",
+        "Solar Turret"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-9d1b7110c7a11b80",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 32,
+      "localPopulations": 0,
+      "names": [
+        "Follower Gulu-Man Thrak",
+        "Sun-Len"
+      ],
+      "observationCount": 3,
+      "playfields": [
+        4310
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-b16fccedc76332e4",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 7,
+      "levelMinimum": 6,
+      "localPopulations": 0,
+      "names": [
+        "Dreadfully Failed Experiment"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-d4745633c0ea238a",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 120,
+      "levelMinimum": 120,
+      "localPopulations": 0,
+      "names": [
+        "Ina Charlotta Kern"
+      ],
+      "observationCount": 3,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-35052e8d74c02992",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 214,
+      "levelMinimum": 212,
+      "localPopulations": 0,
+      "names": [
+        "Ettu the Cursed",
+        "Terry"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-49dba3da1265c072",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 102,
+      "levelMinimum": 102,
+      "localPopulations": 0,
+      "names": [
+        "Guardian Conductor of Corruption",
+        "Guardian Conductor of Transfer"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-5099ed9edccfac46",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 21,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Redundant Scan"
+      ],
+      "observationCount": 2,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-97a378bfc75f622c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Eumenides"
+      ],
+      "observationCount": 2,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-9d8863cf43239def",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 5,
+      "levelMinimum": 4,
+      "localPopulations": 0,
+      "names": [
+        "Horribly Failed Experiment"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-9f62f7dfabac9ff5",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 1,
+      "levelMinimum": 1,
+      "localPopulations": 0,
+      "names": [
+        "Intercom Unit"
+      ],
+      "observationCount": 2,
+      "playfields": [
+        6553
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-da62c63d3f8ccca2",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 103,
+      "levelMinimum": 101,
+      "localPopulations": 0,
+      "names": [
+        "Guardian Conductor of Ransacking"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-f61a28521ca6d11c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 220,
+      "levelMinimum": 220,
+      "localPopulations": 0,
+      "names": [
+        "ICC Secretary"
+      ],
+      "observationCount": 2,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-037a7dd641de5705",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 30,
+      "levelMinimum": 30,
+      "localPopulations": 0,
+      "names": [
+        "Jane Simmons"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-092e0c40236c080f",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 25,
+      "levelMinimum": 25,
+      "localPopulations": 0,
+      "names": [
+        "Samuel Caesar"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-09617f85805d41ee",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 13,
+      "levelMinimum": 13,
+      "localPopulations": 0,
+      "names": [
+        "Saltworm"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-0a9eb4706f366905",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 2,
+      "levelMinimum": 2,
+      "localPopulations": 0,
+      "names": [
+        "Experiment Gone Wrong"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-0e7d80488b9017a3",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 189,
+      "levelMinimum": 189,
+      "localPopulations": 0,
+      "names": [
+        "Penley Meer"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-116566bd79468ff3",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 50,
+      "levelMinimum": 50,
+      "localPopulations": 0,
+      "names": [
+        "Yorick Kjarval"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-15945d31528a80de",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 166,
+      "levelMinimum": 166,
+      "localPopulations": 0,
+      "names": [
+        "Colonist"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-17067bc573c196f3",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 22,
+      "levelMinimum": 22,
+      "localPopulations": 0,
+      "names": [
+        "Lazaro Ricks"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-2bf3e47867d6669d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 40,
+      "localPopulations": 0,
+      "names": [
+        "Prophet Yutt Thrak"
+      ],
+      "observationCount": 1,
+      "playfields": [
+        4310
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-2d8bb111ad474739",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 1,
+      "levelMinimum": 1,
+      "localPopulations": 0,
+      "names": [
+        "Clawfinger Bully"
+      ],
+      "observationCount": 1,
+      "playfields": [
+        3081
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-33a62c38bdeb8e76",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 101,
+      "levelMinimum": 101,
+      "localPopulations": 0,
+      "names": [
+        "Guardian Conductor of Life"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-33b8162428232d52",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 40,
+      "levelMinimum": 40,
+      "localPopulations": 0,
+      "names": [
+        "Doctor James Monaghan"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-3cd45c5b58dba32d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 59,
+      "levelMinimum": 59,
+      "localPopulations": 0,
+      "names": [
+        "Galactech WF2 MK II"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-40eceb4a2949d3be",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 5,
+      "levelMinimum": 5,
+      "localPopulations": 0,
+      "names": [
+        "Winnie Glowtail"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-44d7a9aa94bd407d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 145,
+      "levelMinimum": 145,
+      "localPopulations": 0,
+      "names": [
+        "Confused Colonist"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-46918231413d6e1b",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Pedro Gavrillo"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-4cc9c9a594275d35",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 25,
+      "levelMinimum": 25,
+      "localPopulations": 0,
+      "names": [
+        "Workman Striker"
+      ],
+      "observationCount": 1,
+      "playfields": [
+        127
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-519f105d3164c4be",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 50,
+      "levelMinimum": 50,
+      "localPopulations": 0,
+      "names": [
+        "Sharon Goldman"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-5cefb30ae8063e2a",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 200,
+      "levelMinimum": 200,
+      "localPopulations": 0,
+      "names": [
+        "PROJECT:BANZAI"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-5e734a38f97f9b93",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 69,
+      "levelMinimum": 69,
+      "localPopulations": 0,
+      "names": [
+        "Bored Traveller"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-64956fe7be0328d7",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 93,
+      "levelMinimum": 93,
+      "localPopulations": 0,
+      "names": [
+        "Guardian Conductor of Learning"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-6aaf711d4bd79409",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 15,
+      "levelMinimum": 15,
+      "localPopulations": 0,
+      "names": [
+        "Princess Leet"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-74f43fb4cf33a9dd",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 80,
+      "levelMinimum": 80,
+      "localPopulations": 0,
+      "names": [
+        "Christian Thorwaldsen"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-7d27e909c0e7fdc5",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 142,
+      "levelMinimum": 142,
+      "localPopulations": 0,
+      "names": [
+        "Young Woman"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-8440a20406c3039c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 2,
+      "levelMinimum": 2,
+      "localPopulations": 0,
+      "names": [
+        "brb"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-8b52ea611cff71f3",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 150,
+      "levelMinimum": 150,
+      "localPopulations": 0,
+      "names": [
+        "Professor Dedlock"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-8e7db894ccd058e6",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 196,
+      "levelMinimum": 196,
+      "localPopulations": 0,
+      "names": [
+        "Sprysi D'Lere"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-96467853d1a0647f",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 212,
+      "levelMinimum": 212,
+      "localPopulations": 0,
+      "names": [
+        "Channeled Force Arbiter"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-96f2595b422b155c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 36,
+      "levelMinimum": 36,
+      "localPopulations": 0,
+      "names": [
+        "Old Lady"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-a97b8adf512b7a6d",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Magnus Galway"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-ac5612d71524d61c",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 10,
+      "levelMinimum": 10,
+      "localPopulations": 0,
+      "names": [
+        "Vanguard Henri Zure"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-b44d71d10ca3e2a2",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 45,
+      "levelMinimum": 45,
+      "localPopulations": 0,
+      "names": [
+        "Trond McDougal"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-be8d0fbea16be32b",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 102,
+      "levelMinimum": 102,
+      "localPopulations": 0,
+      "names": [
+        "Des Morck"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-ce801d4ae17215b5",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 225,
+      "levelMinimum": 225,
+      "localPopulations": 0,
+      "names": [
+        "\u0010\u0010Patrick"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-d132ce962067f796",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 26,
+      "levelMinimum": 26,
+      "localPopulations": 0,
+      "names": [
+        "Hammer Broodling"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-d714d4f4d4dc8ccd",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 20,
+      "levelMinimum": 20,
+      "localPopulations": 0,
+      "names": [
+        "Gamma Unit Sentinel"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-d7abf4b49d7db0b0",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 3,
+      "levelMinimum": 3,
+      "localPopulations": 0,
+      "names": [
+        "Experiment Gone Awry"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-e0048b16c4ae8404",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 90,
+      "levelMinimum": 90,
+      "localPopulations": 0,
+      "names": [
+        "Chang Dong"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-ef86e79a0f74a90a",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 100,
+      "levelMinimum": 100,
+      "localPopulations": 0,
+      "names": [
+        "Joshua Falker"
+      ],
+      "observationCount": 1,
+      "playfields": [
+        4677
+      ],
+      "runtimePopulations": 1
+    },
+    {
+      "archetypeId": "archetype-f3678017c220a9fa",
+      "associatedAcgPlacements": 0,
+      "levelMaximum": 80,
+      "levelMinimum": 80,
+      "localPopulations": 0,
+      "names": [
+        "Anita Franklin"
+      ],
+      "observationCount": 1,
+      "playfields": [],
+      "runtimePopulations": 1
+    }
+  ],
+  "deterministicDigest": "c9310e2623818f677a96aaeb91580a03cc639115ba8e5c2c3b8be8ce337a2ac5",
+  "schemaVersion": 1
+}

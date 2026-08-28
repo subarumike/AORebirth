@@ -9,6 +9,19 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- AO Spawn Population Reconstruction: the first deterministic population layer
+  now keeps 32,805 official ACG placements, 3,472 captured runtime observations,
+  server-selected MonsterData/archetypes, and transient runtime identities on
+  explicit evidence axes. It produces 18,423 topology/runtime population
+  records: zero exact-placement associations, 766 local-population
+  associations, 1,397 playfield-population associations, 1,029 unassociated
+  observations, and 280 conflicts. ACG policy groups are direct structural
+  evidence; 25-metre spatial components are explicitly heuristic. Population
+  association never claims exact-row ownership, and only direct/strong
+  population evidence is implementation-ready. Evidence, readiness inventory,
+  reuse statistics, and Leet/PF4582/Borealis studies are under
+  `docs/generated/spawn_populations`.
+
 - ACG-to-MonsterData resource-chain audit: both verified `18.8.62_EP1` and
   `18.8.62_EP2` clients expose byte-identical ACG, PlayfieldDynels, CATMesh, and
   MonsterData records through one active B-tree view. Across 460,193 active

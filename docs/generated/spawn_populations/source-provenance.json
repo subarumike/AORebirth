@@ -1,0 +1,3178 @@
+{
+  "archetypeCatalog": {
+    "path": "docs/generated/enemy_archetypes/enemy-archetype-catalog.json",
+    "sha256": "95502dc4260a76472b230515dcfa3bf4a083b1b68f99f0641a81c60e72655116"
+  },
+  "npcObservations": {
+    "path": "build-verify/npc-observation-harvester/npc-observations.json",
+    "sha256": "33a9164853870201f882e2bc1cbc435f4a0abf7395492b9eb8974da29dc7b10a"
+  },
+  "observationClusters": {
+    "path": "build-verify/npc-placement-identity-resolver/observation-clusters.json",
+    "sha256": "569e8db5a26bda0cb6001f9f035ea6998311994b12927d534b09528df214a6c6"
+  },
+  "placementResolution": {
+    "path": "build-verify/npc-placement-identity-resolver/placement-resolution.json",
+    "sha256": "0f641d19d7e2edcdd4e5a485f30d5ec6089d8c8ff2b9eee21c6dcac12e5b8030"
+  },
+  "placements": {
+    "indexPath": "docs/generated/playfields/official-placement-index.json",
+    "indexSha256": "f6b3a4def439a75b90b8aae8de3d7f22008bbd4e2c1d069d18b0f9b913ac7f48",
+    "shards": [
+      {
+        "path": "docs/generated/playfields/placements/pf_6.json",
+        "placements": 1,
+        "sha256": "7955c91dd719ecf6b0b700bbb97d5863462fb03a20e27c00d76b79f8ca43e7d8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_100.json",
+        "placements": 0,
+        "sha256": "4ba61526405ff4d0f4dc4cea3a574e7d749931c26865fdf4820e42e79583c8d9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_101.json",
+        "placements": 0,
+        "sha256": "936b1ce4edd1d718f3abf72c299fc9b2f0cecf188235ebd9a74d82e74ed4232f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_102.json",
+        "placements": 1,
+        "sha256": "a069f60e885cd2e18c43044fc65df004d7ae2e6003a378e2d557e44e25735004"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_103.json",
+        "placements": 0,
+        "sha256": "5204e247093aa03a1f0c99a59dd881aa33c53cdaa8ae58670d0ac24d8044927d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_104.json",
+        "placements": 0,
+        "sha256": "b1214a54334c965115ec4b6c175160412835e2eb2b73c5212633301933040ab3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_105.json",
+        "placements": 0,
+        "sha256": "9612a0cd588d0eb5f223e61819a756d4cfe9ca9352fd3445c85840af7ddbfdcb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_106.json",
+        "placements": 15,
+        "sha256": "4b4b10a6a4b4fe03bc8058da799cdc5c312e00c7787b5f5846419ee2fcc741a8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_107.json",
+        "placements": 0,
+        "sha256": "b1b18a0265898db0ea9e4feeaa189f6daff4226a702405c59449b137b7ee9106"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_109.json",
+        "placements": 2,
+        "sha256": "f6b71a7324c1fa18f0c04bcf38f2f40e7b9a1dc50343b6808620169236b5b997"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_110.json",
+        "placements": 1,
+        "sha256": "1f6bb6f7cc4027f3772f384931e1a3c37861546a017f3ce20c350f9ba3291a84"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_111.json",
+        "placements": 3,
+        "sha256": "066030c5e61d8bf8592a09eb2850bfa8da57ec59ca192f3c4b1748a018562bcd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_120.json",
+        "placements": 165,
+        "sha256": "29eba37c0df5f04df15b6f98730a716cf8d2efbaaca87cee288f9a82f2c9cfb1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_124.json",
+        "placements": 0,
+        "sha256": "f710ac89d3756372e9456d90762c1a11375206d982ad7b9c751c11c61b9b9ab4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_125.json",
+        "placements": 279,
+        "sha256": "e0e8e8406fe66ed24a4efea77745ef9f0157c0baba77dccb804dd7f9520b0622"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_127.json",
+        "placements": 326,
+        "sha256": "712088499907e8eba1af0fe42d2350babf41bc02ad4595783a72bceb268ac7e2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_128.json",
+        "placements": 6,
+        "sha256": "08c524ea0ce459169840bcf214bd4ba827a699c1cefc4f5b29e860774873060f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_152.json",
+        "placements": 0,
+        "sha256": "d9c6db8401aabfebe91d7ab4f6e5a729366a46d6529464367a65a45dbb905692"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_320.json",
+        "placements": 0,
+        "sha256": "1951f444f63516576199e3e1d4819160ba25b3230cdf585c026fd65ac80240d4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_321.json",
+        "placements": 0,
+        "sha256": "cef3ff8479086f04de2360832c36abecc24d57432547f77cb6ca3a15833a7813"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_322.json",
+        "placements": 0,
+        "sha256": "15f376afb9487e49207663cfc48d077d4279887199ec9f9f3afcf55e34836dce"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_324.json",
+        "placements": 0,
+        "sha256": "37dd4dcd8c9b32f52c7ee76ca9d336eef1a14850a9f315994045b69a8e57066d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_331.json",
+        "placements": 0,
+        "sha256": "e6262295039533b5637046b0b1e5f687956f685adf141fcb9d53b8ff743ad281"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_341.json",
+        "placements": 0,
+        "sha256": "84f5dc28bd6ec40d7b705021058dcae00f6740d0742e4ed2eb6f152ac03bb69c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_346.json",
+        "placements": 0,
+        "sha256": "524c3a87e5653a6cbbab632dd4336d0dc0adfe6b122764066fd2cd584d4755d1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_351.json",
+        "placements": 0,
+        "sha256": "bac0b4a56ee1ff2a16608b2aa382e921c69bc02f33c2477f3832178ff42f7bec"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_362.json",
+        "placements": 0,
+        "sha256": "ab924cd6767117e73b92131f1b71fd113927973239ecd734f8baf9283de984e6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_382.json",
+        "placements": 0,
+        "sha256": "33dda19f0dfaef60d853baf5e82d21ba5ca87570c8ff5905bd11c7f11f716d73"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_386.json",
+        "placements": 0,
+        "sha256": "f5658499c6a70e7d21eb79bcb90ec088fb2a65a5bd12529efbe128d681ba4782"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_500.json",
+        "placements": 9,
+        "sha256": "79fc73b0d5eb3953f918dc58a349fb16e4bd01961a4e9d4c849b5be008789dbf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_501.json",
+        "placements": 0,
+        "sha256": "88a1ac02cbcb5e74afe7fa966b28b1b7ef137a93e557ff535eeba7a1ddee56e7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_505.json",
+        "placements": 387,
+        "sha256": "551e0709ea1bf03592d23242f1f14668e4e2c142e4d9c0353378d4193b69d3ba"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_540.json",
+        "placements": 272,
+        "sha256": "1fdd91995d0771cd2c31d619d5b1c0028aa0cc6390051066dcbcccb5a3376bf2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_545.json",
+        "placements": 129,
+        "sha256": "8156dec66a43e48abc80cedeb51a6ce826486ac7125e5ad79363a87bde8865b8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_550.json",
+        "placements": 20,
+        "sha256": "9d36a77b3dfd8756d3eca02c6b3a67a1f11c42b8fe3de7d750836d4b93bb71b7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_551.json",
+        "placements": 281,
+        "sha256": "28360d2f127376474bcbca23cf88e218ecc9f77d1ca9b559a75aba4f1b97af7c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_556.json",
+        "placements": 1,
+        "sha256": "277a2f74266be0f483df954bb130da4c6d41f6a5ea4e6feb15c36f2205d04632"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_560.json",
+        "placements": 318,
+        "sha256": "498265a6bf23877fe90235f779a06af5cfe55db80aae6f78f88f0abe966c11fb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_565.json",
+        "placements": 633,
+        "sha256": "76837e12fd17d5f82bf3519f36d96d2879e8a34bb910b7ce4d571c0018631eba"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_566.json",
+        "placements": 62,
+        "sha256": "ef558e9b368958d4ffd8f82420f945a2a86f504131cb6d105ff4f3b3ef57119f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_567.json",
+        "placements": 48,
+        "sha256": "4ef2fd67bb056049612e754b17a0c6750c420f5ae57541a3e442a7a352f567ce"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_570.json",
+        "placements": 304,
+        "sha256": "e2a0c24eb3677bdf6d41e05d17a3d3bff7d5be6b77ae1fa0d45e061ad67b469b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_585.json",
+        "placements": 136,
+        "sha256": "b16525718fd3f19b3ee6f847687de520ace01bfaa703c5da09bcfb6ae4d285e8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_586.json",
+        "placements": 49,
+        "sha256": "46ce716eb433411ee43a5938690778202200542ef66ba8c691345058480a6d9d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_590.json",
+        "placements": 210,
+        "sha256": "9ed74abe6a0d26c0bde67067f1a76e956ec8cb44df14f14f1b50e939c082bc88"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_595.json",
+        "placements": 165,
+        "sha256": "251dd0c5723c91f73f7ebcd8d3b335a834380420e5167a7bae1775d9f11d85ab"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_596.json",
+        "placements": 1,
+        "sha256": "462a25af88dac4937bd70ef09173a9a47fa6322f3f6a022184673d3450c2fdc7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_600.json",
+        "placements": 190,
+        "sha256": "c4518719321afe6d49dcef29c9eb299e5acb6e65391b0acb1ed4a94c5fdd8bfd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_605.json",
+        "placements": 262,
+        "sha256": "eb9408b443cd88d3a83b854599682bdcbb05415c116e5eb9f9c47679df40b424"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_610.json",
+        "placements": 125,
+        "sha256": "a6edd8faf7d3dbf2a6e07ecae797d325543614a318366b041230166863c3e671"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_615.json",
+        "placements": 0,
+        "sha256": "12ae86894ae3945a7654aa653a0a62dd8cfafe6c1746495d99219bd3f480bf48"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_620.json",
+        "placements": 137,
+        "sha256": "893bda758bca327e242d5a265295d09ff77aa6475d8a9e377be7348f6c9ce32a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_625.json",
+        "placements": 245,
+        "sha256": "f001c3104c1bf365255ab39f1bda9d8a445b706dbdc64b5c42f9a0a68e61cba3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_630.json",
+        "placements": 71,
+        "sha256": "1061ff9134d520ef11bf851b5f3e719dffc1cc4856c06c9b6dfd87a22a049126"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_635.json",
+        "placements": 59,
+        "sha256": "b75b5f45415e51d3f61a4d3db7b2968451f9dd662c6196a5828146f4a161126e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_640.json",
+        "placements": 68,
+        "sha256": "30cf7f16e5a1ed28d9a3801986f5fe4953852694f18bdb725711357c8522c542"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_641.json",
+        "placements": 0,
+        "sha256": "761f4a4a9edd0574f73827d2b63df88ee588c3c4a6eddcce64596f4a02b858c0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_646.json",
+        "placements": 34,
+        "sha256": "89c232fcff3b07eae007bc98e046407c8e343e3bc33fe880b0841e334f58cd6e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_647.json",
+        "placements": 171,
+        "sha256": "1fc45fe87b2d40c4133ff07f045c3ad9803c900b51f8282cdc30a8c2a8a18b8a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_650.json",
+        "placements": 68,
+        "sha256": "8472073c37a1ee1b7c07ad8c45bdb01f7d41cbc88a90f8a25d9b640d2acf4087"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_655.json",
+        "placements": 397,
+        "sha256": "2bd546e37ff832b3f2919f0083d3d1b40448c59a5fbe13bafe0812184cf6ca0b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_656.json",
+        "placements": 0,
+        "sha256": "7388772bb3a72505f332a946fa796ad9b4d7620dbe4ce3f6af92fcdcb1730815"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_665.json",
+        "placements": 612,
+        "sha256": "8ea9bd14f4b1083219b07d1f603067fb156e808b0be6af965450b1487ac929f3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_670.json",
+        "placements": 176,
+        "sha256": "1584be520a597abeb520bfe09e4ca1550a619db46cc02ce55a1c71c916915433"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_685.json",
+        "placements": 118,
+        "sha256": "dab3c1510747ad42ef3d611f53c6523d93b74eb1fe2784e6111a691aee356ab0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_687.json",
+        "placements": 16,
+        "sha256": "0a4e87d53d99a2d9fa4e9f174774335f4c57b558895d2acc6968b9538efc94ac"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_695.json",
+        "placements": 54,
+        "sha256": "de5088c001d924287eec7cf6eb2b2974404d5291b88342a5dbf8993c0145efda"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_696.json",
+        "placements": 34,
+        "sha256": "c4f0c75020e99d51fd0d2f41a6504a0fe560fc4848ae0adb6473463b5ed87d29"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_700.json",
+        "placements": 35,
+        "sha256": "4989bdd47aa5e777d85dbcec00300a3fa1e1bb1c0a7ce883ae67565942e6056f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_705.json",
+        "placements": 61,
+        "sha256": "f5fe70c306802d17cfa04675fde8b1e0f9121cc50f820cca551d1e9fbd8ee723"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_706.json",
+        "placements": 0,
+        "sha256": "a8ba262388507ac5ee239b2791a8efb32bb377b88efa4dffc4d1dec279be2cdf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_710.json",
+        "placements": 154,
+        "sha256": "12d044a1e389ae20c3c8819de6dce314f018c29ca65bc1c8108af33ad81b84d6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_716.json",
+        "placements": 136,
+        "sha256": "8fb5421aba5de1b6d0dd18bb4a3117c03c9d9255631d65f274e454303a369456"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_717.json",
+        "placements": 4,
+        "sha256": "dd3799aad06dc82f77a38a8fa8db2e534bde5f3931f4b71423822783642a6182"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_730.json",
+        "placements": 108,
+        "sha256": "e772709c12d63fbcc89e12012c7a7383da8b81f9484d662de738d879697a1500"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_735.json",
+        "placements": 22,
+        "sha256": "54f7b0cd5b6a252731874fc8baec1bb42b91a8e410eedbe3b27a69db5dc8dba8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_740.json",
+        "placements": 19,
+        "sha256": "5c445e4d4b8157a44addfb3120d7a99012e9559c407b6fb37283b58b0162e282"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_750.json",
+        "placements": 454,
+        "sha256": "0bebaf210b2051c385e1db2f0b4a698be8843bb2834112c87c5547c102e89dab"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_760.json",
+        "placements": 289,
+        "sha256": "67a3abb1994453ff4e60f4302199eef02199753912183381f9d82a1c469ac680"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_790.json",
+        "placements": 145,
+        "sha256": "acb996be24c96e5d2d3d704c125b2110aab83f5a0d64fb13280c4c78446f74bd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_791.json",
+        "placements": 33,
+        "sha256": "0c40ec3cca3bd8283a58921d4848c23b6629e968a71d9862ce1ae866fabad362"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_795.json",
+        "placements": 335,
+        "sha256": "0779b336d548fa00e124230a4bef90231bd8c68114c2b3302857f4741319b282"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_800.json",
+        "placements": 440,
+        "sha256": "5da1bc4fc9da11ae4ad3898864752f083368d075f806fa56a93cb3e245806d99"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_896.json",
+        "placements": 7,
+        "sha256": "8b88a3bc726e592cf2c712c7b34203ead1c9a37464d8e01882fc7ac567069701"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_950.json",
+        "placements": 4,
+        "sha256": "9f5ae0791d0f4f42a0cbac7ab97c56a35db4ce57c45299a7e1e3feefffa26954"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_952.json",
+        "placements": 4,
+        "sha256": "e26e2ea3519e88cc2fb4fe783a022bc2526a703fd06307b2510010c96e9d08b6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_953.json",
+        "placements": 127,
+        "sha256": "c4d5379dc3945986e010f98586c38b82c11e1104a6e582c96da68cdc880e2e7c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_954.json",
+        "placements": 4,
+        "sha256": "cd21e191111bf9053c3a304794382231bdfc81eadb1d32deb790bf5e7ce7b5c2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_955.json",
+        "placements": 1,
+        "sha256": "475ed22d55f8898b68b130b6820064701045a0d20c147244676f8e7b57cf92e9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1001.json",
+        "placements": 0,
+        "sha256": "027025fd70e084cf53b10bf0038eb430c827f087521e5d9346af94ee5a024a1b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1002.json",
+        "placements": 0,
+        "sha256": "327c49a86b267b9ca64d6e0f8169d6b3c9a6f1d9220d10253c855ac7f07a3235"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1003.json",
+        "placements": 0,
+        "sha256": "506df3c486740bf3dd4d000866eba5f56423055ad6c7879c834838152cd4f4d9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1004.json",
+        "placements": 0,
+        "sha256": "ce7d9c651be8637c2535c5d0460347224d9bfb0e8e85decef759ae998b817baf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1005.json",
+        "placements": 0,
+        "sha256": "4b89ee584196ec44d5ec6e8880dda0c86387cc5d28c99ee1ee380b44c0a0aced"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1011.json",
+        "placements": 0,
+        "sha256": "3c2e4873412a5d54179d163603cd838648a0d56d389d3d237ec4b5fd8fae8bc4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1012.json",
+        "placements": 0,
+        "sha256": "fe3770e948f2cd4af324e1df1b7ceba4bd511445224aa69878569cd2b3aeaad0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1021.json",
+        "placements": 0,
+        "sha256": "cfb2dcfca8f3b45d33cbd03aee6d8c105d620e921f9d9ca11548a81327897b5f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1031.json",
+        "placements": 0,
+        "sha256": "1221aeb9a1dffec30bdee2d2a1697d1c628c164ce6e3e54851a50643ed179dac"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1136.json",
+        "placements": 3,
+        "sha256": "93a918cccf95ac56c0a03a03b77a82aba6bc2b5d6977b380a834be0a99219e84"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1137.json",
+        "placements": 3,
+        "sha256": "ebe102ba24038e9a2acb355d8594d676177eac336d0f408de1f743932b093767"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1180.json",
+        "placements": 0,
+        "sha256": "19c2d5062a19adb5782686ef2c2f26eaaa84900cb2b8016e9e956d421228667c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1181.json",
+        "placements": 0,
+        "sha256": "589e706278b30ebcd151cdc03f48ec0ebfedfe63aadbe772ba2c0fc23620fe39"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1182.json",
+        "placements": 0,
+        "sha256": "9113b7af7a20071bff22c395a1db8978c6cce5287e0fbbb349aebb0daf34c8c9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1183.json",
+        "placements": 1,
+        "sha256": "b5fc10394ee4750f404fd927d854659f3499ac7b8a761e7d01c20aa804913127"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1184.json",
+        "placements": 1,
+        "sha256": "401a1edc7df929d4ead2304bf8faaa3542402b7c18fbd0ad8e6662c75d0bf3bc"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1185.json",
+        "placements": 1,
+        "sha256": "5dc72148f17c622814d8ea3141b7cb81ae735012d0be8782e89d36e811e4a299"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1186.json",
+        "placements": 1,
+        "sha256": "7e4e947b36c8a41cec163cf751155474c4816860c0420e23364f190fc76eb4b5"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1187.json",
+        "placements": 1,
+        "sha256": "c774ef8d0949a693575723611ba54d77670d71546c47101f0148424cb6d60b39"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1189.json",
+        "placements": 0,
+        "sha256": "d897fdff33f782582df6dec7e690184ed12477becec6a4f7c6f4b519f4a410fc"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1190.json",
+        "placements": 0,
+        "sha256": "58d7fc72e9e414dfb2adfced354c231bd47216446f9fd1526baa9b11eff0bdde"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1191.json",
+        "placements": 0,
+        "sha256": "6a1c110857d187d77b853015cb2a5daf4652ecfc41095aa29179aaf36dd4e4ee"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1192.json",
+        "placements": 0,
+        "sha256": "f310afc2759f21713eb5c9311559e2cd8e48e8e2c424173a40f1400f30849dab"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1193.json",
+        "placements": 0,
+        "sha256": "c9f854bbcd7d8687e0f2eaf1c7db236a509b6bd80ca778e5370cd14b2de00575"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1211.json",
+        "placements": 0,
+        "sha256": "9634b68048e630127001190b4e6ebbf0086e967a8d28ce554221d033589d4d8b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1231.json",
+        "placements": 0,
+        "sha256": "024c067fa6cd05daafb06867f7a99074df01676fa829a93f73645be9af774644"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1232.json",
+        "placements": 0,
+        "sha256": "b5344d8ff31ab5fbdf644323d9a43bc589f68dcdb6a2ff15fac2e47341831494"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1233.json",
+        "placements": 0,
+        "sha256": "412c2afc6395a2bf065e764b64c9f4f1e67a432e65829f90de86d0d0a389e46a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1241.json",
+        "placements": 0,
+        "sha256": "1e37c62825484f04d6a317f9141be19110e987b0bbce2a72f3362559a6b5a5df"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1242.json",
+        "placements": 0,
+        "sha256": "560d5b5752920682e32e2ef9f9f60746ccff67962cdacebc3e7e8f8fcd923d93"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1243.json",
+        "placements": 0,
+        "sha256": "0b4e7a7b8acb10a06fdcc5e21b4d45bb638961c51467c23562b5c24bbd178f52"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1251.json",
+        "placements": 0,
+        "sha256": "d02b007ebd9cb63e049e5b60174633e55e670093c77b69ee6da45c242c94c67b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1321.json",
+        "placements": 0,
+        "sha256": "2c676357abc832d7b5c996152dd9e378b45c05c829733b813922404f5bc63468"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1322.json",
+        "placements": 0,
+        "sha256": "190776a2728950dff839a1a36effa740e93cc2cfbae23c53d26cb0fc9ebb58d1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1323.json",
+        "placements": 0,
+        "sha256": "6739f616d40f4efa0de4b9796420364b000bc0edfef9faee88ca1c48173866cf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1324.json",
+        "placements": 0,
+        "sha256": "e03e58233ca1f39c9e18ddfc0adb470459070e21f0033d7d1a407561ddc32005"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1325.json",
+        "placements": 0,
+        "sha256": "16cae4e3e4d613f08520f8b0253ed2a36ae2c9af6120372265d76b18966ed1f9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1326.json",
+        "placements": 0,
+        "sha256": "eb6ee8bc24eebb19519fd1ec0c33d3b998fdfee7d91c4ed62888fb731a687355"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1327.json",
+        "placements": 0,
+        "sha256": "bccf9755623104d9e39d7fd2ef0abd2d19715931d504009c24ead5924cf38604"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1328.json",
+        "placements": 0,
+        "sha256": "f19e3a6b393e63a63dd1f0b87dae97051f61438551bf2672f4b34eeaceece1cd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1329.json",
+        "placements": 0,
+        "sha256": "ef7773a258573dd29711740e29385e9f21dcea83255899e80785cd3b42047706"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1330.json",
+        "placements": 0,
+        "sha256": "10a714bd72b62b38f1591f7d13955e7c27a579eec96ad367674395b411b35db6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1404.json",
+        "placements": 2,
+        "sha256": "7faeb12170e24c782171905264ee045216bd164c9952951a37ab9019173697bf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1405.json",
+        "placements": 0,
+        "sha256": "eba49c9ba388fd19e3ec35f9755b2cea1b25f214d9687f798107bbefafb9d196"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1406.json",
+        "placements": 0,
+        "sha256": "db480e9d4d10cdf296e6857cdbc1a9b814bc809cc4ded286209a2d71f9d22aff"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1407.json",
+        "placements": 0,
+        "sha256": "677e47f9afa1e507d041d2dc62bbe73494052ac0eb8fb49f9d5087ee1b5eb521"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1410.json",
+        "placements": 0,
+        "sha256": "42e5bfa22516b9e37deb846a19bfaa0dac3a63ada0465cf56d1aafa6801499db"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1421.json",
+        "placements": 0,
+        "sha256": "e79fcb5fea91b4ba82ce69fce775ec8b425b795d5c38e17b1e264988ed3e11e1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1422.json",
+        "placements": 0,
+        "sha256": "3f22b7bcd5bf3828c61e791a4b39f2cdd73edfae07ac67a8a64b99a727d47954"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1423.json",
+        "placements": 0,
+        "sha256": "8d86033c28740beca69dddfa5de261fb5fcae638268142833744e99b2f7b5022"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1424.json",
+        "placements": 0,
+        "sha256": "df897a2d546cf3c04c31250689f8aaa05b02e460ec0d2088fdc24f4274368f5c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1426.json",
+        "placements": 0,
+        "sha256": "29a814571270c47cdae5e294b626ebe493888072b7cac88405db3b8f8cd7534a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1427.json",
+        "placements": 0,
+        "sha256": "9eed7b0f8dd17bf203ec52510b342faa25cd98c843327af0f58f0087c899b670"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1428.json",
+        "placements": 0,
+        "sha256": "376d83bd92b81dd3349f0815eaeadc7a00a4a4b479022add79238060de99b619"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1501.json",
+        "placements": 0,
+        "sha256": "0ed6a9f1ee252008aefc08a67447d6d9aa84901e5457297f7bc64969f26235eb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1502.json",
+        "placements": 0,
+        "sha256": "52c034853303348ea6c5cbb260f505d452acd19ca8121ac7140597da3ac8fa44"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1503.json",
+        "placements": 0,
+        "sha256": "0475f8eaa632efde7ca85b30c54d838ada627f50e1730e55d512399da92c1291"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1504.json",
+        "placements": 0,
+        "sha256": "c8afa96ef13895866786abc2447b352258279cfc14128ca3bb83a5d62334407e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1505.json",
+        "placements": 0,
+        "sha256": "661c8b442d1ef224b6c9e6117e93b31ce948d0c37370b02f8c7ea1b56c55b119"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1506.json",
+        "placements": 0,
+        "sha256": "d77148646550f9d19d48daff7bfdddd5009c0ecca14bcd322b0dd836f8613d7a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1507.json",
+        "placements": 0,
+        "sha256": "5e87551fd3d0d40df013bdffebfc131b9d7f86ae82fa379e89d9345f4d1653e9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1510.json",
+        "placements": 0,
+        "sha256": "c945d4c3b36de9860a4cbdeb3b7e8b1d6313fd78d04e7de505697c17299998b3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1511.json",
+        "placements": 0,
+        "sha256": "d78c0a8c71d7574196d3d9eaa51994cdeeed5719bb80a6ef6a85ffe371a8d36b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1601.json",
+        "placements": 0,
+        "sha256": "03e2a252d853fb17efac49f2535a9eca1065f85d408047823148cc6c94edd4cb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1602.json",
+        "placements": 0,
+        "sha256": "1c70bc3930d5c75d491ad5debe44ffedaba5c35561374f610de2bda48747fbae"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1603.json",
+        "placements": 0,
+        "sha256": "38d748615c660044616bca81facd077cad26823b21f4753139a12d25ca835968"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1604.json",
+        "placements": 0,
+        "sha256": "8369aaa7b0d57aa973395aaf758101d0e1698ea2a81aeb3f8c75cb828d8e622b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1611.json",
+        "placements": 0,
+        "sha256": "23075941154b96267147ed79e067c523524162f560e02a1296810e4e604a7a2a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1612.json",
+        "placements": 0,
+        "sha256": "eb8933749ebb6fa54a897adc94904f673f2322b06236c8ce38bfab7e56f101c9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1613.json",
+        "placements": 0,
+        "sha256": "f6c7edc4f502af1bbef3687dd97c6fb2a7d42360a292ecaeffd55ddd886a099e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1614.json",
+        "placements": 0,
+        "sha256": "5b52708803408001da71dcd86cb99eb57eb90a4d8274b9ef3ec388a614ae679d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1621.json",
+        "placements": 0,
+        "sha256": "7244040c833cfcfaa1e229bb47fae138830eeb2bad18a0751d0e7ddf1bb26db7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1622.json",
+        "placements": 0,
+        "sha256": "7a4c666f80cde9deae9e642dfcb2170e8ff028d96524fd56a34c7ea6a3d7cea3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1623.json",
+        "placements": 0,
+        "sha256": "781926f50f8d6f726b5b24773ea33bedf5eab16ad34806f60a72bc0cf2863e36"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1624.json",
+        "placements": 0,
+        "sha256": "2e7d8c5673206680f3e7299a2cd14df620c096ec65a570f8b60788ed6185bf59"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1625.json",
+        "placements": 0,
+        "sha256": "2fd7459342f421887e172681c5f32c310eea2117c42ea6aeaf85380e57037f15"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1626.json",
+        "placements": 0,
+        "sha256": "46ff391f667a7676121086f18190a5950c973d6197ca4e0344bc9d9b7677538e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1627.json",
+        "placements": 0,
+        "sha256": "12439df454ce065826bf63965c0c628b1e6cdb42a7e7f23adc9baa58f7f648aa"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1641.json",
+        "placements": 0,
+        "sha256": "2ae5b3b2c74bf4e5b08159b02569648d36bc750536ec9cf2638525a52d684ff7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1642.json",
+        "placements": 0,
+        "sha256": "fccf7f33f8d1c41c8e8ac6f28c3d106f6655f990859a331f2df174682053263f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1643.json",
+        "placements": 0,
+        "sha256": "5309175fc8eccc89e191aa49e9b3dd850f9fcc0489798e35cdef02d83037cf12"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1644.json",
+        "placements": 0,
+        "sha256": "6336df394acf2e4451941c451d17781f4bc54052c4639bbd690f46649460fd76"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1645.json",
+        "placements": 0,
+        "sha256": "67d10e5849b7ff3e92a2b7d677755e53b72dd85c354d9ec2bc19e1b0f16b8e40"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1646.json",
+        "placements": 0,
+        "sha256": "2a081a6b81ab004e549881b2d3e910a469307e22ef695fc5ce68696855d38f1b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1647.json",
+        "placements": 0,
+        "sha256": "958ab467f92210e67acd354bae89a6b68822368f6871ef53d35ad545c94a5f58"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1648.json",
+        "placements": 0,
+        "sha256": "85a2e34098b06884eed635b2827a2e06df745e9259c2ed8c05985b64874c9451"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1651.json",
+        "placements": 2,
+        "sha256": "109c8780ab8554c22e21dcdfd2098d2b41bd65d75e941d86ce50b16d8f7e6bbc"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1652.json",
+        "placements": 0,
+        "sha256": "ae5d92a6a475a6826aa678dea66800f1444ad0f0c08fa1250b9201566f990ae3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1653.json",
+        "placements": 0,
+        "sha256": "f7f5c85bb52336ed9e58d57efcc6fd81be36b7949eff5d15a5ef9e78533d8f42"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1661.json",
+        "placements": 0,
+        "sha256": "cff7702e7c15c464d573bb77fa17b837156ac8f89cc5dbe6a312c158e4347925"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1662.json",
+        "placements": 0,
+        "sha256": "f231861ecdf2c8b35f8f81a3ca770ab6b415f48f6a5a86512ab8de754a0cad63"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1663.json",
+        "placements": 0,
+        "sha256": "6b1f8dbfe6ef106d2525dc0f17715a0a07c60dc12b0a309b397de9098680cfd0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1671.json",
+        "placements": 0,
+        "sha256": "10230211edef416e841b78ed081962afd18c9b21447c54b4d1855e324434da32"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1672.json",
+        "placements": 0,
+        "sha256": "74f270034eb91231ea2d56060523e38cb0cc73aacf089cacfcc872c4b39fecc5"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1673.json",
+        "placements": 0,
+        "sha256": "90d9ad62d16e000d8dee54ebfb821b0fa3c20ed063fdf57379ff716cbc1399f0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1674.json",
+        "placements": 0,
+        "sha256": "bdc0df754838d395f492fa9ced96297e1654e7c8b0a1124762eab46b257d1b00"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1675.json",
+        "placements": 0,
+        "sha256": "14d3e4968308b417de22cd3ace2628a008f34f22895a43b79abd7f3514e9f201"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1701.json",
+        "placements": 0,
+        "sha256": "445708b1d42a30ca7aec37d1dc90d752f6d96b28b90543916effb4a957a9d819"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1702.json",
+        "placements": 0,
+        "sha256": "de2422abc52f0f48c8196257419a44eee0d6857456638da119ebfaa5a972b465"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1703.json",
+        "placements": 0,
+        "sha256": "360b5d552a5f0980b0b3d9b7efcd136e92bc2a74e50cf5a47576b20d1488a6de"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1711.json",
+        "placements": 0,
+        "sha256": "90ff803934c5e0ceb8cb2c8c19d6704bade5481c4f8f40f799c4fb659adad463"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1712.json",
+        "placements": 0,
+        "sha256": "263e3c0fb32a1a466512b9a6ca775a6082dc263644a35e9a97dd1bd64790c2f6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1721.json",
+        "placements": 0,
+        "sha256": "35a7f84716fa776e7dc026c253974cf1a52ad158ea6f3c9305f9556cf21dd563"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1722.json",
+        "placements": 0,
+        "sha256": "2cd8feccb2c4067649e7f42abe0b23f329ba9037333ccd4d80a978c248c8b5cb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1741.json",
+        "placements": 0,
+        "sha256": "cc165171e43f298cfa7b15eaa751c0bc83e1192a70e1bf95ae236d133152cf1c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1742.json",
+        "placements": 0,
+        "sha256": "0f722003466db9c85669005c44afe978b7622acc1a579e1b8a5560b743bc5cf5"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1743.json",
+        "placements": 0,
+        "sha256": "47170a1c9861d1424fd738b54fb9cc0558f68a621857e79ccf321c969e111d7c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1826.json",
+        "placements": 2,
+        "sha256": "44e2bcf72d0416d8c86089162ea64b24009da7725eafbd6d41d8932a906f9ff2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1827.json",
+        "placements": 0,
+        "sha256": "3ae1a119f2e27697d63383021b19b50989f3f9b6873dfd6004f0e6489adc2c4d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1833.json",
+        "placements": 36,
+        "sha256": "7a77689e0ab33c409ea99e3a9057b1bf34096b2e1d252d8fce451b04d0234289"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1836.json",
+        "placements": 12,
+        "sha256": "943bfff8601a82d2648b48508ad7e48c6ba8118b9187ed80e78aba4f127cc4a2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1840.json",
+        "placements": 11,
+        "sha256": "295b6d5f92152c78ff99b6087e43c12739a9119a8e0b6dc8e10c55da69be8d31"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1846.json",
+        "placements": 3,
+        "sha256": "5e4b00baef30960ec7247dcc296086486d4479a874ef182e10a534b8135cae45"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1862.json",
+        "placements": 153,
+        "sha256": "ff779371b55a4e2730ec5064c617765e4c7b4dbe0a85d8f32be225e051be23f4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1866.json",
+        "placements": 0,
+        "sha256": "8f35bd865124c5530fd8487ec35a85b8e661ce166a3e935b3c1b10d7a93dcb4e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1886.json",
+        "placements": 1,
+        "sha256": "aaa64cc887c3a7e1288f91ff7c8cd37ec43d53802e1accbad781b0c1f6658467"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1887.json",
+        "placements": 1,
+        "sha256": "a2dfa05b24bc4da8e9874538ecaee575b0db66216a1f37e7444a0fe487fd346e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1891.json",
+        "placements": 1,
+        "sha256": "16d231c62258642d4f4bdb60e00601d1ea906a961651be19df8c6f7defb72d86"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1892.json",
+        "placements": 3,
+        "sha256": "08934c58c963f7ff8ab08a96a841c34d0ae109e87ecd49da617726c06f0a3ac2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1893.json",
+        "placements": 3,
+        "sha256": "5f08e93d2910ac3b7ac9f3f1a93cc310e4aca9dfc0719dc97ef015bc3464b86a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1894.json",
+        "placements": 0,
+        "sha256": "658c7505863cedb69bee41cd67f69124c0eb35dd64d1c952ed3f2434d77f865c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1901.json",
+        "placements": 0,
+        "sha256": "bd9ae68bcb7f25ccfc1d1c25cf754e2cb7cdc5e56858c741018aad274a8679ee"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1902.json",
+        "placements": 6,
+        "sha256": "ecf670a8ffcc6b5a0f9788382c1db143a4bccbf20008d33b41d55568d2215235"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1913.json",
+        "placements": 8,
+        "sha256": "dd4154fdd567da9353577bb66d6ee23645d645facad78473d92999cf06b6fa35"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1931.json",
+        "placements": 251,
+        "sha256": "d083f3f06347e9bf1103d4e288fa48d70f3fa059b0b685f4cd2ee57dd418e6d7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1933.json",
+        "placements": 114,
+        "sha256": "be5d5e5a50186de03d899cb89b7e063f8e644116297ae62267875a1a8f2a3d70"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1941.json",
+        "placements": 268,
+        "sha256": "7409ce370ee365ecc9f960a01707872abdde7ed3da81e974130d0df45a8e03b4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_1943.json",
+        "placements": 55,
+        "sha256": "16bd012884a149225ad26fb300b3fac0df22bb5d29fba3af738780b692824015"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2001.json",
+        "placements": 1,
+        "sha256": "020e8d03fd01c6e8683810a09c80aa59cc430b3136ab84addded9c0e19103f39"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2002.json",
+        "placements": 1,
+        "sha256": "8e0f81b1f7ece25b111d556048c19eb0faecfcf47da8387d5bc07840cf580a3d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2003.json",
+        "placements": 1,
+        "sha256": "84a4588f15c4ebb18a7f58d46c2ee54f6d63a1f1477482253d7cad7f7573cfe6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2004.json",
+        "placements": 1,
+        "sha256": "05c190bd81b79860daa432bee72ac5dac8c751181c607ed306bd9f81a10f353b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2005.json",
+        "placements": 1,
+        "sha256": "6a5eca5d3fc9f18f34eaf64002a0802ee7b87427e4be7cc575e471ffd1d74b78"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2006.json",
+        "placements": 0,
+        "sha256": "c74b8d9496dd86221259c0353825ed2b4dc72d33996875730eeb317253f98c9c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2010.json",
+        "placements": 1,
+        "sha256": "1b6774594a92087e29ccdcb2b5eaffec52b0efb0f7f5fe98537e628d9604769f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2011.json",
+        "placements": 1,
+        "sha256": "378d5eb79f86cb66bb961d1477772d8fc40098ed819e4e8f8c1d5e3b8e07d739"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2012.json",
+        "placements": 1,
+        "sha256": "b4012d91c4e34cf8703a03e2c0600c861c3ecebe417b8a7030625cff4de20844"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2013.json",
+        "placements": 1,
+        "sha256": "2a0d65cd652413e8747f00fc11ae4ecc6c35aea02fdae0f1ee506812a2b05db7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2014.json",
+        "placements": 0,
+        "sha256": "925a8902efdac0d63a5e7b932a021776475423411a2299f3a2534cdcbd1e8da6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2020.json",
+        "placements": 1,
+        "sha256": "414aba31482ed3661fd72d2a528a13f3d4cc563b79403bb5013023d9920eff20"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2021.json",
+        "placements": 1,
+        "sha256": "01091286aa2648b185b67ec178ea3b092f51ea60bd6dd87286a5c301d728d083"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2022.json",
+        "placements": 1,
+        "sha256": "7665a0ea9233614765a4419c2a9c3cf3c201b33ba3e66a174115c0661efff723"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2023.json",
+        "placements": 1,
+        "sha256": "a3ce166fe7fcfa411ef884614b74e14db427abc669e6e1cdc16ccab4a784aa0c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2024.json",
+        "placements": 0,
+        "sha256": "ba62c6bfb40e53529ec55af53cf90479ac4a7876ac2acd4553a161e7a92904d0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2030.json",
+        "placements": 1,
+        "sha256": "ae23eed8527f04209db6888deee24984354042eb7793c6111873a6ae0183c4da"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2031.json",
+        "placements": 1,
+        "sha256": "b468e737708fe69c9a7a56ae1041deef196ef6a55437326687088bbf8392140e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2032.json",
+        "placements": 1,
+        "sha256": "8e91f6ca2ce3725c0c0c553275850a67096aefaa29ef0c0e7d0ae267f7930d3a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2033.json",
+        "placements": 1,
+        "sha256": "b979acceb61302bee1b481345960a1ce931b1f8f75577f6bcc664d7fb04f1f2d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2034.json",
+        "placements": 1,
+        "sha256": "d95f21602f1f70ff2a0ec9fca48eacf2c7791808db52326f679dc744221269b6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2040.json",
+        "placements": 1,
+        "sha256": "d183fde0dfc335dbe9cd23d8592e7fd40146776ebc30fc3f585938e10d7bfd66"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2041.json",
+        "placements": 1,
+        "sha256": "8692813207cffe1dcadedf5db12088c57bfcce90c1b60e9101459c21af1f2101"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2042.json",
+        "placements": 1,
+        "sha256": "9e2d0b1d2f66e6cd6a765e1ccb013c54a2fdb3c2cc0cdfb7ff73bfde4e4ac82b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2043.json",
+        "placements": 1,
+        "sha256": "a1362a24170f92ff474d2c76ce2c538914a913175f2b00ae05141d9c4538eddf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2050.json",
+        "placements": 1,
+        "sha256": "81086f974ae5499cdfa9e9666bb5b66c07927ea664f0678d68fb57864a69b52c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2051.json",
+        "placements": 1,
+        "sha256": "044389c874e9c8d52a63fd6aa36fc0e77a2c6420b7c593949e75df5047aae514"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2052.json",
+        "placements": 1,
+        "sha256": "3877d4d440ad5fd6b0e38075716dc96c617ede54baa7b22a50047e5379d379d6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2053.json",
+        "placements": 1,
+        "sha256": "d1904fd0fd8b3ad82978b65b66fd1e608107db456b1ac4eede9b98432934c1cf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2060.json",
+        "placements": 2,
+        "sha256": "052d4d2bba270bfd7d30c67394b2a60af93d1b56a878710d0360690a8501a94f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2061.json",
+        "placements": 2,
+        "sha256": "db4d9fa26f2e6b9fc69d299c23b593106ca31d8777c7d47cfbed7a583beb8427"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2062.json",
+        "placements": 2,
+        "sha256": "b5b5f48c84108ddec0ad944cae333aeae1bf50a4be9161faa5d25463a8d95936"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2063.json",
+        "placements": 1,
+        "sha256": "08316e4fa1136a14e77d172d24043149626f117c6a1692a9fbbb23054a7831b6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2064.json",
+        "placements": 2,
+        "sha256": "4607849eeda769cf3ff6046e10a6a5c8175ac5746f4f1ce967cd0d5958b21329"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2070.json",
+        "placements": 2,
+        "sha256": "8d0ec0dca1a6524560b1785111dec557a068afeb74bd725b36215dd4c23cba55"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2071.json",
+        "placements": 2,
+        "sha256": "a9a80bf8e1e49ec23a014ace10e6adf09fef2c55611233cc35417a09504601b0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2072.json",
+        "placements": 2,
+        "sha256": "b8aac97a672bff3a74ca27ab7acab62c361ad3775881b085562eea905189c217"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2073.json",
+        "placements": 2,
+        "sha256": "8b30fcb5192a4aae7d915f63e554634ac889e9fe6e812fd4cbfef89f2ebc5ba1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_2096.json",
+        "placements": 1,
+        "sha256": "9069f3d30cf7200f5bfe5168e2e15eef91f993cd076fe73de44888c94293089e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3000.json",
+        "placements": 1,
+        "sha256": "f4a995c3c98f17d27ee2cc6f481d0d094e89f4e77a3935f6cb15740a03e329eb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3001.json",
+        "placements": 1,
+        "sha256": "9b69a966215a2ea8e6f49283402c0f61ff90beff4798af8ed4cd7e148ebf1164"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3002.json",
+        "placements": 1,
+        "sha256": "775f8e305827f64fc19a4277fef838ec49efffd98c40b16e654300ef5b158429"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3003.json",
+        "placements": 1,
+        "sha256": "a0c5c4f77b386ba46f467acdbb72dfc7a0991e88bef79cfe79c7aa027a26f1b9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3004.json",
+        "placements": 1,
+        "sha256": "7b5529b79e5a7062aebaa50c541d18f318db5edc591bddffae1d2fdcf2d176b6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3005.json",
+        "placements": 1,
+        "sha256": "f65cdc2196c1f1d42a194e27e6b22bbbbfd54c466f0da963b0f370a14ac0b1f0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3006.json",
+        "placements": 1,
+        "sha256": "539d0715abaabb5aa587b64f7ab37f13f9f16da95b398315a5296daeb8fe7d74"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3007.json",
+        "placements": 1,
+        "sha256": "aa0687ebbd9b2e42fa5bbbb4535065bb9ff31906c232da24795e056c0b7b35dc"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3008.json",
+        "placements": 1,
+        "sha256": "50f0887aa947a32888ccb085c02bc5309c9d54b597da638bfc892c6b3f65d219"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3009.json",
+        "placements": 1,
+        "sha256": "a39a62553088bc2aa9582089c5d057e3fd423d83cb8c8c170e4e9ef935283750"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3010.json",
+        "placements": 1,
+        "sha256": "3c9dd7d20dc1aa4c05053d297d155e377ad26fd66cf0424d9a66f5c4fd03731c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3011.json",
+        "placements": 1,
+        "sha256": "4beabe6cbcc8bd131dcc4224c10722fb2e2ab3cdd6a5b22ec926f29593d2eff1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3012.json",
+        "placements": 1,
+        "sha256": "8a067368c5faf0d316ce5a615268e9262482bd945771b6717093d94129591ab9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3013.json",
+        "placements": 1,
+        "sha256": "6d14275e8c5f287d325d74f59d09a8b549fff0ac5c654465579a20d4fc5d4e0c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3014.json",
+        "placements": 1,
+        "sha256": "d795783789166c580cea595562a0154d72edd43ec455f3c03c44bc7612bb836d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3015.json",
+        "placements": 1,
+        "sha256": "dd752ef63440e02e3cf6db4ebd36ec5d62315cacbcffce5e18bbf647e030df18"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3016.json",
+        "placements": 1,
+        "sha256": "04a2bbe55a954dbad7dee570caa753ced2592647de787b88913490435e04165d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3017.json",
+        "placements": 1,
+        "sha256": "cc8fb789d27755761df00e0d62371647d4dc91006e1a72482bcdf92b38ffc593"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3018.json",
+        "placements": 1,
+        "sha256": "4055150bebf475142c99fbffaa0d7d64f243b73d27345c2ecd34482f95190f6e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3019.json",
+        "placements": 1,
+        "sha256": "0ae483244cc3ebf56a2e351ed55cd3518dbc15ef2fd6663bc2358cd255b4b9c4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3020.json",
+        "placements": 1,
+        "sha256": "6abdb278fec825d63157129872bd1baa6de742dd7d54563b28669a578622761a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3021.json",
+        "placements": 1,
+        "sha256": "a173138e4d27f32dc4f4d4de857c5041c19ca94a33ed2ff7ae8a705d38777535"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3022.json",
+        "placements": 1,
+        "sha256": "f110b93becf6d1e64e7cf5beb8a839ad7704e378662ec73d82c8a69fe3b3c759"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3023.json",
+        "placements": 1,
+        "sha256": "f9dc6507ed85aa0df8107049bd7df88c6bf8cc89ab9f8fb60989c3ce75826f14"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3024.json",
+        "placements": 1,
+        "sha256": "ecab4e9842e45f1b7db088f2b89aa284db7bd970b7127350decabd82324d936f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3025.json",
+        "placements": 1,
+        "sha256": "3cc55d460d23baf6512352778a7a1353a20cd75d4e5d8ce8eff5aebd306ee4ce"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3026.json",
+        "placements": 1,
+        "sha256": "b896b6d55d15a46b1d072e201bc843effb35bf79c7d9459590e9932c1067126d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3027.json",
+        "placements": 1,
+        "sha256": "0a78098bc599ea882039c1fad20fe6c0e379c923a7cab2ee1bee38fbbf43f6fa"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3028.json",
+        "placements": 1,
+        "sha256": "93f9d06426a3b1ecf6c6dd1ab3538d46d96c22675ddb859ab34e4bd943e0265e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3029.json",
+        "placements": 1,
+        "sha256": "7c27059f07251393f5212256cbe05a5e425622c2e4745d712d073820547a2709"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3030.json",
+        "placements": 1,
+        "sha256": "d8503b61fe970a11dac93af491f8ac3316b56e50cb37043e1501fcf12c29fc2b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3031.json",
+        "placements": 1,
+        "sha256": "2dd90802cc115d575c5942ff6bdce982046ab520a78fcefb07c09e06297c1a73"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3032.json",
+        "placements": 1,
+        "sha256": "386a46cb851dffed4f66c762033f143db09cbfb6b2e6cc4fcd1203159e09eaf7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3033.json",
+        "placements": 1,
+        "sha256": "038221e1df67d74a13764ed795297bbe6d6f0de81055e6850db645cb8e4dca5e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3034.json",
+        "placements": 1,
+        "sha256": "ebe38161750df2dc687a5ed1a307baec3f667285e54116cf1dc941270b2429c3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3035.json",
+        "placements": 1,
+        "sha256": "30b6e493432b35e3ff544df86b64e7e502ca9e9fc2d786636dbe88c3ae811334"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3036.json",
+        "placements": 1,
+        "sha256": "a5b28779964ad08aebe86b4a252fd86c2ced190c9bf57a3a42d46dfa1021978f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3037.json",
+        "placements": 1,
+        "sha256": "1b8eaf7d724a1b48c81f145c5d1d3da57008968c1ef0bcb22bc870fed773df49"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3038.json",
+        "placements": 1,
+        "sha256": "fbcc1c552c93a4eb738dc964ea34413a7e901c8660ff12cccc7ec3a58f7fa866"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3039.json",
+        "placements": 1,
+        "sha256": "b7c8fa5b6e6cdb4495751f5b04fe4f1fdf1e2075d712f808d65789d875363730"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3040.json",
+        "placements": 1,
+        "sha256": "675b94c2bbf551a39c7d72a4a8eb428510c47efe6997235925c8d9873e56968d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3041.json",
+        "placements": 1,
+        "sha256": "3c8275c3849d2d3f95ad917a8823aa918b74592e2e677e4e79a1049c9ea80e40"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3042.json",
+        "placements": 1,
+        "sha256": "d887dba5232b2728405ad543b4c2f3f5b6a9d62de2a2d423c1e20aad6c2a537b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3043.json",
+        "placements": 1,
+        "sha256": "f4e110b2f93d534c6b4b78887292e6c0be95bd67ddc79b1aa1cd5d8e5c38d4e5"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3044.json",
+        "placements": 1,
+        "sha256": "1d59e2e1e08e0268f7adefdfb8709cb977a537af85e3d28e38bfdb914ddff986"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3045.json",
+        "placements": 1,
+        "sha256": "41c73f08b16188b6db84948f2b37109a0111dc77402dc2b074d141c75e6f7e7e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3046.json",
+        "placements": 1,
+        "sha256": "e3cec51b61ed12dbf45dd2b819443b1c63cae5ac7de0b7ceeb2cdcf7e0764916"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3047.json",
+        "placements": 1,
+        "sha256": "bd9a288e0261c367da436bf3aa9523f2c2241e43366e6d3d71836daf692eac48"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3048.json",
+        "placements": 1,
+        "sha256": "d7c58a654b5fe3700ea0a935ec8b58efe3eb23bdf522d44c0b035b2209930e50"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3049.json",
+        "placements": 1,
+        "sha256": "ff7fde7dde1ba3dbed72827a3effa656c6742271467cecb4bcca267b5dde285a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3050.json",
+        "placements": 1,
+        "sha256": "a1c0f9a7faf0ef04a6088f3f48ec25e8ab703d165b6801aa7da47ac25819cd16"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3051.json",
+        "placements": 1,
+        "sha256": "cbc8158ba5d287f9ca3cea54f25db6e1cffc2550dc3facb4b431792b93e39fe6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3052.json",
+        "placements": 1,
+        "sha256": "4009e95cc4fcc39e60ec756515434d79d0a3a872c375c567297a06b00e49ce0e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3053.json",
+        "placements": 1,
+        "sha256": "8430141d350f47e43c39b6467042029b69a9f691b63bb169e07c501e8c5f7096"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3054.json",
+        "placements": 1,
+        "sha256": "34da9233f0bdb3b529b42ecc9109af1af55afc24deae05436702ade7f91ecc2e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3055.json",
+        "placements": 1,
+        "sha256": "301aaa24fe7f2ae573b46de1d209a159d0835231b6a8cbaa5e035409bfc3ef07"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3056.json",
+        "placements": 1,
+        "sha256": "0676caa100ebe3ef6d0398291918204dd0fabdedfd983a469d53920fcd0a9808"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3057.json",
+        "placements": 1,
+        "sha256": "69f073fc7bfbf8dc51e4a0fd98823ddf15954c5e31be9465d0572bdb3ac63937"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3058.json",
+        "placements": 1,
+        "sha256": "e9603dcadad6d2c90f56134628d17f0e12e414057275aea38063bc135aea0861"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3059.json",
+        "placements": 1,
+        "sha256": "583c0cf58e716e5ae30fa6cefc62f5c5254a5946cead013be5f2859fafcfe55f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3060.json",
+        "placements": 1,
+        "sha256": "283adf52499e65204f1c60fdffd1d35c97deaebcdd3f72e684fe5cd5c13a3a11"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3061.json",
+        "placements": 1,
+        "sha256": "ec4f0de244ecb28641eb2aeb7203d969f7f882d4e32869458f65a88e4bc9444b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3062.json",
+        "placements": 1,
+        "sha256": "d9308458e2359ef6a9bc51327dfbea5aac34ac62ee935ef401085092820d6852"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3063.json",
+        "placements": 1,
+        "sha256": "3970e9222400037be97346b6d98eb7eb5a1050a74ba8210442d3b4e4c2ea7a0e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3064.json",
+        "placements": 1,
+        "sha256": "0627f67614e8812794b21c8c8b09390e703ea77ec724442db3277f93cf70ef53"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3065.json",
+        "placements": 1,
+        "sha256": "1d114b0b947ddacc3137901aa1a6b5a81fb10ca4702ace2bc47736d1f1802d1a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3066.json",
+        "placements": 1,
+        "sha256": "c825bc2fe8116521e0e790c979d80bcdd33bb624271afd14e4780ca22a78b90c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3067.json",
+        "placements": 1,
+        "sha256": "fd01a9e1bfc502fd23216a35d1639fde5dfbd818e099ce4c51478932705abb42"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3068.json",
+        "placements": 1,
+        "sha256": "b9444ae202a6a86fda8cff44b33c56e701a9b139cd20e9ff5ec1456fd6e1f6a6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3069.json",
+        "placements": 1,
+        "sha256": "2df8537176662de86a0ec509c4f73e210e931c2b7dd88c077619025351a4d6dd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3070.json",
+        "placements": 1,
+        "sha256": "a9e9fbba7b83e53dfc744ca5fd340a4b561d0347976288136d0f3d0904b07503"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3071.json",
+        "placements": 1,
+        "sha256": "1671c8e4f10b6cb51b518f6c59c5a51c01bc37f43d4800de624d378d836d345c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3080.json",
+        "placements": 1,
+        "sha256": "a9a71e9e66a5237cd586af4d4bde684915d6acbceca42386b1a46481b360ba37"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3081.json",
+        "placements": 1,
+        "sha256": "bb21df081037edfe9c3c1a18387e1d91508179cabbdfa4d12953f51ecf2fa763"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3082.json",
+        "placements": 1,
+        "sha256": "defcd0e5a411a51561419ecaa0697831523a389b84e8dc92d9e7f6b045b25587"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3083.json",
+        "placements": 1,
+        "sha256": "458e391b21841930b7fda445e768dc54b1a09ce881810e97908fa83d22610b46"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3084.json",
+        "placements": 1,
+        "sha256": "9ae4bb81794f6e4dc5be860f04be60f65a40e8f31b50266843d3b8fd838d2f1c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3085.json",
+        "placements": 1,
+        "sha256": "e8d88c5b30c6b83c126310d57b23cdbe9d8381f3e1db8dff479a2f1fc7e1ce15"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3086.json",
+        "placements": 1,
+        "sha256": "1b695a93766b80d0b0c28d46313294d096635c81bef20fd1f5b575a10a3be769"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3087.json",
+        "placements": 1,
+        "sha256": "9fc66828175d5fa9f7ddce966f4fe1840250c5d5c3d719494db1122066bff78c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3088.json",
+        "placements": 1,
+        "sha256": "d27c62b6a0ba71094eb5bdda55e9e43b9f01ebceb9c344326b4c5941fd7f3974"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3089.json",
+        "placements": 1,
+        "sha256": "ac7905569495637c51679d31358a6cb11ab02361e597c864619ed583b2aa4d7a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3100.json",
+        "placements": 1,
+        "sha256": "3a355f7c4a7814e4569e128fc7becd81af8a5e45b64216a2ef37009da6d6809c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3101.json",
+        "placements": 1,
+        "sha256": "8186f2fc598e4774ed330fb18bbf5c1db7edf374efb123e9cb901a3f16bffb1e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3102.json",
+        "placements": 1,
+        "sha256": "0d0639f00668a35e3a0f18f761d29d7481129def5aab0d149933834465667955"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3103.json",
+        "placements": 1,
+        "sha256": "52c10fee5e3fbcea42d5607db502b2a6368fce7c9a61b1fafe5b5f43a70229f9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3104.json",
+        "placements": 1,
+        "sha256": "f7266d9bca98b509ca3f0c18e22ab76a7e4b985c25d146f9112e2703be6a117b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3105.json",
+        "placements": 1,
+        "sha256": "af088fc38abb3d1d8620de8ef5e0946b40f6acc416baeb656ac70d9319048736"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3106.json",
+        "placements": 1,
+        "sha256": "6fa43855edf3705236d2c106cd465f2742ccd8a256bcbe3168d7f60f6b0d9641"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3107.json",
+        "placements": 1,
+        "sha256": "fefa4877ed109352f8fc7df3027a49a5b5141c12ba5821cd405e7621a027d945"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3108.json",
+        "placements": 1,
+        "sha256": "bbd79cfac6a3aca79a57ff21a2a0bcc9e545876793b9ae479186cbfa24b3aeb5"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3109.json",
+        "placements": 1,
+        "sha256": "1204f46917132a8005a666116fffd2b039279fd3ac24069759b352f481d19f96"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3110.json",
+        "placements": 1,
+        "sha256": "e10fcf3aa5ef0ac541a8c5ab5f846237945523263b51213dafcb69c342d810e9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3111.json",
+        "placements": 1,
+        "sha256": "5d1a1d1e95f8a4b4fa248456b5f4e50412000a39f42a4f397017403f6ed0b56f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3112.json",
+        "placements": 1,
+        "sha256": "3b76eb43cd99a12ddc8f07752433a43f0b3025e7e3cd94758a257d3b1028bcee"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3113.json",
+        "placements": 1,
+        "sha256": "6b5dc8c656683816f8f2d42ea3f01c20020f68d559baf75a62a1fae5d5e7466b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3114.json",
+        "placements": 1,
+        "sha256": "ea4b1dd348dff7d3a7afd6ce8352a13d4ea389abc1b25dcfc203437843aa3b28"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3115.json",
+        "placements": 1,
+        "sha256": "6aaea27240062ff813581ca076964dd9d079bd823e6846756a19f366c9f847b2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3116.json",
+        "placements": 1,
+        "sha256": "8cee41a4d06ca40e56dd8863c5994efed0da034d7a09284aef210f43b0b95d24"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3117.json",
+        "placements": 1,
+        "sha256": "8a996ee54f24a62ae28fdb92fbd8a772f03573372581785c752c524b8d3b5a67"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3120.json",
+        "placements": 1,
+        "sha256": "ecd2ca7f2faa0ad94ee04404bb2af7ef207171a50745b351b3c6244df669469b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3121.json",
+        "placements": 1,
+        "sha256": "d8be07697268719a8f81aa58f9e00d26e6d7922d250145bfdcc325d9e34e8572"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3122.json",
+        "placements": 1,
+        "sha256": "12e88d3bd742b21ef1b8e7c9ed32eb71d1c993d5c38eb249d0f45df54793b2f2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3123.json",
+        "placements": 1,
+        "sha256": "200f6d5339c7c83aeacbe709beb86a29fbb6048abad277bae826f9722874b3c1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3124.json",
+        "placements": 1,
+        "sha256": "8804d604ceb6b4af275f61cb31e75fad3232ad79f80bbb1c5a484685fc3fd0a6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3125.json",
+        "placements": 1,
+        "sha256": "dae320a354d40e48936d826bd5cc4680aff9438575a500890d2977e11d73d2b8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3126.json",
+        "placements": 1,
+        "sha256": "30fd8c2f4e6f9f7bcd952f5241bc2f6b7a58b6bc60c38848c516b119499a4387"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3127.json",
+        "placements": 1,
+        "sha256": "2c6d3597b89ae677d691f2a2b18e4262109426a9756420fc29120309f9765b98"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3128.json",
+        "placements": 1,
+        "sha256": "6bd45c9e26b50ed7431d4a86794a60e2b6f2c141496b8fa1c54b106c4cf61187"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3129.json",
+        "placements": 1,
+        "sha256": "8714120fbaaae22cb418d33890572d1f1fe3d77bd31b69b8ae2c7ee8f2de1250"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3130.json",
+        "placements": 1,
+        "sha256": "ac6c0daed6dfbf0ffe4e34119d5aa0dbf713be8b9aa191cdda3afaf3b2556815"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3131.json",
+        "placements": 1,
+        "sha256": "76d84540f199bfdebe4d91dd2518d625a402746b9e11887058d4763a7727c970"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3132.json",
+        "placements": 1,
+        "sha256": "14f0a0547de54079ceee7507c08ce4cbcf63491af79ae03c3726c41245279962"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3133.json",
+        "placements": 1,
+        "sha256": "b8bf7780953670e2d795cea052d556a2f9e34b137e8ebd6746339a68135422a4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3134.json",
+        "placements": 1,
+        "sha256": "bbfea364b31a987f301b9021a3b243aff216098d38b95f12eb2489c7d3e82265"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3135.json",
+        "placements": 1,
+        "sha256": "08e34727b319a4f53100f952580e74c0d7c979b1c2b68ac5dd42ce739085e540"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3136.json",
+        "placements": 1,
+        "sha256": "6220654ad21c7d864b83a494ee5ebc1b6c65722fdd45df36611233abef549cd8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3137.json",
+        "placements": 1,
+        "sha256": "a44c8cf0c55c43262bc31d9656c121b172f34e727f20411c9202add05003ab41"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3138.json",
+        "placements": 1,
+        "sha256": "74f710767792d01ade917e7066746297d68d84378e70eeefb40823cfa271c0af"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3139.json",
+        "placements": 1,
+        "sha256": "84f228577d0ea466e1d0e04197948b70710a6662a6b46e5036b80f11dad37d10"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3140.json",
+        "placements": 1,
+        "sha256": "dd3aa07431dc34ef25d5bd240d26b51618fea1316df60f47d7405149ac28174a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3141.json",
+        "placements": 1,
+        "sha256": "6c5664e4c32e50bd78e617d8f3f16e8032941704bc3699791365d1c2785061b2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3142.json",
+        "placements": 1,
+        "sha256": "835caaff3b657c4af513c699336ddb9b2d19e64dcf8729c2db4cd32825041a39"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3143.json",
+        "placements": 1,
+        "sha256": "b7bb0c3e548720607a35304d8a1a833d8caf8911d976953c913baa6db3036012"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3144.json",
+        "placements": 1,
+        "sha256": "679456c42aa78b3700d87df385680d7344b8e358e011be5a5cc6280ef0e83074"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3145.json",
+        "placements": 1,
+        "sha256": "ae793ac03a8ac8790626774712e7741b3b1beed7bbfdc2b383f58ae89e4975f8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3146.json",
+        "placements": 1,
+        "sha256": "12583decb290b75f817bde535bd1bb805e79ea07a75c9362b69c8d8e32f659fd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3147.json",
+        "placements": 1,
+        "sha256": "71db4c3c17aa4525a0439f6979fdcfcb37753e7757f4ce16a002c472c15e9e46"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3148.json",
+        "placements": 1,
+        "sha256": "700ad83495b36f019a0c66d9c361f6b5d033c3acc8bfcbeca6496d3763b55c4b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_3149.json",
+        "placements": 1,
+        "sha256": "8c66ae7ee4f2cf2373dea0c93b063c616f011835a347561f8edd33e8eb4c3d4a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4001.json",
+        "placements": 51,
+        "sha256": "0aa24cacd961ae5598ed27e4c9dec22863df589dcd68857261a6098564d10519"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4005.json",
+        "placements": 683,
+        "sha256": "820bd9e05c85f9f7e162ac606c55d3225dad159ff4ed749585bf5197c6601b67"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4006.json",
+        "placements": 0,
+        "sha256": "b7654b9e182e31da0ab239d7b6e271b6bcb852436c593f0d5cb0ddb6a821ae7f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4010.json",
+        "placements": 0,
+        "sha256": "e8a98b63543f14a4f21c313ca1bac8663252d975464e60d42535ac1642f1a388"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4011.json",
+        "placements": 0,
+        "sha256": "71285724e006482432399225d164f4daf12019f35b6d7da9af261b15207949de"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4021.json",
+        "placements": 168,
+        "sha256": "7e5a517b1626ed6f8500698b2c64aa2710abf6c6618f57731f3a4391d5d22d24"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4102.json",
+        "placements": 2,
+        "sha256": "aad6514663279849e3ee8cef6a9c6df09adcf48853d5a6b8a03330773434be0c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4107.json",
+        "placements": 1,
+        "sha256": "a7f15fb18cd7ab8dbe8267f2a0845d394de6b4b43decc6962b44d30efc262e40"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4121.json",
+        "placements": 26,
+        "sha256": "47e7b3b5741d791f4a1f3d18cba5abdb179ea6507de7a18b9e73526687cd9f18"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4211.json",
+        "placements": 79,
+        "sha256": "2e937962f9b1675638abc7500b4203a2730fc6e15ea642a51656d0db066bab85"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4212.json",
+        "placements": 122,
+        "sha256": "6c3869a47ce7e613cecb2c60ddbcc56292301f132072bfcbe2c22150b46eeb28"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4213.json",
+        "placements": 139,
+        "sha256": "8de850f7f69973b13dc7241f7344f8a402b1597bdb984ccea6ca192ccbf257e2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4214.json",
+        "placements": 126,
+        "sha256": "8b0d1759163d76dda2c7b5027e78fa25e8f16f570998a7212537a104a44cd33c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4215.json",
+        "placements": 238,
+        "sha256": "f39750ba03ce9064f93ebf98f3e47b0f8574c33a2637a31ec8f96bed2eb940c2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4220.json",
+        "placements": 79,
+        "sha256": "86882755405eb4ef14ec545fe7d2be5f049a7fb7ad1d8ada66158cab9048735f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4221.json",
+        "placements": 122,
+        "sha256": "9dba21aabe57bdd41640933674dfa07297e20f1d04c873d2037f261a35706aac"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4222.json",
+        "placements": 139,
+        "sha256": "981f4bfc3046d8f8defbc2ed074722934236957db4afb96c7413564f5f40ed84"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4223.json",
+        "placements": 126,
+        "sha256": "ae27606f2b60fcf6c0b059ab81aa6c6f8d3a7b4691f51357c8da5a101e4de12b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4224.json",
+        "placements": 238,
+        "sha256": "0388817c83b7830bcd126130cbd8c890ec0bb990cf3503762486090438a4f081"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4310.json",
+        "placements": 298,
+        "sha256": "b227035905ba64fee93c10be1d68fb41c5448b249f983a06e77936fdd1dd83e7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4311.json",
+        "placements": 401,
+        "sha256": "f368175a90ed96da3aa15f6dc39aae2c325fb791855c4cd21eebd224ff8d4aee"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4312.json",
+        "placements": 406,
+        "sha256": "f2f908220a89948a67d8768664dcdf742749fdfae73e92af890de7dd069c2084"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4313.json",
+        "placements": 273,
+        "sha256": "664dd972c1045ad3ce09d67c07a4462c9c7033735b7fed5938f5acd779a3b6f2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4314.json",
+        "placements": 3,
+        "sha256": "e52d1b5f474b563405cf34b82c1846282430403928f6210b7a65a94243c56ef9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4315.json",
+        "placements": 3,
+        "sha256": "932eb4eb7344870f727b2829f2261207685925019aba3414e89a5f6f0346e4b2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4316.json",
+        "placements": 3,
+        "sha256": "53b87be073aa3c97300c088a7fa4dfe37c63859a4e07d0076f2a1641f260fb72"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4318.json",
+        "placements": 0,
+        "sha256": "2a7f7f7ac2b9d88df28d56cafd9137c10c8be7bfaa6ac13eefdd3b55789fef04"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4320.json",
+        "placements": 440,
+        "sha256": "741f12cb2cae42b1fff1e64ed8c9e724a3b9053e70586aab9df70badc4dc7856"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4321.json",
+        "placements": 546,
+        "sha256": "966bff41f9c15e3984bcb339317cf490046abfe27b58e8ea47ec012457ad3c2f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4322.json",
+        "placements": 150,
+        "sha256": "5b18dc005de026eed95d40f8913f05ac01d37d3d52442f3b37ff69d3308af63b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4324.json",
+        "placements": 0,
+        "sha256": "7c337868e32c80b3902cf2783770d488abf3f871e4a69871600e768f979fbfb8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4327.json",
+        "placements": 0,
+        "sha256": "efd9d1aab3b4936fedcb4fdddb3bab50b9429699510ea7e64261c3f2bc037f08"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4328.json",
+        "placements": 261,
+        "sha256": "9354d0dfd3b7918a15ac2fc596c0ee19cb4c3f774a07a0d179fa5b28f4f725de"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4329.json",
+        "placements": 95,
+        "sha256": "20d41427dfe6d969af956febab2713770c97e768fa2ec06576bf264a8742a605"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4330.json",
+        "placements": 37,
+        "sha256": "72e2bb418776933520c44b1f113cad9169c552915b99f7a9f09e70a912ad4077"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4331.json",
+        "placements": 43,
+        "sha256": "ed4bbffa2b41c950193707a2f15a5247a943b4d690891104055f274479eed8d9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4334.json",
+        "placements": 0,
+        "sha256": "d26a7b66a474f20b9f5fbbd9661c99ffaafa94aa31caa39cfb4846e11d578ede"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4335.json",
+        "placements": 78,
+        "sha256": "f026ebce850cc04bc8ff3f888097fb05bcbfdab9b0e48c0244e68ff9062552dc"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4336.json",
+        "placements": 60,
+        "sha256": "12caf6bc6d14718d068849745f3a46d882b6f04f381af04805fb095631a6c0e1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4337.json",
+        "placements": 71,
+        "sha256": "83bd32f62539dcc3808d80f7ae226a079d19c7407b33b5613361e1e370398f60"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4341.json",
+        "placements": 2,
+        "sha256": "cc48958cb613ae1d257b06ccf46c50b463abe94785a0d0d9935c2a183391b23b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4342.json",
+        "placements": 2,
+        "sha256": "af626ea840d945fb17485106a6e36db6482040dc72bc3188a908c829a345aace"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4343.json",
+        "placements": 2,
+        "sha256": "693fa54d048a2f6f238e410642386502ba14d5ba62632f0de95dc1cca4c2d27a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4344.json",
+        "placements": 2,
+        "sha256": "c405fc5da1534e13d6eb1fc8584da58c99bd15aefc794c72db725618269cb6d7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4345.json",
+        "placements": 2,
+        "sha256": "32effd0634061288d2d5dadccfa708306b366d66b27786acbb5bf15ccd2c1027"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4346.json",
+        "placements": 2,
+        "sha256": "db4c0a4cd51955b2ff190ad28e35dcab7604b785ced3f77d02d8c85f82574012"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4347.json",
+        "placements": 17,
+        "sha256": "a566f19781fd3fe70a9d4d7555ef899f46e267006f2718adc7e4ee6d0d133458"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4348.json",
+        "placements": 17,
+        "sha256": "817beeff92d20e0c238d9d9df95924732d5a3bd93d9dd14800c2f7f395b72050"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4349.json",
+        "placements": 17,
+        "sha256": "9dbec66489729a6fc9b1b552a0b64c190d20748faf9d24e18ba4180b2a4ca605"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4350.json",
+        "placements": 1,
+        "sha256": "86faf09f8db4d82a208bddf4070347d1bb4e7a14f38f015824dd0505f6e9e4c8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4351.json",
+        "placements": 0,
+        "sha256": "32abefec7248f50aa08a23762dafe16021e60e42beba2684c32a08dac29ea1b6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4352.json",
+        "placements": 0,
+        "sha256": "c99de729e6a6eefe1290ef174b3f35f8b4aa6628e784b7bd1f465e541b6f26e0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4354.json",
+        "placements": 2,
+        "sha256": "f8068632350a6453be9fa71e5653b59faedfd7f0a0af477efad078f4f9657679"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4355.json",
+        "placements": 0,
+        "sha256": "b8fbd042212fd9f54e27617ecb8c36e6834dd1b69f0a5447ff6a470a74844add"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4356.json",
+        "placements": 0,
+        "sha256": "e0839e2987d3686f16d83272615eadddc6661d15d75fa673d396f973666cecae"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4357.json",
+        "placements": 0,
+        "sha256": "c3c419e1ed5d9a662cc876899e04eaec1997ccaa56a11f9e224d53f84aee013a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4360.json",
+        "placements": 0,
+        "sha256": "7ebd18f54a80dd6d53baf989cbe1718a25f8e5a392cafc528cd94462b99f678d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4363.json",
+        "placements": 0,
+        "sha256": "fe555e8fc3e55643c0e7c164586c6aebe11b2fbe4589da8902fca1806bc66311"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4364.json",
+        "placements": 17,
+        "sha256": "871ead58a86e1893503f264173576a5d11dda5816f7d9c6af6881a4aeedf0e8d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4365.json",
+        "placements": 167,
+        "sha256": "ce481280d02a65e015ed5e5b988dd589b1d2a10afc58b0d048d461e8b59c7bf1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4366.json",
+        "placements": 6,
+        "sha256": "9058cca9e579005ef62507f61f3d0ee748bff5f4634211f188733c8948f274cb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4367.json",
+        "placements": 166,
+        "sha256": "0891946baf7b2d049219eb75c8debfaeeb3019045692de6655abdd1cf71506d8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4368.json",
+        "placements": 3,
+        "sha256": "700a5cf2997d759a2b8abaf2ac2ceb4a1dae92c831fe31de78f4d3d133cc3313"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4370.json",
+        "placements": 577,
+        "sha256": "18a9c20cdfed830184f5c923c7adb4cc66abe04d319ed55ff904aaf69a13e05b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4374.json",
+        "placements": 399,
+        "sha256": "2e0ce9a7bf1acc2fb6cceff521f0062034e1878ee39eb218c43b3fc4e48fbfde"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4376.json",
+        "placements": 2,
+        "sha256": "7ee4add7ebeea30c91b6fa0fdb2588f429e6d747dd1df25aee99d0c248018294"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4380.json",
+        "placements": 1,
+        "sha256": "41142484ba6f8874dcf8fc866254f70edc2640789395a90a669afa71c11d5e7f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4381.json",
+        "placements": 1,
+        "sha256": "50673f51e651a3f3bf1b7022c12b4b527376e5a0d5dd7c8192b673c4688f664b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4382.json",
+        "placements": 1,
+        "sha256": "458d5796015ce31b80b7ce3c2e2a9ba050a8be2d9705a0d4b7e0d5daff6bfdc0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4383.json",
+        "placements": 1,
+        "sha256": "d581fbb981d45b22576ab46d6c5bc2075d917b293b383dc33656d4265e5f9637"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4384.json",
+        "placements": 1,
+        "sha256": "62a59ad68685f63685f9931470a4369f3806468554379c46f157bceea0636bfa"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4385.json",
+        "placements": 1,
+        "sha256": "3df883ad0ab7dd1ef84ba49daf92c14ba085f24544b03d202fce1e970a715938"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4386.json",
+        "placements": 1,
+        "sha256": "53fdccf7cc3ba3112ac9f2470454f104595c69a7112e3bb2b6e1cb10b4588c76"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4387.json",
+        "placements": 1,
+        "sha256": "44060fe1fc91370681b73388630764a6dc18dcaa0495a786a7946f86ac488351"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4388.json",
+        "placements": 1,
+        "sha256": "264373550da9a1c606bda97119d1a9f43c5afa26f97142f271db7e8a1be22dd6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4389.json",
+        "placements": 221,
+        "sha256": "8aa0c952afa8fb38b6fbf809ffc61b18ce5685cf13bd339c24635cd7d5214856"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4390.json",
+        "placements": 0,
+        "sha256": "8391dc1d22866cbbb4fd97a3343d7eb448ed2e4c5653b9f7ebc8b69117e8fe29"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4391.json",
+        "placements": 43,
+        "sha256": "3abbbd72ffe407e8732d229ea9322eb718b1bd49b7fdfc3cef52d82ad1f9fa75"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4468.json",
+        "placements": 30,
+        "sha256": "3f560260bd3b7b97b0e85e1ac4cde7596fcc821abb4823716a7535cd5797a059"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4474.json",
+        "placements": 1,
+        "sha256": "c66f9a56f067fcad09c479259d68ffffc1477398e18a6278934fbb20cedf91e4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4475.json",
+        "placements": 1,
+        "sha256": "5a24a1512e608a57bdfc3f8a0f871353c2f6402287c6322aee0ee11564bf0308"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4504.json",
+        "placements": 319,
+        "sha256": "eaff822c76eda002ac55530adec6f8a1843e5918110d9d4a9695a9e9ed66ea6a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4505.json",
+        "placements": 688,
+        "sha256": "064dc3427b4c845d12d037d83db752751910ddf40c5b15172efea91ecca814f2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4530.json",
+        "placements": 2,
+        "sha256": "2d6cafdc847e267cdb12b6b72b0e10bd4c1c9124e7f756641bcaf4a8540c928f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4531.json",
+        "placements": 24,
+        "sha256": "913db41956cb20ecb8133651e34c0a0423afe0ceffb96e6afd4ac99b63a93907"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4532.json",
+        "placements": 17,
+        "sha256": "410522110359994afa4c5cf7a878c9b124e9498d55e5ccf1b48494bbe28dc64b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4533.json",
+        "placements": 20,
+        "sha256": "d198b2b619e63146881bd9bffc0e0074b0ac34225af30026393e1d8a39f7ede2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4534.json",
+        "placements": 0,
+        "sha256": "86df04accba020495509000f43cff5283fc59cfa3268ca3a46b940812e5ec6bd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4540.json",
+        "placements": 1096,
+        "sha256": "48ca5ae3f08f658e76ebbac4fc93fdec8f23106c11b608bd93dea79b744bdd9e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4541.json",
+        "placements": 436,
+        "sha256": "a812eacd7896e1c0aa2daeadc77d1dd2df58a9f4250038c95e03bb3fd654eb4b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4542.json",
+        "placements": 643,
+        "sha256": "fe30ee1b5d116d440c7e4425317951acf8e5a3fde008a06c069fbd860c84f806"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4543.json",
+        "placements": 1404,
+        "sha256": "3d356bb46854cae5562007becca84653924f476be23c30aaa3168acc33985c64"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4544.json",
+        "placements": 1048,
+        "sha256": "bbba4476b9257242774f1beb281dfed4bbe6e1a81dba0b4b880d0acd8a74708a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4561.json",
+        "placements": 3,
+        "sha256": "a51ef691ddeb4ac8503f0283a2e8bb76748bfa89b28e53186c0c219abd1b63d9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4563.json",
+        "placements": 0,
+        "sha256": "066959aa04164a0ddd7111a642bffd47606c1cc16f74dc1fe73666afa818c923"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4564.json",
+        "placements": 0,
+        "sha256": "26a2f387e21ee854e3f58a105df0a2bffd1329803a4e8dedf18ccfc9ba3878b8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4565.json",
+        "placements": 0,
+        "sha256": "66c91e2a53c65341853e331022b47bd20828ba2b1778acb818491314b766a49a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4567.json",
+        "placements": 0,
+        "sha256": "03120a14ab4e98d4c8ff149c4baed4becaac2eb371e43ca4a9cac7bfa55c8251"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4568.json",
+        "placements": 0,
+        "sha256": "3a722f7ab570c1c8d5eec257fe7edef5971d198ac79e1af8c61448ba68f10b03"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4569.json",
+        "placements": 0,
+        "sha256": "05d5cbdfca420d0292a44f12ac39a2ea9678122f91e4afc8f9b5ee84f09289f9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4571.json",
+        "placements": 0,
+        "sha256": "77dee4c0126c64aee888cd23fdb5bb4218e9cff46c22af5291fb3387ea425a42"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4572.json",
+        "placements": 0,
+        "sha256": "4b4c09c809183176d8543688de0e01edc8ea76cdcb0b510e0ea90637e3b6f7ba"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4573.json",
+        "placements": 0,
+        "sha256": "b3a8a0d5aa69c23b78b1344693d61a9e4ebb0018e827ea765455c335199d6ac4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4575.json",
+        "placements": 15,
+        "sha256": "9a7b0e2fe0d29afa7c7b87abd637f2f2b30dd932d58c50241429c7aead86a487"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4576.json",
+        "placements": 15,
+        "sha256": "4822fbad38f6f676f2fb3885a78c8786e4ba3e55652eece5f65b56eaca8a1854"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4577.json",
+        "placements": 14,
+        "sha256": "fb05205c86cad12b12581bc49052c8f50f36349757db3e13965e18cc215e5f9a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4582.json",
+        "placements": 207,
+        "sha256": "94429fd9d220d3984c2c4500869e17fa2500b6c299261b109dbb2052580cb509"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4604.json",
+        "placements": 24,
+        "sha256": "dbe752259793a3b32107931eea32cf0940478b42f959f89655b8644a168725f4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4605.json",
+        "placements": 765,
+        "sha256": "fa7ba94618b5cfa3588cce501d922ee5d1774efb4b8723951853ba39cdad6636"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4621.json",
+        "placements": 210,
+        "sha256": "6ec2d8b7b194cf1664026347ed3258b05de1a35afa51e667c45be5b2665d4e24"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4622.json",
+        "placements": 231,
+        "sha256": "495e3354e9881b403d5899f8c537e900a8215b234949e2f7d581c80abd2bd6e6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4623.json",
+        "placements": 214,
+        "sha256": "d0749698daf42158909cc85bd24561d89193cae310c7cbc069337cde53b83c47"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4624.json",
+        "placements": 235,
+        "sha256": "93fb29054a8e12059e901b02ff40fc4dfd0031d334ee8f16c4913941aa0e68fa"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4625.json",
+        "placements": 209,
+        "sha256": "f745f9d005691d9c5cf00f9e5721ddaf957dcd25b310e9e71247a71b2c2f44ad"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4626.json",
+        "placements": 231,
+        "sha256": "cdaad706567087df44d34edbf1bb9dc31c93805506491536f263b6765bf954da"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4627.json",
+        "placements": 211,
+        "sha256": "0f0b132effbca6b235d7442003ba90052df347d745b781d08c21f72dfbccd488"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4628.json",
+        "placements": 232,
+        "sha256": "f917e9751cd24bac19747e5dffb08036d8f379bf388054902e21eab5a1efcdaa"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4629.json",
+        "placements": 193,
+        "sha256": "89eb9bdbffb082a62517cf3dfab43c5a62371fbe2a563dda1e0fd4a3afeced97"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4630.json",
+        "placements": 231,
+        "sha256": "8aacd0717072a47007326d60d1390e1878568dbc61f0fe6384511432c665360a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4676.json",
+        "placements": 22,
+        "sha256": "6e3e26c84d9442ff2ee1c791c543e02ebdf0bf580e945978fc59cccfe48ac9cd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4677.json",
+        "placements": 18,
+        "sha256": "c040f40acfd5f372801099f9faae9f65e203e8b717d0f0acd36c5dd02ec4c713"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4678.json",
+        "placements": 24,
+        "sha256": "50623224167013b313aa7db3dc2cb69dc868a2fc49cb4a5d695309114f3a6778"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4679.json",
+        "placements": 15,
+        "sha256": "504db27f93e877be5157a3076f5a33ade9add24e85161b9a0c104d5f89b42b0c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4680.json",
+        "placements": 24,
+        "sha256": "ae39e06b4d43b0d4757b124dff2a8e59528331faa5a165f2f8c14bc7c4e7d4d7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4681.json",
+        "placements": 15,
+        "sha256": "ce05b7aba71ea86e3eb4e1f8ad4cbbb0af09a93962cfcd62dc3d4b68404fa50b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4682.json",
+        "placements": 16,
+        "sha256": "519f2152585a9d86f09a99617bd16d49723cc6bb7abf39e098d5c79526a948b3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4683.json",
+        "placements": 17,
+        "sha256": "2a56eb82a4687e6932cdbac699c1c466ed4d36d029273bdd0c0525b040c0304a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4684.json",
+        "placements": 15,
+        "sha256": "92f408d36ab6a3821731e81b26343923006c11f2f19894058bff8ee832568c0e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4685.json",
+        "placements": 11,
+        "sha256": "1f4b4cbe65a1c6f6cfa9fb68c38dab6a64e522a266a38f7cdbdddc492f06a4ff"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4686.json",
+        "placements": 15,
+        "sha256": "90a9c3fe018bfdb0991fa04d12ac54eb7931de0504c6c767bc42356d7e53bab7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4687.json",
+        "placements": 11,
+        "sha256": "7d16aa616b75d90f5e2848601519ca447c68e7971979323cee56dbe237865063"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4688.json",
+        "placements": 14,
+        "sha256": "1142b172e252e7dc2ac92c92e278b0d5914ccc7a49b218224caac7cd446e0902"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4689.json",
+        "placements": 12,
+        "sha256": "745e476a4d2ea0b1abffd4a8c33b3b09bdad295eda536e81056ae39929c13d0b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4690.json",
+        "placements": 14,
+        "sha256": "ddefd28c134a53070e118c4ab09b360457ece040b245c52855e34327423fed42"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4691.json",
+        "placements": 12,
+        "sha256": "8d269776e01278268ab5b2e67604c849cb40abe476d7af3757f5db6eba53c8e3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4692.json",
+        "placements": 14,
+        "sha256": "20dab8bcb534bdaa189c61ada7470d61aa694dd067c526efc82075ec40d23d95"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4693.json",
+        "placements": 12,
+        "sha256": "ee4847482cfd74b6616950c62b60a3e91feba4952ac3e20cdad80f05810c543f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4694.json",
+        "placements": 14,
+        "sha256": "52335375fd8dcd0ceeed7f73cea22a4fa08ac5ef68d12ecd11c1a79f9d4897f1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4695.json",
+        "placements": 12,
+        "sha256": "c67cbd1270a5eb296a3ff2cbc780629ac0e6f4b5f36e02ce68b9e45ab00265ab"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4696.json",
+        "placements": 90,
+        "sha256": "0b93e248abae0fe1c62f2f08e28fb6ec83e927be92dcdd6914b9ea2deeb3c86d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4697.json",
+        "placements": 80,
+        "sha256": "7ae5e0ead376548fc058999666c63783719cc477758dbb08d38e0bd04e907c8d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4698.json",
+        "placements": 10,
+        "sha256": "84b7042ae9a8688624b3e95d820673f2c257e59dfd71d87432034ae1c1d0da2c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4699.json",
+        "placements": 10,
+        "sha256": "98cdf6e5c3f1b5a084802878635c97defbe9fee19dfa68d30fe47c84dd30096c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4704.json",
+        "placements": 0,
+        "sha256": "00ae13d97b998accd7f692c4f7003e9907965750ea9cc6b1215e369c53f2d253"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4805.json",
+        "placements": 0,
+        "sha256": "ec6a71c175a68848b24a6c4850d786c1e6025500f815c2543f88fbff49ebb4f7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4833.json",
+        "placements": 1,
+        "sha256": "b7d7709e5a8ea8f8a21039af988778ad1bebed4b7ca27f10140ace1b9670cb4f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4872.json",
+        "placements": 1068,
+        "sha256": "1bfc60e18cf3c3fb8684d24e0d52df70c2be598805cb05822668bd708983f5b6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4873.json",
+        "placements": 179,
+        "sha256": "824a9609f88c3cd7357ea3d37be1c7a865abe5e83e92eacddcfb8218f07ae530"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4877.json",
+        "placements": 6,
+        "sha256": "e6f6bce7eeb0a2704fd419e2668676560672e3802e2a79cc8e7dc4f40ba90c12"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4880.json",
+        "placements": 937,
+        "sha256": "fb4eb28b1f5c05b4e9f35adeef836106aad8a4a475b28244fc990d07a25f27b3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4881.json",
+        "placements": 469,
+        "sha256": "398b841a149fedd6e2195628b35531fd04a2b1713ee3f451d59a9d34ed98a038"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4885.json",
+        "placements": 0,
+        "sha256": "6b96ee0bedbb656029848af204de0b261279f94374c30107468196a64de44fca"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4894.json",
+        "placements": 0,
+        "sha256": "31af76d98619def517d8e02d2757a52bff96ae2e143fa8c87a4b3cac6eedd6e6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4898.json",
+        "placements": 0,
+        "sha256": "cdbb9e38eb4383e89eb9c1fc6626a336bdf1e299c3d489e04db7b277f8473e03"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4899.json",
+        "placements": 0,
+        "sha256": "6f999b737da289334c5f6e6df6433cf7e4c559ccbf98decb7678ec870109fa17"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_4900.json",
+        "placements": 1,
+        "sha256": "5fae67d2e17b35f9f3eb1bc160e47f77fff95fc909c6de2bfb5424a85e5384a6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_5001.json",
+        "placements": 0,
+        "sha256": "2a8a148726c620585589921a76d05806c104bdad19a6faa75db36a052d4c71a1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_5002.json",
+        "placements": 0,
+        "sha256": "422c82ec68e0ca5c15decc4f1cbce7b4d399ff990a3a3d6b11143cd5e89a13a9"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6001.json",
+        "placements": 0,
+        "sha256": "3d37011f55ed954a84c182a295cb6bd2033cbebdf2703637105564f31e291e1e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6002.json",
+        "placements": 0,
+        "sha256": "6eff1d00078a4a44dfbff6328fd754871d6722edffb16ae136bd494efa2385a0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6003.json",
+        "placements": 7,
+        "sha256": "f8e737b0b6f902fca29fdb520ec00b7f127ceb948255e8d2b49569c60fa308d8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6007.json",
+        "placements": 13,
+        "sha256": "c7d94649ee6237a0999fb6b6b2a9df1c61468a5a46a2964219b6af564a32777c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6010.json",
+        "placements": 0,
+        "sha256": "0ff3e927f988ee8203d3b6a17af7e5e28ebc9ef2fcd5159b75bc4cae50dde9cb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6011.json",
+        "placements": 355,
+        "sha256": "e42b8a4637190483761134653a668d1438ec241f93b53722cce364f8243d728e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6012.json",
+        "placements": 448,
+        "sha256": "1c257ac37fccada26eb020c0f1cf5f7a481c82cd2f160f0945d3747d287d68be"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6013.json",
+        "placements": 33,
+        "sha256": "3631c80fcc51f8e43376ba2f70ffa16f00d3da4331b7ebdac62089709d339cc3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6014.json",
+        "placements": 22,
+        "sha256": "2941daaffad7689191b1f38a4d447a48230a5b503de6740d727608fa5ed4b7a4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6015.json",
+        "placements": 9,
+        "sha256": "b97af65e1c9c69d251449deedc4103f0ea9d95f4812d9fa911e83de69c5da183"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6017.json",
+        "placements": 1,
+        "sha256": "4728b4d8123d58772d8371c0ccdf76551d4a03a723e672bc27345e69346e120f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6020.json",
+        "placements": 11,
+        "sha256": "070115f2331cf1c56dbcb958396f724f473f3005507fe9d89230b3286c8a0251"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6021.json",
+        "placements": 16,
+        "sha256": "1ac4e98c30c9264e988915242b33b6ea08c2bee32264239f909fa4f49645f17f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6022.json",
+        "placements": 25,
+        "sha256": "1173cb342495a08d666453540d34a243b4478c8c18cf788bc059d48ac1928d38"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6024.json",
+        "placements": 25,
+        "sha256": "81a17acf6f3d897d9d7dfd9d7efe4f7bf4750c56aab7bf897d348b865bf5fb06"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6026.json",
+        "placements": 7,
+        "sha256": "887159ac2ed9de5801b1a21a717a746a9bee92e4f6079a95d70f420f8ffa120d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6028.json",
+        "placements": 31,
+        "sha256": "ffe648c5979e2d2136767dcc264d0752a6fe017710f35eb8751ba9e929891e10"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6035.json",
+        "placements": 74,
+        "sha256": "7ca7c5d521f83ee96107db9ef1af0b0a5eed006342fd43d4e3287ffab76e710f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6036.json",
+        "placements": 15,
+        "sha256": "67a32bec16ddf05f4e094d910aaaa70369dcc87d66585f28bab0c3070cbec063"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6041.json",
+        "placements": 19,
+        "sha256": "5a5bfa0742789efdf14c26f17daf650110529a1098348f52aaeae3cf5d2dd110"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6050.json",
+        "placements": 252,
+        "sha256": "a0d48a69b7108686dd07c708f958ee8742b2d67eb5cfd7a01646b8b11ad001fb"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6051.json",
+        "placements": 1,
+        "sha256": "3eaca80059062439a53b4b6c3c0327ac55fc04aef0a09043e404adb81ca9a4e7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6052.json",
+        "placements": 252,
+        "sha256": "dabe12af96889c3787d409f6d2fe0fc0e91cd1e5774142108790e2fb0b0c6f34"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6055.json",
+        "placements": 14,
+        "sha256": "1a0bfdc6d8d247a1a2a499a36f6174037b2dee9d96e07c8c3b1165759ae7428c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6056.json",
+        "placements": 2,
+        "sha256": "06d508d6d2ba6546443b12761876a9d67dd9151aeb575d2ae34d06fd6792b9d8"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6057.json",
+        "placements": 2,
+        "sha256": "404bc1d710066712589d18da60e44a00fcbc4f8cbfec97e1c291a9aa5dd97416"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6060.json",
+        "placements": 0,
+        "sha256": "2bb090f16500c2f643cbbd205b84db305d1e108f54d00a55a48481b77eab09d4"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6061.json",
+        "placements": 2,
+        "sha256": "c5986ac826f89110ef80fe2fbd25089c5a9139c5c8c2e50f7b8357e4379199ff"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6071.json",
+        "placements": 14,
+        "sha256": "66197277f9316845cfc996f362a329414160367a74bf738a5f48c547a91569ca"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6101.json",
+        "placements": 0,
+        "sha256": "ed2daf53ce39bdf37e5023857546f7e975b28e88c57094f941cfc2f63a177496"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6102.json",
+        "placements": 10,
+        "sha256": "53473b785868a7c433d1bcd2d1f18738b605e3e990e49703926772f37a010aed"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6104.json",
+        "placements": 1,
+        "sha256": "074b2f6ded3a8e58ae28b51f6a11f7b762ab5bd44193950046a2a1065f84484f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6111.json",
+        "placements": 2,
+        "sha256": "5781ddd9c53bacbe84953952b8cca49a44107ef588eb3cf1d2bb3827489a3692"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6112.json",
+        "placements": 18,
+        "sha256": "64e37a0c3643319251e03676fe240f4268901bda1b09449df52055d0ec5fc6f0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6113.json",
+        "placements": 18,
+        "sha256": "81bad81d96912cf4c65ed5a217815c2d73b8dbe989d9aad9c0e5e703052a8c6a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6115.json",
+        "placements": 2,
+        "sha256": "8a74b91cd37ca009e86f5d86fa042208c8f9fbbc8ba5a8dbbb7851b596a4e35c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6121.json",
+        "placements": 2,
+        "sha256": "f5d5cf45c14bc6d7b4a8e82920ac62b4d6293ed82688b0c14392b46457d63b18"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6123.json",
+        "placements": 63,
+        "sha256": "2943b3bf7e427aae4e96cf2cecb1a0e5e365b3e5cda2bba62a0e9eabeb62d526"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6125.json",
+        "placements": 2,
+        "sha256": "ef88aac0a6778e131847d25193e00662f12fa27185b3c92f80d92aab563d020a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6127.json",
+        "placements": 0,
+        "sha256": "208ba82bbcf122ae63ce64b3205ec871f72b6efb94573f29dfda94ca429532ea"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6129.json",
+        "placements": 4,
+        "sha256": "e1b43cff3e691b44640ee1c43c8dbdcedc444ce6f802c5aebf86f44e08eef556"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6131.json",
+        "placements": 2,
+        "sha256": "7052959effecc2cd054e3e06f14b4fd870cab2857e6088c6de0950acdbc03b6c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6133.json",
+        "placements": 1,
+        "sha256": "3d377685e70b01e030beeed4822c4d25c28d4c06a5c75d66845bfaf8798f6e93"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6211.json",
+        "placements": 26,
+        "sha256": "00f2d061bfe5c4da91c38014896a6893ac97996d44881c5cec4c5413582248a0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6300.json",
+        "placements": 25,
+        "sha256": "f688fcdfbf45ddafa21f178aed208c254791a9e9deba7d93d3a0fa394769bd3c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6301.json",
+        "placements": 25,
+        "sha256": "29da4880d8c9f3ea04a1a0f401137c6c53e804a8a08bfb27e864773b1dcc27f6"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6302.json",
+        "placements": 25,
+        "sha256": "80074c0015db2f992f2505c502b75a6ecef39e462c456d6d57ef93c0926ed4e3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6303.json",
+        "placements": 25,
+        "sha256": "4fa68c923e66a8b0bdbc28b17045e7b382c3bf4d688b360a141d6606ef0b8040"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6304.json",
+        "placements": 25,
+        "sha256": "f3635f04f8ac8e2acc5501c6634e2c8761fada5b7cc558a007f7444c74d223cf"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6305.json",
+        "placements": 25,
+        "sha256": "ee39f9668980cc8f56444ebc86bde3385f2a5c654b88644fdf4c1f99746c3ca0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6306.json",
+        "placements": 25,
+        "sha256": "c1ae5ca14050f32ef55bc393887d96174cd0060e32dd217504eb3f7a0a29e67a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6550.json",
+        "placements": 75,
+        "sha256": "1fa9afbf51933d1edf1f5cc84f099128d402048a25b1a03535350832a2a38d7b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6551.json",
+        "placements": 93,
+        "sha256": "393a30747870525392f2513c0ddafc9bcae58a2c07764acd23b604ac29c7ce77"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_6553.json",
+        "placements": 377,
+        "sha256": "76825ae030e598a607ecacbbe15f739cbe5d16d5d98240ead2dfdf6ca641a7e3"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7001.json",
+        "placements": 12,
+        "sha256": "c0d569cab6ae0b6771eac531ee91a43a1f3b8095f0dcf3ce0c5b81b5830e5cdd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7010.json",
+        "placements": 2,
+        "sha256": "e7073f597f513139f30bb5a03d9216c7f36dc5ccf2dafb312e8a1b90b1db0db2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7011.json",
+        "placements": 7,
+        "sha256": "b809c97bb7aa92741531000510ef5abf66e9bef739c6d2cbe2124be80b2a4973"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7012.json",
+        "placements": 7,
+        "sha256": "b5554d0f52b688cfbc363961f3c82c4993144127d6f9f0bc411820c01b6dc63d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7013.json",
+        "placements": 6,
+        "sha256": "232c7ebb974b9e8efbee218f48f61fdfff4fae79d09f59a78473770be97dcc2e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7015.json",
+        "placements": 115,
+        "sha256": "363c67f2558b48ee142078c36bace3da36e3d269858cd1214bfa35805620de3a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7018.json",
+        "placements": 1,
+        "sha256": "fa721ee84dcc804d96b5d1f81436d964b1c39e03d6ed980badb71b106fc9b100"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7019.json",
+        "placements": 1,
+        "sha256": "a0a9d722662882897631bf67d199e6fbd5473655f6bb126f7a9492ab235c3a67"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7020.json",
+        "placements": 1,
+        "sha256": "bfa35b17c4901d0bb6a876698d24daa1592e6e798788f80acc3e313d152d651d"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7051.json",
+        "placements": 8,
+        "sha256": "17ff78bf008f78a5c87a1a1093e0a8b91b3e5f24f8c8e6091a4111ffcfd265dd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7054.json",
+        "placements": 8,
+        "sha256": "948e1f73fd4043332c78072cb4c924d65fe8148c00db7b81a50970ed946c9ff0"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7092.json",
+        "placements": 14,
+        "sha256": "46af112e74595c4158cd5a2ae9ebf7f69ed8bf471319f562c7cb969bb1dbff01"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_7101.json",
+        "placements": 2,
+        "sha256": "8f2d7c930593062b3d23914f732cba87233bfd5bde58179e1b70c72142a3d46f"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8002.json",
+        "placements": 0,
+        "sha256": "d08281ce55b5ea8573f05a768185bf3e6beaf741e11b710d682e0bf7de7fbcde"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8004.json",
+        "placements": 1,
+        "sha256": "dce7e2d988a96dbdb5bf9f3c97540709acfc79794258f0879afbba4f4588517e"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8006.json",
+        "placements": 1,
+        "sha256": "dd8e6f87a0c4bba17484db83a145367718889d8e921e2ff3b9ef7c33c329498c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8009.json",
+        "placements": 1,
+        "sha256": "611c87f9c5402896fbcc8a18e23a2eca7808dc5904d4f03a73d13713fc590e1a"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8020.json",
+        "placements": 51,
+        "sha256": "950d997b99b83c035b2caac32f222a4f1b83e4352a2a8c477b023e8e4a45657b"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8030.json",
+        "placements": 1,
+        "sha256": "13fae73c0e9786c3445be5bf750ce8e495e0037b8e55e962d8c716a5109cd539"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8040.json",
+        "placements": 0,
+        "sha256": "f3b2b425451489e12b3b601d2bc0f45bd6de226f5c35b085a03b3bc644ace765"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8045.json",
+        "placements": 0,
+        "sha256": "f950d2c54a9543a7005a1bf5b1ea647784b060ed3e081f0c1c7a00434d0d3210"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8046.json",
+        "placements": 2,
+        "sha256": "135a3def21ab060dccc2af40f15aff13afd2099c6577213121bf51de6c301327"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8050.json",
+        "placements": 2,
+        "sha256": "610dfef800e2e4d384a1d12f7b76f4e92c0245027b9226511f6291257f4178d2"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8060.json",
+        "placements": 1,
+        "sha256": "cec933d2578a91d7c4a33f960c95d3fd7238b8005ad3bb4f9c2f248ce9f129a7"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8070.json",
+        "placements": 1,
+        "sha256": "2acf6815d7998609d84af3340d3da39a659eb2a4284a5cd92ad8899ed3cb0469"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_8080.json",
+        "placements": 2,
+        "sha256": "a503361863ac90b85cb52f484d71ffad0b6ff6633da3a508ac774d975fdd5843"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_9041.json",
+        "placements": 84,
+        "sha256": "a3620ca0516906a285908530df2af8f71029c5182c3d5ebba2a341bb6d7b39e1"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_9042.json",
+        "placements": 18,
+        "sha256": "75ca24f73a89e9ea70ab81b518b03c00822625202aa7823269601943daa7a2cd"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_9050.json",
+        "placements": 8,
+        "sha256": "9357e01c2b48ed6308c000dbf20f5dcc3bf4b6da0e8b9d5eb65fb932ee4d0777"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_9061.json",
+        "placements": 205,
+        "sha256": "2a5fd8c36e6218be10b87e049d435d9b49f52b458ed2dc7652b8d3a4400a2cde"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_9070.json",
+        "placements": 251,
+        "sha256": "446cfa9c044add076628bfc0013a040c1392e3796686edd507110957c5ec5f3c"
+      },
+      {
+        "path": "docs/generated/playfields/placements/pf_9080.json",
+        "placements": 1,
+        "sha256": "a636c30b2fae6872c1c4d40fc89886caef30ac1b9fe614d943e6d9f61ebcad79"
+      }
+    ]
+  },
+  "runtimeArchetypeAssociations": {
+    "path": "docs/generated/enemy_archetypes/runtime-observation-archetype-associations.json",
+    "sha256": "5e081486d0c17813e45d655c8429a3a44578a8c9c8513de217099a4ec7178e66"
+  }
+}

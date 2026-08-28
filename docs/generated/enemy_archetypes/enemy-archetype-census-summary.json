@@ -32,10 +32,15 @@
       260512
     ]
   },
-  "deterministicDigest": "6b8c9b999ac7ca23f688a7fb64dae1a7fbc5651693bce8fad2187658004149c3",
+  "deterministicDigest": "8331f65ba07f8dd9e2eca0f8ad16d477549c5fa13450615e54adf4beb8068b2a",
   "enemyArchetypeCensusImplemented": true,
   "gameplayVariantsIdentified": 582,
-  "harvesterDigest": "2a01a3a78c7429adb825698bdad25750ecdac8226becc72d4e20c86111c427b8",
+  "harvesterAcceptance": {
+    "acceptedCapturesProcessed": 358,
+    "npcObservations": 3472,
+    "sentinelAuthoritativeValues": 0
+  },
+  "harvesterObservationDigest": "f6f33a45e14e1a89fa21fd26961fe3f1b0c68b5d89faf69184f0238b20f35689",
   "heckler": {
     "baseModelFamilies": [
       "base-model-6fda5cc83f212282"

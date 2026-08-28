@@ -2,26 +2,28 @@
 
 ## Active
 
-Complete and accept the deterministic ACG-to-MonsterData Resource Chain Audit
-without changing production NPC definitions or inferring a placement identity.
+Complete and accept the deterministic AO Spawn Population Reconstruction layer
+without changing production NPC definitions or inferring exact placement
+identity from population evidence.
 
-## Current resource-chain checkpoint
+## Current population-reconstruction checkpoint
 
-- Both verified official client variants expose one active B-tree resource view;
-  EP1 and EP2 have byte-identical ACG, PlayfieldDynels, CATMesh, and MonsterData
-  records. The data segments are physical shards, not expansion overlays.
-- The active view contains 460,193 records across 50 resource types, 32,805 ACG
-  placements, and 1,470 MonsterData records, with no duplicate active keys.
-- No direct or indirect official static ACG-to-MonsterData edge exists.
-  PlayfieldDynels also has zero decoded TemplateId or identity-instance matches.
-- The client runtime chain instead uses server-authored SimpleChar stat 359 as
-  resource instance `1040023:<MonsterData>`. A separate Nano stat-359 path
-  statically references 231 MonsterData IDs for spell/morph behavior, not spawn
-  placement.
-- The accepted classification is
-  `ACG_MONSTERDATA_RELATION=SERVER_RUNTIME_ASSOCIATION`. Deterministic catalogs,
-  raw forensic samples, proof cases, and source hashes are published under
-  `docs/generated/acg_monsterdata_resource_audit`.
+- The 32,805 official placements now form explicit structural ACG policy groups
+  and separately labeled heuristic spatial components without assigning mob
+  identity to proximity.
+- All 3,472 accepted runtime observations retain server-supplied MonsterData,
+  archetype, name, level, transient identity, movement envelope, and
+  field/category coverage where observed.
+- The current corpus produces zero exact-placement associations, 766
+  local-population associations, 1,397 playfield-population associations,
+  1,029 unassociated observations, and 280 phase/lineage conflicts.
+- The catalog contains 18,423 topology/runtime population records. Only strong
+  existing-overlay local associations are population-implementation-ready;
+  corroborating and heuristic evidence remains fail-closed.
+- Deterministic catalogs, readiness inventory, reuse analysis, and
+  Leet/PF4582/Borealis studies are under
+  `docs/generated/spawn_populations` and documented in
+  `docs/reference/SPAWN_POPULATION_RECONSTRUCTION.md`.
 
 ## Prior resolver checkpoint
 

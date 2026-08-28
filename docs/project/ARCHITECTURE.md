@@ -70,6 +70,22 @@ sequenceDiagram
     Z->>C: ContainerAddItem ack / corpse despawn
 ```
 
+NPC population reconstruction uses two independent identity axes:
+
+```text
+STATIC:  ACGHash + playfield + district + coordinates -> placement/spawn policy
+RUNTIME: SimpleChar stat 359 -> 1040023:MonsterData -> CATMesh -> visual archetype
+```
+
+`ACGHash` is static placement/spawn-policy identity, `MonsterData` is the
+server-selected runtime model/archetype identity, and SimpleChar runtime
+identity is a transient spawned instance. The effective client resources have
+no static ACGHash-to-MonsterData bridge. AORebirth therefore reconstructs
+reusable contextual populations over the ACG topology and retains exact,
+local-population, playfield-population, unassociated, and conflict scopes
+instead of forcing every runtime NPC onto one exact ACG row. See
+`docs/reference/SPAWN_POPULATION_RECONSTRUCTION.md`.
+
 ## Class And Module Structure
 
 Important files and directories:

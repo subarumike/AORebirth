@@ -1,0 +1,35 @@
+{
+  "currentOfficial207Overlay": {
+    "authorized": 199,
+    "blocked": 8
+  },
+  "currentSpecializedCatalog": {
+    "active": 199,
+    "blocked": 7,
+    "explicitActive": 35,
+    "generatedProfileActive": 164,
+    "source": "docs/generated/pf4582_authoritative_placement_report.json"
+  },
+  "historical25Active181Blocked": {
+    "active": 25,
+    "blocked": 181,
+    "source": "docs/evidence/PF4582_OFFICIAL_SOURCE_RECONCILIATION_20260825.md"
+  },
+  "observations": 1474,
+  "officialPlacements": 207,
+  "populationCount": 109,
+  "runtimeDefinitionsModified": false,
+  "runtimePopulations": 70,
+  "scopeCounts": {
+    "local-population": 38,
+    "playfield-population": 32
+  },
+  "terminology": {
+    "199/7": "current specialized catalog active/blocked",
+    "199/8": "current official overlay authorized/blocked, including NCNN",
+    "206": "accepted specialized AORebirth source records",
+    "207": "official EP1 placement records, including NCNN",
+    "25/181": "superseded historical activation baseline"
+  },
+  "topologyPopulations": 77
+}
