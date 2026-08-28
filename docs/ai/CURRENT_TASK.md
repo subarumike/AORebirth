@@ -2,15 +2,33 @@
 
 ## Active
 
-Complete and accept the deterministic AO Spawn Population Reconstruction layer
-without changing production NPC definitions or inferring exact placement
-identity from population evidence.
+Complete and accept the byte-accurate official ACG placement/spawn-policy
+schema without changing production NPC definitions, reopening the static
+ACG-to-MonsterData search, or using runtime enrichment as placement authority.
 
-## Current population-reconstruction checkpoint
+## Current ACG schema checkpoint
 
-- The 32,805 official placements now form explicit structural ACG policy groups
-  and separately labeled heuristic spatial components without assigning mob
-  identity to proximity.
+- All 32,805 decoded official `HashSpawnPoint_t` records are placement-ready
+  from exact official byte decode alone.
+- The 16 scalar field kinds, conditional sections, district/container schema,
+  native parser/accessor evidence, statistics, flag bits, and raw bytes are
+  published under `docs/generated/acg_placement_schema`.
+- The former 507,976-byte trailing opaque region is fully decoded as the
+  zone-to-district index vector. Only 45 inactive allocation-slack bytes remain
+  opaque and are retained losslessly.
+- Orientation, grouping, radius, probability, and flags remain explicitly
+  partial where the official client proves stored properties but not
+  server-side enforcement. Spawn count and patrol/path references are not
+  present in the decoded record.
+- Population reconstruction remains optional runtime analytics. Its 18,423
+  records and 22 population-identity-ready rows have no placement-validity
+  role.
+
+## Prior population-reconstruction checkpoint
+
+- The 32,805 official placements feed analytical playfield/district/ACGHash
+  buckets and separately labeled heuristic spatial components; neither is a
+  proven Funcom grouping field, and neither assigns mob identity to proximity.
 - All 3,472 accepted runtime observations retain server-supplied MonsterData,
   archetype, name, level, transient identity, movement envelope, and
   field/category coverage where observed.

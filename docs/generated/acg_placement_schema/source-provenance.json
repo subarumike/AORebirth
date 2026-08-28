@@ -1,0 +1,45 @@
+{
+  "resourceDatabase": {
+    "build": "18.8.62_EP1",
+    "files": [
+      {
+        "bytes": 9437184,
+        "path": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online\\cd_image\\data\\db\\ResourceDatabase.idx",
+        "sha256": "ba152f59096d5358f4d1b6511d3a3d264999e0a59f1ab7bf3a7cc18a4888c273"
+      },
+      {
+        "bytes": 1073741824,
+        "path": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online\\cd_image\\data\\db\\ResourceDatabase.dat",
+        "sha256": "3cabdede7b9b2468ed22f10f536fb2f7083ea05ed9483e2d96b22cf080d736a6"
+      },
+      {
+        "bytes": 1073741824,
+        "path": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online\\cd_image\\data\\db\\ResourceDatabase.dat.001",
+        "sha256": "f8884a2c382ce7c95f20b4423567f176ed40675ba9ce8362527288712871ba73"
+      },
+      {
+        "bytes": 142116570,
+        "path": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online\\cd_image\\data\\db\\ResourceDatabase.dat.002",
+        "sha256": "2024021f966c3c8a8c083e01cbad2335ba33c19a1661a148060391755a608cc1"
+      }
+    ],
+    "resourceType": 1000014
+  },
+  "staticClientEvidence": {
+    "behavioralConsumerBoundary": "Exported native accessors prove property roles. The bounded official client call graph retains the data but exposes no spawn-execution consumer; server-side enforcement is not present in this client corpus.",
+    "gameDataPath": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online\\GameData.dll",
+    "gameDataSha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "ghidraTracePath": "C:\\Users\\Mike\\Documents\\AO stripdown\\Docs\\evidence\\ACGHASH_MONSTERDATA_RUNTIME_RESOLVER_TRACE_20260825.md",
+    "ghidraTraceSha256": "9755443a6cfc5e2c1ce0b1e81447d480f2390a8ff84385c7f3d388e21bba344c",
+    "moduleInventoryPath": "C:\\Users\\Mike\\Documents\\AO stripdown\\Docs\\generated\\module_inventory_report.md",
+    "moduleInventorySha256": "51c34546b88197da337664bc394297d0232118913030e78108fc6aba71e8df0a",
+    "parserChain": [
+      "ResourceDatabase type 1000014",
+      "GameData.dll+0x9DEF PlayfieldDistrictInfo_t::ReadBlob",
+      "GameData.dll+0x49BE DistrictData_t reader",
+      "GameData.dll+0x640F HashSpawnPoint_t::ReadBlob",
+      "GameData.dll+0x1B23 ACGHash_t reader",
+      "DistrictData_t+0x5C hash-spawn vector"
+    ]
+  }
+}

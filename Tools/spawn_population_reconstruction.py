@@ -201,6 +201,12 @@ def placement_projection(record: Mapping[str, Any]) -> dict[str, Any]:
             "serializedSize": record.get("SerializedSize"),
             "recordSha256": unknown.get("RecordSha256"),
         },
+        "placementValidity": {
+            "authority": "official-acg-decode-quality",
+            "populationIdentityRequired": False,
+            "runtimeCaptureRequired": False,
+            "monsterDataRequired": False,
+        },
         "aorebirthOverlay": {
             "sourceNpcId": record.get("SourceNpcId"),
             "existingProfile": record.get("ExistingAoRebirthProfile"),
@@ -251,11 +257,12 @@ def build_topology(
     populations: list[dict[str, Any]] = []
     placement_to_population: dict[str, str] = {}
     for group_key, rows in sorted(structural_groups.items(), key=lambda item: tuple(str(value) for value in item[0])):
-        official_group_id = stable_id("official-group", group_key)
+        # Preserve the historical deterministic identifier while correcting its semantic label.
+        acg_policy_bucket_id = stable_id("official-group", group_key)
         for component in spatial_components(rows, threshold):
             placement_ids = [row["OfficialSpawnRecordId"] for row in component]
             spatial_cluster_id = stable_id("spatial-cluster", placement_ids)
-            population_id = stable_id("spawn-population", [official_group_id, spatial_cluster_id])
+            population_id = stable_id("spawn-population", [acg_policy_bucket_id, spatial_cluster_id])
             projected = [placement_projection(row) for row in component]
             profiles = sorted(
                 {row.get("ExistingAoRebirthProfile") for row in component if row.get("ExistingAoRebirthProfile")}
@@ -264,8 +271,9 @@ def build_topology(
                 "populationId": population_id,
                 "recordKind": "official-acg-topology",
                 "playfield": group_key[0],
-                "officialGroupIds": [official_group_id],
-                "officialGroupBasis": "shared ACGHash policy tag within one official district",
+                "acgPolicyBucketIds": [acg_policy_bucket_id],
+                "acgPolicyBucketBasis": "analytical partition by official playfield, district, and ACGHash fields",
+                "officialGroupingSemantic": False,
                 "derivedSpatialClusterId": spatial_cluster_id,
                 "derivedSpatialClusterMethod": {
                     "method": "three-dimensional connected component",
@@ -647,6 +655,8 @@ def readiness(record: Mapping[str, Any]) -> dict[str, Any]:
         "lootReady": bool(coverage.get("loot")),
         "respawnReady": bool(coverage.get("respawn")) and population_ready,
         "exactPlacementReady": scope == SCOPE_EXACT and strength in {"direct", "strong"},
+        "placementValidityGate": False,
+        "readinessScope": "optional-runtime-population-enrichment-only",
         "confidence": strength,
         "blockers": sorted(set(blockers)),
     }
@@ -725,7 +735,8 @@ def build_population_catalog(
             "recordKind": "runtime-population-without-local-placement-ownership",
             "playfield": runtime["playfield"],
             "runtimePlayfield": runtime["runtimePlayfield"],
-            "officialGroupIds": [],
+            "acgPolicyBucketIds": [],
+            "officialGroupingSemantic": False,
             "derivedSpatialClusterId": None,
             "acgHashes": [],
             "placementCount": 0,
@@ -776,7 +787,7 @@ def archetype_reuse(
                 "localPopulations": sum(row["associationScope"] == SCOPE_LOCAL for row in rows),
                 "associatedAcgPlacements": len(associated_placements),
                 "observationCount": sum(row["observationCount"] for row in rows),
-                "names": sorted({name for row in rows for name in row["names"]}, key=str.casefold),
+                "names": sorted({name for row in rows for name in row["names"]}, key=lambda value: (value.casefold(), value)),
                 "levelMinimum": min(levels) if levels else None,
                 "levelMaximum": max(levels) if levels else None,
             }
@@ -946,6 +957,10 @@ def build_reconstruction() -> dict[str, Any]:
         "pf4582Populations": studies["pf4582"]["populationCount"],
         "borealisPopulations": studies["borealis"]["populationCount"],
         "staticAcgMonsterDataBridgeSearchReopened": False,
+        "placementAuthority": "official-acg-corpus",
+        "populationIdentityRequiredForPlacement": False,
+        "runtimeCaptureRequiredForPlacement": False,
+        "monsterDataRequiredForPlacement": False,
         "acgHashUsedAsMonsterData": False,
         "runtimeIdUsedAsPersistentIdentity": False,
         "heuristicExactMatches": 0,
@@ -1014,6 +1029,10 @@ def acceptance_lines(summary: Mapping[str, Any]) -> list[str]:
         ("LEET_POPULATIONS", summary["leetPopulations"]),
         ("PF4582_POPULATIONS", summary["pf4582Populations"]),
         ("BOREALIS_POPULATIONS", summary["borealisPopulations"]),
+        ("PLACEMENT_AUTHORITY", "OFFICIAL_ACG_CORPUS"),
+        ("POPULATION_IDENTITY_REQUIRED_FOR_PLACEMENT", "NO"),
+        ("RUNTIME_CAPTURE_REQUIRED_FOR_PLACEMENT", "NO"),
+        ("MONSTERDATA_REQUIRED_FOR_PLACEMENT", "NO"),
         ("STATIC_ACG_MONSTERDATA_BRIDGE_SEARCH_REOPENED", "NO"),
         ("ACGHASH_USED_AS_MONSTERDATA", "NO"),
         ("RUNTIME_ID_USED_AS_PERSISTENT_IDENTITY", "NO"),
@@ -1036,7 +1055,7 @@ def render_report(result: Mapping[str, Any]) -> str:
         "",
         "## Result",
         "",
-        "The first deterministic population layer is implemented. It keeps official ACG topology, server-selected runtime MonsterData/archetypes, and transient runtime identities separate. Exact-row identity remains zero; useful local and playfield population scopes are recorded without reopening the nonexistent static ACG-to-MonsterData bridge.",
+        "The optional population-analytics layer is implemented. It keeps the authoritative official ACG placement corpus, server-selected runtime MonsterData/archetypes, and transient runtime identities separate. Its 18,423 records and 22 population-identity-ready rows are analytical enrichment only; neither number validates or gates an ACG placement.",
         "",
         "## Model",
         "",
@@ -1044,7 +1063,7 @@ def render_report(result: Mapping[str, Any]) -> str:
         "visual archetype -> contextual runtime variant -> spawn population -> ACG placements -> transient instances",
         "```",
         "",
-        f"Official topology contains {summary['acgPlacements']} placements. Shared ACG policy tags inside official districts are direct structural groups. A fixed {DERIVED_SPATIAL_CLUSTER_METERS:g}m three-dimensional connected component is retained only as a heuristic secondary cluster and never becomes official semantics.",
+        f"Official topology contains {summary['acgPlacements']} placements. The analytical playfield/district/ACGHash bucket and the fixed {DERIVED_SPATIAL_CLUSTER_METERS:g}m three-dimensional connected component are reconstruction indexes only; neither is a proven Funcom group, encounter, or generator field.",
         "",
         "## Association scopes",
         "",
@@ -1091,7 +1110,7 @@ def render_report(result: Mapping[str, Any]) -> str:
         f"- Respawn ready: {summary['spawnPopulationsWithRespawnEvidence']}",
         f"- Exact placement ready: {summary['spawnPopulationsWithExactPlacementReady']}",
         "",
-        "Readiness is population-specific. Finite loot observations remain contextual samples, and movement envelopes use only captured movement. A current moved position never becomes a spawn position.",
+        "Readiness is population-enrichment-specific and has no placement-validity role. Official ACG decode quality alone governs placement readiness. Finite loot observations remain contextual samples, and movement envelopes use only captured movement. A current moved position never becomes a spawn position.",
         "",
         "## Acceptance",
         "",

@@ -720,6 +720,23 @@ not edit resource databases, runtime NPC definitions, or placement activation.
 The three complete bulk indexes use deterministic `.json.gz`; the summary,
 report, and representative raw forensics remain directly readable.
 
+For the complete official ACG placement/spawn-policy schema, byte-accurate
+32,805-row catalog, zone-to-district vector decode, field/flag statistics,
+case studies, and placement/spawn-policy readiness matrices, use:
+
+```cmd
+cmd /d /c Tools\run_acg_placement_schema_audit.cmd
+cmd /d /c Tools\run_acg_placement_schema_audit.cmd --check
+```
+
+This workflow hashes the original `18.8.62_EP1` ResourceDatabase inputs,
+validates the build-matched GameData parser/accessor evidence, runs the focused
+negative and positive tests, and writes deterministic outputs under
+`docs/generated/acg_placement_schema` plus the authoritative
+`docs/reference/ACG_PLACEMENT_SCHEMA.md`. It never launches AO, searches for a
+static ACG-to-MonsterData bridge, edits original client resources, or uses
+runtime/population readiness as placement authority.
+
 For the deterministic population reconstruction over official ACG topology,
 accepted runtime observations, phase-aware resolver evidence, and reusable
 visual archetypes, use:

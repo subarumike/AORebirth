@@ -1,0 +1,389 @@
+{
+  "classification": {
+    "genericHashSpawnPlacements": 32805,
+    "provenNonNpcSubset": 0,
+    "provenNpcSubset": 0,
+    "reason": "No proven per-record discriminator classifies NPC, static object, effect anchor, or interactive object.",
+    "unknownSubtype": 32805
+  },
+  "districtDataSerializedSchema": [
+    {
+      "consumer": "DistrictData_t::GetCentre",
+      "evidenceClass": "proven",
+      "field": "Centre",
+      "meaning": "district centre",
+      "order": 0,
+      "type": "Vector3<float32-le>"
+    },
+    {
+      "consumer": "DistrictData_t::GetName",
+      "evidenceClass": "proven",
+      "field": "Name",
+      "meaning": "district name",
+      "order": 1,
+      "type": "fixed ASCII[32] in v5; uint16-length ASCII in v6/v7"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "LevelOrStyleU16[9]",
+      "meaning": null,
+      "order": 2,
+      "type": "uint16-le[9]"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "LegacyUnknownU8[4]",
+      "meaning": null,
+      "order": 3,
+      "type": "uint8[4] in v5 only"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "RangePair1",
+      "meaning": null,
+      "order": 4,
+      "type": "uint8[2] in v5; uint16-le[2] in v6/v7"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "RangePair2",
+      "meaning": null,
+      "order": 5,
+      "type": "uint16-le[2] in v6/v7"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "UnknownU8A / UnknownI32 / UnknownU8B",
+      "meaning": null,
+      "order": 6,
+      "type": "uint8 / int32-le / uint8"
+    },
+    {
+      "evidenceClass": "proven",
+      "field": "collection counts",
+      "meaning": "SpawnInfo, SecondaryHash, ShortPair, RotationPoint, and HashSpawnPoint element counts",
+      "order": 7,
+      "type": "five uint8 values; SecondaryHashCount is v5-only"
+    },
+    {
+      "consumer": "DistrictData_t::GetSpawnInfo",
+      "evidenceClass": "partial",
+      "field": "SpawnInfo",
+      "meaning": "native SpawnInfo association; integer semantics unknown",
+      "order": 8,
+      "type": "pair<ACGHash_t,uint16-le>[]"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "SecondaryHashes",
+      "meaning": null,
+      "order": 9,
+      "type": "pair<ACGHash_t,uint16-le>[] in v5"
+    },
+    {
+      "evidenceClass": "unknown",
+      "field": "ShortPairs",
+      "meaning": null,
+      "order": 10,
+      "type": "pair<uint16-le,uint16-le>[]"
+    },
+    {
+      "evidenceClass": "strongly-corroborated",
+      "field": "RotationPoints",
+      "meaning": "district rotation/spawn points",
+      "order": 11,
+      "type": "SpawnPoint_t[]"
+    },
+    {
+      "consumer": "DistrictData_t::GetHashSpawnPoints",
+      "evidenceClass": "proven",
+      "field": "HashSpawnPoints",
+      "meaning": "authoritative ACG placements/spawn policy",
+      "order": 12,
+      "type": "HashSpawnPoint_t[]"
+    }
+  ],
+  "fields": [
+    {
+      "consumer": "GameData.dll+0x439E SpawnPoint_t::GetCentrePos",
+      "currentFieldName": "PositionX",
+      "evidenceClass": "proven",
+      "fieldId": "position_x",
+      "notes": "First component of the native SpawnPoint_t centre vector.",
+      "offset": 0,
+      "semanticName": "centre_position_x",
+      "size": 4,
+      "type": "float32-le"
+    },
+    {
+      "consumer": "GameData.dll+0x439E SpawnPoint_t::GetCentrePos",
+      "currentFieldName": "PositionY",
+      "evidenceClass": "proven",
+      "fieldId": "position_y",
+      "notes": "Second component of the native SpawnPoint_t centre vector.",
+      "offset": 4,
+      "semanticName": "centre_position_y",
+      "size": 4,
+      "type": "float32-le"
+    },
+    {
+      "consumer": "GameData.dll+0x439E SpawnPoint_t::GetCentrePos",
+      "currentFieldName": "PositionZ",
+      "evidenceClass": "proven",
+      "fieldId": "position_z",
+      "notes": "Third component of the native SpawnPoint_t centre vector.",
+      "offset": 8,
+      "semanticName": "centre_position_z",
+      "size": 4,
+      "type": "float32-le"
+    },
+    {
+      "consumer": "GameData.dll+0x43A2 SpawnPoint_t::GetRadius",
+      "currentFieldName": "Radius",
+      "evidenceClass": "proven",
+      "fieldId": "radius",
+      "notes": "A native radius property is proven; the client call graph does not prove random-displacement behavior or units.",
+      "offset": 12,
+      "semanticName": "spawn_point_radius",
+      "size": 4,
+      "type": "float32-le"
+    },
+    {
+      "consumer": "GameData.dll+0x2468 RotationSpawnPoint_t::GetRotationMid",
+      "currentFieldName": "RotationMidEncoded",
+      "evidenceClass": "proven",
+      "fieldId": "rotation_mid",
+      "notes": "Native getter returns float. The 0..359 corpus domain is degree-like, but no transform consumer proves units, handedness, or axis.",
+      "offset": 16,
+      "semanticName": "rotation_mid",
+      "size": 2,
+      "type": "uint16-le"
+    },
+    {
+      "consumer": "GameData.dll+0x2748 RotationSpawnPoint_t::GetRotationWidth",
+      "currentFieldName": "RotationWidthEncoded",
+      "evidenceClass": "proven",
+      "fieldId": "rotation_width",
+      "notes": "Native rotation-width property; angular units and sampling behavior remain unproven.",
+      "offset": 18,
+      "semanticName": "rotation_width",
+      "size": 2,
+      "type": "uint16-le"
+    },
+    {
+      "consumer": "GameData.dll+0x1B23 ACGHash_t reader; +0x4459 HashSpawnPoint_t::GetHash",
+      "currentFieldName": "AcgHashNativeUInt32",
+      "evidenceClass": "proven",
+      "fieldId": "acg_hash",
+      "notes": "Packed four-byte placement/spawn-policy tag. It is not MonsterData, a resource identity, or a runtime dynel identity.",
+      "offset": 20,
+      "semanticName": "authoritative_placement_identity",
+      "size": 4,
+      "type": "packed-acghash-uint32-le"
+    },
+    {
+      "consumer": "GameData.dll+0x2D49 HashSpawnPoint_t::GetMinLevel",
+      "currentFieldName": "LevelMinimum",
+      "evidenceClass": "proven",
+      "fieldId": "minimum_level",
+      "notes": "Native minimum-level property; captured NPC level is not used to assign a row.",
+      "offset": 24,
+      "semanticName": "minimum_level",
+      "size": 2,
+      "type": "uint16-le"
+    },
+    {
+      "consumer": "GameData.dll+0x445D HashSpawnPoint_t::GetMaxLevel",
+      "currentFieldName": "LevelMaximum",
+      "evidenceClass": "proven",
+      "fieldId": "maximum_level",
+      "notes": "Native maximum-level property; downstream server selection/scaling behavior is unavailable in the client.",
+      "offset": 26,
+      "semanticName": "maximum_level",
+      "size": 2,
+      "type": "uint16-le"
+    },
+    {
+      "consumer": "GameData.dll+0x4461 HashSpawnPoint_t::GetRespawnChance",
+      "currentFieldName": "RespawnChance",
+      "evidenceClass": "proven",
+      "fieldId": "respawn_chance",
+      "notes": "Native respawn-chance property. Values include 255, so a universal percentage scale is not claimed.",
+      "offset": 28,
+      "semanticName": "respawn_chance",
+      "size": 1,
+      "type": "uint8"
+    },
+    {
+      "consumer": "GameData.dll+0x640F HashSpawnPoint_t::ReadBlob",
+      "currentFieldName": "SerializedOptionalFlags",
+      "evidenceClass": "proven",
+      "fieldId": "serialized_optional_flags",
+      "notes": "Bits 0, 1, and 2 gate native flags/proximity bytes, additional points, and extensions respectively.",
+      "offset": 29,
+      "semanticName": "serialized_section_presence",
+      "size": 1,
+      "type": "uint8-bitmask"
+    },
+    {
+      "consumer": "GameData.dll+0x4465 HashSpawnPoint_t::GetRespawnTime",
+      "currentFieldName": "RespawnTime",
+      "evidenceClass": "proven",
+      "fieldId": "respawn_time",
+      "notes": "Native respawn-time property. The accessor name is proven; serialized time units are not.",
+      "offset": 30,
+      "semanticName": "respawn_time",
+      "size": 2,
+      "type": "uint16-le"
+    },
+    {
+      "consumer": "GameData.dll+0x447C HashSpawnPoint_t::HasMoreFlag",
+      "currentFieldName": "MoreFlags",
+      "evidenceClass": "strongly-corroborated",
+      "fieldId": "more_flags",
+      "notes": "Version-7 bitmask role is proven; individual policy bits remain unnamed.",
+      "offset": "32 when format version >= 7",
+      "semanticName": "more_flags",
+      "size": 4,
+      "type": "int32-le-bitmask"
+    },
+    {
+      "consumer": "GameData.dll+0x4469 HashSpawnPoint_t::HasFlag",
+      "currentFieldName": "NativeFlags",
+      "evidenceClass": "strongly-corroborated",
+      "fieldId": "native_flags",
+      "notes": "Bitmask role is proven; individual policy bits remain unnamed.",
+      "offset": "32 for versions 5/6 or 36 for version 7, when presence bit 0 is set",
+      "semanticName": "flags",
+      "size": 2,
+      "type": "uint16-le-bitmask"
+    },
+    {
+      "consumer": "GameData.dll+0x44B9 HashSpawnPoint_t::GetAssistanceRadius; +0x448F GetProximityRange",
+      "currentFieldName": "AssistanceRadius",
+      "evidenceClass": "strongly-corroborated",
+      "fieldId": "assistance_radius",
+      "notes": "Native accessor names corroborate a social/proximity range, but no behavioral branch proves units or enforcement.",
+      "offset": "34 for versions 5/6 or 38 for version 7, when presence bit 0 is set",
+      "semanticName": "assistance_or_proximity_range",
+      "size": 1,
+      "type": "uint8"
+    },
+    {
+      "consumer": "GameData.dll+0x640F HashSpawnPoint_t::ReadBlob only",
+      "currentFieldName": "UnknownOptionalU8",
+      "evidenceClass": "unknown",
+      "fieldId": "unknown_optional_u8",
+      "notes": "Boundary and value are decoded and preserved; no accessor or purpose is proven.",
+      "offset": "35 for versions 5/6 or 39 for version 7, when presence bit 0 is set",
+      "semanticName": null,
+      "size": 1,
+      "type": "uint8"
+    }
+  ],
+  "formatVersions": [
+    5,
+    6,
+    7
+  ],
+  "orientation": {
+    "axis": "unproven",
+    "handedness": "unproven",
+    "nativeAccessorType": "float",
+    "quaternion": false,
+    "representation": "rotation midpoint plus rotation width",
+    "serializedType": "two uint16 values",
+    "units": "unproven; midpoint is 0..359 but width reaches 14389"
+  },
+  "playfieldDistrictInfoSerializedSchema": [
+    {
+      "evidenceClass": "proven",
+      "field": "FormatVersion",
+      "meaning": "versions 5, 6, or 7",
+      "order": 0,
+      "type": "uint16-le"
+    },
+    {
+      "evidenceClass": "proven",
+      "field": "ZoneToDistrictIndexLength",
+      "historicalName": "UnknownHeaderU32",
+      "meaning": "exact serialized byte length of ZoneToDistrictIndex",
+      "order": 1,
+      "type": "uint32-le"
+    },
+    {
+      "evidenceClass": "proven",
+      "field": "DistrictCount",
+      "meaning": "number of following DistrictData_t records",
+      "order": 2,
+      "type": "uint8"
+    },
+    {
+      "evidenceClass": "proven",
+      "field": "Districts",
+      "meaning": "ordered district/container records",
+      "order": 3,
+      "type": "DistrictData_t[DistrictCount]"
+    },
+    {
+      "evidenceClass": "proven",
+      "field": "ZoneToDistrictIndex",
+      "meaning": "zone/cell to zero-based district index lookup",
+      "order": 4,
+      "type": "uint8[ZoneToDistrictIndexLength]"
+    }
+  ],
+  "rawFieldCount": 16,
+  "recordAlignment": "packed; no inferred intra-record padding",
+  "recordSize": "32 bytes for v5/v6 or 36 bytes for v7 before optional sections; observed records vary with presence sections",
+  "resourceHierarchy": [
+    {
+      "evidence": "proven",
+      "layer": "ResourceDatabase",
+      "structure": "active B-tree index; 34-byte FAFA allocation envelope"
+    },
+    {
+      "evidence": "proven",
+      "layer": "resource",
+      "structure": "type 1000014 / instance validated as playfield for 630/630 controls"
+    },
+    {
+      "evidence": "proven",
+      "layer": "PlayfieldDistrictInfo_t",
+      "structure": "uint16 version; uint32 zone-index byte count; uint8 district count; district vector; zone-to-district index vector"
+    },
+    {
+      "evidence": "proven",
+      "layer": "DistrictData_t",
+      "structure": "versioned header and five uint8 collection counts; HashSpawnPoint_t vector at native object+0x5C"
+    },
+    {
+      "evidence": "proven",
+      "layer": "HashSpawnPoint_t",
+      "structure": "packed 32/36-byte base plus presence-bit sections; no alignment padding"
+    }
+  ],
+  "schemaVersion": 1,
+  "variableSections": [
+    {
+      "consumer": "GameData.dll+0x4493 HashSpawnPoint_t::GetAdditionalPoints",
+      "countType": "uint8",
+      "elementSize": 20,
+      "elementType": "RotationSpawnPoint_t",
+      "evidenceClass": "proven",
+      "notes": "Explicit child rotation-spawn points inside one placement record; not a cross-record encounter/group ID and not a patrol path.",
+      "presenceBit": 1,
+      "sectionId": "additional_points"
+    },
+    {
+      "consumer": "GameData.dll+0x4497 GetTags; +0x449B GetSpells",
+      "countType": "uint32-le",
+      "elementSize": "variable",
+      "elementType": "typed extension",
+      "evidenceClass": "partial",
+      "notes": "Type 32/key 55 tag sets are decoded. Type 2 spell key 20 remains the PF4805 parser boundary.",
+      "presenceBit": 2,
+      "sectionId": "extensions"
+    }
+  ]
+}

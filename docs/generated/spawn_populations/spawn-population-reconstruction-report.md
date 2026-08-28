@@ -2,7 +2,7 @@
 
 ## Result
 
-The first deterministic population layer is implemented. It keeps official ACG topology, server-selected runtime MonsterData/archetypes, and transient runtime identities separate. Exact-row identity remains zero; useful local and playfield population scopes are recorded without reopening the nonexistent static ACG-to-MonsterData bridge.
+The optional population-analytics layer is implemented. It keeps the authoritative official ACG placement corpus, server-selected runtime MonsterData/archetypes, and transient runtime identities separate. Its 18,423 records and 22 population-identity-ready rows are analytical enrichment only; neither number validates or gates an ACG placement.
 
 ## Model
 
@@ -10,7 +10,7 @@ The first deterministic population layer is implemented. It keeps official ACG t
 visual archetype -> contextual runtime variant -> spawn population -> ACG placements -> transient instances
 ```
 
-Official topology contains 32805 placements. Shared ACG policy tags inside official districts are direct structural groups. A fixed 25m three-dimensional connected component is retained only as a heuristic secondary cluster and never becomes official semantics.
+Official topology contains 32805 placements. The analytical playfield/district/ACGHash bucket and the fixed 25m three-dimensional connected component are reconstruction indexes only; neither is a proven Funcom group, encounter, or generator field.
 
 ## Association scopes
 
@@ -38,7 +38,7 @@ Top reused archetypes:
 | `archetype-15284a6aaca17059` | 11 | 2 | 4 | 47 | 5..220 | Antonio Stacklund, Bruiser, Chang Meloche, Earl Dublin, Emery Annunziata |
 | `archetype-0adbc252bc94694e` | 10 | 0 | 13 | 100 | 1..7 | Garbage Flea, Mutated Garbage Flea |
 | `archetype-d310666d074bba2c` | 9 | 1 | 33 | 390 | 1..5 | Burning Cleaning Robot, Cleaning Robot, Cleanmeister Intelligence Robot, Malfunctioning Cleaning Robot |
-| `archetype-b457cf088c8fd9a2` | 9 | 1 | 27 | 130 | 2..4 | Supreme Collector of Waste, Waste collector, Waste Collector |
+| `archetype-b457cf088c8fd9a2` | 9 | 1 | 27 | 130 | 2..4 | Supreme Collector of Waste, Waste Collector, Waste collector |
 | `archetype-85316bb23b707f3e` | 9 | 1 | 8 | 87 | 5..109 | Cross-Wired Junkbot, Engineer Guardbot, Sparepart the Corroded |
 | `archetype-e959fe7bf87d9380` | 9 | 0 | 2 | 69 | 6..250 | Carol Schieffer, Clan Protester, Delois Guiney, Fia Lou, Food Provider |
 | `archetype-79fce60dbc95f0ba` | 9 | 1 | 13 | 39 | 5..40 | Dockworker, Enforcer of IPS, Engineer of IPS, Rex Larsson, Shady Guy |
@@ -73,7 +73,7 @@ Borealis-related evidence forms 6 runtime populations. Guide and Guard preserve 
 - Respawn ready: 0
 - Exact placement ready: 0
 
-Readiness is population-specific. Finite loot observations remain contextual samples, and movement envelopes use only captured movement. A current moved position never becomes a spawn position.
+Readiness is population-enrichment-specific and has no placement-validity role. Official ACG decode quality alone governs placement readiness. Finite loot observations remain contextual samples, and movement envelopes use only captured movement. A current moved position never becomes a spawn position.
 
 ## Acceptance
 
@@ -105,6 +105,10 @@ ACG_PLACEMENTS_WITHOUT_POPULATION_EVIDENCE=32568
 LEET_POPULATIONS=9
 PF4582_POPULATIONS=109
 BOREALIS_POPULATIONS=6
+PLACEMENT_AUTHORITY=OFFICIAL_ACG_CORPUS
+POPULATION_IDENTITY_REQUIRED_FOR_PLACEMENT=NO
+RUNTIME_CAPTURE_REQUIRED_FOR_PLACEMENT=NO
+MONSTERDATA_REQUIRED_FOR_PLACEMENT=NO
 STATIC_ACG_MONSTERDATA_BRIDGE_SEARCH_REOPENED=NO
 ACGHASH_USED_AS_MONSTERDATA=NO
 RUNTIME_ID_USED_AS_PERSISTENT_IDENTITY=NO
@@ -112,6 +116,6 @@ HEURISTIC_EXACT_MATCHES=0
 RUNTIME_NPC_DEFINITIONS_MODIFIED=NO
 TESTS=PASS
 DETERMINISTIC_REPEAT_RUN=YES
-DETERMINISTIC_DIGEST=c9310e2623818f677a96aaeb91580a03cc639115ba8e5c2c3b8be8ce337a2ac5
+DETERMINISTIC_DIGEST=3905836cb59f7b8f4011079a8d3ea211608c23dd86236087a586a238211f5647
 COMMIT=PENDING
 ```

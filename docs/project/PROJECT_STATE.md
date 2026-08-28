@@ -9,16 +9,33 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- ACG placement/spawn-policy schema: the official `18.8.62_EP1`
+  ResourceDatabase type-`1000014` corpus is the authoritative placement layer.
+  All 32,805 decoded `HashSpawnPoint_t` records now have exact raw bytes,
+  versioned field boundaries, native accessor evidence, per-field statistics,
+  and official-decode-only placement readiness. The 16 scalar fields contain
+  proven position, radius, rotation midpoint/width, ACGHash, level range,
+  respawn chance/time, and serialized-section presence; three further fields
+  are strongly corroborated flag/range roles and one optional byte remains
+  unknown. The former 507,976-byte trailing opaque region is fully decoded as
+  `PlayfieldDistrictInfo_t::GetZoneToDistrictIndex`; only 45 inactive
+  allocation-slack bytes remain opaque. All 32,805 known rows are placement
+  ready, while resources 103, 615, and 4805 remain explicit resource-level
+  parser limits without synthetic rows. Evidence and the lossless catalog are
+  under `docs/generated/acg_placement_schema` and governed by
+  `docs/reference/ACG_PLACEMENT_SCHEMA.md`.
+
 - AO Spawn Population Reconstruction: the first deterministic population layer
   now keeps 32,805 official ACG placements, 3,472 captured runtime observations,
   server-selected MonsterData/archetypes, and transient runtime identities on
   explicit evidence axes. It produces 18,423 topology/runtime population
   records: zero exact-placement associations, 766 local-population
   associations, 1,397 playfield-population associations, 1,029 unassociated
-  observations, and 280 conflicts. ACG policy groups are direct structural
-  evidence; 25-metre spatial components are explicitly heuristic. Population
-  association never claims exact-row ownership, and only direct/strong
-  population evidence is implementation-ready. Evidence, readiness inventory,
+  observations, and 280 conflicts. Its playfield/district/ACGHash buckets and
+  25-metre spatial components are analytical indexes, not proven Funcom
+  grouping structures. Population association never claims exact-row
+  ownership; its 22 identity-ready rows are optional runtime enrichment and
+  never gate official placement validity. Evidence, readiness inventory,
   reuse statistics, and Leet/PF4582/Borealis studies are under
   `docs/generated/spawn_populations`.
 

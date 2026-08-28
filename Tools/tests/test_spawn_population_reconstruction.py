@@ -233,6 +233,20 @@ class SpawnPopulationPositiveTests(unittest.TestCase):
         self.assertEqual(len(topology), 2)
         self.assertEqual(set(mapping), {"record-0", "record-1"})
 
+    def test_population_readiness_has_no_placement_validity_role(self):
+        projected = reconstruction.placement_projection(placement("record-0", 0))
+        self.assertEqual(projected["placementValidity"]["authority"], "official-acg-decode-quality")
+        self.assertFalse(projected["placementValidity"]["populationIdentityRequired"])
+        readiness = reconstruction.readiness({"associationScope": "unassociated", "associationStrength": "none"})
+        self.assertFalse(readiness["placementValidityGate"])
+
+    def test_archetype_reuse_name_sort_is_stable_for_casefold_ties(self):
+        left = aggregate_row("o1", "c1", "id1", name="leet")
+        right = aggregate_row("o2", "c1", "id2", name="Leet")
+        rows = reconstruction.aggregate_runtime_rows([left, right])
+        reuse = reconstruction.archetype_reuse(rows)
+        self.assertEqual(reuse[0]["names"], ["Leet", "leet"])
+
 
 if __name__ == "__main__":
     unittest.main()
