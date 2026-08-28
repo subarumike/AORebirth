@@ -10,9 +10,9 @@ change runtime NPC content.
 The decisive client audit result is:
 
 - `Playfield.Identity` directly exposes the current runtime playfield identity.
-- `Playfield.ModelIdentity` directly exposes the loaded playfield model/resource
-  identity. When its type is `1000014`, its instance is retained exactly as the
-  direct base playfield resource candidate.
+- `Playfield.ModelIdentity` exposes a native model identity whose live type is
+  not guaranteed to be `1000014`. The value and state are recorded verbatim;
+  only type `1000014` is retained as direct base-playfield evidence.
 - AOSharp's checked-in Dynel/native surface does not expose an NPC-specific
   type-`1000014` template/model identity.
 - A native zone/cell instance is readable for a Dynel. A stable official
@@ -52,7 +52,7 @@ is serialized as `sentinel/default` and never as authoritative state.
 | World position | `Dynel.Position` / vehicle position | Direct client state; retained separately from the packet SCFU position. |
 | Rotation/orientation | `Dynel.Rotation` / vehicle rotation | Direct client-state quaternion; retained without deriving a placement heading. |
 | SCFU identity, PF, position, heading, appearance, owner, `MonsterData`, `HeadMesh`, textures, meshes, visual flags | raw `SimpleCharFullUpdate` decoder | `packet-observed`, linked by direction, sequence, and global raw-packet ordinal. |
-| Client-visible stats | `Dynel.GetStat` over the distinct checked-in `Stat` values | `client-state-observed`, `sentinel/default`, or `not-observed` per field. A zero returned by the client stays zero; absence is null, never synthetic zero. |
+| Client-visible stats | `Dynel.GetStat` for the ten identity-relevant fields consumed by the bridge | `client-state-observed`, `sentinel/default`, or `not-observed` per field. Full 626-stat enumeration is intentionally skipped; a zero returned by the client stays zero and absence is null. |
 | Stat packet updates | raw `Stat` decoder | `packet-observed`, linked by exact raw-packet key and only within a valid epoch. |
 | Lifecycle/movement/zoning packets | raw packet envelope | Epoch-scoped references link to `raw-packets.csv`; they do not invent decoded semantics. |
 
@@ -92,27 +92,35 @@ resolver proof.
 
 The tracker uses these transitions:
 
-1. Capture start creates a pending epoch and accepts it only after a double
-   sample of local-player identity, runtime playfield identity, and model
-   playfield identity remains identical while `Game.IsZoning` is false.
+1. Capture start creates a pending epoch and accepts it after a double sample
+   of local-player and runtime-playfield identity remains identical while
+   `Game.IsZoning` is false. Model identity is independent epoch enrichment.
 2. `TeleportStarted` closes the prior epoch. No live NPC snapshot is accepted
    while the transition is unresolved.
 3. `PlayfieldInit` creates a new pending epoch with its runtime playfield hint.
    A conflicting stable runtime identity invalidates that pending epoch.
 4. `TeleportEnded` or `TeleportFailed` requires a fresh stable world sample;
    the old epoch is never reopened.
-5. Any independently observed runtime/model/local-player identity replacement
-   closes the epoch and creates a new one.
-6. The NPC identity and complete world identity are sampled before and after
-   stat enumeration. A change discards the bounded snapshot and invalidates its
-   epoch instead of combining partial state.
+5. A runtime-playfield or local-player identity replacement closes the epoch.
+   Model identity is sampled at bounded intervals until direct type `1000014`
+   is seen or the epoch closes; non-resource, default, late, and conflict states
+   remain explicit.
+6. NPC identity and runtime context are sampled before and after the ten-field
+   snapshot. A change discards the bounded snapshot instead of combining state.
 
 SCFU is evidence-eligible only in a stable current epoch when the packet itself
 directly names the same runtime playfield. Stat packets do not name a playfield
 and therefore cannot be attached during a transition. Pointer lineage and
-runtime-instance reuse are keyed by epoch. Direct lifecycle boundaries clear
-the affected lineage, and cached packets at or before a new-lineage detection
-observation are excluded from the replacement lineage.
+runtime-instance reuse are keyed by epoch. Initial client discovery preserves
+already-received direct same-epoch packets. A proven replacement/despawn
+boundary clears the affected lineage and advances its evidence floor.
+
+Capture is event-first. First discovery, SCFU, Stat, lifecycle activity, and
+relevant client changes mark per-epoch identity state dirty. The two-second
+nearby pass performs bounded retries and ten-second position refreshes; an
+unchanged fingerprint is not serialized. Complete NPCs stop incomplete-field
+retries. JSONL rewrites are throttled to 15 seconds and finalization forces the
+last artifact and a coverage/performance summary.
 
 ## Live capture artifacts
 
@@ -129,7 +137,9 @@ do not pay bridge-snapshot overhead. The launcher reports bridge-mode success
 only after the deployed plugin consumes that marker and writes a non-empty
 bridge JSONL artifact.
 
-The mode adds `npc-identity-bridge-live.jsonl` to the normal capture folder.
+The mode adds `npc-identity-bridge-live.jsonl` and final
+`npc-identity-bridge-summary.json` coverage/performance metrics to the normal
+capture folder.
 Schema version `1` record types are:
 
 - `zone_epoch`: validity, state, trigger, inclusive packet bounds, timestamps,
@@ -161,6 +171,9 @@ The analyzer first reconstructs `scfu-appearance.csv` and
 - validates capture/epoch identity and non-overlapping inclusive bounds;
 - rejects snapshots outside their declared epoch;
 - joins SCFU and Stat evidence only by the exact raw-packet triple;
+- reconstructs an omitted live packet reference from a fully decoded raw
+  packet only when epoch, direct runtime identity, ordinal, and lineage evidence
+  window all match;
 - retains failed or partial packet rows for audit but makes their keys
   ineligible for snapshot evidence;
 - reproduces packet-derived values without timestamp fallback;
@@ -202,13 +215,14 @@ record. That test is not live evidence and cannot authorize production content.
 
 ## Live acceptance boundary
 
-PF4582 and Borealis Backyard remain preferred populations for a later
-user-operated capture because their supporting official/capture evidence is
-already governed. Tooling/fixture success must be reported separately from a
-live sample. Until Mike runs the explicit mode and provides the completed
-folder:
+The preserved Arete sample `20260827-213046` proved the first live recorder was
+functionally complete at the raw layer but polling-heavy and incomplete at the
+first-discovery linkage boundary. Its audit is retained in
+`docs/evidence/ARETE_NPC_IDENTITY_BRIDGE_FAILED_CAPTURE_20260827.md`. A later
+user-operated capture remains separate acceptance and is not authorized by
+offline fixture success.
 
 ```text
-LIVE_BRIDGE_SAMPLE_ACQUIRED=NO
+LIVE_BRIDGE_SAMPLE_ACQUIRED=YES_PRESERVED_FAILED_ACCEPTANCE_SAMPLE
 LIVE_UNIQUE_PLACEMENT_PROVEN=NO
 ```

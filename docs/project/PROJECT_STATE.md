@@ -9,19 +9,23 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- NPC identity bridge evidence acquisition: the explicit
+- NPC identity bridge evidence acquisition: the preserved Arete live sample
+  `20260827-213046` proved clean raw capture but exposed polling-heavy client
+  enrichment and a first-discovery evidence-floor defect. The repaired explicit
   `--npc-identity-bridge` AOSharp mode now records direct runtime and loaded
-  type-`1000014` playfield model identities, runtime NPC identity, raw SCFU/Stat
+  playfield model state, runtime NPC identity, raw SCFU/Stat
   references, client-visible stats, world position/rotation, native zone/cell,
-  and pointer-diagnostic lifecycle lineage inside non-overlapping deterministic
-  zone epochs. Offline replay reconstructs packet fields by exact raw-packet
-  key and leaves client-only fields explicit. Optional placement-resolver
+  and pointer-diagnostic lifecycle lineage inside deterministic zone epochs.
+  Event-first dirty state, bounded retries, ten-field client reads, duplicate
+  suppression, and throttled serialization replace 2,202 repeated full-stat
+  snapshots. Offline replay can reconstruct omitted packet links only by exact
+  raw key, epoch, runtime identity, and lineage window. Optional resolver
   consumption remains fail-closed for stale epochs, absent/derived identities,
   ACGHash, unproven transforms, and existing duplicate ambiguity. The client
   audit found no NPC-specific official model/template ID, stable official
-  district ID, or proven world-to-placement transform. Tooling/fixtures are
-  locally validated; no live bridge sample or unique placement is claimed.
-  Evidence: `docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
+  district ID, or proven world-to-placement transform. The live sample proves
+  no unique placement. Evidence: `docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`
+  and `docs/evidence/ARETE_NPC_IDENTITY_BRIDGE_FAILED_CAPTURE_20260827.md`.
 
 - NPC placement identity resolution: the deterministic
   `NpcPlacementIdentityResolver` now expands all 32,805 normalized official

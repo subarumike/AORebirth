@@ -63,7 +63,8 @@ class NpcIdentityBridgeCaptureContractTests(unittest.TestCase):
         self.assertIn("EpochIdentityKey(", BRIDGE)
         self.assertIn("EvidenceAfterGlobalOrdinal", BRIDGE)
         self.assertIn("LastObservationGlobalOrdinal", BRIDGE)
-        self.assertIn("long evidenceFloor = observationOrdinal;", BRIDGE)
+        self.assertIn("this.currentEpoch.StartGlobalOrdinal - 1", BRIDGE)
+        self.assertIn("if (lineageReplaced)", BRIDGE)
         self.assertNotIn(": lineage.LastObservationGlobalOrdinal;", BRIDGE)
         self.assertIn('&& !epoch.EndGlobalOrdinal.HasValue\n', BRIDGE)
         self.assertGreaterEqual(BRIDGE.count("&& this.Epoch.EndGlobalOrdinal.HasValue"), 1)
@@ -139,7 +140,7 @@ class NpcIdentityBridgeCaptureContractTests(unittest.TestCase):
             BRIDGE.count("this.BeginLifecycleBoundaryNoLock("), 2
         )
         self.assertIn("int nextLineage = prior == null ? 1 : prior.Ordinal + 1", BRIDGE)
-        self.assertIn("long evidenceFloor = observationOrdinal", BRIDGE)
+        self.assertIn("long evidenceFloor = Math.Max", BRIDGE)
         self.assertGreaterEqual(
             BRIDGE.count("this.latestScfuByEpochIdentity.Remove(identityKey)"),
             2,
@@ -217,6 +218,65 @@ class NpcIdentityBridgeCaptureContractTests(unittest.TestCase):
             self.assertIn(state, combined)
         self.assertIn("acg_hash_used_as_runtime_identity", REPLAY)
         self.assertIn("False", REPLAY)
+
+    def test_event_first_bounded_capture_and_performance_metrics_are_explicit(self):
+        for token in (
+            "NpcEvidenceState",
+            "MarkEvidenceDirtyNoLock",
+            "MaximumIncompleteRetries = 3",
+            "PositionRefreshInterval",
+            "SnapshotFingerprint",
+            "redundantSnapshotsSuppressed",
+            "snapshot_callback_max_ms",
+            "max_snapshots_per_second",
+            "max_serialized_bytes_per_second",
+            "deferred_work_count",
+            "raw_packet_processing_backlog",
+        ):
+            self.assertIn(token, BRIDGE)
+        self.assertIn("this.nextSnapshotUtc = now.AddSeconds(2)", MAIN)
+        self.assertIn("npc-identity-bridge-summary.json", BRIDGE)
+
+    def test_identity_relevant_stat_reads_replace_full_enum_enumeration(self):
+        self.assertNotIn("Enum.GetValues(typeof(Stat))", BRIDGE)
+        for stat in (
+            "Stat.MonsterData",
+            "Stat.StaticInstance",
+            "Stat.CATMesh",
+            "Stat.HeadMesh",
+            "Stat.Breed",
+            "Stat.Sex",
+            "Stat.Profession",
+            "Stat.Level",
+            "Stat.OwnerInstance",
+            "Stat.VisualFlags",
+        ):
+            self.assertIn(stat, BRIDGE)
+
+    def test_epoch_model_state_is_independent_bounded_and_fail_closed(self):
+        for token in (
+            "playfield_model_id_state",
+            "model_identity_retry_count",
+            "model_identity_first_valid_global_ordinal",
+            "native_zone_instance",
+            "observed-non-resource-type",
+            "observed-direct-resource",
+            "not-exposed",
+        ):
+            self.assertIn(token, BRIDGE)
+        self.assertIn("PlayfieldDistrictInfoType", BRIDGE)
+        self.assertIn("ModelIdentityRetryInterval", BRIDGE)
+
+    def test_artifact_rewrites_are_throttled_but_completion_is_forced(self):
+        self.assertIn("ArtifactFlushInterval", BRIDGE)
+        self.assertIn("if (!this.completed", BRIDGE)
+        self.assertIn("if (this.completed)", BRIDGE)
+        self.assertIn("this.WriteSummaryNoLock();", BRIDGE)
+
+    def test_offline_replay_can_recover_exact_packet_references(self):
+        self.assertIn("attach_offline_packet_references", REPLAY)
+        self.assertIn("evidence_window_start_global_ordinal", BRIDGE)
+        self.assertIn("evidence_window_start_global_ordinal", REPLAY)
 
 
 if __name__ == "__main__":

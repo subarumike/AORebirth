@@ -2,11 +2,11 @@
 
 ## Active
 
-Implement and validate the deterministic, read-only `NpcIdentityBridgeCapture`
-workflow. Capture runtime NPC identity, direct runtime/model playfield identity,
-packet and client-state evidence, coordinate representations, and lifecycle
-lineage in one structurally enforced zone epoch; replay it offline and feed it
-to the placement resolver without weakening any proof rule.
+Validate the repaired event-first, read-only `NpcIdentityBridgeCapture` offline.
+Preserve the failed Arete sample, retain every raw packet, suppress redundant
+client snapshots, link pre-discovery SCFU/Stat by exact same-epoch identity, and
+record delayed/non-resource `Playfield.ModelIdentity` state without weakening
+the placement resolver.
 
 ## Current identity-bridge checkpoint
 
@@ -14,12 +14,15 @@ to the placement resolver without weakening any proof rule.
   `Playfield.ModelIdentity`; type `1000014` is retained as a direct loaded
   playfield resource identity. No NPC-specific official model/template ID or
   stable official district ID is exposed.
-- The targeted launcher mode, explicit non-overlapping zone epochs, atomic NPC
-  snapshots, raw SCFU/Stat linkage, deterministic offline replay, and strict
-  optional resolver consumption are implemented without client or gameplay
-  writes.
-- Local fixtures validate the contract only. No live bridge sample or unique
-  placement proof is claimed until Mike supplies a completed controlled capture.
+- The failed Arete sample `20260827-213046` is preserved. It contains 38 client
+  identities and clean raw replay; 7/13 received client-present SCFUs linked,
+  5/5 received Stat identities linked, and no placement identity was proven.
+- The repaired recorder is event-first with bounded retries, ten-field client
+  reads, duplicate suppression, throttled serialization, independent epoch
+  model state, coverage/performance finalization, and exact offline packet-link
+  recovery.
+- Another live capture is intentionally deferred until offline/load acceptance
+  passes. The resolver proof boundary remains unchanged.
 - Governed workflow and evidence schema:
   `docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
 

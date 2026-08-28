@@ -196,6 +196,7 @@ def live_scfu_record(row, records):
         "capture_id": CAPTURE_ID,
         "zone_epoch_id": assigned_epoch(records, int(row["GlobalOrdinal"])),
         "zone_epoch_valid": True,
+        "bridge_link_eligible": True,
         "captured_utc": row["CapturedUtc"],
         "direction": row["Direction"],
         "global_ordinal": int(row["GlobalOrdinal"]),
@@ -247,6 +248,7 @@ def live_stat_record(row, records):
         "capture_id": CAPTURE_ID,
         "zone_epoch_id": assigned_epoch(records, int(row["GlobalOrdinal"])),
         "zone_epoch_valid": True,
+        "bridge_link_eligible": True,
         "captured_utc": row["CapturedUtc"],
         "direction": row["Direction"],
         "global_ordinal": int(row["GlobalOrdinal"]),
@@ -322,6 +324,78 @@ def direct_identity_fields(runtime_type=0xC350, runtime_instance=0x11223344):
 
 
 class NpcIdentityBridgeReplayTests(unittest.TestCase):
+    def test_offline_replay_recovers_scfu_received_before_client_discovery(self):
+        live_snapshot = snapshot(
+            "epoch-0001",
+            1,
+            20,
+            fields={
+                "runtime_identity_type": 0xC350,
+                "runtime_identity_instance": 0x11223344,
+            },
+        )
+        live_snapshot["evidence_window_start_global_ordinal"] = 1
+        with tempfile.TemporaryDirectory() as temporary:
+            artifact = CaptureFixture(
+                temporary,
+                [epoch("epoch-0001", 1), live_snapshot],
+                [scfu_row(5, 5)],
+            ).build()
+        observation = artifact["observations"][0]
+        self.assertEqual(123, observation["monster_data"]["value"])
+        self.assertEqual(["0:123:0"], observation["textures"]["value"])
+        self.assertEqual(["0:456:0:0"], observation["meshes"]["value"])
+        self.assertEqual(["scfu"], [item["kind"] for item in observation["packet_provenance"]])
+        self.assertTrue(artifact["parity"]["packet_fields_match"], artifact["parity"])
+
+    def test_offline_replay_recovers_direct_stat_identity_link(self):
+        live_snapshot = snapshot(
+            "epoch-0001",
+            1,
+            20,
+            fields={
+                "runtime_identity_type": 0xC350,
+                "runtime_identity_instance": 0x11223344,
+            },
+        )
+        live_snapshot["evidence_window_start_global_ordinal"] = 1
+        with tempfile.TemporaryDirectory() as temporary:
+            artifact = CaptureFixture(
+                temporary,
+                [epoch("epoch-0001", 1), live_snapshot],
+                stat_rows=[stat_row(6, 6, stat_id=54, value=5)],
+            ).build()
+        observation = artifact["observations"][0]
+        self.assertEqual(
+            [{"stat_id": 54, "value": 5}],
+            observation["packet_stat_observations"]["value"],
+        )
+        self.assertEqual(["stat"], [item["kind"] for item in observation["packet_provenance"]])
+        self.assertTrue(artifact["parity"]["packet_fields_match"], artifact["parity"])
+
+    def test_offline_replay_does_not_cross_lineage_evidence_floor(self):
+        live_snapshot = snapshot(
+            "epoch-0001",
+            1,
+            20,
+            fields={
+                "runtime_identity_type": 0xC350,
+                "runtime_identity_instance": 0x11223344,
+            },
+        )
+        live_snapshot["evidence_window_start_global_ordinal"] = 10
+        with tempfile.TemporaryDirectory() as temporary:
+            artifact = CaptureFixture(
+                temporary,
+                [epoch("epoch-0001", 1), live_snapshot],
+                [scfu_row(5, 5)],
+            ).build()
+        self.assertEqual([], artifact["observations"][0]["packet_provenance"])
+        self.assertEqual(
+            "not-observed",
+            artifact["observations"][0]["monster_data"]["classification"],
+        )
+
     def test_zone_transition_creates_distinct_epochs_for_reused_runtime_identity(self):
         records = [
             epoch("epoch-0001", 1, 9, runtime=4582),

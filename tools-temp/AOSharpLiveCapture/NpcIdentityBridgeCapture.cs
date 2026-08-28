@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -26,16 +27,32 @@ namespace AOSharpLiveCapture
     {
         internal const int SchemaVersion = 1;
         internal const string ArtifactFileName = "npc-identity-bridge-live.jsonl";
+        internal const string SummaryFileName = "npc-identity-bridge-summary.json";
 
         private const int PlayfieldDistrictInfoType = 1000014;
         private const int UnsetStatSentinel = 1234567890;
+        private const int MaximumIncompleteRetries = 3;
+        private static readonly TimeSpan IncompleteRetryInterval = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan PositionRefreshInterval = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan ArtifactFlushInterval = TimeSpan.FromSeconds(15);
+        private static readonly TimeSpan ModelIdentityRetryInterval = TimeSpan.FromSeconds(2);
 
-        private static readonly Stat[] ClientVisibleStats = Enum.GetValues(typeof(Stat))
-            .Cast<Stat>()
-            .GroupBy(value => (int)value)
-            .Select(group => group.OrderBy(value => value.ToString(), StringComparer.Ordinal).First())
-            .OrderBy(value => (int)value)
-            .ToArray();
+        // These are the only client stats consumed by the bridge serializer.
+        // Enumerating all 626 Stat values for every nearby NPC made the failed
+        // Arete capture perform 1,378,452 main-thread GetStat calls.
+        private static readonly Stat[] ClientVisibleStats =
+        {
+            Stat.MonsterData,
+            Stat.StaticInstance,
+            Stat.CATMesh,
+            Stat.HeadMesh,
+            Stat.Breed,
+            Stat.Sex,
+            Stat.Profession,
+            Stat.Level,
+            Stat.OwnerInstance,
+            Stat.VisualFlags
+        };
 
         private static readonly HashSet<string> BridgeEnvelopeMessageNames =
             new HashSet<string>(StringComparer.Ordinal)
@@ -64,6 +81,10 @@ namespace AOSharpLiveCapture
             new Dictionary<string, PacketStatRecord>(StringComparer.Ordinal);
         private readonly Dictionary<string, LineageState> lineageByEpochIdentity =
             new Dictionary<string, LineageState>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NpcEvidenceState> evidenceStateByEpochIdentity =
+            new Dictionary<string, NpcEvidenceState>(StringComparer.Ordinal);
+        private readonly Dictionary<long, int> emittedSnapshotsBySecond =
+            new Dictionary<long, int>();
 
         private ZoneEpochRecord currentEpoch;
         private long lastGlobalOrdinal;
@@ -73,6 +94,18 @@ namespace AOSharpLiveCapture
         private bool transitionInProgress;
         private bool completed;
         private bool disposed;
+        private DateTime lastArtifactWriteUtc = DateTime.MinValue;
+        private long redundantSnapshotsSuppressed;
+        private long retriesTotal;
+        private long deferredWorkCount;
+        private long droppedWorkCount = 0;
+        private long snapshotCallbackCount;
+        private long snapshotCallbackElapsedTicks;
+        private long snapshotCallbackMaxTicks;
+        private int maxSnapshotsPerSecond;
+        private long serializedBytesTotal;
+        private long maxSerializedBytesPerSecond;
+        private long artifactWriteCount;
 
         internal NpcIdentityBridgeCapture(string sessionDirectory, string captureId)
         {
@@ -89,9 +122,11 @@ namespace AOSharpLiveCapture
             Directory.CreateDirectory(sessionDirectory);
             this.captureId = captureId.Trim();
             this.ArtifactPath = Path.Combine(sessionDirectory, ArtifactFileName);
+            this.SummaryPath = Path.Combine(sessionDirectory, SummaryFileName);
         }
 
         internal string ArtifactPath { get; private set; }
+        internal string SummaryPath { get; private set; }
 
         internal void Start(DateTime capturedUtc, long currentGlobalOrdinal)
         {
@@ -211,40 +246,49 @@ namespace AOSharpLiveCapture
             long currentGlobalOrdinal,
             string trigger)
         {
-            lock (this.syncRoot)
+            Stopwatch callback = Stopwatch.StartNew();
+            try
             {
-                this.ThrowIfCompletedOrDisposed();
-                DateTime utc = NormalizeUtc(capturedUtc);
-                this.ObserveGlobalOrdinalNoLock(currentGlobalOrdinal);
-                if (!this.EnsureStableEpochNoLock(utc, currentGlobalOrdinal, trigger))
+                lock (this.syncRoot)
                 {
-                    return 0;
-                }
-
-                SimpleChar[] npcs;
-                try
-                {
-                    npcs = (DynelManager.NPCs ?? new SimpleChar[0])
-                        .Where(value => value != null)
-                        .OrderBy(value => SafeIdentityType(value))
-                        .ThenBy(value => SafeIdentityInstance(value))
-                        .ToArray();
-                }
-                catch
-                {
-                    return 0;
-                }
-
-                int captured = 0;
-                foreach (SimpleChar npc in npcs)
-                {
-                    if (this.ObserveNpcNoLock(utc, currentGlobalOrdinal, trigger, npc))
+                    this.ThrowIfCompletedOrDisposed();
+                    DateTime utc = NormalizeUtc(capturedUtc);
+                    this.ObserveGlobalOrdinalNoLock(currentGlobalOrdinal);
+                    if (!this.EnsureStableEpochNoLock(utc, currentGlobalOrdinal, trigger))
                     {
-                        captured++;
+                        return 0;
                     }
-                }
 
-                return captured;
+                    SimpleChar[] npcs;
+                    try
+                    {
+                        npcs = (DynelManager.NPCs ?? new SimpleChar[0])
+                            .Where(value => value != null)
+                            .OrderBy(value => SafeIdentityType(value))
+                            .ThenBy(value => SafeIdentityInstance(value))
+                            .ToArray();
+                    }
+                    catch
+                    {
+                        return 0;
+                    }
+
+                    int captured = 0;
+                    foreach (SimpleChar npc in npcs)
+                    {
+                        if (this.ObserveNpcNoLock(utc, currentGlobalOrdinal, trigger, npc))
+                        {
+                            captured++;
+                        }
+                    }
+
+                    return captured;
+                }
+            }
+            finally
+            {
+                callback.Stop();
+                this.RecordSnapshotCallback(callback.ElapsedTicks);
             }
         }
 
@@ -254,17 +298,26 @@ namespace AOSharpLiveCapture
             string trigger,
             Dynel dynel)
         {
-            lock (this.syncRoot)
+            Stopwatch callback = Stopwatch.StartNew();
+            try
             {
-                this.ThrowIfCompletedOrDisposed();
-                DateTime utc = NormalizeUtc(capturedUtc);
-                this.ObserveGlobalOrdinalNoLock(currentGlobalOrdinal);
-                if (!this.EnsureStableEpochNoLock(utc, currentGlobalOrdinal, trigger))
+                lock (this.syncRoot)
                 {
-                    return false;
-                }
+                    this.ThrowIfCompletedOrDisposed();
+                    DateTime utc = NormalizeUtc(capturedUtc);
+                    this.ObserveGlobalOrdinalNoLock(currentGlobalOrdinal);
+                    if (!this.EnsureStableEpochNoLock(utc, currentGlobalOrdinal, trigger))
+                    {
+                        return false;
+                    }
 
-                return this.ObserveNpcNoLock(utc, currentGlobalOrdinal, trigger, dynel);
+                    return this.ObserveNpcNoLock(utc, currentGlobalOrdinal, trigger, dynel);
+                }
+            }
+            finally
+            {
+                callback.Stop();
+                this.RecordSnapshotCallback(callback.ElapsedTicks);
             }
         }
 
@@ -289,15 +342,30 @@ namespace AOSharpLiveCapture
                 if (boundaryEpoch != null
                     && currentGlobalOrdinal >= boundaryEpoch.StartGlobalOrdinal)
                 {
+                    string identityKey = EpochIdentityKey(
+                        boundaryEpoch.ZoneEpochId,
+                        (int)identity.Type,
+                        identity.Instance);
                     long boundaryOrdinal = Math.Max(
                         boundaryEpoch.StartGlobalOrdinal,
                         Math.Max(currentGlobalOrdinal, this.lastGlobalOrdinal));
-                    this.BeginLifecycleBoundaryNoLock(
-                        boundaryEpoch,
-                        (int)identity.Type,
-                        identity.Instance,
-                        character.Pointer,
-                        boundaryOrdinal);
+                    LineageState priorLineage;
+                    if (this.lineageByEpochIdentity.TryGetValue(identityKey, out priorLineage))
+                    {
+                        this.BeginLifecycleBoundaryNoLock(
+                            boundaryEpoch,
+                            (int)identity.Type,
+                            identity.Instance,
+                            character.Pointer,
+                            boundaryOrdinal);
+                    }
+                    else
+                    {
+                        // An initial Spawn/CharInPlay is discovery, not proof
+                        // that same-epoch packets already received belong to a
+                        // prior object. Preserve them for direct identity link.
+                        this.MarkEvidenceDirtyNoLock(identityKey, "initial-lifecycle-discovery");
+                    }
                 }
             }
         }
@@ -408,6 +476,7 @@ namespace AOSharpLiveCapture
                 {
                     string key = EpochIdentityKey(epoch.ZoneEpochId, message.Identity.Type, message.Identity.Instance);
                     this.latestScfuByEpochIdentity[key] = record;
+                    this.MarkEvidenceDirtyNoLock(key, "scfu-received");
                 }
             }
         }
@@ -458,6 +527,7 @@ namespace AOSharpLiveCapture
                 {
                     string key = EpochIdentityKey(epoch.ZoneEpochId, message.Identity.Type, message.Identity.Instance);
                     this.latestStatByEpochIdentity[key] = record;
+                    this.MarkEvidenceDirtyNoLock(key, "stat-received");
                 }
             }
         }
@@ -528,6 +598,20 @@ namespace AOSharpLiveCapture
                 return false;
             }
 
+            string identityKey = EpochIdentityKey(
+                this.currentEpoch.ZoneEpochId,
+                (int)identityBefore.Type,
+                identityBefore.Instance);
+            NpcEvidenceState evidenceState = this.GetOrCreateEvidenceStateNoLock(
+                identityKey,
+                capturedUtc,
+                character.Pointer);
+            if (!this.ShouldCaptureNpcNoLock(evidenceState, capturedUtc, trigger, character.Pointer))
+            {
+                this.redundantSnapshotsSuppressed++;
+                return false;
+            }
+
             WorldIdentitySample worldBefore = this.currentEpoch.World;
             NpcSnapshotRecord snapshot = this.CaptureNpcSnapshotNoLock(
                 capturedUtc,
@@ -555,7 +639,7 @@ namespace AOSharpLiveCapture
             }
 
             if (!TryCaptureWorldIdentity(out worldAfter, out worldError)
-                || !worldBefore.Equals(worldAfter)
+                || !worldBefore.SameRuntimeContext(worldAfter)
                 || identityBefore != identityAfter
                 || !validAfter)
             {
@@ -572,8 +656,31 @@ namespace AOSharpLiveCapture
                 return false;
             }
 
+            evidenceState.ClientIdentityCaptured = true;
+            evidenceState.ClientSnapshotComplete = string.IsNullOrWhiteSpace(snapshot.PositionError)
+                                                   && string.IsNullOrWhiteSpace(snapshot.RotationError)
+                                                   && snapshot.CellId.HasValue
+                                                   && snapshot.Stats.All(value => string.IsNullOrWhiteSpace(value.Error));
+            evidenceState.Dirty = false;
+            evidenceState.LastSeenUtc = capturedUtc;
+            evidenceState.LastCaptureUtc = capturedUtc;
+            evidenceState.NextPositionRefreshUtc = capturedUtc.Add(PositionRefreshInterval);
+            if (!evidenceState.ClientSnapshotComplete)
+            {
+                evidenceState.NextRetryUtc = capturedUtc.Add(IncompleteRetryInterval);
+            }
+
+            string fingerprint = SnapshotFingerprint(snapshot);
+            if (string.Equals(evidenceState.LastFingerprint, fingerprint, StringComparison.Ordinal))
+            {
+                this.redundantSnapshotsSuppressed++;
+                return false;
+            }
+
+            evidenceState.LastFingerprint = fingerprint;
             snapshot.ObservationSequence = ++this.observationSequence;
             this.snapshots.Add(snapshot);
+            this.RecordEmittedSnapshotNoLock(snapshot.CapturedUtc);
             return true;
         }
 
@@ -701,7 +808,13 @@ namespace AOSharpLiveCapture
             if (!priorLineageFound || lineageReplaced)
             {
                 int nextLineage = lineage == null ? 1 : lineage.Ordinal + 1;
-                long evidenceFloor = observationOrdinal;
+                // A packet can legitimately arrive before AOSharp exposes the
+                // corresponding Dynel. First discovery therefore inherits
+                // direct same-epoch packet evidence. Only a proven object
+                // replacement advances the evidence floor and clears caches.
+                long evidenceFloor = lineageReplaced
+                                         ? observationOrdinal
+                                         : this.currentEpoch.StartGlobalOrdinal - 1;
                 lineage = new LineageState
                 {
                     Ordinal = nextLineage,
@@ -710,8 +823,11 @@ namespace AOSharpLiveCapture
                     LastObservationGlobalOrdinal = observationOrdinal
                 };
                 this.lineageByEpochIdentity[identityKey] = lineage;
-                this.latestScfuByEpochIdentity.Remove(identityKey);
-                this.latestStatByEpochIdentity.Remove(identityKey);
+                if (lineageReplaced)
+                {
+                    this.latestScfuByEpochIdentity.Remove(identityKey);
+                    this.latestStatByEpochIdentity.Remove(identityKey);
+                }
             }
 
             PacketScfuRecord scfu;
@@ -734,6 +850,7 @@ namespace AOSharpLiveCapture
                 Epoch = this.currentEpoch,
                 CapturedUtc = capturedUtc,
                 ObservationGlobalOrdinal = observationOrdinal,
+                EvidenceWindowStartGlobalOrdinal = lineage.EvidenceAfterGlobalOrdinal + 1,
                 Trigger = trigger ?? string.Empty,
                 IdentityType = (int)identity.Type,
                 IdentityInstance = identity.Instance,
@@ -827,7 +944,7 @@ namespace AOSharpLiveCapture
                     this.currentEpoch.SamplingError = string.Empty;
                 }
             }
-            else if (!this.currentEpoch.World.Equals(sample))
+            else if (!this.currentEpoch.World.SameRuntimeContext(sample))
             {
                 this.CloseCurrentEpochNoLock(
                     capturedUtc,
@@ -845,6 +962,12 @@ namespace AOSharpLiveCapture
                 this.currentEpoch.State = "stable";
                 this.currentEpoch.SamplingError = string.Empty;
             }
+
+            this.ObservePlayfieldModelNoLock(
+                this.currentEpoch,
+                sample,
+                capturedUtc,
+                currentGlobalOrdinal);
 
             return this.currentEpoch != null
                    && this.currentEpoch.Validity == "valid"
@@ -893,6 +1016,7 @@ namespace AOSharpLiveCapture
             };
             this.latestScfuByEpochIdentity.Remove(identityKey);
             this.latestStatByEpochIdentity.Remove(identityKey);
+            this.evidenceStateByEpochIdentity.Remove(identityKey);
         }
 
         private void ClearCachedEvidenceNoLock(
@@ -928,6 +1052,209 @@ namespace AOSharpLiveCapture
                 .ToArray())
             {
                 this.latestStatByEpochIdentity.Remove(key);
+            }
+        }
+
+        private NpcEvidenceState GetOrCreateEvidenceStateNoLock(
+            string identityKey,
+            DateTime capturedUtc,
+            IntPtr pointer)
+        {
+            NpcEvidenceState state;
+            if (!this.evidenceStateByEpochIdentity.TryGetValue(identityKey, out state))
+            {
+                state = new NpcEvidenceState
+                {
+                    FirstSeenUtc = capturedUtc,
+                    LastSeenUtc = capturedUtc,
+                    Pointer = pointer,
+                    Dirty = true,
+                    DirtyReason = "first-seen",
+                    NextRetryUtc = capturedUtc,
+                    NextPositionRefreshUtc = capturedUtc
+                };
+                this.evidenceStateByEpochIdentity[identityKey] = state;
+            }
+            else
+            {
+                if (state.FirstSeenUtc == DateTime.MinValue)
+                {
+                    state.FirstSeenUtc = capturedUtc;
+                }
+                state.LastSeenUtc = capturedUtc;
+                if (state.Pointer == IntPtr.Zero)
+                {
+                    state.Pointer = pointer;
+                }
+            }
+
+            return state;
+        }
+
+        private bool ShouldCaptureNpcNoLock(
+            NpcEvidenceState state,
+            DateTime capturedUtc,
+            string trigger,
+            IntPtr pointer)
+        {
+            bool pointerChanged = state.Pointer != IntPtr.Zero && state.Pointer != pointer;
+            bool firstCapture = !state.ClientIdentityCaptured;
+            bool eventTriggered = state.Dirty
+                                  || !string.Equals(
+                                      trigger,
+                                      "periodic-nearby-scan",
+                                      StringComparison.Ordinal);
+            bool retryDue = !state.ClientSnapshotComplete
+                            && state.ClientIdentityCaptured
+                            && state.RetryCount < MaximumIncompleteRetries
+                            && capturedUtc >= state.NextRetryUtc;
+            bool positionRefreshDue = state.ClientIdentityCaptured
+                                      && capturedUtc >= state.NextPositionRefreshUtc;
+            if (retryDue)
+            {
+                state.RetryCount++;
+                this.retriesTotal++;
+            }
+            else if (!state.ClientSnapshotComplete
+                     && state.ClientIdentityCaptured
+                     && state.RetryCount < MaximumIncompleteRetries)
+            {
+                this.deferredWorkCount++;
+            }
+
+            if (pointerChanged)
+            {
+                state.Pointer = pointer;
+                state.Dirty = true;
+                state.DirtyReason = "client-object-pointer-replaced";
+            }
+
+            return firstCapture || eventTriggered || retryDue || positionRefreshDue || pointerChanged;
+        }
+
+        private void MarkEvidenceDirtyNoLock(string identityKey, string reason)
+        {
+            NpcEvidenceState state;
+            if (!this.evidenceStateByEpochIdentity.TryGetValue(identityKey, out state))
+            {
+                state = new NpcEvidenceState
+                {
+                    FirstSeenUtc = DateTime.MinValue,
+                    LastSeenUtc = DateTime.MinValue,
+                    NextRetryUtc = DateTime.MinValue,
+                    NextPositionRefreshUtc = DateTime.MinValue
+                };
+                this.evidenceStateByEpochIdentity[identityKey] = state;
+            }
+
+            state.Dirty = true;
+            state.DirtyReason = reason ?? "packet-evidence-received";
+        }
+
+        private static string SnapshotFingerprint(NpcSnapshotRecord snapshot)
+        {
+            var value = new StringBuilder();
+            value.Append(snapshot.IdentityType).Append('|').Append(snapshot.IdentityInstance).Append('|');
+            value.Append(snapshot.Pointer.ToInt64()).Append('|');
+            value.Append(snapshot.Position.X.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.Position.Y.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.Position.Z.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.Rotation.X.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.Rotation.Y.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.Rotation.Z.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.Rotation.W.ToString("R", CultureInfo.InvariantCulture)).Append('|');
+            value.Append(snapshot.CellId.HasValue ? snapshot.CellId.Value.ToString(CultureInfo.InvariantCulture) : "null");
+            foreach (ClientStatRecord stat in snapshot.Stats)
+            {
+                value.Append('|').Append(stat.StatId).Append(':');
+                value.Append(stat.RawValue.HasValue ? stat.RawValue.Value.ToString(CultureInfo.InvariantCulture) : "null");
+                value.Append(':').Append(stat.Error ?? string.Empty);
+            }
+            value.Append("|scfu:").Append(snapshot.Scfu == null ? 0 : snapshot.Scfu.GlobalOrdinal);
+            value.Append("|stat:").Append(snapshot.LatestStatPacket == null ? 0 : snapshot.LatestStatPacket.GlobalOrdinal);
+            return value.ToString();
+        }
+
+        private void RecordSnapshotCallback(long elapsedTicks)
+        {
+            lock (this.syncRoot)
+            {
+                this.snapshotCallbackCount++;
+                this.snapshotCallbackElapsedTicks += elapsedTicks;
+                this.snapshotCallbackMaxTicks = Math.Max(this.snapshotCallbackMaxTicks, elapsedTicks);
+            }
+        }
+
+        private void RecordEmittedSnapshotNoLock(DateTime capturedUtc)
+        {
+            long second = NormalizeUtc(capturedUtc).Ticks / TimeSpan.TicksPerSecond;
+            int count;
+            this.emittedSnapshotsBySecond.TryGetValue(second, out count);
+            count++;
+            this.emittedSnapshotsBySecond[second] = count;
+            this.maxSnapshotsPerSecond = Math.Max(this.maxSnapshotsPerSecond, count);
+        }
+
+        private void ObservePlayfieldModelNoLock(
+            ZoneEpochRecord epoch,
+            WorldIdentitySample sample,
+            DateTime capturedUtc,
+            long globalOrdinal)
+        {
+            if (epoch == null || sample == null)
+            {
+                return;
+            }
+
+            if (epoch.PlayfieldModelState == "observed-direct-resource")
+            {
+                if (sample.ModelPlayfield != null
+                    && sample.ModelPlayfield.Type == PlayfieldDistrictInfoType
+                    && !sample.ModelPlayfield.Equals(epoch.World.ModelPlayfield))
+                {
+                    epoch.PlayfieldModelState = "conflict";
+                    epoch.PlayfieldModelFinalReason = "A different type-1000014 ModelIdentity appeared in the same epoch.";
+                }
+                return;
+            }
+
+            if (capturedUtc < epoch.NextModelIdentityRetryUtc)
+            {
+                return;
+            }
+
+            epoch.ModelIdentityRetryCount++;
+            epoch.NextModelIdentityRetryUtc = capturedUtc.Add(ModelIdentityRetryInterval);
+            if (sample.ModelPlayfield == null)
+            {
+                epoch.PlayfieldModelState = sample.ModelSampleState == "changed-during-sample"
+                                                ? "late"
+                                                : "default";
+                epoch.PlayfieldModelFinalReason = "Playfield.ModelIdentity was not stably exposed at this sample.";
+                return;
+            }
+
+            if (!epoch.ModelIdentityFirstObservedUtc.HasValue)
+            {
+                epoch.ModelIdentityFirstObservedUtc = capturedUtc;
+                epoch.ModelIdentityFirstObservedGlobalOrdinal = globalOrdinal;
+            }
+            epoch.World.ModelPlayfield = sample.ModelPlayfield;
+            if (sample.ModelPlayfield.Type == PlayfieldDistrictInfoType)
+            {
+                epoch.PlayfieldModelState = "observed-direct-resource";
+                epoch.ModelIdentityFirstValidUtc = capturedUtc;
+                epoch.ModelIdentityFirstValidGlobalOrdinal = globalOrdinal;
+                epoch.PlayfieldModelFinalReason = string.Empty;
+            }
+            else
+            {
+                epoch.PlayfieldModelState = "observed-non-resource-type";
+                epoch.PlayfieldModelFinalReason = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield.ModelIdentity exposed type {0}; only type {1} is direct base-playfield proof.",
+                    sample.ModelPlayfield.Type,
+                    PlayfieldDistrictInfoType);
             }
         }
 
@@ -974,24 +1301,46 @@ namespace AOSharpLiveCapture
                 Identity modelIdentity2 = Playfield.ModelIdentity;
                 if (Game.IsZoning
                     || localIdentity1 != localIdentity2
-                    || runtimeIdentity1 != runtimeIdentity2
-                    || modelIdentity1 != modelIdentity2)
+                    || runtimeIdentity1 != runtimeIdentity2)
                 {
-                    error = "Runtime, model, or local-player identity changed during the atomic sample.";
+                    error = "Runtime or local-player identity changed during the atomic sample.";
                     return false;
                 }
 
-                if (runtimeIdentity1 == Identity.None || modelIdentity1 == Identity.None)
+                if (runtimeIdentity1 == Identity.None || localIdentity1 == Identity.None)
                 {
-                    error = "Runtime or model playfield identity was None.";
+                    error = "Runtime playfield or local-player identity was None.";
                     return false;
+                }
+
+                int? nativeZoneInstance = null;
+                try
+                {
+                    IntPtr nativeZone = N3Dynel_t.GetZone(localPlayer.Pointer);
+                    if (nativeZone != IntPtr.Zero)
+                    {
+                        nativeZoneInstance = N3Zone_t.GetInstance(nativeZone);
+                    }
+                }
+                catch
+                {
+                    nativeZoneInstance = null;
                 }
 
                 sample = new WorldIdentitySample
                 {
                     RuntimePlayfield = IdentityValue.FromIdentity(runtimeIdentity1),
-                    ModelPlayfield = IdentityValue.FromIdentity(modelIdentity1),
-                    LocalPlayer = IdentityValue.FromIdentity(localIdentity1)
+                    ModelPlayfield = modelIdentity1 == Identity.None
+                                         || modelIdentity1 != modelIdentity2
+                                             ? null
+                                             : IdentityValue.FromIdentity(modelIdentity1),
+                    ModelSampleState = modelIdentity1 == Identity.None
+                                           ? "default"
+                                           : modelIdentity1 != modelIdentity2
+                                                 ? "changed-during-sample"
+                                                 : "observed",
+                    LocalPlayer = IdentityValue.FromIdentity(localIdentity1),
+                    NativeZoneInstance = nativeZoneInstance
                 };
                 return true;
             }
@@ -1049,7 +1398,10 @@ namespace AOSharpLiveCapture
                 Trigger = trigger ?? string.Empty,
                 Validity = "pending",
                 State = "awaiting-stable-world",
-                RuntimePlayfieldIdHint = runtimePlayfieldIdHint
+                RuntimePlayfieldIdHint = runtimePlayfieldIdHint,
+                PlayfieldModelState = "default",
+                PlayfieldModelFinalReason = "Playfield.ModelIdentity has not yet been sampled.",
+                NextModelIdentityRetryUtc = capturedUtc
             };
             this.epochs.Add(epoch);
             this.currentEpoch = epoch;
@@ -1090,6 +1442,14 @@ namespace AOSharpLiveCapture
                 this.currentEpoch.Validity = "invalid";
             }
 
+            if (this.currentEpoch.PlayfieldModelState == "default"
+                || this.currentEpoch.PlayfieldModelState == "late")
+            {
+                this.currentEpoch.PlayfieldModelState = "not-exposed";
+                this.currentEpoch.PlayfieldModelFinalReason =
+                    "No stable type-1000014 Playfield.ModelIdentity was exposed before epoch close.";
+            }
+
             this.currentEpoch.State = state ?? "closed";
             this.currentEpoch = null;
         }
@@ -1104,6 +1464,14 @@ namespace AOSharpLiveCapture
 
         private void WriteArtifactNoLock()
         {
+            DateTime writeStartedUtc = DateTime.UtcNow;
+            if (!this.completed
+                && this.lastArtifactWriteUtc != DateTime.MinValue
+                && writeStartedUtc - this.lastArtifactWriteUtc < ArtifactFlushInterval)
+            {
+                return;
+            }
+
             string temporaryPath = this.ArtifactPath + ".tmp";
             using (var output = new StreamWriter(
                 new FileStream(temporaryPath, FileMode.Create, FileAccess.Write, FileShare.Read),
@@ -1136,6 +1504,103 @@ namespace AOSharpLiveCapture
             {
                 File.Move(temporaryPath, this.ArtifactPath);
             }
+
+            long serializedBytes = new FileInfo(this.ArtifactPath).Length;
+            double seconds = this.lastArtifactWriteUtc == DateTime.MinValue
+                                 ? 1.0
+                                 : Math.Max(1.0, (writeStartedUtc - this.lastArtifactWriteUtc).TotalSeconds);
+            this.serializedBytesTotal += serializedBytes;
+            this.maxSerializedBytesPerSecond = Math.Max(
+                this.maxSerializedBytesPerSecond,
+                (long)Math.Ceiling(serializedBytes / seconds));
+            this.artifactWriteCount++;
+            this.lastArtifactWriteUtc = writeStartedUtc;
+            if (this.completed)
+            {
+                this.WriteSummaryNoLock();
+            }
+        }
+
+        private void WriteSummaryNoLock()
+        {
+            NpcSnapshotRecord[] latestSnapshots = this.snapshots
+                .GroupBy(value => value.EpochScopedIdentityKey, StringComparer.Ordinal)
+                .Select(group => group.OrderByDescending(value => value.ObservationSequence).First())
+                .ToArray();
+            int npcsTotal = latestSnapshots.Length;
+            int npcsWithScfu = latestSnapshots.Count(value => value.Scfu != null);
+            int npcsWithStatPacket = latestSnapshots.Count(value => value.LatestStatPacket != null);
+            int rawScfuTotal = this.packetEvents.OfType<PacketScfuRecord>().Count();
+            int rawStatTotal = this.packetEvents.OfType<PacketStatRecord>().Count();
+            int rawScfuNpcIdentities = this.packetEvents
+                .OfType<PacketScfuRecord>()
+                .Where(value => value.Message != null)
+                .Select(value => value.Message.Identity.Type.ToString(CultureInfo.InvariantCulture)
+                                 + ":"
+                                 + value.Message.Identity.Instance.ToString(CultureInfo.InvariantCulture))
+                .Distinct(StringComparer.Ordinal)
+                .Count();
+            int rawStatNpcIdentities = this.packetEvents
+                .OfType<PacketStatRecord>()
+                .Where(value => value.Message != null)
+                .Select(value => value.Message.Identity.Type.ToString(CultureInfo.InvariantCulture)
+                                 + ":"
+                                 + value.Message.Identity.Instance.ToString(CultureInfo.InvariantCulture))
+                .Distinct(StringComparer.Ordinal)
+                .Count();
+            double averageCallbackMs = this.snapshotCallbackCount == 0
+                                           ? 0.0
+                                           : this.snapshotCallbackElapsedTicks * 1000.0
+                                             / Stopwatch.Frequency
+                                             / this.snapshotCallbackCount;
+            double maximumCallbackMs = this.snapshotCallbackMaxTicks * 1000.0 / Stopwatch.Frequency;
+
+            var json = new StringBuilder();
+            json.Append("{");
+            AppendJsonNumber(json, "schema_version", SchemaVersion, false);
+            AppendJsonString(json, "capture_id", this.captureId, true);
+            AppendJsonNumber(json, "npcs_total", npcsTotal, true);
+            AppendJsonNumber(json, "npcs_with_client_identity", npcsTotal, true);
+            AppendJsonNumber(json, "npcs_with_world_position", latestSnapshots.Count(value => string.IsNullOrWhiteSpace(value.PositionError)), true);
+            AppendJsonNumber(json, "npcs_with_orientation", latestSnapshots.Count(value => string.IsNullOrWhiteSpace(value.RotationError)), true);
+            AppendJsonNumber(json, "npcs_with_native_cell", latestSnapshots.Count(value => value.CellId.HasValue), true);
+            AppendJsonNumber(json, "npcs_with_scfu", npcsWithScfu, true);
+            AppendJsonNumber(json, "npcs_with_scfu_position", npcsWithScfu, true);
+            AppendJsonNumber(json, "npcs_with_full_appearance", latestSnapshots.Count(value => value.Scfu != null && value.Scfu.Message != null), true);
+            AppendJsonNumber(json, "npcs_with_stat_packet", npcsWithStatPacket, true);
+            AppendJsonNumber(json, "npcs_with_client_stats", latestSnapshots.Count(value => value.Stats != null && value.Stats.Count == ClientVisibleStats.Length && value.Stats.All(stat => string.IsNullOrWhiteSpace(stat.Error))), true);
+            AppendJsonNumber(json, "epochs_total", this.epochs.Count, true);
+            AppendJsonNumber(json, "epochs_with_playfield_id", this.epochs.Count(value => value.World != null && value.World.RuntimePlayfield != null), true);
+            AppendJsonNumber(json, "epochs_with_playfield_model_id", this.epochs.Count(value => value.World != null && value.World.ModelPlayfield != null), true);
+            AppendJsonNumber(json, "epochs_with_direct_base_playfield_id", this.epochs.Count(value => value.World != null && value.World.ModelPlayfield != null && value.World.ModelPlayfield.Type == PlayfieldDistrictInfoType), true);
+            AppendJsonNumber(json, "snapshots_total", this.snapshots.Count, true);
+            AppendJsonNumber(json, "snapshots_redundant_suppressed", this.redundantSnapshotsSuppressed, true);
+            AppendJsonNumber(json, "retries_total", this.retriesTotal, true);
+            AppendJsonNumber(json, "raw_scfu_total", rawScfuTotal, true);
+            AppendJsonNumber(json, "raw_scfu_npc_identities", rawScfuNpcIdentities, true);
+            AppendJsonNumber(json, "scfu_direct_linked", npcsWithScfu, true);
+            AppendJsonNumber(json, "scfu_unlinked", Math.Max(0, rawScfuNpcIdentities - npcsWithScfu), true);
+            AppendJsonNumber(json, "scfu_decode_failed", this.packetEvents.OfType<PacketScfuRecord>().Count(value => !string.IsNullOrWhiteSpace(value.DecodeError)), true);
+            AppendJsonNumber(json, "scfu_outside_epoch", this.packetEvents.OfType<PacketScfuRecord>().Count(value => value.Epoch == null), true);
+            AppendJsonNumber(json, "raw_stat_total", rawStatTotal, true);
+            AppendJsonNumber(json, "raw_stat_npc_identities", rawStatNpcIdentities, true);
+            AppendJsonNumber(json, "stat_direct_linked", npcsWithStatPacket, true);
+            AppendJsonNumber(json, "stat_unlinked", Math.Max(0, rawStatNpcIdentities - npcsWithStatPacket), true);
+            AppendJsonNumber(json, "stat_decode_failed", this.packetEvents.OfType<PacketStatRecord>().Count(value => !string.IsNullOrWhiteSpace(value.DecodeError)), true);
+            AppendJsonNumber(json, "stat_outside_epoch", this.packetEvents.OfType<PacketStatRecord>().Count(value => value.Epoch == null), true);
+            AppendJsonFloat(json, "snapshot_callback_average_ms", (float)averageCallbackMs, true);
+            AppendJsonFloat(json, "snapshot_callback_max_ms", (float)maximumCallbackMs, true);
+            AppendJsonNumber(json, "max_snapshots_per_second", this.maxSnapshotsPerSecond, true);
+            AppendJsonNumber(json, "serialized_bytes_total", this.serializedBytesTotal, true);
+            AppendJsonNumber(json, "max_serialized_bytes_per_second", this.maxSerializedBytesPerSecond, true);
+            AppendJsonNumber(json, "artifact_write_count", this.artifactWriteCount, true);
+            AppendJsonNumber(json, "queue_depth_high_water", 0, true);
+            AppendJsonNumber(json, "raw_packet_processing_backlog", 0, true);
+            AppendJsonNumber(json, "dropped_work_count", this.droppedWorkCount, true);
+            AppendJsonNumber(json, "deferred_work_count", this.deferredWorkCount, true);
+            AppendJsonString(json, "client_stats_scope", "10 identity-relevant stats; full enumeration skipped for performance", true);
+            json.Append("}");
+            File.WriteAllText(this.SummaryPath, json.ToString() + Environment.NewLine, new UTF8Encoding(false));
         }
 
         private string SerializeZoneEpoch(ZoneEpochRecord epoch)
@@ -1161,6 +1626,56 @@ namespace AOSharpLiveCapture
             AppendJsonNullableNumber(json, "runtime_playfield_id_hint", epoch.RuntimePlayfieldIdHint, true);
             AppendJsonIdentity(json, "runtime_playfield_identity", epoch.World == null ? null : epoch.World.RuntimePlayfield, true);
             AppendJsonIdentity(json, "model_playfield_identity", epoch.World == null ? null : epoch.World.ModelPlayfield, true);
+            AppendJsonString(json, "playfield_model_id_state", epoch.PlayfieldModelState ?? "not-exposed", true);
+            AppendJsonNullableNumber(
+                json,
+                "playfield_model_type",
+                epoch.World == null || epoch.World.ModelPlayfield == null
+                    ? (int?)null
+                    : epoch.World.ModelPlayfield.Type,
+                true);
+            AppendJsonNullableNumber(
+                json,
+                "playfield_model_instance",
+                epoch.World == null || epoch.World.ModelPlayfield == null
+                    ? (int?)null
+                    : epoch.World.ModelPlayfield.Instance,
+                true);
+            AppendJsonNullableNumber(
+                json,
+                "native_zone_instance",
+                epoch.World == null ? (int?)null : epoch.World.NativeZoneInstance,
+                true);
+            AppendJsonNumber(json, "model_identity_retry_count", epoch.ModelIdentityRetryCount, true);
+            AppendJsonNullableString(
+                json,
+                "model_identity_first_observed_utc",
+                epoch.ModelIdentityFirstObservedUtc.HasValue
+                    ? FormatUtc(epoch.ModelIdentityFirstObservedUtc.Value)
+                    : null,
+                true);
+            AppendJsonNullableNumber(
+                json,
+                "model_identity_first_observed_global_ordinal",
+                epoch.ModelIdentityFirstObservedGlobalOrdinal,
+                true);
+            AppendJsonNullableString(
+                json,
+                "model_identity_first_valid_utc",
+                epoch.ModelIdentityFirstValidUtc.HasValue
+                    ? FormatUtc(epoch.ModelIdentityFirstValidUtc.Value)
+                    : null,
+                true);
+            AppendJsonNullableNumber(
+                json,
+                "model_identity_first_valid_global_ordinal",
+                epoch.ModelIdentityFirstValidGlobalOrdinal,
+                true);
+            AppendJsonString(
+                json,
+                "playfield_model_final_reason",
+                epoch.PlayfieldModelFinalReason ?? string.Empty,
+                true);
             AppendJsonIdentityWrapper(
                 json,
                 "runtime_playfield",
@@ -1171,10 +1686,14 @@ namespace AOSharpLiveCapture
             AppendJsonIdentityWrapper(
                 json,
                 "base_playfield_direct",
-                epoch.World != null && epoch.World.ModelPlayfield.Type == PlayfieldDistrictInfoType
+                epoch.World != null
+                    && epoch.World.ModelPlayfield != null
+                    && epoch.World.ModelPlayfield.Type == PlayfieldDistrictInfoType
                     ? epoch.World.ModelPlayfield
                     : null,
-                epoch.World != null && epoch.World.ModelPlayfield.Type == PlayfieldDistrictInfoType
+                epoch.World != null
+                    && epoch.World.ModelPlayfield != null
+                    && epoch.World.ModelPlayfield.Type == PlayfieldDistrictInfoType
                     ? "client-state-observed"
                     : "not-observed",
                 "Playfield.ModelIdentity",
@@ -1196,7 +1715,9 @@ namespace AOSharpLiveCapture
             AppendJsonBoolean(
                 json,
                 "model_identity_is_playfield_district_info",
-                epoch.World != null && epoch.World.ModelPlayfield.Type == PlayfieldDistrictInfoType,
+                epoch.World != null
+                    && epoch.World.ModelPlayfield != null
+                    && epoch.World.ModelPlayfield.Type == PlayfieldDistrictInfoType,
                 true);
             AppendJsonIdentity(json, "local_player_identity", epoch.World == null ? null : epoch.World.LocalPlayer, true);
             AppendJsonString(json, "sampling_error", epoch.SamplingError ?? string.Empty, true);
@@ -1213,6 +1734,7 @@ namespace AOSharpLiveCapture
                               && epoch.EndGlobalOrdinal.HasValue;
             bool directModel = validEpoch
                                && world != null
+                               && world.ModelPlayfield != null
                                && world.ModelPlayfield.Type == PlayfieldDistrictInfoType;
             ClientStatRecord monsterData = FindStat(snapshot.Stats, Stat.MonsterData);
             ClientStatRecord staticInstance = FindStat(snapshot.Stats, Stat.StaticInstance);
@@ -1260,6 +1782,11 @@ namespace AOSharpLiveCapture
             AppendJsonBoolean(json, "zone_epoch_valid", validEpoch, true);
             AppendJsonNumber(json, "observation_sequence", snapshot.ObservationSequence, true);
             AppendJsonNumber(json, "observation_global_ordinal", snapshot.ObservationGlobalOrdinal, true);
+            AppendJsonNumber(
+                json,
+                "evidence_window_start_global_ordinal",
+                snapshot.EvidenceWindowStartGlobalOrdinal,
+                true);
             AppendJsonString(json, "timestamp", FormatUtc(snapshot.CapturedUtc), true);
             AppendJsonString(json, "trigger", snapshot.Trigger, true);
             AppendJsonNumber(json, "runtime_identity_type", snapshot.IdentityType, true);
@@ -2209,13 +2736,21 @@ namespace AOSharpLiveCapture
             internal IdentityValue RuntimePlayfield { get; set; }
             internal IdentityValue ModelPlayfield { get; set; }
             internal IdentityValue LocalPlayer { get; set; }
+            internal int? NativeZoneInstance { get; set; }
+            internal string ModelSampleState { get; set; }
 
-            public bool Equals(WorldIdentitySample other)
+            internal bool SameRuntimeContext(WorldIdentitySample other)
             {
                 return other != null
                        && object.Equals(this.RuntimePlayfield, other.RuntimePlayfield)
-                       && object.Equals(this.ModelPlayfield, other.ModelPlayfield)
                        && object.Equals(this.LocalPlayer, other.LocalPlayer);
+            }
+
+            public bool Equals(WorldIdentitySample other)
+            {
+                return this.SameRuntimeContext(other)
+                       && object.Equals(this.ModelPlayfield, other.ModelPlayfield)
+                       && this.NativeZoneInstance == other.NativeZoneInstance;
             }
 
             public override bool Equals(object obj)
@@ -2230,6 +2765,7 @@ namespace AOSharpLiveCapture
                     int hash = this.RuntimePlayfield == null ? 0 : this.RuntimePlayfield.GetHashCode();
                     hash = (hash * 397) ^ (this.ModelPlayfield == null ? 0 : this.ModelPlayfield.GetHashCode());
                     hash = (hash * 397) ^ (this.LocalPlayer == null ? 0 : this.LocalPlayer.GetHashCode());
+                    hash = (hash * 397) ^ (this.NativeZoneInstance.HasValue ? this.NativeZoneInstance.Value : 0);
                     return hash;
                 }
             }
@@ -2249,6 +2785,14 @@ namespace AOSharpLiveCapture
             internal int? RuntimePlayfieldIdHint { get; set; }
             internal WorldIdentitySample World { get; set; }
             internal string SamplingError { get; set; }
+            internal string PlayfieldModelState { get; set; }
+            internal string PlayfieldModelFinalReason { get; set; }
+            internal int ModelIdentityRetryCount { get; set; }
+            internal DateTime NextModelIdentityRetryUtc { get; set; }
+            internal DateTime? ModelIdentityFirstObservedUtc { get; set; }
+            internal long? ModelIdentityFirstObservedGlobalOrdinal { get; set; }
+            internal DateTime? ModelIdentityFirstValidUtc { get; set; }
+            internal long? ModelIdentityFirstValidGlobalOrdinal { get; set; }
         }
 
         private sealed class ClientStatRecord
@@ -2270,12 +2814,29 @@ namespace AOSharpLiveCapture
             internal long LastObservationGlobalOrdinal { get; set; }
         }
 
+        private sealed class NpcEvidenceState
+        {
+            internal DateTime FirstSeenUtc { get; set; }
+            internal DateTime LastSeenUtc { get; set; }
+            internal DateTime LastCaptureUtc { get; set; }
+            internal DateTime NextRetryUtc { get; set; }
+            internal DateTime NextPositionRefreshUtc { get; set; }
+            internal IntPtr Pointer { get; set; }
+            internal bool ClientIdentityCaptured { get; set; }
+            internal bool ClientSnapshotComplete { get; set; }
+            internal bool Dirty { get; set; }
+            internal string DirtyReason { get; set; }
+            internal int RetryCount { get; set; }
+            internal string LastFingerprint { get; set; }
+        }
+
         private sealed class NpcSnapshotRecord
         {
             internal ZoneEpochRecord Epoch { get; set; }
             internal DateTime CapturedUtc { get; set; }
             internal long ObservationSequence { get; set; }
             internal long ObservationGlobalOrdinal { get; set; }
+            internal long EvidenceWindowStartGlobalOrdinal { get; set; }
             internal string Trigger { get; set; }
             internal int IdentityType { get; set; }
             internal int IdentityInstance { get; set; }

@@ -1337,6 +1337,117 @@ def replay_observation(
     )
 
 
+def attach_offline_packet_references(
+    raw_snapshots: list[dict[str, Any]],
+    raw_packet_records: list[dict[str, Any]],
+    epochs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Recover exact same-epoch identity links omitted by live enrichment.
+
+    This only adds references to already preserved, fully decoded raw SCFU/Stat
+    records. It never synthesizes client fields and never crosses a lineage
+    evidence floor or zone epoch.
+    """
+    packet_candidates: dict[tuple[str, int, int, str], list[dict[str, Any]]] = {}
+    for item in raw_packet_records:
+        record = item["record"]
+        kind = str(item.get("kind", ""))
+        if kind not in {"packet_scfu", "packet_stat"}:
+            continue
+        if record.get("bridge_link_eligible") is not True:
+            continue
+        if str(record.get("decode_error", "")).strip():
+            continue
+        if record.get("decode_fully_consumed") is not True:
+            continue
+        epoch_id = str(record.get("zone_epoch_id", "")).strip()
+        identity_type = record.get("runtime_identity_type")
+        identity_instance = record.get("runtime_identity_instance")
+        if not epoch_id or not isinstance(identity_type, int) or not isinstance(identity_instance, int):
+            continue
+        source_kind = "scfu" if kind == "packet_scfu" else "stat"
+        packet_candidates.setdefault(
+            (epoch_id, identity_type, identity_instance, source_kind), []
+        ).append(record)
+    for records in packet_candidates.values():
+        records.sort(
+            key=lambda record: (
+                int(record.get("global_ordinal", -1)),
+                str(record.get("direction", "")),
+                int(record.get("sequence", -1)),
+            )
+        )
+
+    recovered: list[dict[str, Any]] = []
+    for item in raw_snapshots:
+        snapshot_item = dict(item)
+        record = dict(item["record"])
+        snapshot_item["record"] = record
+        epoch_id = str(record.get("zone_epoch_id", "")).strip()
+        identity_type = record.get("runtime_identity_type")
+        identity_instance = record.get("runtime_identity_instance")
+        observation_ordinal = record.get("observation_global_ordinal")
+        if (
+            not epoch_id
+            or not isinstance(identity_type, int)
+            or not isinstance(identity_instance, int)
+            or not isinstance(observation_ordinal, int)
+        ):
+            recovered.append(snapshot_item)
+            continue
+        evidence_start = record.get("evidence_window_start_global_ordinal")
+        if not isinstance(evidence_start, int):
+            # Older snapshots do not prove their current lineage floor. They
+            # remain unchanged instead of receiving a speculative packet link.
+            recovered.append(snapshot_item)
+            continue
+        references = record.get("packet_provenance", [])
+        if not isinstance(references, list):
+            recovered.append(snapshot_item)
+            continue
+        references = [dict(reference) for reference in references if isinstance(reference, Mapping)]
+        linked_kinds = {str(reference.get("kind", "")) for reference in references}
+        recovered_kinds: list[str] = []
+        for source_kind in ("scfu", "stat"):
+            if source_kind in linked_kinds:
+                continue
+            candidates = packet_candidates.get(
+                (epoch_id, identity_type, identity_instance, source_kind), []
+            )
+            eligible = [
+                candidate
+                for candidate in candidates
+                if evidence_start <= int(candidate["global_ordinal"]) <= observation_ordinal
+            ]
+            if not eligible:
+                continue
+            candidate = eligible[-1]
+            references.append(
+                {
+                    "kind": source_kind,
+                    "source": "SimpleCharFullUpdate" if source_kind == "scfu" else "Stat",
+                    "direction": candidate["direction"],
+                    "sequence": candidate["sequence"],
+                    "global_ordinal": candidate["global_ordinal"],
+                    "captured_utc": candidate.get("captured_utc", ""),
+                }
+            )
+            recovered_kinds.append(source_kind)
+        references.sort(
+            key=lambda reference: (
+                int(reference.get("global_ordinal", -1)),
+                str(reference.get("direction", "")),
+                int(reference.get("sequence", -1)),
+                str(reference.get("kind", "")),
+            )
+        )
+        record["packet_provenance"] = references
+        if recovered_kinds:
+            record["offline_recovered_packet_reference_kinds"] = recovered_kinds
+        recovered.append(snapshot_item)
+    return recovered
+
+
 def build_artifact(
     live_path: Path,
     scfu_path: Path,
@@ -1353,6 +1464,11 @@ def build_artifact(
             scfu_path,
             stat_path,
         )
+    )
+    raw_snapshots = attach_offline_packet_references(
+        raw_snapshots,
+        raw_packet_records,
+        epochs,
     )
     observations = [normalize_snapshot(capture_id, item, epochs) for item in raw_snapshots]
     observations.sort(
