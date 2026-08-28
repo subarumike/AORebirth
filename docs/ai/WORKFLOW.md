@@ -686,6 +686,22 @@ The schema and identity boundary are documented in
 capture inventory and all current repository capture roots, including
 repository-level `Captures`, without pruning accepted history or raw evidence.
 
+For the database-wide official-client NPC visual census, canonical visual
+signatures, structural base-model families, Leet/Heckler case studies, ACG
+association states, and the retained capture overlay, use:
+
+```cmd
+cmd /d /c Tools\run_enemy_archetype_census.cmd
+cmd /d /c Tools\run_enemy_archetype_census.cmd --check
+```
+
+The workflow verifies the accepted EP1 client resource hashes, exports the
+MonsterData-to-CATMesh visual source chain, runs the focused census tests, and
+writes the governed catalog and report under
+`docs/generated/enemy_archetypes`. It does not require a runtime observation to
+resolve to an exact ACG placement. The current official ACG-to-MonsterData join
+is absent, so placement associations remain unresolved instead of inferred.
+
 For the phase-aware official placement identity audit, all candidate coordinate
 transforms, runtime/base mapping evidence, conservative repeated-observation
 clusters, and non-mutating promotion eligibility, use:

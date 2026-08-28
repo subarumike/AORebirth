@@ -2,34 +2,30 @@
 
 ## Active
 
-Validate the repaired event-first, read-only `NpcIdentityBridgeCapture` offline.
-Preserve the failed Arete sample, retain every raw packet, suppress redundant
-client snapshots, link pre-discovery SCFU/Stat by exact same-epoch identity, and
-record delayed/non-resource `Playfield.ModelIdentity` state without weakening
-the placement resolver.
+Complete and accept the database-wide official-client NPC visual archetype
+census without weakening the placement resolver or changing production NPC
+definitions.
 
-## Current identity-bridge checkpoint
+## Current census checkpoint
 
-- The checked-in client surface directly exposes `Playfield.Identity` and
-  `Playfield.ModelIdentity`; type `1000014` is retained as a direct loaded
-  playfield resource identity. No NPC-specific official model/template ID or
-  stable official district ID is exposed.
-- The failed Arete sample `20260827-213046` is preserved. It contains 38 client
-  identities and clean raw replay; 7/13 received client-present SCFUs linked,
-  5/5 received Stat identities linked, and no placement identity was proven.
-- The repaired recorder is event-first with bounded retries, ten-field client
-  reads, duplicate suppression, throttled serialization, independent epoch
-  model state, coverage/performance finalization, and exact offline packet-link
-  recovery.
-- Another live capture is intentionally deferred until offline/load acceptance
-  passes. The resolver proof boundary remains unchanged.
-- Governed workflow and evidence schema:
-  `docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
+- The verified `18.8.62_EP1` source contains 1,470 MonsterData records and 856
+  referenced CATMesh resources. These reduce to 1,360 exact complete visual
+  signatures and 750 structural base-model families.
+- MonsterData is not enemy-only, so exact official NPC visual counts are
+  reported separately and are not relabeled as a guessed enemy-only count.
+- The retained capture overlay contains 3,472 NPC observations; 3,470 associate
+  uniquely through MonsterData/CATMesh evidence and two remain unknown.
+- All 32,805 official ACG placement associations remain unresolved because the
+  client has no ACGHash-to-MonsterData resolver. Exact placement is not a
+  prerequisite for visual-archetype association.
+- The deterministic catalog, case studies, top-20 reuse report, and acceptance
+  fields are in
+  `docs/generated/enemy_archetypes/enemy-archetype-census-report.md`.
 
 ## Prior resolver checkpoint
 
 The accepted `NpcPlacementIdentityResolver` baseline remains zero unique-proven
-matches across all 32,805 official placements and 3,325 observations. Its
+matches across all 32,805 official placements. Its
 coordinate, district, runtime/base mapping, repeated-lineage, ambiguity, and
 ACGHash proof boundaries remain unchanged. Evidence:
 `docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md`.

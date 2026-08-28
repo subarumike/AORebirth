@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-27
+Updated: 2026-08-28
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,19 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- Official NPC visual archetype census: the verified `18.8.62_EP1` client
+  resource chain now catalogs all 1,470 MonsterData records against 856
+  referenced CATMesh resources. It yields 1,360 exact complete visual
+  signatures and 750 broader structural base-model families; MonsterData does
+  not prove an enemy-only subset, so no single guessed `ARCHETYPE_COUNT` is
+  declared. The census associates 3,470 of 3,472 retained runtime observations
+  through MonsterData/CATMesh evidence without requiring exact placement
+  identity. All 32,805 ACG placement associations remain explicitly unresolved
+  because the official client contains no ACGHash-to-MonsterData resolver.
+  Leet and Heckler case studies, top-20 reuse, source hashes, unknown
+  relationships, and deterministic digest are published in
+  `docs/generated/enemy_archetypes/enemy-archetype-census-report.md`.
 
 - NPC identity bridge evidence acquisition: the preserved Arete live sample
   `20260827-213046` proved clean raw capture but exposed polling-heavy client
@@ -50,10 +63,10 @@ completion matrices and dated evidence retain detailed provenance.
   packets, preserves exact appearance arrays and field provenance, rejects AO's
   `1234567890` unset sentinel from authoritative state, inventories all 358
   accepted captures across repository and historical roots without pruning,
-  and reconciles 3,325 captured NPC observations against 32,805 governed
+  and reconciles 3,472 captured NPC observations against 32,805 governed
   official placements. Exact playfield plus float32-coordinate matching found
-  no unique placement bridges; official-radius containment identified 222
-  heuristic candidate sets that remain explicitly ambiguous, with 3,103
+  no unique placement bridges; official-radius containment identified 299
+  heuristic candidate sets that remain explicitly ambiguous, with 3,173
   observations unmatched. All promotion candidates therefore remain blocked
   and no runtime NPC definition was mass rewritten. The PF3081 Borealis Guide
   and Guard appearance regressions pass;
