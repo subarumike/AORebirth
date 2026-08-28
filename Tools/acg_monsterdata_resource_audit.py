@@ -1168,6 +1168,8 @@ def report_markdown(audit: Mapping[str, Any]) -> str:
         f"- Decoded raw field kinds: {acg['rawFieldKinds']}",
         f"- Trailing opaque bytes: {acg['trailingOpaqueBytes']}",
         f"- Allocation slack bytes: {acg['allocationSlackBytes']}",
+        "- Superseding schema result: the 507,976-byte historical `TrailingOpaqueRegion` is the fully decoded `ZoneToDistrictIndex` vector; only 45 allocation-slack bytes remain semantically opaque. See `docs/reference/ACG_PLACEMENT_SCHEMA.md`.",
+        "- The three historical dropped raw-byte classes meant exact raw payloads omitted from this older normalized projection, not three undecoded ACG fields. The complete schema catalog now retains all three losslessly.",
         "- ACG hash generation: unknown; the client reader only proves a packed four-byte scalar/tag.",
         "- Representative PF4582, PF3081, PF127, Central Elysium, and Andromeda records retain exact raw bytes, offsets, widths, signedness, floats, indices, and full opaque regions in the forensic catalog.",
         "",

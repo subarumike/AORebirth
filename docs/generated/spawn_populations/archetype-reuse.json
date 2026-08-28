@@ -206,8 +206,8 @@
       "localPopulations": 6,
       "names": [
         "Supreme Collector of Waste",
-        "Waste collector",
-        "Waste Collector"
+        "Waste Collector",
+        "Waste collector"
       ],
       "observationCount": 130,
       "playfields": [
@@ -2508,6 +2508,6 @@
       "runtimePopulations": 1
     }
   ],
-  "deterministicDigest": "c9310e2623818f677a96aaeb91580a03cc639115ba8e5c2c3b8be8ce337a2ac5",
+  "deterministicDigest": "3905836cb59f7b8f4011079a8d3ea211608c23dd86236087a586a238211f5647",
   "schemaVersion": 1
 }

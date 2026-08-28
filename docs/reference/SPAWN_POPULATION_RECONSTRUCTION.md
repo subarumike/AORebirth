@@ -5,6 +5,12 @@ population layer over the governed official ACG placement corpus, accepted
 captured NPC observations, the phase-aware placement resolver, and the official
 enemy-archetype census.
 
+This layer is optional runtime enrichment, not an authoritative Funcom
+resource structure. Its 18,423 analytical population records and 22
+population-identity-ready rows do not establish, invalidate, or gate any ACG
+placement. Official ACG decode quality is the sole placement-readiness owner;
+MonsterData, runtime identity, and capture availability are not required.
+
 Run the governed Windows workflow with:
 
 ```cmd
@@ -46,13 +52,14 @@ district, exact coordinates, encoded heading, spawn-policy fields, additional
 points, extensions, source provenance, and explicit absence of a proven native
 parent/generator ID.
 
-Two grouping layers remain separate:
+Two analytical bucketing layers remain separate:
 
-- `officialGroupIds` groups one shared ACG policy tag inside one official
-  district. This is direct structural evidence, not creature identity.
+- `acgPolicyBucketIds` partitions by the official playfield, district, and
+  ACGHash fields. The inputs are official; the bucket is an AORebirth analytic
+  index and is not a proven Funcom group, encounter, or generator field.
 - `derivedSpatialClusterId` is a deterministic 25-metre three-dimensional
-  connected component within that structural group. It is heuristic secondary
-  topology and never becomes an official semantic field.
+  connected component within that bucket. It is heuristic secondary topology
+  and never becomes an official semantic field.
 
 ## Association scopes
 
@@ -83,6 +90,11 @@ Each catalog population independently reports:
 - loot evidence;
 - respawn readiness;
 - exact-placement readiness.
+
+These flags govern optional population/runtime enrichment only. In particular,
+`populationIdentityReady` and `exactPlacementReady` have no placement-validity
+role. A decoded official ACG row remains a placement regardless of whether any
+runtime population, MonsterData, or capture can be associated with it.
 
 Finite loot observations are samples, not complete probabilities. Population
 identity is implementation-ready only at direct or strong exact/local scope.

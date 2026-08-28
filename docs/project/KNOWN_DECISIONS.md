@@ -138,11 +138,19 @@ topology, and ordinary mobs heavily reuse visuals, names, levels, and transient
 runtime IDs. Population-scoped evidence preserves useful reconstruction without
 inventing a client-resource bridge or permanent runtime identity.
 
-Consequences: Official ACG policy grouping remains distinct from heuristic
-spatial clustering. Names, levels, loot, and movement remain contextual.
+Consequences: Analytical bucketing by official ACG fields remains distinct from
+heuristic spatial clustering; neither is an official Funcom grouping semantic.
+Names, levels, loot, and movement remain contextual.
 Proximity alone cannot establish ownership, heuristic-only associations cannot
 authorize implementation, and population association never implies exact-row
 association.
+
+Clarification: the population layer is AORebirth analysis, not a decoded
+Funcom structure. Bucketing shared playfield/district/ACGHash values is not a
+proven official group ID, and the 25-metre component is explicitly heuristic.
+Neither the 18,423 population records nor the 22 population-identity-ready
+records can validate, invalidate, or gate an official ACG placement. Placement
+readiness is owned solely by official ACG decode quality.
 
 ## Visual Archetypes Do Not Require Exact ACG Placement Identity
 

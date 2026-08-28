@@ -1,0 +1,3785 @@
+[
+  {
+    "knownPlacements": 1,
+    "playfield": 6,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 100,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 101,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 102,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 103,
+    "reason": "resource envelope unavailable",
+    "status": "parser_limited",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 104,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 105,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 106,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 107,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 109,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 110,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 111,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 165,
+    "playfield": 120,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 124,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 279,
+    "playfield": 125,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 326,
+    "playfield": 127,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 6,
+    "playfield": 128,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 152,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 320,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 321,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 322,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 324,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 331,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 341,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 346,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 351,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 362,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 382,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 386,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 9,
+    "playfield": 500,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 501,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 387,
+    "playfield": 505,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 272,
+    "playfield": 540,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 129,
+    "playfield": 545,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 20,
+    "playfield": 550,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 281,
+    "playfield": 551,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 556,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 318,
+    "playfield": 560,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 633,
+    "playfield": 565,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 62,
+    "playfield": 566,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 48,
+    "playfield": 567,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 304,
+    "playfield": 570,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 136,
+    "playfield": 585,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 49,
+    "playfield": 586,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 210,
+    "playfield": 590,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 165,
+    "playfield": 595,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 596,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 190,
+    "playfield": 600,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 262,
+    "playfield": 605,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 125,
+    "playfield": 610,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 615,
+    "reason": "resource envelope unavailable",
+    "status": "parser_limited",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 137,
+    "playfield": 620,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 245,
+    "playfield": 625,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 71,
+    "playfield": 630,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 59,
+    "playfield": 635,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 68,
+    "playfield": 640,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 641,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 34,
+    "playfield": 646,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 171,
+    "playfield": 647,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 68,
+    "playfield": 650,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 397,
+    "playfield": 655,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 656,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 612,
+    "playfield": 665,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 176,
+    "playfield": 670,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 118,
+    "playfield": 685,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 16,
+    "playfield": 687,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 54,
+    "playfield": 695,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 34,
+    "playfield": 696,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 35,
+    "playfield": 700,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 61,
+    "playfield": 705,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 706,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 154,
+    "playfield": 710,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 136,
+    "playfield": 716,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 4,
+    "playfield": 717,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 108,
+    "playfield": 730,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 22,
+    "playfield": 735,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 19,
+    "playfield": 740,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 454,
+    "playfield": 750,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 289,
+    "playfield": 760,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 145,
+    "playfield": 790,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 33,
+    "playfield": 791,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 335,
+    "playfield": 795,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 440,
+    "playfield": 800,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 7,
+    "playfield": 896,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 4,
+    "playfield": 950,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 4,
+    "playfield": 952,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 127,
+    "playfield": 953,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 4,
+    "playfield": 954,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 955,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1002,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1003,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1004,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1005,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1011,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1012,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1021,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1031,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 1136,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 1137,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1180,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1181,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1182,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1183,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1184,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1185,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1186,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1187,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1189,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1190,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1191,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1192,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1193,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1211,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1231,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1232,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1233,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1241,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1242,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1243,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1251,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1321,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1322,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1323,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1324,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1325,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1326,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1327,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1328,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1329,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1330,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 1404,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1405,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1406,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1407,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1410,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1421,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1422,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1423,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1424,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1426,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1427,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1428,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1501,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1502,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1503,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1504,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1505,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1506,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1507,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1510,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1511,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1601,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1602,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1603,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1604,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1611,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1612,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1613,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1614,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1621,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1622,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1623,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1624,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1625,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1626,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1627,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1641,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1642,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1643,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1644,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1645,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1646,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1647,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1648,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 1651,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1652,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1653,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1661,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1662,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1663,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1671,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1672,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1673,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1674,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1675,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1701,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1702,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1703,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1711,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1712,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1721,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1722,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1741,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1742,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1743,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 1826,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1827,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 36,
+    "playfield": 1833,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 12,
+    "playfield": 1836,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 11,
+    "playfield": 1840,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 1846,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 153,
+    "playfield": 1862,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1866,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1886,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1887,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 1891,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 1892,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 1893,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1894,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 1901,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 6,
+    "playfield": 1902,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 8,
+    "playfield": 1913,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 251,
+    "playfield": 1931,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 114,
+    "playfield": 1933,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 268,
+    "playfield": 1941,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 55,
+    "playfield": 1943,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2002,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2003,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2004,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2005,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 2006,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2010,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2011,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2012,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2013,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 2014,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2020,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2021,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2022,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2023,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 2024,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2030,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2031,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2032,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2033,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2034,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2040,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2041,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2042,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2043,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2050,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2051,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2052,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2053,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2060,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2061,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2062,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2063,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2064,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2070,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2071,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2072,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 2073,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 2096,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3000,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3002,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3003,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3004,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3005,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3006,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3007,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3008,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3009,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3010,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3011,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3012,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3013,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3014,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3015,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3016,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3017,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3018,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3019,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3020,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3021,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3022,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3023,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3024,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3025,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3026,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3027,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3028,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3029,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3030,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3031,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3032,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3033,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3034,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3035,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3036,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3037,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3038,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3039,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3040,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3041,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3042,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3043,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3044,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3045,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3046,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3047,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3048,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3049,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3050,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3051,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3052,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3053,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3054,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3055,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3056,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3057,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3058,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3059,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3060,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3061,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3062,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3063,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3064,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3065,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3066,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3067,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3068,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3069,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3070,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3071,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3080,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3081,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3082,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3083,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3084,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3085,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3086,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3087,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3088,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3089,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3100,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3101,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3102,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3103,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3104,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3105,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3106,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3107,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3108,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3109,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3110,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3111,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3112,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3113,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3114,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3115,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3116,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3117,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3120,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3121,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3122,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3123,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3124,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3125,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3126,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3127,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3128,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3129,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3130,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3131,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3132,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3133,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3134,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3135,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3136,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3137,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3138,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3139,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3140,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3141,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3142,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3143,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3144,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3145,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3146,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3147,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3148,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 3149,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 51,
+    "playfield": 4001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 683,
+    "playfield": 4005,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4006,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4010,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4011,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 168,
+    "playfield": 4021,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4102,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4107,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 26,
+    "playfield": 4121,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 79,
+    "playfield": 4211,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 122,
+    "playfield": 4212,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 139,
+    "playfield": 4213,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 126,
+    "playfield": 4214,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 238,
+    "playfield": 4215,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 79,
+    "playfield": 4220,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 122,
+    "playfield": 4221,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 139,
+    "playfield": 4222,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 126,
+    "playfield": 4223,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 238,
+    "playfield": 4224,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 298,
+    "playfield": 4310,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 401,
+    "playfield": 4311,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 406,
+    "playfield": 4312,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 273,
+    "playfield": 4313,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 4314,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 4315,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 4316,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4318,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 440,
+    "playfield": 4320,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 546,
+    "playfield": 4321,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 150,
+    "playfield": 4322,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4324,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4327,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 261,
+    "playfield": 4328,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 95,
+    "playfield": 4329,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 37,
+    "playfield": 4330,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 43,
+    "playfield": 4331,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4334,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 78,
+    "playfield": 4335,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 60,
+    "playfield": 4336,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 71,
+    "playfield": 4337,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4341,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4342,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4343,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4344,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4345,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4346,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 17,
+    "playfield": 4347,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 17,
+    "playfield": 4348,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 17,
+    "playfield": 4349,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4350,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4351,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4352,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4354,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4355,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4356,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4357,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4360,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4363,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 17,
+    "playfield": 4364,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 167,
+    "playfield": 4365,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 6,
+    "playfield": 4366,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 166,
+    "playfield": 4367,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 4368,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 577,
+    "playfield": 4370,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 399,
+    "playfield": 4374,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4376,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4380,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4381,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4382,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4383,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4384,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4385,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4386,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4387,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4388,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 221,
+    "playfield": 4389,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4390,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 43,
+    "playfield": 4391,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 30,
+    "playfield": 4468,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4474,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4475,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 319,
+    "playfield": 4504,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 688,
+    "playfield": 4505,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 4530,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 24,
+    "playfield": 4531,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 17,
+    "playfield": 4532,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 20,
+    "playfield": 4533,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4534,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1096,
+    "playfield": 4540,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 436,
+    "playfield": 4541,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 643,
+    "playfield": 4542,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1404,
+    "playfield": 4543,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1048,
+    "playfield": 4544,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 3,
+    "playfield": 4561,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4563,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4564,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4565,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4567,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4568,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4569,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4571,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4572,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4573,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 4575,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 4576,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 4577,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 207,
+    "playfield": 4582,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 24,
+    "playfield": 4604,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 765,
+    "playfield": 4605,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 210,
+    "playfield": 4621,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 231,
+    "playfield": 4622,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 214,
+    "playfield": 4623,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 235,
+    "playfield": 4624,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 209,
+    "playfield": 4625,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 231,
+    "playfield": 4626,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 211,
+    "playfield": 4627,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 232,
+    "playfield": 4628,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 193,
+    "playfield": 4629,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 231,
+    "playfield": 4630,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 22,
+    "playfield": 4676,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 18,
+    "playfield": 4677,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 24,
+    "playfield": 4678,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 4679,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 24,
+    "playfield": 4680,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 4681,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 16,
+    "playfield": 4682,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 17,
+    "playfield": 4683,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 4684,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 11,
+    "playfield": 4685,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 4686,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 11,
+    "playfield": 4687,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 4688,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 12,
+    "playfield": 4689,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 4690,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 12,
+    "playfield": 4691,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 4692,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 12,
+    "playfield": 4693,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 4694,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 12,
+    "playfield": 4695,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 90,
+    "playfield": 4696,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 80,
+    "playfield": 4697,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 10,
+    "playfield": 4698,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 10,
+    "playfield": 4699,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4704,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4805,
+    "reason": "unsupported HashSpawnPoint spell extension",
+    "status": "parser_limited",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4833,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1068,
+    "playfield": 4872,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 179,
+    "playfield": 4873,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 6,
+    "playfield": 4877,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 937,
+    "playfield": 4880,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 469,
+    "playfield": 4881,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4885,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4894,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4898,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 4899,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 4900,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 5001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 5002,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 6001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 6002,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 7,
+    "playfield": 6003,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 13,
+    "playfield": 6007,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 6010,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 355,
+    "playfield": 6011,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 448,
+    "playfield": 6012,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 33,
+    "playfield": 6013,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 22,
+    "playfield": 6014,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 9,
+    "playfield": 6015,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 6017,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 11,
+    "playfield": 6020,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 16,
+    "playfield": 6021,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6022,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6024,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 7,
+    "playfield": 6026,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 31,
+    "playfield": 6028,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 74,
+    "playfield": 6035,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 15,
+    "playfield": 6036,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 19,
+    "playfield": 6041,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 252,
+    "playfield": 6050,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 6051,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 252,
+    "playfield": 6052,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 6055,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6056,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6057,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 6060,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6061,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 6071,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 6101,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 10,
+    "playfield": 6102,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 6104,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6111,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 18,
+    "playfield": 6112,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 18,
+    "playfield": 6113,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6115,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6121,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 63,
+    "playfield": 6123,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6125,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 6127,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 4,
+    "playfield": 6129,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 6131,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 6133,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 26,
+    "playfield": 6211,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6300,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6301,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6302,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6303,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6304,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6305,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 25,
+    "playfield": 6306,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 75,
+    "playfield": 6550,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 93,
+    "playfield": 6551,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 377,
+    "playfield": 6553,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 12,
+    "playfield": 7001,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 7010,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 7,
+    "playfield": 7011,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 7,
+    "playfield": 7012,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 6,
+    "playfield": 7013,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 115,
+    "playfield": 7015,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 7018,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 7019,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 7020,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 8,
+    "playfield": 7051,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 8,
+    "playfield": 7054,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 14,
+    "playfield": 7092,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 7101,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 8002,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 8004,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 8006,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 8009,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 51,
+    "playfield": 8020,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 8030,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 8040,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 0,
+    "playfield": 8045,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 8046,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 8050,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 8060,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 8070,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 2,
+    "playfield": 8080,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 84,
+    "playfield": 9041,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 18,
+    "playfield": 9042,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 8,
+    "playfield": 9050,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 205,
+    "playfield": 9061,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 251,
+    "playfield": 9070,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  },
+  {
+    "knownPlacements": 1,
+    "playfield": 9080,
+    "status": "placement_ready",
+    "syntheticPlacementsCreated": false
+  }
+]

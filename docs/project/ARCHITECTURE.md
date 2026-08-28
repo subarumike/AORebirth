@@ -83,7 +83,9 @@ identity is a transient spawned instance. The effective client resources have
 no static ACGHash-to-MonsterData bridge. AORebirth therefore reconstructs
 reusable contextual populations over the ACG topology and retains exact,
 local-population, playfield-population, unassociated, and conflict scopes
-instead of forcing every runtime NPC onto one exact ACG row. See
+instead of forcing every runtime NPC onto one exact ACG row. Those population
+records are optional AORebirth analytics, not a Funcom resource structure, and
+their readiness never gates official ACG placement validity. See
 `docs/reference/SPAWN_POPULATION_RECONSTRUCTION.md`.
 
 ## Class And Module Structure

@@ -67,6 +67,8 @@ The `.dat`, `.001` ... files are contiguous physical segments selected by one ac
 - Decoded raw field kinds: 16
 - Trailing opaque bytes: 507976
 - Allocation slack bytes: 45
+- Superseding schema result: the 507,976-byte historical `TrailingOpaqueRegion` is the fully decoded `ZoneToDistrictIndex` vector; only 45 allocation-slack bytes remain semantically opaque. See `docs/reference/ACG_PLACEMENT_SCHEMA.md`.
+- The three historical dropped raw-byte classes meant exact raw payloads omitted from this older normalized projection, not three undecoded ACG fields. The complete schema catalog now retains all three losslessly.
 - ACG hash generation: unknown; the client reader only proves a packed four-byte scalar/tag.
 - Representative PF4582, PF3081, PF127, Central Elysium, and Andromeda records retain exact raw bytes, offsets, widths, signedness, floats, indices, and full opaque regions in the forensic catalog.
 
