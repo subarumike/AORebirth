@@ -1,0 +1,1029 @@
+{
+  "deterministicDigest": "8a60130b95887635fd4462cff7d4a1fa91238963a57242c2d23de1f3393c9464",
+  "samples": [
+    {
+      "acgHash": {
+        "nativeUInt32": 1178882383,
+        "text": "FDQO",
+        "wireBytes": "4F 51 44 46"
+      },
+      "coordinates": [
+        971.3027954101562,
+        24.69542121887207,
+        757.9806518554688
+      ],
+      "district": 0,
+      "districtName": "ICC Shuttleport",
+      "formatVersion": 7,
+      "heading": {
+        "rotationMidEncoded": 0,
+        "rotationWidthEncoded": 1
+      },
+      "indexIdentity": "index-page-1113:slot-84",
+      "label": "PF4582 ICC Shuttleport",
+      "normalizedComparison": {
+        "dropped": [
+          "serialized placement bytes",
+          "trailing opaque bytes",
+          "allocation-slack bytes"
+        ],
+        "normalized": [
+          "ACG wire/native/text states are emitted separately",
+          "source record identity is made stable by resource/district/ordinal",
+          "unknown and opaque regions retain offsets, lengths, and SHA-256"
+        ],
+        "retained": [
+          "ACG hash bytes/native/text",
+          "playfield/resource instance",
+          "district index/name",
+          "position",
+          "rotation encodings",
+          "levels",
+          "radius",
+          "respawn chance/time",
+          "assistance radius",
+          "native/more/optional flags",
+          "additional points",
+          "extensions",
+          "unknown optional byte value",
+          "record/resource offsets, lengths, and hashes"
+        ],
+        "undecoded": [
+          "UnknownOptionalU8 semantics",
+          "district unknown fields",
+          "trailing opaque region semantics"
+        ]
+      },
+      "placementRecordHex": "61 D3 72 44 39 90 C5 41 C3 7E 3D 44 00 00 00 00 00 00 01 00 4F 51 44 46 01 00 01 00 64 01 1E 00 00 00 00 00 20 00 00 00",
+      "placementRecordLength": 40,
+      "placementRecordOffsetInResource": 134,
+      "rawLayout": {
+        "apparentResourceReferences": [],
+        "decodedPrefixLength": 40,
+        "indices": [
+          {
+            "field": "IndexLeafPage",
+            "value": 1113
+          },
+          {
+            "field": "IndexLeafSlot",
+            "value": 84
+          },
+          {
+            "field": "DistrictIndex",
+            "value": 0
+          },
+          {
+            "field": "DistrictRecordOrdinal",
+            "value": 0
+          }
+        ],
+        "opaqueBytes": [
+          {
+            "field": "UnknownOptionalU8",
+            "hex": "00",
+            "length": 1,
+            "note": "decoded width/value; semantic meaning unresolved",
+            "offset": 39
+          }
+        ],
+        "rawFloatFields": [
+          {
+            "encoding": "float32-le",
+            "field": "PositionX",
+            "offset": 0,
+            "value": 971.3027954101562,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionY",
+            "offset": 4,
+            "value": 24.69542121887207,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionZ",
+            "offset": 8,
+            "value": 757.9806518554688,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "Radius",
+            "offset": 12,
+            "value": 0.0,
+            "width": 4
+          }
+        ],
+        "rawIntegerFields": [
+          {
+            "field": "RotationMidEncoded",
+            "offset": 16,
+            "signed": false,
+            "value": 0,
+            "width": 2
+          },
+          {
+            "field": "RotationWidthEncoded",
+            "offset": 18,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "AcgHashNativeUInt32",
+            "offset": 20,
+            "signed": false,
+            "value": 1178882383,
+            "width": 4
+          },
+          {
+            "field": "LevelMinimum",
+            "offset": 24,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "LevelMaximum",
+            "offset": 26,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "RespawnChance",
+            "offset": 28,
+            "signed": false,
+            "value": 100,
+            "width": 1
+          },
+          {
+            "field": "SerializedOptionalFlags",
+            "offset": 29,
+            "signed": false,
+            "value": 1,
+            "width": 1
+          },
+          {
+            "field": "RespawnTime",
+            "offset": 30,
+            "signed": false,
+            "value": 30,
+            "width": 2
+          },
+          {
+            "field": "MoreFlags",
+            "offset": 32,
+            "signed": true,
+            "value": 0,
+            "width": 4
+          },
+          {
+            "field": "NativeFlags",
+            "offset": 36,
+            "signed": false,
+            "value": 32,
+            "width": 2
+          },
+          {
+            "field": "AssistanceRadius",
+            "offset": 38,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          },
+          {
+            "field": "UnknownOptionalU8",
+            "offset": 39,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          }
+        ],
+        "variableSectionsPresent": {
+          "additionalPoints": false,
+          "extensions": false
+        }
+      },
+      "recordLength": 10999,
+      "recordOffset": 208356406,
+      "resourceInstance": 4582,
+      "resourceTrailingOpaque": {
+        "Length": 2500,
+        "Offset": 8499,
+        "Sha256": "43771aaccc72e6d9f98049db359dd686c2146954c4a6e0fa15af6a11a9547a86",
+        "hex": "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+      },
+      "resourceType": 1000014,
+      "sourceDatabase": "ResourceDatabase.dat"
+    },
+    {
+      "acgHash": {
+        "nativeUInt32": 1313163076,
+        "text": "NEGD",
+        "wireBytes": "44 47 45 4E"
+      },
+      "coordinates": [
+        105.5,
+        40.0,
+        116.5999984741211
+      ],
+      "district": 0,
+      "districtName": "Neutral Backyard",
+      "formatVersion": 6,
+      "heading": {
+        "rotationMidEncoded": 180,
+        "rotationWidthEncoded": 30
+      },
+      "indexIdentity": "index-page-1112:slot-138",
+      "label": "PF3081 Borealis Backyard",
+      "normalizedComparison": {
+        "dropped": [
+          "serialized placement bytes",
+          "trailing opaque bytes",
+          "allocation-slack bytes"
+        ],
+        "normalized": [
+          "ACG wire/native/text states are emitted separately",
+          "source record identity is made stable by resource/district/ordinal",
+          "unknown and opaque regions retain offsets, lengths, and SHA-256"
+        ],
+        "retained": [
+          "ACG hash bytes/native/text",
+          "playfield/resource instance",
+          "district index/name",
+          "position",
+          "rotation encodings",
+          "levels",
+          "radius",
+          "respawn chance/time",
+          "assistance radius",
+          "native/more/optional flags",
+          "additional points",
+          "extensions",
+          "unknown optional byte value",
+          "record/resource offsets, lengths, and hashes"
+        ],
+        "undecoded": [
+          "UnknownOptionalU8 semantics",
+          "district unknown fields",
+          "trailing opaque region semantics"
+        ]
+      },
+      "placementRecordHex": "00 00 D3 42 00 00 20 42 33 33 E9 42 0A D7 A3 3E B4 00 1E 00 44 47 45 4E C8 00 C8 00 50 00 1E 00",
+      "placementRecordLength": 32,
+      "placementRecordOffsetInResource": 123,
+      "rawLayout": {
+        "apparentResourceReferences": [],
+        "decodedPrefixLength": 32,
+        "indices": [
+          {
+            "field": "IndexLeafPage",
+            "value": 1112
+          },
+          {
+            "field": "IndexLeafSlot",
+            "value": 138
+          },
+          {
+            "field": "DistrictIndex",
+            "value": 0
+          },
+          {
+            "field": "DistrictRecordOrdinal",
+            "value": 0
+          }
+        ],
+        "opaqueBytes": [],
+        "rawFloatFields": [
+          {
+            "encoding": "float32-le",
+            "field": "PositionX",
+            "offset": 0,
+            "value": 105.5,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionY",
+            "offset": 4,
+            "value": 40.0,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionZ",
+            "offset": 8,
+            "value": 116.5999984741211,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "Radius",
+            "offset": 12,
+            "value": 0.3199999928474426,
+            "width": 4
+          }
+        ],
+        "rawIntegerFields": [
+          {
+            "field": "RotationMidEncoded",
+            "offset": 16,
+            "signed": false,
+            "value": 180,
+            "width": 2
+          },
+          {
+            "field": "RotationWidthEncoded",
+            "offset": 18,
+            "signed": false,
+            "value": 30,
+            "width": 2
+          },
+          {
+            "field": "AcgHashNativeUInt32",
+            "offset": 20,
+            "signed": false,
+            "value": 1313163076,
+            "width": 4
+          },
+          {
+            "field": "LevelMinimum",
+            "offset": 24,
+            "signed": false,
+            "value": 200,
+            "width": 2
+          },
+          {
+            "field": "LevelMaximum",
+            "offset": 26,
+            "signed": false,
+            "value": 200,
+            "width": 2
+          },
+          {
+            "field": "RespawnChance",
+            "offset": 28,
+            "signed": false,
+            "value": 80,
+            "width": 1
+          },
+          {
+            "field": "SerializedOptionalFlags",
+            "offset": 29,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          },
+          {
+            "field": "RespawnTime",
+            "offset": 30,
+            "signed": false,
+            "value": 30,
+            "width": 2
+          }
+        ],
+        "variableSectionsPresent": {
+          "additionalPoints": false,
+          "extensions": false
+        }
+      },
+      "recordLength": 237,
+      "recordOffset": 207330742,
+      "resourceInstance": 3081,
+      "resourceTrailingOpaque": {
+        "Length": 25,
+        "Offset": 212,
+        "Sha256": "67b0033b2aafb1d606c4618085b41316aaa506e18d25464fb8e22ffcf1b2d430",
+        "hex": "01 01 01 01 01 01 01 00 01 01 01 01 00 01 01 01 01 00 01 01 01 01 01 01 01"
+      },
+      "resourceType": 1000014,
+      "sourceDatabase": "ResourceDatabase.dat"
+    },
+    {
+      "acgHash": {
+        "nativeUInt32": 1145655365,
+        "text": "DIPE",
+        "wireBytes": "45 50 49 44"
+      },
+      "coordinates": [
+        176.0,
+        107.9000015258789,
+        247.30003356933594
+      ],
+      "district": 0,
+      "districtName": "Abandoned Mall",
+      "formatVersion": 7,
+      "heading": {
+        "rotationMidEncoded": 0,
+        "rotationWidthEncoded": 1
+      },
+      "indexIdentity": "index-page-1111:slot-102",
+      "label": "PF127 Subway",
+      "normalizedComparison": {
+        "dropped": [
+          "serialized placement bytes",
+          "trailing opaque bytes",
+          "allocation-slack bytes"
+        ],
+        "normalized": [
+          "ACG wire/native/text states are emitted separately",
+          "source record identity is made stable by resource/district/ordinal",
+          "unknown and opaque regions retain offsets, lengths, and SHA-256"
+        ],
+        "retained": [
+          "ACG hash bytes/native/text",
+          "playfield/resource instance",
+          "district index/name",
+          "position",
+          "rotation encodings",
+          "levels",
+          "radius",
+          "respawn chance/time",
+          "assistance radius",
+          "native/more/optional flags",
+          "additional points",
+          "extensions",
+          "unknown optional byte value",
+          "record/resource offsets, lengths, and hashes"
+        ],
+        "undecoded": [
+          "UnknownOptionalU8 semantics",
+          "district unknown fields",
+          "trailing opaque region semantics"
+        ]
+      },
+      "placementRecordHex": "00 00 30 43 CD CC D7 42 CF 4C 77 43 CD CC 4C 3E 00 00 01 00 45 50 49 44 05 00 08 00 64 01 C2 01 00 00 00 00 20 00 00 00",
+      "placementRecordLength": 40,
+      "placementRecordOffsetInResource": 117,
+      "rawLayout": {
+        "apparentResourceReferences": [],
+        "decodedPrefixLength": 40,
+        "indices": [
+          {
+            "field": "IndexLeafPage",
+            "value": 1111
+          },
+          {
+            "field": "IndexLeafSlot",
+            "value": 102
+          },
+          {
+            "field": "DistrictIndex",
+            "value": 0
+          },
+          {
+            "field": "DistrictRecordOrdinal",
+            "value": 0
+          }
+        ],
+        "opaqueBytes": [
+          {
+            "field": "UnknownOptionalU8",
+            "hex": "00",
+            "length": 1,
+            "note": "decoded width/value; semantic meaning unresolved",
+            "offset": 39
+          }
+        ],
+        "rawFloatFields": [
+          {
+            "encoding": "float32-le",
+            "field": "PositionX",
+            "offset": 0,
+            "value": 176.0,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionY",
+            "offset": 4,
+            "value": 107.9000015258789,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionZ",
+            "offset": 8,
+            "value": 247.30003356933594,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "Radius",
+            "offset": 12,
+            "value": 0.20000000298023224,
+            "width": 4
+          }
+        ],
+        "rawIntegerFields": [
+          {
+            "field": "RotationMidEncoded",
+            "offset": 16,
+            "signed": false,
+            "value": 0,
+            "width": 2
+          },
+          {
+            "field": "RotationWidthEncoded",
+            "offset": 18,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "AcgHashNativeUInt32",
+            "offset": 20,
+            "signed": false,
+            "value": 1145655365,
+            "width": 4
+          },
+          {
+            "field": "LevelMinimum",
+            "offset": 24,
+            "signed": false,
+            "value": 5,
+            "width": 2
+          },
+          {
+            "field": "LevelMaximum",
+            "offset": 26,
+            "signed": false,
+            "value": 8,
+            "width": 2
+          },
+          {
+            "field": "RespawnChance",
+            "offset": 28,
+            "signed": false,
+            "value": 100,
+            "width": 1
+          },
+          {
+            "field": "SerializedOptionalFlags",
+            "offset": 29,
+            "signed": false,
+            "value": 1,
+            "width": 1
+          },
+          {
+            "field": "RespawnTime",
+            "offset": 30,
+            "signed": false,
+            "value": 450,
+            "width": 2
+          },
+          {
+            "field": "MoreFlags",
+            "offset": 32,
+            "signed": true,
+            "value": 0,
+            "width": 4
+          },
+          {
+            "field": "NativeFlags",
+            "offset": 36,
+            "signed": false,
+            "value": 32,
+            "width": 2
+          },
+          {
+            "field": "AssistanceRadius",
+            "offset": 38,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          },
+          {
+            "field": "UnknownOptionalU8",
+            "offset": 39,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          }
+        ],
+        "variableSectionsPresent": {
+          "additionalPoints": false,
+          "extensions": false
+        }
+      },
+      "recordLength": 13507,
+      "recordOffset": 205067190,
+      "resourceInstance": 127,
+      "resourceTrailingOpaque": {
+        "Length": 46,
+        "Offset": 13461,
+        "Sha256": "614a6eba3b010b6c56316bbc7d5aa05b1e393924205f1470a36b22fa752a35be",
+        "hex": "00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 02 02 02 02 02 02 02 02 02 02 02 02 02 02 02 03 03 00"
+      },
+      "resourceType": 1000014,
+      "sourceDatabase": "ResourceDatabase.dat"
+    },
+    {
+      "acgHash": {
+        "nativeUInt32": 1413827920,
+        "text": "TEMP",
+        "wireBytes": "50 4D 45 54"
+      },
+      "coordinates": [
+        856.8623657226562,
+        48.29999923706055,
+        1824.325439453125
+      ],
+      "district": 0,
+      "districtName": "Heartland",
+      "formatVersion": 6,
+      "heading": {
+        "rotationMidEncoded": 0,
+        "rotationWidthEncoded": 350
+      },
+      "indexIdentity": "index-page-1113:slot-68",
+      "label": "PF4542 Central Elysium Shadowlands",
+      "normalizedComparison": {
+        "dropped": [
+          "serialized placement bytes",
+          "trailing opaque bytes",
+          "allocation-slack bytes"
+        ],
+        "normalized": [
+          "ACG wire/native/text states are emitted separately",
+          "source record identity is made stable by resource/district/ordinal",
+          "unknown and opaque regions retain offsets, lengths, and SHA-256"
+        ],
+        "retained": [
+          "ACG hash bytes/native/text",
+          "playfield/resource instance",
+          "district index/name",
+          "position",
+          "rotation encodings",
+          "levels",
+          "radius",
+          "respawn chance/time",
+          "assistance radius",
+          "native/more/optional flags",
+          "additional points",
+          "extensions",
+          "unknown optional byte value",
+          "record/resource offsets, lengths, and hashes"
+        ],
+        "undecoded": [
+          "UnknownOptionalU8 semantics",
+          "district unknown fields",
+          "trailing opaque region semantics"
+        ]
+      },
+      "placementRecordHex": "31 37 56 44 33 33 41 42 6A 0A E4 44 00 00 00 3F 00 00 5E 01 50 4D 45 54 01 00 01 00 50 01 58 02 A7 00 00 00",
+      "placementRecordLength": 36,
+      "placementRecordOffsetInResource": 1490,
+      "rawLayout": {
+        "apparentResourceReferences": [],
+        "decodedPrefixLength": 36,
+        "indices": [
+          {
+            "field": "IndexLeafPage",
+            "value": 1113
+          },
+          {
+            "field": "IndexLeafSlot",
+            "value": 68
+          },
+          {
+            "field": "DistrictIndex",
+            "value": 0
+          },
+          {
+            "field": "DistrictRecordOrdinal",
+            "value": 0
+          }
+        ],
+        "opaqueBytes": [
+          {
+            "field": "UnknownOptionalU8",
+            "hex": "00",
+            "length": 1,
+            "note": "decoded width/value; semantic meaning unresolved",
+            "offset": 35
+          }
+        ],
+        "rawFloatFields": [
+          {
+            "encoding": "float32-le",
+            "field": "PositionX",
+            "offset": 0,
+            "value": 856.8623657226562,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionY",
+            "offset": 4,
+            "value": 48.29999923706055,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionZ",
+            "offset": 8,
+            "value": 1824.325439453125,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "Radius",
+            "offset": 12,
+            "value": 0.5,
+            "width": 4
+          }
+        ],
+        "rawIntegerFields": [
+          {
+            "field": "RotationMidEncoded",
+            "offset": 16,
+            "signed": false,
+            "value": 0,
+            "width": 2
+          },
+          {
+            "field": "RotationWidthEncoded",
+            "offset": 18,
+            "signed": false,
+            "value": 350,
+            "width": 2
+          },
+          {
+            "field": "AcgHashNativeUInt32",
+            "offset": 20,
+            "signed": false,
+            "value": 1413827920,
+            "width": 4
+          },
+          {
+            "field": "LevelMinimum",
+            "offset": 24,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "LevelMaximum",
+            "offset": 26,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "RespawnChance",
+            "offset": 28,
+            "signed": false,
+            "value": 80,
+            "width": 1
+          },
+          {
+            "field": "SerializedOptionalFlags",
+            "offset": 29,
+            "signed": false,
+            "value": 1,
+            "width": 1
+          },
+          {
+            "field": "RespawnTime",
+            "offset": 30,
+            "signed": false,
+            "value": 600,
+            "width": 2
+          },
+          {
+            "field": "NativeFlags",
+            "offset": 32,
+            "signed": false,
+            "value": 167,
+            "width": 2
+          },
+          {
+            "field": "AssistanceRadius",
+            "offset": 34,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          },
+          {
+            "field": "UnknownOptionalU8",
+            "offset": 35,
+            "signed": false,
+            "value": 0,
+            "width": 1
+          }
+        ],
+        "variableSectionsPresent": {
+          "additionalPoints": false,
+          "extensions": false
+        }
+      },
+      "recordLength": 76805,
+      "recordOffset": 208109066,
+      "resourceInstance": 4542,
+      "resourceTrailingOpaque": {
+        "Length": 2184,
+        "Offset": 74621,
+        "Sha256": "df785bc3abb46c51e72ab9911876d6e98d877dd9e9875c78918ed23db2654472",
+        "hex": "0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 14 14 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 14 14 14 14 14 14 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 14 14 14 14 14 14 0C 0C 0C 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 14 14 14 14 14 0C 0C 0C 0C 10 10 10 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 14 14 0F 0F 0F 14 0C 0C 0C 10 10 2F 2F 2F 2F 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0E 0E 0F 0F 0F 0F 0F 0C 0C 10 10 10 10 2F 2F 2E 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0E 0F 0F 0F 0B 0F 0F 0C 0C 10 10 10 10 2F 2E 2E 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0E 0E 0F 0F 0F 0F 0F 0C 0C 0C 10 10 10 10 2F 2E 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 2A 2A 0E 0E 0F 0F 0F 15 0A 0A 0A 10 10 09 09 09 09 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 2A 2A 0E 0E 0E 15 15 15 0A 0A 0A 10 10 30 09 09 09 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0E 0E 0E 15 15 15 0A 0A 0A 11 10 30 30 09 09 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 27 27 27 27 15 15 15 0A 11 11 10 09 09 09 09 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 27 1C 1C 27 27 16 16 16 11 11 11 09 09 09 12 12 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 26 26 0D 0D 27 1C 1C 27 27 16 16 16 11 11 11 12 12 12 12 12 0D 07 07 07 07 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 26 26 26 26 27 27 27 27 27 16 16 16 17 11 11 11 31 12 12 12 37 07 07 07 07 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 26 26 26 26 24 24 24 16 16 16 16 11 11 11 11 11 31 31 12 12 37 07 07 07 07 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 26 26 26 26 24 24 24 18 18 18 18 11 11 11 11 11 31 31 08 08 08 32 32 32 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 26 26 26 26 24 24 24 18 18 35 35 11 11 13 13 31 31 31 08 08 08 32 32 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 26 26 26 26 24 24 24 18 18 35 35 06 06 13 13 31 31 31 13 08 08 32 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 05 05 05 05 24 24 24 24 18 35 06 06 06 06 13 13 13 13 13 13 13 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 05 05 05 05 24 24 24 2D 18 35 06 06 06 06 13 13 13 13 13 13 28 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 05 05 05 05 23 23 2D 2D 19 19 19 06 06 29 13 13 13 13 28 28 28 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 23 23 23 23 23 23 2D 2D 19 19 19 19 19 29 29 28 28 28 28 28 28 28 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 23 23 23 23 23 23 2D 2D 2D 19 19 19 19 29 29 28 28 28 28 28 28 28 28 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 21 25 25 25 22 22 1A 1A 34 34 1A 29 29 29 28 28 28 28 28 28 28 28 28 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 21 21 25 25 25 22 22 1A 34 34 1A 1A 29 04 04 04 03 03 03 03 03 03 03 03 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 21 21 25 25 22 22 22 1A 34 33 1A 1A 29 04 04 04 04 03 03 03 03 03 03 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 21 25 25 22 22 22 1A 1A 38 1A 1A 29 04 04 04 04 03 03 03 03 03 03 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 25 25 25 20 20 20 1B 34 34 34 29 29 04 04 03 03 03 03 03 03 03 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 25 25 25 20 20 20 1B 1B 34 34 1B 29 29 29 03 03 03 03 03 03 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 21 21 25 25 20 20 20 20 1B 1B 1B 1B 1B 29 29 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 01 01 01 01 20 20 20 20 20 1B 1B 00 00 00 00 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 01 01 01 01 1F 1F 1F 2C 2C 2C 00 00 00 02 02 02 02 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 01 01 01 1F 1F 1D 1D 2C 2C 00 00 00 02 02 02 02 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 01 01 1F 1F 1D 1D 2C 2C 00 00 00 02 02 02 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 01 1F 1F 1E 1E 1E 1E 2B 2B 2B 2B 2B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 1E 1E 1E 1E 2B 2B 2B 2B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 1E 1E 36 36 2B 2B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 1E 1E 36 36 36 36 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 36 36 36 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D"
+      },
+      "resourceType": 1000014,
+      "sourceDatabase": "ResourceDatabase.dat"
+    },
+    {
+      "acgHash": {
+        "nativeUInt32": 843270469,
+        "text": "2CIE",
+        "wireBytes": "45 49 43 32"
+      },
+      "coordinates": [
+        3248.628662109375,
+        12.523102760314941,
+        703.688720703125
+      ],
+      "district": 0,
+      "districtName": "Arete Landing",
+      "formatVersion": 7,
+      "heading": {
+        "rotationMidEncoded": 0,
+        "rotationWidthEncoded": 1
+      },
+      "indexIdentity": "index-page-1111:slot-147",
+      "label": "PF655 Andromeda Rubi-Ka",
+      "normalizedComparison": {
+        "dropped": [
+          "serialized placement bytes",
+          "trailing opaque bytes",
+          "allocation-slack bytes"
+        ],
+        "normalized": [
+          "ACG wire/native/text states are emitted separately",
+          "source record identity is made stable by resource/district/ordinal",
+          "unknown and opaque regions retain offsets, lengths, and SHA-256"
+        ],
+        "retained": [
+          "ACG hash bytes/native/text",
+          "playfield/resource instance",
+          "district index/name",
+          "position",
+          "rotation encodings",
+          "levels",
+          "radius",
+          "respawn chance/time",
+          "assistance radius",
+          "native/more/optional flags",
+          "additional points",
+          "extensions",
+          "unknown optional byte value",
+          "record/resource offsets, lengths, and hashes"
+        ],
+        "undecoded": [
+          "UnknownOptionalU8 semantics",
+          "district unknown fields",
+          "trailing opaque region semantics"
+        ]
+      },
+      "placementRecordHex": "0F 0A 4B 45 A1 5E 48 41 14 EC 2F 44 0A D7 23 3C 00 00 01 00 45 49 43 32 01 00 0F 00 64 04 84 03 00 00 00 00 01 00 00 00 20 00 00 00 37 00 00 00 D3 0B 00 00 01 00 00 00 01 00 00 00 0F 00 63 68 72 69 73 74 6D 61 73 5F 6C 65 65 74 73 00 00 00 00 01 00 00 00 0D 00 63 68 72 69 73 74 6D 61 73 5F 61 6C 6C 00 00 00 00",
+      "placementRecordLength": 104,
+      "placementRecordOffsetInResource": 248,
+      "rawLayout": {
+        "apparentResourceReferences": [],
+        "decodedPrefixLength": 36,
+        "indices": [
+          {
+            "field": "IndexLeafPage",
+            "value": 1111
+          },
+          {
+            "field": "IndexLeafSlot",
+            "value": 147
+          },
+          {
+            "field": "DistrictIndex",
+            "value": 0
+          },
+          {
+            "field": "DistrictRecordOrdinal",
+            "value": 0
+          }
+        ],
+        "opaqueBytes": [],
+        "rawFloatFields": [
+          {
+            "encoding": "float32-le",
+            "field": "PositionX",
+            "offset": 0,
+            "value": 3248.628662109375,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionY",
+            "offset": 4,
+            "value": 12.523102760314941,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "PositionZ",
+            "offset": 8,
+            "value": 703.688720703125,
+            "width": 4
+          },
+          {
+            "encoding": "float32-le",
+            "field": "Radius",
+            "offset": 12,
+            "value": 0.009999999776482582,
+            "width": 4
+          }
+        ],
+        "rawIntegerFields": [
+          {
+            "field": "RotationMidEncoded",
+            "offset": 16,
+            "signed": false,
+            "value": 0,
+            "width": 2
+          },
+          {
+            "field": "RotationWidthEncoded",
+            "offset": 18,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "AcgHashNativeUInt32",
+            "offset": 20,
+            "signed": false,
+            "value": 843270469,
+            "width": 4
+          },
+          {
+            "field": "LevelMinimum",
+            "offset": 24,
+            "signed": false,
+            "value": 1,
+            "width": 2
+          },
+          {
+            "field": "LevelMaximum",
+            "offset": 26,
+            "signed": false,
+            "value": 15,
+            "width": 2
+          },
+          {
+            "field": "RespawnChance",
+            "offset": 28,
+            "signed": false,
+            "value": 100,
+            "width": 1
+          },
+          {
+            "field": "SerializedOptionalFlags",
+            "offset": 29,
+            "signed": false,
+            "value": 4,
+            "width": 1
+          },
+          {
+            "field": "RespawnTime",
+            "offset": 30,
+            "signed": false,
+            "value": 900,
+            "width": 2
+          },
+          {
+            "field": "MoreFlags",
+            "offset": 32,
+            "signed": true,
+            "value": 0,
+            "width": 4
+          }
+        ],
+        "variableSectionsPresent": {
+          "additionalPoints": false,
+          "extensions": true
+        }
+      },
+      "recordLength": 58792,
+      "recordOffset": 72155154,
+      "resourceInstance": 655,
+      "resourceTrailingOpaque": {
+        "Length": 9880,
+        "Offset": 48912,
+        "Sha256": "431001d8f2c7785785f9d87ec6b45eb75266775d382430e27f3c1f2e4b1f5fe8",
+        "hex": "05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 15 15 15 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 15 15 15 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 2F 2F 2F 2F 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 00 00 00 00 00 00 00 00 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 2F 2F 2F 2F 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 2B 07 07 07 07 07 07 07 07 07 07 07 07 00 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 07 00 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 0C 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 08 08 08 08 08 08 07 07 07 00 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 08 08 08 08 08 08 07 07 00 00 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 2E 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 2F 2F 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 07 07 08 08 08 08 08 08 07 07 00 00 00 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 08 08 08 08 08 08 08 08 08 08 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 08 08 08 08 08 08 08 08 08 08 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 28 04 04 04 04 04 03 03 03 03 03 03 03 03 03 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 08 08 08 08 08 08 08 08 08 08 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 07 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 03 03 03 03 03 03 03 03 03 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 08 08 08 08 08 08 08 08 08 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 07 07 07 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 03 03 03 03 03 03 03 03 03 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 07 07 07 07 07 07 07 07 08 08 08 08 08 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 03 03 03 03 03 03 03 03 03 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 07 08 08 08 08 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 03 03 03 03 03 03 03 03 03 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 08 08 08 23 23 23 23 23 23 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 16 16 16 00 07 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1B 1B 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 00 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 08 08 08 23 23 23 23 23 23 00 00 00 00 00 00 00 16 16 00 00 00 00 00 00 16 16 16 16 07 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 0C 0B 0B 0B 0B 0B 0B 05 05 05 05 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1B 1B 04 04 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 1B 00 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 08 08 23 23 23 23 23 23 23 00 00 00 00 00 00 00 16 16 16 16 00 00 00 00 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 0C 0C 0C 0B 0B 0B 0B 05 05 05 05 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1B 1B 04 04 04 04 04 04 04 04 04 04 04 04 04 1B 1B 1B 1B 1E 1B 00 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 23 23 23 3C 3C 23 23 00 00 00 00 00 00 00 16 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0C 0B 0B 0B 05 05 05 05 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1B 1B 1B 1B 1B 04 04 04 04 04 04 04 04 04 1B 1B 1B 1E 1E 1E 1B 00 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 23 23 23 23 23 23 23 00 00 00 00 00 00 00 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0C 0C 0B 0B 05 05 05 05 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1B 1B 1B 1B 1B 1B 04 04 04 04 04 04 04 1B 1B 1B 1E 1E 1E 1E 1B 00 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 23 23 23 23 23 23 23 00 00 00 00 00 00 00 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0C 0C 0B 0B 05 05 05 05 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1B 1B 1B 00 1B 1B 1B 04 04 04 04 04 1B 1B 1B 1E 1E 1E 1E 1E 1B 00 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 08 23 23 23 23 23 23 00 00 00 00 00 16 16 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0C 0C 0B 0B 05 05 05 05 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 00 00 1B 1B 1B 1B 1B 1B 1B 1B 1B 1E 1E 1E 1E 1E 1E 1B 1B 00 00 00 00 00 00 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 08 08 08 08 08 08 08 08 08 23 23 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0C 0C 0B 0B 05 05 05 05 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 00 00 00 1B 1B 1B 1B 1B 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 1B 1B 1B 1B 1B 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 08 08 08 08 08 08 08 08 08 08 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0C 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 08 08 08 08 08 08 08 08 08 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 14 15 15 15 15 15 0C 0C 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 08 08 08 08 08 08 17 09 09 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 14 14 14 14 14 14 14 14 14 14 14 14 14 25 14 14 14 14 15 15 15 0C 0C 0C 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 17 08 08 08 08 17 17 09 09 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0C 0C 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 09 09 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 09 09 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 3A 3A 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 35 35 35 35 1E 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 09 09 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 3A 3A 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 35 35 35 35 35 1E 1E 1E 1E 1E 1E 1B 1B 02 02 02 02 02 02 02 02 02 02 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 09 09 09 09 09 09 09 09 09 09 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 3A 3A 3A 3A 3A 3A 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 35 35 35 35 35 1E 1E 1E 1E 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 3B 3B 3B 3A 3A 3A 3A 3A 3A 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1B 1B 1E 1E 1E 1E 26 1E 1E 1E 1E 1E 30 30 30 1E 1E 1E 35 35 35 35 1E 1E 1E 1E 1E 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 3B 3B 3B 3A 3A 3A 3A 3A 3A 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1B 1E 1E 1E 1E 1E 1E 30 30 30 30 30 30 1E 1E 35 35 35 35 1E 1E 1E 1E 1E 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 3B 3B 3B 3B 3B 3A 3A 3A 3A 3A 3A 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 30 30 30 30 30 30 30 30 1E 35 35 35 35 34 34 34 34 34 1E 1E 1B 1B 01 27 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 3B 3B 3B 3B 3B 3A 3A 3A 3A 3A 3A 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 30 30 30 30 30 30 30 30 35 35 35 35 35 34 34 34 34 34 34 34 34 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 13 13 13 16 16 16 13 13 13 13 13 13 13 13 3B 3B 3B 3B 3A 3A 3A 3A 3A 3A 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 30 30 30 30 30 30 30 30 35 35 35 35 35 34 34 34 34 34 34 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 13 13 13 12 12 13 13 13 13 13 13 13 13 3B 3B 3B 3A 3A 3A 3A 3A 3A 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 30 30 30 30 30 30 30 30 35 35 35 35 35 34 34 34 34 34 34 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 12 12 13 13 12 13 13 13 13 13 13 13 13 3B 3B 3B 3A 3A 3A 3A 3A 3A 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1B 1E 1E 1E 1E 30 30 30 30 30 30 30 30 35 35 35 35 35 34 34 34 34 34 34 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 12 12 12 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 30 30 30 30 30 30 1E 35 35 35 35 35 32 32 32 32 34 34 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 12 12 12 12 12 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 30 30 30 1E 1E 1E 1E 33 33 33 33 33 32 32 32 32 32 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 12 12 12 12 12 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 33 33 33 33 33 32 32 32 32 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 33 33 33 33 33 33 32 32 32 32 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 16 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 33 33 33 33 33 33 32 32 32 32 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 16 16 16 16 16 16 00 00 00 0C 0C 0C 0C 13 13 13 13 13 13 13 13 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 33 33 33 33 33 32 32 32 32 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 16 16 16 16 16 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 00 00 0C 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 33 33 33 32 32 32 1E 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 1B 1B 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0C 0C 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 1B 1B 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 05 05 05 05 05 05 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1C 1B 1B 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1E 1B 1B 1B 1B 1E 1B 1B 01 01 01 01 01 01 1B 1B 1B 1B 1B 01 01 01 01 01 01 01 01 2C 1B 1B 1B 1B 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 05 05 05 05 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 36 36 36 36 36 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 00 00 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1A 1A 1A 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 18 18 18 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 20 20 20 37 37 29 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 1B 1B 1B 1A 1A 1A 1A 1A 1B 1A 1A 1A 1A 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 20 20 20 37 37 39 39 39 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 37 37 37 37 37 39 39 39 39 39 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 36 37 37 37 37 37 39 39 39 39 39 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 2D 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 36 37 37 37 37 37 39 39 39 39 39 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 2D 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0B 0B 0B 0B 0B 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 37 37 37 37 37 39 39 39 39 39 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0B 0B 0B 0B 0B 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 36 36 36 36 36 36 37 37 37 37 37 39 39 39 39 20 20 20 20 20 20 20 20 20 0F 0F 0F 0F 0F 0F 0F 0F 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 10 10 10 10 10 20 20 20 20 36 36 36 36 36 36 37 37 37 37 37 39 39 39 20 20 20 20 20 20 20 20 20 20 0F 0F 0F 0F 0F 0F 0F 0F 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 10 10 10 10 10 20 20 20 38 38 38 38 38 38 38 38 38 38 38 38 39 39 39 20 20 20 20 20 20 20 20 20 20 0F 0F 0F 0F 0F 0F 0F 0F 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 10 10 10 10 10 20 20 20 38 38 38 38 38 38 38 38 38 38 38 38 20 20 20 20 20 20 20 20 20 20 20 20 20 0F 0F 0F 0F 0F 0F 0F 0F 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1B 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 10 10 10 10 10 20 20 20 38 38 38 38 38 38 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 0F 0F 0F 0F 0F 0F 0F 0F 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 11 11 11 11 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 38 38 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 0F 0F 0F 0F 0F 0F 0F 0F 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 11 11 11 11 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 38 38 20 20 20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 21 21 21 21 21 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 11 11 11 11 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 31 31 31 31 31 31 20 20 20 20 20 38 38 20 20 20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 21 21 21 21 21 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 11 11 11 11 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1F 1B 1B 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 00 00 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 31 31 31 31 31 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 21 21 21 21 21 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 1B 18 18 18 18 0C 00 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 00 00 00 00 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 31 31 31 31 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 24 21 21 21 21 21 21 21 21 21 21 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 00 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 00 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 31 31 31 31 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 21 21 2A 21 21 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 31 31 31 31 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 21 21 21 21 21 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 31 31 31 31 31 31 31 31 31 31 31 31 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 21 22 22 22 22 22 22 22 22 22 22 00 00 00 00 00 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 19 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 21 22 22 22 22 22 22 22 22 22 22 22 00 00 00 00 00 00 00 00 19 19 19 19 19 19 19 19 19 19 19 19 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 22 22 22 22 22 22 22 22 22 22 22 22 22 22 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 21 21 22 22 22 22 22 22 22 22 22 22 22 22 22 22 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 18 18 18 18 18 18 18 18 18 18 18 18 18 0C 0B 0B 0B 0B 0B 0B 0B 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 0D 00 0B 0B 0B 0B 0B 0B 0B 00 00 00 00 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 0E 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05 05"
+      },
+      "resourceType": 1000014,
+      "sourceDatabase": "ResourceDatabase.dat"
+    }
+  ],
+  "schemaVersion": 1
+}
