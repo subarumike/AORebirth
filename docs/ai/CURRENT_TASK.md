@@ -2,25 +2,26 @@
 
 ## Active
 
-Complete and accept the database-wide official-client NPC visual archetype
-census without weakening the placement resolver or changing production NPC
-definitions.
+Complete and accept the deterministic ACG-to-MonsterData Resource Chain Audit
+without changing production NPC definitions or inferring a placement identity.
 
-## Current census checkpoint
+## Current resource-chain checkpoint
 
-- The verified `18.8.62_EP1` source contains 1,470 MonsterData records and 856
-  referenced CATMesh resources. These reduce to 1,360 exact complete visual
-  signatures and 750 structural base-model families.
-- MonsterData is not enemy-only, so exact official NPC visual counts are
-  reported separately and are not relabeled as a guessed enemy-only count.
-- The retained capture overlay contains 3,472 NPC observations; 3,470 associate
-  uniquely through MonsterData/CATMesh evidence and two remain unknown.
-- All 32,805 official ACG placement associations remain unresolved because the
-  client has no ACGHash-to-MonsterData resolver. Exact placement is not a
-  prerequisite for visual-archetype association.
-- The deterministic catalog, case studies, top-20 reuse report, and acceptance
-  fields are in
-  `docs/generated/enemy_archetypes/enemy-archetype-census-report.md`.
+- Both verified official client variants expose one active B-tree resource view;
+  EP1 and EP2 have byte-identical ACG, PlayfieldDynels, CATMesh, and MonsterData
+  records. The data segments are physical shards, not expansion overlays.
+- The active view contains 460,193 records across 50 resource types, 32,805 ACG
+  placements, and 1,470 MonsterData records, with no duplicate active keys.
+- No direct or indirect official static ACG-to-MonsterData edge exists.
+  PlayfieldDynels also has zero decoded TemplateId or identity-instance matches.
+- The client runtime chain instead uses server-authored SimpleChar stat 359 as
+  resource instance `1040023:<MonsterData>`. A separate Nano stat-359 path
+  statically references 231 MonsterData IDs for spell/morph behavior, not spawn
+  placement.
+- The accepted classification is
+  `ACG_MONSTERDATA_RELATION=SERVER_RUNTIME_ASSOCIATION`. Deterministic catalogs,
+  raw forensic samples, proof cases, and source hashes are published under
+  `docs/generated/acg_monsterdata_resource_audit`.
 
 ## Prior resolver checkpoint
 

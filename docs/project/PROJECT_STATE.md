@@ -9,6 +9,18 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- ACG-to-MonsterData resource-chain audit: both verified `18.8.62_EP1` and
+  `18.8.62_EP2` clients expose byte-identical ACG, PlayfieldDynels, CATMesh, and
+  MonsterData records through one active B-tree view. Across 460,193 active
+  resources, 32,805 ACG placements, and 1,470 MonsterData records, no direct or
+  indirect official static ACG-to-MonsterData edge exists. The proven client
+  spawn path instead consumes server-authored SimpleChar stat 359 as resource
+  instance `1040023:<MonsterData>`, so the accepted relation is
+  `SERVER_RUNTIME_ASSOCIATION`. The separate 1040005 Nano stat-359 references
+  are spell/morph data and do not establish placement identity. Evidence and
+  deterministic catalogs are under
+  `docs/generated/acg_monsterdata_resource_audit`.
+
 - Official NPC visual archetype census: the verified `18.8.62_EP1` client
   resource chain now catalogs all 1,470 MonsterData records against 856
   referenced CATMesh resources. It yields 1,360 exact complete visual

@@ -1,0 +1,4655 @@
+{
+  "acgFieldForwardReferences": {
+    "appearanceUsedToInferStaticBridge": false,
+    "coordinatesUsedToInferStaticBridge": false,
+    "fields": [
+      {
+        "collisions": 0,
+        "field": "AcgHashNativeUInt32",
+        "matchedResourceTypes": [],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 0,
+        "sampleMatches": [],
+        "structuralEvidence": "packed ACG placement tag; no client consumer resolves it as a resource identity",
+        "uniqueResourceMatchedValues": 0,
+        "values": 4016
+      },
+      {
+        "collisions": 216,
+        "field": "LevelMinimum",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000021,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 1286,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000031,
+              1000037,
+              1000039,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 6
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 14
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 16
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 17
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 18
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 19
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 21
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 22
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 24
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 218,
+        "values": 218
+      },
+      {
+        "collisions": 225,
+        "field": "LevelMaximum",
+        "matchedResourceTypes": [
+          1000001,
+          1000008,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000021,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 1350,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000031,
+              1000037,
+              1000039,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 6
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 14
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 16
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 17
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 18
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 19
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 21
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 22
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 24
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 226,
+        "values": 227
+      },
+      {
+        "collisions": 354,
+        "field": "RotationMidEncoded",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000021,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 2113,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000031,
+              1000037,
+              1000039,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 6
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 14
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 16
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 17
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 18
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 19
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 21
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 22
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 24
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 355,
+        "values": 355
+      },
+      {
+        "collisions": 38,
+        "field": "RotationWidthEncoded",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010004,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 252,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 25
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 30
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 39
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 40
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 45
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 50
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 60
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 70
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 80
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 90
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 97
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 98
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000036,
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 100
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000014,
+              1000026,
+              1000029,
+              1000036,
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 120
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000009,
+              1000036,
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 121
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 39,
+        "values": 39
+      },
+      {
+        "collisions": 21,
+        "field": "RespawnChance",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 137,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 25
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 30
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 40
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 50
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 55
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 60
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 70
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 75
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 80
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 82
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 85
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 90
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 95
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 98
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000036,
+              1000046,
+              1000204,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 100
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000036,
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 255
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 22,
+        "values": 22
+      },
+      {
+        "collisions": 139,
+        "field": "RespawnTime",
+        "matchedResourceTypes": [
+          1000001,
+          1000008,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000020,
+          1000021,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000030,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010001,
+          1010003,
+          1010004,
+          1010006,
+          1010008,
+          1010009,
+          1010011,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 821,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 17
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 25
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 28
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 29
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 30
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 33
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 34
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 37
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 40
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 158,
+        "values": 213
+      },
+      {
+        "collisions": 38,
+        "field": "AssistanceRadius",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 246,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000031,
+              1000037,
+              1000039,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 6
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 14
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 16
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 17
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 18
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 19
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 21
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 22
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 24
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 39,
+        "values": 39
+      },
+      {
+        "collisions": 54,
+        "field": "NativeFlags",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 368,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000031,
+              1000037,
+              1000039,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 6
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 14
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 16
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 19
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 21
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 32
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 33
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 34
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 35
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 36
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 55,
+        "values": 55
+      },
+      {
+        "collisions": 1,
+        "field": "MoreFlags",
+        "matchedResourceTypes": [
+          1000010,
+          1000015,
+          1000024,
+          1000027,
+          1000031,
+          1000037,
+          1000045,
+          1000200,
+          1000203,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 21,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 2,
+        "values": 2
+      },
+      {
+        "collisions": 6,
+        "field": "SerializedOptionalFlags",
+        "matchedResourceTypes": [
+          1000010,
+          1000015,
+          1000024,
+          1000027,
+          1000031,
+          1000037,
+          1000045,
+          1000200,
+          1000203,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 73,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 7,
+        "values": 7
+      },
+      {
+        "collisions": 37,
+        "field": "UnknownOptionalU8",
+        "matchedResourceTypes": [
+          1000001,
+          1000009,
+          1000010,
+          1000014,
+          1000015,
+          1000024,
+          1000026,
+          1000027,
+          1000029,
+          1000031,
+          1000036,
+          1000037,
+          1000039,
+          1000045,
+          1000046,
+          1000200,
+          1000203,
+          1000204,
+          1000206,
+          1000209,
+          1000210,
+          1010006,
+          1010009,
+          1010013,
+          1010016,
+          1010017,
+          1010021,
+          1010022,
+          1010023,
+          1010024
+        ],
+        "monsterDataNumericCollisions": 0,
+        "resourceMatches": 239,
+        "sampleMatches": [
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031
+            ],
+            "value": 0
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000010,
+              1000015,
+              1000024,
+              1000027,
+              1000031,
+              1000037,
+              1000045,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010009,
+              1010016,
+              1010017,
+              1010021,
+              1010022,
+              1010023,
+              1010024
+            ],
+            "value": 1
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 2
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 3
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 4
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000027,
+              1000031,
+              1000037,
+              1000200,
+              1000203,
+              1000206,
+              1000209,
+              1000210,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 5
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000001,
+              1000009,
+              1000014,
+              1000026,
+              1000029,
+              1000031,
+              1000037,
+              1000039,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 6
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 7
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 8
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000015,
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 9
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 10
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 11
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000037,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 12
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000031,
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 13
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000200,
+              1000206,
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 14
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1000200,
+              1000206,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 15
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 16
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 17
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 18
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 19
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1000046,
+              1010006,
+              1010013,
+              1010021,
+              1010022
+            ],
+            "value": 20
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 21
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 22
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 23
+          },
+          {
+            "matchesMonsterDataId": false,
+            "resourceTypes": [
+              1010006,
+              1010021,
+              1010022
+            ],
+            "value": 24
+          }
+        ],
+        "structuralEvidence": "numeric field only; equality to a resource instance is not a typed reference",
+        "uniqueResourceMatchedValues": 38,
+        "values": 38
+      }
+    ],
+    "runtimeIdUsedToInferStaticBridge": false,
+    "spawnInfo": {
+      "disposition": "structural pair<ACGHash,int> near-hit, rejected: no official client reader/caller and serialized values are not typed MonsterData references",
+      "entries": 7203,
+      "monsterDataNumericCollisions": [],
+      "uniqueUnknownU16": 60
+    }
+  },
+  "acgReverseReferences": {
+    "outsideAcgResourceType": 193512,
+    "provenTypedReverseReferencesOutsideAcg": 0,
+    "rawOccurrences": 231428
+  },
+  "acgSchema": {
+    "alignment": "packed serialized fields; no inferred padding inside HashSpawnPoint records",
+    "allocationSlackBytes": 45,
+    "countEncoding": "u8 district count and u8 per-district collection counts",
+    "droppedRawByteClasses": 3,
+    "formatVersions": {
+      "5": 88,
+      "6": 307,
+      "7": 233
+    },
+    "hashGeneration": "unknown; ACGHash_t is serialized as a packed four-byte scalar/tag",
+    "placements": 32805,
+    "rawFieldKinds": 16,
+    "recordBoundaries": "index global offset -> 34-byte FAFA envelope -> active payload -> allocation slack",
+    "resourceType": 1000014,
+    "resources": 630,
+    "signedness": "little-endian; coordinates float32; MoreFlags int32; documented remaining scalar widths unsigned",
+    "trailingOpaqueBytes": 507976,
+    "undecoded": [
+      "district LevelOrStyleU16 fields",
+      "district ranges and small scalar fields",
+      "SpawnInfo integer semantics",
+      "UnknownOptionalU8 semantics",
+      "trailing opaque resource region"
+    ],
+    "variableSections": [
+      "additional rotation spawn points",
+      "typed extensions/tags or spells"
+    ]
+  },
+  "architecture": {
+    "acgMonsterDataRelation": "SERVER_RUNTIME_ASSOCIATION",
+    "clientRuntimeJoinFound": false,
+    "joinPolicy": "independent evidence axes; join only where separate contextual evidence proves it",
+    "npcAxis": [
+      "server SimpleChar state",
+      "stat 359 MonsterData",
+      "CATMesh",
+      "visual archetype"
+    ],
+    "placementAxis": [
+      "ACGHash",
+      "playfield",
+      "district",
+      "coordinates",
+      "spawn policy"
+    ],
+    "serverSuppliesRuntimeMonsterData": true,
+    "staticAcgToMonsterDataDirect": 0,
+    "staticAcgToMonsterDataIndirect": 0
+  },
+  "catMeshDecoderLimits": {
+    "affectedVisualRecords": [
+      {
+        "archetypeId": "archetype-23d2b72a008254d4",
+        "catMeshes": [
+          201345
+        ],
+        "monsterData": [
+          201635,
+          205627
+        ],
+        "officialNames": [
+          "lctower_controller_small",
+          "lctower_supplymeels_control_tower"
+        ]
+      },
+      {
+        "archetypeId": "archetype-68af5398681aaa65",
+        "catMeshes": [
+          201342
+        ],
+        "monsterData": [
+          200894
+        ],
+        "officialNames": [
+          "land control tower 1"
+        ]
+      },
+      {
+        "archetypeId": "archetype-9c1e3a91eb132e27",
+        "catMeshes": [
+          201342
+        ],
+        "monsterData": [
+          201636
+        ],
+        "officialNames": [
+          "lctower_controller_big"
+        ]
+      },
+      {
+        "archetypeId": "archetype-a5848782727c575d",
+        "catMeshes": [
+          214953
+        ],
+        "monsterData": [
+          214973,
+          214978
+        ],
+        "officialNames": [
+          "sl_twisted horror",
+          "sl_voracious horror"
+        ]
+      },
+      {
+        "archetypeId": "archetype-b8705907c96af604",
+        "catMeshes": [
+          260512
+        ],
+        "monsterData": [
+          260513
+        ],
+        "officialNames": [
+          "sl_voracious horror_ghost"
+        ]
+      }
+    ],
+    "affectsHecklerNamedEvidence": false,
+    "affectsLeet": false,
+    "affectsPf4582KnownRuntime": false,
+    "disposition": "preserved decoder limitation; affected MonsterData are control-tower/horror visual records, not the proof cases",
+    "recordIds": [
+      201342,
+      201345,
+      214953,
+      260512
+    ]
+  },
+  "deterministicDigest": "8a60130b95887635fd4462cff7d4a1fa91238963a57242c2d23de1f3393c9464",
+  "monsterDataReverseReferences": {
+    "monsterDataIds": 1470,
+    "policy": "raw integer or byte equality is a candidate only; it is never promoted to a semantic edge",
+    "provenStaticReferenceTypes": [
+      {
+        "acgRelationship": false,
+        "references": 498,
+        "relationship": "Nano stat 359 -> MonsterData used by the separate spell/morph client path",
+        "resourceType": 1040005,
+        "resourceTypeName": "Nano",
+        "uniqueMonsterData": 231
+      }
+    ],
+    "provenStaticReferencedIds": 231,
+    "provenStaticReferences": 498,
+    "provenStaticUnreferencedIds": 1239,
+    "rawCandidateReferenceTypes": [
+      {
+        "references": 21205,
+        "resourceType": 1000020
+      },
+      {
+        "references": 11279,
+        "resourceType": 1010001
+      },
+      {
+        "references": 9687,
+        "resourceType": 1010002
+      },
+      {
+        "references": 5206,
+        "resourceType": 1000014
+      },
+      {
+        "references": 2744,
+        "resourceType": 1040005
+      },
+      {
+        "references": 1755,
+        "resourceType": 1010004
+      },
+      {
+        "references": 1699,
+        "resourceType": 1040023
+      },
+      {
+        "references": 1590,
+        "resourceType": 1000009
+      },
+      {
+        "references": 1321,
+        "resourceType": 1000021
+      },
+      {
+        "references": 668,
+        "resourceType": 1000013
+      },
+      {
+        "references": 628,
+        "resourceType": 1010003
+      },
+      {
+        "references": 382,
+        "resourceType": 1000029
+      },
+      {
+        "references": 342,
+        "resourceType": 1010026
+      },
+      {
+        "references": 336,
+        "resourceType": 1000026
+      },
+      {
+        "references": 328,
+        "resourceType": 1010016
+      },
+      {
+        "references": 319,
+        "resourceType": 1010008
+      },
+      {
+        "references": 216,
+        "resourceType": 1000001
+      },
+      {
+        "references": 149,
+        "resourceType": 1010017
+      },
+      {
+        "references": 85,
+        "resourceType": 1000010
+      },
+      {
+        "references": 75,
+        "resourceType": 1000045
+      },
+      {
+        "references": 72,
+        "resourceType": 1010006
+      },
+      {
+        "references": 43,
+        "resourceType": 1010013
+      },
+      {
+        "references": 41,
+        "resourceType": 1000008
+      },
+      {
+        "references": 32,
+        "resourceType": 1010011
+      },
+      {
+        "references": 29,
+        "resourceType": 1000039
+      },
+      {
+        "references": 28,
+        "resourceType": 1010009
+      },
+      {
+        "references": 23,
+        "resourceType": 1000046
+      },
+      {
+        "references": 16,
+        "resourceType": 1010021
+      },
+      {
+        "references": 15,
+        "resourceType": 1000036
+      },
+      {
+        "references": 8,
+        "resourceType": 1000024
+      },
+      {
+        "references": 7,
+        "resourceType": 1000047
+      },
+      {
+        "references": 6,
+        "resourceType": 1010022
+      },
+      {
+        "references": 5,
+        "resourceType": 1010027
+      },
+      {
+        "references": 3,
+        "resourceType": 1000030
+      },
+      {
+        "references": 1,
+        "resourceType": 1000204
+      },
+      {
+        "references": 1,
+        "resourceType": 1010023
+      },
+      {
+        "references": 1,
+        "resourceType": 1010024
+      },
+      {
+        "references": 1,
+        "resourceType": 1010025
+      }
+    ],
+    "rawCandidateReferencedIds": 1297,
+    "rawCandidateReferences": 60346,
+    "structuralContextCandidates": {
+      "disposition": "adjacent uint32 context narrows candidates but remains non-semantic until a resource-specific decoder proves the owning field",
+      "precededByMonsterDataResourceType": [],
+      "precededByStat359": [
+        {
+          "references": 498,
+          "resourceType": 1040005,
+          "uniqueMonsterData": 231
+        },
+        {
+          "references": 20,
+          "resourceType": 1000020,
+          "uniqueMonsterData": 12
+        }
+      ]
+    }
+  },
+  "playfieldDynels": {
+    "dynels": 12624,
+    "identityInstancesMatchingMonsterData": 0,
+    "identityTypes": [
+      {
+        "count": 269,
+        "identityType": 50200
+      },
+      {
+        "count": 25,
+        "identityType": 51004
+      },
+      {
+        "count": 3108,
+        "identityType": 51005
+      },
+      {
+        "count": 5084,
+        "identityType": 51016
+      },
+      {
+        "count": 1,
+        "identityType": 51017
+      },
+      {
+        "count": 3,
+        "identityType": 51032
+      },
+      {
+        "count": 886,
+        "identityType": 51035
+      },
+      {
+        "count": 1,
+        "identityType": 51053
+      },
+      {
+        "count": 3,
+        "identityType": 51056
+      },
+      {
+        "count": 385,
+        "identityType": 51059
+      },
+      {
+        "count": 210,
+        "identityType": 51088
+      },
+      {
+        "count": 407,
+        "identityType": 56001
+      },
+      {
+        "count": 2242,
+        "identityType": 56006
+      }
+    ],
+    "nonzeroTemplateRows": 12604,
+    "resourceRecords": 630,
+    "templateIdsMatchingMonsterData": 0,
+    "uniqueTemplateIds": 800
+  },
+  "possibleSpawnTemplateSystems": [
+    {
+      "disposition": "separate static dynel/template system; no MonsterData edge and no per-ACG placement join",
+      "dynels": 12624,
+      "monsterDataIdentityMatches": 0,
+      "monsterDataTemplateMatches": 0,
+      "name": "PlayfieldDynels",
+      "records": 630,
+      "resourceType": 1000026
+    },
+    {
+      "disposition": "rejected as MonsterData bridge by field shape, corpus values, and absent client consumer",
+      "name": "DistrictData SpawnInfo pair collection",
+      "records": 7203,
+      "resourceType": 1000014
+    }
+  ],
+  "proofCases": {
+    "heckler": {
+      "expansionResourceOmission": false,
+      "officialNamedEvidence": [
+        {
+          "archetypeId": "archetype-8d7394be06cd7ea9",
+          "catMeshes": [
+            290605
+          ],
+          "monsterData": 290647
+        }
+      ],
+      "result": "ordinary Heckler names are not separate MonsterData names in the client; EP1 and EP2 relevant records are byte-identical, so the gap is server/context naming or shared generic visual data rather than a missing expansion layer",
+      "runtimeObservations": []
+    },
+    "leet": {
+      "officialMonsterData17655Exists": true,
+      "officialStaticFdqoTo17655": null,
+      "result": "runtime Leets resolve MonsterData to CATMesh/archetype; ACG candidates remain independent",
+      "runtime": [
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Leet",
+          "observationId": "20260610-185759|(SimpleChar:78C1228B)",
+          "runtimeIdentity": "(SimpleChar:78C1228B)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Leet",
+          "observationId": "20260610-214233|(SimpleChar:78C1228B)",
+          "runtimeIdentity": "(SimpleChar:78C1228B)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Leet",
+          "observationId": "20260623-021643|(SimpleChar:78FA97D4)",
+          "runtimeIdentity": "(SimpleChar:78FA97D4)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            247821
+          ],
+          "monsterData": 247832,
+          "name": "Princess Leet",
+          "observationId": "20260722-152454|(SimpleChar:78E0FD26)",
+          "runtimeIdentity": "(SimpleChar:78E0FD26)",
+          "visualArchetype": "archetype-6aaf711d4bd79409"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Leet",
+          "observationId": "20260728-001044|(SimpleChar:799EDE01)",
+          "runtimeIdentity": "(SimpleChar:799EDE01)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Leet",
+          "observationId": "20260728-003410|(SimpleChar:799EDE01)",
+          "runtimeIdentity": "(SimpleChar:799EDE01)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:126F65)",
+          "runtimeIdentity": "(SimpleChar:126F65)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:126F68)",
+          "runtimeIdentity": "(SimpleChar:126F68)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:12862F)",
+          "runtimeIdentity": "(SimpleChar:12862F)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:129B0D)",
+          "runtimeIdentity": "(SimpleChar:129B0D)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:129B57)",
+          "runtimeIdentity": "(SimpleChar:129B57)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:129B59)",
+          "runtimeIdentity": "(SimpleChar:129B59)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        }
+      ]
+    },
+    "pf4582": {
+      "officialStaticJoin": null,
+      "result": "independent static placement and server-authored runtime MonsterData axes; no official static join",
+      "runtime": [
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            22773
+          ],
+          "monsterData": 22794,
+          "name": "Surf Lizard",
+          "observationId": "20260814-014647|(SimpleChar:129B91)",
+          "runtimeIdentity": "(SimpleChar:129B91)",
+          "visualArchetype": "archetype-f53286bb8bf71f4b"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            96177
+          ],
+          "monsterData": 96195,
+          "name": "Anger Manifestation",
+          "observationId": "20260814-014647|(SimpleChar:129C87)",
+          "runtimeIdentity": "(SimpleChar:129C87)",
+          "visualArchetype": "archetype-0198fd6b97381e87"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            45857
+          ],
+          "monsterData": 45873,
+          "name": "Cross-Wired Junkbot",
+          "observationId": "20260814-015856|(SimpleChar:11A731)",
+          "runtimeIdentity": "(SimpleChar:11A731)",
+          "visualArchetype": "archetype-85316bb23b707f3e"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            45857
+          ],
+          "monsterData": 45873,
+          "name": "Cross-Wired Junkbot",
+          "observationId": "20260814-015856|(SimpleChar:120BC7)",
+          "runtimeIdentity": "(SimpleChar:120BC7)",
+          "visualArchetype": "archetype-85316bb23b707f3e"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            45857
+          ],
+          "monsterData": 45873,
+          "name": "Cross-Wired Junkbot",
+          "observationId": "20260814-015856|(SimpleChar:120BC9)",
+          "runtimeIdentity": "(SimpleChar:120BC9)",
+          "visualArchetype": "archetype-85316bb23b707f3e"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            45857
+          ],
+          "monsterData": 45873,
+          "name": "Cross-Wired Junkbot",
+          "observationId": "20260814-015856|(SimpleChar:1214A2)",
+          "runtimeIdentity": "(SimpleChar:1214A2)",
+          "visualArchetype": "archetype-85316bb23b707f3e"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:126F65)",
+          "runtimeIdentity": "(SimpleChar:126F65)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        },
+        {
+          "associationBasis": "direct-official-monsterdata-resource-chain",
+          "catMeshes": [
+            15222
+          ],
+          "monsterData": 17655,
+          "name": "Beach Leet",
+          "observationId": "20260814-015856|(SimpleChar:126F68)",
+          "runtimeIdentity": "(SimpleChar:126F68)",
+          "visualArchetype": "archetype-96421bebf1e93b95"
+        }
+      ],
+      "static": "original ResourceDatabase 1000014:4582 supplies ACG placements and coordinates"
+    },
+    "serverRuntimePathProven": true
+  },
+  "resourceDatabases": {
+    "clients": [
+      {
+        "clientPath": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online",
+        "index": {
+          "length": 9437184,
+          "name": "ResourceDatabase.idx",
+          "sha256": "ba152f59096d5358f4d1b6511d3a3d264999e0a59f1ab7bf3a7cc18a4888c273"
+        },
+        "segmentCount": 3,
+        "segments": [
+          {
+            "globalEnd": 1073741824,
+            "globalStart": 0,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat",
+            "sha256": "3cabdede7b9b2468ed22f10f536fb2f7083ea05ed9483e2d96b22cf080d736a6"
+          },
+          {
+            "globalEnd": 2147483648,
+            "globalStart": 1073741824,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.001",
+            "sha256": "f8884a2c382ce7c95f20b4423567f176ed40675ba9ce8362527288712871ba73"
+          },
+          {
+            "globalEnd": 2289600218,
+            "globalStart": 2147483648,
+            "length": 142116570,
+            "name": "ResourceDatabase.dat.002",
+            "sha256": "2024021f966c3c8a8c083e01cbad2335ba33c19a1661a148060391755a608cc1"
+          }
+        ],
+        "totalSegmentBytes": 2289600218,
+        "version": "18.8.62_EP1"
+      },
+      {
+        "clientPath": "C:\\Funcom\\Anarchy Online",
+        "index": {
+          "length": 16777216,
+          "name": "ResourceDatabase.idx",
+          "sha256": "6ab5f9747bd82840a6562f1f03d44faece899f7be1c3552aa7c1e646b07892d9"
+        },
+        "segmentCount": 24,
+        "segments": [
+          {
+            "globalEnd": 1073741824,
+            "globalStart": 0,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat",
+            "sha256": "3e903d446f63d44a669bf6d9627dc9a13f59c60dd611fab34f592902b5982b88"
+          },
+          {
+            "globalEnd": 2147483648,
+            "globalStart": 1073741824,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.001",
+            "sha256": "e3f2b9d7175b124bc4757784030b9907971f1a7927d2a4765033d724dbd6563b"
+          },
+          {
+            "globalEnd": 3221225472,
+            "globalStart": 2147483648,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.002",
+            "sha256": "61748f16dd3bc467ddbb9390e0db7bc9e1c71d0be0d0fd2ed859e035d815d62c"
+          },
+          {
+            "globalEnd": 4294967296,
+            "globalStart": 3221225472,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.003",
+            "sha256": "37335143df44f133e6b01e91f368ab0229dc4eb00ea336678f25e066a50c3c4c"
+          },
+          {
+            "globalEnd": 5368709120,
+            "globalStart": 4294967296,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.004",
+            "sha256": "c82654886ecf3e34ad5fa8122b6837ab028078b61d8891e6d378e34a3fce802a"
+          },
+          {
+            "globalEnd": 6442450944,
+            "globalStart": 5368709120,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.005",
+            "sha256": "9770609c2eefe733d7da15cc3ca078d6cdb25c8e7c426536e2ada909b4e0075f"
+          },
+          {
+            "globalEnd": 7516192768,
+            "globalStart": 6442450944,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.006",
+            "sha256": "d9b52637b1e411e2b7a68a1d0e123927539fb5b21c6759b7a89ee4d5b5c29ba6"
+          },
+          {
+            "globalEnd": 8589934592,
+            "globalStart": 7516192768,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.007",
+            "sha256": "ea2162db3cf1f7374502d7fdde4272739a976e46369251a6e80fdc9b14864437"
+          },
+          {
+            "globalEnd": 9663676416,
+            "globalStart": 8589934592,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.008",
+            "sha256": "084c7c7ac7b51f7e4af33578d11e798a989848f81d71c0083472445f431dc9be"
+          },
+          {
+            "globalEnd": 10737418240,
+            "globalStart": 9663676416,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.009",
+            "sha256": "d93e794944ce046214c756c25a1378164b580b8eb0e8070451dbfc8b27bb0ac6"
+          },
+          {
+            "globalEnd": 11811160064,
+            "globalStart": 10737418240,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.010",
+            "sha256": "edf46d441223518482bb2403223fe86b1860fd045427093293c4bd2b9e697960"
+          },
+          {
+            "globalEnd": 12884901888,
+            "globalStart": 11811160064,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.011",
+            "sha256": "35c033d2d9f27fef464ba1d0ba6a07f8b45e1e9a0357ce70864273902ecda330"
+          },
+          {
+            "globalEnd": 13958643712,
+            "globalStart": 12884901888,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.012",
+            "sha256": "fdfafd26b9f23ca044c861093ad501e3addf4e6a47dc384bb18c3a523240a0b3"
+          },
+          {
+            "globalEnd": 15032385536,
+            "globalStart": 13958643712,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.013",
+            "sha256": "5d0e88b4a9d0a0f0d0411fc9eab382207782d79f9e54d7e5323b5a7de59a0787"
+          },
+          {
+            "globalEnd": 16106127360,
+            "globalStart": 15032385536,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.014",
+            "sha256": "9bfac31902f60ee4691005dd387a710d6dfd81632ccc29d439fa26efd1ca0e5a"
+          },
+          {
+            "globalEnd": 17179869184,
+            "globalStart": 16106127360,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.015",
+            "sha256": "c62537dfe17d4b004281480764e420544d8a8a78beeda6e64da601e68ba82830"
+          },
+          {
+            "globalEnd": 18253611008,
+            "globalStart": 17179869184,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.016",
+            "sha256": "834404b0bdc1401a172e2389543996dc9bd30385d748feb00c666925fea64747"
+          },
+          {
+            "globalEnd": 19327352832,
+            "globalStart": 18253611008,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.017",
+            "sha256": "07c2203e61d3c5b577a0703dd5e026ed206b87b71cd60cf80fe6fde88108fb25"
+          },
+          {
+            "globalEnd": 20401094656,
+            "globalStart": 19327352832,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.018",
+            "sha256": "07814c05ea6e6bb66d08be29d8597f3303ea4a5ced530155204be4c73fca8919"
+          },
+          {
+            "globalEnd": 21474836480,
+            "globalStart": 20401094656,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.019",
+            "sha256": "254eeb78af8aebc00c025bef84090b56bf8a0f252c22126d7b19ca95212265d3"
+          },
+          {
+            "globalEnd": 22548578304,
+            "globalStart": 21474836480,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.020",
+            "sha256": "fb8477381969a8dc9cccd814259e6607f0bdb8534ce575767eec393e8424532e"
+          },
+          {
+            "globalEnd": 23622320128,
+            "globalStart": 22548578304,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.021",
+            "sha256": "96de33bf34b80734519d0ebfb709899516af52b3e07f9c026620ecf8bbe122d3"
+          },
+          {
+            "globalEnd": 24696061952,
+            "globalStart": 23622320128,
+            "length": 1073741824,
+            "name": "ResourceDatabase.dat.022",
+            "sha256": "71aeb413c17385519b78b647acf667168b3b8bdc067cb0fcaa587138c74394b2"
+          },
+          {
+            "globalEnd": 24699290839,
+            "globalStart": 24696061952,
+            "length": 3228887,
+            "name": "ResourceDatabase.dat.023",
+            "sha256": "b179d51365604c4c079b8ed6f1a6d503a98df08ccdb8b265cb128f3d4f3b2d0d"
+          }
+        ],
+        "totalSegmentBytes": 24699290839,
+        "version": "18.8.62_EP2"
+      }
+    ],
+    "discovered": 2,
+    "duplicateActiveKeys": 0,
+    "effective": 2,
+    "ep1ActiveIndexEntries": 460193,
+    "ep1LeafPages": 2125,
+    "ep1ResourceTypes": 50,
+    "excluded": 0,
+    "relevantTypeParity": [
+      {
+        "ep1Records": 630,
+        "ep2Records": 630,
+        "name": "PlayfieldDistrictInfo",
+        "onlyEp1": [],
+        "onlyEp2": [],
+        "rawMismatchCount": 0,
+        "rawMismatchIds": [],
+        "resourceType": 1000014
+      },
+      {
+        "ep1Records": 1,
+        "ep2Records": 1,
+        "name": "InfoObject",
+        "onlyEp1": [],
+        "onlyEp2": [],
+        "rawMismatchCount": 0,
+        "rawMismatchIds": [],
+        "resourceType": 1000010
+      },
+      {
+        "ep1Records": 630,
+        "ep2Records": 630,
+        "name": "PlayfieldDynels",
+        "onlyEp1": [],
+        "onlyEp2": [],
+        "rawMismatchCount": 0,
+        "rawMismatchIds": [],
+        "resourceType": 1000026
+      },
+      {
+        "ep1Records": 861,
+        "ep2Records": 861,
+        "name": "CatMesh",
+        "onlyEp1": [],
+        "onlyEp2": [],
+        "rawMismatchCount": 0,
+        "rawMismatchIds": [],
+        "resourceType": 1010002
+      },
+      {
+        "ep1Records": 1470,
+        "ep2Records": 1470,
+        "name": "MonsterData",
+        "onlyEp1": [],
+        "onlyEp2": [],
+        "rawMismatchCount": 0,
+        "rawMismatchIds": [],
+        "resourceType": 1040023
+      }
+    ],
+    "semantics": {
+      "activeResourceSelectionOwner": "ResourceDatabase.idx active B-tree leaf chain",
+      "dataSegmentsAreExpansionOverlays": false,
+      "dataSegmentsArePhysicalConcatenation": true,
+      "duplicateActiveKeyPrecedence": "not observed; duplicate active keys fail closed",
+      "physicalUnindexedRecords": "not enumerable from the active logical index; reported as not observed rather than zero"
+    },
+    "shadowedRecordStatus": "not enumerable from the active logical B-tree; active duplicate keys are zero, and obsolete physical blocks are not relabeled as records without BlockDatabase ownership metadata",
+    "shadowedRecords": [],
+    "shadowedSameKeyPhysicalRecords": null,
+    "unindexedPhysicalRecords": null,
+    "unindexedRecords": []
+  },
+  "runtimeTrace": {
+    "acgConsumerFound": false,
+    "callFlow": [
+      {
+        "function": "N3.dll+0x9b08",
+        "role": "construct inbound Family-10 SimpleChar full update"
+      },
+      {
+        "function": "Gamecode.dll+0x7916d",
+        "role": "decode SimpleCharFullUpdateIIR body"
+      },
+      {
+        "function": "N3.dll+0x65d1",
+        "role": "activate inbound info item"
+      },
+      {
+        "function": "N3.dll+0x3f80",
+        "role": "create dynel from ribosome"
+      },
+      {
+        "function": "Gamecode.dll+0x7803b",
+        "role": "write server-authored field as SimpleChar stat 359"
+      },
+      {
+        "function": "Gamecode.dll+0x5c3ed/0x590b8/0x5a3b1",
+        "role": "read stat 359 during setup, refresh, or stat update"
+      },
+      {
+        "function": "Gamecode.dll+0x52686/0x52271",
+        "role": "propagate and bind requested MonsterData instance"
+      },
+      {
+        "function": "Gamecode.dll+0x4e275/0x4e174",
+        "role": "resolve resource identity 1040023:<stat359>"
+      },
+      {
+        "function": "DatabaseController.dll+0x2c24",
+        "role": "load MonsterData binary stream"
+      },
+      {
+        "function": "Gamecode.dll+0x4de5d",
+        "role": "parse MonsterData"
+      }
+    ],
+    "clientRuntimeJoinFound": false,
+    "decoderCaveat": "The exact wide-value meaning of the Family-10 reader's low-16-bit/padding sequence remains unresolved. The direct server-authored field-to-stat-359 assignment and the ordinary stat-update selector path are independently established.",
+    "serverSuppliesRuntimeMonsterData": true,
+    "sha256": "9755443a6cfc5e2c1ce0b1e81447d480f2390a8ff84385c7f3d388e21bba344c",
+    "source": "C:\\Users\\Mike\\Documents\\AO stripdown\\Docs\\evidence\\ACGHASH_MONSTERDATA_RUNTIME_RESOLVER_TRACE_20260825.md",
+    "staticAcgFlow": [
+      "ResourceDatabase 1000014:<playfield>",
+      "GameData.dll+0x9def PlayfieldDistrictInfo_t::ReadBlob",
+      "GameData.dll+0x49be DistrictData_t reader",
+      "GameData.dll+0x640f HashSpawnPoint_t::ReadBlob",
+      "GameData.dll+0x1b23 ACGHash_t reader",
+      "DistrictData_t hash-spawn vector +0x5c",
+      "terminates without an official client consumer"
+    ]
+  },
+  "safety": {
+    "appearanceUsedToInferStaticBridge": false,
+    "coordinatesUsedToInferStaticBridge": false,
+    "productionNpcDefinitionsModified": false,
+    "rawClientResourcesModified": false,
+    "runtimeIdUsedToInferStaticBridge": false
+  },
+  "schemaVersion": 1,
+  "significantMonsterDataReferenceTypes": [
+    {
+      "disposition": "Item raw candidates include stat-359 adjacency, but the audited client spawn path does not consume Item as an ACG resolver",
+      "name": "Item",
+      "rawCandidateReferences": 21205,
+      "resourceType": 1000020,
+      "stat359ContextCandidates": 20
+    },
+    {
+      "disposition": "visual/geometry resource numeric candidates; no MonsterData-owning field or ACG join",
+      "name": "RDBMesh",
+      "rawCandidateReferences": 11279,
+      "resourceType": 1010001,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "visual/geometry resource numeric candidates; no MonsterData-owning field or ACG join",
+      "name": "CATMesh",
+      "rawCandidateReferences": 9687,
+      "resourceType": 1010002,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "decoded placement-field numeric collisions; no typed MonsterData field",
+      "name": "PlayfieldDistrictInfo/ACG",
+      "rawCandidateReferences": 5206,
+      "resourceType": 1000014,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "proven separate Nano stat-359 spell/morph reference path; not ACG or spawning",
+      "name": "Nano",
+      "rawCandidateReferences": 2744,
+      "resourceType": 1040005,
+      "stat359ContextCandidates": 498
+    },
+    {
+      "disposition": "visual/geometry resource numeric candidates; no MonsterData-owning field or ACG join",
+      "name": "Texture",
+      "rawCandidateReferences": 1755,
+      "resourceType": 1010004,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "MonsterData",
+      "rawCandidateReferences": 1699,
+      "resourceType": 1040023,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "unknown type 1000009",
+      "rawCandidateReferences": 1590,
+      "resourceType": 1000009,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "Wall",
+      "rawCandidateReferences": 1321,
+      "resourceType": 1000021,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "unknown type 1000013",
+      "rawCandidateReferences": 668,
+      "resourceType": 1000013,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "visual/geometry resource numeric candidates; no MonsterData-owning field or ACG join",
+      "name": "Animation",
+      "rawCandidateReferences": 628,
+      "resourceType": 1010003,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "unknown type 1000029",
+      "rawCandidateReferences": 382,
+      "resourceType": 1000029,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "unknown type 1010026",
+      "rawCandidateReferences": 342,
+      "resourceType": 1010026,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "decoded TemplateId and identity fields have zero MonsterData matches; remaining raw hits are descriptor/numeric candidates",
+      "name": "Statel/PlayfieldDynels",
+      "rawCandidateReferences": 336,
+      "resourceType": 1000026,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "unknown type 1010016",
+      "rawCandidateReferences": 328,
+      "resourceType": 1010016,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "visual/geometry resource numeric candidates; no MonsterData-owning field or ACG join",
+      "name": "Icon",
+      "rawCandidateReferences": 319,
+      "resourceType": 1010008,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "Playfield",
+      "rawCandidateReferences": 216,
+      "resourceType": 1000001,
+      "stat359ContextCandidates": 0
+    },
+    {
+      "disposition": "raw numeric candidates only; no typed MonsterData field or ACG consumer proven",
+      "name": "unknown type 1010017",
+      "rawCandidateReferences": 149,
+      "resourceType": 1010017,
+      "stat359ContextCandidates": 0
+    }
+  ],
+  "sourceProvenance": {
+    "ghidraTrace": "C:\\Users\\Mike\\Documents\\AO stripdown\\Docs\\evidence\\ACGHASH_MONSTERDATA_RUNTIME_RESOLVER_TRACE_20260825.md",
+    "ghidraTraceSha256": "9755443a6cfc5e2c1ce0b1e81447d480f2390a8ff84385c7f3d388e21bba344c",
+    "monsterCorpus": "C:\\Users\\Mike\\Documents\\AO stripdown\\Docs\\generated\\monster_data\\monster_data_corpus_inventory.json",
+    "monsterCorpusSha256": "27751866d9429765a2b2a19c9a206c3012328bfd3a22252ecbe471b35fea1157",
+    "numpyVersion": "1.26.4",
+    "sourceExport": "build-verify/acg-monsterdata-resource-audit/official-resource-sources.json",
+    "sourceExportSha256": "b573ef1d964430572ea632789c0ea655c6b0c338dbb741bc353c07bc7e5939de"
+  }
+}

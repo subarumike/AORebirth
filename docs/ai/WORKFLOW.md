@@ -702,6 +702,24 @@ writes the governed catalog and report under
 resolve to an exact ACG placement. The current official ACG-to-MonsterData join
 is absent, so placement associations remain unresolved instead of inferred.
 
+For the complete official-resource ACG-to-MonsterData chain audit, including
+EP1/EP2 effective resource selection, raw reverse references, representative
+ACG byte forensics, client consumer traces, and PF4582/Leet/Heckler proof cases,
+use:
+
+```cmd
+cmd /d /c Tools\run_acg_monsterdata_resource_audit.cmd
+cmd /d /c Tools\run_acg_monsterdata_resource_audit.cmd --check
+```
+
+The workflow fully hashes every database segment, audits the active B-tree
+resource view, runs the focused audit and existing regression suites, and
+writes deterministic outputs under
+`docs/generated/acg_monsterdata_resource_audit`. It is offline-only and does
+not edit resource databases, runtime NPC definitions, or placement activation.
+The three complete bulk indexes use deterministic `.json.gz`; the summary,
+report, and representative raw forensics remain directly readable.
+
 For the phase-aware official placement identity audit, all candidate coordinate
 transforms, runtime/base mapping evidence, conservative repeated-observation
 clusters, and non-mutating promotion eligibility, use:

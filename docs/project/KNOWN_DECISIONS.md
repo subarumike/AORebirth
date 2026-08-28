@@ -96,6 +96,30 @@ same canonical placement-manifest digest for the same source SHA. Packaged
 availability is not runtime activation; the gameplay spawn path remains under
 its existing separately governed catalogs.
 
+## ACG Placement and MonsterData Selection Are Independent Axes
+
+Decision: Classify the official ACG-to-MonsterData relationship as
+`SERVER_RUNTIME_ASSOCIATION`. ACG resources provide static placement and spawn
+policy. The server-authored SimpleChar full update provides stat 359, and the
+client resolves that value as resource instance `1040023:<MonsterData>`.
+
+The official resource view contains no direct or indirect typed
+ACG-to-MonsterData edge. Raw four-byte equality is only a candidate collision.
+Decoded PlayfieldDynels TemplateId and identity-instance fields have no
+MonsterData matches. Nano resources do contain proven stat-359 MonsterData
+references, but their client consumer is the spell/morph path, not ACG or NPC
+spawn placement.
+
+Reason: Static ACG parsing terminates without a client consumer that requests
+MonsterData, while the separate inbound SimpleChar path directly supplies and
+consumes the MonsterData selector. EP1 and EP2 relevant records are
+byte-identical, so the missing join is not an expansion-overlay omission.
+
+Consequences: Never infer placement identity from coordinates, appearance,
+runtime identity, raw integer equality, or the separate Nano morph path. Keep
+placement authorization and runtime MonsterData selection independently
+governed until an exact evidence bridge is found.
+
 ## Visual Archetypes Do Not Require Exact ACG Placement Identity
 
 Decision: Model reusable NPC visuals as a hierarchy of structural base-model
