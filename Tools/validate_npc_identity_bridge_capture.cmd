@@ -2,7 +2,10 @@
 setlocal
 cd /d "%~dp0.."
 
-python -m unittest Tools.tests.test_npc_identity_bridge_capture_contract Tools.tests.test_npc_identity_bridge_replay Tools.tests.test_npc_identity_bridge_resolver
+python -m unittest Tools.tests.test_npc_identity_bridge_capture_contract Tools.tests.test_npc_identity_bridge_replay Tools.tests.test_npc_identity_bridge_resolver Tools.tests.test_npc_identity_bridge_performance
+if errorlevel 1 goto fail
+
+python Tools\simulate_npc_identity_bridge_load.py >nul
 if errorlevel 1 goto fail
 
 python -m unittest Tools.tests.test_npc_observation_harvester

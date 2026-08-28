@@ -1710,7 +1710,7 @@ namespace AOSharpLiveCapture
                     now,
                     Interlocked.Read(ref this.rawPacketGlobalOrdinal),
                     "periodic-nearby-scan");
-                this.nextSnapshotUtc = now.AddSeconds(1);
+                this.nextSnapshotUtc = now.AddSeconds(2);
                 this.TrackDynelChanges();
             }
 
