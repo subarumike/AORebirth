@@ -36,6 +36,7 @@ namespace AOSharpLiveCapture
         private static Main activeInstance;
 
         private readonly object syncRoot = new object();
+        private readonly object npcIdentityBridgeOrderingRoot = new object();
         private readonly HashSet<string> knownCharacters = new HashSet<string>();
         private readonly HashSet<string> knownCorpses = new HashSet<string>();
         private readonly HashSet<string> exportedShopUpdateFingerprints = new HashSet<string>();
@@ -62,6 +63,7 @@ namespace AOSharpLiveCapture
         private const int CorpseFullUpdateTailDeadNpcTypeSuffixOffset = 80;
         private const int CorpseFullUpdateTailDeadNpcInstanceSuffixOffset = 84;
         private const string LootCaptureRequestFileName = "loot-10.request";
+        private const string NpcIdentityBridgeRequestFileName = "npc-identity-bridge.request";
         private const string ExternalControlRequestFileName = "AOSharpLiveCapture.control";
         private const string CaptureBootstrapReadyEventPrefix = @"Local\AOSharpCaptureBootstrap_";
         private const string CaptureBootstrapChannelSuffix = "_capture_safe";
@@ -259,6 +261,8 @@ namespace AOSharpLiveCapture
         private bool enemyFightCaptureStarted;
         private bool respawnCaptureRequested;
         private bool lootCaptureRequested;
+        private bool npcIdentityBridgeRequested;
+        private NpcIdentityBridgeCapture npcIdentityBridgeCapture;
 
         [Obsolete]
         public override void Run(string pluginDir)
@@ -599,6 +603,27 @@ namespace AOSharpLiveCapture
 
                     callback();
                 });
+        }
+
+        private void RunNpcIdentityBridgeOrdered(Action<NpcIdentityBridgeCapture> action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            // LogPacket allocates the raw ordinal while holding this same lock.
+            // The ordering lock is always taken before the bridge lock and the
+            // ordinal read is non-locking, so no bridge-to-Main lock inversion
+            // exists and raw sink locking remains unchanged.
+            lock (this.npcIdentityBridgeOrderingRoot)
+            {
+                NpcIdentityBridgeCapture capture = this.npcIdentityBridgeCapture;
+                if (capture != null)
+                {
+                    action(capture);
+                }
+            }
         }
 
         private void OnCommandBoundary(string command, string[] args, ChatWindow chatWindow)
@@ -1505,6 +1530,23 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("DYNEL-SPAWNED", this.DescribeDynel(dynel));
+            NpcIdentityBridgeCapture bridgeCapture = null;
+            DateTime bridgeUtc = DateTime.UtcNow;
+            long bridgeGlobalOrdinal = 0;
+            lock (this.npcIdentityBridgeOrderingRoot)
+            {
+                bridgeCapture = this.npcIdentityBridgeCapture;
+                if (bridgeCapture != null)
+                {
+                    bridgeGlobalOrdinal = Interlocked.Read(ref this.rawPacketGlobalOrdinal);
+                    bridgeCapture.OnDynelSpawned(bridgeUtc, bridgeGlobalOrdinal, dynel);
+                }
+            }
+            bridgeCapture?.ObserveNpc(
+                bridgeUtc,
+                bridgeGlobalOrdinal,
+                "dynel-spawned",
+                dynel);
             this.TrackEnemyFromDynel(dynel, "spawn");
         }
 
@@ -1522,6 +1564,23 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("CHAR-IN-PLAY", this.DescribeCharacter(character));
+            NpcIdentityBridgeCapture bridgeCapture = null;
+            DateTime bridgeUtc = DateTime.UtcNow;
+            long bridgeGlobalOrdinal = 0;
+            lock (this.npcIdentityBridgeOrderingRoot)
+            {
+                bridgeCapture = this.npcIdentityBridgeCapture;
+                if (bridgeCapture != null)
+                {
+                    bridgeGlobalOrdinal = Interlocked.Read(ref this.rawPacketGlobalOrdinal);
+                    bridgeCapture.OnCharInPlay(bridgeUtc, bridgeGlobalOrdinal, character);
+                }
+            }
+            bridgeCapture?.ObserveNpc(
+                bridgeUtc,
+                bridgeGlobalOrdinal,
+                "char-in-play",
+                character);
             this.TrackEnemyFromCharacter(character, "spawn", "CHAR-IN-PLAY");
         }
 
@@ -1532,6 +1591,11 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            this.RunNpcIdentityBridgeOrdered(
+                capture => capture.OnPlayfieldInit(
+                    DateTime.UtcNow,
+                    Interlocked.Read(ref this.rawPacketGlobalOrdinal),
+                    playfieldId));
             this.lastPlayfieldId = playfieldId.ToString(CultureInfo.InvariantCulture);
             Interlocked.Exchange(
                 ref this.playfieldInitGeneration,
@@ -1551,6 +1615,10 @@ namespace AOSharpLiveCapture
                 return;
             }
 
+            this.RunNpcIdentityBridgeOrdered(
+                capture => capture.OnTeleportStarted(
+                    DateTime.UtcNow,
+                    Interlocked.Read(ref this.rawPacketGlobalOrdinal)));
             Interlocked.Exchange(
                 ref this.pf127CollectionArmedBeforeTeleport,
                 Volatile.Read(ref this.pf127CollectionArmed));
@@ -1576,6 +1644,10 @@ namespace AOSharpLiveCapture
             Interlocked.Exchange(ref this.teleportInProgress, 0);
             Interlocked.Exchange(ref this.pf127CollectionArmed, isPf127 ? 1 : 0);
             this.LogEvent("TELEPORT", "ended");
+            this.RunNpcIdentityBridgeOrdered(
+                capture => capture.OnTeleportEnded(
+                    DateTime.UtcNow,
+                    Interlocked.Read(ref this.rawPacketGlobalOrdinal)));
             this.missionFlowCapture?.OnTeleportEnded();
             this.pf127GeometryCapture?.NotifyPlayfieldChanged(isPf127);
             this.pf127GeometryCapture?.RequestImmediateUpdate();
@@ -1599,6 +1671,10 @@ namespace AOSharpLiveCapture
             }
 
             this.LogEvent("TELEPORT", "failed");
+            this.RunNpcIdentityBridgeOrdered(
+                capture => capture.OnTeleportFailed(
+                    DateTime.UtcNow,
+                    Interlocked.Read(ref this.rawPacketGlobalOrdinal)));
         }
 
         private void OnUpdate(object sender, float deltaTime)
@@ -1630,6 +1706,10 @@ namespace AOSharpLiveCapture
             }
             if (now >= this.nextSnapshotUtc)
             {
+                this.npcIdentityBridgeCapture?.ObserveNearbyNpcs(
+                    now,
+                    Interlocked.Read(ref this.rawPacketGlobalOrdinal),
+                    "periodic-nearby-scan");
                 this.nextSnapshotUtc = now.AddSeconds(1);
                 this.TrackDynelChanges();
             }
@@ -1858,6 +1938,11 @@ namespace AOSharpLiveCapture
                 this.enabled = false;
                 this.captureClock.Stop();
 
+                this.RunFinalizationStage(
+                    "npc-identity-bridge",
+                    () => this.npcIdentityBridgeCapture?.Complete(
+                        finalizedUtc,
+                        Interlocked.Read(ref this.rawPacketGlobalOrdinal)));
                 this.FlushAndCloseRawWritersNoThrow();
                 this.RunFinalizationStage("enemy-state-json", this.WriteEnemyStateJson);
                 this.RunFinalizationStage("enemy-dossier-json", this.WriteEnemyDossierJson);
@@ -2074,6 +2159,14 @@ namespace AOSharpLiveCapture
 
         private void LogPacket(string direction, int sequence, byte[] packet)
         {
+            lock (this.npcIdentityBridgeOrderingRoot)
+            {
+                this.LogPacketOrdered(direction, sequence, packet);
+            }
+        }
+
+        private void LogPacketOrdered(string direction, int sequence, byte[] packet)
+        {
             DateTime capturedUtc = DateTime.UtcNow;
             double elapsedMilliseconds = this.captureClock.Elapsed.TotalMilliseconds;
             long globalOrdinal = Interlocked.Increment(ref this.rawPacketGlobalOrdinal);
@@ -2217,6 +2310,20 @@ namespace AOSharpLiveCapture
                         globalOrdinal));
             }
 
+            this.RunRawPacketProjectionStage(
+                "npc-identity-bridge-envelope",
+                direction,
+                sequence,
+                globalOrdinal,
+                () => this.npcIdentityBridgeCapture?.ObserveRawPacket(
+                    capturedUtc,
+                    direction,
+                    globalOrdinal,
+                    sequence,
+                    n3TypeValue,
+                    identityType,
+                    identityInstance));
+
             if (n3TypeValue == (int)N3MessageType.SimpleCharFullUpdate)
             {
                 this.RunRawPacketProjectionStage(
@@ -2344,6 +2451,14 @@ namespace AOSharpLiveCapture
                 this.scfuAppearanceLog.Flush();
                 this.scfuAppearanceRowCount++;
             }
+
+            this.npcIdentityBridgeCapture?.ObserveRawSimpleCharFullUpdate(
+                capturedUtc,
+                direction,
+                globalOrdinal,
+                sequence,
+                message,
+                decodeError);
 
             if (decoded && message.Npc != null)
             {
@@ -2493,6 +2608,14 @@ namespace AOSharpLiveCapture
 
                 this.npcStatObservationsLog.Flush();
             }
+
+            this.npcIdentityBridgeCapture?.ObserveRawStat(
+                capturedUtc,
+                direction,
+                globalOrdinal,
+                sequence,
+                message,
+                decodeError);
         }
 
         private void ExportNpcLifecyclePacket(string direction, int sequence, byte[] packet)
@@ -6036,6 +6159,12 @@ namespace AOSharpLiveCapture
                     json.Append("  \"resourcePlayfieldId\": ");
                     json.Append(Json(this.captureResourcePlayfieldId));
                     json.AppendLine(",");
+                    json.Append("  \"captureMode\": ");
+                    json.Append(Json(
+                        this.npcIdentityBridgeRequested
+                            ? "npc-identity-bridge"
+                            : this.lootCaptureRequested ? "loot-10" : "comprehensive"));
+                    json.AppendLine(",");
                     json.AppendLine("  \"aoClientProcess\": {");
                     json.Append("    \"id\": ");
                     json.Append(process.Id.ToString(CultureInfo.InvariantCulture));
@@ -7179,6 +7308,12 @@ namespace AOSharpLiveCapture
                 json.AppendLine(",");
                 json.Append("  \"scfuAppearancePath\": ");
                 json.Append(Json(Path.Combine(this.sessionDirectory, "scfu-appearance.csv")));
+                json.AppendLine(",");
+                json.Append("  \"npcIdentityBridgeArtifactPath\": ");
+                json.Append(
+                    this.npcIdentityBridgeCapture == null
+                        ? "null"
+                        : Json(this.npcIdentityBridgeCapture.ArtifactPath));
                 json.AppendLine(",");
                 json.Append("  \"characterName\": ");
                 json.Append(Json(this.GetLocalCharacterName()));
@@ -8762,6 +8897,11 @@ namespace AOSharpLiveCapture
             this.corpseFullUpdatesLog.WriteLine("CapturedUtc,Direction,Sequence,ReceiverInstance,CorpseType,CorpseInstance,CorpseIdentity,CorpseName,PlayfieldId,PositionX,PositionY,PositionZ,MonsterScale,Sex,Breed,Race,DeadNpcType,DeadNpcInstance,DeadNpcIdentity,DeadNpcName,CorpseCatMesh,CorpseCredits,CorpseMonsterData,TailDeadNpcType,TailDeadNpcInstance,TailDeadNpcIdentity,PacketLength,RawHex");
             this.npcLifecycleLog = CreateWriter(Path.Combine(this.sessionDirectory, "npc-lifecycle.csv"));
             this.npcLifecycleLog.WriteLine("CapturedUtc,Direction,Sequence,Phase,MessageType,PrimaryIdentity,RelatedIdentity,Name,Detail");
+            this.npcIdentityBridgeCapture = this.npcIdentityBridgeRequested
+                                                  ? new NpcIdentityBridgeCapture(
+                                                      this.sessionDirectory,
+                                                      this.captureId)
+                                                  : null;
             // Native surface loading/raycast/door probes are isolated to the
             // explicit MinimalPf127Capture workflow. They are not required for
             // gameplay evidence and cannot safely run in a comprehensive packet
@@ -8792,9 +8932,22 @@ namespace AOSharpLiveCapture
                 this.WritePlayerProfileSnapshot("capture-start");
                 this.EnsurePlayerCombatStateSnapshot("startup", "capture-start", "AOSharp LocalPlayer runtime snapshot");
                 this.captureClock.Restart();
+            this.npcIdentityBridgeCapture?.Start(
+                this.captureStartUtc,
+                Interlocked.Read(ref this.rawPacketGlobalOrdinal));
+            this.npcIdentityBridgeCapture?.ObserveNearbyNpcs(
+                this.captureStartUtc,
+                Interlocked.Read(ref this.rawPacketGlobalOrdinal),
+                "capture-start-nearby-scan");
             if (this.lootCaptureRequested)
             {
                 this.LogEvent("CAPTURE-MODE", "loot-10 armed by approved launcher");
+            }
+            if (this.npcIdentityBridgeRequested)
+            {
+                this.LogEvent(
+                    "CAPTURE-MODE",
+                    "npc-identity-bridge armed; artifact=" + this.npcIdentityBridgeCapture.ArtifactPath);
             }
 
             this.enabled = true;
@@ -8899,6 +9052,8 @@ namespace AOSharpLiveCapture
             this.enemyFightCaptureStarted = false;
             this.respawnCaptureRequested = false;
             this.lootCaptureRequested = false;
+            this.npcIdentityBridgeRequested = false;
+            this.npcIdentityBridgeCapture = null;
         }
 
         private void ApplyExternalCaptureRequest(string pluginDir)
@@ -8908,13 +9063,31 @@ namespace AOSharpLiveCapture
                 return;
             }
 
-            string requestPath = Path.Combine(pluginDir, LootCaptureRequestFileName);
-            if (!File.Exists(requestPath))
+            string lootRequestPath = Path.Combine(pluginDir, LootCaptureRequestFileName);
+            string bridgeRequestPath = Path.Combine(pluginDir, NpcIdentityBridgeRequestFileName);
+            bool lootRequested = File.Exists(lootRequestPath);
+            bool bridgeRequested = File.Exists(bridgeRequestPath);
+            if (lootRequested && bridgeRequested)
+            {
+                DeleteCaptureRequestNoThrow(lootRequestPath);
+                DeleteCaptureRequestNoThrow(bridgeRequestPath);
+                throw new InvalidOperationException(
+                    "loot-10 and npc-identity-bridge capture requests are mutually exclusive.");
+            }
+
+            this.lootCaptureRequested = lootRequested;
+            this.npcIdentityBridgeRequested = bridgeRequested;
+            DeleteCaptureRequestNoThrow(lootRequestPath);
+            DeleteCaptureRequestNoThrow(bridgeRequestPath);
+        }
+
+        private static void DeleteCaptureRequestNoThrow(string requestPath)
+        {
+            if (string.IsNullOrWhiteSpace(requestPath) || !File.Exists(requestPath))
             {
                 return;
             }
 
-            this.lootCaptureRequested = true;
             try
             {
                 File.Delete(requestPath);
@@ -8959,6 +9132,7 @@ namespace AOSharpLiveCapture
                 this.FlushWriterNoThrow(this.playerCombatEventsLog, false);
                 this.FlushWriterNoThrow(this.corpseFullUpdatesLog, false);
                 this.FlushWriterNoThrow(this.npcLifecycleLog, false);
+                this.npcIdentityBridgeCapture?.Flush();
                 this.pf127GeometryCapture?.Flush();
             }
         }
@@ -9001,6 +9175,8 @@ namespace AOSharpLiveCapture
                 this.playerCombatEventsLog = this.CloseWriterNoThrow(this.playerCombatEventsLog, false);
                 this.corpseFullUpdatesLog = this.CloseWriterNoThrow(this.corpseFullUpdatesLog, false);
                 this.npcLifecycleLog = this.CloseWriterNoThrow(this.npcLifecycleLog, false);
+                this.npcIdentityBridgeCapture?.Dispose();
+                this.npcIdentityBridgeCapture = null;
                 this.pf127GeometryCapture?.Dispose();
                 this.pf127GeometryCapture = null;
             }

@@ -108,14 +108,23 @@ resource-instance relationship. A packet destination proxy is corroborating,
 not automatic type-1000014 equivalence.
 
 Reason: Multi-zone captures prove that the capture-start resource label can be
-applied to later SCFU rows from another runtime phase. Current capture artifacts
-do not record runtime and model identity atomically.
+applied to later SCFU rows from another runtime phase. The targeted identity
+bridge mode therefore records runtime/model identity atomically instead of
+reusing session context.
 
 Consequences: Placement resolution must reject phase conflicts, must not infer
 district from base playfield, and must not promote exact/near coordinate
 candidates until both base mapping and coordinate transform are independently
 proven. Folder names, numeric runtime equality, destination proxies, names,
 appearance, and ACGHash cannot create that proof.
+
+The bridge epoch boundary is structural: inclusive raw-packet ordinal ranges
+must not overlap; runtime-instance reuse in a later epoch is a different key;
+Stat packets without a playfield cannot cross a transition; and offline replay
+must reject stale or out-of-range references. `Playfield.ModelIdentity` is
+direct loaded-playfield evidence. It does not become an NPC template ID or a
+placement-specific join. See
+`docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
 
 ## Database Safety
 

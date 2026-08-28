@@ -25,6 +25,12 @@ except ModuleNotFoundError:  # Direct invocation from Tools/.
 
 
 SCHEMA_VERSION = 1
+BRIDGE_SCHEMA_VERSION = 1
+BRIDGE_SENTINEL_MODEL_ID = 1234567890
+BRIDGE_RUNTIME_IDENTITY_TYPE = 50000
+BRIDGE_DIRECT_CLASSIFICATIONS = frozenset(
+    {"client-state-observed", "packet-observed"}
+)
 EXACT_EPSILON = 1.0e-6
 EVIDENCE_PROVEN = "proven"
 EVIDENCE_CORROBORATING = "corroborating"
@@ -68,6 +74,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--tests-status", default="NOT_RUN")
     parser.add_argument("--commit", default="PENDING")
+    parser.add_argument(
+        "--bridge-artifact",
+        action="append",
+        type=Path,
+        default=[],
+        help=(
+            "optional repeatable versioned npc-identity-bridge.json replay artifact; "
+            "no artifact is discovered or trusted implicitly"
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -137,6 +153,817 @@ def apply_coordinate_transform(
         step = transform.quantization
         result = tuple(round(value / step) * step for value in result)
     return tuple(float(value) for value in result)
+
+
+def _add_bridge_blocker(blockers: list[str], message: str) -> None:
+    if message not in blockers:
+        blockers.append(message)
+
+
+def _bridge_direct_value(
+    wrapper: Any,
+    field_name: str,
+    blockers: list[str],
+) -> Any:
+    if not isinstance(wrapper, Mapping):
+        _add_bridge_blocker(blockers, field_name + " direct evidence is absent")
+        return None
+    classification = wrapper.get("classification")
+    if classification not in BRIDGE_DIRECT_CLASSIFICATIONS:
+        _add_bridge_blocker(
+            blockers,
+            field_name
+            + " is not directly observed (classification="
+            + str(classification)
+            + ")",
+        )
+    if not wrapper.get("provenance"):
+        _add_bridge_blocker(blockers, field_name + " direct provenance is absent")
+    value = wrapper.get("value")
+    if value is None:
+        _add_bridge_blocker(blockers, field_name + " direct value is absent")
+    if value == BRIDGE_SENTINEL_MODEL_ID or str(value) == str(BRIDGE_SENTINEL_MODEL_ID):
+        _add_bridge_blocker(blockers, field_name + " contains the sentinel/default model id")
+    return value
+
+
+def _bridge_direct_int(
+    wrapper: Any,
+    field_name: str,
+    blockers: list[str],
+) -> int | None:
+    value = _bridge_direct_value(wrapper, field_name, blockers)
+    parsed = None if isinstance(value, bool) else optional_int(value)
+    if value is not None and parsed is None:
+        _add_bridge_blocker(blockers, field_name + " direct value is not an integer")
+    return parsed
+
+
+def _bridge_direct_position(
+    wrapper: Any,
+    field_name: str,
+    blockers: list[str],
+) -> tuple[float, float, float] | None:
+    value = _bridge_direct_value(wrapper, field_name, blockers)
+    if isinstance(value, Mapping):
+        position_values: Sequence[Any] = [value.get(axis) for axis in ("x", "y", "z")]
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        position_values = value
+    else:
+        if value is not None:
+            _add_bridge_blocker(blockers, field_name + " direct value is not a three-vector")
+        return None
+    parsed = position_from_values(position_values)
+    if parsed is None or any(not math.isfinite(item) for item in parsed):
+        _add_bridge_blocker(blockers, field_name + " direct value is not a finite three-vector")
+        return None
+    return parsed
+
+
+def _bridge_scfu_provenance_key(value: Mapping[str, Any]) -> tuple[str, str, int, int, str] | None:
+    source = value.get("source", value.get("artifact"))
+    direction = str(value.get("direction", "")).strip().upper()
+    sequence = optional_int(value.get("sequence"))
+    ordinal = optional_int(value.get("global_ordinal", value.get("globalOrdinal")))
+    packet_sha = value.get("raw_packet_sha256", value.get("rawPacketSha256"))
+    if (
+        not isinstance(source, str)
+        or not source.strip()
+        or direction not in {"IN", "OUT"}
+        or sequence is None
+        or ordinal is None
+        or not isinstance(packet_sha, str)
+        or not packet_sha.strip()
+    ):
+        return None
+    return source, direction, sequence, ordinal, packet_sha.lower()
+
+
+def _bridge_world_position(
+    wrapper: Any,
+    blockers: list[str],
+) -> tuple[float, float, float] | None:
+    position = _bridge_direct_position(
+        wrapper,
+        "observation.positions.world",
+        blockers,
+    )
+    if isinstance(wrapper, Mapping) and wrapper.get("classification") != "client-state-observed":
+        _add_bridge_blocker(
+            blockers,
+            "observation.positions.world is not client-state-observed",
+        )
+    return position
+
+
+def _bridge_packet_scfu_position(
+    wrapper: Any,
+    declared_packet_provenance: Any,
+    harvested: harvester.NpcObservation | None,
+    epoch_start: int | None,
+    epoch_end: int | None,
+    observation_ordinal: int | None,
+    blockers: list[str],
+) -> tuple[float, float, float] | None:
+    position = _bridge_direct_position(
+        wrapper,
+        "observation.positions.packet_scfu",
+        blockers,
+    )
+    if not isinstance(wrapper, Mapping):
+        return position
+    if wrapper.get("classification") != "packet-observed":
+        _add_bridge_blocker(
+            blockers,
+            "observation.positions.packet_scfu is not packet-observed",
+        )
+    provenance = wrapper.get("provenance")
+    if not isinstance(provenance, list) or not all(
+        isinstance(item, Mapping) for item in provenance
+    ):
+        _add_bridge_blocker(
+            blockers,
+            "observation.positions.packet_scfu provenance is invalid",
+        )
+        return position
+    bridge_keys = {
+        key
+        for item in provenance
+        for key in (_bridge_scfu_provenance_key(item),)
+        if key is not None
+    }
+    if not bridge_keys:
+        _add_bridge_blocker(
+            blockers,
+            "observation.positions.packet_scfu exact packet provenance is absent",
+        )
+    declared_scfu_keys: set[tuple[str, str, int, int, str]] = set()
+    if not isinstance(declared_packet_provenance, list) or not all(
+        isinstance(item, Mapping) for item in declared_packet_provenance
+    ):
+        _add_bridge_blocker(blockers, "observation.packet_provenance is invalid")
+    else:
+        declared_scfu_keys = {
+            key
+            for item in declared_packet_provenance
+            if str(item.get("kind", "")).strip().lower() in {"scfu", "packet_scfu"}
+            for key in (_bridge_scfu_provenance_key(item),)
+            if key is not None
+        }
+    bound_keys = bridge_keys.intersection(declared_scfu_keys)
+    if len(bridge_keys) != 1 or len(bound_keys) != 1:
+        _add_bridge_blocker(
+            blockers,
+            "positions.packet_scfu is not bound to one exact declared SCFU packet_provenance entry",
+        )
+    else:
+        packet_ordinal = next(iter(bound_keys))[3]
+        if (
+            epoch_start is not None
+            and epoch_end is not None
+            and not epoch_start <= packet_ordinal <= epoch_end
+        ):
+            _add_bridge_blocker(
+                blockers,
+                "positions.packet_scfu packet ordinal is outside selected zone epoch",
+            )
+        if observation_ordinal is not None and packet_ordinal > observation_ordinal:
+            _add_bridge_blocker(
+                blockers,
+                "positions.packet_scfu packet ordinal is after observation ordinal",
+            )
+    if harvested is not None:
+        harvested_keys = {
+            key
+            for item in harvested.source_rows
+            if isinstance(item, Mapping)
+            for key in (_bridge_scfu_provenance_key(item),)
+            if key is not None
+        }
+        if not harvested_keys:
+            _add_bridge_blocker(
+                blockers,
+                "harvested observation exact SCFU source provenance is absent",
+            )
+        elif bridge_keys.isdisjoint(harvested_keys):
+            _add_bridge_blocker(
+                blockers,
+                "harvested SCFU provenance conflicts with bridge packet_scfu provenance",
+            )
+    return position
+
+
+def _bridge_structural_lineage(
+    wrapper: Any,
+    blockers: list[str],
+) -> str | None:
+    if wrapper is None:
+        return None
+    if (
+        isinstance(wrapper, Mapping)
+        and wrapper.get("classification") == "not-observed"
+        and wrapper.get("value") is None
+    ):
+        return None
+    if not isinstance(wrapper, Mapping):
+        _add_bridge_blocker(blockers, "observation.lifecycle_lineage wrapper is invalid")
+        return None
+    if wrapper.get("classification") != "derived":
+        _add_bridge_blocker(
+            blockers,
+            "observation.lifecycle_lineage is not structurally derived",
+        )
+    if not wrapper.get("provenance"):
+        _add_bridge_blocker(
+            blockers,
+            "observation.lifecycle_lineage provenance is absent",
+        )
+    value = wrapper.get("value")
+    if not isinstance(value, str) or not value.strip():
+        _add_bridge_blocker(
+            blockers,
+            "observation.lifecycle_lineage value is not a nonempty string",
+        )
+        return None
+    return value
+
+
+def _bridge_coordinate_transform(
+    relation: Any,
+    blockers: list[str],
+) -> CoordinateTransform | None:
+    if not isinstance(relation, Mapping) or relation.get("state") != "proven":
+        _add_bridge_blocker(blockers, "coordinate relation is not explicitly proven")
+        return None
+    if relation.get("source_position") != "official-placement.sourcePosition":
+        _add_bridge_blocker(blockers, "coordinate relation does not name the official source position")
+    if relation.get("target_position") != "positions.world":
+        _add_bridge_blocker(blockers, "coordinate relation does not name the observed world position")
+    relation_proof = relation.get("proof")
+    if not isinstance(relation_proof, str) or not relation_proof.strip():
+        _add_bridge_blocker(blockers, "coordinate relation proof is absent")
+    raw = relation.get("transform")
+    if not isinstance(raw, Mapping):
+        _add_bridge_blocker(blockers, "coordinate relation transform is absent")
+        return None
+    if raw.get("proven") is not True:
+        _add_bridge_blocker(blockers, "coordinate relation transform is not explicitly proven")
+    evidence_class = raw.get("evidence_class")
+    if evidence_class != EVIDENCE_PROVEN:
+        _add_bridge_blocker(blockers, "coordinate relation transform evidence class is not proven")
+    name = raw.get("name")
+    if not isinstance(name, str) or not name.strip():
+        _add_bridge_blocker(blockers, "coordinate relation transform name is absent")
+        name = "invalid-bridge-coordinate-transform"
+    transform_proof = raw.get("proof")
+    if not isinstance(transform_proof, str) or not transform_proof.strip():
+        _add_bridge_blocker(blockers, "coordinate relation transform proof is absent")
+        transform_proof = ""
+
+    axis_order_raw = raw.get("axis_order", (0, 1, 2))
+    axis_order = tuple(axis_order_raw) if isinstance(axis_order_raw, (list, tuple)) else ()
+    if len(axis_order) != 3 or set(axis_order) != {0, 1, 2}:
+        _add_bridge_blocker(blockers, "coordinate relation transform axis order is invalid")
+        axis_order = (0, 1, 2)
+
+    signs_raw = raw.get("signs", (1, 1, 1))
+    signs = tuple(signs_raw) if isinstance(signs_raw, (list, tuple)) else ()
+    if len(signs) != 3 or any(value not in (-1, 1) for value in signs):
+        _add_bridge_blocker(blockers, "coordinate relation transform signs are invalid")
+        signs = (1, 1, 1)
+
+    scale = optional_float(raw.get("scale", 1.0))
+    if scale is None or not math.isfinite(scale) or scale <= 0.0:
+        _add_bridge_blocker(blockers, "coordinate relation transform scale is invalid")
+        scale = 1.0
+
+    offset_raw = raw.get("offset", (0.0, 0.0, 0.0))
+    offset = (
+        position_from_values(offset_raw)
+        if isinstance(offset_raw, (list, tuple))
+        else None
+    )
+    if offset is None or any(not math.isfinite(value) for value in offset):
+        _add_bridge_blocker(blockers, "coordinate relation transform offset is invalid")
+        offset = (0.0, 0.0, 0.0)
+
+    quantization = optional_float(raw.get("quantization"))
+    if raw.get("quantization") is not None and (
+        quantization is None or not math.isfinite(quantization) or quantization <= 0.0
+    ):
+        _add_bridge_blocker(blockers, "coordinate relation transform quantization is invalid")
+        quantization = None
+
+    centre_mode = raw.get("district_centre_mode", "none")
+    allowed_centre_modes = {
+        "none",
+        "add-all",
+        "subtract-all",
+        "add-xz",
+        "subtract-xz",
+    }
+    if centre_mode not in allowed_centre_modes:
+        _add_bridge_blocker(blockers, "coordinate relation transform district-centre mode is invalid")
+        centre_mode = "none"
+
+    return CoordinateTransform(
+        name=name,
+        axis_order=axis_order,  # type: ignore[arg-type]
+        signs=signs,  # type: ignore[arg-type]
+        scale=scale,
+        offset=offset,
+        quantization=quantization,
+        district_centre_mode=centre_mode,
+        evidence_class=EVIDENCE_PROVEN,
+        proven=True,
+        proof=transform_proof,
+    )
+
+
+def _rejected_bridge_mapping(blockers: Sequence[str]) -> dict[str, Any]:
+    return {
+        "mappingStatus": "bridge-rejected",
+        "mappingProven": False,
+        "basePlayfieldResourceId": None,
+        "conflicts": list(blockers),
+    }
+
+
+def load_identity_bridge_artifacts(
+    paths: Sequence[Path],
+    official_instances: set[int],
+    observations: Sequence[harvester.NpcObservation],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    """Load explicit replay artifacts without converting weak bridge fields into proof."""
+
+    observed_by_id = {observation.observation_id: observation for observation in observations}
+    bridge_candidates_by_observation: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    artifact_rows: list[dict[str, Any]] = []
+    public_rows: list[dict[str, Any]] = []
+
+    for path in paths:
+        try:
+            artifact = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exception:
+            raise ResolverError("Identity bridge artifact is unreadable: " + str(path)) from exception
+        if not isinstance(artifact, Mapping):
+            raise ResolverError("Identity bridge artifact root must be an object: " + str(path))
+        if optional_int(artifact.get("schema_version")) != BRIDGE_SCHEMA_VERSION:
+            raise ResolverError("Unsupported identity bridge schema version: " + str(path))
+        capture_id = artifact.get("capture_id")
+        if not isinstance(capture_id, str) or not capture_id.strip():
+            raise ResolverError("Identity bridge artifact capture_id is absent: " + str(path))
+        epochs = artifact.get("epochs")
+        rows = artifact.get("observations")
+        if not isinstance(epochs, list) or not isinstance(rows, list):
+            raise ResolverError("Identity bridge artifact epochs/observations must be arrays: " + str(path))
+
+        epoch_by_id: dict[str, Mapping[str, Any]] = {}
+        finalized_epoch_ranges: list[tuple[int, int, str]] = []
+        epoch_range_blockers: list[str] = []
+        for epoch in epochs:
+            if not isinstance(epoch, Mapping):
+                raise ResolverError("Identity bridge epoch must be an object: " + str(path))
+            epoch_id = epoch.get("zone_epoch_id")
+            if not isinstance(epoch_id, str) or not epoch_id.strip():
+                raise ResolverError("Identity bridge zone_epoch_id is absent: " + str(path))
+            if epoch_id in epoch_by_id:
+                raise ResolverError("Identity bridge contains a duplicate zone_epoch_id: " + epoch_id)
+            epoch_by_id[epoch_id] = epoch
+            epoch_start = optional_int(epoch.get("start_global_ordinal"))
+            epoch_end = optional_int(epoch.get("end_global_ordinal"))
+            if epoch_start is None or epoch_end is None or epoch_end < epoch_start:
+                _add_bridge_blocker(
+                    epoch_range_blockers,
+                    "zone epoch range is absent, invalid, or not finalized",
+                )
+            if epoch_start is not None and epoch_end is not None and epoch_end >= epoch_start:
+                finalized_epoch_ranges.append((epoch_start, epoch_end, epoch_id))
+
+        maximum_end: int | None = None
+        for epoch_start, epoch_end, _ in sorted(finalized_epoch_ranges):
+            if maximum_end is not None and epoch_start <= maximum_end:
+                _add_bridge_blocker(
+                    epoch_range_blockers,
+                    "zone epoch ranges overlap or have non-strict starts",
+                )
+            maximum_end = epoch_end if maximum_end is None else max(maximum_end, epoch_end)
+
+        artifact_blockers: list[str] = list(epoch_range_blockers)
+        parity = artifact.get("parity")
+        if not isinstance(parity, Mapping):
+            _add_bridge_blocker(artifact_blockers, "packet/client replay parity is absent")
+        else:
+            if parity.get("packet_fields_match") is not True:
+                _add_bridge_blocker(artifact_blockers, "packet/client replay parity is not proven")
+            conflicts = parity.get("conflicts")
+            if not isinstance(conflicts, list):
+                _add_bridge_blocker(artifact_blockers, "packet/client replay conflict list is absent")
+            elif conflicts:
+                _add_bridge_blocker(artifact_blockers, "packet/client replay contains conflicts")
+
+        artifact_public_rows: list[dict[str, Any]] = []
+        for row in rows:
+            if not isinstance(row, Mapping):
+                raise ResolverError("Identity bridge observation must be an object: " + str(path))
+            blockers = list(artifact_blockers)
+            observation_id = row.get("observation_id")
+            if not isinstance(observation_id, str) or not observation_id.strip():
+                raise ResolverError("Identity bridge observation_id is absent: " + str(path))
+            harvested_observation_id = row.get("harvested_observation_id", observation_id)
+            if not isinstance(harvested_observation_id, str) or not harvested_observation_id.strip():
+                _add_bridge_blocker(blockers, "harvested_observation_id is absent or invalid")
+                harvested_observation_id = observation_id
+            row_capture_id = row.get("capture_id")
+            if row_capture_id != capture_id:
+                _add_bridge_blocker(blockers, "observation capture_id conflicts with artifact capture_id")
+            epoch_id = row.get("zone_epoch_id")
+            epoch = epoch_by_id.get(str(epoch_id))
+            epoch_start: int | None = None
+            epoch_end: int | None = None
+            observation_ordinal = optional_int(row.get("observation_global_ordinal"))
+            if epoch is None:
+                _add_bridge_blocker(blockers, "observation references an absent or stale zone epoch")
+
+            harvested = observed_by_id.get(harvested_observation_id)
+            if harvested is None:
+                _add_bridge_blocker(
+                    blockers,
+                    "harvested_observation_id is absent from the harvested capture corpus",
+                )
+            elif harvested.capture_id != capture_id:
+                _add_bridge_blocker(blockers, "harvested observation capture conflicts with bridge artifact")
+
+            epoch_runtime: int | None = None
+            epoch_base: int | None = None
+            if epoch is not None:
+                if epoch.get("valid") is not True:
+                    _add_bridge_blocker(blockers, "zone epoch is invalid or stale")
+                epoch_start = optional_int(epoch.get("start_global_ordinal"))
+                end_raw = epoch.get("end_global_ordinal")
+                epoch_end = optional_int(end_raw)
+                if end_raw is None or epoch_end is None:
+                    _add_bridge_blocker(
+                        blockers,
+                        "zone epoch finalized end boundary is absent or invalid",
+                    )
+                if epoch_start is None or epoch_end is None or observation_ordinal is None:
+                    _add_bridge_blocker(blockers, "zone epoch ordinal boundary is absent")
+                elif observation_ordinal < epoch_start or observation_ordinal > epoch_end:
+                    _add_bridge_blocker(blockers, "observation ordinal is outside its zone epoch")
+                if (
+                    epoch_end is not None
+                    and epoch_start is not None
+                    and epoch_end < epoch_start
+                ):
+                    _add_bridge_blocker(blockers, "zone epoch end precedes its start")
+                epoch_runtime = _bridge_direct_int(
+                    epoch.get("runtime_playfield"), "epoch.runtime_playfield", blockers
+                )
+                epoch_base = _bridge_direct_int(
+                    epoch.get("base_playfield_direct"), "epoch.base_playfield_direct", blockers
+                )
+
+            runtime_playfield = _bridge_direct_int(
+                row.get("runtime_playfield"), "observation.runtime_playfield", blockers
+            )
+            runtime_identity_type = _bridge_direct_int(
+                row.get("runtime_identity_type"),
+                "observation.runtime_identity_type",
+                blockers,
+            )
+            runtime_identity_instance = _bridge_direct_int(
+                row.get("runtime_identity_instance"),
+                "observation.runtime_identity_instance",
+                blockers,
+            )
+            base_playfield = _bridge_direct_int(
+                row.get("base_playfield_direct"), "observation.base_playfield_direct", blockers
+            )
+            model_type = _bridge_direct_int(
+                row.get("full_model_type_direct"), "observation.full_model_type_direct", blockers
+            )
+            model_instance = _bridge_direct_int(
+                row.get("full_model_instance_direct"),
+                "observation.full_model_instance_direct",
+                blockers,
+            )
+            if model_type != 1000014:
+                _add_bridge_blocker(blockers, "direct full model identity type is not 1000014")
+            if runtime_identity_type != BRIDGE_RUNTIME_IDENTITY_TYPE:
+                _add_bridge_blocker(blockers, "direct runtime identity type is not SimpleChar")
+            if runtime_identity_instance is not None and not (
+                0 <= runtime_identity_instance <= 0xFFFFFFFF
+            ):
+                _add_bridge_blocker(
+                    blockers,
+                    "direct runtime identity instance is outside unsigned 32-bit range",
+                )
+            if base_playfield is not None and base_playfield not in official_instances:
+                _add_bridge_blocker(blockers, "direct base playfield is not an official type-1000014 instance")
+            if model_instance is not None and model_instance not in official_instances:
+                _add_bridge_blocker(blockers, "direct full model instance is not an official type-1000014 instance")
+            if base_playfield is not None and model_instance is not None and base_playfield != model_instance:
+                _add_bridge_blocker(blockers, "direct full model instance conflicts with direct base playfield")
+            if epoch_runtime is not None and runtime_playfield is not None and epoch_runtime != runtime_playfield:
+                _add_bridge_blocker(blockers, "observation runtime playfield conflicts with its zone epoch")
+            if epoch_base is not None and base_playfield is not None and epoch_base != base_playfield:
+                _add_bridge_blocker(blockers, "observation base playfield conflicts with its zone epoch")
+            if harvested is not None and harvested.runtime_playfield_id != runtime_playfield:
+                _add_bridge_blocker(blockers, "harvested runtime playfield conflicts with bridge observation")
+            if (
+                harvested is not None
+                and runtime_identity_instance is not None
+                and 0 <= runtime_identity_instance <= 0xFFFFFFFF
+            ):
+                expected_identity = f"(SimpleChar:{runtime_identity_instance:04X})"
+                if harvested.identity != expected_identity:
+                    _add_bridge_blocker(
+                        blockers,
+                        "harvested runtime identity conflicts with bridge observation",
+                    )
+
+            if row.get("acg_hash_used_as_runtime_identity") is not False:
+                _add_bridge_blocker(blockers, "ACGHash identity exclusion is absent or false")
+            bridge_state = row.get("bridge_state")
+            if bridge_state in {"conflict", "invalid", "invalid-epoch", "stale-epoch"}:
+                _add_bridge_blocker(blockers, "bridge observation state is " + str(bridge_state))
+            lifecycle_lineage = _bridge_structural_lineage(
+                row.get("lifecycle_lineage"),
+                blockers,
+            )
+            bridge_blockers = row.get("bridge_blockers", row.get("blockers", []))
+            if not isinstance(bridge_blockers, list) or any(
+                not isinstance(item, str) or not item.strip() for item in bridge_blockers
+            ):
+                _add_bridge_blocker(blockers, "bridge observation bridge_blockers field is invalid")
+                bridge_blockers = []
+            else:
+                bridge_blockers = list(bridge_blockers)
+
+            positions = row.get("positions")
+            world_position = _bridge_world_position(
+                positions.get("world") if isinstance(positions, Mapping) else None,
+                blockers,
+            )
+            packet_scfu_position = _bridge_packet_scfu_position(
+                positions.get("packet_scfu") if isinstance(positions, Mapping) else None,
+                row.get("packet_provenance"),
+                harvested,
+                epoch_start,
+                epoch_end,
+                observation_ordinal,
+                blockers,
+            )
+
+            transform = _bridge_coordinate_transform(row.get("coordinate_relation"), blockers)
+            eligible = not blockers and transform is not None and base_playfield is not None
+            mapping = (
+                {
+                    "mappingStatus": "proven-bridge-observation-zone-epoch",
+                    "mappingProven": True,
+                    "runtimePlayfieldId": runtime_playfield,
+                    "basePlayfieldResourceId": base_playfield,
+                    "officialPartitionProven": True,
+                    "zoneEpochId": epoch_id,
+                    "conflicts": [],
+                }
+                if eligible
+                else _rejected_bridge_mapping(blockers)
+            )
+            public = {
+                "artifactPath": str(path),
+                "observationId": observation_id,
+                "harvestedObservationId": harvested_observation_id,
+                "observationGlobalOrdinal": optional_int(
+                    row.get("observation_global_ordinal")
+                ),
+                "captureId": capture_id,
+                "zoneEpochId": epoch_id,
+                "lifecycleLineage": lifecycle_lineage,
+                "accepted": eligible,
+                "blockers": blockers,
+                "runtimePlayfieldId": runtime_playfield,
+                "directBasePlayfieldId": base_playfield,
+                "directRuntimeIdentity": {
+                    "type": runtime_identity_type,
+                    "instance": runtime_identity_instance,
+                },
+                "directFullModelIdentity": {"type": model_type, "instance": model_instance},
+                "directWorldPosition": (
+                    list(world_position) if world_position is not None else None
+                ),
+                "directPacketScfuPosition": (
+                    list(packet_scfu_position) if packet_scfu_position is not None else None
+                ),
+                "bridgeBlockers": bridge_blockers,
+                "coordinateRelationState": (
+                    row.get("coordinate_relation", {}).get("state")
+                    if isinstance(row.get("coordinate_relation"), Mapping)
+                    else None
+                ),
+                "coordinateTransform": asdict(transform) if transform is not None else None,
+                "acgHashUsedAsRuntimeIdentity": row.get("acg_hash_used_as_runtime_identity"),
+            }
+            entry = {
+                "accepted": eligible,
+                "mapping": mapping,
+                "transform": transform,
+                "worldPosition": world_position,
+                "public": public,
+                "criticalProof": {
+                    "zoneEpochId": epoch_id,
+                    "lifecycleLineage": lifecycle_lineage,
+                    "runtimeIdentity": {
+                        "type": runtime_identity_type,
+                        "instance": runtime_identity_instance,
+                    },
+                    "runtimePlayfieldId": runtime_playfield,
+                    "epochRuntimePlayfieldId": epoch_runtime,
+                    "basePlayfieldId": base_playfield,
+                    "epochBasePlayfieldId": epoch_base,
+                    "fullModelIdentity": {
+                        "type": model_type,
+                        "instance": model_instance,
+                    },
+                    "worldPosition": list(world_position) if world_position is not None else None,
+                    "coordinateTransform": (
+                        asdict(transform) if transform is not None else None
+                    ),
+                },
+                "entityScope": {
+                    "zoneEpochId": epoch_id,
+                    "lifecycleLineage": lifecycle_lineage,
+                    "runtimeIdentity": {
+                        "type": runtime_identity_type,
+                        "instance": runtime_identity_instance,
+                    },
+                    "runtimePlayfieldId": runtime_playfield,
+                    "epochRuntimePlayfieldId": epoch_runtime,
+                    "basePlayfieldId": base_playfield,
+                    "epochBasePlayfieldId": epoch_base,
+                    "fullModelIdentity": {
+                        "type": model_type,
+                        "instance": model_instance,
+                    },
+                },
+            }
+            bridge_candidates_by_observation[harvested_observation_id].append(entry)
+            artifact_public_rows.append(public)
+            public_rows.append(public)
+
+        artifact_rows.append(
+            {
+                "path": str(path),
+                "captureId": capture_id,
+                "schemaVersion": BRIDGE_SCHEMA_VERSION,
+                "epochCount": len(epochs),
+                "observationCount": len(rows),
+                "artifactBlockers": artifact_blockers,
+            }
+        )
+
+    bridge_by_observation: dict[str, dict[str, Any]] = {}
+    for harvested_observation_id, candidates in sorted(
+        bridge_candidates_by_observation.items()
+    ):
+        ordered_candidates = sorted(
+            candidates,
+            key=lambda candidate: (
+                str(candidate["public"].get("artifactPath")),
+                optional_int(candidate["public"].get("observationGlobalOrdinal")) or -1,
+                str(candidate["public"].get("observationId")),
+            ),
+        )
+        eligible_candidates = [
+            candidate for candidate in ordered_candidates if candidate.get("accepted") is True
+        ]
+        aggregation_state = "single-row"
+        if len(eligible_candidates) > 1:
+            critical_fingerprints = {
+                json.dumps(
+                    candidate["criticalProof"],
+                    ensure_ascii=True,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                for candidate in eligible_candidates
+            }
+            all_epoch_and_lineage_scoped = all(
+                isinstance(candidate["criticalProof"].get("zoneEpochId"), str)
+                and bool(candidate["criticalProof"]["zoneEpochId"].strip())
+                and isinstance(candidate["criticalProof"].get("lifecycleLineage"), str)
+                and bool(candidate["criticalProof"]["lifecycleLineage"].strip())
+                for candidate in eligible_candidates
+            )
+            if all_epoch_and_lineage_scoped and len(critical_fingerprints) == 1:
+                aggregation_state = "identical-eligible-temporal-rows-deduplicated"
+            else:
+                aggregation_state = "conflicting-eligible-temporal-rows"
+                conflict_message = (
+                    "multiple eligible temporal bridge rows have conflicting or unscoped critical proof"
+                )
+                for candidate in eligible_candidates:
+                    _add_bridge_blocker(candidate["public"]["blockers"], conflict_message)
+                    candidate["accepted"] = False
+                    candidate["public"]["accepted"] = False
+                    candidate["mapping"] = _rejected_bridge_mapping(
+                        candidate["public"]["blockers"]
+                    )
+                    candidate["transform"] = None
+                eligible_candidates = []
+        elif len(eligible_candidates) == 1 and len(ordered_candidates) > 1:
+            entity_scope_fingerprints = {
+                json.dumps(
+                    candidate["entityScope"],
+                    ensure_ascii=True,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                for candidate in ordered_candidates
+            }
+            all_entity_scopes_complete = all(
+                isinstance(candidate["entityScope"].get("zoneEpochId"), str)
+                and bool(candidate["entityScope"]["zoneEpochId"].strip())
+                and isinstance(candidate["entityScope"].get("lifecycleLineage"), str)
+                and bool(candidate["entityScope"]["lifecycleLineage"].strip())
+                and all(
+                    candidate["entityScope"].get(field_name) is not None
+                    for field_name in (
+                        "runtimePlayfieldId",
+                        "epochRuntimePlayfieldId",
+                        "basePlayfieldId",
+                        "epochBasePlayfieldId",
+                    )
+                )
+                and all(
+                    candidate["entityScope"]["runtimeIdentity"].get(field_name)
+                    is not None
+                    for field_name in ("type", "instance")
+                )
+                and all(
+                    candidate["entityScope"]["fullModelIdentity"].get(field_name)
+                    is not None
+                    for field_name in ("type", "instance")
+                )
+                for candidate in ordered_candidates
+            )
+            if all_entity_scopes_complete and len(entity_scope_fingerprints) == 1:
+                aggregation_state = "one-eligible-temporal-row-selected"
+            else:
+                aggregation_state = "conflicting-temporal-entity-scope"
+                conflict_message = (
+                    "temporal bridge rows cross epoch, lineage, or direct identity scope"
+                )
+                for candidate in ordered_candidates:
+                    _add_bridge_blocker(candidate["public"]["blockers"], conflict_message)
+                    candidate["accepted"] = False
+                    candidate["public"]["accepted"] = False
+                    candidate["mapping"] = _rejected_bridge_mapping(
+                        candidate["public"]["blockers"]
+                    )
+                    candidate["transform"] = None
+                eligible_candidates = []
+        elif not eligible_candidates:
+            aggregation_state = "no-eligible-temporal-rows"
+
+        if eligible_candidates:
+            selected = dict(eligible_candidates[0])
+            selected_public = dict(eligible_candidates[0]["public"])
+        else:
+            selected = dict(ordered_candidates[0])
+            selected_public = dict(ordered_candidates[0]["public"])
+            combined_blockers: list[str] = []
+            for candidate in ordered_candidates:
+                for blocker in candidate["public"].get("blockers", []):
+                    _add_bridge_blocker(combined_blockers, str(blocker))
+            selected["accepted"] = False
+            selected["mapping"] = _rejected_bridge_mapping(combined_blockers)
+            selected["transform"] = None
+            selected_public["accepted"] = False
+            selected_public["blockers"] = combined_blockers
+
+        if len(ordered_candidates) > 1:
+            selected_public["temporalAggregation"] = aggregation_state
+            selected_public["temporalRows"] = [
+                dict(candidate["public"]) for candidate in ordered_candidates
+            ]
+        selected["public"] = selected_public
+        bridge_by_observation[harvested_observation_id] = selected
+
+    accepted = sum(bool(entry.get("accepted")) for entry in bridge_by_observation.values())
+    payload = {
+        "schemaVersion": BRIDGE_SCHEMA_VERSION,
+        "artifacts": artifact_rows,
+        "observations": sorted(public_rows, key=lambda row: (str(row["observationId"]), row["artifactPath"])),
+        "acceptedObservations": accepted,
+        "rejectedObservations": len(bridge_by_observation) - accepted,
+        "conclusion": (
+            "Only same-epoch direct type-1000014/base-playfield evidence plus an explicitly proven "
+            "official-source-position-to-world-position transform is identity-eligible."
+        ),
+    }
+    return payload, bridge_by_observation
 
 
 def atomic_json(path: Path, value: Any) -> None:
@@ -1532,6 +2359,7 @@ def resolve_observations(
     mapping_by_capture: Mapping[str, Mapping[str, Any]],
     clusters: list[dict[str, Any]],
     observation_to_cluster: Mapping[str, str],
+    bridge_by_observation: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     placements_by_playfield: dict[int, list[Mapping[str, Any]]] = defaultdict(list)
     for placement in placements:
@@ -1548,44 +2376,53 @@ def resolve_observations(
     rows: list[dict[str, Any]] = []
     candidate_rows: list[dict[str, Any]] = []
     cluster_candidate_ids: dict[str, set[str]] = defaultdict(set)
+    bridge_by_observation = bridge_by_observation or {}
     for observation in sorted(observations, key=lambda value: value.observation_id):
-        mapping = dict(mapping_by_capture.get(
-            observation.capture_id,
-            {
-                "mappingStatus": "not-proven",
-                "mappingProven": False,
-                "basePlayfieldResourceId": None,
-                "conflicts": [],
-            },
-        ))
-        mapping = mapping_for_observation_epoch(mapping, observation.runtime_playfield_id)
-        if (
-            not mapping.get("mappingProven")
-            and observation.runtime_playfield_id in mapping.get("phaseConflictingRuntimePlayfieldIds", [])
-        ):
-            mapping["mappingStatus"] = "conflict"
-            mapping["mappingProven"] = False
-            mapping["conflicts"] = list(mapping.get("conflicts", [])) + [
-                "observation runtime playfield belongs to a different zone epoch than the capture-level resource label"
-            ]
-        proxy_candidates = sorted(
-            {
-                int(pair["destinationPlayfieldProxyId"])
-                for pair in mapping.get("packetRuntimeDestinationProxyPairs", [])
-                if pair.get("runtimePlayfieldId") == observation.runtime_playfield_id
-                and int(pair.get("destinationPlayfieldProxyId", -1)) in placements_by_playfield
-            }
-        )
-        if len(proxy_candidates) == 1:
-            mapping["candidateBasePlayfieldId"] = proxy_candidates[0]
-            mapping["candidateBaseBasis"] = "packet-runtime-to-destination-playfield-proxy"
-            mapping["candidateBaseEvidenceClass"] = EVIDENCE_CORROBORATING
-        elif len(proxy_candidates) > 1:
-            mapping["mappingStatus"] = "conflict"
-            mapping["mappingProven"] = False
-            mapping["conflicts"] = list(mapping.get("conflicts", [])) + [
-                "runtime playfield is paired with multiple destination playfield proxies"
-            ]
+        bridge = bridge_by_observation.get(observation.observation_id)
+        selected_transform = production_transform
+        if bridge is not None:
+            mapping = dict(bridge.get("mapping", _rejected_bridge_mapping([])))
+            bridge_transform = bridge.get("transform")
+            if bridge.get("accepted") is True and isinstance(bridge_transform, CoordinateTransform):
+                selected_transform = bridge_transform
+        else:
+            mapping = dict(mapping_by_capture.get(
+                observation.capture_id,
+                {
+                    "mappingStatus": "not-proven",
+                    "mappingProven": False,
+                    "basePlayfieldResourceId": None,
+                    "conflicts": [],
+                },
+            ))
+            mapping = mapping_for_observation_epoch(mapping, observation.runtime_playfield_id)
+            if (
+                not mapping.get("mappingProven")
+                and observation.runtime_playfield_id in mapping.get("phaseConflictingRuntimePlayfieldIds", [])
+            ):
+                mapping["mappingStatus"] = "conflict"
+                mapping["mappingProven"] = False
+                mapping["conflicts"] = list(mapping.get("conflicts", [])) + [
+                    "observation runtime playfield belongs to a different zone epoch than the capture-level resource label"
+                ]
+            proxy_candidates = sorted(
+                {
+                    int(pair["destinationPlayfieldProxyId"])
+                    for pair in mapping.get("packetRuntimeDestinationProxyPairs", [])
+                    if pair.get("runtimePlayfieldId") == observation.runtime_playfield_id
+                    and int(pair.get("destinationPlayfieldProxyId", -1)) in placements_by_playfield
+                }
+            )
+            if len(proxy_candidates) == 1:
+                mapping["candidateBasePlayfieldId"] = proxy_candidates[0]
+                mapping["candidateBaseBasis"] = "packet-runtime-to-destination-playfield-proxy"
+                mapping["candidateBaseEvidenceClass"] = EVIDENCE_CORROBORATING
+            elif len(proxy_candidates) > 1:
+                mapping["mappingStatus"] = "conflict"
+                mapping["mappingProven"] = False
+                mapping["conflicts"] = list(mapping.get("conflicts", [])) + [
+                    "runtime playfield is paired with multiple destination playfield proxies"
+                ]
         candidate_playfield = (
             optional_int(mapping.get("basePlayfieldResourceId"))
             if mapping.get("mappingProven")
@@ -1595,13 +2432,41 @@ def resolve_observations(
         )
         cluster_id = observation_to_cluster[observation.observation_id]
         cluster_conflict = bool(cluster_by_id[cluster_id]["conflicts"])
+        resolution_input = observation_resolution_input(observation)
+        candidate_position_space = "harvested-packet-scfu"
+        if bridge is not None and bridge.get("accepted") is True:
+            bridge_world_position = bridge.get("worldPosition")
+            if isinstance(bridge_world_position, Sequence) and not isinstance(
+                bridge_world_position, (str, bytes)
+            ):
+                resolution_input["position"] = list(bridge_world_position)
+                candidate_position_space = "bridge-positions.world"
         result = resolve_candidate_set(
-            observation_resolution_input(observation),
+            resolution_input,
             placements_by_playfield.get(candidate_playfield, []) if candidate_playfield is not None else [],
             mapping,
-            production_transform,
+            selected_transform,
             cluster_conflict=cluster_conflict,
         )
+        if bridge is not None:
+            public_bridge = dict(bridge.get("public", {}))
+            result["identityEvidence"].insert(
+                0,
+                {
+                    "class": EVIDENCE_PROVEN if bridge.get("accepted") is True else EVIDENCE_HEURISTIC,
+                    "type": "versioned-identity-bridge-replay",
+                    "accepted": bridge.get("accepted") is True,
+                    "zoneEpochId": public_bridge.get("zoneEpochId"),
+                    "blockers": public_bridge.get("blockers", []),
+                },
+            )
+            result["identityBridge"] = public_bridge
+            bridge_blockers = list(public_bridge.get("blockers", []))
+            if bridge_blockers:
+                bridge_reason = "identity bridge rejected: " + "; ".join(bridge_blockers)
+                result["blockingReason"] = "; ".join(
+                    value for value in (result.get("blockingReason"), bridge_reason) if value
+                )
         formal_ids = sorted(
             {
                 str(candidate["placementId"])
@@ -1620,7 +2485,8 @@ def resolve_observations(
             "resourcePlayfieldId": observation.resource_playfield_id,
             "runtimePlayfieldId": observation.runtime_playfield_id,
             "resolvedBasePlayfieldId": candidate_playfield,
-            "runtimePosition": list(observation.position) if observation.position else None,
+            "runtimePosition": resolution_input.get("position"),
+            "candidatePositionSpace": candidate_position_space,
             **result,
             "candidatePlacementIds": formal_ids,
             "promotionReady": result["matchState"] == MATCH_UNIQUE,
@@ -1631,8 +2497,9 @@ def resolve_observations(
                 "observationId": observation.observation_id,
                 "clusterId": cluster_id,
                 "playfieldId": candidate_playfield,
-                "coordinateHypothesis": production_transform.name,
-                "coordinateHypothesisProven": False,
+                "coordinateHypothesis": selected_transform.name,
+                "coordinateHypothesisProven": selected_transform.proven,
+                "coordinateTargetPositionSpace": candidate_position_space,
                 "exactCandidates": result.get("exactCandidates", []),
                 "spawnRegionCandidates": result.get("regionCandidates", []),
                 "nearestDiagnostics": result.get("nearestCandidates", []),
@@ -1950,13 +2817,30 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     records = [record for record in harvester.inventory_records(repo_root) if record.accepted]
     observations, stat_metrics = harvester.harvest_observations(records, repo_root)
     position_history = load_capture_position_history(records)
+    official_instances = official_resource_instances(manifest, resources)
     runtime_mapping_payload, mapping_by_capture = build_runtime_playfield_mapping(
-        records, observations, official_resource_instances(manifest, resources)
+        records, observations, official_instances
     )
+    bridge_paths = [
+        path if path.is_absolute() else repo_root / path
+        for path in getattr(args, "bridge_artifact", [])
+    ]
+    bridge_payload: dict[str, Any] | None = None
+    bridge_by_observation: dict[str, dict[str, Any]] = {}
+    if bridge_paths:
+        bridge_payload, bridge_by_observation = load_identity_bridge_artifacts(
+            bridge_paths, official_instances, observations
+        )
+        runtime_mapping_payload["identityBridgeReplay"] = bridge_payload
     clusters, observation_to_cluster = build_observation_clusters(observations, position_history)
     coordinate_payload = analyze_coordinate_transforms(observations, placements, mapping_by_capture)
     resolutions, candidate_rows = resolve_observations(
-        observations, placements, mapping_by_capture, clusters, observation_to_cluster
+        observations,
+        placements,
+        mapping_by_capture,
+        clusters,
+        observation_to_cluster,
+        bridge_by_observation,
     )
     promotions = build_promotion_eligibility(observations, resolutions)
     populations = population_results(
@@ -2054,6 +2938,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             ),
         },
     }
+    if bridge_payload is not None:
+        summary["identityBridgeReplay"] = {
+            "artifactsConsumed": len(bridge_payload["artifacts"]),
+            "acceptedObservations": bridge_payload["acceptedObservations"],
+            "rejectedObservations": bridge_payload["rejectedObservations"],
+        }
     atomic_json(output_dir / "summary.json", summary)
     return summary
 

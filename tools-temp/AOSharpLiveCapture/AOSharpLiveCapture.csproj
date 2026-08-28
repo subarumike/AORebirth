@@ -58,6 +58,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="MinimalPf127Capture.cs" />
     <Compile Include="MissionFlowCapture.cs" />
+    <Compile Include="NpcIdentityBridgeCapture.cs" />
     <Compile Include="Pf127GeometryCapture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
