@@ -120,6 +120,30 @@ runtime identity, raw integer equality, or the separate Nano morph path. Keep
 placement authorization and runtime MonsterData selection independently
 governed until an exact evidence bridge is found.
 
+## Reconstruct Reusable Populations Over ACG Topology
+
+Decision: Use the hierarchy visual archetype, contextual runtime variant,
+spawn population, ACG placements, and transient runtime instances. Do not make
+one runtime instance or one exact ACG row the mandatory reconstruction unit.
+
+Population association has five explicit scopes: `exact-placement`,
+`local-population`, `playfield-population`, `unassociated`, and `conflict`.
+Exact placement is allowed only through unique position correlation inside a
+proven base playfield and is still recorded with `explicitIdBridge=false`.
+Local population evidence may associate several placements with a repeated
+MonsterData/archetype population without choosing an individual row.
+
+Reason: The server supplies MonsterData independently of the static ACG
+topology, and ordinary mobs heavily reuse visuals, names, levels, and transient
+runtime IDs. Population-scoped evidence preserves useful reconstruction without
+inventing a client-resource bridge or permanent runtime identity.
+
+Consequences: Official ACG policy grouping remains distinct from heuristic
+spatial clustering. Names, levels, loot, and movement remain contextual.
+Proximity alone cannot establish ownership, heuristic-only associations cannot
+authorize implementation, and population association never implies exact-row
+association.
+
 ## Visual Archetypes Do Not Require Exact ACG Placement Identity
 
 Decision: Model reusable NPC visuals as a hierarchy of structural base-model

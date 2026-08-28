@@ -1,0 +1,588 @@
+{
+  "conclusion": "Guide and Guard retain exact appearance evidence, but current evidence supports no exact placement identity; population scope remains explicit.",
+  "guideGuardResolverEvidence": {
+    "guard": {
+      "details": [
+        {
+          "appearanceExpected": {
+            "headMesh": 40111,
+            "textures": [
+              30848,
+              42260,
+              30831,
+              42261
+            ]
+          },
+          "appearancePreserved": true,
+          "candidateBasePlayfieldId": 954,
+          "captureStartResourcePlayfieldId": 3081,
+          "formalCandidateCount": 1,
+          "headMesh": 40111,
+          "identityConclusion": "base playfield mapping is not proven for this observation epoch; placement-to-runtime coordinate transform is not proven; official spawn-region containment is not placement identity",
+          "matchState": "ambiguous",
+          "normalizedOfficialCandidatePositions": [
+            {
+              "distance": 0.780253,
+              "districtId": "18.8.62_EP1:1000014:954:district-2",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-2:record-0",
+              "radius": 1.0,
+              "sourcePosition": [
+                246.28109741210938,
+                5.800110340118408,
+                76.54754638671875
+              ],
+              "templateId": null
+            },
+            {
+              "distance": 14.586927,
+              "districtId": "18.8.62_EP1:1000014:954:district-2",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-2:record-1",
+              "radius": 1.0,
+              "sourcePosition": [
+                232.54840087890625,
+                6.399409770965576,
+                75.19691467285156
+              ],
+              "templateId": null
+            },
+            {
+              "distance": 93.492882,
+              "districtId": "18.8.62_EP1:1000014:954:district-1",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-1:record-0",
+              "radius": 1.0,
+              "sourcePosition": [
+                194.1500701904297,
+                3.678462266921997,
+                153.59197998046875
+              ],
+              "templateId": null
+            },
+            {
+              "distance": 195.650536,
+              "districtId": "18.8.62_EP1:1000014:954:district-5",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-5:record-0",
+              "radius": 1.0,
+              "sourcePosition": [
+                53.16907501220703,
+                5.15273904800415,
+                102.70478820800781
+              ],
+              "templateId": null
+            }
+          ],
+          "observationId": "20260826-222425|(SimpleChar:7A351C36)",
+          "officialAppearanceComparison": "official placement structure contains no proven appearance fields",
+          "runtimeIdentity": "(SimpleChar:7A351C36)",
+          "runtimePlayfieldId": 2130084,
+          "runtimePositions": [
+            [
+              247.061264,
+              5.81000042,
+              76.54147
+            ]
+          ],
+          "textures": [
+            30848,
+            42260,
+            30831,
+            42261
+          ]
+        }
+      ],
+      "name": "Guard",
+      "observationCount": 1,
+      "unique": false
+    },
+    "guide": {
+      "details": [
+        {
+          "appearanceExpected": {
+            "headMesh": 40635,
+            "textures": [
+              42239,
+              42260,
+              42240,
+              42261
+            ]
+          },
+          "appearancePreserved": true,
+          "candidateBasePlayfieldId": 954,
+          "captureStartResourcePlayfieldId": 3081,
+          "formalCandidateCount": 1,
+          "headMesh": 40635,
+          "identityConclusion": "base playfield mapping is not proven for this observation epoch; placement-to-runtime coordinate transform is not proven; official spawn-region containment is not placement identity",
+          "matchState": "ambiguous",
+          "normalizedOfficialCandidatePositions": [
+            {
+              "distance": 0.892717,
+              "districtId": "18.8.62_EP1:1000014:954:district-2",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-2:record-1",
+              "radius": 1.0,
+              "sourcePosition": [
+                232.54840087890625,
+                6.399409770965576,
+                75.19691467285156
+              ],
+              "templateId": null
+            },
+            {
+              "distance": 13.78109,
+              "districtId": "18.8.62_EP1:1000014:954:district-2",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-2:record-0",
+              "radius": 1.0,
+              "sourcePosition": [
+                246.28109741210938,
+                5.800110340118408,
+                76.54754638671875
+              ],
+              "templateId": null
+            },
+            {
+              "distance": 86.589366,
+              "districtId": "18.8.62_EP1:1000014:954:district-1",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-1:record-0",
+              "radius": 1.0,
+              "sourcePosition": [
+                194.1500701904297,
+                3.678462266921997,
+                153.59197998046875
+              ],
+              "templateId": null
+            },
+            {
+              "distance": 181.322861,
+              "districtId": "18.8.62_EP1:1000014:954:district-5",
+              "monsterDataIfProven": null,
+              "placementId": "18.8.62_EP1:1000014:954:district-5:record-0",
+              "radius": 1.0,
+              "sourcePosition": [
+                53.16907501220703,
+                5.15273904800415,
+                102.70478820800781
+              ],
+              "templateId": null
+            }
+          ],
+          "observationId": "20260826-222425|(SimpleChar:7A351C37)",
+          "officialAppearanceComparison": "official placement structure contains no proven appearance fields",
+          "runtimeIdentity": "(SimpleChar:7A351C37)",
+          "runtimePlayfieldId": 2130084,
+          "runtimePositions": [
+            [
+              232.512512,
+              6.01,
+              75.99942
+            ]
+          ],
+          "textures": [
+            42239,
+            42260,
+            42240,
+            42261
+          ]
+        }
+      ],
+      "name": "Guide",
+      "observationCount": 1,
+      "unique": false
+    },
+    "playfield": {
+      "ambiguous": 2,
+      "clusters": 22,
+      "conflicts": 0,
+      "observations": 22,
+      "playfieldId": 3081,
+      "uniqueProven": 0,
+      "unmatched": 20
+    }
+  },
+  "populationCount": 6,
+  "runtimePopulations": [
+    {
+      "archetypeId": "archetype-73143d6a69558639",
+      "associationScope": "playfield-population",
+      "associationStrength": "corroborating",
+      "blockingReasons": [
+        "no authoritative local ACG population ownership"
+      ],
+      "captureCount": 1,
+      "captureIds": [
+        "20260826-222425"
+      ],
+      "coverageCounts": {
+        "appearance": 11,
+        "combat": 0,
+        "lifecycle": 11,
+        "loot": 0,
+        "movement": 9,
+        "respawn": 0,
+        "stats": 0
+      },
+      "levelMaximum": 1,
+      "levelMinimum": 1,
+      "lootDefinesVisualArchetype": false,
+      "lootObservationCount": 0,
+      "maximumObservedMovementDisplacement": 0.0,
+      "monsterData": 17649,
+      "names": [
+        "34-I Helper"
+      ],
+      "observationCount": 11,
+      "observationIds": [
+        "20260826-222425|(SimpleChar:7A351C43)",
+        "20260826-222425|(SimpleChar:7A351C4B)",
+        "20260826-222425|(SimpleChar:7A351C4F)",
+        "20260826-222425|(SimpleChar:7A351C53)",
+        "20260826-222425|(SimpleChar:7A351C57)",
+        "20260826-222425|(SimpleChar:7A351C60)",
+        "20260826-222425|(SimpleChar:7A351C66)",
+        "20260826-222425|(SimpleChar:7A351C69)",
+        "20260826-222425|(SimpleChar:7A351C6C)",
+        "20260826-222425|(SimpleChar:7A351C6F)",
+        "20260826-222425|(SimpleChar:7A351C75)"
+      ],
+      "placementPopulationId": null,
+      "playfield": 3081,
+      "positionExtent": {
+        "centre": [
+          248.996486,
+          6.681891,
+          87.978588
+        ],
+        "maximum": [
+          276.115784,
+          10.641584,
+          116.59301
+        ],
+        "minimum": [
+          208.940567,
+          5.41,
+          61.00884
+        ]
+      },
+      "runtimeIdentitiesObserved": 11,
+      "runtimeIdentityPersistent": false,
+      "runtimeIdsChangeAcrossCaptures": false,
+      "runtimeInstanceCount": 11,
+      "runtimePlayfield": 2130084,
+      "runtimePopulationId": "runtime-population-3781cb42291d66ef2700",
+      "structuralFamily": "base-model-c463594bee15db47"
+    },
+    {
+      "archetypeId": "archetype-96421bebf1e93b95",
+      "associationScope": "playfield-population",
+      "associationStrength": "corroborating",
+      "blockingReasons": [
+        "no authoritative local ACG population ownership"
+      ],
+      "captureCount": 1,
+      "captureIds": [
+        "20260826-222425"
+      ],
+      "coverageCounts": {
+        "appearance": 4,
+        "combat": 4,
+        "lifecycle": 4,
+        "loot": 0,
+        "movement": 4,
+        "respawn": 0,
+        "stats": 0
+      },
+      "levelMaximum": 2,
+      "levelMinimum": 1,
+      "lootDefinesVisualArchetype": false,
+      "lootObservationCount": 0,
+      "maximumObservedMovementDisplacement": 0.006472,
+      "monsterData": 17655,
+      "names": [
+        "Eleet",
+        "Leet"
+      ],
+      "observationCount": 4,
+      "observationIds": [
+        "20260826-222425|(SimpleChar:7A351C4E)",
+        "20260826-222425|(SimpleChar:7A351C5F)",
+        "20260826-222425|(SimpleChar:7A351C77)",
+        "20260826-222425|(SimpleChar:7A351C7A)"
+      ],
+      "placementPopulationId": null,
+      "playfield": 3081,
+      "positionExtent": {
+        "centre": [
+          179.490352,
+          8.593948,
+          75.959788
+        ],
+        "maximum": [
+          184.409332,
+          13.122986,
+          100.357208
+        ],
+        "minimum": [
+          176.125381,
+          3.790209,
+          49.680206
+        ]
+      },
+      "runtimeIdentitiesObserved": 4,
+      "runtimeIdentityPersistent": false,
+      "runtimeIdsChangeAcrossCaptures": false,
+      "runtimeInstanceCount": 4,
+      "runtimePlayfield": 2130084,
+      "runtimePopulationId": "runtime-population-345b5a2d91583814fc89",
+      "structuralFamily": "base-model-768733e09faabda4"
+    },
+    {
+      "archetypeId": "archetype-861c23c180f04da1",
+      "associationScope": "playfield-population",
+      "associationStrength": "corroborating",
+      "blockingReasons": [
+        "no authoritative local ACG population ownership",
+        "spatial candidate evidence is heuristic or ambiguous"
+      ],
+      "captureCount": 1,
+      "captureIds": [
+        "20260826-222425"
+      ],
+      "coverageCounts": {
+        "appearance": 1,
+        "combat": 0,
+        "lifecycle": 1,
+        "loot": 0,
+        "movement": 0,
+        "respawn": 0,
+        "stats": 0
+      },
+      "levelMaximum": 200,
+      "levelMinimum": 200,
+      "lootDefinesVisualArchetype": false,
+      "lootObservationCount": 0,
+      "maximumObservedMovementDisplacement": 0.0,
+      "monsterData": 26076,
+      "names": [
+        "Guide"
+      ],
+      "observationCount": 1,
+      "observationIds": [
+        "20260826-222425|(SimpleChar:7A351C37)"
+      ],
+      "placementPopulationId": null,
+      "playfield": 3081,
+      "positionExtent": {
+        "centre": [
+          232.512512,
+          6.01,
+          75.99942
+        ],
+        "maximum": [
+          232.512512,
+          6.01,
+          75.99942
+        ],
+        "minimum": [
+          232.512512,
+          6.01,
+          75.99942
+        ]
+      },
+      "runtimeIdentitiesObserved": 1,
+      "runtimeIdentityPersistent": false,
+      "runtimeIdsChangeAcrossCaptures": false,
+      "runtimeInstanceCount": 1,
+      "runtimePlayfield": 2130084,
+      "runtimePopulationId": "runtime-population-27ac0342a3cb13f62d5f",
+      "structuralFamily": "base-model-76615c28c0b2d675"
+    },
+    {
+      "archetypeId": "archetype-0511d362f6791ebb",
+      "associationScope": "playfield-population",
+      "associationStrength": "corroborating",
+      "blockingReasons": [
+        "no authoritative local ACG population ownership",
+        "spatial candidate evidence is heuristic or ambiguous"
+      ],
+      "captureCount": 1,
+      "captureIds": [
+        "20260826-222425"
+      ],
+      "coverageCounts": {
+        "appearance": 1,
+        "combat": 1,
+        "lifecycle": 1,
+        "loot": 0,
+        "movement": 0,
+        "respawn": 0,
+        "stats": 0
+      },
+      "levelMaximum": 200,
+      "levelMinimum": 200,
+      "lootDefinesVisualArchetype": false,
+      "lootObservationCount": 0,
+      "maximumObservedMovementDisplacement": 0.0,
+      "monsterData": 26097,
+      "names": [
+        "Guard"
+      ],
+      "observationCount": 1,
+      "observationIds": [
+        "20260826-222425|(SimpleChar:7A351C36)"
+      ],
+      "placementPopulationId": null,
+      "playfield": 3081,
+      "positionExtent": {
+        "centre": [
+          247.061264,
+          5.81,
+          76.54147
+        ],
+        "maximum": [
+          247.061264,
+          5.81,
+          76.54147
+        ],
+        "minimum": [
+          247.061264,
+          5.81,
+          76.54147
+        ]
+      },
+      "runtimeIdentitiesObserved": 1,
+      "runtimeIdentityPersistent": false,
+      "runtimeIdsChangeAcrossCaptures": false,
+      "runtimeInstanceCount": 1,
+      "runtimePlayfield": 2130084,
+      "runtimePopulationId": "runtime-population-171d506d253d234b9b7c",
+      "structuralFamily": "base-model-52f1be4cbc9e3f4e"
+    },
+    {
+      "archetypeId": "archetype-2a25c85e06aa5efe",
+      "associationScope": "playfield-population",
+      "associationStrength": "corroborating",
+      "blockingReasons": [
+        "no authoritative local ACG population ownership"
+      ],
+      "captureCount": 1,
+      "captureIds": [
+        "20260826-222425"
+      ],
+      "coverageCounts": {
+        "appearance": 4,
+        "combat": 1,
+        "lifecycle": 4,
+        "loot": 0,
+        "movement": 3,
+        "respawn": 0,
+        "stats": 0
+      },
+      "levelMaximum": 2,
+      "levelMinimum": 1,
+      "lootDefinesVisualArchetype": false,
+      "lootObservationCount": 0,
+      "maximumObservedMovementDisplacement": 1.096927,
+      "monsterData": 30258,
+      "names": [
+        "Biofreak Carcass"
+      ],
+      "observationCount": 4,
+      "observationIds": [
+        "20260826-222425|(SimpleChar:7A351C47)",
+        "20260826-222425|(SimpleChar:7A351C5A)",
+        "20260826-222425|(SimpleChar:7A351C5D)",
+        "20260826-222425|(SimpleChar:7A351C71)"
+      ],
+      "placementPopulationId": null,
+      "playfield": 3081,
+      "positionExtent": {
+        "centre": [
+          231.967577,
+          7.915715,
+          103.179971
+        ],
+        "maximum": [
+          270.0102,
+          14.194967,
+          115.701866
+        ],
+        "minimum": [
+          164.461319,
+          5.32776,
+          89.863945
+        ]
+      },
+      "runtimeIdentitiesObserved": 4,
+      "runtimeIdentityPersistent": false,
+      "runtimeIdsChangeAcrossCaptures": false,
+      "runtimeInstanceCount": 4,
+      "runtimePlayfield": 2130084,
+      "runtimePopulationId": "runtime-population-302902fdec4c6ca691ff",
+      "structuralFamily": "base-model-d553ed0b61ccbe5b"
+    },
+    {
+      "archetypeId": "archetype-2d8bb111ad474739",
+      "associationScope": "playfield-population",
+      "associationStrength": "corroborating",
+      "blockingReasons": [
+        "no authoritative local ACG population ownership"
+      ],
+      "captureCount": 1,
+      "captureIds": [
+        "20260826-222425"
+      ],
+      "coverageCounts": {
+        "appearance": 1,
+        "combat": 1,
+        "lifecycle": 1,
+        "loot": 0,
+        "movement": 1,
+        "respawn": 0,
+        "stats": 0
+      },
+      "levelMaximum": 1,
+      "levelMinimum": 1,
+      "lootDefinesVisualArchetype": false,
+      "lootObservationCount": 0,
+      "maximumObservedMovementDisplacement": 0.0,
+      "monsterData": 38387,
+      "names": [
+        "Clawfinger Bully"
+      ],
+      "observationCount": 1,
+      "observationIds": [
+        "20260826-222425|(SimpleChar:7A351C3B)"
+      ],
+      "placementPopulationId": null,
+      "playfield": 3081,
+      "positionExtent": {
+        "centre": [
+          180.036926,
+          4.037008,
+          54.246105
+        ],
+        "maximum": [
+          180.036926,
+          4.037008,
+          54.246105
+        ],
+        "minimum": [
+          180.036926,
+          4.037008,
+          54.246105
+        ]
+      },
+      "runtimeIdentitiesObserved": 1,
+      "runtimeIdentityPersistent": false,
+      "runtimeIdsChangeAcrossCaptures": false,
+      "runtimeInstanceCount": 1,
+      "runtimePlayfield": 2130084,
+      "runtimePopulationId": "runtime-population-9f87a1359802e612fa95",
+      "structuralFamily": "base-model-1fc27876d37dc5c0"
+    }
+  ]
+}

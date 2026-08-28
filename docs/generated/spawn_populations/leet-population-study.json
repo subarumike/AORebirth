@@ -1,0 +1,47 @@
+{
+  "archetypeIds": [
+    "archetype-6aaf711d4bd79409",
+    "archetype-8440a20406c3039c",
+    "archetype-96421bebf1e93b95"
+  ],
+  "levelMaximum": 15,
+  "levelMinimum": 1,
+  "lootObservationCount": 3,
+  "monsterData": [
+    17655,
+    247832,
+    247836
+  ],
+  "names": [
+    "Beach Leet",
+    "brb",
+    "Eleet",
+    "Flurryflutter the Phearsome Smasher",
+    "Flurryflutter the Troubled Smasher",
+    "Leet",
+    "Princess Leet",
+    "Redeye the Pheared",
+    "Redeyeflutter of the Phat Loot Wrecker",
+    "Redeyeflutter the Dood Wrecker",
+    "Shinyflutter the Phearsome",
+    "Shinyfoot the Supa Pheared Smasher",
+    "Swiftfoot the Frantic Exterminator"
+  ],
+  "playfields": [
+    3081,
+    4582
+  ],
+  "populationCount": 9,
+  "scopeCounts": {
+    "conflict": 1,
+    "local-population": 1,
+    "playfield-population": 3,
+    "unassociated": 4
+  },
+  "structuralFamilies": [
+    "base-model-1d88b9b462a7fe20",
+    "base-model-768733e09faabda4",
+    "base-model-d793bcd4303d7ba6"
+  ],
+  "visualSamenessIsGameplaySameness": false
+}

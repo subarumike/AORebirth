@@ -590,7 +590,12 @@ def build_census(
             "ambiguousArchetype": observation_counts["ambiguous"],
             "unknownArchetype": observation_counts["unknown"],
         },
-        "harvesterDigest": harvester_summary.get("deterministicOutputDigest"),
+        "harvesterObservationDigest": canonical_digest(observations_document),
+        "harvesterAcceptance": {
+            "acceptedCapturesProcessed": harvester_summary.get("acceptedCapturesProcessed"),
+            "npcObservations": harvester_summary.get("npcObservations"),
+            "sentinelAuthoritativeValues": harvester_summary.get("sentinelAuthoritativeValues"),
+        },
         "catMeshCoverage": {
             "indexedRecords": source.get("counts", {}).get("officialCatMeshIndexRecords"),
             "decodedRecords": source.get("counts", {}).get("decodedCatMeshRecords"),
