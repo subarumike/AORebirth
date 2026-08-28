@@ -10,6 +10,7 @@ set "CAPTURE_ROOT=%REPO_ROOT%\Captures"
 set "CAPTURE_ROOT_CONFIG=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\capture-root.path"
 set "LOOT_CAPTURE_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\loot-10.request"
 set "PF127_GEOMETRY_ONLY_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\pf127-geometry-only.request"
+set "NPC_IDENTITY_BRIDGE_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\npc-identity-bridge.request"
 set "EXTERNAL_CONTROL_REQUEST=%REPO_ROOT%\tools-temp\AOSharpLiveCapture\bin\Debug\AOSharpLiveCapture.control"
 set "EXTERNAL_CONTROL_PROCESSING=%EXTERNAL_CONTROL_REQUEST%.processing"
 set "LOG_PATH=%REPO_ROOT%\tools-temp\AOSharpLiveInjector\bin\Debug\AOSharpLiveInjector-start.log"
@@ -17,6 +18,7 @@ set "TARGET_SWITCH="
 set "TARGET_VALUE="
 set "LOOT_CAPTURE_MODE="
 set "PF127_GEOMETRY_ONLY_MODE="
+set "NPC_IDENTITY_BRIDGE_MODE="
 set "LAUNCHER_VBS=%TEMP%\start-aosharp-live-capture-%RANDOM%%RANDOM%.vbs"
 
 if "%~1"=="" goto usage
@@ -32,6 +34,11 @@ if /I "%~1"=="--loot-10" (
 )
 if /I "%~1"=="--pf127-geometry-only" (
     set "PF127_GEOMETRY_ONLY_MODE=1"
+    shift
+    goto parse
+)
+if /I "%~1"=="--npc-identity-bridge" (
+    set "NPC_IDENTITY_BRIDGE_MODE=1"
     shift
     goto parse
 )
@@ -64,6 +71,14 @@ exit /b 2
 if not defined TARGET_SWITCH goto usage
 if defined LOOT_CAPTURE_MODE if defined PF127_GEOMETRY_ONLY_MODE (
     echo FAILED: --loot-10 and --pf127-geometry-only are mutually exclusive.
+    exit /b 2
+)
+if defined LOOT_CAPTURE_MODE if defined NPC_IDENTITY_BRIDGE_MODE (
+    echo FAILED: --loot-10 and --npc-identity-bridge are mutually exclusive.
+    exit /b 2
+)
+if defined PF127_GEOMETRY_ONLY_MODE if defined NPC_IDENTITY_BRIDGE_MODE (
+    echo FAILED: --pf127-geometry-only and --npc-identity-bridge are mutually exclusive.
     exit /b 2
 )
 
@@ -105,6 +120,8 @@ if not exist "%CAPTURE_ROOT%" (
 )
 
 call :cleanup_pf127_geometry_request
+if errorlevel 1 exit /b 1
+call :cleanup_npc_identity_bridge_request
 if errorlevel 1 exit /b 1
 
 for /f "delims=" %%D in ('dir /b /ad /o-d "%CAPTURE_ROOT%" 2^>nul') do (
@@ -151,6 +168,10 @@ if defined PREVIOUS_CAPTURE (
                 echo FAILED: --pf127-geometry-only requires a fresh capture injection; the comprehensive capture is active.
                 exit /b 1
             )
+            if defined NPC_IDENTITY_BRIDGE_MODE (
+                echo FAILED: --npc-identity-bridge requires a fresh capture injection; an existing capture is active.
+                exit /b 1
+            )
             echo SUCCESS: AOSharp live capture already active.
             echo CaptureOutputPath: "!ACTIVE_CAPTURE_PATH!"
             echo FailureLog: "%LOG_PATH%"
@@ -163,6 +184,10 @@ if defined PREVIOUS_CAPTURE (
             )
             if defined PF127_GEOMETRY_ONLY_MODE (
                 echo FAILED: --pf127-geometry-only requires a fresh capture injection; the comprehensive capture is active.
+                exit /b 1
+            )
+            if defined NPC_IDENTITY_BRIDGE_MODE (
+                echo FAILED: --npc-identity-bridge requires a fresh capture injection; an existing capture is active.
                 exit /b 1
             )
             echo SUCCESS: AOSharp live capture already active.
@@ -192,6 +217,14 @@ if defined PF127_GEOMETRY_ONLY_MODE (
         exit /b 1
     )
     set "PF127_GEOMETRY_REQUEST_ARMED=1"
+)
+
+if defined NPC_IDENTITY_BRIDGE_MODE (
+    > "%NPC_IDENTITY_BRIDGE_REQUEST%" echo npc-identity-bridge
+    if not exist "%NPC_IDENTITY_BRIDGE_REQUEST%" (
+        echo FAILED: could not arm the NPC identity bridge capture request: "%NPC_IDENTITY_BRIDGE_REQUEST%"
+        exit /b 1
+    )
 )
 
 set "POST_ARM_FAILURE_LOG=%LOG_PATH%"
@@ -241,7 +274,17 @@ if defined LATEST_CAPTURE (
     if exist "!LATEST_CAPTURE_PATH!\events.log" (
         for %%F in ("!LATEST_CAPTURE_PATH!\events.log") do if %%~zF GTR 0 set "CAPTURE_HAS_EVENT_FILE=1"
     )
-    if not defined PF127_GEOMETRY_ONLY_MODE if defined CAPTURE_HAS_PACKET_FILE if defined CAPTURE_HAS_EVENT_FILE if /I not "!LATEST_CAPTURE!"=="!PREVIOUS_CAPTURE!" (
+    if defined NPC_IDENTITY_BRIDGE_MODE if exist "!LATEST_CAPTURE_PATH!\npc-identity-bridge-live.jsonl" (
+        for %%F in ("!LATEST_CAPTURE_PATH!\npc-identity-bridge-live.jsonl") do if %%~zF GTR 0 set "CAPTURE_HAS_BRIDGE_ARTIFACT=1"
+    )
+    if defined NPC_IDENTITY_BRIDGE_MODE if not exist "%NPC_IDENTITY_BRIDGE_REQUEST%" set "BRIDGE_REQUEST_CONSUMED=1"
+    if defined NPC_IDENTITY_BRIDGE_MODE if defined CAPTURE_HAS_PACKET_FILE if defined CAPTURE_HAS_EVENT_FILE if defined CAPTURE_HAS_BRIDGE_ARTIFACT if defined BRIDGE_REQUEST_CONSUMED if /I not "!LATEST_CAPTURE!"=="!PREVIOUS_CAPTURE!" (
+        set "POST_ARM_EXIT_CODE=0"
+        set "POST_ARM_SUMMARY=SUCCESS: NPC identity bridge capture injected."
+        set "POST_ARM_CAPTURE_PATH=!LATEST_CAPTURE_PATH!"
+        goto post_arm_exit
+    )
+    if not defined PF127_GEOMETRY_ONLY_MODE if not defined NPC_IDENTITY_BRIDGE_MODE if defined CAPTURE_HAS_PACKET_FILE if defined CAPTURE_HAS_EVENT_FILE if /I not "!LATEST_CAPTURE!"=="!PREVIOUS_CAPTURE!" (
         set "POST_ARM_EXIT_CODE=0"
         set "POST_ARM_SUMMARY=SUCCESS: AOSharp live capture injected."
         set "POST_ARM_CAPTURE_PATH=!LATEST_CAPTURE_PATH!"
@@ -252,6 +295,13 @@ if defined LATEST_CAPTURE (
 if defined PF127_GEOMETRY_ONLY_MODE (
     set "POST_ARM_EXIT_CODE=1"
     set "POST_ARM_SUMMARY=FAILED: injector did not create a new PF127 geometry-only safe capture folder; the request was not confirmed consumed."
+    set "POST_ARM_CAPTURE_PATH=%CAPTURE_ROOT%"
+    goto post_arm_exit
+)
+
+if defined NPC_IDENTITY_BRIDGE_MODE (
+    set "POST_ARM_EXIT_CODE=1"
+    set "POST_ARM_SUMMARY=FAILED: injector did not create a new capture with a non-empty NPC identity bridge artifact and consume the request marker."
     set "POST_ARM_CAPTURE_PATH=%CAPTURE_ROOT%"
     goto post_arm_exit
 )
@@ -285,6 +335,8 @@ goto post_arm_exit
 :post_arm_exit
 call :cleanup_pf127_geometry_request
 if errorlevel 1 exit /b 1
+call :cleanup_npc_identity_bridge_request
+if errorlevel 1 exit /b 1
 if defined POST_ARM_SUMMARY echo %POST_ARM_SUMMARY%
 if defined POST_ARM_CAPTURE_PATH echo CaptureOutputPath: "%POST_ARM_CAPTURE_PATH%"
 if defined POST_ARM_FAILURE_LOG echo FailureLog: "%POST_ARM_FAILURE_LOG%"
@@ -302,6 +354,7 @@ echo Usage: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy
 echo    or: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid 1234
 echo Add --loot-10 to arm one-enemy ten-corpse loot validation without an in-game command.
 echo Add --pf127-geometry-only only after the character is already inside and stable in Subway; it disables comprehensive packet and dynel callbacks.
+echo Add --npc-identity-bridge to arm zone-epoch-scoped, read-only NPC identity evidence capture.
 echo This wrapper attaches to an already-running AO client. It does not launch the game/client.
 exit /b 2
 
@@ -310,6 +363,7 @@ echo Usage: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "Anarchy
 echo    or: cmd /d /c tools-temp\start-aosharp-live-capture.cmd --pid 1234
 echo Add --loot-10 to arm one-enemy ten-corpse loot validation without an in-game command.
 echo Add --pf127-geometry-only only after the character is already inside and stable in Subway; it disables comprehensive packet and dynel callbacks.
+echo Add --npc-identity-bridge to arm zone-epoch-scoped, read-only NPC identity evidence capture.
 echo This wrapper attaches to an already-running AO client. It does not launch the game/client.
 exit /b 0
 
@@ -319,6 +373,16 @@ del /q "%PF127_GEOMETRY_ONLY_REQUEST%" >nul 2>nul
 if exist "%PF127_GEOMETRY_ONLY_REQUEST%" (
     echo FAILED: could not remove the PF127 geometry-only request marker; refusing to continue because a stale marker could activate safe mode later.
     echo RequestMarker: "%PF127_GEOMETRY_ONLY_REQUEST%"
+    exit /b 1
+)
+exit /b 0
+
+:cleanup_npc_identity_bridge_request
+if not exist "%NPC_IDENTITY_BRIDGE_REQUEST%" exit /b 0
+del /q "%NPC_IDENTITY_BRIDGE_REQUEST%" >nul 2>nul
+if exist "%NPC_IDENTITY_BRIDGE_REQUEST%" (
+    echo FAILED: could not remove the NPC identity bridge request marker; refusing to continue because a stale marker could activate bridge capture later.
+    echo RequestMarker: "%NPC_IDENTITY_BRIDGE_REQUEST%"
     exit /b 1
 )
 exit /b 0

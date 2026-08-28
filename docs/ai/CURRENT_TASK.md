@@ -2,26 +2,34 @@
 
 ## Active
 
-Implement and validate the deterministic `NpcPlacementIdentityResolver` over
-all 358 accepted captures and all 32,805 official placements. Audit the full
-retained resource hierarchy, coordinate hypotheses, district metadata,
-placement indirection, runtime/base-playfield evidence, and conservative
-repeated-observation clusters without guessing identity or modifying runtime
-NPC definitions.
+Implement and validate the deterministic, read-only `NpcIdentityBridgeCapture`
+workflow. Capture runtime NPC identity, direct runtime/model playfield identity,
+packet and client-state evidence, coordinate representations, and lifecycle
+lineage in one structurally enforced zone epoch; replay it offline and feed it
+to the placement resolver without weakening any proof rule.
 
-## Current resolver checkpoint
+## Current identity-bridge checkpoint
 
-- Official provenance and 146 normalized field paths are expanded; missing raw
-  upstream/opaque bytes and the fixed-projection retention gap are explicit.
-- Direct X/Y/Z is the strongest coordinate diagnostic, and exact PF4582 X/Z
-  repetition corroborates those axes/scale, but no full transform is proven.
-- Current capture artifacts contain zero same-epoch runtime/model identity
-  pairs; capture-level resource labels are rejected when row runtime epochs
-  conflict.
-- Production result remains zero unique-proven matches. All 3,325 promotion
-  eligibility records are blocked; ACGHash is never runtime identity.
+- The checked-in client surface directly exposes `Playfield.Identity` and
+  `Playfield.ModelIdentity`; type `1000014` is retained as a direct loaded
+  playfield resource identity. No NPC-specific official model/template ID or
+  stable official district ID is exposed.
+- The targeted launcher mode, explicit non-overlapping zone epochs, atomic NPC
+  snapshots, raw SCFU/Stat linkage, deterministic offline replay, and strict
+  optional resolver consumption are implemented without client or gameplay
+  writes.
+- Local fixtures validate the contract only. No live bridge sample or unique
+  placement proof is claimed until Mike supplies a completed controlled capture.
 - Governed workflow and evidence schema:
-  `docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md`.
+  `docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
+
+## Prior resolver checkpoint
+
+The accepted `NpcPlacementIdentityResolver` baseline remains zero unique-proven
+matches across all 32,805 official placements and 3,325 observations. Its
+coordinate, district, runtime/base mapping, repeated-lineage, ambiguity, and
+ACGHash proof boundaries remain unchanged. Evidence:
+`docs/reference/NPC_PLACEMENT_IDENTITY_RESOLVER.md`.
 
 ## Prior active checkpoint
 

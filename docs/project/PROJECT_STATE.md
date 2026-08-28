@@ -9,6 +9,20 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- NPC identity bridge evidence acquisition: the explicit
+  `--npc-identity-bridge` AOSharp mode now records direct runtime and loaded
+  type-`1000014` playfield model identities, runtime NPC identity, raw SCFU/Stat
+  references, client-visible stats, world position/rotation, native zone/cell,
+  and pointer-diagnostic lifecycle lineage inside non-overlapping deterministic
+  zone epochs. Offline replay reconstructs packet fields by exact raw-packet
+  key and leaves client-only fields explicit. Optional placement-resolver
+  consumption remains fail-closed for stale epochs, absent/derived identities,
+  ACGHash, unproven transforms, and existing duplicate ambiguity. The client
+  audit found no NPC-specific official model/template ID, stable official
+  district ID, or proven world-to-placement transform. Tooling/fixtures are
+  locally validated; no live bridge sample or unique placement is claimed.
+  Evidence: `docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
+
 - NPC placement identity resolution: the deterministic
   `NpcPlacementIdentityResolver` now expands all 32,805 normalized official
   placements and 146 retained field paths, quantitatively tests coordinate and

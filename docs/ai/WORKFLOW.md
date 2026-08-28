@@ -592,6 +592,18 @@ For a one-enemy ten-corpse loot sample, Codex arms validation through the same a
 cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>" --loot-10
 ```
 
+For controlled, read-only NPC identity research, use the explicit bridge mode:
+
+```cmd
+cmd /d /c tools-temp\start-aosharp-live-capture.cmd --title "<AO window title>" --npc-identity-bridge
+```
+
+This mode is mutually exclusive with `--loot-10` and
+`--pf127-geometry-only`. It adds epoch-scoped atomic NPC snapshots and
+`npc-identity-bridge-live.jsonl` without narrowing the comprehensive raw packet
+capture. Never run it unless Mike has supplied or authorized control of an
+already-running client session.
+
 This wrapper is the only approved Codex startup command for AOSharp live capture. It starts the existing AOSharp injector against an already-running AO client and reports only the exact injector command, success or failure, capture output path, and failure log path. It does not launch the AO game/client. Before target selection it runs a fail-closed capture-safe contract check against the deployed injector and Bootstrap pair. A stale or unsafe binary cannot proceed to injection.
 
 New captures are stored in the repository-level `Captures` folder. The live AO playfield name and resource ID lead each human-readable session folder, while the final compact timestamp remains the unique analyzer-facing capture ID. Example: `Captures\ICC Shuttleport [PF 4582] - 20260818-143201`. The launcher writes the absolute capture root contract before injection. Direct plugin loads without that contract retain the legacy plugin-local `captures` fallback.
@@ -644,6 +656,22 @@ cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <
 ```
 
 Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
+
+For a completed NPC identity bridge capture, run the analyzer and deterministic
+bridge replay in that order:
+
+```cmd
+cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe "<capture-folder>"
+cmd /d /c Tools\replay_npc_identity_bridge.cmd "<capture-folder>"
+cmd /d /c Tools\replay_npc_identity_bridge.cmd "<capture-folder>" --check
+```
+
+Replay validates non-overlapping inclusive zone-epoch packet bounds and joins
+SCFU/Stat rows only by direction, directional sequence, and global raw-packet
+ordinal. It emits `npc-identity-bridge.json`; client-state-only fields remain
+explicit and are never fabricated offline. The field audit, safety boundary,
+artifact schema, and resolver proof rules are documented in
+`docs/reference/NPC_IDENTITY_BRIDGE_CAPTURE.md`.
 
 For database-wide generic NPC evidence harvesting, ordinary Stat replay,
 official-placement reconciliation, field-level coverage, and fail-closed
