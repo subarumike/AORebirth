@@ -184,6 +184,29 @@ launched-PID ownership and rolls back only processes launched by that
 invocation. Managed shutdown trusts only PID metadata whose executable path and
 start time match and never falls back to killing processes by name.
 
+The Debug-only ACG placement visualization wrapper enables one selected
+playfield for one managed engine session without changing machine-wide
+configuration:
+
+```cmd
+cmd /d /c restart-engines-acg-development-placeholders.cmd CurrentPlayfieldPrimary 4582
+```
+
+Accepted modes are `CapturePlan`, `CurrentPlayfieldPrimary`,
+`CurrentPlayfieldAllPoints`, and `ResolvedComparison`. The all-points mode warns
+that official `AdditionalPoints` have unresolved runtime multiplicity semantics.
+Release ZoneEngine builds reject every non-`Off` value. A normal managed restart
+restores the default `Off` mode. See
+`docs/reference/ACG_DEVELOPMENT_PLACEHOLDERS.md`.
+
+Regenerate or verify the checksum-pinned development placeholder corpus only
+through its repository wrapper:
+
+```cmd
+cmd /d /c tools\generate_acg_development_placeholders.cmd "<portable-atlas-zip>"
+cmd /d /c tools\generate_acg_development_placeholders.cmd "<portable-atlas-zip>" --check
+```
+
 WebEngine remains excluded from normal startup. Its explicit optional workflow
 is:
 

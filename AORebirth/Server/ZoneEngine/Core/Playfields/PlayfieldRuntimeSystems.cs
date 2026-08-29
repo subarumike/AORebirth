@@ -395,6 +395,11 @@ namespace ZoneEngine.Core.Playfields
             this.visibilityInterest.Register(character);
         }
 
+        internal void DeactivateDevelopmentPlaceholder(Identity identity)
+        {
+            this.DeactivateNpc(identity);
+        }
+
         private void DeactivateNpc(Identity identity)
         {
             this.npcRuntime.RemoveNpcHome(identity);

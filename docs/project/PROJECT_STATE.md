@@ -9,6 +9,17 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Development-only ACG placement visualization: the checksum-pinned
+  `18.8.62_EP1` portable atlas is imported deterministically into lazy
+  per-playfield shards with 32,805 primary records, 32,737 additional points,
+  65,542 coordinates, 4,016 native ACG keys, 459 populated playfields, and the
+  explicit PF103/PF615/PF4805 malformed boundaries. `Off` is the default,
+  Release builds reject activation, one configured current playfield is loaded,
+  and inert placeholders retain native-key visual evidence and full source
+  provenance without changing Legacy or production spawn authority. Evidence
+  grades remain one `ExactOfficial`, four capture-correlated, and 4,011
+  unresolved. See `docs/reference/ACG_DEVELOPMENT_PLACEHOLDERS.md`.
+
 - ACG placement/spawn-policy schema: the official `18.8.62_EP1`
   ResourceDatabase type-`1000014` corpus is the authoritative placement layer.
   All 32,805 decoded `HashSpawnPoint_t` records now have exact raw bytes,

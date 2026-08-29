@@ -644,6 +644,8 @@
     <Compile Include="Core\Playfields\IccShuttleportOfficialPlacementCatalog.g.cs" />
     <Compile Include="Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs" />
     <Compile Include="Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacementCatalog.cs" />
+    <Compile Include="Core\Playfields\OfficialPlacements\AcgDevelopmentPlaceholderCatalog.cs" />
+    <Compile Include="Core\Playfields\OfficialPlacements\AcgDevelopmentPlaceholderRuntimeService.cs" />
     <Compile Include="Core\Playfields\IccShuttleportBasicCombatCatalog.g.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />
@@ -867,6 +869,18 @@
   <ItemGroup>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\acg_development_placeholders\acg-development-placeholder-manifest.json">
+      <Link>Content\Official\AcgDevelopmentPlaceholders\acg-development-placeholder-manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\acg_development_placeholders\acg-visual-resolution-registry.json">
+      <Link>Content\Official\AcgDevelopmentPlaceholders\acg-visual-resolution-registry.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\docs\generated\acg_development_placeholders\playfields\*.json">
+      <Link>Content\Official\AcgDevelopmentPlaceholders\playfields\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\docs\generated\playfields\official-placement-corpus-manifest.json">

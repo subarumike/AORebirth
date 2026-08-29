@@ -2,9 +2,23 @@
 
 ## Active
 
-Complete and accept the byte-accurate official ACG placement/spawn-policy
-schema without changing production NPC definitions, reopening the static
-ACG-to-MonsterData search, or using runtime enrichment as placement authority.
+Complete and accept the development-only ACG placement visualization layer
+without changing production NPC definitions, Legacy routing, or the independent
+identity/behavior activation gates.
+
+## Development placeholder checkpoint
+
+- The portable ACG atlas is pinned by SHA-256 and imported into deterministic
+  native-key visual evidence plus lazy playfield shards.
+- `Off` remains the default; Debug-only modes require one explicit playfield and
+  Release builds fail closed.
+- Primary and additional-point provenance remains distinct. Additional-point
+  runtime selection semantics remain unresolved and debug-only.
+- FDQO is the only `ExactOfficial` visual. UIGU, RPOF, VAWT, and 01V1 remain
+  capture-correlated placeholders; the other 4,011 native ACGs remain
+  unresolved.
+- Runtime placeholders use normal transient identities, passive/immune combat
+  guards, and no XP, loot, mission, pathing, or production-spawn authority.
 
 ## Current ACG schema checkpoint
 

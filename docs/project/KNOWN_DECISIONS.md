@@ -120,6 +120,30 @@ runtime identity, raw integer equality, or the separate Nano morph path. Keep
 placement authorization and runtime MonsterData selection independently
 governed until an exact evidence bridge is found.
 
+## Official ACG Visualization Is Debug-Only And Evidence-Graded
+
+Decision: Official ACG placements may be materialized as inert visualization
+entities only in a Debug ZoneEngine, only for one explicitly selected current
+playfield, and only through the governed `Off`, `CapturePlan`,
+`CurrentPlayfieldPrimary`, `CurrentPlayfieldAllPoints`, or
+`ResolvedComparison` modes. `Off` remains the default and Release builds reject
+activation.
+
+Visual resolution is keyed by native ACG uint32 with stored bytes retained
+separately. Only `ExactOfficial` may select an exact mapped appearance;
+capture-correlated and unresolved grades use a visibly named placeholder and do
+not gain identity or behavior authority. Additional points remain an explicit
+debug display only.
+
+Reason: Developers need to see placement coverage without turning structural
+evidence or capture correlation into production population.
+
+Consequences: Placeholder runtime identities come only from the existing
+transient allocator, combat/aggro/XP/loot/mission paths fail closed, Legacy
+remains the default route with zero placeholder output in `Off`, and the
+visualization corpus has no production activation role. See
+`docs/reference/ACG_DEVELOPMENT_PLACEHOLDERS.md`.
+
 ## Reconstruct Reusable Populations Over ACG Topology
 
 Decision: Use the hierarchy visual archetype, contextual runtime variant,

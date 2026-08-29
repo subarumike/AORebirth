@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core;
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields.OfficialPlacements;
 
     #endregion
 
@@ -93,6 +94,15 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                return;
+            }
+
+            if (AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                    target.Identity.Instance))
+            {
+                this.CancelPlayerAttack(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored for development ACG placeholder.");
                 return;
             }
 
