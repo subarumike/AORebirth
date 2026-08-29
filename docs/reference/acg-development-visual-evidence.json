@@ -1,0 +1,53 @@
+{
+  "SchemaVersion": 1,
+  "BuildId": "18.8.62_EP1",
+  "ResourceType": 1000014,
+  "Entries": [
+    {
+      "AcgHashNativeUInt32": 808539697,
+      "EvidenceGrade": "CaptureCorrelatedMultipleVariants",
+      "AppearanceIds": [1576, 1896],
+      "MeshResourceIds": ["1010002:5907", "1010002:5941"],
+      "AdditionalVariantUnresolved": true,
+      "EvidenceSource": "Portable atlas capture correlation; exact ACG identity remains unresolved"
+    },
+    {
+      "AcgHashNativeUInt32": 1178882383,
+      "EvidenceGrade": "ExactOfficial",
+      "AppearanceIds": [],
+      "MeshResourceIds": ["1010002:15222"],
+      "AdditionalVariantUnresolved": false,
+      "ServerTemplateId": 43296,
+      "ServerTemplateHash": "A004",
+      "MonsterDataType": 1040023,
+      "MonsterDataInstance": 17655,
+      "ExactMeshType": 1010002,
+      "ExactMeshInstance": 15222,
+      "EvidenceSource": "Beach Leet exact official server-template to MonsterData to active-mesh bridge"
+    },
+    {
+      "AcgHashNativeUInt32": 1380994886,
+      "EvidenceGrade": "CaptureCorrelated",
+      "AppearanceIds": [1576],
+      "MeshResourceIds": ["1010002:5907"],
+      "AdditionalVariantUnresolved": false,
+      "EvidenceSource": "Portable atlas PF655 capture correlation; no exact identity bridge"
+    },
+    {
+      "AcgHashNativeUInt32": 1430865749,
+      "EvidenceGrade": "CaptureCorrelated",
+      "AppearanceIds": [1578],
+      "MeshResourceIds": ["1010002:5907"],
+      "AdditionalVariantUnresolved": false,
+      "EvidenceSource": "Portable atlas PF655 capture correlation; no exact identity bridge"
+    },
+    {
+      "AcgHashNativeUInt32": 1447122772,
+      "EvidenceGrade": "CaptureCorrelated",
+      "AppearanceIds": [1576],
+      "MeshResourceIds": ["1010002:5907"],
+      "AdditionalVariantUnresolved": false,
+      "EvidenceSource": "Portable atlas PF655 capture correlation; no exact identity bridge"
+    }
+  ]
+}

@@ -57,6 +57,7 @@ namespace ZoneEngine.Core
 
     using ZoneEngine.ChatCommands;
     using ZoneEngine.Core.Playfields.Hydration;
+    using ZoneEngine.Core.Playfields.OfficialPlacements;
     using ZoneEngine.Script;
 
     using IBus = MemBus.IBus;
@@ -83,6 +84,8 @@ namespace ZoneEngine.Core
 
         private readonly PlayfieldInstantiationCoordinator playfieldInstantiation;
 
+        private readonly AcgDevelopmentPlaceholderRuntimeService acgDevelopmentPlaceholders;
+
         private readonly DisposeContainer memBusDisposeContainer = new DisposeContainer();
 
         private readonly IBus zoneBus;
@@ -101,6 +104,9 @@ namespace ZoneEngine.Core
         {
             // TODO: Get the Server id from chatengine or config file
             this.Id = 0x356;
+            this.acgDevelopmentPlaceholders =
+                AcgDevelopmentPlaceholderRuntimeService.FromEnvironment(
+                    AppDomain.CurrentDomain.BaseDirectory);
             this.playfieldInstantiation =
                 new PlayfieldInstantiationCoordinator(
                     PlayfieldHydrationMode.Legacy,
@@ -331,13 +337,16 @@ namespace ZoneEngine.Core
 
         private IPlayfield MaterializeLegacyPlayfield(int playfieldInstance)
         {
-            return new Playfield(
+            var playfield = new Playfield(
                 this,
                 new Identity
                 {
                     Type = IdentityType.Playfield,
                     Instance = playfieldInstance
                 });
+            playfield.MaterializeAcgDevelopmentPlaceholders(
+                this.acgDevelopmentPlaceholders);
+            return playfield;
         }
 
         /// <summary>

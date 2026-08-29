@@ -77,6 +77,7 @@ namespace AORebirth.Core.Playfields
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Playfields.OfficialPlacements;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Script;
 
@@ -301,6 +302,21 @@ namespace AORebirth.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);
+        }
+
+        internal int MaterializeAcgDevelopmentPlaceholders(
+            AcgDevelopmentPlaceholderRuntimeService service)
+        {
+            if (service == null)
+            {
+                throw new ArgumentNullException("service");
+            }
+
+            return service.Materialize(
+                this,
+                this.Identity,
+                this.runtimeSystems.ActivateNpc,
+                this.runtimeSystems.DeactivateDevelopmentPlaceholder);
         }
 
         #endregion
@@ -613,6 +629,16 @@ namespace AORebirth.Core.Playfields
 
         public void AcquireNpcAggro(ICharacter attacker, ICharacter target)
         {
+            if ((attacker != null
+                 && AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                     attacker.Identity.Instance))
+                || (target != null
+                    && AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                        target.Identity.Instance)))
+            {
+                return;
+            }
+
             this.runtimeSystems.AcquireNpcAggro(attacker, target);
         }
 
@@ -621,6 +647,13 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         public void ForceNpcTauntAggro(ICharacter taunter, ICharacter npc)
         {
+            if (npc != null
+                && AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                    npc.Identity.Instance))
+            {
+                return;
+            }
+
             this.runtimeSystems.ForceNpcTauntAggro(taunter, npc);
         }
 
@@ -2027,6 +2060,13 @@ namespace AORebirth.Core.Playfields
 
         private void DoCombatTick(ICharacter attacker)
         {
+            if (AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                    attacker.Identity.Instance))
+            {
+                this.ClearNpcFightingTarget(attacker);
+                return;
+            }
+
             if (attacker.Controller is NPCController)
             {
                 this.runtimeSystems.ProcessNpcCombatTick(attacker);
@@ -2050,6 +2090,8 @@ namespace AORebirth.Core.Playfields
         private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)
         {
             return target != null
+                   && !AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                       target.Identity.Instance)
                    && target.InPlayfield(this.Identity)
                    && target.Stats[StatIds.health].Value > 0
                    && PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target);
@@ -2778,11 +2820,27 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                    target.Identity.Instance))
+            {
+                return;
+            }
+
             this.runtimeSystems.BeginNpcDeath(attacker, target);
         }
 
         internal void HandleCombatKillingHit(ICharacter attacker, ICharacter target)
         {
+            if (AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                    target.Identity.Instance))
+            {
+                target.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.health,
+                    (uint)Math.Max(1, target.Stats[StatIds.life].Value));
+                this.CancelPlayerAttack(attacker);
+                return;
+            }
+
             if (target.Controller is NPCController)
             {
                 this.KillNpcTarget(attacker, target);
@@ -2847,6 +2905,13 @@ namespace AORebirth.Core.Playfields
 
         internal void AwardCombatXp(ICharacter attacker, ICharacter target)
         {
+            if (target != null
+                && AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder(
+                    target.Identity.Instance))
+            {
+                return;
+            }
+
             CombatXpRuntimeService.AwardCombatXp(
                 attacker,
                 target,
@@ -5170,6 +5235,8 @@ namespace AORebirth.Core.Playfields
                         }
                         finally
                         {
+                            AcgDevelopmentPlaceholderRuntimeRegistry.ClearPlayfield(
+                                this.Identity.Instance);
                             base.Dispose(true);
                         }
                     }
