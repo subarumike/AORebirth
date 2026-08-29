@@ -1,5 +1,5 @@
 diff --git a/AOSharp.Bootstrap/Main.cs b/AOSharp.Bootstrap/Main.cs
-index 639dde5..3c1b9be 100644
+index 639dde5..419c454 100644
 --- a/AOSharp.Bootstrap/Main.cs
 +++ b/AOSharp.Bootstrap/Main.cs
 @@ -15,6 +15,12 @@ namespace AOSharp.Bootstrap
@@ -7,7 +7,7 @@ index 639dde5..3c1b9be 100644
      public class Main : IEntryPoint
      {
 +        public const string CaptureSafeChannelSuffix = "_capture_safe";
-+        public const int CaptureSafeContractVersion = 5;
++        public const int CaptureSafeContractVersion = 6;
 +        public const string CaptureSafeSingletonNamePrefix = @"Local\AOSharpCaptureBootstrap_";
 +        public const string TypedChatLogFileName = "AOSharpLiveCapture.typed-chat.log";
 +        public const string ChatSocketLogFileName = "AOSharpLiveCapture.chat-socket.log";
@@ -15,7 +15,7 @@ index 639dde5..3c1b9be 100644
          private IPCServer _ipcPipe;
          private AppDomain _pluginAppDomain;
          private ManualResetEvent _connectEvent;
-@@ -22,37 +28,120 @@ namespace AOSharp.Bootstrap
+@@ -22,37 +28,146 @@ namespace AOSharp.Bootstrap
          private static List<LocalHook> _hooks = new List<LocalHook>();
          private PluginProxy _pluginProxy;
          private ChatSocketListener _chatSocketListener;
@@ -87,10 +87,36 @@ index 639dde5..3c1b9be 100644
 +        {
 +            return captureSafeMode && captureSafeSingletonHeld;
 +        }
++
++        public static bool ShouldProcessChatSocketRead(int bytesRead, IntPtr buffer)
++        {
++            return bytesRead > 0 && buffer != IntPtr.Zero;
++        }
++
++        public static bool TryExecuteNativeBoundary(Action action, Action<Exception> onError)
++        {
++            try
++            {
++                action();
++                return true;
++            }
++            catch (Exception ex)
++            {
++                try
++                {
++                    onError?.Invoke(ex);
++                }
++                catch
++                {
++                }
  
 -            _connectEvent = new ManualResetEvent(false);
 -            _unloadEvent = new ManualResetEvent(false);
 -            _chatSocketListener = new ChatSocketListener();
++                return false;
++            }
++        }
++
 +        public static bool IsCaptureChatCommand(string input)
 +        {
 +            return NormalizeCaptureChatCommand(input) != null;
@@ -100,6 +126,13 @@ index 639dde5..3c1b9be 100644
 +        {
 +            if (string.IsNullOrWhiteSpace(input))
 +                return null;
++
++            string trimmed = input.TrimStart();
++            if (HasCommandPrefix(trimmed, "/aocap"))
++                return "/aocap" + trimmed.Substring(6);
++
++            if (HasCommandPrefix(trimmed, "/aosmoke"))
++                return "/aosmoke" + trimmed.Substring(8);
  
 -            //Setup IPC server that will be used for handling API requests and events.
 -            _ipcPipe = new IPCServer(inChannelName);
@@ -107,13 +140,6 @@ index 639dde5..3c1b9be 100644
 -            _ipcPipe.OnDisconnected = OnIPCClientDisconnected;
 -            _ipcPipe.RegisterCallback((byte)HookOpCode.LoadAssembly, typeof(LoadAssemblyMessage), OnAssembliesChanged);
 -            _ipcPipe.Start();
-+            string trimmed = input.TrimStart();
-+            if (HasCommandPrefix(trimmed, "/aocap"))
-+                return "/aocap" + trimmed.Substring(6);
-+
-+            if (HasCommandPrefix(trimmed, "/aosmoke"))
-+                return "/aosmoke" + trimmed.Substring(8);
-+
 +            return null;
 +        }
 +
@@ -153,7 +179,7 @@ index 639dde5..3c1b9be 100644
          }
  
          private void OnIPCClientConnected(IPCServer pipe)
-@@ -65,14 +154,34 @@ namespace AOSharp.Bootstrap
+@@ -65,14 +180,34 @@ namespace AOSharp.Bootstrap
  
          private void OnIPCClientDisconnected(IPCServer pipe)
          {
@@ -188,16 +214,30 @@ index 639dde5..3c1b9be 100644
                  LoadAssemblyMessage msg = message as LoadAssemblyMessage;
  
                  if (_pluginAppDomain != null)
-@@ -101,6 +210,8 @@ namespace AOSharp.Bootstrap
+@@ -101,11 +236,21 @@ namespace AOSharp.Bootstrap
                  {
                      _pluginProxy.LoadPlugin(assembly);
                  }
 +
 +                _pluginProxy.RunPluginInitializations();
++
++                if (_captureSafeMode)
++                {
++                    if (!_captureCommandHookReady || _captureSafeSingleton == null)
++                        throw new InvalidOperationException("Capture-safe Bootstrap cannot signal readiness before its command hook is active.");
++
++                    _captureSafeSingleton.Set();
++                }
              }
              catch (Exception e)
              {
-@@ -204,7 +315,16 @@ namespace AOSharp.Bootstrap
+                 //TODO: Send IPC message back to loader on error
+-                Log.Error(e.Message);
++                Log.Error(e.ToString());
+             }
+         }
+ 
+@@ -204,7 +349,16 @@ namespace AOSharp.Bootstrap
                          "recv",
                          new Ws2_32.RecvDelegate(WsRecv_Hook));
  
@@ -215,7 +255,7 @@ index 639dde5..3c1b9be 100644
              {
                  CommandInterpreter_c.ProcessChatInput = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DProcessChatInput>(pProcessCommand);
                  CommandInterpreter_c.GetCommand = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DGetCommand>(pGetCommand);
-@@ -213,6 +333,113 @@ namespace AOSharp.Bootstrap
+@@ -213,16 +367,137 @@ namespace AOSharp.Bootstrap
              }
          }
  
@@ -328,22 +368,67 @@ index 639dde5..3c1b9be 100644
 +
          private void CreateHook(string module, string funcName, Delegate newFunc)
          {
-             CreateHook(LocalHook.GetProcAddress(module, funcName), newFunc);
-@@ -240,15 +467,51 @@ namespace AOSharp.Bootstrap
-                 byte[] trimmedBuffer = new byte[bytesRead];
-                 Marshal.Copy(buffer, trimmedBuffer, 0, bytesRead);
+-            CreateHook(LocalHook.GetProcAddress(module, funcName), newFunc);
++            try
++            {
++                CreateHook(LocalHook.GetProcAddress(module, funcName), newFunc);
++            }
++            catch (Exception ex)
++            {
++                Log.Error($"CreateHook failed: {module}!{funcName} {ex}");
++            }
+         }
  
-+                if (_captureSafeMode && bytesRead > 0)
-+                    TryLogChatSocket("IN-RAW", trimmedBuffer);
+         public void CreateHook(IntPtr origFunc, Delegate newFunc)
+         {
+-            LocalHook hook = LocalHook.Create(origFunc, newFunc, this);
+-            hook.ThreadACL.SetExclusiveACL(new Int32[] { 0 });
+-            _hooks.Add(hook);
++            try
++            {
++                LocalHook hook = LocalHook.Create(origFunc, newFunc, this);
++                hook.ThreadACL.SetExclusiveACL(new Int32[] { 0 });
++                _hooks.Add(hook);
++            }
++            catch (Exception ex)
++            {
++                Log.Error($"CreateHook failed: 0x{origFunc.ToInt64():X} {ex}");
++            }
+         }
+ 
+         private void UnhookAll()
+@@ -237,18 +512,62 @@ namespace AOSharp.Bootstrap
+ 
+             if (_pluginProxy != null && socket == ChatSocketListener.Socket)
+             {
+-                byte[] trimmedBuffer = new byte[bytesRead];
+-                Marshal.Copy(buffer, trimmedBuffer, 0, bytesRead);
++                if (!ShouldProcessChatSocketRead(bytesRead, buffer))
++                    return bytesRead;
+ 
+-                List<byte[]> packets = _chatSocketListener.ProcessBuffer(trimmedBuffer);
+-
+-                foreach (byte[] packet in packets)
+-                    _pluginProxy.ChatRecv(packet);
++                TryExecuteNativeBoundary(
++                    () =>
++                    {
++                        byte[] trimmedBuffer = new byte[bytesRead];
++                        Marshal.Copy(buffer, trimmedBuffer, 0, bytesRead);
 +
-                 List<byte[]> packets = _chatSocketListener.ProcessBuffer(trimmedBuffer);
- 
-                 foreach (byte[] packet in packets)
-+                {
-+                    if (_captureSafeMode)
-+                        TryLogChatSocket("IN", packet);
-                     _pluginProxy.ChatRecv(packet);
-+                }
++                        if (_captureSafeMode)
++                            TryLogChatSocket("IN-RAW", trimmedBuffer);
++
++                        List<byte[]> packets = _chatSocketListener.ProcessBuffer(trimmedBuffer);
++
++                        foreach (byte[] packet in packets)
++                        {
++                            if (_captureSafeMode)
++                                TryLogChatSocket("IN", packet);
++                            _pluginProxy.ChatRecv(packet);
++                        }
++                    },
++                    ex => TryLogError("Chat socket receive processing failed open.", ex));
              }
  
              return bytesRead;
@@ -381,7 +466,7 @@ index 639dde5..3c1b9be 100644
          public int DynamicID_GetID_Hook(IntPtr pThis, string name, bool unk)
          {
              int customId = (_pluginProxy?.GetDynamicIDOverride(name)).GetValueOrDefault(0);
-@@ -285,10 +548,28 @@ namespace AOSharp.Bootstrap
+@@ -285,10 +604,28 @@ namespace AOSharp.Bootstrap
  
          public byte ProcessChatInput_Hook(IntPtr pThis, IntPtr pWindow, IntPtr pCmdText)
          {
@@ -414,6 +499,13 @@ index 639dde5..3c1b9be 100644
  
              return CommandInterpreter_c.ProcessChatInput(pThis, pWindow, pCmdText);
          }
+@@ -546,4 +883,4 @@ namespace AOSharp.Bootstrap
+             catch (Exception) { }
+         }
+     }
+-}
+\ No newline at end of file
++}
 diff --git a/AOSharp.Bootstrap/ProcessChatInputPatcher.cs b/AOSharp.Bootstrap/ProcessChatInputPatcher.cs
 index eb20162..ee951c8 100644
 --- a/AOSharp.Bootstrap/ProcessChatInputPatcher.cs

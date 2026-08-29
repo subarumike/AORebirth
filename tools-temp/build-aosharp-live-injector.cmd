@@ -67,7 +67,13 @@ if errorlevel 1 (
     exit /b 1
 )
 
-findstr /C:"public const int CaptureSafeContractVersion = 5;" "%BOOTSTRAP_MAIN%" >nul
+findstr /C:"public const int CaptureSafeContractVersion = 6;" "%BOOTSTRAP_MAIN%" >nul
+if errorlevel 1 goto contract_marker_failed
+findstr /C:"ShouldProcessChatSocketRead(bytesRead, buffer)" "%BOOTSTRAP_MAIN%" >nul
+if errorlevel 1 goto contract_marker_failed
+findstr /C:"TryExecuteNativeBoundary(" "%BOOTSTRAP_MAIN%" >nul
+if errorlevel 1 goto contract_marker_failed
+findstr /C:"Chat socket receive processing failed open." "%BOOTSTRAP_MAIN%" >nul
 if errorlevel 1 goto contract_marker_failed
 findstr /C:"GetCaptureSafeSingletonName(inChannelName)" "%BOOTSTRAP_MAIN%" >nul
 if errorlevel 1 goto contract_marker_failed
@@ -99,14 +105,6 @@ findstr /C:"AOSharpCaptureBootstrap_" "%CAPTURE_MAIN%" >nul
 if errorlevel 1 goto contract_marker_failed
 findstr /C:"_capture_safe" "%CAPTURE_MAIN%" >nul
 if errorlevel 1 goto contract_marker_failed
-findstr /C:"PollTypedChatLog" "%CAPTURE_MAIN%" >nul
-if errorlevel 1 goto contract_marker_failed
-findstr /C:"AOSharpLiveCapture.typed-chat.log" "%CAPTURE_MAIN%" >nul
-if errorlevel 1 goto contract_marker_failed
-findstr /C:"PollChatSocketLog" "%CAPTURE_MAIN%" >nul
-if errorlevel 1 goto contract_marker_failed
-findstr /C:"AOSharpLiveCapture.chat-socket.log" "%CAPTURE_MAIN%" >nul
-if errorlevel 1 goto contract_marker_failed
 findstr /C:"private const int NativeObjectSize = 0x18;" "%BOOTSTRAP_STD_STRING%" >nul
 if errorlevel 1 goto contract_marker_failed
 findstr /C:"[FieldOffset(20)]" "%BOOTSTRAP_STD_STRING%" >nul
@@ -116,7 +114,7 @@ if errorlevel 1 goto contract_marker_failed
 findstr /C:"pipe?.Disconnect();" "%INJECTOR_SOURCE%" >nul
 if errorlevel 1 goto contract_marker_failed
 rem DelayedExpansion eats bare !; caret preserves != for findstr.
-findstr /C:"CaptureSafeContractVersion ^!= 5" "%INJECTOR_SOURCE%" >nul
+findstr /C:"CaptureSafeContractVersion ^!= 6" "%INJECTOR_SOURCE%" >nul
 if errorlevel 1 goto contract_marker_failed
 
 pushd "%REPO_ROOT%"

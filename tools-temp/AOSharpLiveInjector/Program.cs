@@ -98,12 +98,23 @@ namespace AOSharpLiveInjector
         private static int RunSelfTest()
         {
             string safeChannel = "1234" + AOSharp.Bootstrap.Main.CaptureSafeChannelSuffix;
-            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 5
+            bool receiveFailureObserved = false;
+            bool receiveFailureEscaped = AOSharp.Bootstrap.Main.TryExecuteNativeBoundary(
+                () => { throw new System.IO.EndOfStreamException("truncated chat frame"); },
+                ex => receiveFailureObserved = ex is System.IO.EndOfStreamException);
+            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 6
                 || !AOSharp.Bootstrap.Main.IsCaptureSafeChannel(safeChannel)
                 || AOSharp.Bootstrap.Main.IsCaptureSafeChannel("1234")
                 || !AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(true, true)
                 || AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(true, false)
                 || AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(false, true)
+                || !AOSharp.Bootstrap.Main.ShouldProcessChatSocketRead(1, new IntPtr(1))
+                || AOSharp.Bootstrap.Main.ShouldProcessChatSocketRead(0, new IntPtr(1))
+                || AOSharp.Bootstrap.Main.ShouldProcessChatSocketRead(-1, new IntPtr(1))
+                || AOSharp.Bootstrap.Main.ShouldProcessChatSocketRead(1, IntPtr.Zero)
+                || receiveFailureEscaped
+                || !receiveFailureObserved
+                || !AOSharp.Bootstrap.Main.TryExecuteNativeBoundary(() => { }, null)
                 || !AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aocap start")
                 || !AOSharp.Bootstrap.Main.IsCaptureChatCommand("/AOCAP STOP")
                 || !AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aosmoke status")

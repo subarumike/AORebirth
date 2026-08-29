@@ -663,3 +663,7 @@ migrations; details and exact source references are recorded in
   `Captures` folders named `<area> [PF <resource id>] - <capture id>`; the
   timestamp suffix remains the stable analyzer-facing ID, and historical
   plugin-local captures are not moved automatically.
+- AOSharp capture-safety contract 6 prevents failed/empty chat socket reads and
+  malformed chat-frame parser exceptions from escaping the native receive hook.
+  The governed injector build self-tests the exact `EndOfStreamException`
+  containment boundary before publishing a usable binary.
