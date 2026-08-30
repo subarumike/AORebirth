@@ -602,6 +602,22 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
+For Mike's multi-plugin `AO Sharp Zam 2022` runtime, build the dedicated x86
+compatibility plugin directly against that installation's existing
+`AOSharp.Core.dll` and `AOSharp.Common.dll`:
+
+```cmd
+cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Zam2022.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
+```
+
+Load `AOSharpLiveCapture.Zam2022.dll` in the same assembly selection as the
+other Zam plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
+plugin registers `/aocap start|stop|status|flush|mark`, retains the complete
+inbound and outbound raw stream in `packets.hex.log` and `raw-packets.csv`, and
+marks the session for offline decoding. Zam 2022 lacks the newer AOSharp APIs
+required by the optional in-process geometry and decoded-message projections;
+the repository analyzer remains responsible for those projections.
+
 Build the injector and its capture-safe Bootstrap only through:
 
 ```cmd
