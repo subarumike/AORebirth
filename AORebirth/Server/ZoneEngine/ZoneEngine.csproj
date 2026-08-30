@@ -675,6 +675,7 @@
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs" />
+    <Compile Include="Core\Playfields\CapturedSubwayLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs" />

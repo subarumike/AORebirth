@@ -450,6 +450,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
       <Link>CapturedTempleOfThreeWindsLootDefinitions.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayLootDefinitions.cs">
+      <Link>CapturedSubwayLootDefinitions.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs">
       <Link>OrdinaryEnemyCatalog.cs</Link>
     </Compile>
