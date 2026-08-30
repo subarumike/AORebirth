@@ -1,7 +1,10 @@
 namespace SmokeLounge.AOtomation.Messaging.Tests
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Web.Script.Serialization;
 
     using AORebirth.Core.Playfields;
 
@@ -52,6 +55,181 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.MinimumCredits,
                             value.ObservedCorpses))
                     .ToArray());
+        }
+
+        [TestMethod]
+        public void SubwayWikiMembershipMapsGeneralSpecificAndLivingCyberDrops()
+        {
+            OrdinaryEnemyProfile architect = Profile("Architect Striker");
+            int[] architectIds = CapturedSubwayLootDefinitions
+                .DocumentedItemIdsForProfile(
+                    architect.ProfileKey,
+                    architect.DisplayName);
+            Assert.AreEqual(19, architectIds.Length);
+            CollectionAssert.Contains(architectIds, 202731);
+            CollectionAssert.Contains(architectIds, 301716);
+            CollectionAssert.Contains(architectIds, 202756);
+
+            OrdinaryEnemyProfile premature = Profile("Premature Pattern");
+            int[] prematureIds = CapturedSubwayLootDefinitions
+                .DocumentedItemIdsForProfile(
+                    premature.ProfileKey,
+                    premature.DisplayName);
+            CollectionAssert.Contains(prematureIds, 204396);
+            CollectionAssert.Contains(prematureIds, 163432);
+            CollectionAssert.Contains(prematureIds, 163430);
+            CollectionAssert.Contains(prematureIds, 163426);
+            CollectionAssert.Contains(prematureIds, 160051);
+
+            OrdinaryEnemyProfile attendant = Profile("Infected Attendant");
+            int[] attendantIds = CapturedSubwayLootDefinitions
+                .DocumentedItemIdsForProfile(
+                    attendant.ProfileKey,
+                    attendant.DisplayName);
+            CollectionAssert.DoesNotContain(attendantIds, 163432);
+
+            int[] eumenidesIds = CapturedSubwayLootDefinitions
+                .DocumentedItemIdsForProfile(
+                    CapturedSubwayLootDefinitions.EumenidesProfileKey,
+                    "Eumenides");
+            CollectionAssert.Contains(eumenidesIds, 287146);
+            CollectionAssert.Contains(eumenidesIds, 202717);
+            CollectionAssert.Contains(eumenidesIds, 163432);
+
+            Assert.AreEqual(
+                0,
+                CapturedSubwayLootDefinitions.DocumentedItemIdsForProfile(
+                    CapturedSubwayLootDefinitions.AbmouthInfectorProfileKey,
+                    "Infector").Length);
+            Assert.AreEqual(
+                0,
+                CapturedSubwayLootDefinitions.DocumentedItemIdsForProfile(
+                    "totw.named.aztur",
+                    "Aztur the Immortal").Length);
+            Assert.AreEqual(
+                34,
+                CapturedSubwayLootDefinitions.DocumentedSourceItemIds.Length);
+        }
+
+        [TestMethod]
+        public void SubwayWikiSupplementPreservesCapturedLootAndAddsOnlyMissingIds()
+        {
+            OrdinaryEnemyProfile architect = Profile("Architect Striker");
+            OrdinaryEnemyLootTableAdapterResult adapted =
+                OrdinaryEnemyLootTableAdapter.Build(
+                    architect,
+                    "subway.test.documented.architect",
+                    "subway.test.documented.architect.assignment");
+            int capturedGroupCount = adapted.Table.RollGroups.Length;
+            Assert.IsTrue(
+                CapturedSubwayLootDefinitions.ApplyDocumentedMembership(
+                    adapted.Table,
+                    architect.ProfileKey,
+                    architect.DisplayName));
+            LootGroupDefinition group = adapted.Table.RollGroups.Single(
+                value => value.LootGroupKey.StartsWith(
+                    CapturedSubwayLootDefinitions.DocumentedLootGroupPrefix,
+                    StringComparison.Ordinal));
+            Assert.AreEqual(capturedGroupCount + 1, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(LootRollMode.WeightedOne, group.RollMode);
+            Assert.AreEqual(1, group.RollCount);
+            Assert.AreEqual(10000, group.DropChanceBasisPoints);
+            Assert.IsTrue(adapted.Table.AllowsDocumentedSupplement);
+            CollectionAssert.Contains(
+                group.Entries.Select(value => value.ItemTemplateId).ToArray(),
+                202756);
+            CollectionAssert.DoesNotContain(
+                group.Entries.Select(value => value.ItemTemplateId).ToArray(),
+                234877);
+            Assert.IsTrue(
+                group.Entries.All(
+                    value => value.Semantics == LootSemantics.WeightedDocumented
+                             && value.Evidence
+                                == LootEvidenceConfidence.CommunityDocumented
+                             && value.ProbabilityEvidence
+                                == "unresolved-membership-only"));
+
+            Assert.IsTrue(
+                CapturedSubwayLootDefinitions.ApplyDocumentedMembership(
+                    adapted.Table,
+                    architect.ProfileKey,
+                    architect.DisplayName));
+            Assert.AreEqual(capturedGroupCount + 1, adapted.Table.RollGroups.Length);
+
+            LootTableDefinition vergil = new LootTableDefinition
+            {
+                LootTableKey = "subway.test.documented.vergil",
+                RollGroups = new LootGroupDefinition[0],
+                ObservedCorpseSnapshots = new[]
+                {
+                    new ObservedCorpseSnapshotDefinition
+                    {
+                        SnapshotKey = "captured.vergil",
+                        Credits = 563,
+                        Entries = new[]
+                        {
+                            CapturedSnapshotEntry(202743),
+                            CapturedSnapshotEntry(287146),
+                            CapturedSnapshotEntry(160051)
+                        },
+                        Evidence = LootEvidenceConfidence.ProvenCapture,
+                        SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved,
+                        EvidenceReference = "captured.vergil"
+                    }
+                },
+                CreditsPolicy = new CreditsPolicyDefinition
+                {
+                    Mode = CreditsPolicyMode.Unresolved,
+                    Evidence = LootEvidenceConfidence.Unresolved
+                },
+                ItemPoolUnresolved = true,
+                Enabled = true
+            };
+            Assert.IsTrue(
+                CapturedSubwayLootDefinitions.ApplyDocumentedMembership(
+                    vergil,
+                    CapturedSubwayLootDefinitions.VergilProfileKey,
+                    "Vergil Aeneid"));
+            LootGroupDefinition vergilGroup = vergil.RollGroups.Single();
+            int[] vergilSupplement = vergilGroup.Entries
+                .Select(value => value.ItemTemplateId)
+                .ToArray();
+            CollectionAssert.Contains(vergilSupplement, 202733);
+            CollectionAssert.Contains(vergilSupplement, 163432);
+            CollectionAssert.DoesNotContain(vergilSupplement, 202743);
+            CollectionAssert.DoesNotContain(vergilSupplement, 287146);
+            CollectionAssert.DoesNotContain(vergilSupplement, 160051);
+
+            var registry = new LootTableRegistry(value => true);
+            registry.RegisterTable(vergil);
+            Assert.IsTrue(
+                registry.ContainsTable(vergil.LootTableKey),
+                "The documented-only supplement must remain the sole allowed roll-group stack on captured snapshots.");
+        }
+
+        [TestMethod]
+        public void SubwayWikiAuditArtifactMatchesDocumentedSourceIds()
+        {
+            string root = FindRepositoryRoot();
+            string artifactPath = Path.Combine(
+                root,
+                @"docs\generated\pf127_loot\subway-loot-membership-audit.json");
+            Assert.IsTrue(File.Exists(artifactPath));
+            var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var artifact = (Dictionary<string, object>)serializer.DeserializeObject(
+                File.ReadAllText(artifactPath));
+            object[] rows = (object[])artifact["items"];
+            Assert.AreEqual(34, Convert.ToInt32(artifact["source_item_count"]));
+            Assert.AreEqual(34, rows.Length);
+
+            int[] artifactIds = rows
+                .Cast<Dictionary<string, object>>()
+                .Select(value => Convert.ToInt32(value["item_id"]))
+                .OrderBy(value => value)
+                .ToArray();
+            CollectionAssert.AreEqual(
+                CapturedSubwayLootDefinitions.DocumentedSourceItemIds,
+                artifactIds);
         }
 
         [TestMethod]
@@ -1378,6 +1556,40 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
             return catalog.GetProfiles().Single(value => value.DisplayName == displayName);
+        }
+
+        private static LootEntryDefinition CapturedSnapshotEntry(int itemId)
+        {
+            return new LootEntryDefinition
+            {
+                ItemTemplateId = itemId,
+                HighItemTemplateId = itemId,
+                FixedQuality = 1,
+                MinimumQuality = 1,
+                MaximumQuality = 1,
+                MinimumQuantity = 1,
+                MaximumQuantity = 1,
+                Semantics = LootSemantics.ObservedAvailable,
+                Evidence = LootEvidenceConfidence.ProvenCapture,
+                EvidenceReference = "captured.vergil"
+            };
+        }
+
+        private static string FindRepositoryRoot()
+        {
+            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (current != null)
+            {
+                if (Directory.Exists(Path.Combine(current.FullName, "AORebirth"))
+                    && Directory.Exists(Path.Combine(current.FullName, "docs")))
+                {
+                    return current.FullName;
+                }
+
+                current = current.Parent;
+            }
+
+            throw new DirectoryNotFoundException("Repository root not found.");
         }
 
         private static void AssertReviewedLegacyStrictLoot(

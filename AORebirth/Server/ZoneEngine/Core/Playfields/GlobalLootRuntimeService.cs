@@ -688,6 +688,10 @@ namespace AORebirth.Core.Playfields
                 ItemPoolUnresolved = true,
                 Enabled = true
             };
+            CapturedSubwayLootDefinitions.ApplyDocumentedMembership(
+                table,
+                encounter.ProfileKey,
+                encounter.DisplayName);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -712,7 +716,12 @@ namespace AORebirth.Core.Playfields
             string tableKey = "captured." + CapturedVergilProfileKey;
             if (this.registry.ContainsTable(tableKey)) return;
 
-            this.registry.RegisterTable(BuildCapturedVergilLootTable());
+            LootTableDefinition table = BuildCapturedVergilLootTable();
+            CapturedSubwayLootDefinitions.ApplyDocumentedMembership(
+                table,
+                CapturedVergilProfileKey,
+                "Vergil Aeneid");
+            this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
                 AssignmentKey = tableKey,
@@ -902,6 +911,10 @@ namespace AORebirth.Core.Playfields
                 targetLevel,
                 tableKey,
                 assignmentKey);
+            CapturedSubwayLootDefinitions.ApplyDocumentedMembership(
+                adapted.Table,
+                profile.ProfileKey,
+                profile.DisplayName);
             this.registry.RegisterTableAndAssignment(adapted.Table, adapted.Assignment);
         }
 
