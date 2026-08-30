@@ -577,6 +577,8 @@ def build_generated_files(
             "RuntimeIdentityUsesSourceIdentity": False,
             "CaptureCorrelationPromotesExactIdentity": False,
             "AdditionalPointRuntimeSemanticsProven": False,
+            "DefaultPlaceholderVisualSource": "default_monster.cir",
+            "DefaultPlaceholderCatMeshId": 26884,
             "RespawnChanceFieldName": "RespawnChanceRaw",
         },
     }

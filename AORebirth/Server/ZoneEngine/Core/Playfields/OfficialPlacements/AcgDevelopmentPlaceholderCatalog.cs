@@ -132,6 +132,12 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
 
     internal sealed class AcgDevelopmentPlaceholderCatalog
     {
+        internal const string DefaultPlaceholderVisualSource = "default_monster.cir";
+
+        internal const int DefaultPlaceholderCatMeshId = 26884;
+
+        internal const int ExactFdqoCatMeshId = 15222;
+
         private const int SupportedSchemaVersion = 1;
 
         private const int ExpectedResourceType = 1000014;
@@ -492,6 +498,15 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
                 "Capture correlation cannot promote exact identity.");
             Require(this.manifest.Policy.AdditionalPointRuntimeSemanticsProven == false,
                 "Additional-point runtime semantics cannot be promoted.");
+            Require(string.Equals(
+                    this.manifest.Policy.DefaultPlaceholderVisualSource,
+                    DefaultPlaceholderVisualSource,
+                    StringComparison.Ordinal),
+                "Default placeholder visual source drifted.");
+            RequireValue(
+                this.manifest.Policy.DefaultPlaceholderCatMeshId,
+                DefaultPlaceholderCatMeshId,
+                "Default placeholder CatMesh drifted.");
             Require(string.Equals(this.manifest.Policy.RespawnChanceFieldName, "RespawnChanceRaw", StringComparison.Ordinal),
                 "Respawn chance raw-field boundary drifted.");
 
@@ -639,6 +654,12 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
                 RespawnTimeRaw = record.RespawnTimeRaw.Value,
                 VisibleName = CreateVisibleName(record, additionalPointOrdinal),
                 UseExactOfficialVisual = visual.EvidenceGrade == "ExactOfficial",
+                SelectedCatMeshId = visual.EvidenceGrade == "ExactOfficial"
+                    ? ExactFdqoCatMeshId
+                    : DefaultPlaceholderCatMeshId,
+                SelectedVisualSource = visual.EvidenceGrade == "ExactOfficial"
+                    ? "ExactOfficial FDQO"
+                    : DefaultPlaceholderVisualSource,
                 CanAttack = false,
                 CanAggro = false,
                 AwardsXp = false,
@@ -793,6 +814,8 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
         public double RespawnTimeRaw { get; set; }
         public string VisibleName { get; set; }
         public bool UseExactOfficialVisual { get; set; }
+        public int SelectedCatMeshId { get; set; }
+        public string SelectedVisualSource { get; set; }
         public bool CanAttack { get; set; }
         public bool CanAggro { get; set; }
         public bool AwardsXp { get; set; }
@@ -956,6 +979,8 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
         public bool? RuntimeIdentityUsesSourceIdentity { get; set; }
         public bool? CaptureCorrelationPromotesExactIdentity { get; set; }
         public bool? AdditionalPointRuntimeSemanticsProven { get; set; }
+        public string DefaultPlaceholderVisualSource { get; set; }
+        public int? DefaultPlaceholderCatMeshId { get; set; }
         public string RespawnChanceFieldName { get; set; }
     }
 

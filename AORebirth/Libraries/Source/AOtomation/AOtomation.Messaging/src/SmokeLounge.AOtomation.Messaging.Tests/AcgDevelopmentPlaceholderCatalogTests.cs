@@ -140,6 +140,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(primary.All(row => row.LocationKind == AcgPlaceholderLocationKind.Primary));
             Assert.IsTrue(primary.All(row => !row.AdditionalPointOrdinal.HasValue));
             Assert.AreEqual(9, primary.Count(row => row.UseExactOfficialVisual));
+            Assert.IsTrue(primary
+                .Where(row => row.UseExactOfficialVisual)
+                .All(row => row.SelectedCatMeshId == 15222));
+            Assert.IsTrue(primary
+                .Where(row => !row.UseExactOfficialVisual)
+                .All(row => row.SelectedCatMeshId == 26884));
+            Assert.IsTrue(primary
+                .Where(row => !row.UseExactOfficialVisual)
+                .All(row => row.SelectedVisualSource == "default_monster.cir"));
             CollectionAssert.AreEqual(new[] { 4582 }, catalog.LoadedPlayfields.ToArray());
 
             AcgDevelopmentPlaceholderManifestPlayfield capturePlayfield =
@@ -248,6 +257,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "return 0;");
             StringAssert.Contains(runtime, "DoNotDoTimers = true");
             StringAssert.Contains(runtime, "(uint)Side.Neutral");
+            StringAssert.Contains(runtime, "(int)StatIds.catmesh");
+            StringAssert.Contains(runtime, "(int)StatIds.displaycatmesh");
+            StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId");
             StringAssert.Contains(attackHandler, "AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder");
             StringAssert.Contains(playfield, "private void DoCombatTick(ICharacter attacker)");
             StringAssert.Contains(playfield, "private void KillNpcTarget(ICharacter attacker, ICharacter target)");
