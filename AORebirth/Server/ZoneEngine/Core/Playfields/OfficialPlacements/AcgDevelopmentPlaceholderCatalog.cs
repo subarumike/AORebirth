@@ -294,6 +294,16 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
             return new ReadOnlyCollection<AcgDevelopmentPlaceholderPlanEntry>(plan);
         }
 
+        internal static string CreateExactLocationKey(double x, double y, double z)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0:R}|{1:R}|{2:R}",
+                (float)x,
+                (float)y,
+                (float)z);
+        }
+
         internal AcgDevelopmentPlaceholderCorpusAudit AuditAllShards()
         {
             int primary = 0;

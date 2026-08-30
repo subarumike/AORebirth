@@ -245,6 +245,13 @@ namespace AORebirth.Core.Playfields
             this.npcHomeStates.Remove(identity.Instance);
         }
 
+        internal IList<Coordinate> NpcHomeCoordinates()
+        {
+            return this.npcHomeStates.Values
+                .Select(state => new Coordinate(state.Coordinates))
+                .ToList();
+        }
+
         internal void DespawnNpcImmediately(
             ICharacter target,
             Action<Identity> stopFightingDeadTarget,

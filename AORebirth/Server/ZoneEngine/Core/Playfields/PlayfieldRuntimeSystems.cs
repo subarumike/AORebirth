@@ -462,6 +462,11 @@ namespace ZoneEngine.Core.Playfields
             return this.dynelRegistry.Characters();
         }
 
+        internal IList<Coordinate> NpcHomeCoordinates()
+        {
+            return this.npcRuntime.NpcHomeCoordinates();
+        }
+
         internal ReadOnlyCollection<Character> CharacterEntities()
         {
             return this.dynelRegistry.CharacterEntities();
