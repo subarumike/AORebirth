@@ -9,6 +9,12 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Inner Sanctum documented named-boss loot is live on Linux from exact accepted
+  source SHA `52a1c546444ccdd16ee056605dd6833dc53b0222`. LoginEngine and ZoneEngine
+  releases are both `release-52a1c546444ccdd16ee056605dd6833dc53b0222`;
+  Windows exact-SHA acceptance, Linux acceptance, the zero-online-player dry
+  run, transactional promotion, service readiness, and rollback readiness all
+  passed.
 - Subway documented-loot membership is live on Linux from exact accepted source
   SHA `08d59f347bcfad6733ee01e36b67e14b1bd59443`. LoginEngine and ZoneEngine
   releases are both `release-08d59f347bcfad6733ee01e36b67e14b1bd59443`;
