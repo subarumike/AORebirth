@@ -679,6 +679,7 @@
     <Compile Include="Core\Playfields\CapturedSubwayLootDefinitions.cs" />
     <Compile Include="Core\Playfields\DocumentedInnerSanctumLootDefinitions.cs" />
     <Compile Include="Core\Playfields\DocumentedForemansLootDefinitions.cs" />
+    <Compile Include="Core\Playfields\DocumentedStepsOfMadnessLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs" />

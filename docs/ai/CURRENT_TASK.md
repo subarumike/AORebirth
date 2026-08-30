@@ -2,17 +2,17 @@
 
 ## Active
 
-Finish and deploy the practical PF4582 ICC Shuttleport population. The
-specialized runtime catalog now materializes 199 of its 206 accepted placements:
-the original 25 definitions, 10 additional exact `ISRE` Island Reets using the
-captured Island Reet combat contract, and 164 exact same-name unique-template
-placements in template-backed Social mode without invented combat, loot,
-pathing, or respawn behavior. Seven unresolved source records remain blocked.
-The reconciled 207-row official overlay authorizes the same 199 and blocks eight,
-including `NCNN`. The concurrent corpse-spawn queue regression that crashed the
-PF4582 heartbeat is fixed. Complete only the governed Windows and Linux
-acceptance gates, deploy ZoneEngine alone, and leave all gameplay/client testing
-to Mike.
+Complete the PF1933 Steps of Madness wiki-loot supplement. The audited AOWiki
+revision resolves 22 local item templates across 61 enemy/item memberships.
+Seven unambiguous numeric mappings are active: Nervejolter on Pulsing Hatred,
+Neutrino Flash on Notum Habit, Neleb's four guaranteed items, and Neleb's exact
+45% none / 40% one / 15% two Dark Dreams outcome distribution. The remaining
+54 qualitative, unspecified, or same-name location-bound memberships remain
+inactive evidence. Focused validation and the Windows Debug build pass; the
+broader AOtomation suite still exposes the pre-existing stale Temple combat
+coverage input hash, whose governed regeneration is blocked because the retained
+historical capture folders are not present in this checkout. Do not invent the
+missing capture corpus or edit generated combat projections by hand.
 
 ## Prior active checkpoint
 

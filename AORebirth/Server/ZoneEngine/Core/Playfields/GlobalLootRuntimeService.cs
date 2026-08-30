@@ -3414,10 +3414,15 @@ namespace AORebirth.Core.Playfields
                 DocumentedForemansLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any();
+            bool hasDocumentedStepsOfMadnessLoot =
+                DocumentedStepsOfMadnessLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
             if (matches.Length == 0
                 && !hasCredits
                 && !hasDocumentedInnerSanctumLoot
-                && !hasDocumentedForemansLoot) return;
+                && !hasDocumentedForemansLoot
+                && !hasDocumentedStepsOfMadnessLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3440,7 +3445,9 @@ namespace AORebirth.Core.Playfields
                 ? DocumentedInnerSanctumLootDefinitions.DocumentedLootSourceUrl
                 : (hasDocumentedForemansLoot
                     ? DocumentedForemansLootDefinitions.DocumentedLootSourceUrl
-                    : null);
+                    : (hasDocumentedStepsOfMadnessLoot
+                        ? DocumentedStepsOfMadnessLootDefinitions.DocumentedLootSourceUrl
+                        : null));
             string evidence = matches.Length > 0
                 ? repositoryEvidence
                 : (!string.IsNullOrWhiteSpace(documentedEvidence)
@@ -3464,7 +3471,9 @@ namespace AORebirth.Core.Playfields
                     ? "legacy-range-check; inner-sanctum-wiki-fixed-quality"
                     : (hasDocumentedForemansLoot
                         ? "legacy-range-check; foremans-wiki-fixed-and-range-quality"
-                        : "legacy-range-check"),
+                        : (hasDocumentedStepsOfMadnessLoot
+                            ? "legacy-range-check; steps-of-madness-wiki-fixed-quality"
+                            : "legacy-range-check")),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3479,6 +3488,10 @@ namespace AORebirth.Core.Playfields
                 table,
                 playfieldId,
                 target.Name);
+            DocumentedStepsOfMadnessLootDefinitions.ApplyDocumentedLoot(
+                table,
+                playfieldId,
+                target.Name);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -3490,7 +3503,9 @@ namespace AORebirth.Core.Playfields
                     ? (int?)DocumentedInnerSanctumLootDefinitions.PlayfieldInstance
                     : (hasDocumentedForemansLoot
                         ? (int?)DocumentedForemansLootDefinitions.PlayfieldInstance
-                        : null),
+                        : (hasDocumentedStepsOfMadnessLoot
+                            ? (int?)DocumentedStepsOfMadnessLootDefinitions.PlayfieldInstance
+                            : null)),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0
