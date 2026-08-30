@@ -2,17 +2,16 @@
 
 ## Active
 
-Complete the PF1933 Steps of Madness wiki-loot supplement. The audited AOWiki
-revision resolves 22 local item templates across 61 enemy/item memberships.
-Seven unambiguous numeric mappings are active: Nervejolter on Pulsing Hatred,
-Neutrino Flash on Notum Habit, Neleb's four guaranteed items, and Neleb's exact
-45% none / 40% one / 15% two Dark Dreams outcome distribution. The remaining
-54 qualitative, unspecified, or same-name location-bound memberships remain
-inactive evidence. Focused validation and the Windows Debug build pass; the
-broader AOtomation suite still exposes the pre-existing stale Temple combat
-coverage input hash, whose governed regeneration is blocked because the retained
-historical capture folders are not present in this checkout. Do not invent the
-missing capture corpus or edit generated combat projections by hand.
+Complete the PF1862 Smuggler's Den wiki-loot supplement. AOWiki revisions 45701
+and 45756 resolve 22 local source items across 23 enemy/item memberships. The
+Den Mantis Queen's exact 100% Mantis Egg outcome is the single active mapping.
+The other 22 membership-only, qualitative, range-unresolved, or non-numeric
+rows remain inactive evidence. DeCranum's Corona set links and the generic Ring
+of Power row remain explicitly excluded because the source does not identify
+exact direct-drop templates. No PF1862 specialized population exists, so the
+active mapping remains dormant until a matching queen is populated by an
+authorized runtime source. Do not infer missing rates, outcome groups, or spawn
+behavior from the wiki.
 
 ## Prior active checkpoint
 
