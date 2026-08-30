@@ -1,0 +1,58 @@
+{
+  "playfield_resource_id": 4474,
+  "runtime_playfield_identity_observed": 111888,
+  "boss_level": 190,
+  "monster_data": 257313,
+  "corpse_credits": 35507,
+  "identity_linked_roll_count": 10,
+  "selection_probability_status": "unresolved",
+  "bosses": [
+    {
+      "name": "Ilari Khazoh Ra",
+      "profile_key": "sector10.4474.boss.ilari-khazoh-ra",
+      "roll_count": 5,
+      "capture_ids": [
+        "20260830-041457",
+        "20260830-041643",
+        "20260830-041816",
+        "20260830-041950",
+        "20260830-042105"
+      ],
+      "viralbots": [
+        { "name": "Supple Lead Viralbots", "low_id": 247140, "high_id": 247141, "quality": 222 },
+        { "name": "Supple Lead Viralbots", "low_id": 247140, "high_id": 247141, "quality": 162 }
+      ]
+    },
+    {
+      "name": "Ankari Khazoh Ra",
+      "profile_key": "sector10.4474.boss.ankari-khazoh-ra",
+      "roll_count": 4,
+      "capture_ids": [
+        "20260830-042257",
+        "20260830-042449",
+        "20260830-042700",
+        "20260830-042926"
+      ],
+      "viralbots": [
+        { "name": "Strong Lead Viralbots", "low_id": 247138, "high_id": 247139, "quality": 190 },
+        { "name": "Arithmetic Lead Viralbots", "low_id": 247144, "high_id": 247145, "quality": 163 },
+        { "name": "Enduring Lead Viralbots", "low_id": 247136, "high_id": 247137, "quality": 157 }
+      ]
+    },
+    {
+      "name": "Cha Khazoh Ra",
+      "profile_key": "sector10.4474.boss.cha-khazoh-ra",
+      "roll_count": 1,
+      "capture_ids": ["20260830-043059"],
+      "viralbots": []
+    }
+  ],
+  "unresolved_evidence": [
+    {
+      "capture_id": "20260830-040731",
+      "item_count": 7,
+      "reason": "populated corpse inventory was not identity-linked to a boss generation",
+      "runtime_disposition": "preserved but not assigned"
+    }
+  ]
+}
