@@ -9,9 +9,10 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Inner Sanctum documented named-boss loot is live on Linux from exact accepted
-  source SHA `52a1c546444ccdd16ee056605dd6833dc53b0222`. LoginEngine and ZoneEngine
-  releases are both `release-52a1c546444ccdd16ee056605dd6833dc53b0222`;
+- Temple documented boss loot, together with the preceding Inner Sanctum and
+  Foreman's documented-loot additions, is live on Linux from exact accepted
+  source SHA `b1b17e6c43e25d3ce3115ca5c60a842dfe07dd19`. LoginEngine and ZoneEngine
+  releases are both `release-b1b17e6c43e25d3ce3115ca5c60a842dfe07dd19`;
   Windows exact-SHA acceptance, Linux acceptance, the zero-online-player dry
   run, transactional promotion, service readiness, and rollback readiness all
   passed.
