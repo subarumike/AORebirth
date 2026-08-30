@@ -19,6 +19,8 @@ namespace AORebirth.Core.Playfields
         internal const double CapturedMedianAttackIntervalSeconds = 4.635295;
         internal const string MurialProfileKey =
             "totw.ordinary.main-room.murial-the-faithful.26090";
+        internal const string EternalSentinelProfileKey =
+            "totw.ordinary.eternal-sentinel.41690";
         internal const string DeathlessLegionnaireProfileKey =
             "totw.ordinary.deathless-legionnaire.42981";
 
@@ -337,7 +339,7 @@ namespace AORebirth.Core.Playfields
                 "20260721-041439/043204: exact Eternal Sentinel SCFU, 17..18 normal damage, "
                 + "CATMesh 41664, empty observed loot and level-credit outcomes";
             return new OrdinaryEnemyProfile(
-                "totw.ordinary.eternal-sentinel.41690",
+                EternalSentinelProfileKey,
                 "totw.ordinary.eternal-sentinel",
                 "Eternal Sentinel",
                 41690,
@@ -466,7 +468,7 @@ namespace AORebirth.Core.Playfields
             return new OrdinaryEnemySpawnDefinition(
                 "totw.ordinary." + sourceIdentity.ToString("X8", CultureInfo.InvariantCulture),
                 sourceIdentity,
-                "totw.ordinary.eternal-sentinel.41690",
+                EternalSentinelProfileKey,
                 PlayfieldInstance,
                 level,
                 health,

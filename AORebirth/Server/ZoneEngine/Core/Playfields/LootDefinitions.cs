@@ -91,6 +91,7 @@ namespace AORebirth.Core.Playfields
         internal string Evidence { get; set; }
         internal LootEvidenceConfidence Confidence { get; set; }
         internal bool ItemPoolUnresolved { get; set; }
+        internal bool AllowsDocumentedSupplement { get; set; }
         internal bool Enabled { get; set; }
     }
 
@@ -256,7 +257,21 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (table.RollGroups.Length != 0)
+            bool validDocumentedSupplement = table.AllowsDocumentedSupplement
+                && table.RollGroups.All(
+                    group => group != null
+                             && group.LootGroupKey.StartsWith(
+                                 "documented.",
+                                 StringComparison.Ordinal)
+                             && group.Entries != null
+                             && group.Entries.Length > 0
+                             && group.Entries.All(
+                                 entry => entry != null
+                                          && entry.Semantics
+                                              == LootSemantics.WeightedDocumented
+                                          && entry.Evidence
+                                              == LootEvidenceConfidence.CommunityDocumented));
+            if (table.RollGroups.Length != 0 && !validDocumentedSupplement)
             {
                 throw new LootDefinitionValidationException(
                     "Observed corpse snapshots cannot be combined with independent roll groups in "
