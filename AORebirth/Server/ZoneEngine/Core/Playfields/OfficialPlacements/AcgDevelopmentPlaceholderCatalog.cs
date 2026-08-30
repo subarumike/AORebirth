@@ -132,11 +132,13 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
 
     internal sealed class AcgDevelopmentPlaceholderCatalog
     {
-        internal const string DefaultPlaceholderVisualSource = "items.dat Item 283862 Mesh stat 12";
+        internal const string DefaultPlaceholderVisualSource = "items.dat Item 283862 equipped-mesh stat 209";
 
         internal const int DefaultPlaceholderItemId = 283862;
 
-        internal const int DefaultPlaceholderMeshId = 9013;
+        internal const int DefaultPlaceholderMeshStatId = 209;
+
+        internal const int DefaultPlaceholderMeshId = 283882;
 
         internal const int ExactFdqoCatMeshId = 15222;
 
@@ -509,6 +511,10 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
                 this.manifest.Policy.DefaultPlaceholderItemId,
                 DefaultPlaceholderItemId,
                 "Default placeholder item source drifted.");
+            RequireValue(
+                this.manifest.Policy.DefaultPlaceholderMeshStatId,
+                DefaultPlaceholderMeshStatId,
+                "Default placeholder Mesh stat drifted.");
             RequireValue(
                 this.manifest.Policy.DefaultPlaceholderMeshId,
                 DefaultPlaceholderMeshId,
@@ -995,6 +1001,7 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
         public bool? AdditionalPointRuntimeSemanticsProven { get; set; }
         public string DefaultPlaceholderVisualSource { get; set; }
         public int? DefaultPlaceholderItemId { get; set; }
+        public int? DefaultPlaceholderMeshStatId { get; set; }
         public int? DefaultPlaceholderMeshId { get; set; }
         public string RespawnChanceFieldName { get; set; }
     }

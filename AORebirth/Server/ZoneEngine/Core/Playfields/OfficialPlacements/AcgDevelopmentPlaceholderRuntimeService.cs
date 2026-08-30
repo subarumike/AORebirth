@@ -124,6 +124,10 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
 
         private const int SimpleCharFullUpdateIsImmuneFlag = 0x00800000;
 
+        private const int PlaceholderMeshPosition = 1;
+
+        private const int PlaceholderMeshLayer = 4;
+
         private readonly AcgDevelopmentPlaceholderOptions options;
 
         private readonly AcgDevelopmentPlaceholderCatalog catalog;
@@ -294,7 +298,9 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
                     || !ItemLoader.ItemList.TryGetValue(
                         AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderItemId,
                         out placeholderItem)
-                    || !placeholderItem.Stats.TryGetValue((int)StatIds.mesh, out itemMesh)
+                    || !placeholderItem.Stats.TryGetValue(
+                        AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderMeshStatId,
+                        out itemMesh)
                     || itemMesh != AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderMeshId)
                 {
                     throw new InvalidOperationException(
@@ -349,8 +355,33 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
             else
             {
                 character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.mesh,
+                    (int)StatIds.monsterdata,
+                    0);
+                character.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.catmesh,
+                    0);
+                character.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.displaycatmesh,
+                    0);
+                character.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.headmesh,
+                    0);
+                character.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.weaponmeshright,
                     (uint)entry.SelectedMeshId.Value);
+                character.Textures.Clear();
+                character.MeshLayer.Clear();
+                character.SocialMeshLayer.Clear();
+                character.MeshLayer.AddMesh(
+                    PlaceholderMeshPosition,
+                    entry.SelectedMeshId.Value,
+                    0,
+                    PlaceholderMeshLayer);
+                character.SocialMeshLayer.AddMesh(
+                    PlaceholderMeshPosition,
+                    entry.SelectedMeshId.Value,
+                    0,
+                    PlaceholderMeshLayer);
             }
             uint flags = (uint)character.Stats[StatIds.flags].Value;
             character.Stats.SetBaseValueWithoutTriggering(
