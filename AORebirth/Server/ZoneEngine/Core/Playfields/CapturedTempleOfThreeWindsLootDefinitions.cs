@@ -143,6 +143,10 @@ namespace AORebirth.Core.Playfields
 
             if (!registry.ContainsTable(table.LootTableKey))
             {
+                DocumentedTempleOfThreeWindsLootDefinitions.ApplyDocumentedBossLoot(
+                    table,
+                    PlayfieldInstance,
+                    profileKey);
                 registry.RegisterTable(table);
                 registry.RegisterAssignment(
                     new LootAssignmentDefinition

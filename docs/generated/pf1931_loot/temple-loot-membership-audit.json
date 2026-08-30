@@ -1,0 +1,81 @@
+{
+  "source_url": "https://wiki.aodb.us/wiki/Temple_of_Three_Winds",
+  "source_revision_note": "AOWiki page inspected 2026-08-30; only numeric boss drop ranges absent from the capture-backed tables are active.",
+  "playfield_instance": 1931,
+  "source_item_count": 7,
+  "documented_mapping_count": 7,
+  "capture_preservation": "Captured corpse snapshots remain authoritative. Wiki groups are independent supplements and deduplicate item IDs against captured snapshots.",
+  "probability_policy": "Use the published lower bound at runtime. Retain the published upper bound as audit evidence.",
+  "items": [
+    {
+      "profile_key": "totw.647.named.windcaller-yatila",
+      "boss": "Windcaller Yatila",
+      "item_id": 204576,
+      "item_name": "Platinum Ring of the Three PM/SI",
+      "quality": 1,
+      "minimum_basis_points": 600,
+      "maximum_basis_points": 900,
+      "source_probability": "approximately 6-9%"
+    },
+    {
+      "profile_key": "totw.647.boss.the-curator",
+      "boss": "The Curator",
+      "item_id": 204577,
+      "item_name": "Notum Ring of the Three MM/BM",
+      "quality": 1,
+      "minimum_basis_points": 200,
+      "maximum_basis_points": 300,
+      "source_probability": "approximately 2-3%"
+    },
+    {
+      "profile_key": "totw.647.boss.the-curator",
+      "boss": "The Curator",
+      "item_id": 204578,
+      "item_name": "Notum Ring of the Three TS/MC",
+      "quality": 1,
+      "minimum_basis_points": 600,
+      "maximum_basis_points": 700,
+      "source_probability": "approximately 6-7%"
+    },
+    {
+      "profile_key": "totw.647.boss.the-curator",
+      "boss": "The Curator",
+      "item_id": 204575,
+      "item_name": "Platinum Ring of the Three TS/MC",
+      "quality": 1,
+      "minimum_basis_points": 100,
+      "maximum_basis_points": 100,
+      "source_probability": "approximately 1%"
+    },
+    {
+      "profile_key": "totw.647.boss.nematet-the-custodian-of-time",
+      "boss": "Nematet the Custodian of Time",
+      "item_id": 204647,
+      "item_name": "Skull of the Ancient",
+      "quality": 1,
+      "minimum_basis_points": 2000,
+      "maximum_basis_points": 2000,
+      "source_probability": "approximately 20%"
+    },
+    {
+      "profile_key": "totw.647.boss.nematet-the-custodian-of-time",
+      "boss": "Nematet the Custodian of Time",
+      "item_id": 204613,
+      "item_name": "Nematet's Inner Eye",
+      "quality": 1,
+      "minimum_basis_points": 300,
+      "maximum_basis_points": 500,
+      "source_probability": "approximately 3-5%"
+    },
+    {
+      "profile_key": "totw.1931.boss.guardian-of-tomorrow",
+      "boss": "Guardian of Tomorrow",
+      "item_id": 204748,
+      "item_name": "Guardian Tank Armor",
+      "quality": 1,
+      "minimum_basis_points": 400,
+      "maximum_basis_points": 500,
+      "source_probability": "approximately 4-5%"
+    }
+  ]
+}
