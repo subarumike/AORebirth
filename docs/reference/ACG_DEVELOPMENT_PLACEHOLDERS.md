@@ -44,10 +44,12 @@ Current grades are:
   and unresolved Atrox-family variant remain explicit.
 - `Unresolved`: the other 4,011 native ACG keys.
 
-Only `ExactOfficial` may select its mapped visual automatically. The current
-generic placeholder also uses the already proven, client-renderable `A004`
-Beach Leet appearance, but it is named and governed as a placeholder and must
-never be described as the real unresolved mob.
+Only `ExactOfficial` may select its mapped visual automatically. FDQO retains
+the exact `A004` / CatMesh `15222` Beach Leet appearance. Every
+capture-correlated or unresolved row uses `default_monster.cir`, CatMesh
+`26884`, as the explicit development placeholder and must never be described
+as the real unresolved mob. The existing `A004` template remains only the safe
+NPC construction pipeline before the placeholder CatMesh override is applied.
 
 ## Modes
 
@@ -64,11 +66,12 @@ existing pool allocator. ACG keys, resource IDs, ordinals, and stable source IDs
 are never used as runtime entity IDs. Full source provenance is retained in the
 server-side development registry even when the visible name is shortened.
 
-Placeholders use a passive idle controller, neutral side, the existing immune
-flag plus explicit combat guards, no combat contract, no loot registration,
-and no mission/XP completion path. They have no waypoints and do not run NPC
-timers. No proven server-side non-collision switch is available on this path, so
-collision suppression remains explicitly unclaimed.
+Placeholders set both `catmesh` and `displaycatmesh` to `26884`, use a passive
+idle controller, neutral side, the existing immune flag plus explicit combat
+guards, no combat contract, no loot registration, and no mission/XP completion
+path. They have no waypoints and do not run NPC timers. No proven server-side
+non-collision switch is available on this path, so collision suppression
+remains explicitly unclaimed.
 
 ## Operator guide
 

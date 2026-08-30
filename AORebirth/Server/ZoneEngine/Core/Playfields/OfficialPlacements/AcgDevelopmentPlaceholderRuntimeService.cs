@@ -272,6 +272,16 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
                 }
             }
 
+            int expectedCatMesh = entry.UseExactOfficialVisual
+                ? AcgDevelopmentPlaceholderCatalog.ExactFdqoCatMeshId
+                : AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderCatMeshId;
+            if (entry.SelectedCatMeshId != expectedCatMesh)
+            {
+                throw new InvalidOperationException(
+                    "ACG development visual selection failed closed for "
+                    + entry.OfficialSpawnRecordId);
+            }
+
             var controller = new NPCController
             {
                 AiProfile = NpcAiProfile.Passive,
@@ -306,6 +316,12 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
             character.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.side,
                 (uint)Side.Neutral);
+            character.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.catmesh,
+                (uint)entry.SelectedCatMeshId);
+            character.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.displaycatmesh,
+                (uint)entry.SelectedCatMeshId);
             uint flags = (uint)character.Stats[StatIds.flags].Value;
             character.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.flags,

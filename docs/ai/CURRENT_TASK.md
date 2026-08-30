@@ -19,6 +19,8 @@ identity/behavior activation gates.
   unresolved.
 - Runtime placeholders use normal transient identities, passive/immune combat
   guards, and no XP, loot, mission, pathing, or production-spawn authority.
+- Capture-correlated and unresolved rows use `default_monster.cir` CatMesh
+  `26884`; only exact FDQO retains its mapped CatMesh `15222`.
 
 ## Current ACG schema checkpoint
 
