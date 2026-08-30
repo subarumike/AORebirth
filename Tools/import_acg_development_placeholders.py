@@ -577,8 +577,9 @@ def build_generated_files(
             "RuntimeIdentityUsesSourceIdentity": False,
             "CaptureCorrelationPromotesExactIdentity": False,
             "AdditionalPointRuntimeSemanticsProven": False,
-            "DefaultPlaceholderVisualSource": "default_monster.cir",
-            "DefaultPlaceholderCatMeshId": 26884,
+            "DefaultPlaceholderVisualSource": "items.dat Item 283862 Mesh stat 12",
+            "DefaultPlaceholderItemId": 283862,
+            "DefaultPlaceholderMeshId": 9013,
             "RespawnChanceFieldName": "RespawnChanceRaw",
         },
     }

@@ -144,11 +144,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .Where(row => row.UseExactOfficialVisual)
                 .All(row => row.SelectedCatMeshId == 15222));
             Assert.IsTrue(primary
-                .Where(row => !row.UseExactOfficialVisual)
-                .All(row => row.SelectedCatMeshId == 26884));
+                .Where(row => row.UseExactOfficialVisual)
+                .All(row => !row.SelectedItemId.HasValue && !row.SelectedMeshId.HasValue));
             Assert.IsTrue(primary
                 .Where(row => !row.UseExactOfficialVisual)
-                .All(row => row.SelectedVisualSource == "default_monster.cir"));
+                .All(row => !row.SelectedCatMeshId.HasValue));
+            Assert.IsTrue(primary
+                .Where(row => !row.UseExactOfficialVisual)
+                .All(row => row.SelectedItemId == 283862 && row.SelectedMeshId == 9013));
+            Assert.IsTrue(primary
+                .Where(row => !row.UseExactOfficialVisual)
+                .All(row => row.SelectedVisualSource == "items.dat Item 283862 Mesh stat 12"));
             CollectionAssert.AreEqual(new[] { 4582 }, catalog.LoadedPlayfields.ToArray());
 
             AcgDevelopmentPlaceholderManifestPlayfield capturePlayfield =
@@ -259,7 +265,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "(uint)Side.Neutral");
             StringAssert.Contains(runtime, "(int)StatIds.catmesh");
             StringAssert.Contains(runtime, "(int)StatIds.displaycatmesh");
-            StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId");
+            StringAssert.Contains(runtime, "ItemLoader.ItemList.TryGetValue");
+            StringAssert.Contains(runtime, "placeholderItem.Stats.TryGetValue((int)StatIds.mesh");
+            StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId.Value");
+            StringAssert.Contains(runtime, "(uint)entry.SelectedMeshId.Value");
             StringAssert.Contains(attackHandler, "AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder");
             StringAssert.Contains(playfield, "private void DoCombatTick(ICharacter attacker)");
             StringAssert.Contains(playfield, "private void KillNpcTarget(ICharacter attacker, ICharacter target)");
