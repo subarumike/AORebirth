@@ -3443,6 +3443,10 @@ namespace AORebirth.Core.Playfields
                 DocumentedCryptOfHomeLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any(value => value.IsActive);
+            bool hasDocumentedCamelotLoot =
+                DocumentedCamelotLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
             if (matches.Length == 0
                 && !hasCredits
                 && !hasDocumentedInnerSanctumLoot
@@ -3450,7 +3454,8 @@ namespace AORebirth.Core.Playfields
                 && !hasDocumentedStepsOfMadnessLoot
                 && !hasDocumentedSmugglersDenLoot
                 && !hasDocumentedCyborgBarracksLoot
-                && !hasDocumentedCryptOfHomeLoot) return;
+                && !hasDocumentedCryptOfHomeLoot
+                && !hasDocumentedCamelotLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3481,7 +3486,9 @@ namespace AORebirth.Core.Playfields
                                 ? DocumentedCyborgBarracksLootDefinitions.DocumentedLootSourceUrl
                                 : (hasDocumentedCryptOfHomeLoot
                                     ? DocumentedCryptOfHomeLootDefinitions.DocumentedLootSourceUrl
-                                    : null)))));
+                                    : (hasDocumentedCamelotLoot
+                                        ? DocumentedCamelotLootDefinitions.DocumentedLootSourceUrl
+                                        : null))))));
             string evidence = matches.Length > 0
                 ? repositoryEvidence
                 : (!string.IsNullOrWhiteSpace(documentedEvidence)
@@ -3513,7 +3520,9 @@ namespace AORebirth.Core.Playfields
                                     ? "legacy-range-check; cyborg-barracks-wiki-fixed-and-range-quality"
                                     : (hasDocumentedCryptOfHomeLoot
                                         ? "legacy-range-check; crypt-of-home-wiki-fixed-quality"
-                                        : "legacy-range-check"))))),
+                                        : (hasDocumentedCamelotLoot
+                                            ? "legacy-range-check; camelot-wiki-fixed-quality"
+                                            : "legacy-range-check")))))),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3544,6 +3553,10 @@ namespace AORebirth.Core.Playfields
                 table,
                 playfieldId,
                 target.Name);
+            DocumentedCamelotLootDefinitions.ApplyDocumentedLoot(
+                table,
+                playfieldId,
+                target.Name);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -3563,7 +3576,9 @@ namespace AORebirth.Core.Playfields
                                     ? (int?)DocumentedCyborgBarracksLootDefinitions.PlayfieldInstance
                                     : (hasDocumentedCryptOfHomeLoot
                                         ? (int?)DocumentedCryptOfHomeLootDefinitions.PlayfieldInstance
-                                        : null))))),
+                                        : (hasDocumentedCamelotLoot
+                                            ? (int?)DocumentedCamelotLootDefinitions.PlayfieldInstance
+                                            : null)))))),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0

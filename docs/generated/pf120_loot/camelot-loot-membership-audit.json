@@ -1,0 +1,60 @@
+{
+  "source_urls": ["https://wiki.aodb.us/wiki/Camelot"],
+  "source_pages": ["Camelot"],
+  "source_revisions": [47135],
+  "source_checked_utc": "2026-08-30",
+  "playfield_instance": 120,
+  "production_pf120_specialized_spawn_count": 0,
+  "drop_scope_count": 4,
+  "documented_mapping_count": 31,
+  "active_mapping_count": 1,
+  "inactive_mapping_count": 30,
+  "source_item_count": 31,
+  "probability_policy": "Activate only an exact numeric outcome with an unambiguous PF120 display-name scope. Retain membership-only, phase-unresolved, qualitative, and grouped-outcome rows as inactive evidence.",
+  "runtime_status": "Administrator DeValos has one active 100% Nanobot Infusion Device mapping. It remains dormant until a matching PF120 enemy is populated by an authorized runtime source.",
+  "items": [
+    { "item_id": 157856, "item_name": "The Edge of the Tarasque", "quality": 200 },
+    { "item_id": 157900, "item_name": "A Well Shaped Tool of Torturing", "quality": 200 },
+    { "item_id": 157903, "item_name": "Extra Curved Gutting Hook", "quality": 200 },
+    { "item_id": 158298, "item_name": "Dreadful Pitchfork", "quality": 1 },
+    { "item_id": 158321, "item_name": "Fork of Ghasap", "quality": 1 },
+    { "item_id": 158403, "item_name": "Fork of Ghasap (Lord Version)", "quality": 1 },
+    { "item_id": 158764, "item_name": "Sinew of Tarasque", "quality": 1 },
+    { "item_id": 158787, "item_name": "Heart of Tarasque", "quality": 1 },
+    { "item_id": 158788, "item_name": "Cloak of the Wandering Knight", "quality": 1 },
+    { "item_id": 158789, "item_name": "Smart Hood of the Wanderer", "quality": 1 },
+    { "item_id": 158790, "item_name": "Robust Backpack", "quality": 1 },
+    { "item_id": 158795, "item_name": "Gaily Painted Hood", "quality": 1 },
+    { "item_id": 158796, "item_name": "Globe of Sufferance", "quality": 1 },
+    { "item_id": 158797, "item_name": "Globe of Clarity", "quality": 1 },
+    { "item_id": 158798, "item_name": "Aura Magnifier", "quality": 100 },
+    { "item_id": 158800, "item_name": "Heavily Padded Overcoat", "quality": 1 },
+    { "item_id": 158801, "item_name": "Signet Ring of the Green Knight", "quality": 1 },
+    { "item_id": 158842, "item_name": "Typical Dragon Tooth Poker", "quality": 199 },
+    { "item_id": 158844, "item_name": "Smelly Butcher Gloves", "quality": 1 },
+    { "item_id": 158891, "item_name": "Hollow Bone Bracer of Merlin Ambrosius", "quality": 1 },
+    { "item_id": 158892, "item_name": "Chunk of Living Dragon Flesh", "quality": 100 },
+    { "item_id": 158893, "item_name": "Patch of Living Dragon Skin", "quality": 100 },
+    { "item_id": 158894, "item_name": "Piece of Living Dragon Wing", "quality": 100 },
+    { "item_id": 158895, "item_name": "Lump of Living Dragon Marrow", "quality": 100 },
+    { "item_id": 158896, "item_name": "Shard of Living Dragon Skull", "quality": 100 },
+    { "item_id": 159136, "item_name": "Heavy-Headed Hardwood Staff", "quality": 200 },
+    { "item_id": 200818, "item_name": "Corroded Ring", "quality": 100 },
+    { "item_id": 255552, "item_name": "Pattern of Inevitable Death", "quality": 200 },
+    { "item_id": 255553, "item_name": "Pattern of Imminent Death", "quality": 200 },
+    { "item_id": 275382, "item_name": "Nanobot Infusion Device", "quality": 1 },
+    { "item_id": 301127, "item_name": "Living Dragon Claws", "quality": 100 }
+  ],
+  "active_mappings": [
+    { "enemy_key": "camelot.120.boss.administrator-devalos", "enemy_name": "Administrator DeValos", "item_id": 275382, "outcome": "exclusive 100% Nanobot Infusion Device", "probability_source_revision": 47135 }
+  ],
+  "inactive_membership_summary": [
+    { "enemy_key": "camelot.120.boss.morgan-le-faye", "mapping_count": 2, "reason": "Two memberships are published without numeric rates." },
+    { "enemy_key": "camelot.120.boss.lord-ghasap", "mapping_count": 6, "reason": "The section covers two boss phases but does not publish phase-specific memberships or numeric rates." },
+    { "enemy_key": "camelot.120.boss.tarasque", "mapping_count": 22, "reason": "The page says only a handful drop and none are 100%; it does not publish the outcome size or per-item probabilities." }
+  ],
+  "excluded_unresolved_source_rows": [
+    { "item_name": "Ghasap's Minion loot", "reason": "Six item names are listed without exact linked item templates or numeric rates." },
+    { "item_name": "Lord Ghasap's Elite loot", "reason": "The source explicitly states that the four bodyguards do not drop loot." }
+  ]
+}
