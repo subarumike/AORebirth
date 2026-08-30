@@ -7245,6 +7245,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ZoneClientDisconnectCannotWaitForeverForBlockedOutboundDispatcher()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string zoneClientText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
+            string disposeMethod = ExtractMethodBlock(
+                zoneClientText,
+                "protected override void Dispose(bool disposing)");
+            string sendMethod = ExtractMethodBlock(
+                zoneClientText,
+                "private void SendCompressed(byte[] buffer, bool traceQuestNpcTransport)");
+
+            Assert.IsFalse(
+                disposeMethod.Contains("while (this.stopDispatcher)"),
+                "Disconnect must never spin forever waiting for a blocked outbound dispatcher.");
+            AssertTextBefore(
+                disposeMethod,
+                "this.AbortTcpTransportQuietly();",
+                "this.dispatcherThread.Join(DispatcherStopTimeoutMilliseconds)");
+            Assert.IsTrue(
+                disposeMethod.Contains("continuing bounded disconnect cleanup"),
+                "A dispatcher timeout must continue cleanup instead of wedging the server client registry.");
+            Assert.IsTrue(
+                zoneClientText.Contains("this.TcpSocket.SendTimeout = TransportSendTimeoutMilliseconds;")
+                && zoneClientText.Contains("this.dispatcherThread.IsBackground = true;"),
+                "Outbound writes and dispatcher process lifetime must both be bounded.");
+            Assert.IsTrue(
+                sendMethod.Contains("disconnectAfterTransportFailure && !this.disposed && !this.stopDispatcher"),
+                "A dispatcher released by disposal must not recursively enter server disconnect.");
+        }
+
+        [TestMethod]
         public void ExistingCharacterSnapshotsInitializeOnceFromClientConnectedWithoutInboundCharInPlay()
         {
             string repositoryRoot = FindRepositoryRoot();
