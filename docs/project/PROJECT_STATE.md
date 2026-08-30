@@ -19,9 +19,10 @@ completion matrices and dated evidence retain detailed provenance.
   provenance without changing Legacy or production spawn authority. Evidence
   grades remain one `ExactOfficial`, four capture-correlated, and 4,011
   unresolved. See `docs/reference/ACG_DEVELOPMENT_PLACEHOLDERS.md`.
-  Capture-correlated and unresolved development entities use Mesh `9013`,
-  resolved from local `items.dat` Item `283862` (`No No Placard`) stat `mesh` /
-  `12`; FDQO retains exact CatMesh `15222`.
+  Capture-correlated and unresolved development entities use equipped Mesh
+  `283882`, resolved from local `items.dat` Item `283862` (`No No Placard`) stat
+  `209`, with inherited construction MonsterData/CatMesh cleared; FDQO retains
+  exact CatMesh `15222`.
 
 - ACG placement/spawn-policy schema: the official `18.8.62_EP1`
   ResourceDatabase type-`1000014` corpus is the authoritative placement layer.

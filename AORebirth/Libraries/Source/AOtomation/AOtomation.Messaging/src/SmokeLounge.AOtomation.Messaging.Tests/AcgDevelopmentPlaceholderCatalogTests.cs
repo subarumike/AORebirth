@@ -151,10 +151,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .All(row => !row.SelectedCatMeshId.HasValue));
             Assert.IsTrue(primary
                 .Where(row => !row.UseExactOfficialVisual)
-                .All(row => row.SelectedItemId == 283862 && row.SelectedMeshId == 9013));
+                .All(row => row.SelectedItemId == 283862 && row.SelectedMeshId == 283882));
             Assert.IsTrue(primary
                 .Where(row => !row.UseExactOfficialVisual)
-                .All(row => row.SelectedVisualSource == "items.dat Item 283862 Mesh stat 12"));
+                .All(row => row.SelectedVisualSource == "items.dat Item 283862 equipped-mesh stat 209"));
             CollectionAssert.AreEqual(new[] { 4582 }, catalog.LoadedPlayfields.ToArray());
 
             AcgDevelopmentPlaceholderManifestPlayfield capturePlayfield =
@@ -266,9 +266,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "(int)StatIds.catmesh");
             StringAssert.Contains(runtime, "(int)StatIds.displaycatmesh");
             StringAssert.Contains(runtime, "ItemLoader.ItemList.TryGetValue");
-            StringAssert.Contains(runtime, "placeholderItem.Stats.TryGetValue((int)StatIds.mesh");
+            StringAssert.Contains(runtime, "DefaultPlaceholderMeshStatId");
             StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId.Value");
-            StringAssert.Contains(runtime, "(uint)entry.SelectedMeshId.Value");
+            StringAssert.Contains(runtime, "(int)StatIds.monsterdata");
+            StringAssert.Contains(runtime, "character.MeshLayer.Clear()");
+            StringAssert.Contains(runtime, "character.MeshLayer.AddMesh(");
+            StringAssert.Contains(runtime, "entry.SelectedMeshId.Value");
             StringAssert.Contains(attackHandler, "AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder");
             StringAssert.Contains(playfield, "private void DoCombatTick(ICharacter attacker)");
             StringAssert.Contains(playfield, "private void KillNpcTarget(ICharacter attacker, ICharacter target)");

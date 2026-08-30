@@ -19,9 +19,10 @@ identity/behavior activation gates.
   unresolved.
 - Runtime placeholders use normal transient identities, passive/immune combat
   guards, and no XP, loot, mission, pathing, or production-spawn authority.
-- Capture-correlated and unresolved rows use Mesh `9013`, resolved from local
-  `items.dat` Item `283862` (`No No Placard`) stat `mesh` / `12`; only exact
-  FDQO retains its mapped CatMesh `15222`.
+- Capture-correlated and unresolved rows use equipped Mesh `283882`, resolved
+  from local `items.dat` Item `283862` (`No No Placard`) stat `209`, with the
+  inherited construction MonsterData/CatMesh cleared; only exact FDQO retains
+  its mapped CatMesh `15222`.
 
 ## Current ACG schema checkpoint
 
