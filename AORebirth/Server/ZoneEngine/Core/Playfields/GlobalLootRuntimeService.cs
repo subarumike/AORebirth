@@ -3422,12 +3422,17 @@ namespace AORebirth.Core.Playfields
                 DocumentedSmugglersDenLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any(value => value.IsActive);
+            bool hasDocumentedCyborgBarracksLoot =
+                DocumentedCyborgBarracksLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
             if (matches.Length == 0
                 && !hasCredits
                 && !hasDocumentedInnerSanctumLoot
                 && !hasDocumentedForemansLoot
                 && !hasDocumentedStepsOfMadnessLoot
-                && !hasDocumentedSmugglersDenLoot) return;
+                && !hasDocumentedSmugglersDenLoot
+                && !hasDocumentedCyborgBarracksLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3454,7 +3459,9 @@ namespace AORebirth.Core.Playfields
                         ? DocumentedStepsOfMadnessLootDefinitions.DocumentedLootSourceUrl
                         : (hasDocumentedSmugglersDenLoot
                             ? DocumentedSmugglersDenLootDefinitions.DocumentedLootSourceUrl
-                            : null)));
+                            : (hasDocumentedCyborgBarracksLoot
+                                ? DocumentedCyborgBarracksLootDefinitions.DocumentedLootSourceUrl
+                                : null))));
             string evidence = matches.Length > 0
                 ? repositoryEvidence
                 : (!string.IsNullOrWhiteSpace(documentedEvidence)
@@ -3482,7 +3489,9 @@ namespace AORebirth.Core.Playfields
                             ? "legacy-range-check; steps-of-madness-wiki-fixed-quality"
                             : (hasDocumentedSmugglersDenLoot
                                 ? "legacy-range-check; smugglers-den-wiki-fixed-quality"
-                                : "legacy-range-check"))),
+                                : (hasDocumentedCyborgBarracksLoot
+                                    ? "legacy-range-check; cyborg-barracks-wiki-fixed-and-range-quality"
+                                    : "legacy-range-check")))),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3505,6 +3514,10 @@ namespace AORebirth.Core.Playfields
                 table,
                 playfieldId,
                 target.Name);
+            DocumentedCyborgBarracksLootDefinitions.ApplyDocumentedLoot(
+                table,
+                playfieldId,
+                target.Name);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -3520,7 +3533,9 @@ namespace AORebirth.Core.Playfields
                             ? (int?)DocumentedStepsOfMadnessLootDefinitions.PlayfieldInstance
                             : (hasDocumentedSmugglersDenLoot
                                 ? (int?)DocumentedSmugglersDenLootDefinitions.PlayfieldInstance
-                                : null))),
+                                : (hasDocumentedCyborgBarracksLoot
+                                    ? (int?)DocumentedCyborgBarracksLootDefinitions.PlayfieldInstance
+                                    : null)))),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0

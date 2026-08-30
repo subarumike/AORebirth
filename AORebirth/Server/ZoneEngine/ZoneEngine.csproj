@@ -681,6 +681,7 @@
     <Compile Include="Core\Playfields\DocumentedForemansLootDefinitions.cs" />
     <Compile Include="Core\Playfields\DocumentedStepsOfMadnessLootDefinitions.cs" />
     <Compile Include="Core\Playfields\DocumentedSmugglersDenLootDefinitions.cs" />
+    <Compile Include="Core\Playfields\DocumentedCyborgBarracksLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs" />
