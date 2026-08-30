@@ -656,10 +656,13 @@ cmd /d /c MSBuild.exe tools-temp\AOSharpCaptureAnalyzer\AOSharpCaptureAnalyzer.c
 cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe --self-test
 cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py --self-test
 cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe "<capture-folder>"
+cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe --decode-loot "<capture-folder>"
 cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <capture-folder>
 ```
 
-Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
+Run the analyzer first to recover direct SCFU evidence from raw packets, run
+`--decode-loot` to recover raw inventory snapshots and item transfers, then run
+the lifecycle decoder to rebuild correlated NPC lifecycle and corpse-loot outputs.
 
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
