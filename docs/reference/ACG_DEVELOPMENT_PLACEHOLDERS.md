@@ -46,13 +46,10 @@ Current grades are:
 
 Only `ExactOfficial` may select its mapped visual automatically. FDQO retains
 the exact `A004` / CatMesh `15222` Beach Leet appearance. Every
-capture-correlated or unresolved row uses equipped Mesh `283882`, resolved
-directly from local `items.dat` Item `283862` (`No No Placard`) stat `209`, as
-the explicit development placeholder and must never be described as the real
-unresolved mob. Item stat `mesh` / `12` (`9013`) is the inventory-item mesh and
-does not populate the SimpleChar mesh list. The existing `A004` template remains
-only the safe NPC construction pipeline before its monster appearance is
-cleared and the equipped-mesh layer is applied.
+capture-correlated or unresolved row uses `default_monster.cir`, CatMesh
+`26884`, as the explicit development placeholder and must never be described
+as the real unresolved mob. The existing `A004` template remains only the safe
+NPC construction pipeline before the placeholder CatMesh override is applied.
 
 ## Modes
 
@@ -69,16 +66,18 @@ existing pool allocator. ACG keys, resource IDs, ordinals, and stable source IDs
 are never used as runtime entity IDs. Full source provenance is retained in the
 server-side development registry even when the visible name is shortened.
 
-Placeholders verify Item `283862` still resolves stat `209` to equipped Mesh
-`283882` in the loaded `items.dat`. They clear the construction template's
-MonsterData, CatMesh, DisplayCatMesh, head, texture, and mesh layers, then put
-Mesh `283882` in the normal right-hand SimpleChar mesh slot. They use a passive
+Placeholders set both `catmesh` and `displaycatmesh` to `26884`, use a passive
 idle controller, neutral side, the existing immune flag plus explicit combat
 guards, no combat contract, no loot registration, and no mission/XP completion
-path. Exact FDQO continues to set `catmesh` and `displaycatmesh` to `15222`.
-Placeholders have no waypoints and do not run NPC timers. No proven server-side
+path. They have no waypoints and do not run NPC timers. No proven server-side
 non-collision switch is available on this path, so collision suppression
 remains explicitly unclaimed.
+
+The reliable in-client identifier is the forced-visible blue nameplate, not a
+replacement item mesh. Primary rows use `[KNOWN] ACG ...`, `[PARTIAL] ACG ...`,
+or `[NO DATA] ACG ...`. The unchanged proven placeholder appearance remains a
+construction detail; `[NO DATA]` is the direct signal that the placement has no
+resolved visual identity.
 
 ## Operator guide
 

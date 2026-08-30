@@ -142,19 +142,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(9, primary.Count(row => row.UseExactOfficialVisual));
             Assert.IsTrue(primary
                 .Where(row => row.UseExactOfficialVisual)
-                .All(row => row.SelectedCatMeshId == 15222));
+                .All(row => row.VisibleName.StartsWith("[KNOWN] ACG ", StringComparison.Ordinal)));
+            Assert.IsTrue(primary
+                .Where(row => row.EvidenceGrade == AcgVisualEvidenceGrade.Unresolved)
+                .All(row => row.VisibleName.StartsWith("[NO DATA] ACG ", StringComparison.Ordinal)));
             Assert.IsTrue(primary
                 .Where(row => row.UseExactOfficialVisual)
-                .All(row => !row.SelectedItemId.HasValue && !row.SelectedMeshId.HasValue));
+                .All(row => row.SelectedCatMeshId == 15222));
             Assert.IsTrue(primary
                 .Where(row => !row.UseExactOfficialVisual)
-                .All(row => !row.SelectedCatMeshId.HasValue));
+                .All(row => row.SelectedCatMeshId == 26884));
             Assert.IsTrue(primary
                 .Where(row => !row.UseExactOfficialVisual)
-                .All(row => row.SelectedItemId == 283862 && row.SelectedMeshId == 283882));
-            Assert.IsTrue(primary
-                .Where(row => !row.UseExactOfficialVisual)
-                .All(row => row.SelectedVisualSource == "items.dat Item 283862 equipped-mesh stat 209"));
+                .All(row => row.SelectedVisualSource == "default_monster.cir"));
             CollectionAssert.AreEqual(new[] { 4582 }, catalog.LoadedPlayfields.ToArray());
 
             AcgDevelopmentPlaceholderManifestPlayfield capturePlayfield =
@@ -263,15 +263,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "return 0;");
             StringAssert.Contains(runtime, "DoNotDoTimers = true");
             StringAssert.Contains(runtime, "(uint)Side.Neutral");
+            StringAssert.Contains(runtime, "(uint)CharacterFlags.HasVisibleName");
             StringAssert.Contains(runtime, "(int)StatIds.catmesh");
             StringAssert.Contains(runtime, "(int)StatIds.displaycatmesh");
-            StringAssert.Contains(runtime, "ItemLoader.ItemList.TryGetValue");
-            StringAssert.Contains(runtime, "DefaultPlaceholderMeshStatId");
-            StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId.Value");
-            StringAssert.Contains(runtime, "(int)StatIds.monsterdata");
-            StringAssert.Contains(runtime, "character.MeshLayer.Clear()");
-            StringAssert.Contains(runtime, "character.MeshLayer.AddMesh(");
-            StringAssert.Contains(runtime, "entry.SelectedMeshId.Value");
+            StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId");
             StringAssert.Contains(attackHandler, "AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder");
             StringAssert.Contains(playfield, "private void DoCombatTick(ICharacter attacker)");
             StringAssert.Contains(playfield, "private void KillNpcTarget(ICharacter attacker, ICharacter target)");
