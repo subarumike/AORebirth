@@ -1112,6 +1112,14 @@ def identity_key(value):
     return f"{identity_type.upper()}:{instance}"
 
 
+def enemy_name_from_corpse(row):
+    corpse_name = (row.get("CorpseName", "") or "").strip()
+    prefix = "Remains of "
+    if not corpse_name.startswith(prefix):
+        return ""
+    return corpse_name[len(prefix):].strip()
+
+
 def load_corpse_gone_times(path):
     gone_times = collections.defaultdict(list)
     if not path.exists():
@@ -1305,7 +1313,9 @@ def rebind_corpse_loot_observations(
                 "OpenOrdinal": str(open_ordinal),
                 "InitialSnapshot": "true" if open_ordinal == 1 else "false",
                 "DeadNpcIdentity": dead_npc_identity,
-                "EnemyName": profile.get("Name", ""),
+                "EnemyName": profile.get("Name", "") or enemy_name_from_corpse(
+                    generation_update
+                ),
                 "MonsterData": generation_update.get("CorpseMonsterData", ""),
                 "EnemyLevel": profile.get("Level", ""),
                 "CorpseCredits": generation_update.get("CorpseCredits", ""),
@@ -1505,6 +1515,14 @@ def run_self_tests():
     test_root = Path(__file__).resolve().parent
     with tempfile.TemporaryDirectory(prefix=".npc-lifecycle-self-test-", dir=test_root) as name:
         root = Path(name)
+
+        self_test_check(
+            enemy_name_from_corpse({"CorpseName": "Remains of Ilari Khazoh Ra"})
+            == "Ilari Khazoh Ra"
+            and enemy_name_from_corpse({"CorpseName": "Unrelated label"}) == "",
+            "corpse names must provide an exact fallback enemy name",
+        )
+        tests.append("corpse-name-fallback")
 
         raw_only = root / "raw-index-only"
         raw_only.mkdir()
