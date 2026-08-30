@@ -1223,6 +1223,39 @@ namespace AOSharpCaptureAnalyzer
                     terminalSpecialAttack.Unknown4.GetValueOrDefault(),
                     "Observed terminal special-attack Unknown4 preserved");
 
+                byte[] flags2Fc4OmittedSlotsPacket = ReplaceScfuTail(
+                    abmouthPacket,
+                    FromHex(
+                        "00000FC40004"
+                        + "191C0004191D4C5347584C5347580004"
+                        + "19190004191A50475856504758560004"
+                        + "1916000419174D4F5A534D4F5A530000"
+                        + "000000"));
+                RawSimpleCharFullUpdate flags2Fc4OmittedSlots =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(flags2Fc4OmittedSlotsPacket);
+                Assert(
+                    flags2Fc4OmittedSlots.DecodeFullyConsumed,
+                    "Observed flags2 FC4 omitted special-attack slots fully decoded");
+                Assert(
+                    flags2Fc4OmittedSlots.TerminalSpecialAttackSlotOmitted,
+                    "Observed flags2 FC4 omitted special-attack slots recorded");
+
+                byte[] flags2Bd3OmittedSlotsPacket = ReplaceScfuTail(
+                    abmouthPacket,
+                    FromHex(
+                        "00000BD30004"
+                        + "19B6000419B74C50504B4C50504B0004"
+                        + "19B3000419B44B46504F4B46504F0000"
+                        + "000000"));
+                RawSimpleCharFullUpdate flags2Bd3OmittedSlots =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(flags2Bd3OmittedSlotsPacket);
+                Assert(
+                    flags2Bd3OmittedSlots.DecodeFullyConsumed,
+                    "Observed flags2 BD3 omitted special-attack slots fully decoded");
+                Assert(
+                    flags2Bd3OmittedSlots.TerminalSpecialAttackSlotOmitted,
+                    "Observed flags2 BD3 omitted special-attack slots recorded");
+
                 RawSimpleCharFullUpdate characterTowerFlag =
                     RawSimpleCharFullUpdateDecoder.DecodePacket(
                         FromHex(CharacterTowerFlagPacketHex));

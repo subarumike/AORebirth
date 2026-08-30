@@ -404,6 +404,11 @@ namespace AORebirth.CaptureProtocol
                 var attacks = new RawScfuSpecialAttack[count];
                 for (int i = 0; i < count; i++)
                 {
+                    if (result.TerminalSpecialAttackSlotOmitted)
+                    {
+                        break;
+                    }
+
                     if (IsObservedOpaqueExtensionBeforeDeclaredSpecialAttackSlots(result, reader))
                     {
                         result.TerminalSpecialAttackSlotOmitted = true;
@@ -560,9 +565,7 @@ namespace AORebirth.CaptureProtocol
             int index,
             int count)
         {
-            return result.Flags2 == 0x000007E2
-                   && Has(result.Flags, IsNpc)
-                   && Has(result.Flags2, Flags2Unknown1)
+            return Has(result.Flags2, Flags2Unknown1)
                    && index < count
                    && reader.Remaining == 1
                    && reader.PeekByte(0) == 0;
@@ -582,16 +585,19 @@ namespace AORebirth.CaptureProtocol
             int index,
             int count)
         {
-            if (index == count - 1
-                && reader.Remaining == 1
+            if (reader.Remaining == 1
                 && reader.PeekByte(0) == 0)
             {
-                if (Has(result.Flags2, Flags2Unknown1))
+                if (index < count - 1)
                 {
-                    return 0;
+                    result.TerminalSpecialAttackSlotOmitted = true;
                 }
 
-                reader.ReadByte("TerminalSpecialAttackUnknown6");
+                if (!Has(result.Flags2, Flags2Unknown1))
+                {
+                    reader.ReadByte("TerminalSpecialAttackUnknown6");
+                }
+
                 return 0;
             }
 
