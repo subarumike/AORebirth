@@ -132,9 +132,11 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
 
     internal sealed class AcgDevelopmentPlaceholderCatalog
     {
-        internal const string DefaultPlaceholderVisualSource = "default_monster.cir";
+        internal const string DefaultPlaceholderVisualSource = "items.dat Item 283862 Mesh stat 12";
 
-        internal const int DefaultPlaceholderCatMeshId = 26884;
+        internal const int DefaultPlaceholderItemId = 283862;
+
+        internal const int DefaultPlaceholderMeshId = 9013;
 
         internal const int ExactFdqoCatMeshId = 15222;
 
@@ -504,9 +506,13 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
                     StringComparison.Ordinal),
                 "Default placeholder visual source drifted.");
             RequireValue(
-                this.manifest.Policy.DefaultPlaceholderCatMeshId,
-                DefaultPlaceholderCatMeshId,
-                "Default placeholder CatMesh drifted.");
+                this.manifest.Policy.DefaultPlaceholderItemId,
+                DefaultPlaceholderItemId,
+                "Default placeholder item source drifted.");
+            RequireValue(
+                this.manifest.Policy.DefaultPlaceholderMeshId,
+                DefaultPlaceholderMeshId,
+                "Default placeholder Mesh drifted.");
             Require(string.Equals(this.manifest.Policy.RespawnChanceFieldName, "RespawnChanceRaw", StringComparison.Ordinal),
                 "Respawn chance raw-field boundary drifted.");
 
@@ -654,9 +660,15 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
                 RespawnTimeRaw = record.RespawnTimeRaw.Value,
                 VisibleName = CreateVisibleName(record, additionalPointOrdinal),
                 UseExactOfficialVisual = visual.EvidenceGrade == "ExactOfficial",
+                SelectedItemId = visual.EvidenceGrade == "ExactOfficial"
+                    ? (int?)null
+                    : DefaultPlaceholderItemId,
+                SelectedMeshId = visual.EvidenceGrade == "ExactOfficial"
+                    ? (int?)null
+                    : DefaultPlaceholderMeshId,
                 SelectedCatMeshId = visual.EvidenceGrade == "ExactOfficial"
-                    ? ExactFdqoCatMeshId
-                    : DefaultPlaceholderCatMeshId,
+                    ? (int?)ExactFdqoCatMeshId
+                    : null,
                 SelectedVisualSource = visual.EvidenceGrade == "ExactOfficial"
                     ? "ExactOfficial FDQO"
                     : DefaultPlaceholderVisualSource,
@@ -814,7 +826,9 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
         public double RespawnTimeRaw { get; set; }
         public string VisibleName { get; set; }
         public bool UseExactOfficialVisual { get; set; }
-        public int SelectedCatMeshId { get; set; }
+        public int? SelectedItemId { get; set; }
+        public int? SelectedMeshId { get; set; }
+        public int? SelectedCatMeshId { get; set; }
         public string SelectedVisualSource { get; set; }
         public bool CanAttack { get; set; }
         public bool CanAggro { get; set; }
@@ -980,7 +994,8 @@ namespace AORebirth.Core.Playfields.OfficialPlacements
         public bool? CaptureCorrelationPromotesExactIdentity { get; set; }
         public bool? AdditionalPointRuntimeSemanticsProven { get; set; }
         public string DefaultPlaceholderVisualSource { get; set; }
-        public int? DefaultPlaceholderCatMeshId { get; set; }
+        public int? DefaultPlaceholderItemId { get; set; }
+        public int? DefaultPlaceholderMeshId { get; set; }
         public string RespawnChanceFieldName { get; set; }
     }
 
