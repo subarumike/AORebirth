@@ -201,6 +201,22 @@ namespace AOSharpCaptureAnalyzer
             return errors == 0 ? 0 : 1;
         }
 
+        internal static void RunSelfTest()
+        {
+            string actual = IdentityText(
+                new Identity { Type = IdentityType.Corpse, Instance = 868353 });
+            const string expected = "Corpse:000D4001";
+            if (!string.Equals(actual, expected, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "Loot identity formatting mismatch. Expected "
+                    + expected
+                    + " but found "
+                    + actual
+                    + ".");
+            }
+        }
+
         private static T Deserialize<T>(SerializerResolver resolver, byte[] body)
             where T : MessageBody
         {
@@ -311,7 +327,11 @@ namespace AOSharpCaptureAnalyzer
 
         private static string IdentityText(Identity identity)
         {
-            return identity == null ? string.Empty : identity.ToString();
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}:{1:X8}",
+                identity.Type,
+                unchecked((uint)identity.Instance));
         }
 
         private static string Csv(string value)
