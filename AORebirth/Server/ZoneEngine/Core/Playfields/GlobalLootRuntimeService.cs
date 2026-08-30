@@ -902,6 +902,9 @@ namespace AORebirth.Core.Playfields
                 targetLevel,
                 tableKey,
                 assignmentKey);
+            CapturedTempleOfThreeWindsLootDefinitions.ApplyDocumentedMembership(
+                adapted.Table,
+                profile.ProfileKey);
             this.registry.RegisterTableAndAssignment(adapted.Table, adapted.Assignment);
         }
 

@@ -1,6 +1,7 @@
 namespace AORebirth.Core.Playfields
 {
     using System;
+    using System.Linq;
 
     internal static class CapturedTempleOfThreeWindsLootDefinitions
     {
@@ -34,6 +35,11 @@ namespace AORebirth.Core.Playfields
         internal const int DefenderCredits = 1450;
         internal const int DefenderFirstItem = 204750;
         internal const int DefenderSecondItem = 204649;
+
+        internal const string DocumentedLootSourceUrl =
+            "https://wiki.aodb.us/wiki/Temple_of_Three_Winds#Loot";
+        internal const string DocumentedLootGroupPrefix =
+            "documented.aowiki.totw.loot-membership.";
 
         private const string DefenderEvidence =
             "official-live captures 20260721-035526/040249/040324: two exact Defender of the Three "
@@ -143,6 +149,7 @@ namespace AORebirth.Core.Playfields
 
             if (!registry.ContainsTable(table.LootTableKey))
             {
+                ApplyDocumentedMembership(table, profileKey);
                 registry.RegisterTable(table);
                 registry.RegisterAssignment(
                     new LootAssignmentDefinition
@@ -162,6 +169,117 @@ namespace AORebirth.Core.Playfields
             }
 
             return true;
+        }
+
+        internal static bool ApplyDocumentedMembership(
+            LootTableDefinition table,
+            string profileKey)
+        {
+            if (table == null || string.IsNullOrWhiteSpace(profileKey))
+            {
+                return false;
+            }
+
+            int[] itemIds = DocumentedItemIdsForProfile(profileKey);
+            if (itemIds.Length == 0)
+            {
+                return false;
+            }
+
+            string groupKey = DocumentedLootGroupPrefix + profileKey;
+            LootGroupDefinition[] existing = table.RollGroups
+                ?? new LootGroupDefinition[0];
+            if (existing.Any(
+                    value => string.Equals(
+                        value.LootGroupKey,
+                        groupKey,
+                        StringComparison.Ordinal)))
+            {
+                return true;
+            }
+
+            table.RollGroups = existing.Concat(
+                new[]
+                {
+                    new LootGroupDefinition
+                    {
+                        LootGroupKey = groupKey,
+                        RollMode = LootRollMode.WeightedOne,
+                        RollCount = 1,
+                        EmptyWeight = 0,
+                        DropChanceBasisPoints = 10000,
+                        Entries = itemIds
+                            .Distinct()
+                            .OrderBy(value => value)
+                            .Select(DocumentedEntry)
+                            .ToArray(),
+                        Conditions = new string[0]
+                    }
+                }).ToArray();
+            table.AllowsDocumentedSupplement = true;
+            return true;
+        }
+
+        internal static int[] DocumentedItemIdsForProfile(string profileKey)
+        {
+            switch (profileKey)
+            {
+                case DefenderProfileKey:
+                    return new[] { 204649, 204750, 204756 };
+                case YatilaProfileKey:
+                    return new[] { 204576, 204596, 204653, 204760, 275083 };
+                case ReAnimatorProfileKey:
+                    return new[] { 204698, 204708, 204751, 275083 };
+                case BetanyProfileKey:
+                    return new[] { 204572 };
+                case CuratorProfileKey:
+                    return new[] { 204575, 204577, 204578, 204651, 204758 };
+                case NematetProfileKey:
+                    return new[] { 204595, 204613, 204647, 204651, 204706 };
+                case GuardianProfileKey:
+                    return new[] { 204601, 204748, 204756 };
+                case GartuaProfileKey:
+                    return new[] { 204650 };
+                case UkleshProfileKey:
+                    return new[] { 204653, 204739, 204757 };
+                case KhalumProfileKey:
+                    return new[] { 204598 };
+                case AzturProfileKey:
+                    return new[] { 204593, 204647, 204755, 204765 };
+                case CapturedTempleOfThreeWindsContentProvider.DeathlessLegionnaireProfileKey:
+                    return new[] { 204746 };
+                case CapturedTempleOfThreeWindsContentProvider.EternalSentinelProfileKey:
+                    return new[] { 160210, 160213, 160216, 160273 };
+                case CapturedTempleOfThreeWindsContentProvider.MurialProfileKey:
+                    return new[] { 204571 };
+                default:
+                    return profileKey.StartsWith(
+                        "totw.cultist.",
+                        StringComparison.Ordinal)
+                        ? new[] { 204571 }
+                        : new int[0];
+            }
+        }
+
+        private static LootEntryDefinition DocumentedEntry(int itemId)
+        {
+            return new LootEntryDefinition
+            {
+                ItemTemplateId = itemId,
+                HighItemTemplateId = itemId,
+                FixedQuality = 1,
+                MinimumQuality = 1,
+                MaximumQuality = 1,
+                MinimumQuantity = 1,
+                MaximumQuantity = 1,
+                Weight = 1,
+                DropChanceBasisPoints = 0,
+                UniquePerCorpse = true,
+                Semantics = LootSemantics.WeightedDocumented,
+                Evidence = LootEvidenceConfidence.CommunityDocumented,
+                EvidenceReference = DocumentedLootSourceUrl,
+                ProbabilityEvidence = "unresolved-membership-only"
+            };
         }
 
         internal static LootTableDefinition BuildDefenderLootTable()

@@ -2,7 +2,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Web.Script.Serialization;
     using AORebirth.Core.Playfields;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ZoneEngine.Core.Playfields;
@@ -725,6 +727,217 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 200,
                 CapturedTempleOfThreeWindsLootDefinitions.BuildNematetLootTable().ObservedCorpseSnapshots[0].Entries[0].FixedQuality);
+        }
+
+        [TestMethod]
+        public void TempleWikiMembershipCoversEveryImplementedExactNpcMapping()
+        {
+            var expected = new Dictionary<string, int[]>(StringComparer.Ordinal)
+            {
+                { CapturedTempleOfThreeWindsLootDefinitions.DefenderProfileKey, new[] { 204649, 204750, 204756 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.YatilaProfileKey, new[] { 204576, 204596, 204653, 204760, 275083 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.GulardProfileKey, new int[0] },
+                { CapturedTempleOfThreeWindsLootDefinitions.ReAnimatorProfileKey, new[] { 204698, 204708, 204751, 275083 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey, new[] { 204572 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.CuratorProfileKey, new[] { 204575, 204577, 204578, 204651, 204758 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey, new[] { 204595, 204613, 204647, 204651, 204706 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey, new[] { 204601, 204748, 204756 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey, new[] { 204650 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.UkleshProfileKey, new[] { 204653, 204739, 204757 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.KhalumProfileKey, new[] { 204598 } },
+                { CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey, new[] { 204593, 204647, 204755, 204765 } }
+            };
+
+            foreach (KeyValuePair<string, int[]> row in expected)
+            {
+                CollectionAssert.AreEqual(
+                    row.Value,
+                    CapturedTempleOfThreeWindsLootDefinitions
+                        .DocumentedItemIdsForProfile(row.Key));
+            }
+
+            OrdinaryEnemyProfile[] ordinary =
+                new CapturedTempleOfThreeWindsContentProvider().GetProfiles();
+            Assert.AreEqual(10, ordinary.Length);
+            foreach (OrdinaryEnemyProfile profile in ordinary)
+            {
+                int[] itemIds = CapturedTempleOfThreeWindsLootDefinitions
+                    .DocumentedItemIdsForProfile(profile.ProfileKey);
+                if (profile.DisplayName == "Cultist"
+                    || profile.DisplayName == "Murial the Faithful")
+                {
+                    CollectionAssert.AreEqual(new[] { 204571 }, itemIds);
+                }
+                else if (profile.DisplayName == "Deathless Legionnaire")
+                {
+                    CollectionAssert.AreEqual(new[] { 204746 }, itemIds);
+                }
+                else if (profile.DisplayName == "Eternal Sentinel")
+                {
+                    CollectionAssert.AreEqual(
+                        new[] { 160210, 160213, 160216, 160273 },
+                        itemIds);
+                }
+                else
+                {
+                    Assert.Fail("Unreviewed Temple ordinary profile: " + profile.ProfileKey);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TempleWikiMembershipIsNpcSpecificAndAmbiguitiesFailClosed()
+        {
+            int[] guardian = CapturedTempleOfThreeWindsLootDefinitions
+                .DocumentedItemIdsForProfile(
+                    CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey);
+            int[] defender = CapturedTempleOfThreeWindsLootDefinitions
+                .DocumentedItemIdsForProfile(
+                    CapturedTempleOfThreeWindsLootDefinitions.DefenderProfileKey);
+            CollectionAssert.Contains(guardian, 204748);
+            CollectionAssert.DoesNotContain(defender, 204748);
+
+            string[] implementedProfiles = new[]
+                {
+                    CapturedTempleOfThreeWindsLootDefinitions.DefenderProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.YatilaProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.GulardProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.ReAnimatorProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.CuratorProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.UkleshProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.KhalumProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey
+                }
+                .Concat(
+                    new CapturedTempleOfThreeWindsContentProvider()
+                        .GetProfiles()
+                        .Select(value => value.ProfileKey))
+                .ToArray();
+            int[] productionIds = implementedProfiles
+                .SelectMany(
+                    CapturedTempleOfThreeWindsLootDefinitions
+                        .DocumentedItemIdsForProfile)
+                .Distinct()
+                .ToArray();
+            CollectionAssert.DoesNotContain(productionIds, 204614);
+            CollectionAssert.DoesNotContain(productionIds, 204725);
+
+            var unrelated = new LootTableDefinition
+            {
+                LootTableKey = "test.non-totw",
+                RollGroups = new LootGroupDefinition[0]
+            };
+            Assert.IsFalse(
+                CapturedTempleOfThreeWindsLootDefinitions
+                    .ApplyDocumentedMembership(unrelated, "subway.127.boss.abmouth"));
+            Assert.AreEqual(0, unrelated.RollGroups.Length);
+        }
+
+        [TestMethod]
+        public void TempleWikiMembershipUsesCommunityDocumentedLootLayer()
+        {
+            LootTableDefinition table =
+                CapturedTempleOfThreeWindsLootDefinitions.BuildGuardianLootTable();
+            Assert.IsTrue(
+                CapturedTempleOfThreeWindsLootDefinitions.ApplyDocumentedMembership(
+                    table,
+                    CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey));
+            LootGroupDefinition group = table.RollGroups.Single(
+                value => value.LootGroupKey.StartsWith(
+                    CapturedTempleOfThreeWindsLootDefinitions.DocumentedLootGroupPrefix,
+                    StringComparison.Ordinal));
+            Assert.AreEqual(LootRollMode.WeightedOne, group.RollMode);
+            Assert.AreEqual(1, group.RollCount);
+            Assert.AreEqual(10000, group.DropChanceBasisPoints);
+            Assert.IsTrue(table.AllowsDocumentedSupplement);
+            CollectionAssert.AreEqual(
+                new[] { 204601, 204748, 204756 },
+                group.Entries.Select(value => value.ItemTemplateId).ToArray());
+            Assert.IsTrue(group.Entries.All(
+                value => value.Semantics == LootSemantics.WeightedDocumented
+                         && value.Evidence == LootEvidenceConfidence.CommunityDocumented
+                         && value.ProbabilityEvidence == "unresolved-membership-only"));
+            Assert.AreEqual(1, table.ObservedCorpseSnapshots.Length);
+            Assert.AreEqual(4, table.ObservedCorpseSnapshots[0].Entries.Length);
+        }
+
+        [TestMethod]
+        public void TempleWikiAuditArtifactIsComplete()
+        {
+            string root = FindRepositoryRoot();
+            string artifactPath = Path.Combine(
+                root,
+                @"docs\generated\pf1931_loot\totw-loot-membership-audit.json");
+            Assert.IsTrue(File.Exists(artifactPath));
+            var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var artifact = (Dictionary<string, object>)serializer.DeserializeObject(
+                File.ReadAllText(artifactPath));
+            Assert.AreEqual(72, Convert.ToInt32(artifact["source_item_count"]));
+            Assert.AreEqual(22, Convert.ToInt32(artifact["implemented_profile_count"]));
+            Assert.AreEqual(48, Convert.ToInt32(artifact["production_profile_item_memberships"]));
+            Assert.AreEqual(36, Convert.ToInt32(artifact["production_unique_item_ids"]));
+            object[] rows = (object[])artifact["items"];
+            Assert.AreEqual(72, rows.Length);
+
+            string[] profiles = new[]
+                {
+                    CapturedTempleOfThreeWindsLootDefinitions.DefenderProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.YatilaProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.GulardProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.ReAnimatorProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.CuratorProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.UkleshProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.KhalumProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey
+                }
+                .Concat(
+                    new CapturedTempleOfThreeWindsContentProvider()
+                        .GetProfiles()
+                        .Select(value => value.ProfileKey))
+                .ToArray();
+            string[] productionMappings = profiles
+                .SelectMany(
+                    profile => CapturedTempleOfThreeWindsLootDefinitions
+                        .DocumentedItemIdsForProfile(profile)
+                        .Select(itemId => profile + ":" + itemId))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            string[] artifactMappings = rows
+                .Cast<Dictionary<string, object>>()
+                .SelectMany(
+                    row => ((object[])row["matched_profiles"])
+                        .Cast<string>()
+                        .Select(
+                            profile => profile + ":"
+                                       + Convert.ToInt32(row["item_id"])))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+            CollectionAssert.AreEqual(productionMappings, artifactMappings);
+        }
+
+        private static string FindRepositoryRoot()
+        {
+            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (current != null)
+            {
+                if (Directory.Exists(Path.Combine(current.FullName, "AORebirth"))
+                    && Directory.Exists(Path.Combine(current.FullName, "docs")))
+                {
+                    return current.FullName;
+                }
+
+                current = current.Parent;
+            }
+
+            throw new DirectoryNotFoundException("Repository root not found.");
         }
     }
 }
