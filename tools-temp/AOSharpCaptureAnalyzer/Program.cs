@@ -1553,7 +1553,8 @@ namespace AOSharpCaptureAnalyzer
                         "2026-07-08T06:06:07.9373411Z",
                         boundedExpectations),
                     "Trailing packet after finalized legacy capture excluded");
-                Console.WriteLine("SCFU decoder self-test PASS");
+                RawInventoryLootProjection.RunSelfTest();
+                Console.WriteLine("SCFU decoder and loot projection self-test PASS");
                 return 0;
             }
             catch (Exception exception)
