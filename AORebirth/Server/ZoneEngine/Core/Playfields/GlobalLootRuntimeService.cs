@@ -3426,13 +3426,18 @@ namespace AORebirth.Core.Playfields
                 DocumentedCyborgBarracksLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any(value => value.IsActive);
+            bool hasDocumentedCryptOfHomeLoot =
+                DocumentedCryptOfHomeLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
             if (matches.Length == 0
                 && !hasCredits
                 && !hasDocumentedInnerSanctumLoot
                 && !hasDocumentedForemansLoot
                 && !hasDocumentedStepsOfMadnessLoot
                 && !hasDocumentedSmugglersDenLoot
-                && !hasDocumentedCyborgBarracksLoot) return;
+                && !hasDocumentedCyborgBarracksLoot
+                && !hasDocumentedCryptOfHomeLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3461,7 +3466,9 @@ namespace AORebirth.Core.Playfields
                             ? DocumentedSmugglersDenLootDefinitions.DocumentedLootSourceUrl
                             : (hasDocumentedCyborgBarracksLoot
                                 ? DocumentedCyborgBarracksLootDefinitions.DocumentedLootSourceUrl
-                                : null))));
+                                : (hasDocumentedCryptOfHomeLoot
+                                    ? DocumentedCryptOfHomeLootDefinitions.DocumentedLootSourceUrl
+                                    : null)))));
             string evidence = matches.Length > 0
                 ? repositoryEvidence
                 : (!string.IsNullOrWhiteSpace(documentedEvidence)
@@ -3491,7 +3498,9 @@ namespace AORebirth.Core.Playfields
                                 ? "legacy-range-check; smugglers-den-wiki-fixed-quality"
                                 : (hasDocumentedCyborgBarracksLoot
                                     ? "legacy-range-check; cyborg-barracks-wiki-fixed-and-range-quality"
-                                    : "legacy-range-check")))),
+                                    : (hasDocumentedCryptOfHomeLoot
+                                        ? "legacy-range-check; crypt-of-home-wiki-fixed-quality"
+                                        : "legacy-range-check"))))),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3518,6 +3527,10 @@ namespace AORebirth.Core.Playfields
                 table,
                 playfieldId,
                 target.Name);
+            DocumentedCryptOfHomeLootDefinitions.ApplyDocumentedLoot(
+                table,
+                playfieldId,
+                target.Name);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -3535,7 +3548,9 @@ namespace AORebirth.Core.Playfields
                                 ? (int?)DocumentedSmugglersDenLootDefinitions.PlayfieldInstance
                                 : (hasDocumentedCyborgBarracksLoot
                                     ? (int?)DocumentedCyborgBarracksLootDefinitions.PlayfieldInstance
-                                    : null)))),
+                                    : (hasDocumentedCryptOfHomeLoot
+                                        ? (int?)DocumentedCryptOfHomeLootDefinitions.PlayfieldInstance
+                                        : null))))),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0

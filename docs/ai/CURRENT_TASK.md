@@ -2,15 +2,15 @@
 
 ## Active
 
-Complete the PF1833 Cyborg Barracks wiki-loot supplement. AOWiki revision 44732
-resolves 13 local source items across 13 enemy/item memberships. All rows remain
-inactive evidence because the page publishes membership-only or qualitative
-rates, including "rare" and "perhaps over 10%," rather than exact numeric drop
-outcomes. Cyborg Implants and Cyborg Death Squad Armor are excluded because the
-page scopes them outside the instance; Burnt-out Armor is an attack effect, and
-Ring of Crawling Ants is a mission reward. No PF1833 specialized population
-exists. Do not infer missing rates, outcome groups, or spawn behavior from the
-wiki.
+Complete the PF4805 Crypt of Home wiki-loot supplement. AOWiki revision 45627
+resolves 36 local source items across 64 enemy/item memberships. All rows remain
+inactive evidence because the page publishes membership-only or approximate
+rates, including "near 50% for a full team," rather than exact numeric drop
+outcomes. Skincrawler hide patches and the unnamed higher-level Cenobite Shadow
+weapon versions remain excluded because the enemy-scoped rows do not identify
+exact templates. Pyramid of Home is a separate raid instance and remains out of
+scope. No PF4805 specialized population exists. Do not infer missing rates,
+outcome groups, or spawn behavior from the wiki.
 
 ## Prior active checkpoint
 
