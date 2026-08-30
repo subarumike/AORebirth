@@ -61,6 +61,14 @@ NPC construction pipeline before the placeholder CatMesh override is applied.
 | `CurrentPlayfieldAllPoints` | Every primary plus every official child `AdditionalPoint`; emits an explicit warning. |
 | `ResolvedComparison` | All selected-playfield primaries; `ExactOfficial` uses its exact mapping and every other grade remains a placeholder. |
 
+Before creating an entity, the runtime snapshots the selected playfield's
+existing NPC home coordinates. Using the stable spawn location avoids movement
+timing races. An exact coordinate already occupied by an existing server NPC is
+treated as covered and receives no ACG entity. Exact duplicate ACG coordinates
+also collapse to one development entity. Existing content therefore wins, while
+an uncovered official location receives one placeholder instead of an overlay
+pair.
+
 Every created entity receives a normal transient runtime identity from the
 existing pool allocator. ACG keys, resource IDs, ordinals, and stable source IDs
 are never used as runtime entity IDs. Full source provenance is retained in the

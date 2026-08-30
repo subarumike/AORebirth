@@ -227,6 +227,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ExactLocationKeysMatchServerFloatCoordinatesWithoutMergingNearbySpawns()
+        {
+            const double x = 940.830017;
+            const double y = 24.1345406;
+            const double z = 751.827026;
+
+            string officialLocation = AcgDevelopmentPlaceholderCatalog.CreateExactLocationKey(x, y, z);
+            string runtimeLocation = AcgDevelopmentPlaceholderCatalog.CreateExactLocationKey(
+                (float)x,
+                (float)y,
+                (float)z);
+            string nearbyLocation = AcgDevelopmentPlaceholderCatalog.CreateExactLocationKey(
+                x + 0.01,
+                y,
+                z);
+
+            Assert.AreEqual(officialLocation, runtimeLocation);
+            Assert.AreNotEqual(officialLocation, nearbyLocation);
+        }
+
+        [TestMethod]
         public void RuntimeWiringFailsClosedAndGuardsCombatDeathXpAndLegacyRouting()
         {
             string runtime = ReadRepositoryFile(
@@ -267,6 +288,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "(int)StatIds.catmesh");
             StringAssert.Contains(runtime, "(int)StatIds.displaycatmesh");
             StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId");
+            StringAssert.Contains(runtime, "playfield.EnumerateNpcHomeCoordinates()");
+            StringAssert.Contains(runtime, "existingNpcLocationKeys.Contains(locationKey)");
+            StringAssert.Contains(runtime, "materializedLocationKeys.Add(locationKey)");
             StringAssert.Contains(attackHandler, "AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder");
             StringAssert.Contains(playfield, "private void DoCombatTick(ICharacter attacker)");
             StringAssert.Contains(playfield, "private void KillNpcTarget(ICharacter attacker, ICharacter target)");
