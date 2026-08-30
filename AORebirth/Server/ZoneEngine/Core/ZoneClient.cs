@@ -72,6 +72,10 @@ namespace ZoneEngine.Core
     /// </summary>
     public class ZoneClient : ClientBase, IZoneClient
     {
+        private const int DispatcherStopTimeoutMilliseconds = 2000;
+
+        private const int TransportSendTimeoutMilliseconds = 15000;
+
         #region Fields
 
         /// <summary>
@@ -133,7 +137,7 @@ namespace ZoneEngine.Core
         /// </summary>
         private bool zStreamSetup;
 
-        private bool disposed = false;
+        private volatile bool disposed = false;
 
         private IDisposable characterOnlineOwnership;
 
@@ -143,7 +147,7 @@ namespace ZoneEngine.Core
 
         private Thread dispatcherThread;
 
-        private bool stopDispatcher = false;
+        private volatile bool stopDispatcher = false;
 
         #endregion
 
@@ -166,6 +170,8 @@ namespace ZoneEngine.Core
             this.sessionLifecycle = new ZoneClientSessionLifecycleCoordinator();
             this.packetSequencing = new PacketSequencingCoordinator();
             this.dispatcherThread = new Thread(this.DispatchMessages);
+            this.dispatcherThread.IsBackground = true;
+            this.dispatcherThread.Name = "ZoneClient outbound dispatcher";
             this.dispatcherThread.Start();
         }
 
@@ -728,7 +734,7 @@ namespace ZoneEngine.Core
                     EmitQuestNpcOutboundTransportDiagnostic);
             }
 
-            if (disconnectAfterTransportFailure)
+            if (disconnectAfterTransportFailure && !this.disposed && !this.stopDispatcher)
             {
                 this.server.DisconnectClient(this);
             }
@@ -875,6 +881,8 @@ namespace ZoneEngine.Core
             {
                 if (!this.zStreamSetup)
                 {
+                    this.TcpSocket.SendTimeout = TransportSendTimeoutMilliseconds;
+
                     // CreateIM the zStream
                     this.netStream = new NetworkStream(this.TcpSocket);
                     this.zStream = new ZlibStream(this.netStream, CompressionMode.Compress, CompressionLevel.BestSpeed);
@@ -906,9 +914,22 @@ namespace ZoneEngine.Core
 
                     this.stopDispatcher = true;
 
-                    while (this.stopDispatcher)
+                    // A client can stop reading while the outbound dispatcher is inside a
+                    // synchronous zlib write/flush. Waiting for that dispatcher before closing
+                    // the socket deadlocks disconnect while the server's client registry is
+                    // being updated, which blocks every later ZoneLogin. Abort the transport
+                    // first so the write unwinds, then wait only for a bounded interval.
+                    this.AbortTcpTransportQuietly();
+                    bool dispatcherStopped = this.dispatcherThread == null
+                                             || this.dispatcherThread == Thread.CurrentThread
+                                             || this.dispatcherThread.Join(DispatcherStopTimeoutMilliseconds);
+                    if (!dispatcherStopped)
                     {
-                        Thread.Sleep(10);
+                        LogUtil.Debug(
+                            DebugInfoDetail.Error,
+                            "Zone client outbound dispatcher did not stop within "
+                            + DispatcherStopTimeoutMilliseconds.ToString(CultureInfo.InvariantCulture)
+                            + "ms; continuing bounded disconnect cleanup.");
                     }
 
                     QuestNpcOutboundTransportDiagnostics.OnSessionDisposed(
@@ -965,7 +986,7 @@ namespace ZoneEngine.Core
                     }
                     // Client often aborts the TCP socket before we dispose. Closing ZlibStream
                     // flushes to NetworkStream and throws IOException/SocketException — expected.
-                    this.CloseTransportStreamsQuietly();
+                    this.CloseTransportStreamsQuietly(dispatcherStopped);
                     this.controller = null;
                 }
             }
@@ -977,11 +998,42 @@ namespace ZoneEngine.Core
             base.Dispose(disposing);
         }
 
-        private void CloseTransportStreamsQuietly()
+        private void AbortTcpTransportQuietly()
+        {
+            Socket socket = this.TcpSocket;
+            if (socket == null)
+            {
+                return;
+            }
+
+            try
+            {
+                socket.Shutdown(SocketShutdown.Both);
+            }
+            catch (SocketException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+
+            try
+            {
+                socket.Close(0);
+            }
+            catch (SocketException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+        }
+
+        private void CloseTransportStreamsQuietly(bool closeCompressionStream)
         {
             try
             {
-                if (this.zStream != null)
+                if (closeCompressionStream && this.zStream != null)
                 {
                     this.zStream.Close();
                 }
