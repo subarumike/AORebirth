@@ -2,16 +2,15 @@
 
 ## Active
 
-Complete the PF1862 Smuggler's Den wiki-loot supplement. AOWiki revisions 45701
-and 45756 resolve 22 local source items across 23 enemy/item memberships. The
-Den Mantis Queen's exact 100% Mantis Egg outcome is the single active mapping.
-The other 22 membership-only, qualitative, range-unresolved, or non-numeric
-rows remain inactive evidence. DeCranum's Corona set links and the generic Ring
-of Power row remain explicitly excluded because the source does not identify
-exact direct-drop templates. No PF1862 specialized population exists, so the
-active mapping remains dormant until a matching queen is populated by an
-authorized runtime source. Do not infer missing rates, outcome groups, or spawn
-behavior from the wiki.
+Complete the PF1833 Cyborg Barracks wiki-loot supplement. AOWiki revision 44732
+resolves 13 local source items across 13 enemy/item memberships. All rows remain
+inactive evidence because the page publishes membership-only or qualitative
+rates, including "rare" and "perhaps over 10%," rather than exact numeric drop
+outcomes. Cyborg Implants and Cyborg Death Squad Armor are excluded because the
+page scopes them outside the instance; Burnt-out Armor is an attack effect, and
+Ring of Crawling Ants is a mission reward. No PF1833 specialized population
+exists. Do not infer missing rates, outcome groups, or spawn behavior from the
+wiki.
 
 ## Prior active checkpoint
 

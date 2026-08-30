@@ -1,0 +1,47 @@
+{
+  "source_urls": [
+    "https://wiki.aodb.us/wiki/Cyborg_Barracks"
+  ],
+  "source_pages": ["Cyborg Barracks"],
+  "source_revisions": [44732],
+  "source_checked_utc": "2026-08-30",
+  "playfield_instance": 1833,
+  "production_pf1833_specialized_spawn_count": 0,
+  "drop_scope_count": 6,
+  "documented_mapping_count": 13,
+  "active_mapping_count": 0,
+  "inactive_mapping_count": 13,
+  "source_item_count": 13,
+  "probability_policy": "Activate only an exact numeric outcome with an unambiguous PF1833 display-name scope. Retain membership-only and qualitative rows as inactive evidence.",
+  "runtime_status": "All 13 Cyborg Barracks memberships are inactive because the source publishes no exact numeric drop outcomes. No wiki-derived loot is added at runtime.",
+  "items": [
+    { "item_id": 153975, "high_item_id": 153975, "item_name": "Bonehammer", "minimum_quality": 90, "maximum_quality": 90 },
+    { "item_id": 153976, "high_item_id": 153976, "item_name": "Hellspinner Shock Cannon", "minimum_quality": 84, "maximum_quality": 84 },
+    { "item_id": 153977, "high_item_id": 153977, "item_name": "Hellfury Assault Cannon", "minimum_quality": 80, "maximum_quality": 80 },
+    { "item_id": 153979, "high_item_id": 153979, "item_name": "Severus' Fusion Sprayer", "minimum_quality": 83, "maximum_quality": 83 },
+    { "item_id": 153980, "high_item_id": 153980, "item_name": "Severus' Void Spinner", "minimum_quality": 83, "maximum_quality": 83 },
+    { "item_id": 153981, "high_item_id": 153981, "item_name": "Deimos' Bio-Enhanced Feedback Rifle", "minimum_quality": 78, "maximum_quality": 78 },
+    { "item_id": 153982, "high_item_id": 153982, "item_name": "Bastion of Deimos", "minimum_quality": 78, "maximum_quality": 78 },
+    { "item_id": 154405, "high_item_id": 154405, "item_name": "Augmented Cyborg Arm Armor", "minimum_quality": 77, "maximum_quality": 77 },
+    { "item_id": 154406, "high_item_id": 154406, "item_name": "Sub-Dermal Vengeance Screen (Left Wrist)", "minimum_quality": 85, "maximum_quality": 85 },
+    { "item_id": 154407, "high_item_id": 154407, "item_name": "Sub-Dermal Vengeance Screen (Right Wrist)", "minimum_quality": 85, "maximum_quality": 85 },
+    { "item_id": 154408, "high_item_id": 154408, "item_name": "Internal Anti-Matter Powerplant", "minimum_quality": 85, "maximum_quality": 85 },
+    { "item_id": 154505, "high_item_id": 154505, "item_name": "Immortal Katana", "minimum_quality": 200, "maximum_quality": 200 },
+    { "item_id": 165110, "high_item_id": 165111, "item_name": "Library of Foul Language", "minimum_quality": 1, "maximum_quality": 200 }
+  ],
+  "active_mappings": [],
+  "inactive_membership_summary": [
+    { "enemy_key": "cyborg-barracks.1833.enemy.cyborg", "mapping_count": 1, "reason": "The page says perhaps over 10%, which is qualitative rather than an exact numeric outcome." },
+    { "enemy_key": "cyborg-barracks.1833.enemy.augmented-cyborg-hellfury", "mapping_count": 1, "reason": "The Hellfury Assault Cannon is described as rare without a numeric rate." },
+    { "enemy_key": "cyborg-barracks.1833.boss.eradicator-deimos", "mapping_count": 2, "reason": "Two memberships are published without numeric rates." },
+    { "enemy_key": "cyborg-barracks.1833.boss.general-severus", "mapping_count": 2, "reason": "Two memberships are published without numeric rates." },
+    { "enemy_key": "cyborg-barracks.1833.boss.commander-jocasta", "mapping_count": 6, "reason": "Six memberships are published without numeric rates." },
+    { "enemy_key": "cyborg-barracks.1833.boss.prototype-inferno", "mapping_count": 1, "reason": "The Hellspinner Shock Cannon is described as rare without a numeric rate." }
+  ],
+  "excluded_unresolved_source_rows": [
+    { "item_name": "Cyborg Implants", "reason": "The source explicitly scopes these drops to cyborgs outside the barracks instance." },
+    { "item_name": "Cyborg Death Squad Armor", "reason": "The source explicitly scopes this outside and links an armor set rather than exact direct-drop templates." },
+    { "item_name": "Burnt-out Armor", "reason": "This is listed under Prototype Inferno attack information, not under its Drop heading." },
+    { "item_name": "Ring of Crawling Ants", "reason": "The page identifies this as Janella Gheron's mission reward, not enemy corpse loot." }
+  ]
+}
