@@ -593,6 +593,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRules.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayLootDefinitions.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs" />
