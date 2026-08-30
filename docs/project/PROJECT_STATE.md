@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-25
+Updated: 2026-08-30
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,12 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- Subway documented-loot membership is live on Linux from exact accepted source
+  SHA `08d59f347bcfad6733ee01e36b67e14b1bd59443`. LoginEngine and ZoneEngine
+  releases are both `release-08d59f347bcfad6733ee01e36b67e14b1bd59443`;
+  Windows exact-SHA acceptance, Linux acceptance, zero-online-player dry run,
+  transactional promotion, service readiness, and rollback readiness passed.
 
 - Playfield hydration Stage 0/1: the current mixed loader and `Playfield`
   constructor remain the sole production authority behind a narrow legacy-only
