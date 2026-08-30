@@ -1,0 +1,57 @@
+{
+  "source_urls": [
+    "https://wiki.aodb.us/wiki/Smuggler%27s_Den",
+    "https://wiki.aodb.us/wiki/Unique_Encounters"
+  ],
+  "source_pages": ["Smuggler's Den", "Unique Encounters"],
+  "source_revisions": [45701, 45756],
+  "source_checked_utc": "2026-08-30",
+  "playfield_instance": 1862,
+  "production_pf1862_specialized_spawn_count": 0,
+  "drop_scope_count": 5,
+  "documented_mapping_count": 23,
+  "active_mapping_count": 1,
+  "inactive_mapping_count": 22,
+  "source_item_count": 22,
+  "probability_policy": "Activate only an exact numeric outcome with an unambiguous PF1862 display-name scope. Retain membership-only, qualitative, range-unresolved, and set-level rows as inactive evidence.",
+  "runtime_status": "The Den Mantis Queen's exact 100% Mantis Egg mapping is active and PF1862/name scoped. It remains dormant until a matching queen is populated by an authorized runtime source.",
+  "items": [
+    { "item_id": 123853, "high_item_id": 123853, "item_name": "FA Super 90 Pannikin", "minimum_quality": 159, "maximum_quality": 159, "note": "Linked template only; source quality range is not published." },
+    { "item_id": 157222, "high_item_id": 157222, "item_name": "Small Titan Message Container", "minimum_quality": 100, "maximum_quality": 100 },
+    { "item_id": 157760, "high_item_id": 157760, "item_name": "Mantis Scissors", "minimum_quality": 185, "maximum_quality": 185 },
+    { "item_id": 157761, "high_item_id": 157761, "item_name": "Queen Blade", "minimum_quality": 200, "maximum_quality": 200 },
+    { "item_id": 157947, "high_item_id": 157947, "item_name": "Mantis Egg", "minimum_quality": 190, "maximum_quality": 190 },
+    { "item_id": 158912, "high_item_id": 158912, "item_name": "Fleshchopper", "minimum_quality": 1, "maximum_quality": 1 },
+    { "item_id": 158913, "high_item_id": 158913, "item_name": "Toothpicker", "minimum_quality": 1, "maximum_quality": 1 },
+    { "item_id": 158914, "high_item_id": 158914, "item_name": "Notum Focus", "minimum_quality": 1, "maximum_quality": 1 },
+    { "item_id": 158915, "high_item_id": 158915, "item_name": "Spirit Focus", "minimum_quality": 1, "maximum_quality": 1 },
+    { "item_id": 164271, "high_item_id": 164272, "item_name": "Deformed Mantidae Head", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164273, "high_item_id": 164274, "item_name": "Deformed Mantidae Abdomen", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164275, "high_item_id": 164276, "item_name": "Deformed Mantidae Femur", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164277, "high_item_id": 164278, "item_name": "Deformed Mantidae Tarsus", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164279, "high_item_id": 164280, "item_name": "Deformed Mantidae Tibia", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164281, "high_item_id": 164282, "item_name": "Deformed Mantidae Wing", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164401, "high_item_id": 164402, "item_name": "Deformed Mantidae Antennae", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164412, "high_item_id": 164413, "item_name": "Deformed Mantidae Coxa", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164414, "high_item_id": 164415, "item_name": "Deformed Mantidae Mandibles", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164416, "high_item_id": 164417, "item_name": "Deformed Mantidae Eye", "template_minimum_quality": 1, "template_maximum_quality": 200, "minimum_quality": 75, "maximum_quality": 140 },
+    { "item_id": 164431, "high_item_id": 164431, "item_name": "Mantis Predator Blade", "minimum_quality": 120, "maximum_quality": 120, "note": "The source says the drop varies up to QL120; only its linked QL120 template is retained until the lower-range identity bridge is resolved." },
+    { "item_id": 164432, "high_item_id": 164432, "item_name": "Deformed Mantidae Prothorax", "minimum_quality": 100, "maximum_quality": 100 },
+    { "item_id": 287131, "high_item_id": 287131, "item_name": "Peridotite", "minimum_quality": 200, "maximum_quality": 200, "note": "Linked template only; source quality range is not published." }
+  ],
+  "active_mappings": [
+    { "enemy_key": "smugglers-den.1862.boss.den-mantis-queen", "enemy_name": "Den Mantis Queen", "item_id": 157947, "outcome": "100% one Mantis Egg", "probability_source_revision": 45756 }
+  ],
+  "inactive_membership_summary": [
+    { "enemy_key": "smugglers-den.1862.enemy.den-mantis", "mapping_count": 12, "reason": "The page publishes memberships and quality guidance but no numeric drop rates." },
+    { "enemy_key": "smugglers-den.1862.enemy.den-mantis-breeder", "mapping_count": 2, "reason": "Mantis Scissors and Mantis Egg memberships are published without numeric rates." },
+    { "enemy_key": "smugglers-den.1862.named.den-smuggler-pilot", "mapping_count": 2, "reason": "Small Titan Message Container and FA Super 90 Pannikin memberships are published without numeric rates." },
+    { "enemy_key": "smugglers-den.1862.boss.clawfinger-forefather", "mapping_count": 4, "reason": "The page says the focus drops are usual but not guaranteed and that two can occur together; no exact per-item outcome distribution is published." },
+    { "enemy_key": "smugglers-den.1862.boss.den-mantis-queen", "mapping_count": 2, "reason": "Queen Blade and Peridotite memberships are published without numeric rates." }
+  ],
+  "excluded_unresolved_source_rows": [
+    { "item_name": "DeCranum's Corona MK I", "reason": "The source links an armor set, not an exact list of direct-drop item templates or rates." },
+    { "item_name": "DeCranum's Corona MK II", "reason": "The source links an armor set, not an exact list of direct-drop item templates or rates." },
+    { "item_name": "Ring of Power", "reason": "The source does not identify the exact elemental ring template, quality, or rate." }
+  ]
+}

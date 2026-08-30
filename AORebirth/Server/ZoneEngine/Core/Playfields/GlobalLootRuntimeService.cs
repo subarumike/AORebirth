@@ -3418,11 +3418,16 @@ namespace AORebirth.Core.Playfields
                 DocumentedStepsOfMadnessLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any(value => value.IsActive);
+            bool hasDocumentedSmugglersDenLoot =
+                DocumentedSmugglersDenLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
             if (matches.Length == 0
                 && !hasCredits
                 && !hasDocumentedInnerSanctumLoot
                 && !hasDocumentedForemansLoot
-                && !hasDocumentedStepsOfMadnessLoot) return;
+                && !hasDocumentedStepsOfMadnessLoot
+                && !hasDocumentedSmugglersDenLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3447,7 +3452,9 @@ namespace AORebirth.Core.Playfields
                     ? DocumentedForemansLootDefinitions.DocumentedLootSourceUrl
                     : (hasDocumentedStepsOfMadnessLoot
                         ? DocumentedStepsOfMadnessLootDefinitions.DocumentedLootSourceUrl
-                        : null));
+                        : (hasDocumentedSmugglersDenLoot
+                            ? DocumentedSmugglersDenLootDefinitions.DocumentedLootSourceUrl
+                            : null)));
             string evidence = matches.Length > 0
                 ? repositoryEvidence
                 : (!string.IsNullOrWhiteSpace(documentedEvidence)
@@ -3473,7 +3480,9 @@ namespace AORebirth.Core.Playfields
                         ? "legacy-range-check; foremans-wiki-fixed-and-range-quality"
                         : (hasDocumentedStepsOfMadnessLoot
                             ? "legacy-range-check; steps-of-madness-wiki-fixed-quality"
-                            : "legacy-range-check")),
+                            : (hasDocumentedSmugglersDenLoot
+                                ? "legacy-range-check; smugglers-den-wiki-fixed-quality"
+                                : "legacy-range-check"))),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3492,6 +3501,10 @@ namespace AORebirth.Core.Playfields
                 table,
                 playfieldId,
                 target.Name);
+            DocumentedSmugglersDenLootDefinitions.ApplyDocumentedLoot(
+                table,
+                playfieldId,
+                target.Name);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -3505,7 +3518,9 @@ namespace AORebirth.Core.Playfields
                         ? (int?)DocumentedForemansLootDefinitions.PlayfieldInstance
                         : (hasDocumentedStepsOfMadnessLoot
                             ? (int?)DocumentedStepsOfMadnessLootDefinitions.PlayfieldInstance
-                            : null)),
+                            : (hasDocumentedSmugglersDenLoot
+                                ? (int?)DocumentedSmugglersDenLootDefinitions.PlayfieldInstance
+                                : null))),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0

@@ -356,6 +356,7 @@
     <Compile Include="ForemansLootEvidenceTests.cs" />
     <Compile Include="TempleLootEvidenceTests.cs" />
     <Compile Include="StepsOfMadnessLootEvidenceTests.cs" />
+    <Compile Include="SmugglersDenLootEvidenceTests.cs" />
     <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
@@ -465,6 +466,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedStepsOfMadnessLootDefinitions.cs">
       <Link>DocumentedStepsOfMadnessLootDefinitions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedSmugglersDenLootDefinitions.cs">
+      <Link>DocumentedSmugglersDenLootDefinitions.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedTempleOfThreeWindsLootDefinitions.cs">
       <Link>DocumentedTempleOfThreeWindsLootDefinitions.cs</Link>
