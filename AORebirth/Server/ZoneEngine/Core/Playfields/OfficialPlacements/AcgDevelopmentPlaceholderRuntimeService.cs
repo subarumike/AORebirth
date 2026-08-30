@@ -5,7 +5,6 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
     using System.Globalization;
 
     using AORebirth.Core.Entities;
-    using AORebirth.Core.Items;
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Playfields.OfficialPlacements;
@@ -123,10 +122,6 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
         private const string SafePlaceholderTemplateHash = "A004";
 
         private const int SimpleCharFullUpdateIsImmuneFlag = 0x00800000;
-
-        private const int PlaceholderMeshPosition = 1;
-
-        private const int PlaceholderMeshLayer = 4;
 
         private readonly AcgDevelopmentPlaceholderOptions options;
 
@@ -277,36 +272,14 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
                 }
             }
 
-            if (entry.UseExactOfficialVisual)
+            int expectedCatMesh = entry.UseExactOfficialVisual
+                ? AcgDevelopmentPlaceholderCatalog.ExactFdqoCatMeshId
+                : AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderCatMeshId;
+            if (entry.SelectedCatMeshId != expectedCatMesh)
             {
-                if (entry.SelectedCatMeshId != AcgDevelopmentPlaceholderCatalog.ExactFdqoCatMeshId
-                    || entry.SelectedItemId.HasValue
-                    || entry.SelectedMeshId.HasValue)
-                {
-                    throw new InvalidOperationException(
-                        "ACG development exact visual selection failed closed for "
-                        + entry.OfficialSpawnRecordId);
-                }
-            }
-            else
-            {
-                ItemTemplate placeholderItem;
-                int itemMesh;
-                if (entry.SelectedCatMeshId.HasValue
-                    || entry.SelectedItemId != AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderItemId
-                    || entry.SelectedMeshId != AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderMeshId
-                    || !ItemLoader.ItemList.TryGetValue(
-                        AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderItemId,
-                        out placeholderItem)
-                    || !placeholderItem.Stats.TryGetValue(
-                        AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderMeshStatId,
-                        out itemMesh)
-                    || itemMesh != AcgDevelopmentPlaceholderCatalog.DefaultPlaceholderMeshId)
-                {
-                    throw new InvalidOperationException(
-                        "ACG development item-mesh placeholder selection failed closed for "
-                        + entry.OfficialSpawnRecordId);
-                }
+                throw new InvalidOperationException(
+                    "ACG development visual selection failed closed for "
+                    + entry.OfficialSpawnRecordId);
             }
 
             var controller = new NPCController
@@ -343,50 +316,18 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
             character.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.side,
                 (uint)Side.Neutral);
-            if (entry.UseExactOfficialVisual)
-            {
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.catmesh,
-                    (uint)entry.SelectedCatMeshId.Value);
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.displaycatmesh,
-                    (uint)entry.SelectedCatMeshId.Value);
-            }
-            else
-            {
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.monsterdata,
-                    0);
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.catmesh,
-                    0);
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.displaycatmesh,
-                    0);
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.headmesh,
-                    0);
-                character.Stats.SetBaseValueWithoutTriggering(
-                    (int)StatIds.weaponmeshright,
-                    (uint)entry.SelectedMeshId.Value);
-                character.Textures.Clear();
-                character.MeshLayer.Clear();
-                character.SocialMeshLayer.Clear();
-                character.MeshLayer.AddMesh(
-                    PlaceholderMeshPosition,
-                    entry.SelectedMeshId.Value,
-                    0,
-                    PlaceholderMeshLayer);
-                character.SocialMeshLayer.AddMesh(
-                    PlaceholderMeshPosition,
-                    entry.SelectedMeshId.Value,
-                    0,
-                    PlaceholderMeshLayer);
-            }
+            character.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.catmesh,
+                (uint)entry.SelectedCatMeshId);
+            character.Stats.SetBaseValueWithoutTriggering(
+                (int)StatIds.displaycatmesh,
+                (uint)entry.SelectedCatMeshId);
             uint flags = (uint)character.Stats[StatIds.flags].Value;
             character.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.flags,
-                flags | SimpleCharFullUpdateIsImmuneFlag);
+                flags
+                | SimpleCharFullUpdateIsImmuneFlag
+                | (uint)CharacterFlags.HasVisibleName);
 
             AcgDevelopmentPlaceholderRuntimeRegistry.Register(
                 playfieldIdentity.Instance,
