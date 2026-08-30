@@ -3410,7 +3410,14 @@ namespace AORebirth.Core.Playfields
                 DocumentedInnerSanctumLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any(value => value.IsActive);
-            if (matches.Length == 0 && !hasCredits && !hasDocumentedInnerSanctumLoot) return;
+            bool hasDocumentedForemansLoot =
+                DocumentedForemansLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any();
+            if (matches.Length == 0
+                && !hasCredits
+                && !hasDocumentedInnerSanctumLoot
+                && !hasDocumentedForemansLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3429,13 +3436,19 @@ namespace AORebirth.Core.Playfields
             string repositoryEvidence = debugMatches.Length > 0
                 ? "combat-test-catalog"
                 : "mobtemplate/mobdroptable";
+            string documentedEvidence = hasDocumentedInnerSanctumLoot
+                ? DocumentedInnerSanctumLootDefinitions.DocumentedLootSourceUrl
+                : (hasDocumentedForemansLoot
+                    ? DocumentedForemansLootDefinitions.DocumentedLootSourceUrl
+                    : null);
             string evidence = matches.Length > 0
                 ? repositoryEvidence
-                : DocumentedInnerSanctumLootDefinitions.DocumentedLootSourceUrl;
-            if (matches.Length > 0 && hasDocumentedInnerSanctumLoot)
+                : (!string.IsNullOrWhiteSpace(documentedEvidence)
+                    ? documentedEvidence
+                    : "captured-credit-range");
+            if (matches.Length > 0 && !string.IsNullOrWhiteSpace(documentedEvidence))
             {
-                evidence += "; "
-                            + DocumentedInnerSanctumLootDefinitions.DocumentedLootSourceUrl;
+                evidence += "; " + documentedEvidence;
             }
 
             var table = new LootTableDefinition
@@ -3449,7 +3462,9 @@ namespace AORebirth.Core.Playfields
                     : new CreditsPolicyDefinition { Mode = CreditsPolicyMode.Unresolved, Evidence = LootEvidenceConfidence.Unresolved },
                 QualityPolicy = hasDocumentedInnerSanctumLoot
                     ? "legacy-range-check; inner-sanctum-wiki-fixed-quality"
-                    : "legacy-range-check",
+                    : (hasDocumentedForemansLoot
+                        ? "legacy-range-check; foremans-wiki-fixed-and-range-quality"
+                        : "legacy-range-check"),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3457,6 +3472,10 @@ namespace AORebirth.Core.Playfields
                 Enabled = true
             };
             DocumentedInnerSanctumLootDefinitions.ApplyDocumentedBossLoot(
+                table,
+                playfieldId,
+                target.Name);
+            DocumentedForemansLootDefinitions.ApplyDocumentedMembership(
                 table,
                 playfieldId,
                 target.Name);
@@ -3469,7 +3488,9 @@ namespace AORebirth.Core.Playfields
                 LootTableKey = tableKey,
                 PlayfieldId = hasDocumentedInnerSanctumLoot
                     ? (int?)DocumentedInnerSanctumLootDefinitions.PlayfieldInstance
-                    : null,
+                    : (hasDocumentedForemansLoot
+                        ? (int?)DocumentedForemansLootDefinitions.PlayfieldInstance
+                        : null),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0

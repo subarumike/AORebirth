@@ -353,6 +353,7 @@
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
     <Compile Include="InnerSanctumLootEvidenceTests.cs" />
+    <Compile Include="ForemansLootEvidenceTests.cs" />
     <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
@@ -456,6 +457,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedInnerSanctumLootDefinitions.cs">
       <Link>DocumentedInnerSanctumLootDefinitions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedForemansLootDefinitions.cs">
+      <Link>DocumentedForemansLootDefinitions.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs">
       <Link>OrdinaryEnemyCatalog.cs</Link>
