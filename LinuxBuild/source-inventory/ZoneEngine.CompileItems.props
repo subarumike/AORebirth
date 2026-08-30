@@ -601,6 +601,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/DocumentedSmugglersDenLootDefinitions.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/DocumentedCyborgBarracksLootDefinitions.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/DocumentedCryptOfHomeLootDefinitions.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/DocumentedCamelotLootDefinitions.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs" />

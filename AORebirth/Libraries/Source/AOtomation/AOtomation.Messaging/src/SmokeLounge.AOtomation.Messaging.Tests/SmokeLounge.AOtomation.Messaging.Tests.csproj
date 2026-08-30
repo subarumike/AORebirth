@@ -360,6 +360,7 @@
     <Compile Include="SmugglersDenLootEvidenceTests.cs" />
     <Compile Include="CyborgBarracksLootEvidenceTests.cs" />
     <Compile Include="CryptOfHomeLootEvidenceTests.cs" />
+    <Compile Include="CamelotLootEvidenceTests.cs" />
     <Compile Include="SubwayVendorContentTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestTests.cs" />
     <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
@@ -481,6 +482,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedCryptOfHomeLootDefinitions.cs">
       <Link>DocumentedCryptOfHomeLootDefinitions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedCamelotLootDefinitions.cs">
+      <Link>DocumentedCamelotLootDefinitions.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedTempleOfThreeWindsLootDefinitions.cs">
       <Link>DocumentedTempleOfThreeWindsLootDefinitions.cs</Link>
