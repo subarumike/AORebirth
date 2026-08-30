@@ -54,6 +54,12 @@ namespace AOSharpCaptureAnalyzer
                 return RunSelfTest();
             }
 
+            if (args.Length == 2
+                && string.Equals(args[0], "--decode-loot", StringComparison.Ordinal))
+            {
+                return RawInventoryLootProjection.Run(args[1]);
+            }
+
             if (args.Length == 1
                 && string.Equals(
                     args[0],
@@ -108,6 +114,7 @@ namespace AOSharpCaptureAnalyzer
             {
                 Console.Error.WriteLine("Usage: AOSharpCaptureAnalyzer <capture-folder> [capture-folder ...]");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --decode-loot <capture-folder>");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test-pf127-los-promotion");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test-pf127-capture-snapshot");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --project-item-templates <items.dat> <sha256> <byte-length> <comma-separated-template-ids> <output-json>");

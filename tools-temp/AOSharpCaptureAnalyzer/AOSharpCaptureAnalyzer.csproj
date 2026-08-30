@@ -40,9 +40,14 @@
     <Compile Include="Pf127LineOfSightPromotionValidator.cs" />
     <Compile Include="Pf127CaptureSnapshot.cs" />
     <Compile Include="ItemTemplateProjection.cs" />
+    <Compile Include="RawInventoryLootProjection.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
+      <Project>{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}</Project>
+      <Name>SmokeLounge.AOtomation.Messaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\AORebirth.Core.csproj">
       <Project>{8aef23b2-9e44-40a1-a74e-cf7348b45b62}</Project>
       <Name>AORebirth.Core</Name>
