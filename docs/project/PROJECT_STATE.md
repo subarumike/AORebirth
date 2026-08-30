@@ -22,10 +22,12 @@ completion matrices and dated evidence retain detailed provenance.
   Capture-correlated and unresolved development entities use the explicit
   `default_monster.cir` CatMesh `26884`; FDQO retains exact CatMesh `15222`.
   Forced-visible blue nameplates classify primary rows as `[KNOWN]`,
-  `[PARTIAL]`, or `[NO DATA]`; item-mesh substitution is not used. Runtime
-  materialization is missing-location-only: existing server NPCs win exact
-  coordinate collisions, and exact duplicate ACG coordinates collapse to one
-  development entity instead of producing double spawns.
+  `[PARTIAL]`, or `[NO DATA]`; item-mesh substitution is not used. PF4582 Debug
+  materialization now uses its exact official-record to `SourceNpcId` bridge as
+  a data-coverage switch: accepted detailed capture-backed profiles and exact
+  FDQO Beach Leets remain real NPCs without overlays, while incomplete
+  template-only profiles are suppressed and replaced by one placeholder. Exact
+  duplicate ACG coordinates collapse to one marker.
 
 - ACG placement/spawn-policy schema: the official `18.8.62_EP1`
   ResourceDatabase type-`1000014` corpus is the authoritative placement layer.

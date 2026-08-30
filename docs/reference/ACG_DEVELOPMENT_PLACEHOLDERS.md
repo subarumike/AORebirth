@@ -57,17 +57,22 @@ NPC construction pipeline before the placeholder CatMesh override is applied.
 | --- | --- |
 | `Off` | No corpus load and no runtime entities. This is the default. |
 | `CapturePlan` | The recommended primary target assigned to each ACG in the selected playfield. |
-| `CurrentPlayfieldPrimary` | Every official primary record in the selected playfield. |
+| `CurrentPlayfieldPrimary` | One entity per official primary: accepted PF4582 runtime data stays real; incomplete data uses a placeholder. |
 | `CurrentPlayfieldAllPoints` | Every primary plus every official child `AdditionalPoint`; emits an explicit warning. |
-| `ResolvedComparison` | All selected-playfield primaries; `ExactOfficial` uses its exact mapping and every other grade remains a placeholder. |
+| `ResolvedComparison` | All selected-playfield primaries using the same PF4582 data-coverage replacement rule. |
 
-Before creating an entity, the runtime snapshots the selected playfield's
-existing NPC home coordinates. Using the stable spawn location avoids movement
-timing races. An exact coordinate already occupied by an existing server NPC is
-treated as covered and receives no ACG entity. Exact duplicate ACG coordinates
-also collapse to one development entity. Existing content therefore wins, while
-an uncovered official location receives one placeholder instead of an overlay
-pair.
+PF4582 does not infer data coverage from proximity or from whether some NPC
+happens to exist at a coordinate. Its exact official-record to `SourceNpcId`
+bridge selects the specialized runtime profile for that placement. Detailed
+capture-backed definitions and the accepted exact FDQO Beach Leet data remain
+as real NPCs and receive no ACG entity. Template-only profiles without the full
+runtime fields being collected are suppressed for the selected Debug session
+and replaced by one `default_monster.cir` marker. Normal `Off` startup retains
+the governed 199-placement PF4582 behavior unchanged.
+
+Exact duplicate ACG coordinates collapse to one development entity. The result
+is one visible entity per data-collection location rather than a real/template
+NPC plus an overlapping marker.
 
 Every created entity receives a normal transient runtime identity from the
 existing pool allocator. ACG keys, resource IDs, ordinals, and stable source IDs
@@ -82,10 +87,11 @@ non-collision switch is available on this path, so collision suppression
 remains explicitly unclaimed.
 
 The reliable in-client identifier is the forced-visible blue nameplate, not a
-replacement item mesh. Primary rows use `[KNOWN] ACG ...`, `[PARTIAL] ACG ...`,
-or `[NO DATA] ACG ...`. The unchanged proven placeholder appearance remains a
-construction detail; `[NO DATA]` is the direct signal that the placement has no
-resolved visual identity.
+replacement item mesh. Created rows use `[PARTIAL] ACG ...` or
+`[NO DATA] ACG ...`; accepted PF4582 data creates no ACG entity and therefore no
+overlapping `[KNOWN]` label. The unchanged proven placeholder appearance
+remains a construction detail; the marker means that runtime fields still need
+collection for that placement profile.
 
 ## Operator guide
 

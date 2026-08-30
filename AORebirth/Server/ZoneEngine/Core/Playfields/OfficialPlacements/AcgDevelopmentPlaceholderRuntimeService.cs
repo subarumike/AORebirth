@@ -29,6 +29,35 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
         private static readonly Dictionary<int, HashSet<int>> RuntimeIdentitiesByPlayfield =
             new Dictionary<int, HashSet<int>>();
 
+        private static AcgDevelopmentPlaceholderMode configuredMode =
+            AcgDevelopmentPlaceholderMode.Off;
+
+        private static int? configuredPlayfield;
+
+        internal static void Configure(AcgDevelopmentPlaceholderOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
+            lock (Sync)
+            {
+                configuredMode = options.Mode;
+                configuredPlayfield = options.SelectedPlayfield;
+            }
+        }
+
+        internal static bool ShouldReplaceIncompleteNpc(int playfieldInstance)
+        {
+            lock (Sync)
+            {
+                return configuredMode != AcgDevelopmentPlaceholderMode.Off
+                       && configuredPlayfield.HasValue
+                       && configuredPlayfield.Value == playfieldInstance;
+            }
+        }
+
         internal static bool IsPlaceholder(int runtimeIdentity)
         {
             lock (Sync)
@@ -150,6 +179,7 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
         {
             AcgDevelopmentPlaceholderOptions options =
                 AcgDevelopmentPlaceholderOptions.FromEnvironment();
+            AcgDevelopmentPlaceholderRuntimeRegistry.Configure(options);
             if (options.IsOff)
             {
                 return new AcgDevelopmentPlaceholderRuntimeService(options, null);
@@ -210,25 +240,24 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
                     + "AdditionalPoints with unresolved runtime multiplicity semantics.");
             }
 
-            HashSet<string> existingNpcLocationKeys = GetExistingNpcLocationKeys(playfield);
             var materializedLocationKeys = new HashSet<string>(StringComparer.Ordinal);
             var materialized = new List<Character>();
-            int skippedExisting = 0;
+            int skippedAccepted = 0;
             int skippedDuplicate = 0;
             try
             {
                 foreach (AcgDevelopmentPlaceholderPlanEntry entry in plan)
                 {
+                    if (HasAcceptedRuntimeData(entry))
+                    {
+                        skippedAccepted++;
+                        continue;
+                    }
+
                     string locationKey = AcgDevelopmentPlaceholderCatalog.CreateExactLocationKey(
                         entry.PositionX,
                         entry.PositionY,
                         entry.PositionZ);
-                    if (existingNpcLocationKeys.Contains(locationKey))
-                    {
-                        skippedExisting++;
-                        continue;
-                    }
-
                     if (!materializedLocationKeys.Add(locationKey))
                     {
                         skippedDuplicate++;
@@ -263,32 +292,29 @@ namespace ZoneEngine.Core.Playfields.OfficialPlacements
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "ACG development placeholders materialized mode={0} pf={1} count={2} "
-                    + "skippedExisting={3} skippedDuplicate={4}",
+                    + "skippedAccepted={3} skippedDuplicate={4}",
                     this.options.Mode,
                     playfieldIdentity.Instance,
                     materialized.Count,
-                    skippedExisting,
+                    skippedAccepted,
                     skippedDuplicate));
             return materialized.Count;
         }
 
-        private static HashSet<string> GetExistingNpcLocationKeys(Playfield playfield)
+        private static bool HasAcceptedRuntimeData(AcgDevelopmentPlaceholderPlanEntry entry)
         {
-            var locationKeys = new HashSet<string>(StringComparer.Ordinal);
-            foreach (Coordinate coordinate in playfield.EnumerateNpcHomeCoordinates())
+            if (entry.ResourceInstance != 4582)
             {
-                if (coordinate == null)
-                {
-                    continue;
-                }
-
-                locationKeys.Add(AcgDevelopmentPlaceholderCatalog.CreateExactLocationKey(
-                    coordinate.x,
-                    coordinate.y,
-                    coordinate.z));
+                return false;
             }
 
-            return locationKeys;
+            IccShuttleportOfficialPlacementRecord officialRecord;
+            return IccShuttleportOfficialPlacementCatalog.TryGetByOfficialIdentity(
+                       entry.OfficialSpawnRecordId,
+                       out officialRecord)
+                   && officialRecord.SourceNpcId.HasValue
+                   && IccShuttleportSpawn.HasAcceptedDevelopmentData(
+                       officialRecord.SourceNpcId.Value);
         }
 
         private Character MaterializeOne(

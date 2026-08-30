@@ -4,6 +4,7 @@ namespace AORebirth.Core.Playfields
 
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     #endregion
 
@@ -105,6 +106,12 @@ namespace AORebirth.Core.Playfields
         private static readonly IccShuttleportOfficialPlacementRecord[] Records =
             CreateRecords();
 
+        private static readonly Dictionary<string, IccShuttleportOfficialPlacementRecord>
+            RecordsByIdentity = BuildIdentityIndex();
+
+        private static readonly Dictionary<int, IccShuttleportOfficialPlacementRecord>
+            RecordsBySourceNpcId = BuildSourceNpcIndex();
+
         static IccShuttleportOfficialPlacementCatalog()
         {
             ValidateOrThrow();
@@ -113,6 +120,34 @@ namespace AORebirth.Core.Playfields
         internal static int Count
         {
             get { return Records.Length; }
+        }
+
+        internal static bool TryGetByOfficialIdentity(
+            string officialRecordIdentity,
+            out IccShuttleportOfficialPlacementRecord record)
+        {
+            return RecordsByIdentity.TryGetValue(officialRecordIdentity, out record);
+        }
+
+        internal static bool TryGetBySourceNpcId(
+            int sourceNpcId,
+            out IccShuttleportOfficialPlacementRecord record)
+        {
+            return RecordsBySourceNpcId.TryGetValue(sourceNpcId, out record);
+        }
+
+        private static Dictionary<string, IccShuttleportOfficialPlacementRecord> BuildIdentityIndex()
+        {
+            return new Dictionary<string, IccShuttleportOfficialPlacementRecord>(
+                Records.ToDictionary(record => record.OfficialRecordIdentity),
+                StringComparer.Ordinal);
+        }
+
+        private static Dictionary<int, IccShuttleportOfficialPlacementRecord> BuildSourceNpcIndex()
+        {
+            return Records
+                .Where(record => record.SourceNpcId.HasValue)
+                .ToDictionary(record => record.SourceNpcId.Value);
         }
 
         private static void ValidateOrThrow()

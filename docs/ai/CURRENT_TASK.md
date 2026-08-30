@@ -24,10 +24,12 @@ identity/behavior activation gates.
 - Development entities force a visible blue nameplate. Primary labels are
   `[KNOWN] ACG ...`, `[PARTIAL] ACG ...`, or `[NO DATA] ACG ...`; the label is
   the supported identification mechanism rather than an item-mesh override.
-- Runtime materialization is missing-location-only: an exact official coordinate
-  already occupied by an existing server NPC keeps that NPC and receives no ACG
-  entity. Exact duplicate ACG coordinates collapse to one development entity, so
-  a location never receives an ordinary NPC plus a placeholder overlay.
+- PF4582 runtime materialization is data-gap-only. The exact official-record to
+  `SourceNpcId` bridge selects accepted detailed capture-backed profiles and the
+  accepted exact FDQO Beach Leet data as real NPCs with no ACG overlay.
+  Template-only incomplete profiles are suppressed in the selected Debug session
+  and replaced by one `default_monster.cir` marker. Exact duplicate ACG
+  coordinates collapse to one marker.
 
 ## Current ACG schema checkpoint
 

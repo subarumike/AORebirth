@@ -17,6 +17,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Playfields.OfficialPlacements;
 
     using Coordinate = AORebirth.Core.Vector.Coordinate;
     using Quaternion = AORebirth.Core.Vector.Quaternion;
@@ -74,6 +75,59 @@ namespace AORebirth.Core.Playfields
         }
 
         private static readonly ShuttleportNpc[] Npcs = CreateNpcDefinitions();
+
+        private static readonly Dictionary<int, ShuttleportNpc> NpcsBySourceNpcId =
+            BuildNpcIndex();
+
+        internal static bool HasAcceptedDevelopmentData(int sourceNpcId)
+        {
+            ShuttleportNpc definition;
+            if (!NpcsBySourceNpcId.TryGetValue(sourceNpcId, out definition))
+            {
+                return false;
+            }
+
+            IccShuttleportPlacementRecord activePlacement;
+            string placementFailure;
+            if (!IccShuttleportPlacementCatalog.TryGetRuntimeActive(
+                    sourceNpcId,
+                    out activePlacement,
+                    out placementFailure))
+            {
+                return false;
+            }
+
+            if (!definition.UseTemplateProfile)
+            {
+                return true;
+            }
+
+            IccShuttleportOfficialPlacementRecord officialRecord;
+            return IccShuttleportOfficialPlacementCatalog.TryGetBySourceNpcId(
+                       sourceNpcId,
+                       out officialRecord)
+                   && string.Equals(
+                       officialRecord.CanonicalAcgHashText,
+                       "FDQO",
+                       StringComparison.Ordinal);
+        }
+
+        private static Dictionary<int, ShuttleportNpc> BuildNpcIndex()
+        {
+            var index = new Dictionary<int, ShuttleportNpc>();
+            foreach (ShuttleportNpc definition in Npcs)
+            {
+                if (index.ContainsKey(definition.SourceNpcId))
+                {
+                    throw new InvalidOperationException(
+                        "Duplicate PF4582 runtime profile npcId=" + definition.SourceNpcId);
+                }
+
+                index.Add(definition.SourceNpcId, definition);
+            }
+
+            return index;
+        }
 
         private static ShuttleportNpc[] CreateNpcDefinitions()
         {
@@ -643,6 +697,17 @@ namespace AORebirth.Core.Playfields
             Action<ICharacter> activateNpc,
             ShuttleportNpc def)
         {
+            if (AcgDevelopmentPlaceholderRuntimeRegistry.ShouldReplaceIncompleteNpc(
+                    playfieldIdentity.Instance)
+                && !HasAcceptedDevelopmentData(def.SourceNpcId))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "IccShuttleportSpawn replaced by ACG data-gap placeholder npcId="
+                    + def.SourceNpcId + " npc=" + def.Name);
+                return false;
+            }
+
             IccShuttleportPlacementRecord sourcePlacement;
             string placementFailure;
             if (!IccShuttleportPlacementCatalog.TryGetRuntimeActive(

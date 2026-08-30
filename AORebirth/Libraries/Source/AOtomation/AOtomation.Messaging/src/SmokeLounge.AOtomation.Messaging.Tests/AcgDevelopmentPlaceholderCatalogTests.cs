@@ -278,6 +278,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ZoneEngine",
                 "Core",
                 "ZoneServer.cs");
+            string iccSpawn = ReadRepositoryFile(
+                "AORebirth",
+                "Server",
+                "ZoneEngine",
+                "Core",
+                "Playfields",
+                "IccShuttleportSpawn.cs");
+            string iccOfficialPlacements = ReadRepositoryFile(
+                "AORebirth",
+                "Server",
+                "ZoneEngine",
+                "Core",
+                "Playfields",
+                "IccShuttleportOfficialPlacementCatalog.cs");
 
             StringAssert.Contains(runtime, "if (options.IsOff)");
             StringAssert.Contains(runtime, "if (this.options.IsOff)");
@@ -288,9 +302,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(runtime, "(int)StatIds.catmesh");
             StringAssert.Contains(runtime, "(int)StatIds.displaycatmesh");
             StringAssert.Contains(runtime, "(uint)entry.SelectedCatMeshId");
-            StringAssert.Contains(runtime, "playfield.EnumerateNpcHomeCoordinates()");
-            StringAssert.Contains(runtime, "existingNpcLocationKeys.Contains(locationKey)");
+            StringAssert.Contains(runtime, "AcgDevelopmentPlaceholderRuntimeRegistry.Configure(options)");
+            StringAssert.Contains(runtime, "HasAcceptedRuntimeData(entry)");
             StringAssert.Contains(runtime, "materializedLocationKeys.Add(locationKey)");
+            StringAssert.Contains(iccSpawn, "ShouldReplaceIncompleteNpc(");
+            StringAssert.Contains(iccSpawn, "!HasAcceptedDevelopmentData(def.SourceNpcId)");
+            StringAssert.Contains(iccSpawn, "if (!definition.UseTemplateProfile)");
+            StringAssert.Contains(iccSpawn, "\"FDQO\"");
+            StringAssert.Contains(iccOfficialPlacements, "TryGetByOfficialIdentity(");
+            StringAssert.Contains(iccOfficialPlacements, "TryGetBySourceNpcId(");
             StringAssert.Contains(attackHandler, "AcgDevelopmentPlaceholderRuntimeRegistry.IsPlaceholder");
             StringAssert.Contains(playfield, "private void DoCombatTick(ICharacter attacker)");
             StringAssert.Contains(playfield, "private void KillNpcTarget(ICharacter attacker, ICharacter target)");

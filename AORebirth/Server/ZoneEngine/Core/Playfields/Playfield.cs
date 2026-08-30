@@ -662,11 +662,6 @@ namespace AORebirth.Core.Playfields
             return this.runtimeSystems.Characters();
         }
 
-        internal IEnumerable<Coordinate> EnumerateNpcHomeCoordinates()
-        {
-            return this.runtimeSystems.NpcHomeCoordinates();
-        }
-
         internal void NotifyNpcCombatDamage(ICharacter npc)
         {
             this.runtimeSystems.NotifyNpcCombatDamage(npc);
