@@ -355,6 +355,7 @@
     <Compile Include="InnerSanctumLootEvidenceTests.cs" />
     <Compile Include="ForemansLootEvidenceTests.cs" />
     <Compile Include="TempleLootEvidenceTests.cs" />
+    <Compile Include="Sector10LootEvidenceTests.cs" />
     <Compile Include="StepsOfMadnessLootEvidenceTests.cs" />
     <Compile Include="SmugglersDenLootEvidenceTests.cs" />
     <Compile Include="CyborgBarracksLootEvidenceTests.cs" />
@@ -456,6 +457,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
       <Link>CapturedTempleOfThreeWindsLootDefinitions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSector10LootDefinitions.cs">
+      <Link>CapturedSector10LootDefinitions.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayLootDefinitions.cs">
       <Link>CapturedSubwayLootDefinitions.cs</Link>

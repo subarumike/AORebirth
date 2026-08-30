@@ -275,6 +275,19 @@ namespace AORebirth.Core.Playfields
             if (context.IsOwnedSummon || context.SuppressMonsterDataFallbackLoot) return;
             lock (this.sync)
             {
+                string sector10ProfileKey;
+                if (CapturedSector10LootDefinitions.TryRegister(
+                        this.registry,
+                        target.Name,
+                        context.MonsterData,
+                        context.Level,
+                        out sector10ProfileKey))
+                {
+                    context.EnemyProfileKey = sector10ProfileKey;
+                    context.IsBoss = true;
+                    return;
+                }
+
                 if (string.Equals(
                     context.EnemyProfileKey,
                     CapturedVergilProfileKey,

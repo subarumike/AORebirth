@@ -2,15 +2,15 @@
 
 ## Active
 
-Complete the PF4805 Crypt of Home wiki-loot supplement. AOWiki revision 45627
-resolves 36 local source items across 64 enemy/item memberships. All rows remain
-inactive evidence because the page publishes membership-only or approximate
-rates, including "near 50% for a full team," rather than exact numeric drop
-outcomes. Skincrawler hide patches and the unnamed higher-level Cenobite Shadow
-weapon versions remain excluded because the enemy-scoped rows do not identify
-exact templates. Pyramid of Home is a separate raid instance and remains out of
-scope. No PF4805 specialized population exists. Do not infer missing rates,
-outcome groups, or spawn behavior from the wiki.
+Promote the completed PF4474 Sector 10 boss-loot corpus. Ten exact corpse rolls
+are identity-linked by boss name: Ilari Khazoh Ra (5), Ankari Khazoh Ra (4), and
+Cha Khazoh Ra (1). Runtime authority is limited to whole observed corpse
+snapshots with exact item IDs, qualities, quantities, and 35,507 credits. Bosses
+remain distinct despite sharing MonsterData 257313. Snapshot-selection
+probability and the wider item pool remain unresolved. The populated
+20260830-040731 corpse is preserved but not assigned because its boss generation
+is not identity-linked. Do not infer spawn, combat, respawn, or missing loot
+probabilities from these captures.
 
 ## Prior active checkpoint
 

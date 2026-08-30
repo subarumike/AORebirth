@@ -22,6 +22,16 @@ completion matrices and dated evidence retain detailed provenance.
   Windows exact-SHA acceptance, Linux acceptance, zero-online-player dry run,
   transactional promotion, service readiness, and rollback readiness passed.
 
+- PF4474 Sector 10 now has capture-backed local source definitions for ten
+  identity-linked boss corpse rolls: Ilari Khazoh Ra (5), Ankari Khazoh Ra (4),
+  and Cha Khazoh Ra (1). Exact names plus captured MonsterData 257313 and level
+  190 keep the three assignments distinct. Runtime generation selects only a
+  whole observed outcome, preserving exact item IDs, qualities, quantities, and
+  35,507 credits while leaving selection probability and the wider pool
+  unresolved. Capture 20260830-040731 remains recorded but inactive because its
+  populated corpse could not be identity-linked. Audit:
+  `docs/generated/pf4474_loot/sector10-boss-loot-capture-audit.json`.
+
 - Playfield hydration Stage 0/1: the current mixed loader and `Playfield`
   constructor remain the sole production authority behind a narrow legacy-only
   composition seam. Static definition, validation, provenance, canonical
