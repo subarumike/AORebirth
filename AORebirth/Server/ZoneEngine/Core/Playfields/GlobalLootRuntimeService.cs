@@ -528,7 +528,10 @@ namespace AORebirth.Core.Playfields
                 }
 
                 this.EnsureDatabaseLoaded();
-                this.EnsureLegacyTarget(target, context.EnemyProfileKey);
+                this.EnsureLegacyTarget(
+                    target,
+                    context.EnemyProfileKey,
+                    context.PlayfieldId);
             }
         }
 
@@ -3385,7 +3388,10 @@ namespace AORebirth.Core.Playfields
             this.databaseLoaded = true;
         }
 
-        private void EnsureLegacyTarget(ICharacter target, string profileKey)
+        private void EnsureLegacyTarget(
+            ICharacter target,
+            string profileKey,
+            int playfieldId)
         {
             string tableKey = profileKey;
             if (this.registry.ContainsTable(tableKey)) return;
@@ -3400,7 +3406,11 @@ namespace AORebirth.Core.Playfields
             int creditMaximum;
             bool hasCredits = CombatCorpseRules.TryGetObservedCreditRange(
                 target.Name, target.Stats[StatIds.monsterdata].Value, out creditMinimum, out creditMaximum);
-            if (matches.Length == 0 && !hasCredits) return;
+            bool hasDocumentedInnerSanctumLoot =
+                DocumentedInnerSanctumLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
+            if (matches.Length == 0 && !hasCredits && !hasDocumentedInnerSanctumLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3416,7 +3426,19 @@ namespace AORebirth.Core.Playfields
                     Conditions = new string[0]
                 });
             }
-            this.registry.RegisterTable(new LootTableDefinition
+            string repositoryEvidence = debugMatches.Length > 0
+                ? "combat-test-catalog"
+                : "mobtemplate/mobdroptable";
+            string evidence = matches.Length > 0
+                ? repositoryEvidence
+                : DocumentedInnerSanctumLootDefinitions.DocumentedLootSourceUrl;
+            if (matches.Length > 0 && hasDocumentedInnerSanctumLoot)
+            {
+                evidence += "; "
+                            + DocumentedInnerSanctumLootDefinitions.DocumentedLootSourceUrl;
+            }
+
+            var table = new LootTableDefinition
             {
                 LootTableKey = tableKey,
                 DisplayName = target.Name + " legacy DB loot",
@@ -3425,20 +3447,34 @@ namespace AORebirth.Core.Playfields
                 CreditsPolicy = hasCredits
                     ? CreditsRange(creditMinimum, creditMaximum, LootEvidenceConfidence.ProvenRepository)
                     : new CreditsPolicyDefinition { Mode = CreditsPolicyMode.Unresolved, Evidence = LootEvidenceConfidence.Unresolved },
-                QualityPolicy = "legacy-range-check",
-                Evidence = debugMatches.Length > 0 ? "combat-test-catalog" : "mobtemplate/mobdroptable",
-                Confidence = LootEvidenceConfidence.ProvenRepository,
+                QualityPolicy = hasDocumentedInnerSanctumLoot
+                    ? "legacy-range-check; inner-sanctum-wiki-fixed-quality"
+                    : "legacy-range-check",
+                Evidence = evidence,
+                Confidence = matches.Length > 0
+                    ? LootEvidenceConfidence.ProvenRepository
+                    : LootEvidenceConfidence.CommunityDocumented,
                 Enabled = true
-            });
+            };
+            DocumentedInnerSanctumLootDefinitions.ApplyDocumentedBossLoot(
+                table,
+                playfieldId,
+                target.Name);
+            this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
                 AssignmentKey = tableKey,
                 TargetType = LootAssignmentTargetType.EnemyType,
                 TargetKey = profileKey,
                 LootTableKey = tableKey,
+                PlayfieldId = hasDocumentedInnerSanctumLoot
+                    ? (int?)DocumentedInnerSanctumLootDefinitions.PlayfieldInstance
+                    : null,
                 Priority = 0,
-                Evidence = debugMatches.Length > 0 ? "combat-test-catalog" : "mobtemplate/mobdroptable",
-                Confidence = LootEvidenceConfidence.ProvenRepository,
+                Evidence = evidence,
+                Confidence = matches.Length > 0
+                    ? LootEvidenceConfidence.ProvenRepository
+                    : LootEvidenceConfidence.CommunityDocumented,
                 Enabled = true,
                 Conditions = new string[0]
             });
