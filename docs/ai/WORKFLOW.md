@@ -612,13 +612,30 @@ cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Zam2022.c
 
 Load `AOSharpLiveCapture.Zam2022.dll` in the same assembly selection as the
 other Zam plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
-plugin registers `/aocap start|stop|status|flush|mark`, retains the complete
-inbound and outbound raw stream in `packets.hex.log` and `raw-packets.csv`, and
-directly projects raw `FollowTarget`, `SetPos`, `StopMovingCmd`, and `CharDCMove`
-packets into `movement-packets.csv`. Its packet log uses the canonical format
-consumed by the repository decoders. Zam 2022 lacks the newer AOSharp APIs
-required by the remaining optional in-process geometry and decoded-message
-projections; the repository analyzer remains responsible for those projections.
+plugin registers `/aocap start|stop|status|flush|mark|snapshot` plus
+`/aocap auto on|off|status`. It starts a crash-recoverable session when loaded,
+auto-flushes every evidence row, writes an atomic checkpoint every two seconds,
+and rotates to a new session after a playfield change. `/aocap start` promotes
+the already-running automatic session instead of discarding pre-command spawn
+or idle evidence. `/aocap stop` drains and finalizes the current folder, writes
+`capture-validation.json`, and starts a continuation folder while automatic
+capture is on; use `/aocap auto off` before stop when no continuation is wanted.
+
+The plugin retains the complete inbound and outbound raw stream in
+`packets.hex.log` and `raw-packets.csv`. It directly projects raw
+`FollowTarget`, `SetPos`, `StopMovingCmd`, and `CharDCMove` packets into
+`movement-packets.csv`, raw `SimpleCharFullUpdate` packets into
+`scfu-appearance.csv`, current AOSharp dynels plus exact raw entity/corpse
+evidence into `world-snapshot.csv`, player position/stats/evades/armor/buffs/
+weapons into `player-combat-context.csv`, and attack-boundary distance evidence
+into `aggro-observations.csv`. Stop-time validation reports coverage for raw,
+spawn identity, world/player context, movement, combat start, NPC-to-player and
+unprovoked aggro, death/corpse, and identity-linked loot. A projection gap with
+an intact raw stream remains an offline-decode issue rather than an automatic
+recapture request. The packet log uses the canonical format consumed by the
+repository decoders. Zam 2022 still lacks newer AOSharp APIs required by the
+remaining optional in-process geometry projections; the repository analyzer
+remains responsible for those projections.
 
 Build the injector and its capture-safe Bootstrap only through:
 
