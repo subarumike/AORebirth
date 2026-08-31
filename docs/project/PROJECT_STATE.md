@@ -240,17 +240,18 @@ completion matrices and dated evidence retain detailed provenance.
   14/14, LoginEngine Debug/Release builds pass, database preflight passes, and
   AOtomation messaging passes 1013/1013. No production database, website, Linux,
   MyBB, or public-registration change was made.
-- Unified password management source foundation: authenticated password change
-  and verified-email password recovery are implemented behind Account Broker
-  without creating a second credential authority. Both flows update the AO
-  `login.Password` hash through `LoginEncryption.GeneratePasswordHash()`;
-  password reset uses hashed 256-bit single-use tokens, atomic consumption,
-  expiry, resend superseding, dual source/target rate limits, SMTP delivery,
-  CSRF-protected Broker-host pages, and Broker-session invalidation. Windows
-  schema validation, Account Broker validation, and local HTTP/SMTP acceptance
-  pass. Production remains unchanged pending the additive token-table migration,
-  accepted-SHA deployment, and the separate production PHP website integration.
-  Design and API contract: `docs/project/PASSWORD_MANAGEMENT.md`.
+- Unified password management: production-accepted on 2026-08-31 without a
+  second credential authority. The additive reset-token migration is applied,
+  Account Broker release `password-management-8fd1300f` is active, and website
+  revision `c79468e6395aefbe91709237be754490b1029b70` exposes
+  `/forgot-password`, `/reset-password`, and `/account/password`. Real SMTP
+  delivery, generic enumeration-safe responses, hashed 256-bit one-time and
+  supersedable reset tokens, PHP/Broker session invalidation, old/new website
+  credentials, email verification/resend, MyBB SSO, and the final production
+  LoginEngine `CHARACTER_LIST`/`LOGIN_ERROR` paths pass with one controlled
+  account. PHP never reads or mutates `login.Password`; Account Broker remains
+  the sole password mutation boundary. Evidence:
+  `docs/project/PASSWORD_MANAGEMENT_PRODUCTION_EVIDENCE_20260831.md`.
 
 - Complete AOtomation suite: PASS (1003/1003).
 - Arete regular-mob combat uses a scoped forward reconciliation against the

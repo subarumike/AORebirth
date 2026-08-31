@@ -83,9 +83,12 @@ required for launch. Evidence:
 
 ## Current checkpoint
 
-- Password-management source is implemented and Windows-local validated behind
-  Account Broker. Production is not changed; remaining work is the production
-  PHP website integration followed by migration/deployment approval.
+- Unified password management is production-accepted. Account Broker release
+  `password-management-8fd1300f` and website revision `c79468e6` provide
+  `/forgot-password`, `/reset-password`, and `/account/password`; the additive
+  token migration, real email delivery, website session invalidation, token
+  lifecycle, MyBB regression, and final LoginEngine credential path all pass.
+  Evidence: `docs/project/PASSWORD_MANAGEMENT_PRODUCTION_EVIDENCE_20260831.md`.
 - Password authentication is restored and proven in Debug and Release.
 - The proposed identity schema now validates against the local Windows
   development MySQL target.
