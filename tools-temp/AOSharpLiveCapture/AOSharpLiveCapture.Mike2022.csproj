@@ -6,26 +6,26 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D2419B94-170D-461E-B726-C8CC74A81103}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AOSharpLiveCapture.Zam2022</RootNamespace>
-    <AssemblyName>AOSharpLiveCapture.Zam2022</AssemblyName>
+    <RootNamespace>AOSharpLiveCapture.Mike2022</RootNamespace>
+    <AssemblyName>AOSharpLiveCapture.Mike2022</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <PlatformTarget>x86</PlatformTarget>
-    <AOSharpRuntimeDir Condition=" '$(AOSharpRuntimeDir)' == '' ">C:\Users\Mike\Documents\AO programs\AO Sharp Zam 2022</AOSharpRuntimeDir>
+    <AOSharpRuntimeDir Condition=" '$(AOSharpRuntimeDir)' == '' ">$(MIKE_AOSHARP_RUNTIME)</AOSharpRuntimeDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Zam2022\Debug\</OutputPath>
+    <OutputPath>bin\Mike2022\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Zam2022\Release\</OutputPath>
+    <OutputPath>bin\Mike2022\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -46,8 +46,13 @@
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
     <Compile Include="CaptureSessionLayout.cs" />
-    <Compile Include="Zam2022Main.cs" />
-    <Compile Include="Properties\Zam2022AssemblyInfo.cs" />
+    <Compile Include="Mike2022Main.cs" />
+    <Compile Include="Properties\Mike2022AssemblyInfo.cs" />
   </ItemGroup>
+  <Target Name="ValidateAOSharpRuntime" BeforeTargets="ResolveReferences">
+    <Error Condition=" '$(AOSharpRuntimeDir)' == '' " Text="Set MIKE_AOSHARP_RUNTIME to the exact legacy AOSharp runtime directory before building." />
+    <Error Condition=" !Exists('$(AOSharpRuntimeDir)\AOSharp.Common.dll') " Text="AOSharp.Common.dll was not found under MIKE_AOSHARP_RUNTIME." />
+    <Error Condition=" !Exists('$(AOSharpRuntimeDir)\AOSharp.Core.dll') " Text="AOSharp.Core.dll was not found under MIKE_AOSHARP_RUNTIME." />
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
