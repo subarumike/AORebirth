@@ -2,16 +2,15 @@
 
 ## Active
 
-Complete the PF120 Camelot wiki-loot supplement. AOWiki revision 47135 resolves
-31 local source items across 31 boss/item memberships. Administrator DeValos's
-exclusive 100% Nanobot Infusion Device is the single active mapping. Morgan Le
-Faye, Lord/Reborn Lord Ghasap, and Tarasque memberships remain inactive because
-their rates, phase distribution, or grouped corpse outcomes are not published.
-Ghasap's Minion item names remain excluded because the source provides no exact
-linked templates, and Lord Ghasap's Elite is explicitly documented as dropping
-nothing. No PF120 specialized population exists, so the active mapping remains
-dormant. Do not infer missing rates, outcome groups, or spawn behavior from the
-wiki.
+Complete the PF620 Mercenary Camp wiki-loot supplement. AOWiki revision 45756
+resolves 24 local source items across 48 boss/item memberships. Ian Warr's 100%
+Breastplate of Azure Reveries, Nelly Johnson's 100% Little Black Dress, and Ris
+Lee's 100% Fancy Stethoscopic Glasses are active. Random Azure, Notum Tank,
+extra-item, and approximate-rate memberships remain inactive because per-item
+probabilities or duplicate behavior are not published. No PF620 specialized
+population exists, so the three active mappings remain dormant. Do not infer
+missing rates, selection weights, duplicate behavior, or spawn behavior from
+the wiki.
 
 ## Prior active checkpoint
 
