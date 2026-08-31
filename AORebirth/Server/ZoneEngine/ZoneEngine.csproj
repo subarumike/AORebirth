@@ -685,6 +685,7 @@
     <Compile Include="Core\Playfields\DocumentedCyborgBarracksLootDefinitions.cs" />
     <Compile Include="Core\Playfields\DocumentedCryptOfHomeLootDefinitions.cs" />
     <Compile Include="Core\Playfields\DocumentedCamelotLootDefinitions.cs" />
+    <Compile Include="Core\Playfields\DocumentedMercenaryCampLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs" />

@@ -3447,6 +3447,10 @@ namespace AORebirth.Core.Playfields
                 DocumentedCamelotLootDefinitions
                     .DropsForDisplayName(playfieldId, target.Name)
                     .Any(value => value.IsActive);
+            bool hasDocumentedMercenaryCampLoot =
+                DocumentedMercenaryCampLootDefinitions
+                    .DropsForDisplayName(playfieldId, target.Name)
+                    .Any(value => value.IsActive);
             if (matches.Length == 0
                 && !hasCredits
                 && !hasDocumentedInnerSanctumLoot
@@ -3455,7 +3459,8 @@ namespace AORebirth.Core.Playfields
                 && !hasDocumentedSmugglersDenLoot
                 && !hasDocumentedCyborgBarracksLoot
                 && !hasDocumentedCryptOfHomeLoot
-                && !hasDocumentedCamelotLoot) return;
+                && !hasDocumentedCamelotLoot
+                && !hasDocumentedMercenaryCampLoot) return;
             var groups = new List<LootGroupDefinition>();
             for (int index = 0; index < matches.Length; index++)
             {
@@ -3488,7 +3493,9 @@ namespace AORebirth.Core.Playfields
                                     ? DocumentedCryptOfHomeLootDefinitions.DocumentedLootSourceUrl
                                     : (hasDocumentedCamelotLoot
                                         ? DocumentedCamelotLootDefinitions.DocumentedLootSourceUrl
-                                        : null))))));
+                                        : (hasDocumentedMercenaryCampLoot
+                                            ? DocumentedMercenaryCampLootDefinitions.DocumentedLootSourceUrl
+                                            : null)))))));
             string evidence = matches.Length > 0
                 ? repositoryEvidence
                 : (!string.IsNullOrWhiteSpace(documentedEvidence)
@@ -3522,7 +3529,9 @@ namespace AORebirth.Core.Playfields
                                         ? "legacy-range-check; crypt-of-home-wiki-fixed-quality"
                                         : (hasDocumentedCamelotLoot
                                             ? "legacy-range-check; camelot-wiki-fixed-quality"
-                                            : "legacy-range-check")))))),
+                                            : (hasDocumentedMercenaryCampLoot
+                                                ? "legacy-range-check; mercenary-camp-wiki-fixed-quality"
+                                                : "legacy-range-check"))))))),
                 Evidence = evidence,
                 Confidence = matches.Length > 0
                     ? LootEvidenceConfidence.ProvenRepository
@@ -3557,6 +3566,10 @@ namespace AORebirth.Core.Playfields
                 table,
                 playfieldId,
                 target.Name);
+            DocumentedMercenaryCampLootDefinitions.ApplyDocumentedLoot(
+                table,
+                playfieldId,
+                target.Name);
             this.registry.RegisterTable(table);
             this.registry.RegisterAssignment(new LootAssignmentDefinition
             {
@@ -3578,7 +3591,9 @@ namespace AORebirth.Core.Playfields
                                         ? (int?)DocumentedCryptOfHomeLootDefinitions.PlayfieldInstance
                                         : (hasDocumentedCamelotLoot
                                             ? (int?)DocumentedCamelotLootDefinitions.PlayfieldInstance
-                                            : null)))))),
+                                            : (hasDocumentedMercenaryCampLoot
+                                                ? (int?)DocumentedMercenaryCampLootDefinitions.PlayfieldInstance
+                                                : null))))))),
                 Priority = 0,
                 Evidence = evidence,
                 Confidence = matches.Length > 0

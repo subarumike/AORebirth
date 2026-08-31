@@ -1,0 +1,53 @@
+{
+  "source_urls": ["https://wiki.aodb.us/wiki/Unique_Encounters"],
+  "source_pages": ["Unique Encounters"],
+  "source_revisions": [45756],
+  "source_checked_utc": "2026-08-30",
+  "playfield_instance": 620,
+  "production_pf620_specialized_spawn_count": 0,
+  "drop_scope_count": 5,
+  "documented_mapping_count": 48,
+  "active_mapping_count": 3,
+  "inactive_mapping_count": 45,
+  "source_item_count": 24,
+  "probability_policy": "Activate only an exact numeric outcome with an unambiguous PF620 display-name scope. Retain random-pool membership, approximate rates, qualitative rates, and rows without published probabilities as inactive evidence.",
+  "runtime_status": "Ian Warr's 100% Breastplate of Azure Reveries, Nelly Johnson's 100% Little Black Dress, and Ris Lee's 100% Fancy Stethoscopic Glasses are active mappings. They remain dormant until matching PF620 enemies are populated by an authorized runtime source.",
+  "items": [
+    { "item_id": 156772, "item_name": "Rust-pitted Ring", "quality": 100 },
+    { "item_id": 165127, "item_name": "Blood Mace", "quality": 200 },
+    { "item_id": 165130, "item_name": "Blood Bat", "quality": 200 },
+    { "item_id": 165176, "item_name": "Fancy Stethoscopic Glasses", "quality": 1 },
+    { "item_id": 165203, "item_name": "Pioneer of Jobe Cloak", "quality": 1 },
+    { "item_id": 165205, "item_name": "Stone Samurai Boots", "quality": 200 },
+    { "item_id": 165206, "item_name": "Flaxen Notum Pants", "quality": 200 },
+    { "item_id": 165207, "item_name": "Average Gloves", "quality": 100 },
+    { "item_id": 165208, "item_name": "Light Notum Tank Armor", "quality": 200 },
+    { "item_id": 165209, "item_name": "Medium Notum Tank Armor", "quality": 200 },
+    { "item_id": 165213, "item_name": "Heavy Notum Tank Armor", "quality": 200 },
+    { "item_id": 165214, "item_name": "Nelly Johnsons Little Black Dress", "quality": 200 },
+    { "item_id": 165215, "item_name": "Anything", "quality": 200 },
+    { "item_id": 165303, "item_name": "Sleeves of Azure Reveries", "quality": 200 },
+    { "item_id": 165304, "item_name": "Breastplate of Azure Reveries", "quality": 200 },
+    { "item_id": 165305, "item_name": "Boots of Azure Reveries", "quality": 200 },
+    { "item_id": 165306, "item_name": "Gloves of Azure Reveries", "quality": 200 },
+    { "item_id": 165307, "item_name": "Helmet of Azure Reveries", "quality": 200 },
+    { "item_id": 165308, "item_name": "Pants of Azure Reveries", "quality": 200 },
+    { "item_id": 168670, "item_name": "Luxurious Rubber Pants", "quality": 200 },
+    { "item_id": 168671, "item_name": "Luxurious Rubber Sleeves", "quality": 200 },
+    { "item_id": 168672, "item_name": "Luxurious Rubber Shirt", "quality": 200 },
+    { "item_id": 168675, "item_name": "Pain of Patricia", "quality": 200 },
+    { "item_id": 212995, "item_name": "Reign of Patricia", "quality": 200 }
+  ],
+  "active_mappings": [
+    { "enemy_key": "mercenary-camp.620.boss.ian-warr", "enemy_name": "Ian Warr", "item_id": 165304, "outcome": "100% Breastplate of Azure Reveries", "probability_source_revision": 45756 },
+    { "enemy_key": "mercenary-camp.620.boss.nelly-johnson", "enemy_name": "Nelly Johnson", "item_id": 165214, "outcome": "100% Nelly Johnsons Little Black Dress", "probability_source_revision": 45756 },
+    { "enemy_key": "mercenary-camp.620.boss.ris-lee", "enemy_name": "Ris Lee", "item_id": 165176, "outcome": "100% Fancy Stethoscopic Glasses", "probability_source_revision": 45756 }
+  ],
+  "inactive_membership_summary": [
+    { "enemy_key": "mercenary-camp.620.boss.ian-warr", "mapping_count": 12, "reason": "One random Azure piece and one random extra are published without per-item probabilities." },
+    { "enemy_key": "mercenary-camp.620.boss.nelly-johnson", "mapping_count": 7, "reason": "Anything and Azure memberships are published without probabilities." },
+    { "enemy_key": "mercenary-camp.620.boss.patricia-johnson", "mapping_count": 11, "reason": "The Azure chance is approximate and all individual item probabilities are unpublished." },
+    { "enemy_key": "mercenary-camp.620.boss.peter-lee", "mapping_count": 9, "reason": "The two random outcome pools are published without per-item probabilities." },
+    { "enemy_key": "mercenary-camp.620.boss.ris-lee", "mapping_count": 6, "reason": "Two random Azure pieces are published without per-item probabilities or duplicate behavior." }
+  ]
+}
