@@ -49,7 +49,13 @@ response contains `invalidateSessions=true`.
 Canonical standalone routes:
 
 - `/forgot-password`;
-- `/reset-password?token=<opaque-token>`.
+- `/reset-password#token=<opaque-token>`.
+
+The fragment transport matches the established email-verification boundary: the
+browser posts the opaque token body-side to the production PHP integration, so
+normal nginx and Apache request logs never receive the bearer token. The PHP
+route retains short-lived server-side token state only long enough to render and
+submit the clean `/reset-password` form.
 
 Reset requests always return the same public message:
 

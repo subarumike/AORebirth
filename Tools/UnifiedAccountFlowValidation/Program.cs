@@ -316,11 +316,14 @@ namespace UnifiedAccountFlowValidation
                     && unknownResetRequest.StatusCode == 200
                     && resetRequest.Body == unknownResetRequest.Body);
             string resetMessage = smtp.WaitForMessage("AORebirth password reset", 5000);
-            string resetToken = ExtractMessageToken(resetMessage, "/reset-password?token=");
+            string resetToken = ExtractMessageToken(resetMessage, "/reset-password#token=");
+            string decodedResetMessage = DecodeMessageBody(resetMessage);
             SensitiveLogValues.Add(resetToken);
             SensitiveLogValues.Add("FlowChanged!2026");
             SensitiveLogValues.Add("FlowReset!2026");
             Pass("reset-email-captured", !string.IsNullOrEmpty(resetToken));
+            Pass("reset-email-fragment-token", decodedResetMessage.Contains("/reset-password#token="));
+            Pass("reset-email-no-query-token", !decodedResetMessage.Contains("/reset-password?token="));
             Pass("reset-token-not-stored-plaintext", ResetTokenStoredAsDigest(connectionString, resetToken));
             Pass(
                 "reset-status-secret-required",
