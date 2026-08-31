@@ -614,9 +614,11 @@ Load `AOSharpLiveCapture.Zam2022.dll` in the same assembly selection as the
 other Zam plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
 plugin registers `/aocap start|stop|status|flush|mark`, retains the complete
 inbound and outbound raw stream in `packets.hex.log` and `raw-packets.csv`, and
-marks the session for offline decoding. Zam 2022 lacks the newer AOSharp APIs
-required by the optional in-process geometry and decoded-message projections;
-the repository analyzer remains responsible for those projections.
+directly projects raw `FollowTarget`, `SetPos`, `StopMovingCmd`, and `CharDCMove`
+packets into `movement-packets.csv`. Its packet log uses the canonical format
+consumed by the repository decoders. Zam 2022 lacks the newer AOSharp APIs
+required by the remaining optional in-process geometry and decoded-message
+projections; the repository analyzer remains responsible for those projections.
 
 Build the injector and its capture-safe Bootstrap only through:
 
