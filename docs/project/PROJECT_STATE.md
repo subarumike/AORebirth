@@ -327,32 +327,37 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Generated combat authority
 
-The capture corpus and production runtime are authoritative; checked-in
-generated projections must reproduce from them and are never edited by hand.
-The current deterministic inventory contains 381 sessions, 365 canonical
+Raw capture directories are disposable development evidence after explicit
+promotion. The accepted inventory and formula evidence committed in the
+repository are authoritative for ordinary regeneration; build, deployment,
+and runtime do not read historical captures. Raw evidence remains mandatory
+for explicit ingestion/promotion, while optional provenance verification
+reports `EVIDENCE_NOT_LOCALLY_AVAILABLE` without invalidating accepted state.
+The current deterministic inventory contains 383 sessions, 367 canonical
 sessions, 3,269 complete attack chains, 260 certified profiles, 96 runtime-ready
-profiles, 309 semantic definitions, 101 runtime-ready definitions, and 1,486
-explicitly unresolved observations with zero generator errors.
+profiles, 309 semantic definitions, 101 runtime-ready definitions, and 1,499
+explicitly unresolved profiles with zero generator errors. The canonical
+cohort generation identity is
+`fff698665eae5f5975d367974289edac272d9011354c49cca53eeb9c7d492a13`.
 
-The active-coverage projection contains 1,534 actors, 1,520 binding records,
-and maximum actor index 1,536. It reconciles 559 certified actors and 975
+The active-coverage projection contains 1,562 actors and 1,548 binding records.
+It reconciles 559 certified actors and 1,003
 explicitly unresolved actors. The PF6553/PF8009 Arete active cohort contains
 100 bindings / 113 actors; 43 certified bindings cover 56 actors and 57 bindings
 remain explicit unresolved/quarantined exclusions. The transactional generator,
 current-cohort validation, and deterministic second regeneration pass against
-identity `041b9dc66bed5ddf2b50277d54232173a1b1d2f80196e721f50c38f138f1f1d5`.
+identity `fff698665eae5f5975d367974289edac272d9011354c49cca53eeb9c7d492a13`.
 Unsupported or conflicting observations remain fail-closed.
 
-The generated combat surface is now one six-file cohort: five semantic artifacts
-plus a manifest commit marker. A multi-reader/single-writer lease protects
-supported readers and serializes writers. Primary captures are parsed once into
-immutable validated shards; all generator/tool inputs are frozen; active coverage
-and formula data converge to one fixed point; and publication is manifest-last,
+The generated combat surface is one eight-file cohort: seven accepted/generated
+artifacts plus a manifest commit marker. A multi-reader/single-writer lease
+protects supported readers and serializes writers. Explicit raw promotion parses
+captures into immutable validated shards; ordinary regeneration renders only from
+accepted repository state. All generator/tool inputs are frozen, active coverage
+and formula data converge to one fixed point, and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
 recorded in `docs/generated/capture_backed_npc_combat_generation_manifest.json`.
-Generated output no longer embeds the local checkout path. Runtime catalog,
-exact-byte fixtures, and formula semantics are byte-identical to the prior
-authority; no supported gameplay behavior changed.
+Generated output no longer embeds the local checkout path.
 
 Capture-decoder internal type failures caused by the known Windows interpreter
 corruption boundary are retried at the coordinator child boundary; ordinary
@@ -427,6 +432,9 @@ migrations; details and exact source references are recorded in
   attack reach and supported mobs pursue before attacking. Engineer Automaton I,
   Robotic Guard Dog, and incomplete robot variants remain intentionally passive
   where exact combat evidence is insufficient.
+- Rex-platform Malfunctioning Cleaning Robots no longer burn and force their
+  own health to zero after a fixed lifetime. They remain alive until a normal
+  combat death and retain their existing 60-second soft-respawn behavior.
 - Rubi-Ka character creation persists its initial Arete location as PF 6553,
   X 3607.6, Y 52.4, Z 785.7 without integer rounding.
 - PF4582 ICC Shuttleport has a checked-in authoritative placement layer with

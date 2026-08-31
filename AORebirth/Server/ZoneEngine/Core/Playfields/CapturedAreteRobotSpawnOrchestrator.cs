@@ -30,12 +30,6 @@ namespace AORebirth.Core.Playfields
         // Mike: soft-respawn 60s. Prior Rox capture (~70s) incomplete in 20260722-keeper-exect-nano.
         private const double RespawnSeconds = 60.0;
 
-        // Mike: after ~2 minutes of life, Malfunctioning Cleaning Robots catch fire,
-        // then explode (death Parameter2=503) and soft-respawn after RespawnSeconds.
-        private const double LifeUntilBurnSeconds = 120.0;
-
-        private const double BurnBeforeExplodeSeconds = 8.0;
-
         private const float LivingNearRadiusSquared = 6.25f;
 
         private readonly CapturedAreteRobotContentProvider capturedRobotContent;
@@ -47,21 +41,7 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, DateTime[]> nextRespawnUtcByPlayfield =
             new Dictionary<int, DateTime[]>();
 
-        private readonly Dictionary<int, RobotLifeState> robotLifeByInstance =
-            new Dictionary<int, RobotLifeState>();
-
         private readonly HashSet<int> linkedPlayfields = new HashSet<int>();
-
-        private sealed class RobotLifeState
-        {
-            public DateTime SpawnedUtc;
-
-            public DateTime BurnStartedUtc;
-
-            public DateTime NextFireSpellListUtc;
-
-            public bool Burning;
-        }
 
         internal CapturedAreteRobotSpawnOrchestrator(
             CapturedAreteRobotContentProvider capturedRobotContent,
@@ -77,7 +57,6 @@ namespace AORebirth.Core.Playfields
         {
             this.linkedPlayfields.Remove(playfieldInstance);
             this.nextRespawnUtcByPlayfield.Remove(playfieldInstance);
-            this.robotLifeByInstance.Clear();
         }
 
         internal void SpawnForPlayfield(Playfield playfield, Identity playfieldIdentity)
@@ -159,112 +138,6 @@ namespace AORebirth.Core.Playfields
                     {
                     }
                 }
-            }
-
-            this.TickBurnAndExplodeLifecycle(playfield, playfieldIdentity);
-        }
-
-        private void TickBurnAndExplodeLifecycle(Playfield playfield, Identity playfieldIdentity)
-        {
-            if (playfield == null || playfieldIdentity.Instance != PrivateAretePlayfieldInstance)
-            {
-                return;
-            }
-
-            DateTime now = DateTime.UtcNow;
-            var living = new HashSet<int>();
-
-            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
-            {
-                if (candidate == null
-                    || candidate.Controller is PlayerController
-                    || !string.Equals(
-                        candidate.Name,
-                        CapturedAreteRobotContentProvider.RobotName,
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                int instance = candidate.Identity.Instance;
-                if (candidate.Stats[StatIds.health].Value <= 0)
-                {
-                    this.robotLifeByInstance.Remove(instance);
-                    continue;
-                }
-
-                living.Add(instance);
-                RobotLifeState state;
-                if (!this.robotLifeByInstance.TryGetValue(instance, out state) || state == null)
-                {
-                    state = new RobotLifeState
-                    {
-                        SpawnedUtc = now,
-                        BurnStartedUtc = DateTime.MinValue,
-                        NextFireSpellListUtc = DateTime.MinValue,
-                        Burning = false
-                    };
-                    this.robotLifeByInstance[instance] = state;
-                }
-
-                if (!state.Burning)
-                {
-                    if (now < state.SpawnedUtc + TimeSpan.FromSeconds(LifeUntilBurnSeconds))
-                    {
-                        continue;
-                    }
-
-                    state.Burning = true;
-                    state.BurnStartedUtc = now;
-                    state.NextFireSpellListUtc =
-                        now + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
-                    CapturedSpellListVisualEffects.AnnounceBurningRobotFire(candidate);
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        "Captured Arete robot burning identity="
-                        + candidate.Identity.ToString(true)
-                        + " afterLifeSeconds="
-                        + LifeUntilBurnSeconds.ToString(CultureInfo.InvariantCulture));
-                    continue;
-                }
-
-                if (now >= state.BurnStartedUtc + TimeSpan.FromSeconds(BurnBeforeExplodeSeconds))
-                {
-                    // Health=0 → ProcessDeadNpcDespawn → BeginNpcDeath → explode Parameter2=503.
-                    candidate.Stats[StatIds.health].Value = 0;
-                    this.robotLifeByInstance.Remove(instance);
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        "Captured Arete robot explode identity="
-                        + candidate.Identity.ToString(true));
-                    continue;
-                }
-
-                if (!(state.NextFireSpellListUtc > now))
-                {
-                    CapturedSpellListVisualEffects.AnnounceBurningRobotFire(candidate);
-                    state.NextFireSpellListUtc =
-                        now + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
-                }
-            }
-
-            if (this.robotLifeByInstance.Count == 0)
-            {
-                return;
-            }
-
-            var stale = new List<int>();
-            foreach (int tracked in this.robotLifeByInstance.Keys)
-            {
-                if (!living.Contains(tracked))
-                {
-                    stale.Add(tracked);
-                }
-            }
-
-            for (int i = 0; i < stale.Count; i++)
-            {
-                this.robotLifeByInstance.Remove(stale[i]);
             }
         }
 
@@ -366,14 +239,6 @@ namespace AORebirth.Core.Playfields
                 mobCharacter.Identity,
                 PlayfieldLifecycleTrace.FormatCapturedAreteRobotSimpleCharFullUpdateDetail(spawn.SourceInstance));
             playfield.AnnounceSpawnedCharacterVisibility(mobCharacter, Identity.None);
-
-            this.robotLifeByInstance[mobCharacter.Identity.Instance] = new RobotLifeState
-            {
-                SpawnedUtc = DateTime.UtcNow,
-                BurnStartedUtc = DateTime.MinValue,
-                NextFireSpellListUtc = DateTime.MinValue,
-                Burning = false
-            };
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,

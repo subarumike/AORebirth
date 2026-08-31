@@ -1426,15 +1426,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void CapturedAreteRobotContentProviderPreservesPatrolReplayPathAndMissingFileFallback()
+        public void CapturedAreteRobotContentProviderPreservesCanonicalPatrolReplayPathAndMissingFileFallback()
         {
             Assert.AreEqual(
                 @"Content\Captured\Arete\cleaning_robot_patrol_replay.csv",
                 CapturedAreteRobotContentProvider.PatrolReplayRelativePath);
-            Assert.AreEqual(
-                @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260721-Rox-robots\movement-packets.csv",
-                CapturedAreteRobotContentProvider.EvidenceCapturePatrolReplayRelativePath);
-
             var provider = new CapturedAreteRobotContentProvider(
                 new[] { Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "movement-packets.csv") });
 

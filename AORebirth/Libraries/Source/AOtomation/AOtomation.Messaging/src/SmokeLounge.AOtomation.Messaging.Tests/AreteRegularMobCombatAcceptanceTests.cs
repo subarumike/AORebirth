@@ -467,6 +467,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.Register("));
         }
 
+        [TestMethod]
+        public void RexPlatformCleaningRobotsDoNotDieFromAnUnconditionalLifetimeTimer()
+        {
+            string root = FindRepositoryRoot();
+            string source = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
+
+            Assert.IsTrue(source.Contains("private const double RespawnSeconds = 60.0;"));
+            Assert.IsFalse(source.Contains("LifeUntilBurnSeconds"));
+            Assert.IsFalse(source.Contains("BurnBeforeExplodeSeconds"));
+            Assert.IsFalse(source.Contains("TickBurnAndExplodeLifecycle"));
+            Assert.IsFalse(source.Contains("Captured Arete robot explode"));
+            Assert.IsFalse(source.Contains("candidate.Stats[StatIds.health].Value = 0;"));
+        }
+
         private static ExpectedMob Mob(
             string name,
             int monsterData,

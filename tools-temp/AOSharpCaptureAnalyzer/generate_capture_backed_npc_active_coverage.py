@@ -11,7 +11,7 @@ two safe lookup modes as the generated runtime catalog:
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
-or if the fixed initial population does not reconcile to 1,534 actors.
+or if the fixed initial population does not reconcile to 1,562 actors.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1534
+EXPECTED_INITIAL_ACTORS = 1562
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -41,7 +41,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("temple-named-encounters", 12),
     ("temple-reanimated-corpse-adds", 2),
     ("nascence-core-hecklers", 40),
-    ("nascence-life", 837),
+    ("nascence-life", 865),
     ("arete-family", 96),
     ("arete-additional-captured-actors", 17),
     ("subway-merchants", 6),
@@ -159,6 +159,11 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
         "fixed-denominator-surfaces",
         ("arete-family",),
     ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs": (
+        1,
+        "non-denominator-audit",
+        ("captured-dialogue-trade-npcs",),
+    ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs": (
         1,
         "fixed-denominator-surfaces",
@@ -260,6 +265,16 @@ ICC_SHUTTLEPORT_SOURCE = (
     "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs"
 )
 ICC_SHUTTLEPORT_ENTRY_GOVERNANCE: Tuple[Tuple[str, str], ...] = (
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
+    ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
     ("Island Reet", "ACCEPTED_RUNTIME_CONTENT"),
     ("Clan Equipment Vendor", "ACTIVE_EVIDENCE"),
     ("Clan Recruiter", "ACTIVE_EVIDENCE"),
@@ -475,16 +490,22 @@ def discover_icc_shuttleport_entry_governance(
             "ICC Shuttleport entry governance is stale: expected ordered entries "
             f"{len(expected_names)}, found {len(actual_names)}"
         )
-    if not definitions or definitions[0].get(
-        "CombatContractFactory"
-    ) != "IccShuttleportBasicCombatCatalog.IslandReet":
+    accepted_entries = sum(
+        state == "ACCEPTED_RUNTIME_CONTENT"
+        for _, state in ICC_SHUTTLEPORT_ENTRY_GOVERNANCE
+    )
+    if not definitions or any(
+        definition.get("CombatContractFactory")
+        != "IccShuttleportBasicCombatCatalog.IslandReet"
+        for definition in definitions[:accepted_entries]
+    ):
         raise CoverageError(
-            "ICC Shuttleport accepted Island Reet entry is not bound to its "
+            "ICC Shuttleport accepted Island Reet entries are not bound to their "
             "capture-backed combat catalog"
         )
     if any(
         definition.get("CombatContractFactory")
-        for definition in definitions[1:]
+        for definition in definitions[accepted_entries:]
     ):
         raise CoverageError(
             "ICC Shuttleport active-evidence entries must not acquire an "
@@ -1296,8 +1317,8 @@ def parse_nascence_life(repo_root: Path) -> List[ActorDefinition]:
     counts = defaultdict(int)
     for actor in actors:
         counts[actor.resource] += actor.actor_count
-    expected = {4001: 1, 4310: 245, 4311: 387, 4312: 197, 4531: 7}
-    if dict(counts) != expected or len(actors) != 837:
+    expected = {4001: 1, 4310: 272, 4311: 387, 4312: 197, 4531: 7, 4676: 1}
+    if dict(counts) != expected or len(actors) != 865:
         raise CoverageError(
             f"Nascence Life parser found {len(actors)} actors with playfield counts {dict(counts)}"
         )

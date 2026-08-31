@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
 import os
 import shutil
@@ -794,12 +795,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
     @staticmethod
     def _runtime_descriptor():
-        return {
-            "implementation": "CPython",
-            "version": "3.test",
-            "executableSha256": "f" * 64,
-            "executableByteLength": 123,
-        }
+        return pipeline.runtime_descriptor()
 
     @staticmethod
     def _snapshot():
@@ -1987,7 +1983,9 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                         auxiliary_snapshot, candidate, root, object()
                     )
 
-            revalidate_auxiliary.assert_called_once_with(auxiliary_snapshot, root)
+            revalidate_auxiliary.assert_called_once_with(
+                auxiliary_snapshot, root, require_capture_evidence=False
+            )
             auxiliary_snapshot.path_for.assert_called_once_with(
                 pipeline.PRIMARY_GENERATOR.as_posix()
             )
@@ -2119,14 +2117,21 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                     source.write_bytes(source_name.encode("ascii"))
                     expected.append(source.relative_to(root).as_posix())
 
-            discovered = pipeline.auxiliary_input_paths(root)
+            discovered = pipeline.auxiliary_input_paths(
+                root, require_capture_evidence=True
+            )
+            canonical_discovered = pipeline.auxiliary_input_paths(root)
 
             for relative in expected:
                 self.assertIn(relative, discovered)
+            capture_prefix = "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+            self.assertFalse(
+                any(path.startswith(capture_prefix) for path in canonical_discovered)
+            )
             self.assertNotIn(ignored_binary.relative_to(root).as_posix(), discovered)
-            self.assertNotIn(runtime.relative_to(root).as_posix(), discovered)
+            self.assertIn(runtime.relative_to(root).as_posix(), discovered)
 
-    def test_auxiliary_snapshot_does_not_fingerprint_unrelated_zone_runtime_source(self):
+    def test_auxiliary_snapshot_freezes_zone_runtime_scanned_by_active_coverage(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             formula = root / pipeline.FORMULA_GENERATOR
@@ -2150,7 +2155,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
             discovered = pipeline.auxiliary_input_paths(root)
 
-            self.assertNotIn(unrelated.relative_to(root).as_posix(), discovered)
+            self.assertIn(unrelated.relative_to(root).as_posix(), discovered)
 
     def test_explicit_generation_reports_missing_required_capture_evidence(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -2168,6 +2173,116 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 "Required capture evidence is unavailable",
             ):
                 pipeline.auxiliary_input_paths(root, require_capture_evidence=True)
+
+    def test_write_is_canonical_only_and_raw_promotion_remains_gated(self):
+        accepted_manifest = {"inputSnapshot": {}}
+        lease = mock.MagicMock()
+        lease.__enter__.return_value = object()
+        stopped = pipeline.PipelineError("stop after capture requirement")
+
+        with mock.patch.object(pipeline, "_shared_lease", return_value=lease), mock.patch.object(
+            pipeline, "validate_cohort", return_value=accepted_manifest
+        ), mock.patch.object(
+            pipeline, "capture_auxiliary_inputs", side_effect=stopped
+        ) as capture_inputs:
+            with self.assertRaisesRegex(pipeline.PipelineError, "stop after"):
+                pipeline.run_pipeline(
+                    repo_root=Path.cwd(),
+                    mode="write",
+                    max_rounds=1,
+                )
+            self.assertFalse(capture_inputs.call_args.kwargs["require_capture_evidence"])
+
+        with mock.patch.object(pipeline, "_shared_lease", return_value=lease), mock.patch.object(
+            pipeline, "capture_auxiliary_inputs", side_effect=stopped
+        ) as capture_inputs:
+            with self.assertRaisesRegex(pipeline.PipelineError, "stop after"):
+                pipeline.run_pipeline(
+                    repo_root=Path.cwd(),
+                    mode="promote-raw-evidence",
+                    max_rounds=1,
+                )
+            self.assertTrue(capture_inputs.call_args.kwargs["require_capture_evidence"])
+
+    def test_missing_explicit_provenance_is_non_destructive(self):
+        lease = mock.MagicMock()
+        lease.__enter__.return_value = object()
+        manifest = {"generationIdentity": "a" * 64}
+        output = io.StringIO()
+        with mock.patch.object(pipeline, "_shared_lease", return_value=lease), mock.patch.object(
+            pipeline, "validate_cohort", return_value=manifest
+        ), mock.patch.object(
+            pipeline,
+            "capture_auxiliary_inputs",
+            side_effect=pipeline.PipelineError(
+                "Required capture evidence is unavailable: captures/missing"
+            ),
+        ), mock.patch("sys.stdout", new=output):
+            result = pipeline.run_pipeline(
+                repo_root=Path.cwd(),
+                mode="validate",
+                max_rounds=1,
+            )
+        self.assertEqual(0, result)
+        self.assertIn("EVIDENCE_NOT_LOCALLY_AVAILABLE", output.getvalue())
+        self.assertIn("acceptedState=VALID", output.getvalue())
+
+    def test_accepted_inventory_renders_without_raw_and_is_cross_platform_stable(self):
+        extractor = self._load_module_from_path(
+            "accepted_inventory_renderer_test",
+            Path("tools-temp/AOSharpCaptureAnalyzer/extract_capture_backed_npc_combat.py"),
+        )
+        inventory = Path(pipeline.ARTIFACT_RELATIVE_PATHS["inventory"])
+        inventory_before = inventory.read_bytes()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "captures" / "reduced-local-set").mkdir(parents=True)
+            windows_catalog = root / "windows-catalog.cs"
+            windows_fixtures = root / "windows-fixtures.cs"
+            linux_catalog = root / "linux-catalog.cs"
+            linux_fixtures = root / "linux-fixtures.cs"
+            extractor.render_accepted_inventory_artifacts(
+                inventory, windows_catalog, windows_fixtures
+            )
+            shutil.rmtree(root / "captures")
+            extractor.render_accepted_inventory_artifacts(
+                inventory, linux_catalog, linux_fixtures
+            )
+            self.assertEqual(windows_catalog.read_bytes(), linux_catalog.read_bytes())
+            self.assertEqual(windows_fixtures.read_bytes(), linux_fixtures.read_bytes())
+        self.assertEqual(inventory_before, inventory.read_bytes())
+        self.assertEqual(
+            pipeline.runtime_descriptor(Path(r"C:\\Python\\python.exe")),
+            pipeline.runtime_descriptor(Path("/usr/bin/python3")),
+        )
+
+    def test_production_and_build_paths_do_not_consume_raw_capture_filesystems(self):
+        raw_markers = (
+            "tools-temp/aosharplivecapture/bin/debug/captures/",
+            "tools-temp\\aosharplivecapture\\bin\\debug\\captures\\",
+        )
+        production_root = Path("AORebirth/Server/ZoneEngine")
+        violations = []
+        for path in production_root.rglob("*.cs"):
+            if path.name.endswith(".g.cs"):
+                continue
+            text = path.read_text(encoding="utf-8").casefold()
+            executable_lines = [
+                line.split("//", 1)[0]
+                for line in text.splitlines()
+                if not line.lstrip().startswith(("//", "///", "*"))
+            ]
+            if any(marker in "\n".join(executable_lines) for marker in raw_markers):
+                violations.append(path.as_posix())
+        for wrapper in (
+            Path("Tools/build_aorebirth_debug.cmd"),
+            Path("Tools/run_mandatory_integration_gate.cmd"),
+            Path("Tools/accept_windows_source.cmd"),
+        ):
+            text = wrapper.read_text(encoding="utf-8").casefold()
+            if "promote-raw-evidence" in text or "aosharplivecapture" in text:
+                violations.append(wrapper.as_posix())
+        self.assertEqual([], violations)
 
 
 if __name__ == "__main__":

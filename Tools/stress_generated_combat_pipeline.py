@@ -298,12 +298,7 @@ def create_fixture_candidate(fake_repo: Path, variant: str) -> pipeline.Candidat
         }
         for name, logical in pipeline.GENERATOR_PATHS.items()
     }
-    runtime = {
-        "implementation": "fixture",
-        "version": "1",
-        "executableSha256": "0" * 64,
-        "executableByteLength": 1,
-    }
+    runtime = pipeline.runtime_descriptor()
     plan_core = {
         "schemaVersion": 1,
         "generatorSources": [],
