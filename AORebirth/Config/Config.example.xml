@@ -8,6 +8,8 @@
   <ZonePort>7501</ZonePort>
   <LoginPort>7500</LoginPort>
   <CommPort>6996</CommPort>
+  <!-- Playfield simulation ticks per second (default 32) -->
+  <PlayfieldTickRate>32</PlayfieldTickRate>
   <SqlLog>true</SqlLog>
   <LogChat>false</LogChat>
   <Motd>https://ao-rebirth.com</Motd>

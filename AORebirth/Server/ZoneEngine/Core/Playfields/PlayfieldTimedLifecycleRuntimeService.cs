@@ -18,14 +18,14 @@ namespace ZoneEngine.Core.Playfields
     {
         internal void ProcessHeartbeatLifecycle(
             Identity playfieldIdentity,
+            double deltaTime,
             Func<IEnumerable<ICharacter>> characters,
             Func<Identity, bool> hasPendingDeadNpcDespawn,
             Action processPendingCorpseSpawns,
             Action processCorpseDespawns,
             Action processPendingCorpseCreditAwards,
             Func<ICharacter, bool> processDeadNpcDespawn,
-            Action<ICharacter> processRegeneration,
-            Action<ICharacter> processCombatTick,
+            Action<ICharacter, double> processCharacterTick,
             Action<ICharacter> processNpcPatrolTick,
             Action<ICharacter> processFollow,
             Action<ICharacter> processPlayerCollision)
@@ -36,8 +36,7 @@ namespace ZoneEngine.Core.Playfields
             Require(processCorpseDespawns, "processCorpseDespawns");
             Require(processPendingCorpseCreditAwards, "processPendingCorpseCreditAwards");
             Require(processDeadNpcDespawn, "processDeadNpcDespawn");
-            Require(processRegeneration, "processRegeneration");
-            Require(processCombatTick, "processCombatTick");
+            Require(processCharacterTick, "processCharacterTick");
             Require(processNpcPatrolTick, "processNpcPatrolTick");
             Require(processFollow, "processFollow");
             Require(processPlayerCollision, "processPlayerCollision");
@@ -74,8 +73,7 @@ namespace ZoneEngine.Core.Playfields
                         continue;
                     }
 
-                    processCombatTick(dynel);
-                    processRegeneration(dynel);
+                    processCharacterTick(dynel, deltaTime);
 
                     if (dynel.Controller is NPCController)
                     {

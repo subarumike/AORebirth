@@ -227,6 +227,11 @@ namespace Utility.Config
         public int ZonePort { get; set; }
 
         /// <summary>
+        /// Gets or sets playfield simulation ticks per second. Default 32.
+        /// </summary>
+        public int PlayfieldTickRate { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public string WebHostName { get; set; }

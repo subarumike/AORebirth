@@ -261,6 +261,55 @@ namespace AORebirth.Core.Playfields
                     }
                 }
             }
+
+            if (!hasCapturedContract)
+            {
+                this.EnsureNpcCharacterWeapon(attacker, initialDelaySeconds);
+            }
+        }
+
+        private void EnsureNpcCharacterWeapon(ICharacter attacker, double initialAttackDelaySeconds)
+        {
+            Character character = attacker as Character;
+            if (character == null)
+            {
+                return;
+            }
+
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            double attackSpeed = initialAttackDelaySeconds > 0.0
+                                     ? initialAttackDelaySeconds
+                                     : CharacterWeapon.DefaultAttackSpeedSeconds;
+            double rechargeSpeed = CharacterWeapon.DefaultRechargeSpeedSeconds;
+            if (attackSource != null)
+            {
+                if (attackSource.AttackSpeedSeconds > 0.0)
+                {
+                    attackSpeed = attackSource.AttackSpeedSeconds;
+                }
+
+                if (attackSource.RechargeOnlySeconds > 0.0)
+                {
+                    rechargeSpeed = attackSource.RechargeOnlySeconds;
+                }
+                else if (attackSource.RechargeSeconds > 0.0)
+                {
+                    // Legacy combined cycle: treat majority as recharge after first swing.
+                    rechargeSpeed = attackSource.RechargeSeconds;
+                }
+            }
+
+            if (PetCombatRules.IsPlayerOwnedPet(attacker)
+                && !PetCombatRules.IsPlayerOwnedHealingPet(attacker))
+            {
+                attackSpeed = CharacterWeapon.DefaultAttackSpeedSeconds;
+                rechargeSpeed = PetCombatRules.AttackPetRechargeSeconds;
+            }
+
+            CharacterWeapon weapon = new CharacterWeapon();
+            weapon.ConfigureSpeeds(attackSpeed, rechargeSpeed);
+            character.SetWeapon(WeaponSlot.MainHand, weapon);
+            character.ResetAllWeaponAttacks();
         }
 
         internal void ClearTracking(Identity identity)
@@ -285,6 +334,16 @@ namespace AORebirth.Core.Playfields
             this.nextBasicInitialDelayObservationIndexes.Remove(identity.Instance);
             this.nextBasicDamageObservationIndexes.Remove(identity.Instance);
             this.nextBasicLandedIntervalObservationIndexes.Remove(identity.Instance);
+
+            if (this.playfield != null)
+            {
+                ICharacter character = this.playfield.FindByIdentity<ICharacter>(identity);
+                Character c = character as Character;
+                if (c != null)
+                {
+                    c.ClearWeapons();
+                }
+            }
         }
 
         internal void ClearRuntimeState()
@@ -525,6 +584,14 @@ namespace AORebirth.Core.Playfields
                                                  attacker.Identity.Instance,
                                                  out activeCapturedContract)
                                              && activeCapturedContract.IsCombatReady;
+
+            // CharacterWeapon clocks drive ordinary swings. Captured contracts keep legacy clocks.
+            if (!hasActiveCapturedContract)
+            {
+                this.ProcessNpcCombatMovementMaintenance(attacker, target, attackSource);
+                return;
+            }
+
             bool maintainMovementDuringRecharge =
                 Playfield.IsCapturedCleaningRobot(attacker)
                 || PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
@@ -567,6 +634,97 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            this.ApplyNpcCombatHitCore(attacker, target, attackSource, activeCapturedContract);
+
+            if (attacker.FightingTarget.Instance != 0)
+            {
+                this.nextCombatTicks[attacker.Identity.Instance] =
+                    DateTime.UtcNow + TimeSpan.FromSeconds(
+                        this.ResolveLandedRechargeSeconds(attacker, attackSource));
+            }
+        }
+
+        /// <summary>
+        /// Apply one NPC auto-attack hit. Called from CharacterWeapon Attacked (no nextCombatTicks gate).
+        /// </summary>
+        internal void ApplyCombatHit(ICharacter attacker)
+        {
+            if (attacker == null || this.playfield == null || attacker.FightingTarget.Instance == 0)
+            {
+                return;
+            }
+
+            CapturedEnemyCombatContract registeredCapturedContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    attacker.Identity.Instance,
+                    out registeredCapturedContract)
+                && registeredCapturedContract.IsCombatReady)
+            {
+                // Captured combat keeps legacy ProcessCombatTick timing.
+                return;
+            }
+
+            ICharacter target = this.playfield.FindByIdentity<ICharacter>(attacker.FightingTarget);
+            if (target == null
+                || !target.InPlayfield(this.playfield.Identity)
+                || target.Stats[StatIds.health].Value <= 0
+                || !PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target))
+            {
+                this.playfield.ClearInvalidNpcCombatTarget(attacker);
+                return;
+            }
+
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            if (attackSource == null)
+            {
+                this.playfield.ClearNpcCombatTracking(attacker.Identity);
+                return;
+            }
+
+            if (!this.playfield.IsInCombatRange(attacker, target, attackSource.Range))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                return;
+            }
+
+            if (!this.CanApplyNpcDamage(attacker, target, null, DateTime.UtcNow))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                return;
+            }
+
+            this.ApplyNpcCombatHitCore(attacker, target, attackSource, null);
+        }
+
+        private void ProcessNpcCombatMovementMaintenance(
+            ICharacter attacker,
+            ICharacter target,
+            CombatAttackSource attackSource)
+        {
+            bool maintainMovement =
+                Playfield.IsCapturedCleaningRobot(attacker)
+                || PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
+                || true;
+
+            if (!this.playfield.IsInCombatRange(attacker, target, attackSource.Range))
+            {
+                this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);
+                return;
+            }
+
+            this.playfield.HoldNpcAtCombatPosition(attacker, target);
+            if (maintainMovement && attackSource.Range <= NpcCombatAttackRules.MaxMeleeCombatDistance)
+            {
+                this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);
+            }
+        }
+
+        private void ApplyNpcCombatHitCore(
+            ICharacter attacker,
+            ICharacter target,
+            CombatAttackSource attackSource,
+            CapturedEnemyCombatContract activeCapturedContract)
+        {
             this.playfield.HoldNpcAtCombatPosition(attacker, target);
 
             if (attackSource.Range <= NpcCombatAttackRules.MaxMeleeCombatDistance)
@@ -590,8 +748,6 @@ namespace AORebirth.Core.Playfields
             }
 
             this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
-            // AttackInfo-only: client emits "hit you for N points of melee damage" from AttackInfo.
-            // Sending HealthDamage alongside suppresses that chat line while stats still update server-side.
             CombatDamageSource damageSource = attackSource.UsesEquippedWeapon
                                                   ? CombatDamageSource.WeaponAutoAttack
                                                   : CombatDamageSource.UnarmedAutoAttack;
@@ -606,6 +762,7 @@ namespace AORebirth.Core.Playfields
             {
                 this.completedCapturedOpeningAttacks.Add(attacker.Identity.Instance);
             }
+
             target.SendChangedStats();
             this.playfield.NotifyNpcCombatDamage(target);
             LogUtil.Debug(
@@ -633,12 +790,7 @@ namespace AORebirth.Core.Playfields
                 }
 
                 this.playfield.HandleCombatKillingHit(attacker, target);
-                return;
             }
-
-            this.nextCombatTicks[attacker.Identity.Instance] =
-                DateTime.UtcNow + TimeSpan.FromSeconds(
-                    this.ResolveLandedRechargeSeconds(attacker, attackSource));
         }
 
         private bool TryApplyCapturedWeaponAmmo(
@@ -2108,6 +2260,12 @@ namespace AORebirth.Core.Playfields
                                              : NormalizeCombatDelaySeconds(
                                                  weapon.GetAttribute((int)StatIds.itemdelay),
                                                  weapon.GetAttribute((int)StatIds.rechargedelay)),
+                       AttackSpeedSeconds = NormalizeDelayCentisecondsToSeconds(
+                           weapon.GetAttribute((int)StatIds.itemdelay),
+                           CharacterWeapon.DefaultAttackSpeedSeconds),
+                       RechargeOnlySeconds = NormalizeDelayCentisecondsToSeconds(
+                           weapon.GetAttribute((int)StatIds.rechargedelay),
+                           CharacterWeapon.DefaultRechargeSpeedSeconds),
                        UsesEquippedWeapon = true,
                        AttackInfoAmmoCount = hasCapturedEquippedAttackInfo
                                                  ? capturedContract.AttackInfoAmmoCount
@@ -2291,6 +2449,22 @@ namespace AORebirth.Core.Playfields
             return Math.Max(0.25, totalCentiseconds / 100.0);
         }
 
+        private static double NormalizeDelayCentisecondsToSeconds(int delayCentiseconds, double fallbackSeconds)
+        {
+            int normalized = NormalizeCombatItemStat(delayCentiseconds, 0);
+            if (normalized <= 0)
+            {
+                return fallbackSeconds;
+            }
+
+            if (normalized > 500)
+            {
+                normalized = 100;
+            }
+
+            return Math.Max(0.05, normalized / 100.0);
+        }
+
         private sealed class CombatAttackSource
         {
             public int MinDamage { get; set; }
@@ -2302,6 +2476,12 @@ namespace AORebirth.Core.Playfields
             public double Range { get; set; }
 
             public double RechargeSeconds { get; set; }
+
+            /// <summary>Itemdelay only (seconds). Used by CharacterWeapon AttackSpeed.</summary>
+            public double AttackSpeedSeconds { get; set; }
+
+            /// <summary>Rechargedelay only (seconds). Used by CharacterWeapon RechargeSpeed.</summary>
+            public double RechargeOnlySeconds { get; set; }
 
             public bool UsesEquippedWeapon { get; set; }
 
