@@ -658,11 +658,15 @@ cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py -
 cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe "<capture-folder>"
 cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe --decode-loot "<capture-folder>"
 cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <capture-folder>
+cmd /d /c python tools-temp\AOSharpLiveCapture\decode_movement_capture.py <capture-folder>
 ```
 
 Run the analyzer first to recover direct SCFU evidence from raw packets, run
 `--decode-loot` to recover raw inventory snapshots and item transfers, then run
 the lifecycle decoder to rebuild correlated NPC lifecycle and corpse-loot outputs.
+Run the movement decoder when movement, idle paths, chase, or range evidence is
+needed. It reconciles the packet log and `raw-packets.csv`, so Zam captures whose
+packet log uses the alternate line format still retain their movement evidence.
 
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
