@@ -602,16 +602,17 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-For Mike's multi-plugin `AO Sharp Zam 2022` runtime, build the dedicated x86
+For Mike's multi-plugin legacy AOSharp runtime, build the dedicated x86
 compatibility plugin directly against that installation's existing
 `AOSharp.Core.dll` and `AOSharp.Common.dll`:
 
 ```cmd
-cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Zam2022.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
+set MIKE_AOSHARP_RUNTIME=<exact legacy AOSharp runtime directory>
+cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Mike2022.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
 ```
 
-Load `AOSharpLiveCapture.Zam2022.dll` in the same assembly selection as the
-other Zam plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
+Load `AOSharpLiveCapture.Mike2022.dll` in the same assembly selection as the
+other plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
 plugin registers `/aocap start|stop|status|flush|mark|snapshot` plus
 `/aocap auto on|off|status`. It starts a crash-recoverable session when loaded,
 auto-flushes every evidence row, writes an atomic checkpoint every two seconds,
@@ -633,9 +634,9 @@ spawn identity, world/player context, movement, combat start, NPC-to-player and
 unprovoked aggro, death/corpse, and identity-linked loot. A projection gap with
 an intact raw stream remains an offline-decode issue rather than an automatic
 recapture request. The packet log uses the canonical format consumed by the
-repository decoders. Zam 2022 still lacks newer AOSharp APIs required by the
-remaining optional in-process geometry projections; the repository analyzer
-remains responsible for those projections.
+repository decoders. The legacy 2022 runtime still lacks newer AOSharp APIs
+required by the remaining optional in-process geometry projections; the
+repository analyzer remains responsible for those projections.
 
 Build the injector and its capture-safe Bootstrap only through:
 
@@ -684,7 +685,7 @@ Run the analyzer first to recover direct SCFU evidence from raw packets, run
 `--decode-loot` to recover raw inventory snapshots and item transfers, then run
 the lifecycle decoder to rebuild correlated NPC lifecycle and corpse-loot outputs.
 Run the movement decoder when movement, idle paths, chase, or range evidence is
-needed. It reconciles the packet log and `raw-packets.csv`, so Zam captures whose
+needed. It reconciles the packet log and `raw-packets.csv`, so Mike captures whose
 packet log uses the alternate line format still retain their movement evidence.
 
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**

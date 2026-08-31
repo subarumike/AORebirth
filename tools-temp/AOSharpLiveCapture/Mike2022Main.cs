@@ -12,7 +12,7 @@ using AOSharp.Core;
 using AOSharp.Core.UI;
 using AORebirth.CaptureProtocol;
 
-namespace AOSharpLiveCapture.Zam2022
+namespace AOSharpLiveCapture.Mike2022
 {
     public sealed class Main : AOPluginEntry
     {
@@ -177,7 +177,7 @@ namespace AOSharpLiveCapture.Zam2022
                     this.StartSession("automatic plugin startup");
                 }
                 Chat.WriteLine(
-                    "AOSharpLiveCapture Zam 2022 ready with automatic crash-safe capture: "
+                    "AOSharpLiveCapture Mike 2022 ready with automatic crash-safe capture: "
                     + this.sessionDirectory,
                     ChatColor.Gold);
             }
@@ -348,7 +348,7 @@ namespace AOSharpLiveCapture.Zam2022
                 areaName,
                 playfieldId,
                 captureId,
-                "Zam 2022");
+                "Mike 2022");
 
             this.packetLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
             this.rawPacketLog = CreateWriter(Path.Combine(this.sessionDirectory, "raw-packets.csv"));
@@ -411,7 +411,7 @@ namespace AOSharpLiveCapture.Zam2022
             this.captureClock.Restart();
             this.enabled = true;
             this.nextCheckpointUtc = this.captureStartUtc.AddSeconds(CheckpointSeconds);
-            this.WriteEvent("START", "AOSharp Zam 2022 compatibility capture started: " + reason);
+            this.WriteEvent("START", "AOSharp Mike 2022 compatibility capture started: " + reason);
             this.WriteWorldSnapshot("capture-start");
             this.WritePlayerCombatContext("capture-start");
             this.WriteCaptureInfo(false, reason);
@@ -1575,7 +1575,7 @@ namespace AOSharpLiveCapture.Zam2022
             string path = Path.Combine(this.sessionDirectory, "capture_info.json");
             StringBuilder json = new StringBuilder();
             json.AppendLine("{");
-            json.AppendLine("  \"captureMode\": \"aosharp-zam-2022-raw-compatible\",");
+            json.AppendLine("  \"captureMode\": \"aosharp-mike-2022-raw-compatible\",");
             json.AppendLine("  \"automaticCaptureEnabled\": " + (this.automaticCaptureEnabled ? "true" : "false") + ",");
             json.AppendLine("  \"sessionAreaName\": " + Json(this.sessionAreaName) + ",");
             json.AppendLine("  \"sessionPlayfieldId\": " + this.sessionPlayfieldId.ToString(CultureInfo.InvariantCulture) + ",");
