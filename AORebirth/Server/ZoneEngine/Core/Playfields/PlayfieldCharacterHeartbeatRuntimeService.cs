@@ -20,10 +20,6 @@ namespace ZoneEngine.Core.Playfields
 
     using AORebirth.ObjectManager;
 
-    using AORebirth.Stats.SpecialStats;
-
-
-
     using ZoneEngine.Core;
 
     using ZoneEngine.Core.Controllers;
@@ -38,23 +34,25 @@ namespace ZoneEngine.Core.Playfields
 
     {
 
-        private readonly ConcurrentDictionary<int, DateTime> nextNpcHealthRegenUtc =
-
-            new ConcurrentDictionary<int, DateTime>();
-
-
-
         private readonly ConcurrentDictionary<int, byte> npcRegenSuspendedForCombat =
 
             new ConcurrentDictionary<int, byte>();
 
 
 
-        internal void ProcessRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)
+        internal void ProcessRegeneration(ICharacter dynel, double deltaTime, Action<ICharacter> sendChangedStats)
 
         {
 
             Require(sendChangedStats, "sendChangedStats");
+
+            if (deltaTime <= 0.0)
+
+            {
+
+                return;
+
+            }
 
 
 
@@ -74,7 +72,7 @@ namespace ZoneEngine.Core.Playfields
 
             {
 
-                this.ProcessNpcPassiveRegen(dynel, sendChangedStats);
+                this.ProcessNpcPassiveRegen(dynel, deltaTime, sendChangedStats);
 
                 return;
 
@@ -90,56 +88,6 @@ namespace ZoneEngine.Core.Playfields
             }
 
             AmbientRestorationAuraRuntime.ProcessTick(dynel);
-
-            StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
-
-            int healIntervalSeconds = healInterval.Value;
-
-            int healDelta = dynel.Stats[StatIds.healdelta].Value;
-
-            if (healIntervalSeconds > 0
-
-                && healDelta != 0
-
-                && healInterval.LastTick < DateTime.UtcNow)
-
-            {
-
-                dynel.Stats[StatIds.health].Value =
-
-                    Math.Min(dynel.Stats[StatIds.life].Value, dynel.Stats[StatIds.health].Value + healDelta);
-
-                healInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(healIntervalSeconds);
-
-                changed = true;
-
-            }
-
-
-
-            StatNanoInterval nanoInterval = (StatNanoInterval)dynel.Stats[StatIds.nanointerval];
-
-            int nanoIntervalSeconds = nanoInterval.Value;
-
-            int nanoDelta = dynel.Stats[StatIds.nanodelta].Value;
-
-            if (nanoIntervalSeconds > 0
-
-                && nanoDelta != 0
-
-                && nanoInterval.LastTick < DateTime.UtcNow)
-
-            {
-
-                dynel.Stats[StatIds.currentnano].Value += nanoDelta;
-
-                nanoInterval.LastTick = DateTime.UtcNow + TimeSpan.FromSeconds(nanoIntervalSeconds);
-
-                changed = true;
-
-            }
-
-
 
             if (changed)
 
@@ -183,7 +131,7 @@ namespace ZoneEngine.Core.Playfields
 
 
 
-        private void ProcessNpcPassiveRegen(ICharacter npc, Action<ICharacter> sendChangedStats)
+        private void ProcessNpcPassiveRegen(ICharacter npc, double deltaTime, Action<ICharacter> sendChangedStats)
 
         {
 
@@ -199,13 +147,18 @@ namespace ZoneEngine.Core.Playfields
 
 
 
+            Character character = npc as Character;
+
             int currentHealth = npc.Stats[StatIds.health].Value;
 
             if (!PlayfieldCharacterHeartbeatHealthRules.IsLivingHealth(
                 currentHealth))
             {
 
-                this.nextNpcHealthRegenUtc.TryRemove(npcInstance, out _);
+                if (character != null)
+                {
+                    character.NpcHealthRegenElapsed = 0.0;
+                }
 
                 this.npcRegenSuspendedForCombat.TryRemove(npcInstance, out _);
 
@@ -256,11 +209,19 @@ namespace ZoneEngine.Core.Playfields
 
 
 
-            DateTime now = DateTime.UtcNow;
+            if (character == null || regenIntervalSeconds <= 0.0)
 
-            DateTime nextHealth = this.nextNpcHealthRegenUtc.GetOrAdd(npcInstance, now);
+            {
 
-            if (now < nextHealth)
+                return;
+
+            }
+
+
+
+            character.NpcHealthRegenElapsed += deltaTime;
+
+            if (character.NpcHealthRegenElapsed < regenIntervalSeconds)
 
             {
 
@@ -272,9 +233,7 @@ namespace ZoneEngine.Core.Playfields
 
             npc.Stats[StatIds.health].Value = Math.Min(maxHealth, currentHealth + healDelta);
 
-            this.nextNpcHealthRegenUtc[npcInstance] =
-
-                now.AddSeconds(regenIntervalSeconds);
+            character.NpcHealthRegenElapsed = 0.0;
 
             sendChangedStats(npc);
 

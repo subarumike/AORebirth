@@ -828,11 +828,11 @@ namespace ZoneEngine.Core.Playfields
 
         internal void ProcessHeartbeatTimedLifecycle(
             Identity playfieldIdentity,
+            double deltaTime,
             Action processPendingCorpseSpawns,
             Action processCorpseDespawns,
             Action processPendingCorpseCreditAwards,
-            Action<ICharacter> processRegeneration,
-            Action<ICharacter> processCombatTick,
+            Action<ICharacter, double> processCharacterTick,
             Action<ICharacter> processFollow,
             Action<ICharacter> processPlayerCollision)
         {
@@ -851,14 +851,14 @@ namespace ZoneEngine.Core.Playfields
 
             this.timedLifecycle.ProcessHeartbeatLifecycle(
                 playfieldIdentity,
+                deltaTime,
                 this.Characters,
                 this.HasPendingDeadNpcDespawn,
                 processPendingCorpseSpawns,
                 processCorpseDespawns,
                 processPendingCorpseCreditAwards,
                 this.ProcessDeadNpcDespawn,
-                processRegeneration,
-                processCombatTick,
+                processCharacterTick,
                 this.ProcessNpcPatrolTick,
                 processFollow,
                 processPlayerCollision);
@@ -868,9 +868,12 @@ namespace ZoneEngine.Core.Playfields
             this.doorStatuses.ProcessCharacters(this.Characters(), DateTime.UtcNow);
         }
 
-        internal void ProcessCharacterRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)
+        internal void ProcessCharacterRegeneration(
+            ICharacter dynel,
+            double deltaTime,
+            Action<ICharacter> sendChangedStats)
         {
-            this.characterHeartbeat.ProcessRegeneration(dynel, sendChangedStats);
+            this.characterHeartbeat.ProcessRegeneration(dynel, deltaTime, sendChangedStats);
         }
 
         internal void NotifyNpcCombatDamage(ICharacter npc)
@@ -1289,6 +1292,11 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ProcessCombatTick(attacker);
         }
 
+        internal void ApplyNpcCombatHit(ICharacter attacker)
+        {
+            this.npcRuntime.ApplyCombatHit(attacker);
+        }
+
         internal void ClearInvalidNpcCombatTarget(ICharacter attacker)
         {
             this.npcRuntime.ClearInvalidCombatTarget(attacker);
@@ -1344,14 +1352,16 @@ namespace ZoneEngine.Core.Playfields
 
         internal void ProcessPlayerCombatTick(
             ICharacter attacker,
+            WeaponSlot preferredSlot,
             Action<Identity> clearCombatTracking,
             Func<Identity, ICharacter> findTarget,
             Func<ICharacter, bool> isValidTarget,
             Action<ICharacter, ICharacter> logInvalidTarget,
-            Action<ICharacter, ICharacter> processValidatedCombatTick)
+            Action<ICharacter, ICharacter, WeaponSlot> processValidatedCombatTick)
         {
             this.playerCombat.ProcessCombatTick(
                 attacker,
+                preferredSlot,
                 clearCombatTracking,
                 findTarget,
                 isValidTarget,

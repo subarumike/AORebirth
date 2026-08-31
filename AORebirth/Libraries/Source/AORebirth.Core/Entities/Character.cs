@@ -130,6 +130,8 @@ namespace AORebirth.Core.Entities
             this.TrainedPerkPacketIds = new HashSet<int>();
             this.LockedPerkPacketIdsUntilUtc = new Dictionary<int, DateTime>();
 
+            this.Weapons = new Dictionary<WeaponSlot, CharacterWeapon>();
+
             this.BaseInventory = new PlayerInventory(this);
 
             this.SocialTab = new Dictionary<int, int>
@@ -227,6 +229,33 @@ namespace AORebirth.Core.Entities
         /// <summary>
         /// </summary>
         public Identity FightingTarget { get; set; }
+
+        /// <summary>
+        /// Per-slot auto-attack clocks (Lost Eden multi-weapon model).
+        /// </summary>
+        public Dictionary<WeaponSlot, CharacterWeapon> Weapons { get; private set; }
+
+        /// <summary>
+        /// Playfield-registered combat apply. Invoked when a CharacterWeapon fires Attacked.
+        /// </summary>
+        public Action<WeaponSlot> CombatSwingHandler { get; set; }
+
+        /// <summary>
+        /// Accumulated healinterval elapsed seconds (deltaTime regen).
+        /// </summary>
+        public double HealRegenElapsed { get; set; }
+
+        /// <summary>
+        /// Accumulated nanointerval elapsed seconds (deltaTime regen).
+        /// </summary>
+        public double NanoRegenElapsed { get; set; }
+
+        /// <summary>
+        /// Accumulated NPC passive health regen elapsed seconds.
+        /// </summary>
+        public double NpcHealthRegenElapsed { get; set; }
+
+        private readonly Dictionary<WeaponSlot, Action> weaponAttackHandlers = new Dictionary<WeaponSlot, Action>();
 
         /// <summary>
         /// </summary>
@@ -596,6 +625,161 @@ namespace AORebirth.Core.Entities
         {
             this.FightingTarget = identity;
             return true;
+        }
+
+        /// <summary>
+        /// Assign or replace a per-slot auto-attack clock.
+        /// </summary>
+        public void SetWeapon(WeaponSlot slot, CharacterWeapon weapon)
+        {
+            if (slot == WeaponSlot.None || weapon == null)
+            {
+                return;
+            }
+
+            CharacterWeapon existing;
+            if (this.Weapons.TryGetValue(slot, out existing) && existing != null)
+            {
+                Action existingHandler;
+                if (this.weaponAttackHandlers.TryGetValue(slot, out existingHandler))
+                {
+                    existing.Attacked -= existingHandler;
+                    this.weaponAttackHandlers.Remove(slot);
+                }
+            }
+
+            weapon.Wielder = this;
+            Action handler = () =>
+                {
+                    Action<WeaponSlot> swingHandler = this.CombatSwingHandler;
+                    if (swingHandler != null)
+                    {
+                        swingHandler(slot);
+                    }
+                };
+            this.weaponAttackHandlers[slot] = handler;
+            this.Weapons[slot] = weapon;
+            weapon.Attacked += handler;
+        }
+
+        /// <summary>
+        /// Reset all weapon clocks to Attacking.
+        /// </summary>
+        public void ResetAllWeaponAttacks()
+        {
+            foreach (CharacterWeapon weapon in this.Weapons.Values)
+            {
+                if (weapon != null)
+                {
+                    weapon.ResetAttack();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clear all weapon clocks and handlers.
+        /// </summary>
+        public void ClearWeapons()
+        {
+            foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in this.Weapons)
+            {
+                Action handler;
+                if (pair.Value != null && this.weaponAttackHandlers.TryGetValue(pair.Key, out handler))
+                {
+                    pair.Value.Attacked -= handler;
+                    pair.Value.Wielder = null;
+                }
+            }
+
+            this.weaponAttackHandlers.Clear();
+            this.Weapons.Clear();
+        }
+
+        public override void Tick(double deltaTime)
+        {
+            this.ProcessCharacterRegen(deltaTime);
+
+            if (this.FightingTarget.Instance == 0)
+            {
+                return;
+            }
+
+            this.TickWeapons(deltaTime);
+        }
+
+        /// <summary>
+        /// While any slot is charging attack, only that slot ticks; others pause.
+        /// </summary>
+        private void TickWeapons(double deltaTime)
+        {
+            CharacterWeapon charging = null;
+            foreach (CharacterWeapon weapon in this.Weapons.Values)
+            {
+                if (weapon != null && weapon.State == WeaponState.Attacking)
+                {
+                    charging = weapon;
+                    break;
+                }
+            }
+
+            if (charging != null)
+            {
+                charging.Tick(deltaTime);
+                return;
+            }
+
+            foreach (CharacterWeapon weapon in this.Weapons.Values)
+            {
+                if (weapon != null)
+                {
+                    weapon.Tick(deltaTime);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Heal/nano interval regen driven by playfield deltaTime.
+        /// </summary>
+        private void ProcessCharacterRegen(double deltaTime)
+        {
+            if (deltaTime <= 0.0)
+            {
+                return;
+            }
+
+            bool changed = false;
+
+            int healIntervalSeconds = this.Stats[StatIds.healinterval].Value;
+            int healDelta = this.Stats[StatIds.healdelta].Value;
+            if (healIntervalSeconds > 0 && healDelta != 0)
+            {
+                this.HealRegenElapsed += deltaTime;
+                if (this.HealRegenElapsed >= healIntervalSeconds)
+                {
+                    this.Stats[StatIds.health].Value =
+                        Math.Min(this.Stats[StatIds.life].Value, this.Stats[StatIds.health].Value + healDelta);
+                    this.HealRegenElapsed = 0.0;
+                    changed = true;
+                }
+            }
+
+            int nanoIntervalSeconds = this.Stats[StatIds.nanointerval].Value;
+            int nanoDelta = this.Stats[StatIds.nanodelta].Value;
+            if (nanoIntervalSeconds > 0 && nanoDelta != 0)
+            {
+                this.NanoRegenElapsed += deltaTime;
+                if (this.NanoRegenElapsed >= nanoIntervalSeconds)
+                {
+                    this.Stats[StatIds.currentnano].Value += nanoDelta;
+                    this.NanoRegenElapsed = 0.0;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                this.SendChangedStats();
+            }
         }
 
         /// <summary>
