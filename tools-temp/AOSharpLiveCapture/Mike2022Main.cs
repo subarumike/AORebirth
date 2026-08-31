@@ -28,7 +28,9 @@ namespace AOSharpLiveCapture.Mike2022
         private const int CharacterActionMessage = 0x5E477770;
         private const int CorpseFullUpdateMessage = 0x4F474E05;
         private const int InventoryUpdateMessage = 0x4E536976;
+        private const int DespawnMessage = 0x36510078;
         private const int CheckpointSeconds = 2;
+        private const int VisibilitySampleMilliseconds = 500;
         private const double AggroPositionWindowSeconds = 2.0;
 
         private sealed class EntitySnapshot
@@ -48,7 +50,10 @@ namespace AOSharpLiveCapture.Mike2022
             internal int Health;
             internal int HealthDamage;
             internal uint MonsterData;
+            internal string Kind;
+            internal bool HasPosition;
             internal bool IsNpc;
+            internal bool IsPlayer;
         }
 
         private sealed class CorpseSnapshot
@@ -107,6 +112,7 @@ namespace AOSharpLiveCapture.Mike2022
         private StreamWriter worldSnapshotLog;
         private StreamWriter playerCombatContextLog;
         private StreamWriter aggroObservationLog;
+        private StreamWriter visibilityObservationLog;
         private StreamWriter eventLog;
         private readonly Dictionary<string, EntitySnapshot> knownEntities =
             new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
@@ -119,14 +125,19 @@ namespace AOSharpLiveCapture.Mike2022
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> observedCorpseIdentities =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, EntitySnapshot> previousVisibleDynels =
+            new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
         private bool enabled;
         private bool stopRequested;
-        private bool automaticCaptureEnabled = true;
+        private bool automaticCaptureEnabled;
         private bool teardownRequested;
         private DateTime captureStartUtc;
         private DateTime stopRequestedUtc;
         private DateTime lastPacketUtc;
         private DateTime nextCheckpointUtc;
+        private DateTime nextVisibilitySampleUtc;
+        private DateTime previousVisibilitySampleUtc;
+        private EntitySnapshot previousVisibilityPlayer;
         private int sessionPlayfieldId;
         private string sessionAreaName = string.Empty;
         private string playerIdentity = string.Empty;
@@ -162,6 +173,11 @@ namespace AOSharpLiveCapture.Mike2022
         private int aggroObservationRows;
         private int npcToPlayerAggroObservationRows;
         private int unprovokedNpcAggroObservationRows;
+        private int visibilitySamples;
+        private int visibilityObservationRows;
+        private int visibilityTransitionRows;
+        private int visibilitySampleErrors;
+        private int despawnPackets;
 
         public override void Run(string pluginDir)
         {
@@ -172,13 +188,8 @@ namespace AOSharpLiveCapture.Mike2022
                 Network.PacketSent += this.OnPacketSent;
                 Game.OnUpdate += this.OnUpdate;
                 Chat.RegisterCommand("aocap", this.OnCommand);
-                lock (this.syncRoot)
-                {
-                    this.StartSession("automatic plugin startup");
-                }
                 Chat.WriteLine(
-                    "AOSharpLiveCapture Mike 2022 ready with automatic crash-safe capture: "
-                    + this.sessionDirectory,
+                    "AOSharpLiveCapture Mike 2022 ready. Use /aocap start; automatic capture is off.",
                     ChatColor.Gold);
             }
             catch (Exception ex)
@@ -211,9 +222,11 @@ namespace AOSharpLiveCapture.Mike2022
                     case "start":
                         lock (this.syncRoot)
                         {
+                            this.automaticCaptureEnabled = false;
                             if (this.enabled)
                             {
-                                this.WriteEvent("MANUAL-START", "Existing automatic session promoted without losing pre-start evidence.");
+                                this.stopRequested = false;
+                                this.WriteEvent("MANUAL-START", "Existing session retained; automatic continuation disabled.");
                                 this.WriteWorldSnapshot("manual-start");
                                 this.WritePlayerCombatContext("manual-start");
                             }
@@ -235,9 +248,10 @@ namespace AOSharpLiveCapture.Mike2022
                                 return;
                             }
 
+                            this.automaticCaptureEnabled = false;
                             this.stopRequested = true;
                             this.stopRequestedUtc = DateTime.UtcNow;
-                            this.WriteEvent("STOP-REQUEST", "Finalizing after packet drain.");
+                            this.WriteEvent("STOP-REQUEST", "Finalizing after packet drain; automatic continuation disabled.");
                         }
 
                         chatWindow.WriteLine(
@@ -313,6 +327,8 @@ namespace AOSharpLiveCapture.Mike2022
                                 + " out=" + this.outboundSequence.ToString(CultureInfo.InvariantCulture)
                                 + " movement=" + this.movementPacketRows.ToString(CultureInfo.InvariantCulture)
                                 + " scfu=" + this.scfuPackets.ToString(CultureInfo.InvariantCulture)
+                                + " visibility=" + this.visibilitySamples.ToString(CultureInfo.InvariantCulture)
+                                + "/" + this.visibilityTransitionRows.ToString(CultureInfo.InvariantCulture)
                                 + " attacks=" + this.attackStarts.ToString(CultureInfo.InvariantCulture)
                                 + " corpses=" + this.corpseFullUpdatePackets.ToString(CultureInfo.InvariantCulture)
                                 + " loot=" + this.inventoryUpdatePackets.ToString(CultureInfo.InvariantCulture)
@@ -350,25 +366,44 @@ namespace AOSharpLiveCapture.Mike2022
                 captureId,
                 "Mike 2022");
 
-            this.packetLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
-            this.rawPacketLog = CreateWriter(Path.Combine(this.sessionDirectory, "raw-packets.csv"));
-            this.movementPacketLog = CreateWriter(Path.Combine(this.sessionDirectory, "movement-packets.csv"));
-            this.scfuAppearanceLog = CreateWriter(Path.Combine(this.sessionDirectory, "scfu-appearance.csv"));
-            this.worldSnapshotLog = CreateWriter(Path.Combine(this.sessionDirectory, "world-snapshot.csv"));
-            this.playerCombatContextLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat-context.csv"));
-            this.aggroObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "aggro-observations.csv"));
-            this.eventLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
-            this.rawPacketLog.WriteLine(
-                "CapturedUtc,ElapsedMilliseconds,Direction,GlobalOrdinal,Sequence,PacketLength,N3TypeValue,N3TypeName,IdentityType,IdentityInstance,PreservationStatus,RawHex");
-            this.movementPacketLog.WriteLine(
-                "CapturedUtc,Direction,Sequence,MessageType,SourceType,SourceInstance,SourceIdentity,SourceName,TargetType,TargetInstance,TargetIdentity,TargetName,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,Speed,Animation,Flags,PathCount,RawParams,RawTailHex");
-            this.scfuAppearanceLog.WriteLine(RawScfuAppearanceCsv.Header);
-            this.worldSnapshotLog.WriteLine(
-                "CapturedUtc,Phase,Kind,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Level,Health,HealthDamage,MonsterData,DeadNpcIdentity,Credits,EvidenceUtc,EvidenceSource");
-            this.playerCombatContextLog.WriteLine(
-                "CapturedUtc,Phase,Identity,Name,Level,Profession,PositionX,PositionY,PositionZ,Health,MaxHealth,RunSpeed,EvadeClsC,DodgeRanged,DuckExp,MeleeAC,ProjectileAC,EnergyAC,ChemicalAC,RadiationAC,ColdAC,PoisonAC,FireAC,ActiveNanos,Equipment,Error");
-            this.aggroObservationLog.WriteLine(
-                "CapturedUtc,ElapsedMilliseconds,GlobalOrdinal,Direction,Sequence,SourceIdentity,SourceName,TargetIdentity,TargetName,InitiatorRole,PlayerPreviouslyAttackedSource,SourcePositionUtc,SourcePositionMessage,SourceX,SourceY,SourceZ,TargetPositionUtc,TargetPositionMessage,TargetX,TargetY,TargetZ,PreviousTargetPositionUtc,PreviousTargetX,PreviousTargetY,PreviousTargetZ,TriggerDistance,PreviousDistance,DistanceBracketMin,DistanceBracketMax,SourcePositionDeltaMs,TargetPositionDeltaMs,CorrelationStatus");
+            try
+            {
+                this.packetLog = CreateWriter(Path.Combine(this.sessionDirectory, "packets.hex.log"));
+                this.rawPacketLog = CreateWriter(Path.Combine(this.sessionDirectory, "raw-packets.csv"));
+                this.movementPacketLog = CreateWriter(Path.Combine(this.sessionDirectory, "movement-packets.csv"));
+                this.scfuAppearanceLog = CreateWriter(Path.Combine(this.sessionDirectory, "scfu-appearance.csv"));
+                this.worldSnapshotLog = CreateWriter(Path.Combine(this.sessionDirectory, "world-snapshot.csv"));
+                this.playerCombatContextLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat-context.csv"));
+                this.aggroObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "aggro-observations.csv"));
+                this.visibilityObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "visibility-observations.csv"));
+                this.eventLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
+                this.rawPacketLog.WriteLine(
+                    "CapturedUtc,ElapsedMilliseconds,Direction,GlobalOrdinal,Sequence,PacketLength,N3TypeValue,N3TypeName,IdentityType,IdentityInstance,PreservationStatus,RawHex");
+                this.movementPacketLog.WriteLine(
+                    "CapturedUtc,Direction,Sequence,MessageType,SourceType,SourceInstance,SourceIdentity,SourceName,TargetType,TargetInstance,TargetIdentity,TargetName,FollowKind,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,Speed,Animation,Flags,PathCount,RawParams,RawTailHex");
+                this.scfuAppearanceLog.WriteLine(RawScfuAppearanceCsv.Header);
+                this.worldSnapshotLog.WriteLine(
+                    "CapturedUtc,Phase,Kind,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,Level,Health,HealthDamage,MonsterData,DeadNpcIdentity,Credits,EvidenceUtc,EvidenceSource");
+                this.playerCombatContextLog.WriteLine(
+                    "CapturedUtc,Phase,Identity,Name,Level,Profession,PositionX,PositionY,PositionZ,Health,MaxHealth,RunSpeed,EvadeClsC,DodgeRanged,DuckExp,MeleeAC,ProjectileAC,EnergyAC,ChemicalAC,RadiationAC,ColdAC,PoisonAC,FireAC,ActiveNanos,Equipment,Error");
+                this.aggroObservationLog.WriteLine(
+                    "CapturedUtc,ElapsedMilliseconds,GlobalOrdinal,Direction,Sequence,SourceIdentity,SourceName,TargetIdentity,TargetName,InitiatorRole,PlayerPreviouslyAttackedSource,SourcePositionUtc,SourcePositionMessage,SourceX,SourceY,SourceZ,TargetPositionUtc,TargetPositionMessage,TargetX,TargetY,TargetZ,PreviousTargetPositionUtc,PreviousTargetX,PreviousTargetY,PreviousTargetZ,TriggerDistance,PreviousDistance,DistanceBracketMin,DistanceBracketMax,SourcePositionDeltaMs,TargetPositionDeltaMs,CorrelationStatus");
+                this.visibilityObservationLog.WriteLine(
+                    "CapturedUtc,ElapsedMilliseconds,SampleIndex,Phase,Observation,Identity,Name,Kind,PlayfieldId,PlayerX,PlayerY,PlayerZ,EntityX,EntityY,EntityZ,Distance,PreviousSampleUtc,PreviousPlayerX,PreviousPlayerY,PreviousPlayerZ,PreviousEntityX,PreviousEntityY,PreviousEntityZ,PreviousDistance,Direction,Sequence,GlobalOrdinal,EvidenceSource");
+            }
+            catch
+            {
+                this.packetLog = CloseWriter(this.packetLog);
+                this.rawPacketLog = CloseWriter(this.rawPacketLog);
+                this.movementPacketLog = CloseWriter(this.movementPacketLog);
+                this.scfuAppearanceLog = CloseWriter(this.scfuAppearanceLog);
+                this.worldSnapshotLog = CloseWriter(this.worldSnapshotLog);
+                this.playerCombatContextLog = CloseWriter(this.playerCombatContextLog);
+                this.aggroObservationLog = CloseWriter(this.aggroObservationLog);
+                this.visibilityObservationLog = CloseWriter(this.visibilityObservationLog);
+                this.eventLog = CloseWriter(this.eventLog);
+                throw;
+            }
 
             this.globalOrdinal = 0;
             this.inboundSequence = 0;
@@ -400,9 +435,20 @@ namespace AOSharpLiveCapture.Mike2022
             this.aggroObservationRows = 0;
             this.npcToPlayerAggroObservationRows = 0;
             this.unprovokedNpcAggroObservationRows = 0;
+            this.visibilitySamples = 0;
+            this.visibilityObservationRows = 0;
+            this.visibilityTransitionRows = 0;
+            this.visibilitySampleErrors = 0;
+            this.despawnPackets = 0;
+            this.knownEntities.Clear();
+            this.knownCorpses.Clear();
+            this.positions.Clear();
             this.pendingAttacks.Clear();
             this.playerAttackTargets.Clear();
             this.observedCorpseIdentities.Clear();
+            this.previousVisibleDynels.Clear();
+            this.previousVisibilityPlayer = null;
+            this.previousVisibilitySampleUtc = DateTime.MinValue;
             this.lastValidationStatus = "RUNNING";
             this.lastValidationSummary = string.Empty;
             this.stopRequested = false;
@@ -411,6 +457,7 @@ namespace AOSharpLiveCapture.Mike2022
             this.captureClock.Restart();
             this.enabled = true;
             this.nextCheckpointUtc = this.captureStartUtc.AddSeconds(CheckpointSeconds);
+            this.nextVisibilitySampleUtc = this.captureStartUtc.AddMilliseconds(VisibilitySampleMilliseconds);
             this.WriteEvent("START", "AOSharp Mike 2022 compatibility capture started: " + reason);
             this.WriteWorldSnapshot("capture-start");
             this.WritePlayerCombatContext("capture-start");
@@ -541,6 +588,18 @@ namespace AOSharpLiveCapture.Mike2022
                 return;
             }
 
+            if (messageType == DespawnMessage)
+            {
+                this.CaptureDespawnObservation(
+                    capturedUtc,
+                    elapsedMilliseconds,
+                    ordinal,
+                    direction,
+                    sequence,
+                    packet);
+                return;
+            }
+
             if (messageType == AttackMessage)
             {
                 this.CaptureAttackStart(
@@ -645,6 +704,8 @@ namespace AOSharpLiveCapture.Mike2022
                 Health = decoded.Health,
                 HealthDamage = decoded.HealthDamage,
                 MonsterData = decoded.MonsterData,
+                Kind = decoded.Npc != null ? "NPC" : "Character",
+                HasPosition = true,
                 IsNpc = decoded.Npc != null
             };
             this.knownEntities[identity] = entity;
@@ -657,6 +718,55 @@ namespace AOSharpLiveCapture.Mike2022
                 decoded.Position.X,
                 decoded.Position.Y,
                 decoded.Position.Z);
+        }
+
+        private void CaptureDespawnObservation(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            long ordinal,
+            string direction,
+            int sequence,
+            byte[] packet)
+        {
+            uint identityType;
+            uint identityInstance;
+            if (!TryReadIdentity(packet, 20, out identityType, out identityInstance))
+            {
+                return;
+            }
+
+            this.despawnPackets++;
+            string identity = FormatIdentity(identityType, identityInstance);
+            EntitySnapshot prior;
+            this.previousVisibleDynels.TryGetValue(identity, out prior);
+            if (prior == null)
+            {
+                this.knownEntities.TryGetValue(identity, out prior);
+            }
+
+            var entity = new EntitySnapshot
+            {
+                CapturedUtc = capturedUtc,
+                Identity = identity,
+                Name = prior == null ? this.ResolveEntityName(identity) : prior.Name,
+                PlayfieldId = this.sessionPlayfieldId,
+                Kind = prior == null ? "Unknown" : prior.Kind,
+                HasPosition = false
+            };
+
+            this.WriteVisibilityObservation(
+                capturedUtc,
+                elapsedMilliseconds,
+                "raw-packet",
+                "DESPAWN_PACKET",
+                entity,
+                null,
+                this.previousVisibilityPlayer,
+                null,
+                direction,
+                sequence,
+                ordinal,
+                "RawDespawnIdentityOnly");
         }
 
         private void CaptureAttackStart(
@@ -1491,7 +1601,7 @@ namespace AOSharpLiveCapture.Mike2022
                                         : quiet
                                               ? "quiet packet drain complete"
                                               : "maximum packet drain elapsed";
-                    this.FinalizeSessionNoThrow(reason);
+                    this.FinalizeSessionNoThrow(reason, !playfieldChanged);
                     validationStatus = this.lastValidationStatus;
                     validationSummary = this.lastValidationSummary;
                     finalized = true;
@@ -1503,12 +1613,21 @@ namespace AOSharpLiveCapture.Mike2022
                         activeDirectory = this.sessionDirectory;
                     }
                 }
-                else if (now >= this.nextCheckpointUtc)
+                else
                 {
-                    this.ResolvePendingAttacks(now, false);
-                    this.FlushNoThrow();
-                    this.WriteCaptureInfo(false, "periodic crash-safe checkpoint");
-                    this.nextCheckpointUtc = now.AddSeconds(CheckpointSeconds);
+                    if (now >= this.nextVisibilitySampleUtc)
+                    {
+                        this.CaptureLiveWorldSnapshot(now, "periodic-visibility", false);
+                        this.nextVisibilitySampleUtc = now.AddMilliseconds(VisibilitySampleMilliseconds);
+                    }
+
+                    if (now >= this.nextCheckpointUtc)
+                    {
+                        this.ResolvePendingAttacks(now, false);
+                        this.FlushNoThrow();
+                        this.WriteCaptureInfo(false, "periodic crash-safe checkpoint");
+                        this.nextCheckpointUtc = now.AddSeconds(CheckpointSeconds);
+                    }
                 }
             }
 
@@ -1531,6 +1650,11 @@ namespace AOSharpLiveCapture.Mike2022
 
         private void FinalizeSessionNoThrow(string reason)
         {
+            this.FinalizeSessionNoThrow(reason, true);
+        }
+
+        private void FinalizeSessionNoThrow(string reason, bool captureFinalContext)
+        {
             if (!this.enabled
                 && this.packetLog == null
                 && this.rawPacketLog == null
@@ -1539,6 +1663,7 @@ namespace AOSharpLiveCapture.Mike2022
                 && this.worldSnapshotLog == null
                 && this.playerCombatContextLog == null
                 && this.aggroObservationLog == null
+                && this.visibilityObservationLog == null
                 && this.eventLog == null)
             {
                 return;
@@ -1548,8 +1673,17 @@ namespace AOSharpLiveCapture.Mike2022
             this.stopRequested = false;
             this.captureClock.Stop();
             this.ResolvePendingAttacks(DateTime.UtcNow, true);
-            this.WriteWorldSnapshot("capture-end");
-            this.WritePlayerCombatContext("capture-end");
+            if (captureFinalContext)
+            {
+                this.WriteWorldSnapshot("capture-end");
+                this.WritePlayerCombatContext("capture-end");
+            }
+            else
+            {
+                this.WriteEvent(
+                    "FINAL-CONTEXT-SKIPPED",
+                    "Playfield rotation detected; new-playfield dynels are excluded from the old session.");
+            }
             this.ValidateSession();
             this.WriteEvent("FINALIZE", reason);
             this.FlushNoThrow();
@@ -1562,6 +1696,7 @@ namespace AOSharpLiveCapture.Mike2022
             this.worldSnapshotLog = CloseWriter(this.worldSnapshotLog);
             this.playerCombatContextLog = CloseWriter(this.playerCombatContextLog);
             this.aggroObservationLog = CloseWriter(this.aggroObservationLog);
+            this.visibilityObservationLog = CloseWriter(this.visibilityObservationLog);
             this.eventLog = CloseWriter(this.eventLog);
         }
 
@@ -1617,7 +1752,12 @@ namespace AOSharpLiveCapture.Mike2022
             json.AppendLine("    \"identityLinkedInventoryPackets\": " + this.identityLinkedInventoryPackets.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"aggroObservationRows\": " + this.aggroObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"npcToPlayerAggroObservationRows\": " + this.npcToPlayerAggroObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
-            json.AppendLine("    \"unprovokedNpcAggroObservationRows\": " + this.unprovokedNpcAggroObservationRows.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine("    \"unprovokedNpcAggroObservationRows\": " + this.unprovokedNpcAggroObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"visibilitySamples\": " + this.visibilitySamples.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"visibilityObservationRows\": " + this.visibilityObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"visibilityTransitionRows\": " + this.visibilityTransitionRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"visibilitySampleErrors\": " + this.visibilitySampleErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"despawnPackets\": " + this.despawnPackets.ToString(CultureInfo.InvariantCulture));
             json.AppendLine("  },");
             json.AppendLine("  \"validationStatus\": " + Json(this.lastValidationStatus) + ",");
             json.AppendLine("  \"validationSummary\": " + Json(this.lastValidationSummary) + ",");
@@ -1680,7 +1820,7 @@ namespace AOSharpLiveCapture.Mike2022
             }
 
             DateTime now = DateTime.UtcNow;
-            this.CaptureLiveWorldSnapshot(now, phase);
+            this.CaptureLiveWorldSnapshot(now, phase, true);
             foreach (EntitySnapshot entity in this.knownEntities.Values)
             {
                 if ((now - entity.CapturedUtc).TotalMinutes > 10)
@@ -1764,10 +1904,15 @@ namespace AOSharpLiveCapture.Mike2022
             }
         }
 
-        private void CaptureLiveWorldSnapshot(DateTime capturedUtc, string phase)
+        private void CaptureLiveWorldSnapshot(DateTime capturedUtc, string phase, bool writeWorldRows)
         {
+            var currentVisibleDynels =
+                new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
+            EntitySnapshot currentPlayer = null;
+            bool visibilitySampleComplete = true;
             try
             {
+                this.RefreshPlayerIdentity();
                 IEnumerable dynels = DynelManager.AllDynels;
                 if (dynels == null)
                 {
@@ -1801,34 +1946,38 @@ namespace AOSharpLiveCapture.Mike2022
                                                       ? "Player"
                                                       : runtimeType;
 
-                        this.worldSnapshotRows++;
-                        this.worldSnapshotLog.WriteLine(
-                            string.Join(
-                                ",",
-                                Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
-                                Csv(phase),
-                                Csv(kind),
-                                Csv(identity),
-                                Csv(name),
-                                this.sessionPlayfieldId.ToString(CultureInfo.InvariantCulture),
-                                Csv(positionX),
-                                Csv(positionY),
-                                Csv(positionZ),
-                                Csv(MemberNumber(rotation, "X")),
-                                Csv(MemberNumber(rotation, "Y")),
-                                Csv(MemberNumber(rotation, "Z")),
-                                Csv(MemberNumber(rotation, "W")),
-                                Csv(level),
-                                Csv(health),
-                                Csv(string.Empty),
-                                Csv(monsterData),
-                                Csv(string.Empty),
-                                Csv(string.Empty),
-                                Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
-                                Csv("AOSharpDynel")));
+                        if (writeWorldRows)
+                        {
+                            this.worldSnapshotRows++;
+                            this.worldSnapshotLog.WriteLine(
+                                string.Join(
+                                    ",",
+                                    Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                                    Csv(phase),
+                                    Csv(kind),
+                                    Csv(identity),
+                                    Csv(name),
+                                    this.sessionPlayfieldId.ToString(CultureInfo.InvariantCulture),
+                                    Csv(positionX),
+                                    Csv(positionY),
+                                    Csv(positionZ),
+                                    Csv(MemberNumber(rotation, "X")),
+                                    Csv(MemberNumber(rotation, "Y")),
+                                    Csv(MemberNumber(rotation, "Z")),
+                                    Csv(MemberNumber(rotation, "W")),
+                                    Csv(level),
+                                    Csv(health),
+                                    Csv(string.Empty),
+                                    Csv(monsterData),
+                                    Csv(string.Empty),
+                                    Csv(string.Empty),
+                                    Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                                    Csv("AOSharpDynel")));
+                        }
 
                         if (identity.Length == 0)
                         {
+                            visibilitySampleComplete = false;
                             continue;
                         }
 
@@ -1839,6 +1988,35 @@ namespace AOSharpLiveCapture.Mike2022
                             && float.TryParse(positionY, NumberStyles.Float, CultureInfo.InvariantCulture, out y)
                             && float.TryParse(positionZ, NumberStyles.Float, CultureInfo.InvariantCulture, out z))
                         {
+                            int parsedLevel;
+                            int parsedHealth;
+                            uint parsedMonsterData;
+                            int.TryParse(level, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedLevel);
+                            int.TryParse(health, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedHealth);
+                            uint.TryParse(monsterData, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedMonsterData);
+                            var visible = new EntitySnapshot
+                            {
+                                CapturedUtc = capturedUtc,
+                                Identity = identity,
+                                Name = name,
+                                PlayfieldId = this.sessionPlayfieldId,
+                                X = x,
+                                Y = y,
+                                Z = z,
+                                Level = parsedLevel,
+                                Health = parsedHealth,
+                                MonsterData = parsedMonsterData,
+                                Kind = kind,
+                                HasPosition = true,
+                                IsNpc = isNpc,
+                                IsPlayer = isPlayer
+                            };
+                            currentVisibleDynels[identity] = visible;
+                            if (IdentityEquals(identity, this.playerIdentity))
+                            {
+                                currentPlayer = visible;
+                            }
+
                             this.UpdatePosition(
                                 identity,
                                 capturedUtc,
@@ -1849,20 +2027,191 @@ namespace AOSharpLiveCapture.Mike2022
                                 y,
                                 z);
                         }
+                        else
+                        {
+                            visibilitySampleComplete = false;
+                        }
                     }
                     catch (Exception ex)
                     {
+                        visibilitySampleComplete = false;
                         this.worldSnapshotErrors++;
                         this.WriteFallbackError("WorldSnapshot.Dynel", ex);
                     }
                 }
+
+                if (!visibilitySampleComplete || currentPlayer == null)
+                {
+                    this.visibilitySampleErrors++;
+                    this.WriteEvent(
+                        "VISIBILITY-SAMPLE-SKIPPED",
+                        "Incomplete dynel set or local player unavailable during " + phase + ".");
+                }
+                else
+                {
+                    this.TrackVisibilitySample(capturedUtc, phase, currentVisibleDynels, currentPlayer);
+                }
             }
             catch (Exception ex)
             {
+                this.visibilitySampleErrors++;
                 this.worldSnapshotErrors++;
                 this.WriteFallbackError("WorldSnapshot.AllDynels", ex);
             }
 
+        }
+
+        private void TrackVisibilitySample(
+            DateTime capturedUtc,
+            string phase,
+            Dictionary<string, EntitySnapshot> currentVisibleDynels,
+            EntitySnapshot currentPlayer)
+        {
+            if (this.visibilityObservationLog == null)
+            {
+                return;
+            }
+
+            try
+            {
+                this.visibilitySamples++;
+                bool baseline = this.previousVisibilitySampleUtc == DateTime.MinValue;
+                foreach (KeyValuePair<string, EntitySnapshot> pair in currentVisibleDynels)
+                {
+                    EntitySnapshot previousEntity;
+                    if (!baseline && this.previousVisibleDynels.TryGetValue(pair.Key, out previousEntity))
+                    {
+                        continue;
+                    }
+
+                    this.WriteVisibilityObservation(
+                        capturedUtc,
+                        this.captureClock.Elapsed.TotalMilliseconds,
+                        phase,
+                        baseline ? "BASELINE" : "APPEARED",
+                        pair.Value,
+                        currentPlayer,
+                        this.previousVisibilityPlayer,
+                        null,
+                        string.Empty,
+                        0,
+                        0,
+                        "AOSharpDynelTransition");
+                }
+
+                if (!baseline)
+                {
+                    foreach (KeyValuePair<string, EntitySnapshot> pair in this.previousVisibleDynels)
+                    {
+                        if (currentVisibleDynels.ContainsKey(pair.Key))
+                        {
+                            continue;
+                        }
+
+                        var disappeared = new EntitySnapshot
+                        {
+                            CapturedUtc = capturedUtc,
+                            Identity = pair.Value.Identity,
+                            Name = pair.Value.Name,
+                            PlayfieldId = pair.Value.PlayfieldId,
+                            Kind = pair.Value.Kind,
+                            HasPosition = false,
+                            IsNpc = pair.Value.IsNpc,
+                            IsPlayer = pair.Value.IsPlayer
+                        };
+                        this.WriteVisibilityObservation(
+                            capturedUtc,
+                            this.captureClock.Elapsed.TotalMilliseconds,
+                            phase,
+                            "DISAPPEARED",
+                            disappeared,
+                            currentPlayer,
+                            this.previousVisibilityPlayer,
+                            pair.Value,
+                            string.Empty,
+                            0,
+                            0,
+                            "AOSharpDynelTransition");
+                    }
+                }
+
+                this.previousVisibleDynels.Clear();
+                foreach (KeyValuePair<string, EntitySnapshot> pair in currentVisibleDynels)
+                {
+                    this.previousVisibleDynels[pair.Key] = pair.Value;
+                }
+
+                this.previousVisibilityPlayer = currentPlayer;
+                this.previousVisibilitySampleUtc = capturedUtc;
+            }
+            catch (Exception ex)
+            {
+                this.visibilitySampleErrors++;
+                this.WriteFallbackError("VisibilitySample", ex);
+            }
+        }
+
+        private void WriteVisibilityObservation(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            string phase,
+            string observation,
+            EntitySnapshot entity,
+            EntitySnapshot currentPlayer,
+            EntitySnapshot previousPlayer,
+            EntitySnapshot previousEntity,
+            string direction,
+            int sequence,
+            long globalOrdinal,
+            string evidenceSource)
+        {
+            if (this.visibilityObservationLog == null || entity == null)
+            {
+                return;
+            }
+
+            double? distance = Distance(currentPlayer, entity);
+            double? previousDistance = Distance(previousPlayer, previousEntity);
+            this.visibilityObservationRows++;
+            if (string.Equals(observation, "APPEARED", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(observation, "DISAPPEARED", StringComparison.OrdinalIgnoreCase))
+            {
+                this.visibilityTransitionRows++;
+            }
+
+            this.visibilityObservationLog.WriteLine(
+                string.Join(
+                    ",",
+                    Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                    elapsedMilliseconds.ToString("0.###", CultureInfo.InvariantCulture),
+                    this.visibilitySamples.ToString(CultureInfo.InvariantCulture),
+                    Csv(phase),
+                    Csv(observation),
+                    Csv(entity.Identity),
+                    Csv(entity.Name),
+                    Csv(entity.Kind),
+                    entity.PlayfieldId.ToString(CultureInfo.InvariantCulture),
+                    FormatEntityCoordinate(currentPlayer, "X"),
+                    FormatEntityCoordinate(currentPlayer, "Y"),
+                    FormatEntityCoordinate(currentPlayer, "Z"),
+                    FormatEntityCoordinate(entity, "X"),
+                    FormatEntityCoordinate(entity, "Y"),
+                    FormatEntityCoordinate(entity, "Z"),
+                    FormatDistance(distance),
+                    this.previousVisibilitySampleUtc == DateTime.MinValue
+                        ? string.Empty
+                        : Csv(this.previousVisibilitySampleUtc.ToString("o", CultureInfo.InvariantCulture)),
+                    FormatEntityCoordinate(previousPlayer, "X"),
+                    FormatEntityCoordinate(previousPlayer, "Y"),
+                    FormatEntityCoordinate(previousPlayer, "Z"),
+                    FormatEntityCoordinate(previousEntity, "X"),
+                    FormatEntityCoordinate(previousEntity, "Y"),
+                    FormatEntityCoordinate(previousEntity, "Z"),
+                    FormatDistance(previousDistance),
+                    Csv(direction),
+                    sequence == 0 ? string.Empty : sequence.ToString(CultureInfo.InvariantCulture),
+                    globalOrdinal == 0 ? string.Empty : globalOrdinal.ToString(CultureInfo.InvariantCulture),
+                    Csv(evidenceSource)));
         }
 
         private void WritePlayerCombatContext(string phase)
@@ -2052,6 +2401,15 @@ namespace AOSharpLiveCapture.Mike2022
                 issues.Add("world snapshot errors=" + this.worldSnapshotErrors.ToString(CultureInfo.InvariantCulture));
             }
 
+            if (this.visibilitySamples < 2)
+            {
+                issues.Add("insufficient periodic visibility samples=" + this.visibilitySamples.ToString(CultureInfo.InvariantCulture));
+            }
+            else if (this.visibilitySampleErrors > 0)
+            {
+                issues.Add("visibility sample errors=" + this.visibilitySampleErrors.ToString(CultureInfo.InvariantCulture));
+            }
+
             if (this.movementPacketRows == 0)
             {
                 issues.Add("no movement evidence");
@@ -2122,6 +2480,9 @@ namespace AOSharpLiveCapture.Mike2022
                 json.AppendLine("    \"rawPacketStream\": " + (this.inboundSequence + this.outboundSequence > 0 && this.rawWriteErrors == 0 && this.rawMissingPackets == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"identityAndSpawn\": " + (this.scfuPackets > 0 && this.scfuDecodeErrors == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"worldSnapshot\": " + (this.worldSnapshotRows > 0 && this.worldSnapshotErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"visibilitySampling\": " + (this.visibilitySamples >= 2 && this.visibilitySampleErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"visibilityTransitions\": " + (this.visibilityTransitionRows > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"despawnPackets\": " + (this.despawnPackets > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"playerCombatContext\": " + (this.playerCombatContextCompleteRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"movement\": " + (this.movementPacketRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"combatStart\": " + (this.attackStarts > 0 ? "true" : "false") + ",");
@@ -2176,6 +2537,7 @@ namespace AOSharpLiveCapture.Mike2022
             TryFlush(this.worldSnapshotLog);
             TryFlush(this.playerCombatContextLog);
             TryFlush(this.aggroObservationLog);
+            TryFlush(this.visibilityObservationLog);
             TryFlush(this.eventLog);
         }
 
@@ -2393,6 +2755,46 @@ namespace AOSharpLiveCapture.Mike2022
             double y = left.Y - right.Y;
             double z = left.Z - right.Z;
             return Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        private static double? Distance(EntitySnapshot left, EntitySnapshot right)
+        {
+            if (left == null || right == null || !left.HasPosition || !right.HasPosition)
+            {
+                return null;
+            }
+
+            double x = left.X - right.X;
+            double y = left.Y - right.Y;
+            double z = left.Z - right.Z;
+            return Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        private static string FormatEntityCoordinate(EntitySnapshot entity, string coordinate)
+        {
+            if (entity == null || !entity.HasPosition)
+            {
+                return string.Empty;
+            }
+
+            if (coordinate == "X")
+            {
+                return FormatFloat(entity.X);
+            }
+
+            if (coordinate == "Y")
+            {
+                return FormatFloat(entity.Y);
+            }
+
+            return FormatFloat(entity.Z);
+        }
+
+        private static string FormatDistance(double? value)
+        {
+            return value.HasValue
+                       ? value.Value.ToString("0.######", CultureInfo.InvariantCulture)
+                       : string.Empty;
         }
 
         private static string FormatPositionUtc(PositionObservation observation)
