@@ -1687,7 +1687,7 @@ namespace AORebirth.AccountBroker.Service
                     throw new InvalidOperationException("Mail sender is not configured.");
                 }
 
-                string link = publicBaseUrl.TrimEnd('/') + "/reset-password?token=" + Uri.EscapeDataString(reset.Token);
+                string link = publicBaseUrl.TrimEnd('/') + "/reset-password#token=" + Uri.EscapeDataString(reset.Token);
                 using (var message = new MailMessage())
                 {
                     message.From = new MailAddress(this.fromAddress, this.fromName, Encoding.UTF8);
