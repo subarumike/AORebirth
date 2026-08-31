@@ -112,26 +112,20 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private readonly Timer heartBeat;
 
+        /// <summary>
+        /// Heartbeat period in milliseconds derived from Config.PlayfieldTickRate.
+        /// </summary>
+        private readonly int heartBeatIntervalMs;
+
         private readonly object heartBeatSync = new object();
 
         private readonly object lifetimeSync = new object();
 
-        /// <summary>
-        /// Player auto-attack schedule only. Must not share heartBeatSync — Attack handlers
-        /// waiting on the full PF heartbeat were delayed for many seconds (Mike 20260801).
-        /// </summary>
-        private readonly object playerCombatSync = new object();
-
         private readonly PlayfieldRuntimeSystems runtimeSystems;
 
-        private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
-        private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
+        private DateTime lastHeartbeatUtc;
 
-        /// <summary>
-        /// Player follow-up auto-attacks. First hit is from AttackMessageHandler; later hits must
-        /// not depend on the PF heartbeat character loop (Mike 20260801: 15–20s between swings).
-        /// </summary>
-        private readonly Dictionary<int, Timer> playerAutoAttackTimers = new Dictionary<int, Timer>();
+        private readonly Dictionary<int, int> lastCombatWeaponSlots = new Dictionary<int, int>();
 
         private readonly CorpseInventoryService corpseInventoryService = new CorpseInventoryService();
 
@@ -295,7 +289,20 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.MaterializeStartupObjects(
                 playfieldIdentity,
                 this.statels);
-            this.heartBeat = new Timer(this.HeartBeatTimer, null, 10, 0);
+
+            int configuredTickRate = Config.Instance.CurrentConfig.PlayfieldTickRate;
+            int tickRate = configuredTickRate > 0 ? configuredTickRate : 32;
+            this.heartBeatIntervalMs = Math.Max(1, 1000 / tickRate);
+            this.heartBeat = new Timer(this.HeartBeatTimer, null, this.heartBeatIntervalMs, 0);
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield {0} startup tick rate={1}/s interval={2}ms (config PlayfieldTickRate={3})",
+                    playfieldIdentity,
+                    tickRate,
+                    this.heartBeatIntervalMs,
+                    configuredTickRate));
         }
 
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
@@ -1513,13 +1520,26 @@ namespace AORebirth.Core.Playfields
 
                 try
                 {
+                    DateTime now = DateTime.UtcNow;
+                    double deltaTime;
+                    if (this.lastHeartbeatUtc == default(DateTime))
+                    {
+                        deltaTime = this.heartBeatIntervalMs / 1000.0;
+                    }
+                    else
+                    {
+                        deltaTime = (now - this.lastHeartbeatUtc).TotalSeconds;
+                    }
+
+                    this.lastHeartbeatUtc = now;
+
                     this.runtimeSystems.ProcessHeartbeatTimedLifecycle(
                         this.Identity,
+                        deltaTime,
                         this.ProcessPendingCorpseSpawns,
                         this.ProcessCorpseDespawns,
                         this.ProcessPendingCorpseCreditAwards,
-                        dynel => this.runtimeSystems.ProcessCharacterRegeneration(dynel, SendChangedStats),
-                        this.DoCombatTick,
+                        this.ProcessCharacterTick,
                         this.runtimeSystems.ProcessCharacterFollow,
                         dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
                             dynel,
@@ -1536,7 +1556,7 @@ namespace AORebirth.Core.Playfields
                     {
                         try
                         {
-                            this.heartBeat.Change(10, 0);
+                            this.heartBeat.Change(this.heartBeatIntervalMs, 0);
                         }
                         catch (ObjectDisposedException)
                         {
@@ -1546,11 +1566,61 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        private void ProcessCharacterTick(ICharacter dynel, double deltaTime)
+        {
+            this.EnsureCharacterTickHandlers(dynel);
+            dynel.Tick(deltaTime);
+            this.runtimeSystems.ProcessCharacterRegeneration(dynel, deltaTime, SendChangedStats);
+            if (dynel.Controller is NPCController)
+            {
+                this.runtimeSystems.ProcessNpcCombatTick(dynel);
+            }
+        }
+
+        private void EnsureCharacterTickHandlers(ICharacter character)
+        {
+            Character c = character as Character;
+            if (c == null)
+            {
+                return;
+            }
+
+            if (c.CombatSwingHandler == null)
+            {
+                ICharacter captured = character;
+                c.CombatSwingHandler = slot => this.ApplyCombatSwingFromWeapon(captured, slot);
+            }
+        }
+
+        private void ApplyCombatSwingFromWeapon(ICharacter attacker, WeaponSlot slot)
+        {
+            if (attacker == null || this.disposed)
+            {
+                return;
+            }
+
+            if (attacker.Controller is NPCController)
+            {
+                this.runtimeSystems.ApplyNpcCombatHit(attacker);
+                return;
+            }
+
+            this.runtimeSystems.ProcessPlayerCombatTick(
+                attacker,
+                slot,
+                this.ClearCombatTracking,
+                this.FindPlayerCombatTarget,
+                target => this.IsValidPlayerCombatTarget(attacker, target),
+                this.LogInvalidPlayerCombatTickTarget,
+                this.ProcessValidatedPlayerCombatTick);
+        }
+
         public void ResetCombatTick(Identity attacker)
         {
             ICharacter character = this.FindByIdentity<ICharacter>(attacker);
             if (character != null && character.Controller is NPCController)
             {
+                this.EnsureCharacterTickHandlers(character);
                 this.runtimeSystems.ResetNpcCombatTick(character);
             }
             else
@@ -1566,8 +1636,10 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            this.EnsureCharacterTickHandlers(character);
             // Arm only (no heartBeatSync). First swing runs after Attack+SAW packets.
             this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);
+            this.ConfigurePlayerWeaponsFromEquipment(character);
         }
 
         /// <summary>
@@ -1580,7 +1652,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker, WeaponSlot.MainHand);
             double attackRange = attackSource != null && attackSource.Range > 0.0
                                      ? attackSource.Range
                                      : MaxMeleeCombatDistance;
@@ -1598,12 +1670,121 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.DoCombatTick(character);
+            this.EnsureCharacterTickHandlers(character);
+            Character c = character as Character;
+            WeaponSlot slot = WeaponSlot.MainHand;
+            if (c != null)
+            {
+                if (!c.Weapons.ContainsKey(WeaponSlot.MainHand))
+                {
+                    if (c.Weapons.ContainsKey(WeaponSlot.CombinedMA))
+                    {
+                        slot = WeaponSlot.CombinedMA;
+                    }
+                    else if (c.Weapons.ContainsKey(WeaponSlot.OffHand))
+                    {
+                        slot = WeaponSlot.OffHand;
+                    }
+                }
+            }
+
+            this.ApplyCombatSwingFromWeapon(character, slot);
+            if (c != null)
+            {
+                CharacterWeapon weapon;
+                if (c.Weapons.TryGetValue(slot, out weapon) && weapon != null)
+                {
+                    weapon.EnterRecharging();
+                }
+            }
         }
 
         public void CancelPlayerAttack(ICharacter character)
         {
+            Character c = character as Character;
+            if (c != null)
+            {
+                c.ClearWeapons();
+            }
+
             this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);
+        }
+
+        private void ConfigurePlayerWeaponsFromEquipment(ICharacter character)
+        {
+            Character c = character as Character;
+            if (c == null)
+            {
+                return;
+            }
+
+            c.ClearWeapons();
+
+            IItem rightHand = null;
+            IItem leftHand = null;
+            if (character.BaseInventory != null
+                && character.BaseInventory.Pages.ContainsKey((int)IdentityType.WeaponPage))
+            {
+                IInventoryPage weaponPage = character.BaseInventory.Pages[(int)IdentityType.WeaponPage];
+                rightHand = weaponPage[(int)WeaponSlots.Righthand];
+                leftHand = weaponPage[(int)WeaponSlots.LeftHand];
+            }
+
+            bool rightHandUsable = this.IsWieldableCombatWeapon(rightHand);
+            bool leftHandUsable = this.IsWieldableCombatWeapon(leftHand);
+
+            if (rightHandUsable)
+            {
+                CharacterWeapon main = new CharacterWeapon();
+                main.ConfigureSpeeds(
+                    NormalizeDelayCentisecondsToSeconds(
+                        rightHand.GetAttribute((int)StatIds.itemdelay),
+                        CharacterWeapon.DefaultAttackSpeedSeconds),
+                    NormalizeDelayCentisecondsToSeconds(
+                        rightHand.GetAttribute((int)StatIds.rechargedelay),
+                        CharacterWeapon.DefaultRechargeSpeedSeconds));
+                c.SetWeapon(WeaponSlot.MainHand, main);
+            }
+
+            if (leftHandUsable)
+            {
+                CharacterWeapon off = new CharacterWeapon();
+                off.ConfigureSpeeds(
+                    NormalizeDelayCentisecondsToSeconds(
+                        leftHand.GetAttribute((int)StatIds.itemdelay),
+                        CharacterWeapon.DefaultAttackSpeedSeconds),
+                    NormalizeDelayCentisecondsToSeconds(
+                        leftHand.GetAttribute((int)StatIds.rechargedelay),
+                        CharacterWeapon.DefaultRechargeSpeedSeconds));
+                c.SetWeapon(WeaponSlot.OffHand, off);
+            }
+
+            if (!rightHandUsable && !leftHandUsable)
+            {
+                CharacterWeapon unarmed = new CharacterWeapon();
+                unarmed.ConfigureSpeeds(
+                    CharacterWeapon.DefaultAttackSpeedSeconds,
+                    DefaultCombatTickSeconds);
+                c.SetWeapon(WeaponSlot.MainHand, unarmed);
+            }
+
+            c.ResetAllWeaponAttacks();
+        }
+
+        private static double NormalizeDelayCentisecondsToSeconds(int delayCentiseconds, double fallbackSeconds)
+        {
+            int normalized = NormalizeCombatItemStat(delayCentiseconds, 0);
+            if (normalized <= 0)
+            {
+                return fallbackSeconds;
+            }
+
+            if (normalized > 500)
+            {
+                normalized = 100;
+            }
+
+            return Math.Max(0.05, normalized / 100.0);
         }
 
         /// <summary>
@@ -1638,7 +1819,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker, WeaponSlot.MainHand);
             if (attackSource == null)
             {
                 return false;
@@ -1694,124 +1875,11 @@ namespace AORebirth.Core.Playfields
 
         private void ResetPlayerCombatTick(Identity attacker)
         {
-            this.CancelPlayerAutoAttackTimer(attacker.Instance);
-            lock (this.playerCombatSync)
+            ICharacter character = this.FindByIdentity<ICharacter>(attacker);
+            Character c = character as Character;
+            if (c != null)
             {
-                this.nextCombatTicks.Remove(attacker.Instance);
-            }
-        }
-
-        private void CancelPlayerAutoAttackTimer(int attackerInstance)
-        {
-            Timer timer;
-            lock (this.playerCombatSync)
-            {
-                if (!this.playerAutoAttackTimers.TryGetValue(attackerInstance, out timer))
-                {
-                    return;
-                }
-
-                this.playerAutoAttackTimers.Remove(attackerInstance);
-            }
-
-            try
-            {
-                timer.Dispose();
-            }
-            catch (ObjectDisposedException)
-            {
-            }
-        }
-
-        private void SchedulePlayerAutoAttack(ICharacter attacker, double delaySeconds)
-        {
-            if (attacker == null || !(attacker.Controller is PlayerController) || this.disposed)
-            {
-                return;
-            }
-
-            int attackerInstance = attacker.Identity.Instance;
-            if (delaySeconds < 0.25)
-            {
-                delaySeconds = 0.25;
-            }
-
-            int dueMs = (int)Math.Round(delaySeconds * 1000.0);
-            if (dueMs < 250)
-            {
-                dueMs = 250;
-            }
-
-            this.CancelPlayerAutoAttackTimer(attackerInstance);
-
-            Timer timer = null;
-            timer = new Timer(
-                _ => this.OnPlayerAutoAttackTimer(attackerInstance),
-                null,
-                dueMs,
-                Timeout.Infinite);
-
-            lock (this.playerCombatSync)
-            {
-                // Replace if Start/Cancel raced another schedule.
-                Timer existing;
-                if (this.playerAutoAttackTimers.TryGetValue(attackerInstance, out existing))
-                {
-                    try
-                    {
-                        existing.Dispose();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                    }
-                }
-
-                this.playerAutoAttackTimers[attackerInstance] = timer;
-                this.nextCombatTicks[attackerInstance] =
-                    DateTime.UtcNow + TimeSpan.FromSeconds(delaySeconds);
-            }
-        }
-
-        private void OnPlayerAutoAttackTimer(int attackerInstance)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            lock (this.playerCombatSync)
-            {
-                this.playerAutoAttackTimers.Remove(attackerInstance);
-                // Allow this swing through the nextTick gate.
-                this.nextCombatTicks.Remove(attackerInstance);
-            }
-
-            ICharacter attacker =
-                this.FindByIdentity<ICharacter>(
-                    new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = attackerInstance
-                    });
-            if (attacker == null
-                || !(attacker.Controller is PlayerController)
-                || attacker.FightingTarget.Instance == 0)
-            {
-                return;
-            }
-
-            try
-            {
-                this.DoCombatTick(attacker);
-            }
-            catch (Exception exception)
-            {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "PlayerAutoAttackTimer failed attacker="
-                    + attackerInstance
-                    + " err="
-                    + exception.Message);
+                c.ResetAllWeaponAttacks();
             }
         }
 
@@ -2025,50 +2093,10 @@ namespace AORebirth.Core.Playfields
                     character.Identity));
         }
 
-        private void DoCombatTick(ICharacter attacker)
-        {
-            if (attacker.Controller is NPCController)
-            {
-                this.runtimeSystems.ProcessNpcCombatTick(attacker);
-                return;
-            }
-
-            this.runtimeSystems.ProcessPlayerCombatTick(
-                attacker,
-                this.ClearCombatTracking,
-                this.FindPlayerCombatTarget,
-                target => this.IsValidPlayerCombatTarget(attacker, target),
-                this.LogInvalidPlayerCombatTickTarget,
-                this.ProcessValidatedPlayerCombatTick);
-        }
-
-        private ICharacter FindPlayerCombatTarget(Identity target)
-        {
-            return this.FindByIdentity<ICharacter>(target);
-        }
-
-        private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)
-        {
-            return target != null
-                   && target.InPlayfield(this.Identity)
-                   && target.Stats[StatIds.health].Value > 0
-                   && PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target);
-        }
-
-        private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)
-        {
-            LogUtil.Debug(
-                DebugInfoDetail.Error,
-                string.Format(
-                    "CombatTickTargetInvalid attacker={0} target={1} found={2} inPlayfield={3} health={4}",
-                    attacker.Identity,
-                    attacker.FightingTarget,
-                    target != null,
-                    target != null && target.InPlayfield(this.Identity),
-                    target == null ? 0 : target.Stats[StatIds.health].Value));
-        }
-
-        private void ProcessValidatedPlayerCombatTick(ICharacter attacker, ICharacter target)
+        private void ProcessValidatedPlayerCombatTick(
+            ICharacter attacker,
+            ICharacter target,
+            WeaponSlot preferredSlot)
         {
             string missionSpatialFailure;
             if (!MissionAcgSpatialRuntime.TryValidateCombatPair(
@@ -2080,16 +2108,10 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
-            DateTime nextTick;
-            DateTime now = DateTime.UtcNow;
-            lock (this.playerCombatSync)
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker, preferredSlot);
+            if (attackSource == null)
             {
-                if (this.nextCombatTicks.TryGetValue(attacker.Identity.Instance, out nextTick)
-                    && nextTick > now)
-                {
-                    return;
-                }
+                return;
             }
 
             // Soft weapon range gate (Mike D2: hits from across PF). Grace for coord lag;
@@ -2104,7 +2126,7 @@ namespace AORebirth.Core.Playfields
 
             if (distance > attackRange + 1.5)
             {
-                this.SchedulePlayerAutoAttack(attacker, Math.Min(0.5, attackSource.RechargeSeconds));
+                // Out of soft range: skip this swing; CharacterWeapon recharge will retry.
                 return;
             }
 
@@ -2152,7 +2174,6 @@ namespace AORebirth.Core.Playfields
 
             if (killingHit)
             {
-                this.CancelPlayerAutoAttackTimer(attacker.Identity.Instance);
                 this.HandleCombatKillingHit(attacker, target);
                 return;
             }
@@ -2162,10 +2183,32 @@ namespace AORebirth.Core.Playfields
                 this.AcquireNpcAggro(attacker, target);
                 this.SuspendNpcRegen(target);
             }
+        }
 
-            // Drive the next swing from a player timer (AggDef/initiative cycle). Do not wait
-            // for the playfield heartbeat foreach — that path was skipping players for ~15s.
-            this.SchedulePlayerAutoAttack(attacker, attackSource.RechargeSeconds);
+        private ICharacter FindPlayerCombatTarget(Identity target)
+        {
+            return this.FindByIdentity<ICharacter>(target);
+        }
+
+        private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)
+        {
+            return target != null
+                   && target.InPlayfield(this.Identity)
+                   && target.Stats[StatIds.health].Value > 0
+                   && PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target);
+        }
+
+        private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)
+        {
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CombatTickTargetInvalid attacker={0} target={1} found={2} inPlayfield={3} health={4}",
+                    attacker.Identity,
+                    attacker.FightingTarget,
+                    target != null,
+                    target != null && target.InPlayfield(this.Identity),
+                    target == null ? 0 : target.Stats[StatIds.health].Value));
         }
 
         private int CalculateCombatDamage(ICharacter attacker, CombatAttackSource attackSource)
@@ -2305,9 +2348,9 @@ namespace AORebirth.Core.Playfields
                    && source != CombatDamageSource.UnarmedAutoAttack;
         }
 
-        private CombatAttackSource GetCombatAttackSource(ICharacter attacker)
+        private CombatAttackSource GetCombatAttackSource(ICharacter attacker, WeaponSlot preferredSlot)
         {
-            EquippedCombatWeapon equippedWeapon = this.GetEquippedCombatWeapon(attacker);
+            EquippedCombatWeapon equippedWeapon = this.GetEquippedCombatWeapon(attacker, preferredSlot);
             if (equippedWeapon == null)
             {
                 LogUtil.Debug(
@@ -2594,7 +2637,7 @@ namespace AORebirth.Core.Playfields
             return PlayerUnarmedAttackInfoWeaponInstance;
         }
 
-        private EquippedCombatWeapon GetEquippedCombatWeapon(ICharacter attacker)
+        private EquippedCombatWeapon GetEquippedCombatWeapon(ICharacter attacker, WeaponSlot preferredSlot)
         {
             if (attacker.BaseInventory == null
                 || !attacker.BaseInventory.Pages.ContainsKey((int)IdentityType.WeaponPage))
@@ -2609,18 +2652,18 @@ namespace AORebirth.Core.Playfields
             bool rightHandUsable = this.IsWieldableCombatWeapon(rightHand);
             bool leftHandUsable = this.IsWieldableCombatWeapon(leftHand);
 
-            if (rightHandUsable && leftHandUsable)
+            if (preferredSlot == WeaponSlot.OffHand && leftHandUsable)
             {
-                int attackerInstance = attacker.Identity.Instance;
-                int lastSlot;
-                if (this.lastCombatWeaponSlots.TryGetValue(attackerInstance, out lastSlot)
-                    && lastSlot == (int)WeaponSlots.Righthand)
-                {
-                    this.lastCombatWeaponSlots[attackerInstance] = (int)WeaponSlots.LeftHand;
-                    return new EquippedCombatWeapon { Item = leftHand, Slot = (int)WeaponSlots.LeftHand };
-                }
+                this.lastCombatWeaponSlots[attacker.Identity.Instance] = (int)WeaponSlots.LeftHand;
+                return new EquippedCombatWeapon { Item = leftHand, Slot = (int)WeaponSlots.LeftHand };
+            }
 
-                this.lastCombatWeaponSlots[attackerInstance] = (int)WeaponSlots.Righthand;
+            if ((preferredSlot == WeaponSlot.MainHand
+                 || preferredSlot == WeaponSlot.CombinedMA
+                 || preferredSlot == WeaponSlot.None)
+                && rightHandUsable)
+            {
+                this.lastCombatWeaponSlots[attacker.Identity.Instance] = (int)WeaponSlots.Righthand;
                 return new EquippedCombatWeapon { Item = rightHand, Slot = (int)WeaponSlots.Righthand };
             }
 
@@ -3660,10 +3703,11 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearCombatTracking(Identity identity)
         {
-            this.CancelPlayerAutoAttackTimer(identity.Instance);
-            lock (this.playerCombatSync)
+            ICharacter character = this.FindByIdentity<ICharacter>(identity);
+            Character c = character as Character;
+            if (c != null)
             {
-                this.nextCombatTicks.Remove(identity.Instance);
+                c.ClearWeapons();
             }
 
             this.lastCombatWeaponSlots.Remove(identity.Instance);
@@ -5116,25 +5160,6 @@ namespace AORebirth.Core.Playfields
 
             lock (this.heartBeatSync)
             {
-            }
-
-            List<Timer> timersToDispose;
-            lock (this.playerCombatSync)
-            {
-                timersToDispose = new List<Timer>(this.playerAutoAttackTimers.Values);
-                this.playerAutoAttackTimers.Clear();
-                this.nextCombatTicks.Clear();
-            }
-
-            foreach (Timer timer in timersToDispose)
-            {
-                try
-                {
-                    timer.Dispose();
-                }
-                catch (ObjectDisposedException)
-                {
-                }
             }
 
             this.lastCombatWeaponSlots.Clear();

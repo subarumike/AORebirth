@@ -425,6 +425,13 @@ namespace AORebirth.Core.Entities
             this.Controller.SendChangedStats();
         }
 
+        /// <summary>
+        /// Playfield simulation tick. Override in Character for combat/regen.
+        /// </summary>
+        public virtual void Tick(double deltaTime)
+        {
+        }
+
         #endregion
 
         #region Teleporting

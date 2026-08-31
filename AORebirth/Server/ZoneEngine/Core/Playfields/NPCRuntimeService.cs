@@ -701,6 +701,11 @@ namespace AORebirth.Core.Playfields
             this.combatTick.ProcessCombatTick(attacker);
         }
 
+        internal void ApplyCombatHit(ICharacter attacker)
+        {
+            this.combatTick.ApplyCombatHit(attacker);
+        }
+
         internal void ClearInvalidCombatTarget(ICharacter attacker)
         {
             this.ClearFightingTarget(attacker);

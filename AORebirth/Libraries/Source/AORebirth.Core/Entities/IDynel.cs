@@ -120,5 +120,10 @@ namespace AORebirth.Core.Entities
         void WriteStats();
 
         bool InPlayfield(Identity identity);
+
+        /// <summary>
+        /// Playfield simulation tick. <paramref name="deltaTime"/> is seconds since last tick.
+        /// </summary>
+        void Tick(double deltaTime);
     }
 }
