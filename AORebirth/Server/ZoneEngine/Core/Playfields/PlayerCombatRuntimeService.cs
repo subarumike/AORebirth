@@ -38,11 +38,12 @@ namespace ZoneEngine.Core.Playfields
 
         internal void ProcessCombatTick(
             ICharacter attacker,
+            WeaponSlot preferredSlot,
             Action<Identity> clearCombatTracking,
             Func<Identity, ICharacter> findTarget,
             Func<ICharacter, bool> isValidTarget,
             Action<ICharacter, ICharacter> logInvalidTarget,
-            Action<ICharacter, ICharacter> processValidatedCombatTick)
+            Action<ICharacter, ICharacter, WeaponSlot> processValidatedCombatTick)
         {
             Require(clearCombatTracking, "clearCombatTracking");
             Require(findTarget, "findTarget");
@@ -63,7 +64,7 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
-            processValidatedCombatTick(attacker, target);
+            processValidatedCombatTick(attacker, target, preferredSlot);
         }
 
         internal void ClearInvalidCombatTarget(

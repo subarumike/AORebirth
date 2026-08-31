@@ -144,6 +144,9 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+
+            // HACK
+            // TODO: Remove once pathing is implemented.
             Playfield attackPlayfield = character.Playfield as Playfield;
             if (attackPlayfield != null && !attackPlayfield.IsPlayerAttackInRange(character, target))
             {
@@ -157,8 +160,7 @@ namespace ZoneEngine.Core.MessageHandlers
             this.EngageNpcTarget(character, target);
             this.SendCombatStartSpecialAttackWeapon(character);
             this.SendAttackState(character, message.Target, message.Action);
-            // First swing only after SAW+Attack so the client plays the attack anim.
-            this.TryPlayerFirstCombatTick(character);
+
             PetCommandService.OnOwnerEngagedCombat(character, message.Target);
         }
 
