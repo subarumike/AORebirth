@@ -42,6 +42,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
+      <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
+    </Compile>
     <Compile Include="CaptureSessionLayout.cs" />
     <Compile Include="Zam2022Main.cs" />
     <Compile Include="Properties\Zam2022AssemblyInfo.cs" />
