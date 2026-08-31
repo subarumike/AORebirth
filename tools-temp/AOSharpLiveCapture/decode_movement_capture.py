@@ -279,20 +279,23 @@ def decode_char_dc_move(timestamp, direction, sequence, data, counts):
     return row
 
 
-def decode_line(line, counts):
-    match = LINE_RE.match(line.strip())
-    if not match:
+def decode_packet(timestamp, direction, sequence, raw_hex, counts, seen_packets):
+    raw_hex = raw_hex.strip()
+    try:
+        data = bytes.fromhex(raw_hex)
+    except ValueError:
         return None
 
-    data = bytes.fromhex(match.group("hex"))
+    packet_key = (direction, str(sequence), raw_hex.upper())
+    if packet_key in seen_packets:
+        counts["duplicatePackets"] += 1
+        return None
+    seen_packets.add(packet_key)
+
     if len(data) < 20:
         return None
 
     message_type = read_u32(data, 16)
-    timestamp = match.group("time")
-    direction = match.group("direction")
-    sequence = match.group("sequence")
-
     if message_type == FOLLOW_TARGET:
         return decode_follow_target(timestamp, direction, sequence, data, counts)
     if message_type == SET_POS:
@@ -304,6 +307,21 @@ def decode_line(line, counts):
     return None
 
 
+def decode_line(line, counts, seen_packets):
+    match = LINE_RE.match(line.strip())
+    if not match:
+        return None
+
+    return decode_packet(
+        match.group("time"),
+        match.group("direction"),
+        match.group("sequence"),
+        match.group("hex"),
+        counts,
+        seen_packets,
+    )
+
+
 def main():
     if len(sys.argv) != 2:
         print("usage: python decode_movement_capture.py <capture-folder>")
@@ -311,11 +329,13 @@ def main():
 
     capture_dir = os.path.abspath(sys.argv[1])
     packet_log = os.path.join(capture_dir, "packets.hex.log")
-    if not os.path.exists(packet_log):
-        print("missing packets.hex.log: " + packet_log)
+    raw_packet_index = os.path.join(capture_dir, "raw-packets.csv")
+    if not os.path.exists(packet_log) and not os.path.exists(raw_packet_index):
+        print("missing raw packet sources: " + capture_dir)
         return 1
 
     rows = []
+    seen_packets = set()
     counts = {
         "movementPacketRows": 0,
         "followTargetPackets": 0,
@@ -324,13 +344,33 @@ def main():
         "stopMovingCmdPackets": 0,
         "charDCMovePackets": 0,
         "decodeErrors": 0,
+        "packetLogRows": 0,
+        "rawPacketIndexRows": 0,
+        "duplicatePackets": 0,
     }
 
-    with open(packet_log, "r", encoding="utf-8-sig", errors="replace") as handle:
-        for line in handle:
-            row = decode_line(line, counts)
-            if row is not None:
-                rows.append(row)
+    if os.path.exists(packet_log):
+        with open(packet_log, "r", encoding="utf-8-sig", errors="replace") as handle:
+            for line in handle:
+                row = decode_line(line, counts, seen_packets)
+                if row is not None:
+                    counts["packetLogRows"] += 1
+                    rows.append(row)
+
+    if os.path.exists(raw_packet_index):
+        with open(raw_packet_index, "r", newline="", encoding="utf-8-sig") as handle:
+            for packet in csv.DictReader(handle):
+                row = decode_packet(
+                    packet.get("CapturedUtc", ""),
+                    packet.get("Direction", ""),
+                    packet.get("Sequence", ""),
+                    packet.get("RawHex", ""),
+                    counts,
+                    seen_packets,
+                )
+                if row is not None:
+                    counts["rawPacketIndexRows"] += 1
+                    rows.append(row)
 
     counts["movementPacketRows"] = len(rows)
 
