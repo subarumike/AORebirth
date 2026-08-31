@@ -614,13 +614,14 @@ cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Mike2022.
 Load `AOSharpLiveCapture.Mike2022.dll` in the same assembly selection as the
 other plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
 plugin registers `/aocap start|stop|status|flush|mark|snapshot` plus
-`/aocap auto on|off|status`. It starts a crash-recoverable session when loaded,
-auto-flushes every evidence row, writes an atomic checkpoint every two seconds,
-and rotates to a new session after a playfield change. `/aocap start` promotes
-the already-running automatic session instead of discarding pre-command spawn
-or idle evidence. `/aocap stop` drains and finalizes the current folder, writes
-`capture-validation.json`, and starts a continuation folder while automatic
-capture is on; use `/aocap auto off` before stop when no continuation is wanted.
+`/aocap auto on|off|status`. It loads idle so it can coexist with other plugins
+without creating capture folders until requested. `/aocap start` begins a manual,
+crash-recoverable session and disables automatic continuation. `/aocap stop`
+drains and finalizes the current folder, writes `capture-validation.json`, and
+stays stopped. Every evidence row is auto-flushed and an atomic checkpoint is
+written every two seconds. `/aocap auto on` is the explicit opt-in for immediate
+continuous capture and playfield-change rotation; `/aocap auto off` leaves the
+current session running until `/aocap stop`.
 
 The plugin retains the complete inbound and outbound raw stream in
 `packets.hex.log` and `raw-packets.csv`. It directly projects raw
@@ -629,7 +630,14 @@ The plugin retains the complete inbound and outbound raw stream in
 `scfu-appearance.csv`, current AOSharp dynels plus exact raw entity/corpse
 evidence into `world-snapshot.csv`, player position/stats/evades/armor/buffs/
 weapons into `player-combat-context.csv`, and attack-boundary distance evidence
-into `aggro-observations.csv`. Stop-time validation reports coverage for raw,
+into `aggro-observations.csv`. While a session is active, the compatibility
+plugin samples the AOSharp live dynel set every 500 milliseconds and writes
+baseline, appeared, and disappeared observations with player/entity position
+brackets and distances to `visibility-observations.csv`. Raw Despawn rows preserve
+the packet identity without presenting stale coordinates as current evidence.
+This records AOSharp presence transitions but does not claim rendered or
+geometric line of sight.
+Stop-time validation reports coverage for raw,
 spawn identity, world/player context, movement, combat start, NPC-to-player and
 unprovoked aggro, death/corpse, and identity-linked loot. A projection gap with
 an intact raw stream remains an offline-decode issue rather than an automatic
