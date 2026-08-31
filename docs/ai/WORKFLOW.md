@@ -633,18 +633,25 @@ weapons into `player-combat-context.csv`, and attack-boundary distance evidence
 into `aggro-observations.csv`. While a session is active, the compatibility
 plugin samples the AOSharp live dynel set every 500 milliseconds and writes
 baseline, appeared, and disappeared observations with player/entity position
-brackets and distances to `visibility-observations.csv`. Raw Despawn rows preserve
-the packet identity without presenting stale coordinates as current evidence.
-This records AOSharp presence transitions but does not claim rendered or
-geometric line of sight.
+brackets and distances to `visibility-observations.csv`. For every non-local
+character in the installed runtime's `DynelManager.Characters` set, each complete
+sample writes a `CLIENT_STATE` row containing the native-client
+`SimpleChar.IsInLineOfSight` and `SimpleChar.IsInPlay` values. It also emits
+`LOS_GAINED`, `LOS_LOST`, `INPLAY_GAINED`, or `INPLAY_LOST` when either value
+changes. Raw Despawn rows preserve the packet identity without presenting stale
+coordinates as current evidence. These are three separate evidence channels:
+gamecode line-of-sight/in-play state, AOSharp dynel-set presence, and server
+removal packets. AOSharp does not expose a per-dynel renderer/frustum visibility
+property, so none of these rows alone proves that pixels were drawn.
 Stop-time validation reports coverage for raw,
-spawn identity, world/player context, movement, combat start, NPC-to-player and
-unprovoked aggro, death/corpse, and identity-linked loot. A projection gap with
-an intact raw stream remains an offline-decode issue rather than an automatic
-recapture request. The packet log uses the canonical format consumed by the
-repository decoders. The legacy 2022 runtime still lacks newer AOSharp APIs
-required by the remaining optional in-process geometry projections; the
-repository analyzer remains responsible for those projections.
+spawn identity, world/player context, periodic presence, LOS/in-play state,
+movement, combat start, NPC-to-player and unprovoked aggro, death/corpse, and
+identity-linked loot. A projection gap with an intact raw stream remains an
+offline-decode issue rather than an automatic recapture request. The packet log
+uses the canonical format consumed by the repository decoders. The legacy 2022
+runtime still lacks newer AOSharp APIs required by the remaining optional
+in-process geometry projections; the repository analyzer remains responsible
+for those projections.
 
 Build the injector and its capture-safe Bootstrap only through:
 

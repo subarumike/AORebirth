@@ -52,6 +52,10 @@ namespace AOSharpLiveCapture.Mike2022
             internal uint MonsterData;
             internal string Kind;
             internal bool HasPosition;
+            internal bool HasLineOfSight;
+            internal bool IsInLineOfSight;
+            internal bool HasInPlay;
+            internal bool IsInPlay;
             internal bool IsNpc;
             internal bool IsPlayer;
         }
@@ -178,6 +182,12 @@ namespace AOSharpLiveCapture.Mike2022
         private int visibilityTransitionRows;
         private int visibilitySampleErrors;
         private int despawnPackets;
+        private int lineOfSightStateObservations;
+        private int lineOfSightTransitionRows;
+        private int lineOfSightReadErrors;
+        private int inPlayStateObservations;
+        private int inPlayTransitionRows;
+        private int inPlayReadErrors;
 
         public override void Run(string pluginDir)
         {
@@ -329,6 +339,10 @@ namespace AOSharpLiveCapture.Mike2022
                                 + " scfu=" + this.scfuPackets.ToString(CultureInfo.InvariantCulture)
                                 + " visibility=" + this.visibilitySamples.ToString(CultureInfo.InvariantCulture)
                                 + "/" + this.visibilityTransitionRows.ToString(CultureInfo.InvariantCulture)
+                                + " los=" + this.lineOfSightStateObservations.ToString(CultureInfo.InvariantCulture)
+                                + "/" + this.lineOfSightTransitionRows.ToString(CultureInfo.InvariantCulture)
+                                + " inplay=" + this.inPlayStateObservations.ToString(CultureInfo.InvariantCulture)
+                                + "/" + this.inPlayTransitionRows.ToString(CultureInfo.InvariantCulture)
                                 + " attacks=" + this.attackStarts.ToString(CultureInfo.InvariantCulture)
                                 + " corpses=" + this.corpseFullUpdatePackets.ToString(CultureInfo.InvariantCulture)
                                 + " loot=" + this.inventoryUpdatePackets.ToString(CultureInfo.InvariantCulture)
@@ -389,7 +403,7 @@ namespace AOSharpLiveCapture.Mike2022
                 this.aggroObservationLog.WriteLine(
                     "CapturedUtc,ElapsedMilliseconds,GlobalOrdinal,Direction,Sequence,SourceIdentity,SourceName,TargetIdentity,TargetName,InitiatorRole,PlayerPreviouslyAttackedSource,SourcePositionUtc,SourcePositionMessage,SourceX,SourceY,SourceZ,TargetPositionUtc,TargetPositionMessage,TargetX,TargetY,TargetZ,PreviousTargetPositionUtc,PreviousTargetX,PreviousTargetY,PreviousTargetZ,TriggerDistance,PreviousDistance,DistanceBracketMin,DistanceBracketMax,SourcePositionDeltaMs,TargetPositionDeltaMs,CorrelationStatus");
                 this.visibilityObservationLog.WriteLine(
-                    "CapturedUtc,ElapsedMilliseconds,SampleIndex,Phase,Observation,Identity,Name,Kind,PlayfieldId,PlayerX,PlayerY,PlayerZ,EntityX,EntityY,EntityZ,Distance,PreviousSampleUtc,PreviousPlayerX,PreviousPlayerY,PreviousPlayerZ,PreviousEntityX,PreviousEntityY,PreviousEntityZ,PreviousDistance,Direction,Sequence,GlobalOrdinal,EvidenceSource");
+                    "CapturedUtc,ElapsedMilliseconds,SampleIndex,Phase,Observation,Identity,Name,Kind,PlayfieldId,PlayerX,PlayerY,PlayerZ,EntityX,EntityY,EntityZ,Distance,PreviousSampleUtc,PreviousPlayerX,PreviousPlayerY,PreviousPlayerZ,PreviousEntityX,PreviousEntityY,PreviousEntityZ,PreviousDistance,LineOfSight,PreviousLineOfSight,IsInPlay,PreviousIsInPlay,Direction,Sequence,GlobalOrdinal,EvidenceSource");
             }
             catch
             {
@@ -440,6 +454,12 @@ namespace AOSharpLiveCapture.Mike2022
             this.visibilityTransitionRows = 0;
             this.visibilitySampleErrors = 0;
             this.despawnPackets = 0;
+            this.lineOfSightStateObservations = 0;
+            this.lineOfSightTransitionRows = 0;
+            this.lineOfSightReadErrors = 0;
+            this.inPlayStateObservations = 0;
+            this.inPlayTransitionRows = 0;
+            this.inPlayReadErrors = 0;
             this.knownEntities.Clear();
             this.knownCorpses.Clear();
             this.positions.Clear();
@@ -1757,7 +1777,13 @@ namespace AOSharpLiveCapture.Mike2022
             json.AppendLine("    \"visibilityObservationRows\": " + this.visibilityObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"visibilityTransitionRows\": " + this.visibilityTransitionRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"visibilitySampleErrors\": " + this.visibilitySampleErrors.ToString(CultureInfo.InvariantCulture) + ",");
-            json.AppendLine("    \"despawnPackets\": " + this.despawnPackets.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine("    \"despawnPackets\": " + this.despawnPackets.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"lineOfSightStateObservations\": " + this.lineOfSightStateObservations.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"lineOfSightTransitionRows\": " + this.lineOfSightTransitionRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"lineOfSightReadErrors\": " + this.lineOfSightReadErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"inPlayStateObservations\": " + this.inPlayStateObservations.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"inPlayTransitionRows\": " + this.inPlayTransitionRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"inPlayReadErrors\": " + this.inPlayReadErrors.ToString(CultureInfo.InvariantCulture));
             json.AppendLine("  },");
             json.AppendLine("  \"validationStatus\": " + Json(this.lastValidationStatus) + ",");
             json.AppendLine("  \"validationSummary\": " + Json(this.lastValidationSummary) + ",");
@@ -1919,25 +1945,59 @@ namespace AOSharpLiveCapture.Mike2022
                     throw new InvalidOperationException("DynelManager.AllDynels is unavailable.");
                 }
 
+                IEnumerable characters = DynelManager.Characters;
+                if (characters == null)
+                {
+                    throw new InvalidOperationException("DynelManager.Characters is unavailable.");
+                }
+
+                var charactersByIdentity =
+                    new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                foreach (object character in characters)
+                {
+                    try
+                    {
+                        string characterIdentity = NormalizeIdentity(MemberText(character, "Identity"));
+                        if (characterIdentity.Length == 0)
+                        {
+                            visibilitySampleComplete = false;
+                            continue;
+                        }
+
+                        charactersByIdentity[characterIdentity] = character;
+                    }
+                    catch (Exception ex)
+                    {
+                        visibilitySampleComplete = false;
+                        this.worldSnapshotErrors++;
+                        this.WriteFallbackError("WorldSnapshot.Character", ex);
+                    }
+                }
+
                 foreach (object dynel in dynels)
                 {
                     try
                     {
                         string identity = NormalizeIdentity(MemberText(dynel, "Identity"));
-                        string name = MemberText(dynel, "Name");
-                        object position = MemberValue(dynel, "Position");
-                        object rotation = MemberValue(dynel, "Rotation");
+                        object character = null;
+                        bool isCharacter = identity.Length > 0
+                                           && charactersByIdentity.TryGetValue(identity, out character);
+                        object evidenceDynel = isCharacter ? character : dynel;
+                        string evidenceSource = isCharacter ? "AOSharpSimpleChar" : "AOSharpDynel";
+                        string name = MemberText(evidenceDynel, "Name");
+                        object position = MemberValue(evidenceDynel, "Position");
+                        object rotation = MemberValue(evidenceDynel, "Rotation");
                         string positionX = MemberNumber(position, "X");
                         string positionY = MemberNumber(position, "Y");
                         string positionZ = MemberNumber(position, "Z");
-                        string level = NamedStat(dynel, "Level");
-                        string health = NamedStat(dynel, "Health");
-                        string monsterData = NamedStat(dynel, "MonsterData");
+                        string level = NamedStat(evidenceDynel, "Level");
+                        string health = NamedStat(evidenceDynel, "Health");
+                        string monsterData = NamedStat(evidenceDynel, "MonsterData");
                         bool isNpc;
                         bool isPlayer;
-                        bool.TryParse(MemberText(dynel, "IsNpc"), out isNpc);
-                        bool.TryParse(MemberText(dynel, "IsPlayer"), out isPlayer);
-                        string runtimeType = dynel == null ? string.Empty : dynel.GetType().Name;
+                        bool.TryParse(MemberText(evidenceDynel, "IsNpc"), out isNpc);
+                        bool.TryParse(MemberText(evidenceDynel, "IsPlayer"), out isPlayer);
+                        string runtimeType = evidenceDynel == null ? string.Empty : evidenceDynel.GetType().Name;
                         string kind = runtimeType.IndexOf("Corpse", StringComparison.OrdinalIgnoreCase) >= 0
                                           ? "Corpse"
                                           : isNpc
@@ -1945,6 +2005,17 @@ namespace AOSharpLiveCapture.Mike2022
                                                 : isPlayer
                                                       ? "Player"
                                                       : runtimeType;
+                        bool isLocalCharacter = isCharacter
+                                                && IdentityEquals(identity, this.playerIdentity);
+                        bool lineOfSight = false;
+                        bool hasLineOfSight = isCharacter
+                                              && !isLocalCharacter
+                                              && this.TryReadLineOfSight(character, out lineOfSight);
+
+                        bool isInPlay = false;
+                        bool hasInPlay = isCharacter
+                                         && !isLocalCharacter
+                                         && this.TryReadInPlay(character, out isInPlay);
 
                         if (writeWorldRows)
                         {
@@ -1972,7 +2043,7 @@ namespace AOSharpLiveCapture.Mike2022
                                     Csv(string.Empty),
                                     Csv(string.Empty),
                                     Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
-                                    Csv("AOSharpDynel")));
+                                    Csv(evidenceSource)));
                         }
 
                         if (identity.Length == 0)
@@ -2008,6 +2079,10 @@ namespace AOSharpLiveCapture.Mike2022
                                 MonsterData = parsedMonsterData,
                                 Kind = kind,
                                 HasPosition = true,
+                                HasLineOfSight = hasLineOfSight,
+                                IsInLineOfSight = lineOfSight,
+                                HasInPlay = hasInPlay,
+                                IsInPlay = isInPlay,
                                 IsNpc = isNpc,
                                 IsPlayer = isPlayer
                             };
@@ -2020,7 +2095,7 @@ namespace AOSharpLiveCapture.Mike2022
                             this.UpdatePosition(
                                 identity,
                                 capturedUtc,
-                                "AOSharpDynel",
+                                evidenceSource,
                                 "LOCAL",
                                 0,
                                 x,
@@ -2078,9 +2153,77 @@ namespace AOSharpLiveCapture.Mike2022
                 bool baseline = this.previousVisibilitySampleUtc == DateTime.MinValue;
                 foreach (KeyValuePair<string, EntitySnapshot> pair in currentVisibleDynels)
                 {
-                    EntitySnapshot previousEntity;
-                    if (!baseline && this.previousVisibleDynels.TryGetValue(pair.Key, out previousEntity))
+                    EntitySnapshot previousEntity = null;
+                    bool hasPrevious = !baseline
+                                       && this.previousVisibleDynels.TryGetValue(pair.Key, out previousEntity);
+                    bool isLocalPlayer = IdentityEquals(pair.Key, this.playerIdentity);
+                    if (!isLocalPlayer && (pair.Value.HasLineOfSight || pair.Value.HasInPlay))
                     {
+                        this.WriteVisibilityObservation(
+                            capturedUtc,
+                            this.captureClock.Elapsed.TotalMilliseconds,
+                            phase,
+                            "CLIENT_STATE",
+                            pair.Value,
+                            currentPlayer,
+                            this.previousVisibilityPlayer,
+                            hasPrevious ? previousEntity : null,
+                            string.Empty,
+                            0,
+                            0,
+                            "AOSharpSimpleChar.ClientState");
+
+                        if (pair.Value.HasLineOfSight)
+                        {
+                            this.lineOfSightStateObservations++;
+                        }
+
+                        if (pair.Value.HasInPlay)
+                        {
+                            this.inPlayStateObservations++;
+                        }
+                    }
+
+                    if (hasPrevious)
+                    {
+                        if (pair.Value.HasLineOfSight
+                            && previousEntity.HasLineOfSight
+                            && pair.Value.IsInLineOfSight != previousEntity.IsInLineOfSight)
+                        {
+                            this.WriteVisibilityObservation(
+                                capturedUtc,
+                                this.captureClock.Elapsed.TotalMilliseconds,
+                                phase,
+                                pair.Value.IsInLineOfSight ? "LOS_GAINED" : "LOS_LOST",
+                                pair.Value,
+                                currentPlayer,
+                                this.previousVisibilityPlayer,
+                                previousEntity,
+                                string.Empty,
+                                0,
+                                0,
+                                "AOSharpSimpleChar.IsInLineOfSight");
+                        }
+
+                        if (pair.Value.HasInPlay
+                            && previousEntity.HasInPlay
+                            && pair.Value.IsInPlay != previousEntity.IsInPlay)
+                        {
+                            this.WriteVisibilityObservation(
+                                capturedUtc,
+                                this.captureClock.Elapsed.TotalMilliseconds,
+                                phase,
+                                pair.Value.IsInPlay ? "INPLAY_GAINED" : "INPLAY_LOST",
+                                pair.Value,
+                                currentPlayer,
+                                this.previousVisibilityPlayer,
+                                previousEntity,
+                                string.Empty,
+                                0,
+                                0,
+                                "AOSharpSimpleChar.IsInPlay");
+                        }
+
                         continue;
                     }
 
@@ -2151,6 +2294,85 @@ namespace AOSharpLiveCapture.Mike2022
             }
         }
 
+        private bool TryReadLineOfSight(object dynel, out bool value)
+        {
+            return this.TryReadClientBooleanState(
+                dynel,
+                "IsInLineOfSight",
+                "LineOfSight",
+                ref this.lineOfSightReadErrors,
+                out value);
+        }
+
+        private bool TryReadInPlay(object dynel, out bool value)
+        {
+            return this.TryReadClientBooleanState(
+                dynel,
+                "IsInPlay",
+                "InPlay",
+                ref this.inPlayReadErrors,
+                out value);
+        }
+
+        private bool TryReadClientBooleanState(
+            object dynel,
+            string propertyName,
+            string errorCategory,
+            ref int readErrors,
+            out bool value)
+        {
+            value = false;
+            if (dynel == null)
+            {
+                readErrors++;
+                return false;
+            }
+
+            try
+            {
+                PropertyInfo property = dynel.GetType().GetProperty(
+                    propertyName,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (property == null || property.GetIndexParameters().Length != 0)
+                {
+                    readErrors++;
+                    if (readErrors <= 5)
+                    {
+                        this.WriteEvent(
+                            "CLIENT-STATE-READ-ERROR",
+                            propertyName + " is unavailable on " + dynel.GetType().FullName + ".");
+                    }
+
+                    return false;
+                }
+
+                object raw = property.GetValue(dynel, null);
+                if (raw is bool)
+                {
+                    value = (bool)raw;
+                    return true;
+                }
+
+                if (raw != null && bool.TryParse(raw.ToString(), out value))
+                {
+                    return true;
+                }
+
+                readErrors++;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                readErrors++;
+                if (readErrors <= 5)
+                {
+                    this.WriteFallbackError(errorCategory, ex);
+                }
+
+                return false;
+            }
+        }
+
         private void WriteVisibilityObservation(
             DateTime capturedUtc,
             double elapsedMilliseconds,
@@ -2177,6 +2399,16 @@ namespace AOSharpLiveCapture.Mike2022
                 || string.Equals(observation, "DISAPPEARED", StringComparison.OrdinalIgnoreCase))
             {
                 this.visibilityTransitionRows++;
+            }
+            else if (string.Equals(observation, "LOS_GAINED", StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(observation, "LOS_LOST", StringComparison.OrdinalIgnoreCase))
+            {
+                this.lineOfSightTransitionRows++;
+            }
+            else if (string.Equals(observation, "INPLAY_GAINED", StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(observation, "INPLAY_LOST", StringComparison.OrdinalIgnoreCase))
+            {
+                this.inPlayTransitionRows++;
             }
 
             this.visibilityObservationLog.WriteLine(
@@ -2208,6 +2440,10 @@ namespace AOSharpLiveCapture.Mike2022
                     FormatEntityCoordinate(previousEntity, "Y"),
                     FormatEntityCoordinate(previousEntity, "Z"),
                     FormatDistance(previousDistance),
+                    FormatLineOfSight(entity),
+                    FormatLineOfSight(previousEntity),
+                    FormatInPlay(entity),
+                    FormatInPlay(previousEntity),
                     Csv(direction),
                     sequence == 0 ? string.Empty : sequence.ToString(CultureInfo.InvariantCulture),
                     globalOrdinal == 0 ? string.Empty : globalOrdinal.ToString(CultureInfo.InvariantCulture),
@@ -2410,6 +2646,24 @@ namespace AOSharpLiveCapture.Mike2022
                 issues.Add("visibility sample errors=" + this.visibilitySampleErrors.ToString(CultureInfo.InvariantCulture));
             }
 
+            if (this.lineOfSightStateObservations == 0)
+            {
+                issues.Add("no non-local AOSharp line-of-sight state observations");
+            }
+            else if (this.lineOfSightReadErrors > 0)
+            {
+                issues.Add("line-of-sight read errors=" + this.lineOfSightReadErrors.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (this.inPlayStateObservations == 0)
+            {
+                issues.Add("no non-local AOSharp in-play state observations");
+            }
+            else if (this.inPlayReadErrors > 0)
+            {
+                issues.Add("in-play read errors=" + this.inPlayReadErrors.ToString(CultureInfo.InvariantCulture));
+            }
+
             if (this.movementPacketRows == 0)
             {
                 issues.Add("no movement evidence");
@@ -2482,6 +2736,10 @@ namespace AOSharpLiveCapture.Mike2022
                 json.AppendLine("    \"worldSnapshot\": " + (this.worldSnapshotRows > 0 && this.worldSnapshotErrors == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"visibilitySampling\": " + (this.visibilitySamples >= 2 && this.visibilitySampleErrors == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"visibilityTransitions\": " + (this.visibilityTransitionRows > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"lineOfSightState\": " + (this.lineOfSightStateObservations > 0 && this.lineOfSightReadErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"lineOfSightTransitions\": " + (this.lineOfSightTransitionRows > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"inPlayState\": " + (this.inPlayStateObservations > 0 && this.inPlayReadErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"inPlayTransitions\": " + (this.inPlayTransitionRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"despawnPackets\": " + (this.despawnPackets > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"playerCombatContext\": " + (this.playerCombatContextCompleteRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"movement\": " + (this.movementPacketRows > 0 ? "true" : "false") + ",");
@@ -2788,6 +3046,20 @@ namespace AOSharpLiveCapture.Mike2022
             }
 
             return FormatFloat(entity.Z);
+        }
+
+        private static string FormatLineOfSight(EntitySnapshot entity)
+        {
+            return entity != null && entity.HasLineOfSight
+                       ? (entity.IsInLineOfSight ? "true" : "false")
+                       : string.Empty;
+        }
+
+        private static string FormatInPlay(EntitySnapshot entity)
+        {
+            return entity != null && entity.HasInPlay
+                       ? (entity.IsInPlay ? "true" : "false")
+                       : string.Empty;
         }
 
         private static string FormatDistance(double? value)
