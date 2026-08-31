@@ -240,6 +240,17 @@ completion matrices and dated evidence retain detailed provenance.
   14/14, LoginEngine Debug/Release builds pass, database preflight passes, and
   AOtomation messaging passes 1013/1013. No production database, website, Linux,
   MyBB, or public-registration change was made.
+- Unified password management source foundation: authenticated password change
+  and verified-email password recovery are implemented behind Account Broker
+  without creating a second credential authority. Both flows update the AO
+  `login.Password` hash through `LoginEncryption.GeneratePasswordHash()`;
+  password reset uses hashed 256-bit single-use tokens, atomic consumption,
+  expiry, resend superseding, dual source/target rate limits, SMTP delivery,
+  CSRF-protected Broker-host pages, and Broker-session invalidation. Windows
+  schema validation, Account Broker validation, and local HTTP/SMTP acceptance
+  pass. Production remains unchanged pending the additive token-table migration,
+  accepted-SHA deployment, and the separate production PHP website integration.
+  Design and API contract: `docs/project/PASSWORD_MANAGEMENT.md`.
 
 - Complete AOtomation suite: PASS (1003/1003).
 - Arete regular-mob combat uses a scoped forward reconciliation against the

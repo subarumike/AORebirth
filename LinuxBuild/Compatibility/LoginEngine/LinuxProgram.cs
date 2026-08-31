@@ -69,6 +69,7 @@ namespace LoginEngine
             "account_email_verification_tokens",
             "account_game_mappings",
             "account_identities",
+            "account_password_reset_tokens",
             "account_provisioning_jobs"
         };
 

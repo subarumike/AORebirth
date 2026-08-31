@@ -128,6 +128,10 @@ namespace AORebirth.AccountBroker.Service
 
         private readonly FixedWindowRateLimiter emailVerificationLimiter;
 
+        private readonly FixedWindowRateLimiter passwordResetIpLimiter;
+
+        private readonly FixedWindowRateLimiter passwordResetTargetLimiter;
+
         private readonly AccountEmailSender emailSender;
 
         private readonly ForumSsoCodeStore forumSsoCodes;
@@ -139,6 +143,8 @@ namespace AORebirth.AccountBroker.Service
         private readonly string publicBaseUrl;
 
         private readonly int emailVerificationTtlMinutes;
+
+        private readonly int passwordResetTtlMinutes;
 
         private readonly WebSessionStore sessions;
 
@@ -155,6 +161,7 @@ namespace AORebirth.AccountBroker.Service
                 "AOREBIRTH_ACCOUNT_BROKER_ACCOUNT_MAIL_SECRET_FILE");
             this.publicBaseUrl = GetEnvironment("AOREBIRTH_PUBLIC_BASE_URL", "https://ao-rebirth.com").TrimEnd('/');
             this.emailVerificationTtlMinutes = GetIntEnvironment("AOREBIRTH_EMAIL_VERIFICATION_TOKEN_MINUTES", 120);
+            this.passwordResetTtlMinutes = GetIntEnvironment("AOREBIRTH_PASSWORD_RESET_TOKEN_MINUTES", 30);
             this.emailSender = AccountEmailSender.FromEnvironment();
             this.forumSsoCodes = new ForumSsoCodeStore(GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_FORUM_SSO_SECONDS", 120));
             this.registrationLimiter = new FixedWindowRateLimiter(
@@ -166,6 +173,14 @@ namespace AORebirth.AccountBroker.Service
             this.emailVerificationLimiter = new FixedWindowRateLimiter(
                 GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_EMAIL_VERIFY_LIMIT", 3),
                 TimeSpan.FromMinutes(15));
+            TimeSpan passwordResetWindow = TimeSpan.FromMinutes(
+                GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_PASSWORD_RESET_WINDOW_MINUTES", 15));
+            this.passwordResetIpLimiter = new FixedWindowRateLimiter(
+                GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_PASSWORD_RESET_IP_LIMIT", 10),
+                passwordResetWindow);
+            this.passwordResetTargetLimiter = new FixedWindowRateLimiter(
+                GetIntEnvironment("AOREBIRTH_ACCOUNT_BROKER_PASSWORD_RESET_TARGET_LIMIT", 3),
+                passwordResetWindow);
         }
 
         public void Run()
@@ -223,6 +238,30 @@ namespace AORebirth.AccountBroker.Service
                 return;
             }
 
+            if (context.Request.HttpMethod == "GET" && path == "/forgot-password")
+            {
+                this.WriteForgotPasswordPage(context, null, false);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "GET" && path == "/reset-password")
+            {
+                this.WriteResetPasswordPage(context, context.Request.QueryString["token"], null);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "GET" && path == "/change-password")
+            {
+                Redirect(context.Response, "/account/password");
+                return;
+            }
+
+            if (context.Request.HttpMethod == "GET" && path == "/account/password")
+            {
+                this.WritePasswordPage(context, null);
+                return;
+            }
+
             if (context.Request.HttpMethod == "GET" && path == "/member")
             {
                 this.WriteMemberPage(context);
@@ -247,6 +286,30 @@ namespace AORebirth.AccountBroker.Service
                 return;
             }
 
+            if (context.Request.HttpMethod == "POST" && path == "/api/account/password/change")
+            {
+                this.HandleInternalPasswordChange(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/password/reset/request")
+            {
+                this.HandleInternalPasswordResetRequest(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/password/reset/status")
+            {
+                this.HandleInternalPasswordResetStatus(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/api/password/reset/consume")
+            {
+                this.HandleInternalPasswordResetConsume(context);
+                return;
+            }
+
             if (context.Request.HttpMethod == "POST" && (path == "/api/register" || path == "/register"))
             {
                 this.HandleRegister(context, path == "/api/register");
@@ -262,6 +325,24 @@ namespace AORebirth.AccountBroker.Service
             if (context.Request.HttpMethod == "POST" && (path == "/api/logout" || path == "/logout"))
             {
                 this.HandleLogout(context, path == "/api/logout");
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/forgot-password")
+            {
+                this.HandlePasswordResetRequest(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/reset-password")
+            {
+                this.HandlePasswordReset(context);
+                return;
+            }
+
+            if (context.Request.HttpMethod == "POST" && path == "/account/password")
+            {
+                this.HandlePasswordChange(context);
                 return;
             }
 
@@ -486,6 +567,249 @@ namespace AORebirth.AccountBroker.Service
             }
         }
 
+        private void HandlePasswordChange(HttpListenerContext context)
+        {
+            WebSession session = this.GetCurrentSession(context);
+            if (session == null)
+            {
+                Redirect(context.Response, "/login");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            if (!this.ValidateCsrf(context, form))
+            {
+                this.WritePasswordPage(context, "The submitted form expired.", 403);
+                return;
+            }
+
+            string newPassword = GetForm(form, "newPassword");
+            if (newPassword != GetForm(form, "confirmPassword"))
+            {
+                this.WritePasswordPage(context, "The new passwords do not match.");
+                return;
+            }
+
+            if (!PasswordPolicy.IsValid(newPassword))
+            {
+                this.WritePasswordPage(context, "The new password must be between 8 and 128 characters.");
+                return;
+            }
+
+            PasswordChangeResult result = this.broker.ChangePassword(
+                session.Identity.IdentityPublicId,
+                GetForm(form, "currentPassword"),
+                newPassword);
+            if (!result.Changed)
+            {
+                this.WritePasswordPage(context, "The current password is incorrect.");
+                return;
+            }
+
+            this.sessions.InvalidateIdentity(result.IdentityPublicId);
+            ExpireCookie(context.Response, SessionCookieName, context.Request.IsSecureConnection);
+            Redirect(context.Response, "/login?passwordChanged=1");
+        }
+
+        private void HandleInternalPasswordChange(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            string newPassword = GetForm(form, "newPassword");
+            if (newPassword != GetForm(form, "confirmPassword"))
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"PASSWORD_CONFIRMATION_MISMATCH\"}");
+                return;
+            }
+
+            if (!PasswordPolicy.IsValid(newPassword))
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"INVALID_PASSWORD\"}");
+                return;
+            }
+
+            try
+            {
+                PasswordChangeResult result = this.broker.ChangePassword(
+                    GetForm(form, "identityPublicId"),
+                    GetForm(form, "currentPassword"),
+                    newPassword);
+                if (!result.Changed)
+                {
+                    WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"INVALID_CURRENT_PASSWORD\"}");
+                    return;
+                }
+
+                this.sessions.InvalidateIdentity(result.IdentityPublicId);
+                WriteJson(context.Response, 200, "{\"ok\":true,\"passwordChanged\":true,\"invalidateSessions\":true}");
+            }
+            catch (AccountBrokerException)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"PASSWORD_CHANGE_FAILED\"}");
+            }
+        }
+
+        private void HandlePasswordResetRequest(HttpListenerContext context)
+        {
+            Dictionary<string, string> form = this.ReadForm(context);
+            if (!this.ValidateCsrf(context, form))
+            {
+                this.WriteForgotPasswordPage(context, "The submitted form expired.", false, 403);
+                return;
+            }
+
+            this.QueuePasswordReset(context, GetForm(form, "email"));
+            this.WriteForgotPasswordPage(context, null, true);
+        }
+
+        private void HandleInternalPasswordResetRequest(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            this.QueuePasswordReset(context, GetForm(form, "email"));
+            WriteJson(context.Response, 200, "{\"ok\":true,\"message\":\"If an eligible account exists for that email, a password reset message has been sent.\"}");
+        }
+
+        private void HandleInternalPasswordResetStatus(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            PasswordResetTokenStatus status = this.broker.GetPasswordResetTokenStatus(
+                GetForm(this.ReadForm(context), "token"));
+            WriteJson(
+                context.Response,
+                200,
+                "{\"ok\":true,\"valid\":" + (status.Valid ? "true" : "false") + "}");
+        }
+
+        private void HandlePasswordReset(HttpListenerContext context)
+        {
+            Dictionary<string, string> form = this.ReadForm(context);
+            string token = GetForm(form, "token");
+            if (!this.ValidateCsrf(context, form))
+            {
+                this.WriteResetPasswordPage(context, token, "The submitted form expired.", 403);
+                return;
+            }
+
+            string newPassword = GetForm(form, "newPassword");
+            if (newPassword != GetForm(form, "confirmPassword"))
+            {
+                this.WriteResetPasswordPage(context, token, "The new passwords do not match.");
+                return;
+            }
+
+            if (!PasswordPolicy.IsValid(newPassword))
+            {
+                this.WriteResetPasswordPage(context, token, "The new password must be between 8 and 128 characters.");
+                return;
+            }
+
+            PasswordResetResult result = this.broker.ResetPassword(token, newPassword);
+            if (!result.Reset)
+            {
+                this.WriteResetPasswordPage(context, token, "This password reset link is invalid or expired.");
+                return;
+            }
+
+            this.sessions.InvalidateIdentity(result.IdentityPublicId);
+            Redirect(context.Response, "/login?passwordReset=1");
+        }
+
+        private void HandleInternalPasswordResetConsume(HttpListenerContext context)
+        {
+            if (!this.ValidateAccountMailSecret(context))
+            {
+                WriteJson(context.Response, 403, "{\"ok\":false,\"error\":\"ACCOUNT_MAIL_FORBIDDEN\"}");
+                return;
+            }
+
+            Dictionary<string, string> form = this.ReadForm(context);
+            string newPassword = GetForm(form, "newPassword");
+            if (newPassword != GetForm(form, "confirmPassword"))
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"PASSWORD_CONFIRMATION_MISMATCH\"}");
+                return;
+            }
+
+            if (!PasswordPolicy.IsValid(newPassword))
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"INVALID_PASSWORD\"}");
+                return;
+            }
+
+            PasswordResetResult result = this.broker.ResetPassword(GetForm(form, "token"), newPassword);
+            if (!result.Reset)
+            {
+                WriteJson(context.Response, 400, "{\"ok\":false,\"error\":\"PASSWORD_RESET_INVALID\"}");
+                return;
+            }
+
+            this.sessions.InvalidateIdentity(result.IdentityPublicId);
+            WriteJson(context.Response, 200, "{\"ok\":true,\"passwordReset\":true,\"invalidateSessions\":true}");
+        }
+
+        private void QueuePasswordReset(HttpListenerContext context, string email)
+        {
+            string targetKey = PasswordResetLimiterKey(email);
+            bool sourceAllowed = this.passwordResetIpLimiter.Allow(
+                "password-reset-source:" + GetRemoteAddress(context));
+            bool targetAllowed = this.passwordResetTargetLimiter.Allow(
+                "password-reset-target:" + targetKey);
+            if (!sourceAllowed || !targetAllowed || !this.emailSender.IsConfigured)
+            {
+                return;
+            }
+
+            PasswordResetTokenResult reset = this.broker.CreatePasswordResetToken(
+                email,
+                this.passwordResetTtlMinutes);
+            if (reset == null)
+            {
+                return;
+            }
+
+            ThreadPool.QueueUserWorkItem(
+                _ =>
+                {
+                    try
+                    {
+                        this.emailSender.SendPasswordReset(reset, this.publicBaseUrl);
+                    }
+                    catch (Exception exception)
+                    {
+                        try
+                        {
+                            this.broker.CancelPasswordResetToken(reset.Token);
+                        }
+                        catch (Exception cancellationException)
+                        {
+                            Console.Error.WriteLine(
+                                "AORebirth Account Broker password reset cancellation failed: "
+                                + cancellationException.GetType().FullName);
+                        }
+
+                        Console.Error.WriteLine(
+                            "AORebirth Account Broker password reset send failed: "
+                            + exception.GetType().FullName);
+                    }
+                });
+        }
+
         private void HandleEmailVerificationResend(HttpListenerContext context)
         {
             if (!this.ValidateAccountMailSecret(context))
@@ -699,9 +1023,84 @@ namespace AORebirth.AccountBroker.Service
                 + Label("Username", "username", "text")
                 + Label("Password", "password", "password")
                 + "<button type=\"submit\">Login</button>"
-                + "</form><p><a href=\"/register\">Create an account</a></p>"
+                + "</form><p><a href=\"/forgot-password\">Forgot password?</a></p>"
+                + "<p><a href=\"/register\">Create an account</a></p>"
                 + PageFooter();
             WriteHtml(context.Response, 200, body);
+        }
+
+        private void WriteForgotPasswordPage(
+            HttpListenerContext context,
+            string error,
+            bool submitted,
+            int statusCode = 200)
+        {
+            string csrf = this.IssueCsrf(context);
+            string body =
+                PageHeader("Forgot password")
+                + Alert(error)
+                + "<h1>Forgot password</h1>"
+                + (submitted
+                    ? "<p>If an eligible account exists for that email, a password reset message has been sent.</p>"
+                    : "<form method=\"post\" action=\"/forgot-password\">"
+                        + Hidden("csrf", csrf)
+                        + Label("Email", "email", "email")
+                        + "<button type=\"submit\">Send reset link</button></form>")
+                + "<p><a href=\"/login\">Back to login</a></p>"
+                + PageFooter();
+            WriteHtml(context.Response, statusCode, body);
+        }
+
+        private void WriteResetPasswordPage(
+            HttpListenerContext context,
+            string token,
+            string error,
+            int statusCode = 200)
+        {
+            PasswordResetTokenStatus status = this.broker.GetPasswordResetTokenStatus(token);
+            string body = PageHeader("Reset password") + Alert(error) + "<h1>Reset password</h1>";
+            if (!status.Valid)
+            {
+                body += "<p>This password reset link is invalid or expired.</p>"
+                    + "<p><a href=\"/forgot-password\">Request another reset link</a></p>";
+            }
+            else
+            {
+                string csrf = this.IssueCsrf(context);
+                body += "<form method=\"post\" action=\"/reset-password\">"
+                    + Hidden("csrf", csrf)
+                    + Hidden("token", token)
+                    + Label("New password", "newPassword", "password")
+                    + Label("Confirm new password", "confirmPassword", "password")
+                    + "<button type=\"submit\">Reset password</button></form>";
+            }
+
+            WriteHtml(context.Response, statusCode, body + PageFooter());
+        }
+
+        private void WritePasswordPage(HttpListenerContext context, string error, int statusCode = 200)
+        {
+            WebSession session = this.GetCurrentSession(context);
+            if (session == null)
+            {
+                Redirect(context.Response, "/login");
+                return;
+            }
+
+            string csrf = this.IssueCsrf(context);
+            string body =
+                PageHeader("Change password")
+                + Alert(error)
+                + "<h1>Change password</h1>"
+                + "<form method=\"post\" action=\"/account/password\">"
+                + Hidden("csrf", csrf)
+                + Label("Current password", "currentPassword", "password")
+                + Label("New password", "newPassword", "password")
+                + Label("Confirm new password", "confirmPassword", "password")
+                + "<button type=\"submit\">Change password</button></form>"
+                + "<p><a href=\"/member\">Back to account</a></p>"
+                + PageFooter();
+            WriteHtml(context.Response, statusCode, body);
         }
 
         private void WriteMemberPage(HttpListenerContext context)
@@ -724,6 +1123,7 @@ namespace AORebirth.AccountBroker.Service
                 + "<dt>Identity status</dt><dd>" + Html(identity.IdentityStatus) + "</dd>"
                 + "<dt>Game account linkage</dt><dd>" + Html(identity.GameMappingState) + "</dd>"
                 + "</dl>"
+                + "<p><a href=\"/account/password\">Change password</a></p>"
                 + "<form method=\"post\" action=\"/logout\">" + Hidden("csrf", csrf)
                 + "<button type=\"submit\">Logout</button></form>"
                 + PageFooter();
@@ -1062,6 +1462,24 @@ namespace AORebirth.AccountBroker.Service
                 : context.Request.RemoteEndPoint.Address.ToString();
         }
 
+        private static string PasswordResetLimiterKey(string email)
+        {
+            string normalized = string.IsNullOrWhiteSpace(email)
+                ? string.Empty
+                : email.Trim().ToLowerInvariant();
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] digest = sha.ComputeHash(Encoding.UTF8.GetBytes(normalized));
+                var builder = new StringBuilder(digest.Length * 2);
+                foreach (byte value in digest)
+                {
+                    builder.Append(value.ToString("x2", CultureInfo.InvariantCulture));
+                }
+
+                return builder.ToString();
+            }
+        }
+
         private static bool IsTrustedProxyRemote(IPAddress remoteAddress)
         {
             string configured = Environment.GetEnvironmentVariable("AOREBIRTH_ACCOUNT_BROKER_TRUSTED_PROXY_CIDRS");
@@ -1261,6 +1679,46 @@ namespace AORebirth.AccountBroker.Service
                     }
                 }
             }
+
+            public void SendPasswordReset(PasswordResetTokenResult reset, string publicBaseUrl)
+            {
+                if (!this.IsConfigured)
+                {
+                    throw new InvalidOperationException("Mail sender is not configured.");
+                }
+
+                string link = publicBaseUrl.TrimEnd('/') + "/reset-password?token=" + Uri.EscapeDataString(reset.Token);
+                using (var message = new MailMessage())
+                {
+                    message.From = new MailAddress(this.fromAddress, this.fromName, Encoding.UTF8);
+                    message.To.Add(new MailAddress(reset.CanonicalEmail));
+                    message.Subject = "Reset your AORebirth account password";
+                    message.BodyEncoding = Encoding.UTF8;
+                    message.SubjectEncoding = Encoding.UTF8;
+                    message.Body =
+                        "AORebirth password reset" + Environment.NewLine
+                        + Environment.NewLine
+                        + "A password reset was requested for account: "
+                        + reset.CanonicalUsername + Environment.NewLine
+                        + Environment.NewLine
+                        + "Open this link to choose a new password:" + Environment.NewLine
+                        + link + Environment.NewLine
+                        + Environment.NewLine
+                        + "This password reset link expires at "
+                        + reset.ExpiresAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
+                        + " UTC." + Environment.NewLine
+                        + Environment.NewLine
+                        + "If you did not request this password reset, ignore this message.";
+
+                    using (var client = new SmtpClient(this.host, this.port))
+                    {
+                        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        client.EnableSsl = this.requireTls;
+                        client.Credentials = new NetworkCredential(this.username, this.password);
+                        client.Send(message);
+                    }
+                }
+            }
         }
 
         private sealed class CsrfTokenStore
@@ -1398,6 +1856,35 @@ namespace AORebirth.AccountBroker.Service
                 lock (this.sync)
                 {
                     this.sessions.Remove(token);
+                }
+            }
+
+            public void InvalidateIdentity(string identityPublicId)
+            {
+                if (string.IsNullOrEmpty(identityPublicId))
+                {
+                    return;
+                }
+
+                lock (this.sync)
+                {
+                    var expired = new List<string>();
+                    foreach (KeyValuePair<string, WebSession> entry in this.sessions)
+                    {
+                        if (entry.Value.Identity != null
+                            && string.Equals(
+                                entry.Value.Identity.IdentityPublicId,
+                                identityPublicId,
+                                StringComparison.Ordinal))
+                        {
+                            expired.Add(entry.Key);
+                        }
+                    }
+
+                    foreach (string token in expired)
+                    {
+                        this.sessions.Remove(token);
+                    }
                 }
             }
         }

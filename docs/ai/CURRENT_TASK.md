@@ -83,6 +83,9 @@ required for launch. Evidence:
 
 ## Current checkpoint
 
+- Password-management source is implemented and Windows-local validated behind
+  Account Broker. Production is not changed; remaining work is the production
+  PHP website integration followed by migration/deployment approval.
 - Password authentication is restored and proven in Debug and Release.
 - The proposed identity schema now validates against the local Windows
   development MySQL target.
@@ -111,7 +114,7 @@ required for launch. Evidence:
 - Exposed MySQL root and `aorebirth_stage6` credentials were rotated, old values
   were rejected, and ChatEngine/LoginEngine/ZoneEngine/AccountBroker remained
   healthy after deployment.
-- LoginEngine and ZoneEngine Linux database preflights now allow only the four
+- LoginEngine and ZoneEngine Linux database preflights now allow only the six
   governed Account Broker extension tables in addition to the 34 governed game
   tables.
 - Legacy PHP account routes remain blocked.

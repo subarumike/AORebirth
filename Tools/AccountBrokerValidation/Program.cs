@@ -7,6 +7,7 @@ namespace AccountBrokerValidation
     using System.Net;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Threading.Tasks;
 
     using AO.Core.Encryption;
     using AORebirth.AccountBroker;
@@ -39,6 +40,8 @@ namespace AccountBrokerValidation
             "Old5",
             "Old6"
         };
+
+        private static int checks;
 
         private static int Main()
         {
@@ -83,7 +86,7 @@ namespace AccountBrokerValidation
                 return 1;
             }
 
-            Console.WriteLine("PASS AccountBrokerValidation 41/41");
+            Console.WriteLine("PASS AccountBrokerValidation " + checks + "/" + checks);
             return 0;
         }
 
@@ -151,6 +154,71 @@ namespace AccountBrokerValidation
             EmailVerificationResult verificationReplay = broker.VerifyEmailToken(verificationToken.Token);
             Expect("verification token replay not verified", false, verificationReplay.Verified, failures);
             Expect("verification token replay status", "Used", verificationReplay.Status, failures);
+
+            Expect("password policy minimum accepted", true, PasswordPolicy.IsValid("12345678"), failures);
+            Expect("password policy short rejected", false, PasswordPolicy.IsValid("1234567"), failures);
+            Expect("password policy oversized rejected", false, PasswordPolicy.IsValid(new string('x', 129)), failures);
+
+            PasswordResetTokenResult invalidatedByChange =
+                broker.CreatePasswordResetToken("BrokerA1@example.com", 30);
+            PasswordChangeResult wrongCurrent = broker.ChangePassword(
+                created.IdentityPublicId,
+                "Wrong-current-password",
+                "Changed-Password-123!");
+            Expect("incorrect current password rejected", false, wrongCurrent.Changed, failures);
+            PasswordChangeResult changed = broker.ChangePassword(
+                created.IdentityPublicId,
+                password,
+                "Changed-Password-123!");
+            Expect("authenticated password change succeeds", true, changed.Changed, failures);
+            Expect("old password fails after change", false, broker.AuthenticateWebsiteIdentity("BrokerA1", password).IsAuthenticated, failures);
+            Expect("new password succeeds after change", true, broker.AuthenticateWebsiteIdentity("BrokerA1", "Changed-Password-123!").IsAuthenticated, failures);
+            Expect(
+                "game credential path accepts changed password",
+                true,
+                ValidatePassword("BrokerA1", "Changed-Password-123!", broker.GetGameAccount(created.GameAccountId).PasswordHash),
+                failures);
+            Expect("password change invalidates reset token", false, broker.GetPasswordResetTokenStatus(invalidatedByChange.Token).Valid, failures);
+            ExpectBrokerException(
+                "invalid changed password rejected",
+                "INVALID_PASSWORD",
+                () => broker.ChangePassword(created.IdentityPublicId, "Changed-Password-123!", "short"),
+                failures);
+
+            PasswordResetTokenResult reset = broker.CreatePasswordResetToken("brokera1@example.com", 30);
+            Expect("verified account reset token issued", true, reset != null, failures);
+            Expect("reset token initially valid", true, broker.GetPasswordResetTokenStatus(reset.Token).Valid, failures);
+            Expect("reset token stored only as digest", true, StoredResetDigestMatches(connectionString, reset.Token), failures);
+            PasswordResetResult resetResult = broker.ResetPassword(reset.Token, "Reset-Password-456!");
+            Expect("valid reset token changes password", true, resetResult.Reset, failures);
+            Expect("pre-reset password fails", false, broker.AuthenticateWebsiteIdentity("BrokerA1", "Changed-Password-123!").IsAuthenticated, failures);
+            Expect("reset password succeeds", true, broker.AuthenticateWebsiteIdentity("BrokerA1", "Reset-Password-456!").IsAuthenticated, failures);
+            Expect(
+                "game credential path accepts reset password",
+                true,
+                ValidatePassword("BrokerA1", "Reset-Password-456!", broker.GetGameAccount(created.GameAccountId).PasswordHash),
+                failures);
+            Expect("consumed reset token fails", false, broker.ResetPassword(reset.Token, "Replay-Password-789!").Reset, failures);
+
+            PasswordResetTokenResult olderReset = broker.CreatePasswordResetToken("BrokerA1@example.com", 30);
+            PasswordResetTokenResult newerReset = broker.CreatePasswordResetToken("BrokerA1@example.com", 30);
+            Expect("newer reset supersedes older", false, broker.GetPasswordResetTokenStatus(olderReset.Token).Valid, failures);
+            Expect("newer reset remains valid", true, broker.GetPasswordResetTokenStatus(newerReset.Token).Valid, failures);
+            Expect("unknown email reset is indistinguishable internally", true, broker.CreatePasswordResetToken("unknown@example.com", 30) == null, failures);
+            Expect("malformed reset token rejected", false, broker.GetPasswordResetTokenStatus("bad token").Valid, failures);
+            Expect("unknown reset token rejected", false, broker.GetPasswordResetTokenStatus(NewPublicToken()).Valid, failures);
+
+            string concurrentToken = broker.CreatePasswordResetToken("BrokerA1@example.com", 30).Token;
+            Task<PasswordResetResult> concurrentA = Task.Run(() => broker.ResetPassword(concurrentToken, "Concurrent-Password-1!"));
+            Task<PasswordResetResult> concurrentB = Task.Run(() => broker.ResetPassword(concurrentToken, "Concurrent-Password-1!"));
+            Task.WaitAll(concurrentA, concurrentB);
+            Expect("same reset token consumed exactly once", 1, (concurrentA.Result.Reset ? 1 : 0) + (concurrentB.Result.Reset ? 1 : 0), failures);
+            string expiredResetToken = InsertExpiredPasswordResetToken(
+                connectionString,
+                created.IdentityId,
+                "BrokerA1@example.com");
+            Expect("expired reset token status rejected", false, broker.GetPasswordResetTokenStatus(expiredResetToken).Valid, failures);
+            Expect("expired reset token cannot change password", false, broker.ResetPassword(expiredResetToken, "Expired-Password-1!").Reset, failures);
 
             ExpectBrokerException(
                 "case-equivalent duplicate rejected",
@@ -280,6 +348,7 @@ namespace AccountBrokerValidation
             string expiredToken = InsertExpiredEmailVerificationToken(connectionString, expiredAccount.IdentityId);
             Expect("expired verification token rejected", "Expired", broker.VerifyEmailToken(expiredToken).Status, failures);
             Expect("malformed verification token rejected", "INVALID", broker.VerifyEmailToken("bad token").Status, failures);
+            Expect("unverified email reset not issued", true, broker.CreatePasswordResetToken("BrokerG1@example.com", 30) == null, failures);
         }
 
         private static void Cleanup(string connectionString)
@@ -288,6 +357,7 @@ namespace AccountBrokerValidation
             {
                 connection.Open();
                 Execute(connection, "DELETE FROM account_external_mappings");
+                Execute(connection, "DELETE FROM account_password_reset_tokens");
                 Execute(connection, "DELETE FROM account_email_verification_tokens");
                 Execute(connection, "DELETE FROM account_game_mappings");
                 Execute(connection, "DELETE FROM account_provisioning_jobs");
@@ -472,6 +542,54 @@ namespace AccountBrokerValidation
             return token;
         }
 
+        private static string InsertExpiredPasswordResetToken(
+            string connectionString,
+            long identityId,
+            string email)
+        {
+            string token = NewPublicToken();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                Execute(
+                    connection,
+                    "INSERT INTO account_password_reset_tokens (IdentityId, EmailHash, TokenHash, CreatedAt, ExpiresAt) VALUES (@identityId, @emailHash, @tokenHash, TIMESTAMPADD(MINUTE, -60, CURRENT_TIMESTAMP(6)), TIMESTAMPADD(MINUTE, -30, CURRENT_TIMESTAMP(6)))",
+                    Parameter("@identityId", identityId),
+                    Parameter("@emailHash", HashToken(email.Trim().ToLowerInvariant())),
+                    Parameter("@tokenHash", HashToken(token)));
+            }
+
+            return token;
+        }
+
+        private static bool StoredResetDigestMatches(string connectionString, string token)
+        {
+            byte[] expected = HashToken(token);
+            byte[] stored;
+            using (var connection = new MySqlConnection(connectionString))
+            using (var command = new MySqlCommand(
+                "SELECT TokenHash FROM account_password_reset_tokens WHERE TokenHash=@tokenHash",
+                connection))
+            {
+                command.Parameters.Add(Parameter("@tokenHash", expected));
+                connection.Open();
+                stored = command.ExecuteScalar() as byte[];
+            }
+
+            if (stored == null || stored.Length != expected.Length)
+            {
+                return false;
+            }
+
+            int difference = 0;
+            for (int index = 0; index < expected.Length; index++)
+            {
+                difference |= expected[index] ^ stored[index];
+            }
+
+            return difference == 0 && stored.Length != Encoding.UTF8.GetByteCount(token);
+        }
+
         private static bool ValidatePassword(string account, string password, string storedHash)
         {
             string loginKey = CreateLoginKey(account, password, ServerSalt);
@@ -480,6 +598,7 @@ namespace AccountBrokerValidation
 
         private static void Expect<T>(string name, T expected, T actual, IList<string> failures)
         {
+            checks++;
             if (!object.Equals(expected, actual))
             {
                 failures.Add(name + " expected " + expected + " actual " + actual);
@@ -492,6 +611,7 @@ namespace AccountBrokerValidation
             Action action,
             IList<string> failures)
         {
+            checks++;
             try
             {
                 action();

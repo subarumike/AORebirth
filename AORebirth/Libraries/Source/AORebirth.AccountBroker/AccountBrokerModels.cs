@@ -175,4 +175,46 @@ namespace AORebirth.AccountBroker
 
         public string CanonicalEmail { get; set; }
     }
+
+    public sealed class PasswordChangeResult
+    {
+        public bool Changed { get; set; }
+
+        public string Status { get; set; }
+
+        public string IdentityPublicId { get; set; }
+
+        public string CanonicalUsername { get; set; }
+    }
+
+    public sealed class PasswordResetTokenResult
+    {
+        public string Token { get; set; }
+
+        public string IdentityPublicId { get; set; }
+
+        public string CanonicalUsername { get; set; }
+
+        public string CanonicalEmail { get; set; }
+
+        public DateTime ExpiresAt { get; set; }
+    }
+
+    public sealed class PasswordResetTokenStatus
+    {
+        public bool Valid { get; set; }
+
+        public string Status { get; set; }
+    }
+
+    public sealed class PasswordResetResult
+    {
+        public bool Reset { get; set; }
+
+        public string Status { get; set; }
+
+        public string IdentityPublicId { get; set; }
+
+        public string CanonicalUsername { get; set; }
+    }
 }
