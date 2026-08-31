@@ -6564,6 +6564,63 @@ class AggregateWorkerResult:
     plan_identity: str
 
 
+def render_accepted_inventory_artifacts(
+    inventory_path: Path,
+    catalog_output: Path,
+    fixture_output: Path,
+) -> None:
+    """Render runtime artifacts from the promoted canonical inventory only."""
+    inventory_payload = inventory_path.read_bytes()
+    try:
+        inventory = json.loads(inventory_payload.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as error:
+        raise RuntimeError("accepted combat inventory is malformed") from error
+    if not isinstance(inventory, dict):
+        raise RuntimeError("accepted combat inventory root must be an object")
+    if inventory_payload.replace(b"\r\n", b"\n") != canonical_json(inventory).encode(
+        "utf-8"
+    ):
+        raise RuntimeError("accepted combat inventory is not canonical JSON")
+    if not isinstance(inventory.get("profiles"), list) or not isinstance(
+        inventory.get("packets"), list
+    ):
+        raise RuntimeError("accepted combat inventory lacks profiles or packets")
+
+    outputs = {
+        catalog_output: render_generated_catalog(inventory).encode("utf-8"),
+        fixture_output: render_generated_packet_fixtures(inventory).encode("utf-8"),
+    }
+    identities = [os.path.normcase(str(path.resolve())) for path in outputs]
+    if len(set(identities)) != len(identities):
+        raise RuntimeError("accepted-inventory outputs must be distinct")
+    for path, payload in outputs.items():
+        _reject_symlink_or_reparse(
+            path, "accepted-inventory generated output", include_parent=True
+        )
+        if not path.parent.is_dir():
+            raise RuntimeError(
+                f"accepted-inventory output parent is missing: {path.parent}"
+            )
+        temporary_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="wb",
+                prefix=f".{path.name}.",
+                suffix=".tmp",
+                dir=path.parent,
+                delete=False,
+            ) as handle:
+                temporary_path = Path(handle.name)
+                handle.write(payload)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary_path, path)
+            temporary_path = None
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+
+
 def _stream_file_sha256_and_length(path: Path) -> tuple[str, int]:
     checksum = hashlib.sha256()
     length = 0
@@ -8956,6 +9013,11 @@ def main() -> int:
     mode.add_argument("--check", action="store_true", help="fail if generated output is stale")
     mode.add_argument("--self-test", action="store_true")
     mode.add_argument(
+        "--render-accepted-inventory",
+        type=Path,
+        help="render catalog and fixtures from promoted canonical inventory",
+    )
+    mode.add_argument(
         "--_parse-capture-worker", type=Path, help=argparse.SUPPRESS
     )
     mode.add_argument(
@@ -9054,6 +9116,46 @@ def main() -> int:
         if args._input_snapshot_manifest is not None:
             parser.error("self-test mode cannot export an input snapshot manifest")
         self_test()
+        return 0
+    if args.render_accepted_inventory is not None:
+        if args._input_snapshot_manifest is not None:
+            parser.error(
+                "accepted-inventory rendering cannot export a capture input snapshot"
+            )
+        if any(value is not None for value in range_authority_arguments):
+            parser.error(
+                "accepted-inventory rendering does not accept raw-promotion range authority"
+            )
+        governed_outputs = {
+            CATALOG_OUTPUT.resolve(),
+            FIXTURE_OUTPUT.resolve(),
+        }
+        requested_outputs = {
+            args.catalog_output.resolve(),
+            args.fixture_output.resolve(),
+        }
+        governed_alias = any(
+            os.path.lexists(requested)
+            and os.path.lexists(governed)
+            and os.path.samefile(requested, governed)
+            for requested in requested_outputs
+            for governed in governed_outputs
+        )
+        if governed_outputs & requested_outputs or governed_alias:
+            parser.error(
+                "governed generated-combat outputs must be written through "
+                "Tools/generated_combat_pipeline.py"
+            )
+        render_accepted_inventory_artifacts(
+            args.render_accepted_inventory,
+            args.catalog_output,
+            args.fixture_output,
+        )
+        print(
+            "accepted combat inventory rendered "
+            f"inventory={args.render_accepted_inventory} "
+            f"catalog={args.catalog_output} fixtures={args.fixture_output}"
+        )
         return 0
     if not all(value is not None for value in range_authority_arguments):
         parser.error(

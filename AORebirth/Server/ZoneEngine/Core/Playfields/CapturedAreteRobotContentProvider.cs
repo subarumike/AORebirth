@@ -27,9 +27,6 @@ namespace ZoneEngine.Core.Playfields
         public const string PatrolReplaySourceRelativePath =
             @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv";
 
-        public const string EvidenceCapturePatrolReplayRelativePath =
-            @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260721-Rox-robots\movement-packets.csv";
-
         // Capture 20260721-Rox-robots: 11 concurrent Malfunctioning Cleaning Robots
         // on Rex platform (lifecycle pet=False). Excludes Burning/Cleaning Robot / pets.
         private static readonly CapturedAreteRobotSpawnDefinition[] SpawnDefinitions =

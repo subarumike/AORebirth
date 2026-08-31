@@ -39,6 +39,13 @@ DEFAULT_ACTIVE_COVERAGE = (
     / "generated"
     / "capture_backed_npc_combat_active_coverage.json"
 )
+DEFAULT_ACCEPTED_PACKET_EVIDENCE = (
+    REPOSITORY_ROOT
+    / "docs"
+    / "accepted"
+    / "combat"
+    / "enemy_combat_formula_packet_evidence.json"
+)
 DEFAULT_OUTPUT = (
     REPOSITORY_ROOT
     / "docs"
@@ -810,54 +817,72 @@ def collect_template_ids(value: Any, key: str = "") -> set[int]:
     return result
 
 
-def read_raw_packet(capture: str, sequence: int) -> dict[str, Any]:
-    path = (
-        REPOSITORY_ROOT
-        / "tools-temp"
-        / "AOSharpLiveCapture"
-        / "bin"
-        / "Debug"
-        / "captures"
-        / capture
-        / "packets.hex.log"
+def read_accepted_packet(
+    packet_evidence: dict[str, Any], capture: str, sequence: int
+) -> dict[str, Any]:
+    capture_session = (
+        f"tools-temp/AOSharpLiveCapture/bin/Debug/captures/{capture}"
     )
-    marker = f"#{sequence} "
-    line = next(
-        row
-        for row in path.read_text(encoding="utf-8").splitlines()
-        if marker in row
-    )
-    match = re.search(
-        r"^(\S+)\s+(IN|OUT) #\d+ .*?\bn3=([^ ]+) hex=([0-9A-F]+)$",
-        line,
-    )
-    if match is None:
-        raise ValueError(f"could not decode raw packet {capture} #{sequence}")
-    wire = bytes.fromhex(match.group(4))
-    body_marker = bytes.fromhex("1D3C0F1C")
-    body_offset = wire.index(body_marker)
-    body = wire[body_offset:]
-    unknowns = struct.unpack(">IIIII", body[-20:])
-    packet_hash = hashlib.sha256(wire).hexdigest()[:12]
-    return {
-        "packetId": (
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
-            f"{capture}|{match.group(2)}|{sequence}|{packet_hash}"
-        ),
-        "captureSession": (
-            f"tools-temp/AOSharpLiveCapture/bin/Debug/captures/{capture}"
-        ),
-        "timestampUtc": match.group(1),
-        "direction": match.group(2),
-        "sequence": sequence,
-        "messageType": match.group(3),
-        "bodyHex": body.hex().upper(),
-        "unknown1": unknowns[0],
-        "unknown2": unknowns[1],
-        "unknown3": unknowns[2],
-        "unknown4": unknowns[3],
-        "unknown5": unknowns[4],
+    matches = [
+        packet
+        for packet in packet_evidence.get("packets", [])
+        if packet.get("captureSession") == capture_session
+        and packet.get("sequence") == sequence
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            "accepted combat inventory packet lookup is not unique "
+            f"capture={capture} sequence={sequence} matches={len(matches)}"
+        )
+    packet = dict(matches[0])
+    body_hex = packet.get("bodyHex")
+    if not isinstance(body_hex, str):
+        raise ValueError("accepted formula packet evidence lacks exact body bytes")
+    body = bytes.fromhex(body_hex)
+    if hashlib.sha256(body).hexdigest() != packet.get("bodySha256"):
+        raise ValueError("accepted formula packet evidence body hash is stale")
+    unknowns = tuple(packet.get(f"unknown{index}") for index in range(1, 6))
+    if any(not isinstance(value, int) for value in unknowns):
+        raise ValueError("accepted formula packet evidence lacks SAW unknown fields")
+    packet.pop("bodySha256", None)
+    return packet
+
+
+def accepted_temple_loadouts(
+    packet_evidence: dict[str, Any],
+) -> tuple[list[dict[str, Any]], dict[int, list[dict[str, Any]]]]:
+    named_sources = {
+        0x7983FA22: "Eternal Sentinel",
+        0x7983FA26: "Eternal Sentinel",
+        0x7983FBC2: "Eternal Sentinel",
+        0x7987F12D: "Murial the Faithful",
     }
+    actors = []
+    loadouts: dict[int, list[dict[str, Any]]] = {}
+    for row in packet_evidence.get("templeActiveLoadouts", []):
+        source = row.get("sourceIdentity")
+        if not isinstance(source, int) or source in loadouts:
+            raise ValueError("accepted Temple loadout source identity is invalid")
+        actor = {
+            "sourceIdentity": source,
+            "name": named_sources.get(source, "Cultist"),
+            "monsterData": row["monsterData"],
+            "level": row["level"],
+            "capture": row["capture"],
+        }
+        actors.append(actor)
+        loadouts[source] = [
+            {
+                "capture": row["capture"],
+                "lowTemplate": row["lowTemplate"],
+                "highTemplate": row["highTemplate"],
+                "quality": row["quality"],
+                "slot": row["slot"],
+            }
+        ]
+    if not actors:
+        raise ValueError("accepted Temple loadout evidence is empty")
+    return actors, loadouts
 
 
 def disobedient_bot_formula(level: int) -> int:
@@ -1219,6 +1244,9 @@ def build_formula_dataset(
     item_template_projection_sha256: str | None = None,
     item_template_projection_byte_length: int | None = None,
 ) -> dict[str, Any]:
+    packet_evidence = load_json(DEFAULT_ACCEPTED_PACKET_EVIDENCE)
+    if packet_evidence.get("schemaVersion") != 1:
+        raise ValueError("accepted formula packet evidence schema is unsupported")
     profiles = [
         compact_profile(profile)
         for profile in inventory.get("profiles", [])
@@ -1288,7 +1316,7 @@ def build_formula_dataset(
 
     observations = []
     for capture, sequence, level, source_identity in DISOBEDIENT_BOT_OBSERVATIONS:
-        packet = read_raw_packet(capture, sequence)
+        packet = read_accepted_packet(packet_evidence, capture, sequence)
         packet.update(
             {
                 "level": level,
@@ -1396,7 +1424,7 @@ def build_formula_dataset(
 
     stim_observations = []
     for capture, sequence, level, source_identity in STIM_FIEND_OBSERVATIONS:
-        packet = read_raw_packet(capture, sequence)
+        packet = read_accepted_packet(packet_evidence, capture, sequence)
         packet.update(
             {
                 "level": level,
@@ -1560,7 +1588,7 @@ def build_formula_dataset(
         level,
         source_identity,
     ) in MELDED_PATTERNS_OBSERVATIONS:
-        packet = read_raw_packet(capture, sequence)
+        packet = read_accepted_packet(packet_evidence, capture, sequence)
         formula_values = melded_patterns_formula(level)
         packet.update(
             {
@@ -1748,7 +1776,7 @@ def build_formula_dataset(
         source_identity,
         chain_classification,
     ) in FRAGMENTED_SOUL_OBSERVATIONS:
-        packet = read_raw_packet(capture, sequence)
+        packet = read_accepted_packet(packet_evidence, capture, sequence)
         predicted = fragmented_soul_formula(level)
         observed = {
             f"unknown{index}": packet[f"unknown{index}"]
@@ -1883,7 +1911,8 @@ def build_formula_dataset(
         "Incomplete Rebuild",
         incomplete_rebuild_formula,
     )
-    incomplete_level_seventeen = read_raw_packet(
+    incomplete_level_seventeen = read_accepted_packet(
+        packet_evidence,
         "20260709-222339",
         6282,
     )
@@ -2181,11 +2210,9 @@ def build_formula_dataset(
     ):
         raise ValueError("Temple Cultist cross-family held-out validation failed")
 
-    cultist_actors, cultist_loadouts = temple_active_loadouts()
-    noncultist_actors, noncultist_loadouts = temple_noncultist_loadouts()
-    active_temple_actors = cultist_actors + noncultist_actors
-    active_temple_loadouts = dict(cultist_loadouts)
-    active_temple_loadouts.update(noncultist_loadouts)
+    active_temple_actors, active_temple_loadouts = accepted_temple_loadouts(
+        packet_evidence
+    )
     starting_sources = temple_starting_quarantine_sources()
     temple_starting_dispositions = []
     for actor in sorted(
@@ -2477,7 +2504,7 @@ def build_formula_dataset(
 
     vagabond_observations = []
     for capture, sequence, level in VIOLENT_VAGABOND_OBSERVATIONS:
-        packet = read_raw_packet(capture, sequence)
+        packet = read_accepted_packet(packet_evidence, capture, sequence)
         predicted = violent_vagabond_formula(level)
         packet.update(
             {
@@ -2496,7 +2523,7 @@ def build_formula_dataset(
 
     eternal_observations = []
     for capture, sequence, level, source_identity in ETERNAL_SENTINEL_OBSERVATIONS:
-        packet = read_raw_packet(capture, sequence)
+        packet = read_accepted_packet(packet_evidence, capture, sequence)
         predicted = eternal_sentinel_formula(level)
         packet.update(
             {
