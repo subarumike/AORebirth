@@ -42,6 +42,7 @@
     <Compile Include="BotAccountManagement.cs" />
     <Compile Include="AccountBrokerModels.cs" />
     <Compile Include="BotManagementContracts.cs" />
+    <Compile Include="PasswordPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UsernamePolicy.cs" />
   </ItemGroup>

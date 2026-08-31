@@ -45,7 +45,7 @@ namespace AccountIdentitySchemaValidationRunner
                 }
 
                 Console.WriteLine(
-                    "AORebirth account identity schema validation PASS | IdentityRows 3 | GameMappingRows 1 | ExternalMappingRows 1 | ProvisioningState GameAccountLinked");
+                    "AORebirth account identity schema validation PASS | IdentityRows 3 | GameMappingRows 1 | ExternalMappingRows 1 | PasswordResetTokenRows 1 | ProvisioningState GameAccountLinked");
                 return 0;
             }
             catch (Exception exception)
@@ -58,6 +58,8 @@ namespace AccountIdentitySchemaValidationRunner
         private static void ResetIdentityTables(MySqlConnection connection)
         {
             Execute(connection, "DROP TABLE IF EXISTS `account_provisioning_jobs`");
+            Execute(connection, "DROP TABLE IF EXISTS `account_password_reset_tokens`");
+            Execute(connection, "DROP TABLE IF EXISTS `account_email_verification_tokens`");
             Execute(connection, "DROP TABLE IF EXISTS `account_external_mappings`");
             Execute(connection, "DROP TABLE IF EXISTS `account_game_mappings`");
             Execute(connection, "DROP TABLE IF EXISTS `account_identities`");
@@ -82,8 +84,8 @@ namespace AccountIdentitySchemaValidationRunner
             string tables = Convert.ToString(
                 Scalar(
                     connection,
-                    "SELECT GROUP_CONCAT(table_name ORDER BY table_name SEPARATOR ',') FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name IN ('account_identities','account_game_mappings','account_external_mappings','account_provisioning_jobs')"));
-            if (tables != "account_external_mappings,account_game_mappings,account_identities,account_provisioning_jobs")
+                    "SELECT GROUP_CONCAT(table_name ORDER BY table_name SEPARATOR ',') FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name IN ('account_identities','account_game_mappings','account_external_mappings','account_email_verification_tokens','account_password_reset_tokens','account_provisioning_jobs')"));
+            if (tables != "account_email_verification_tokens,account_external_mappings,account_game_mappings,account_identities,account_password_reset_tokens,account_provisioning_jobs")
             {
                 throw new InvalidOperationException("identity table set mismatch: " + tables);
             }
@@ -117,6 +119,26 @@ namespace AccountIdentitySchemaValidationRunner
                 connection,
                 "INSERT INTO `account_external_mappings` (`IdentityId`, `Provider`, `ExternalAccountId`, `MappingState`, `LinkedAt`) VALUES (2, 'mybb', '42', 'Linked', CURRENT_TIMESTAMP(6))",
                 "duplicate provider external account mapping was accepted");
+
+            Execute(
+                connection,
+                "INSERT INTO `account_password_reset_tokens` (`IdentityId`, `EmailHash`, `TokenHash`, `ExpiresAt`) VALUES (1, @emailHash, @tokenHash, TIMESTAMPADD(MINUTE, 30, CURRENT_TIMESTAMP(6)))",
+                Parameter("@emailHash", Hash("player@example.com")),
+                Parameter("@tokenHash", Hash("password-reset-token")));
+
+            ExpectRejected(
+                connection,
+                "INSERT INTO `account_password_reset_tokens` (`IdentityId`, `EmailHash`, `TokenHash`, `ExpiresAt`) VALUES (2, @emailHash, @tokenHash, TIMESTAMPADD(MINUTE, 30, CURRENT_TIMESTAMP(6)))",
+                "duplicate password reset token hash was accepted",
+                Parameter("@emailHash", Hash("second@example.com")),
+                Parameter("@tokenHash", Hash("password-reset-token")));
+
+            ExpectRejected(
+                connection,
+                "INSERT INTO `account_password_reset_tokens` (`IdentityId`, `EmailHash`, `TokenHash`, `TokenState`, `ExpiresAt`, `UsedAt`) VALUES (1, @emailHash, @tokenHash, 'Used', TIMESTAMPADD(MINUTE, 30, CURRENT_TIMESTAMP(6)), NULL)",
+                "used password reset token without UsedAt was accepted",
+                Parameter("@emailHash", Hash("player@example.com")),
+                Parameter("@tokenHash", Hash("bad-password-reset-state")));
 
             Execute(
                 connection,

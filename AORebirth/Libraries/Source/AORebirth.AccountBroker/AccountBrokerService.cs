@@ -357,6 +357,293 @@ namespace AORebirth.AccountBroker
             }
         }
 
+        public PasswordChangeResult ChangePassword(
+            string identityPublicId,
+            string currentPassword,
+            string newPassword)
+        {
+            RequireIdentityPublicId(identityPublicId);
+            PasswordPolicy.RequireValid(newPassword);
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                AccountIdentitySnapshot identity =
+                    this.GetIdentitySnapshotByPublicId(connection, transaction, identityPublicId);
+                if (!IsActiveLinkedIdentity(identity))
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("IDENTITY_NOT_ACTIVE", "Identity is not active.");
+                }
+
+                GameAccountSnapshot gameAccount =
+                    this.GetGameAccountForUpdate(connection, transaction, identity.GameAccountId);
+                if (gameAccount == null || gameAccount.Flags != NormalFlags)
+                {
+                    transaction.Commit();
+                    throw new AccountBrokerException("GAME_ACCOUNT_NOT_ACTIVE", "Game account is not active.");
+                }
+
+                if (string.IsNullOrEmpty(currentPassword)
+                    || !ValidateStoredPassword(currentPassword, gameAccount.PasswordHash))
+                {
+                    transaction.Commit();
+                    return new PasswordChangeResult
+                    {
+                        Changed = false,
+                        Status = "InvalidCurrentPassword",
+                        IdentityPublicId = identity.IdentityPublicId,
+                        CanonicalUsername = identity.CanonicalUsername
+                    };
+                }
+
+                string passwordHash = new LoginEncryption().GeneratePasswordHash(newPassword);
+                int changed = this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE login SET Password=@password WHERE Id=@gameAccountId",
+                    Parameter("@password", passwordHash),
+                    Parameter("@gameAccountId", identity.GameAccountId));
+                if (changed != 1)
+                {
+                    throw new AccountBrokerException("PASSWORD_UPDATE_FAILED", "Password could not be updated.");
+                }
+
+                this.SupersedeActivePasswordResetTokens(connection, transaction, identity.IdentityId);
+                transaction.Commit();
+                return new PasswordChangeResult
+                {
+                    Changed = true,
+                    Status = "Changed",
+                    IdentityPublicId = identity.IdentityPublicId,
+                    CanonicalUsername = identity.CanonicalUsername
+                };
+            }
+        }
+
+        public PasswordResetTokenResult CreatePasswordResetToken(string email, int ttlMinutes)
+        {
+            if (ttlMinutes < 5 || ttlMinutes > 1440)
+            {
+                throw new AccountBrokerException("INVALID_PASSWORD_RESET_TTL", "Password reset token TTL is invalid.");
+            }
+
+            string normalizedEmail = NormalizeEmail(email);
+            if (string.IsNullOrEmpty(normalizedEmail) || normalizedEmail.Length > 254)
+            {
+                return null;
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                AccountIdentitySnapshot identity =
+                    this.GetIdentitySnapshotByNormalizedEmail(connection, transaction, normalizedEmail);
+                if (!IsActiveLinkedIdentity(identity) || !identity.EmailVerified)
+                {
+                    transaction.Commit();
+                    return null;
+                }
+
+                GameAccountSnapshot gameAccount =
+                    this.GetGameAccountForUpdate(connection, transaction, identity.GameAccountId);
+                if (gameAccount == null || gameAccount.Flags != NormalFlags)
+                {
+                    transaction.Commit();
+                    return null;
+                }
+
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_password_reset_tokens SET TokenState='Expired' WHERE IdentityId=@identityId AND TokenState='Active' AND ExpiresAt<CURRENT_TIMESTAMP(6)",
+                    Parameter("@identityId", identity.IdentityId));
+                this.SupersedeActivePasswordResetTokens(connection, transaction, identity.IdentityId);
+
+                string token = NewPublicToken();
+                DateTime expiresAt = DateTime.UtcNow.AddMinutes(ttlMinutes);
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "INSERT INTO account_password_reset_tokens (IdentityId, EmailHash, TokenHash, ExpiresAt) VALUES (@identityId, @emailHash, @tokenHash, @expiresAt)",
+                    Parameter("@identityId", identity.IdentityId),
+                    Parameter("@emailHash", HashToken(normalizedEmail)),
+                    Parameter("@tokenHash", HashToken(token)),
+                    Parameter("@expiresAt", expiresAt));
+
+                transaction.Commit();
+                return new PasswordResetTokenResult
+                {
+                    Token = token,
+                    IdentityPublicId = identity.IdentityPublicId,
+                    CanonicalUsername = identity.CanonicalUsername,
+                    CanonicalEmail = identity.CanonicalEmail,
+                    ExpiresAt = expiresAt
+                };
+            }
+        }
+
+        public void CancelPasswordResetToken(string token)
+        {
+            if (!IsValidPublicTokenShape(token))
+            {
+                return;
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_password_reset_tokens SET TokenState='Superseded' WHERE TokenHash=@tokenHash AND TokenState='Active'",
+                    Parameter("@tokenHash", HashToken(token)));
+                transaction.Commit();
+            }
+        }
+
+        public PasswordResetTokenStatus GetPasswordResetTokenStatus(string token)
+        {
+            if (!IsValidPublicTokenShape(token))
+            {
+                return FailedPasswordResetTokenStatus("Invalid");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                PasswordResetTokenRow tokenRow =
+                    this.GetPasswordResetToken(connection, transaction, token, false);
+                if (tokenRow == null)
+                {
+                    transaction.Commit();
+                    return FailedPasswordResetTokenStatus("Invalid");
+                }
+
+                if (string.Equals(tokenRow.TokenState, "Active", StringComparison.Ordinal)
+                    && tokenRow.ExpiresAt < DateTime.UtcNow)
+                {
+                    this.ExecuteNonQuery(
+                        connection,
+                        transaction,
+                        "UPDATE account_password_reset_tokens SET TokenState='Expired' WHERE PasswordResetTokenId=@tokenId AND TokenState='Active'",
+                        Parameter("@tokenId", tokenRow.PasswordResetTokenId));
+                    transaction.Commit();
+                    return FailedPasswordResetTokenStatus("InvalidOrExpired");
+                }
+
+                AccountIdentitySnapshot identity =
+                    this.GetIdentitySnapshotByIdentity(connection, transaction, tokenRow.IdentityId);
+                GameAccountSnapshot gameAccount = identity == null
+                    ? null
+                    : this.GetGameAccount(connection, transaction, identity.GameAccountId);
+                if (!string.Equals(tokenRow.TokenState, "Active", StringComparison.Ordinal)
+                    || !IsActiveLinkedIdentity(identity)
+                    || !identity.EmailVerified
+                    || gameAccount == null
+                    || gameAccount.Flags != NormalFlags
+                    || !FixedTimeEquals(tokenRow.EmailHash, HashToken(NormalizeEmail(identity.CanonicalEmail))))
+                {
+                    transaction.Commit();
+                    return FailedPasswordResetTokenStatus("InvalidOrExpired");
+                }
+
+                transaction.Commit();
+                return new PasswordResetTokenStatus { Valid = true, Status = "Valid" };
+            }
+        }
+
+        public PasswordResetResult ResetPassword(string token, string newPassword)
+        {
+            PasswordPolicy.RequireValid(newPassword);
+            if (!IsValidPublicTokenShape(token))
+            {
+                return FailedPasswordReset("Invalid");
+            }
+
+            using (IDbConnection connection = this.OpenConnection())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+            {
+                PasswordResetTokenRow initial =
+                    this.GetPasswordResetToken(connection, transaction, token, false);
+                if (initial == null)
+                {
+                    transaction.Commit();
+                    return FailedPasswordReset("Invalid");
+                }
+
+                AccountIdentitySnapshot identity =
+                    this.GetIdentitySnapshotByIdentity(connection, transaction, initial.IdentityId);
+                if (!IsActiveLinkedIdentity(identity) || !identity.EmailVerified)
+                {
+                    transaction.Commit();
+                    return FailedPasswordReset("InvalidOrExpired");
+                }
+
+                GameAccountSnapshot gameAccount =
+                    this.GetGameAccountForUpdate(connection, transaction, identity.GameAccountId);
+                PasswordResetTokenRow current =
+                    this.GetPasswordResetToken(connection, transaction, token, true);
+                if (gameAccount == null
+                    || gameAccount.Flags != NormalFlags
+                    || current == null
+                    || !string.Equals(current.TokenState, "Active", StringComparison.Ordinal))
+                {
+                    transaction.Commit();
+                    return FailedPasswordReset("InvalidOrExpired");
+                }
+
+                if (current.ExpiresAt < DateTime.UtcNow)
+                {
+                    this.ExecuteNonQuery(
+                        connection,
+                        transaction,
+                        "UPDATE account_password_reset_tokens SET TokenState='Expired' WHERE PasswordResetTokenId=@tokenId AND TokenState='Active'",
+                        Parameter("@tokenId", current.PasswordResetTokenId));
+                    transaction.Commit();
+                    return FailedPasswordReset("InvalidOrExpired");
+                }
+
+                if (!FixedTimeEquals(current.EmailHash, HashToken(NormalizeEmail(identity.CanonicalEmail))))
+                {
+                    this.ExecuteNonQuery(
+                        connection,
+                        transaction,
+                        "UPDATE account_password_reset_tokens SET TokenState='Superseded' WHERE PasswordResetTokenId=@tokenId AND TokenState='Active'",
+                        Parameter("@tokenId", current.PasswordResetTokenId));
+                    transaction.Commit();
+                    return FailedPasswordReset("InvalidOrExpired");
+                }
+
+                string passwordHash = new LoginEncryption().GeneratePasswordHash(newPassword);
+                int changed = this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE login SET Password=@password WHERE Id=@gameAccountId",
+                    Parameter("@password", passwordHash),
+                    Parameter("@gameAccountId", identity.GameAccountId));
+                int consumed = this.ExecuteNonQuery(
+                    connection,
+                    transaction,
+                    "UPDATE account_password_reset_tokens SET TokenState='Used', UsedAt=CURRENT_TIMESTAMP(6) WHERE PasswordResetTokenId=@tokenId AND TokenState='Active'",
+                    Parameter("@tokenId", current.PasswordResetTokenId));
+                if (changed != 1 || consumed != 1)
+                {
+                    throw new AccountBrokerException("PASSWORD_RESET_FAILED", "Password could not be reset.");
+                }
+
+                this.SupersedeActivePasswordResetTokens(connection, transaction, identity.IdentityId);
+                transaction.Commit();
+                return new PasswordResetResult
+                {
+                    Reset = true,
+                    Status = "Reset",
+                    IdentityPublicId = identity.IdentityPublicId,
+                    CanonicalUsername = identity.CanonicalUsername
+                };
+            }
+        }
+
         public AccountProvisioningResult CreateGameAccount(CreateAccountRequest request)
         {
             if (request == null)
@@ -373,6 +660,8 @@ namespace AORebirth.AccountBroker
             {
                 throw new AccountBrokerException("MISSING_PASSWORD", "Password is required.");
             }
+
+            PasswordPolicy.RequireValid(request.Password);
 
             string normalizedUsername = UsernamePolicy.NormalizeForNewRegistration(request.Username);
             byte[] idempotencyHash = HashIdempotencyKey(request.IdempotencyKey);
@@ -912,6 +1201,18 @@ namespace AORebirth.AccountBroker
                     Parameter("@normalizedEmail", normalizedEmail)));
         }
 
+        private AccountIdentitySnapshot GetIdentitySnapshotByNormalizedEmail(
+            IDbConnection connection,
+            IDbTransaction transaction,
+            string normalizedEmail)
+        {
+            return this.GetSingleIdentitySnapshot(
+                connection,
+                transaction,
+                "SELECT i.IdentityId, i.IdentityPublicId, i.CanonicalUsername, i.NormalizedUsername, i.CanonicalEmail, i.EmailVerifiedAt, i.IdentityStatus, m.GameAccountId, m.MappingState, i.CreatedAt FROM account_identities i INNER JOIN account_game_mappings m ON m.IdentityId=i.IdentityId WHERE i.NormalizedEmail=@normalizedEmail",
+                Parameter("@normalizedEmail", normalizedEmail));
+        }
+
         private long? GetIdentityIdByGameAccount(IDbConnection connection, IDbTransaction transaction, int gameAccountId)
         {
             return ToNullableInt64(
@@ -958,6 +1259,18 @@ namespace AORebirth.AccountBroker
                 connection,
                 transaction,
                 "SELECT Id, Username, Password, Flags, AccountFlags, GM FROM login WHERE Id=@id",
+                Parameter("@id", id));
+        }
+
+        private GameAccountSnapshot GetGameAccountForUpdate(
+            IDbConnection connection,
+            IDbTransaction transaction,
+            int id)
+        {
+            return this.GetSingleGameAccount(
+                connection,
+                transaction,
+                "SELECT Id, Username, Password, Flags, AccountFlags, GM FROM login WHERE Id=@id FOR UPDATE",
                 Parameter("@id", id));
         }
 
@@ -1109,6 +1422,50 @@ namespace AORebirth.AccountBroker
             }
         }
 
+        private PasswordResetTokenRow GetPasswordResetToken(
+            IDbConnection connection,
+            IDbTransaction transaction,
+            string token,
+            bool forUpdate)
+        {
+            string sql =
+                "SELECT PasswordResetTokenId, IdentityId, EmailHash, TokenState, ExpiresAt FROM account_password_reset_tokens WHERE TokenHash=@tokenHash"
+                + (forUpdate ? " FOR UPDATE" : string.Empty);
+            using (IDbCommand command = CreateCommand(
+                connection,
+                transaction,
+                sql,
+                Parameter("@tokenHash", HashToken(token))))
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (!reader.Read())
+                {
+                    return null;
+                }
+
+                return new PasswordResetTokenRow
+                {
+                    PasswordResetTokenId = Convert.ToInt64(reader["PasswordResetTokenId"]),
+                    IdentityId = Convert.ToInt64(reader["IdentityId"]),
+                    EmailHash = (byte[])reader["EmailHash"],
+                    TokenState = Convert.ToString(reader["TokenState"]),
+                    ExpiresAt = Convert.ToDateTime(reader["ExpiresAt"])
+                };
+            }
+        }
+
+        private void SupersedeActivePasswordResetTokens(
+            IDbConnection connection,
+            IDbTransaction transaction,
+            long identityId)
+        {
+            this.ExecuteNonQuery(
+                connection,
+                transaction,
+                "UPDATE account_password_reset_tokens SET TokenState='Superseded' WHERE IdentityId=@identityId AND TokenState='Active'",
+                Parameter("@identityId", identityId));
+        }
+
         private object ExecuteScalar(
             IDbConnection connection,
             IDbTransaction transaction,
@@ -1121,7 +1478,7 @@ namespace AORebirth.AccountBroker
             }
         }
 
-        private void ExecuteNonQuery(
+        private int ExecuteNonQuery(
             IDbConnection connection,
             IDbTransaction transaction,
             string sql,
@@ -1129,7 +1486,7 @@ namespace AORebirth.AccountBroker
         {
             using (IDbCommand command = CreateCommand(connection, transaction, sql, parameters))
             {
-                command.ExecuteNonQuery();
+                return command.ExecuteNonQuery();
             }
         }
 
@@ -1236,6 +1593,47 @@ namespace AORebirth.AccountBroker
             };
         }
 
+        private static PasswordResetTokenStatus FailedPasswordResetTokenStatus(string status)
+        {
+            return new PasswordResetTokenStatus { Valid = false, Status = status };
+        }
+
+        private static PasswordResetResult FailedPasswordReset(string status)
+        {
+            return new PasswordResetResult { Reset = false, Status = status };
+        }
+
+        private static bool IsActiveLinkedIdentity(AccountIdentitySnapshot identity)
+        {
+            return identity != null
+                && string.Equals(identity.IdentityStatus, "Active", StringComparison.Ordinal)
+                && string.Equals(identity.GameMappingState, "Linked", StringComparison.Ordinal);
+        }
+
+        private static void RequireIdentityPublicId(string identityPublicId)
+        {
+            if (string.IsNullOrWhiteSpace(identityPublicId) || identityPublicId.Length > 64)
+            {
+                throw new AccountBrokerException("INVALID_IDENTITY_PUBLIC_ID", "Identity public id is required.");
+            }
+        }
+
+        private static bool FixedTimeEquals(byte[] expected, byte[] actual)
+        {
+            if (expected == null || actual == null || expected.Length != actual.Length)
+            {
+                return false;
+            }
+
+            int difference = 0;
+            for (int index = 0; index < expected.Length; index++)
+            {
+                difference |= expected[index] ^ actual[index];
+            }
+
+            return difference == 0;
+        }
+
         private static bool ValidateStoredPassword(string password, string storedHash)
         {
             if (string.IsNullOrWhiteSpace(storedHash))
@@ -1310,6 +1708,19 @@ namespace AORebirth.AccountBroker
             public int Step { get; set; }
 
             public DateTime UpdatedAt { get; set; }
+        }
+
+        private sealed class PasswordResetTokenRow
+        {
+            public long PasswordResetTokenId { get; set; }
+
+            public long IdentityId { get; set; }
+
+            public byte[] EmailHash { get; set; }
+
+            public string TokenState { get; set; }
+
+            public DateTime ExpiresAt { get; set; }
         }
 
         private sealed class BrokerParameter : IDbDataParameter
