@@ -68,7 +68,7 @@ generates that form. The edge proxy's request-line log can observe a manually
 supplied compatibility query before PHP cleans it; this is the only remaining
 token-URL caveat.
 
-A real production log scan compared all five controlled bearer tokens (three
+A real production log scan compared all six controlled bearer tokens (four
 password-reset and two email-verification tokens) against Account Broker,
 website, and edge-proxy logs. Token matches were zero. The final controlled
 password also had zero log matches.
@@ -113,8 +113,8 @@ Immediate post-migration evidence:
 - exact Account Broker `SELECT`/`INSERT`/`UPDATE` grants on the new table: PASS.
 
 After controlled acceptance, expected state is login rows `35`, identity rows
-`28`, one non-GM linked/verified controlled identity, and three reset-token
-history rows (`Superseded=1`, `Used=2`, active=0). This delta belongs only to
+`28`, one non-GM linked/verified controlled identity, and four reset-token
+history rows (`Superseded=1`, `Used=3`, active=0). This delta belongs only to
 the controlled acceptance account.
 
 ## Production deployment
@@ -178,6 +178,8 @@ Production acceptance:
 - used-token replay rejection: PASS;
 - older-token superseding and rejection: PASS;
 - newer token one-time success: PASS;
+- immediately pre-reset password rejection and final reset-password acceptance:
+  PASS;
 - final website login: PASS;
 - registration page, login, account, logout, verification, and resend: PASS;
 - MyBB SSO issue/redeem and authenticated forum state: PASS;
