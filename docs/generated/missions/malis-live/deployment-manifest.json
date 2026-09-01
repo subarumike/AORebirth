@@ -493,7 +493,7 @@
       "DestinationRelativePath": "Plugins/MissionOfferHarvester/AOSharpMissionOfferHarvester.dll",
       "PackageRelativePath": "MissionOfferHarvester/AOSharpMissionOfferHarvester.dll",
       "Provenance": "COMPILED_FROM_TRACKED_AOREBIRTH_HARVESTER_SOURCE",
-      "Sha256": "ca07e05e9bcfa63d32a0bcc42a0287387c287556b5c36e638b51687a8c4205f2"
+      "Sha256": "381256c6632c3ce766306a7b9b9c611b3da46b86d4f9679fc7c60956982224a4"
     },
     {
       "ByteLength": 2344,

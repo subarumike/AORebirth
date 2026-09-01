@@ -62,7 +62,21 @@ namespace AORebirth.MissionEvidence
         {
             if (parameters.Length == 1 && string.Equals(parameters[0], "stop", StringComparison.OrdinalIgnoreCase))
             {
+                if (!_active)
+                {
+                    Chat.WriteLine("Mission evidence harvester is already stopped.", ChatColor.Gold);
+                    return;
+                }
+
+                string stoppedSessionId = _sessionId;
+                int stoppedRequestCount = _issuedRequestCount;
+                int stoppedCohortCount = _completedCohortCount;
                 Stop("user_stop");
+                Chat.WriteLine(string.Format(
+                    "Mission evidence session stopped: {0}. Requests={1}, complete cohorts={2}.",
+                    stoppedSessionId,
+                    stoppedRequestCount,
+                    stoppedCohortCount), ChatColor.Gold);
                 return;
             }
             if (parameters.Length == 1 && string.Equals(parameters[0], "status", StringComparison.OrdinalIgnoreCase))
