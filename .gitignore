@@ -118,6 +118,8 @@ AORebirth/AORebirth.sln.DotSettings
 tools-temp/external/aosharp/
 tools-temp/external/aosharp-github/
 tools-temp/external/easyhook/
+/tools-temp/MalisLiveBuild/
+/tools-temp/MalisLiveBuildOriginal/
 
 # Local/generated investigation artifacts that can contain credentials, captures, or copied binaries.
 build-verify/

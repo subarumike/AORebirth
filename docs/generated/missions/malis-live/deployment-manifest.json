@@ -1,0 +1,731 @@
+{
+  "Build": {
+    "Framework": ".NET Framework 4.8",
+    "MSBuildVersion": "18.8.2.30814",
+    "MalisWarnings": [
+      "CS0672 Main.Run(string) overrides the retained obsolete AOPluginEntry.Run(string) compatibility seam",
+      "CS0649 MainWindow._missionLevel is an audited pre-existing unassigned field; not an installed-runtime API mismatch"
+    ],
+    "PlatformTarget": "x86"
+  },
+  "BuildDefinitionBaseline": "aea19aba8d0069f4b6c34578247ec2ab53a6e584",
+  "BuildTimestampUtc": null,
+  "ExcludedPrivateDependencies": [
+    "AOSharp.Bootstrap.dll",
+    "AOSharp.Common.dll",
+    "AOSharp.Core.dll",
+    "HtmlAgilityPack.dll",
+    "Newtonsoft.Json.dll",
+    "Serilog.dll"
+  ],
+  "Files": [
+    {
+      "ByteLength": 11327,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/Default_Settings.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/Default_Settings.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "5de0cde70871913a8bd3a3b05a897a4a08ed7b6f781e72a28b5f4577051d3b7e"
+    },
+    {
+      "ByteLength": 97715,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/ItemDb_Clusters.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/ItemDb_Clusters.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "da95a9401920dd8368be559696af239497b3bed2e4c4b4688b60d2ebac7cb984"
+    },
+    {
+      "ByteLength": 1549309,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/ItemDB_Implants.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/ItemDB_Implants.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "e51e3aa50de21ad1a9e96005bb47398be38405759483b5e3a2f47a4aa5fb41ab"
+    },
+    {
+      "ByteLength": 805512,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/ItemDb_Nanos.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/ItemDb_Nanos.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "ce5d1403cba36e9fdc6c7add9d322bd13f23170b7b50635d2c2befc7bd88c751"
+    },
+    {
+      "ByteLength": 1746304,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/ItemDb_Refined.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/ItemDb_Refined.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "a88b127d77226cdf23bcb9120b6acf9f4f02dec95d7986e379d237edb5048542"
+    },
+    {
+      "ByteLength": 702478,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/ItemDb_Rest.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/ItemDb_Rest.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c"
+    },
+    {
+      "ByteLength": 25076,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/MissionLevels.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/MissionLevels.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "cccee41a7a26bcd5e9f4179ed010adfd924c32734ab9e478313890a47cdb8214"
+    },
+    {
+      "ByteLength": 10434,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/ModTags.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/ModTags.json",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "44f336330813e9df750c0f8b40585577abe2ac7a4b20bba1074500608391593f"
+    },
+    {
+      "ByteLength": 10696,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/JSON/Settings.json",
+      "PackageRelativePath": "Malis Mission Roller 2/JSON/Settings.json",
+      "Provenance": "DERIVED_SAFE_EVIDENCE_CONFIGURATION_FROM_AUDITED_DEFAULT",
+      "Sha256": "ef5a8b03fac62e5a929ad347dee953ba66e1f6f0f7dd2f1f51b210b9cf2b747c"
+    },
+    {
+      "ByteLength": 75264,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/Malis Mission Roller 2.dll",
+      "PackageRelativePath": "Malis Mission Roller 2/Malis Mission Roller 2.dll",
+      "Provenance": "COMPILED_FROM_AUDITED_MALIS_SOURCE_COMMIT",
+      "Sha256": "f4a358bf08d430104a70844bc84521dcc0dfc1c58c1a8aa63ad2ecc6c4b26736"
+    },
+    {
+      "ByteLength": 432,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/Malis Mission Roller 2.dll.config",
+      "PackageRelativePath": "Malis Mission Roller 2/Malis Mission Roller 2.dll.config",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "d635d56f6d1bd958309253803e5800dbf1059a495d3abc7a9f33812d33ef0752"
+    },
+    {
+      "ByteLength": 1067122,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/Sound/Alert.wav",
+      "PackageRelativePath": "Malis Mission Roller 2/Sound/Alert.wav",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "25a0ae83b8ec921c91e14d546a651fc2b5ae30cdd3e6bfc9033fbea9c0b31c91"
+    },
+    {
+      "ByteLength": 21444,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/Sound/Click.wav",
+      "PackageRelativePath": "Malis Mission Roller 2/Sound/Click.wav",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "8ba38b0e70526285910c889ec8cc860dfc914ee85596406a259e03619e75ea0a"
+    },
+    {
+      "ByteLength": 1799,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/001_AcceptButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/001_AcceptButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "56627cf5e11b17629119232fbd1547e304b815779ecad71088c1e78737c95463"
+    },
+    {
+      "ByteLength": 1959,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/002_GreenCircle.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/002_GreenCircle.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "600363a19b3bcb539fb64c5709611b9d51930dcd1e0219db6818a0c95425a7fb"
+    },
+    {
+      "ByteLength": 1995,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/003_GreenPlus.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/003_GreenPlus.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "130694c6a419cc61e2a01c7ce0f3389145804278a636e809b112e11a0a94c685"
+    },
+    {
+      "ByteLength": 1844,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/004_HeaderBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/004_HeaderBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "287e63e3adf5172eaed16c52a35f208f5ef8736eae23b7f2bb3e6da9b4413f5a"
+    },
+    {
+      "ByteLength": 2212,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/005_HeaderIcon.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/005_HeaderIcon.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "13e405b3e874ab599eb5b5766ede13c6698f5d06f84321e7bc3db390b4f03a3c"
+    },
+    {
+      "ByteLength": 1867,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/006_HelpButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/006_HelpButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "219e0398b4fc8e62a74143f323050bdb4628385532f12556111a83815e2def6c"
+    },
+    {
+      "ByteLength": 2910,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/007_ItemPreviewBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/007_ItemPreviewBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "1c9a8623285aa284e9b398036fefda286ace2c334a5d8cda125740aa9e2f89fe"
+    },
+    {
+      "ByteLength": 1996,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/008_LocationPreviewBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/008_LocationPreviewBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "42cd74554e2254a3049c2dc015bf2e17361ba59a1e6d2384a8b4bc643e43ef10"
+    },
+    {
+      "ByteLength": 2438,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/009_MissionsButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/009_MissionsButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "3580e962f4516f8714fb634afce2a964114af60ad7d15171b9aa4b5ea60db444"
+    },
+    {
+      "ByteLength": 2786,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/010_MissionSlotBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/010_MissionSlotBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "790a642544a197ca4a49977e610f3e01131e08b986f4127d64122d651c6f8677"
+    },
+    {
+      "ByteLength": 1795,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/011_PingButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/011_PingButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "764a9b50752b668c9bf28a341b559cbac6fc8881b3e92743b55169254aab03ea"
+    },
+    {
+      "ByteLength": 1963,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/012_RedCircle.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/012_RedCircle.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "ac3336bb634c4e5f8e12e2ab0b3a3ec27ad80fb3b49245c851cb9d132b47ca4c"
+    },
+    {
+      "ByteLength": 1963,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/013_RedMinus.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/013_RedMinus.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "32df4815bfc15493813b7dab19ce07dd7c12c2e62c9361411a5536e04a4c3fb0"
+    },
+    {
+      "ByteLength": 2509,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/014_RequestButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/014_RequestButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "9309a7e51459aa2ff0f0d8410507656555e5f311a595ad97f835d24b612176dc"
+    },
+    {
+      "ByteLength": 3926,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/015_SearchWindowBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/015_SearchWindowBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "a22895b34a905f0e0d9ed6142c30602276629a97911a109943165b1d0633af7b"
+    },
+    {
+      "ByteLength": 2429,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/016_SettingsButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/016_SettingsButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "cd9ba6d280cfb1660bd0179939fa02b2253346e664f03ac77a393a95063a4046"
+    },
+    {
+      "ByteLength": 2271,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/017_SliderArrow.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/017_SliderArrow.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "cd2a119f3ce72e01a1b892e1e63a2a056b2d446045713f91645aeb5f4ee6f58b"
+    },
+    {
+      "ByteLength": 1683,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/018_SliderBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/018_SliderBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "2b681888f54590626339d019eebddb16fb1f64c082f0b32a80f0606506180f34"
+    },
+    {
+      "ByteLength": 2438,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/019_StartStopButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/019_StartStopButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "751d81f69a3b8bc78bc6211dd29a17e428a94d4d6afed323a725d7f5421b04e2"
+    },
+    {
+      "ByteLength": 2002,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/020_WindowBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/020_WindowBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "9622cb3cfd3298c0ed8d5cc2dcd997b3a665bda1f7b70ae5ac508fbdad5565ed"
+    },
+    {
+      "ByteLength": 2513,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/021_LocationsBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/021_LocationsBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "c91a322d5e01dfc681cfb11bff609b044b93f5a3575969d8021885fadb6ede15"
+    },
+    {
+      "ByteLength": 2707,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/022_SlidersBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/022_SlidersBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "6badf6db9ff48d965fc48ae1f09fa3deeff91019d0c97dc11374577a2040dadb"
+    },
+    {
+      "ByteLength": 2575,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/023_TypesBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/023_TypesBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "668daea4046db8a3635dbe3eb53765c7fed41452524104ae2c16c2ad6583c8cd"
+    },
+    {
+      "ByteLength": 2767,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/024_ExtrasBg.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/024_ExtrasBg.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "8c0980096224d68284c710b8af072fe74b539492277fa0c338270162fb47bef7"
+    },
+    {
+      "ByteLength": 3927,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/025_SearchWindowBg2.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/025_SearchWindowBg2.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "6f18fef5aec4cda0d54d9556afcede40618c88fe7c509e99a70bd096f233ea7c"
+    },
+    {
+      "ByteLength": 2626,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/026_ItemPreviewBg2.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/026_ItemPreviewBg2.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "89302af91d874147aa0040389f3ef3fefa0f89c2024c4de100148f69eccd2f18"
+    },
+    {
+      "ByteLength": 3100,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/027_BoundsButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/027_BoundsButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "a2277abd5ffde805ea198a40f42d8dc47bfc441f9506a1a405553ec1a1708c37"
+    },
+    {
+      "ByteLength": 3108,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/028_BoundsButton2.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/028_BoundsButton2.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "58c7c299fea0ddab25c05e4168b42f7737ff131a0407550afb1f6806c870dfaa"
+    },
+    {
+      "ByteLength": 10312,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/029_BigLogo.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/029_BigLogo.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "b14251ea75916e251434db54f74087280cfc5aef59f04b097f615cf399152cff"
+    },
+    {
+      "ByteLength": 2822,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/030_RedCloseButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/030_RedCloseButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "2dacd312a9f017e20fd4b8a6e6497426cb95cbc4977c7926d9097359474069bf"
+    },
+    {
+      "ByteLength": 2889,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/031_11330.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/031_11330.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "c27dd8a66a21ce37529f6e0be4d83910c6ca7aaf4b3a9fbe96b685a60c77d389"
+    },
+    {
+      "ByteLength": 2798,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/032_11335.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/032_11335.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "3bc8896a09d1bbe69432c11ced43f0d240b78dcc49c331259e80a00b1c5745be"
+    },
+    {
+      "ByteLength": 2836,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/033_11337.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/033_11337.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "bbd913b5a53c7402ccc56570aedd24a862c8dbc0d6ee184f03bef11ec99587ce"
+    },
+    {
+      "ByteLength": 2877,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/034_11342.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/034_11342.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "e8765185caaaaca5703a3a4757eadc03870f95b2e39e126fc39506521a832f38"
+    },
+    {
+      "ByteLength": 2853,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/035_11329.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/035_11329.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "01196e8c145f0cee3c85296b912d422a8304066558050db67fdbc8e8b6033922"
+    },
+    {
+      "ByteLength": 2647,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/036_DevButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/036_DevButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "a05a352f9232ae832b75ea605550e4cc6384447dabb61143d6833ea44fe9d88a"
+    },
+    {
+      "ByteLength": 3132,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/037_DisableAllButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/037_DisableAllButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "4d64387ce4627f6d6012ea92cabea5e4f14250c2608aedc16f9d654548ff8170"
+    },
+    {
+      "ByteLength": 3141,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/038_EnableAllButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/038_EnableAllButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "ea5ef33d12c6d90d9020cfef56653452380de96b6a80db349df04861f087d57a"
+    },
+    {
+      "ByteLength": 3240,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/039_GraphicalGuideButton.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/039_GraphicalGuideButton.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "7e42cf85d8c15e86f7a6d246f9a997f509b7254228050e6b02693c7bf09f4f3c"
+    },
+    {
+      "ByteLength": 64129,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Textures/040_GraphicalGuide.png",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Textures/040_GraphicalGuide.png",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "6098fc09d72ac90e8119f1a69975f90591ac0d8d728c3e1288b987b5493bdd07"
+    },
+    {
+      "ByteLength": 1010,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/BrowserEntryView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/BrowserEntryView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "59e5ed15b8f00ae15418d3229adfd47a287b774d3697782bbdbb4dea211ee251"
+    },
+    {
+      "ByteLength": 1879,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/ExtrasView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/ExtrasView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "240ab9af8cf74bea4863d803724243bacdc9a2bfcc4ef39302d5468dfdf750e7"
+    },
+    {
+      "ByteLength": 714,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/HeaderView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/HeaderView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "8839ef014f89ee1ab1b6afc8f3660769d6b2d3bfb2115d9afe2b041e3bd001f1"
+    },
+    {
+      "ByteLength": 2552,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/ItemDisplayView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/ItemDisplayView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "abaec7bc952dfd63098914590f4df1fafed698fbfac17bfb87d222eca9415c39"
+    },
+    {
+      "ByteLength": 1787,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/MissionView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/MissionView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "27adf0d9b701a7560bb485fd6ffe5fd735465fed5aa44fb13ef988837658d1a2"
+    },
+    {
+      "ByteLength": 823,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/PlayfieldEntryView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/PlayfieldEntryView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "533cd6000f55bcf3d343b5291ea1cad4ee28bfddc7472af02340d1fcd95707e9"
+    },
+    {
+      "ByteLength": 913,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/PlayfieldView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/PlayfieldView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "55b8f3ac49de049baf41d0173940df803fff0dba057486fa5e4e87bf988349a7"
+    },
+    {
+      "ByteLength": 1017,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/RollEntryView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/RollEntryView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "1eb5bc9ed58a43eeef7a3a9f9b7b0a6c3482a26d8f5683300d30cea5da209fca"
+    },
+    {
+      "ByteLength": 584,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/SettingsView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/SettingsView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "0bb6371dc711dabd551741766bfd014f2043f839965bbb0a705c497f73585a80"
+    },
+    {
+      "ByteLength": 2451,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/SliderView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/SliderView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "af83ac7292b75f281ba49adc03ee69ab40ded54bd44d39686724df269f83b0a5"
+    },
+    {
+      "ByteLength": 1641,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Views/TypesView.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Views/TypesView.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "b21a0deff1d7bc73c4185339d0ee8e321d38697d9a98f72260e4ae8fd9ee31fe"
+    },
+    {
+      "ByteLength": 253,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Windows/GraphicalHelpWindow.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Windows/GraphicalHelpWindow.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "13f8f83154d0aecd135bd16b4d44090376f932d91b01f97bf0902d6d804dd011"
+    },
+    {
+      "ByteLength": 874,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Windows/HelpWindow.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Windows/HelpWindow.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "2c366ca5b007ffc8394847c72b6b5278511b3e212bb6dda7adfd68176091ce4f"
+    },
+    {
+      "ByteLength": 344,
+      "DestinationRelativePath": "Plugins/Malis Mission Roller 2/UI/Windows/MainWindow.xml",
+      "PackageRelativePath": "Malis Mission Roller 2/UI/Windows/MainWindow.xml",
+      "Provenance": "BYTE_IDENTICAL_AUDITED_MALIS_SOURCE_RESOURCE_OR_BUILD_CONFIG",
+      "Sha256": "b533865d836c214009cf0a1d1bf4fb3736170527c1916ed9a34b50d5a57e53a0"
+    },
+    {
+      "ByteLength": 23040,
+      "DestinationRelativePath": "Plugins/MissionOfferHarvester/AOSharpMissionOfferHarvester.dll",
+      "PackageRelativePath": "MissionOfferHarvester/AOSharpMissionOfferHarvester.dll",
+      "Provenance": "COMPILED_FROM_TRACKED_AOREBIRTH_HARVESTER_SOURCE",
+      "Sha256": "ca07e05e9bcfa63d32a0bcc42a0287387c287556b5c36e638b51687a8c4205f2"
+    },
+    {
+      "ByteLength": 2344,
+      "DestinationRelativePath": "Plugins/MissionOfferHarvester/README.txt",
+      "PackageRelativePath": "MissionOfferHarvester/README.txt",
+      "Provenance": "TRACKED_AOREBIRTH_PACKAGE_DOCUMENTATION",
+      "Sha256": "19036f15d1c958aed3d2d8395963c4fcf511e12a6a667a829d88ee44e25ed94b"
+    },
+    {
+      "ByteLength": 2442,
+      "DestinationRelativePath": null,
+      "PackageRelativePath": "README-FIRST.txt",
+      "Provenance": "TRACKED_AOREBIRTH_PACKAGE_DOCUMENTATION",
+      "Sha256": "29bf4bedaf90fc1dbabbba2e557f83b1df62c6e6c79cda092f0e2b39f48dbca7"
+    }
+  ],
+  "HarvesterCompatibilityChanges": [
+    "Added passive Network.N3MessageSent observation mode for Malis-generated requests",
+    "Preserved the existing active request mode independently"
+  ],
+  "InstalledAOSharpRuntime": {
+    "CoexistenceAssemblyIdentity": "PASS",
+    "DependencyClosure": "PASS",
+    "LiveGameplayValidation": "NOT_PERFORMED",
+    "PluginEntryValidation": "PASS",
+    "Plugins": [
+      {
+        "EntryType": "MaliMissionRoller2.Main",
+        "FullName": "Malis Mission Roller 2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Name": "Malis Mission Roller 2",
+        "Path": "C:\\Users\\Mike\\Documents\\AORebirth-malis-live-build\\tools-temp\\MalisLiveBuild\\source\\malis-3ac9943a\\bin\\Release\\Malis Mission Roller 2.dll",
+        "PublicInitString": true,
+        "PublicParameterlessConstructor": true,
+        "PublicTeardown": true,
+        "References": [
+          {
+            "Name": "AOSharp.Common",
+            "RequestedIdentity": "AOSharp.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedIdentity": "AOSharp.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedLocation": "D:\\AOTools\\ReadyToUse\\AOSharp.Common.dll"
+          },
+          {
+            "Name": "AOSharp.Core",
+            "RequestedIdentity": "AOSharp.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedIdentity": "AOSharp.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedLocation": "D:\\AOTools\\ReadyToUse\\AOSharp.Core.dll"
+          },
+          {
+            "Name": "Newtonsoft.Json",
+            "RequestedIdentity": "Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed",
+            "ResolvedIdentity": "Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed",
+            "ResolvedLocation": "D:\\AOTools\\ReadyToUse\\Newtonsoft.Json.dll"
+          },
+          {
+            "Name": "System",
+            "RequestedIdentity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedIdentity": "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedLocation": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\System.dll"
+          },
+          {
+            "Name": "System.Core",
+            "RequestedIdentity": "System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedIdentity": "System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedLocation": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System.Core\\v4.0_4.0.0.0__b77a5c561934e089\\System.Core.dll"
+          },
+          {
+            "Name": "mscorlib",
+            "RequestedIdentity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedIdentity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedLocation": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\mscorlib.dll"
+          }
+        ],
+        "TargetFramework": ".NETFramework,Version=v4.8"
+      },
+      {
+        "EntryType": "AORebirth.MissionEvidence.MissionOfferHarvester",
+        "FullName": "AOSharpMissionOfferHarvester, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null",
+        "Name": "AOSharpMissionOfferHarvester",
+        "Path": "C:\\Users\\Mike\\Documents\\AORebirth-malis-live-build\\Tools\\AOSharpMissionOfferHarvester\\bin\\Release\\AOSharpMissionOfferHarvester.dll",
+        "PublicInitString": true,
+        "PublicParameterlessConstructor": true,
+        "PublicTeardown": true,
+        "References": [
+          {
+            "Name": "AOSharp.Common",
+            "RequestedIdentity": "AOSharp.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedIdentity": "AOSharp.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedLocation": "D:\\AOTools\\ReadyToUse\\AOSharp.Common.dll"
+          },
+          {
+            "Name": "AOSharp.Core",
+            "RequestedIdentity": "AOSharp.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedIdentity": "AOSharp.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "ResolvedLocation": "D:\\AOTools\\ReadyToUse\\AOSharp.Core.dll"
+          },
+          {
+            "Name": "System.Web.Extensions",
+            "RequestedIdentity": "System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+            "ResolvedIdentity": "System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+            "ResolvedLocation": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System.Web.Extensions\\v4.0_4.0.0.0__31bf3856ad364e35\\System.Web.Extensions.dll"
+          },
+          {
+            "Name": "mscorlib",
+            "RequestedIdentity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedIdentity": "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+            "ResolvedLocation": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\mscorlib.dll"
+          }
+        ],
+        "TargetFramework": ".NETFramework,Version=v4.8"
+      }
+    ],
+    "RuntimeAssemblies": [
+      {
+        "ByteLength": 35840,
+        "FullName": "AOSharp.Bootstrap, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Name": "AOSharp.Bootstrap",
+        "Path": "D:\\AOTools\\ReadyToUse\\AOSharp.Bootstrap.dll",
+        "Pe": {
+          "CorFlags": "0x00000001",
+          "ILOnly": true,
+          "Machine": "0x014C",
+          "Prefers32Bit": false,
+          "Requires32Bit": false
+        },
+        "ProcessorArchitecture": "MSIL",
+        "Sha256": "ad3aa1968b378fd423c398250bc46493b936fa72db1fead1c970fc3a10788050",
+        "Version": "1.0.0.0"
+      },
+      {
+        "ByteLength": 472064,
+        "FullName": "AOSharp.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Name": "AOSharp.Common",
+        "Path": "D:\\AOTools\\ReadyToUse\\AOSharp.Common.dll",
+        "Pe": {
+          "CorFlags": "0x00000001",
+          "ILOnly": true,
+          "Machine": "0x014C",
+          "Prefers32Bit": false,
+          "Requires32Bit": false
+        },
+        "ProcessorArchitecture": "MSIL",
+        "Sha256": "3e246b58be745988edbb399ba8cbcab7b784075ad4a357a043ed53b7e8a986f6",
+        "Version": "1.0.0.0"
+      },
+      {
+        "ByteLength": 192000,
+        "FullName": "AOSharp.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Name": "AOSharp.Core",
+        "Path": "D:\\AOTools\\ReadyToUse\\AOSharp.Core.dll",
+        "Pe": {
+          "CorFlags": "0x00000001",
+          "ILOnly": true,
+          "Machine": "0x014C",
+          "Prefers32Bit": false,
+          "Requires32Bit": false
+        },
+        "ProcessorArchitecture": "MSIL",
+        "Sha256": "01f827a2e0e2809f88487523f4c49378a6bb315384706f6d33b598e30ff167f3",
+        "Version": "1.0.0.0"
+      },
+      {
+        "ByteLength": 48640,
+        "FullName": "AOSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Name": "AOSharp",
+        "Path": "D:\\AOTools\\ReadyToUse\\AOSharp.exe",
+        "Pe": {
+          "CorFlags": "0x00020003",
+          "ILOnly": true,
+          "Machine": "0x014C",
+          "Prefers32Bit": true,
+          "Requires32Bit": true
+        },
+        "ProcessorArchitecture": "MSIL",
+        "Sha256": "750f6d14e3d0aa5610665a4bf5462fb8606cc1ec7ec538d30b09d0de8f63ca3a",
+        "Version": "1.0.0.0"
+      },
+      {
+        "ByteLength": 711952,
+        "FullName": "Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed",
+        "Name": "Newtonsoft.Json",
+        "Path": "D:\\AOTools\\ReadyToUse\\Newtonsoft.Json.dll",
+        "Pe": {
+          "CorFlags": "0x00000009",
+          "ILOnly": true,
+          "Machine": "0x014C",
+          "Prefers32Bit": false,
+          "Requires32Bit": false
+        },
+        "ProcessorArchitecture": "MSIL",
+        "Sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d",
+        "Version": "13.0.0.0"
+      }
+    ],
+    "RuntimeDirectory": "D:\\AOTools\\ReadyToUse",
+    "SchemaVersion": 1,
+    "SharedAOSharpCoreIdentity": "AOSharp.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  },
+  "MalisCompatibilityChanges": [],
+  "MalisSource": {
+    "Archive": "docs/reference/missions/malis/raw/malis-source-3ac9943a4943b8cb80eda9e40359729e656686b0.zip",
+    "ArchiveSha256": "c1dc1bf4c919193c0ea9b5ba3cc5419075becd5b94e1041391f0d9ebbae0074d",
+    "Commit": "3ac9943a4943b8cb80eda9e40359729e656686b0",
+    "SourceChanges": []
+  },
+  "MissionBehaviorIntentionallyChanged": false,
+  "MissionOfferHarvesterCoexistence": {
+    "AssemblyIdentity": "PASS",
+    "ChatCommands": {
+      "Harvester": "/missionharvest",
+      "Malis": "/mmr (developer-only)"
+    },
+    "DependencyClosure": "PASS",
+    "EvidenceAuthority": "MissionOfferHarvester raw JSONL",
+    "LiveValidation": "NOT_PERFORMED",
+    "PrivateAOSharpAssembliesBundled": false
+  },
+  "RuntimeMissionLogicChanged": false,
+  "RuntimeResources": {
+    "JsonFiles": 8,
+    "SoundFiles": 2,
+    "UiTextureFiles": 40,
+    "UiViewFiles": 11,
+    "UiWindowFiles": 3
+  },
+  "SafeEvidenceConfiguration": {
+    "AutoAccept": false,
+    "AutoAdjustQl": false,
+    "DefaultSettingsRetainedUnchanged": true,
+    "EnabledMissionTypes": [],
+    "MissionSelectionAlgorithmChanged": false,
+    "RemoveRoll": false
+  },
+  "SchemaVersion": 1,
+  "TimestampPolicy": "OMITTED_FOR_DETERMINISTIC_REGENERATION"
+}

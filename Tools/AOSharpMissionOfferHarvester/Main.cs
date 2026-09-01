@@ -33,6 +33,9 @@ namespace AORebirth.MissionEvidence
         private int _completedCohortCount;
         private double _intervalSeconds;
         private bool _active;
+        private bool _observeExternalRequests;
+        private Identity _pendingTerminalIdentity;
+        private bool _hasPendingTerminalIdentity;
         private string _lastCohortFingerprint;
         private string _lastCohortRequestId;
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
@@ -41,15 +44,17 @@ namespace AORebirth.MissionEvidence
         public override void Run(string pluginDir)
         {
             Network.N3MessageReceived += OnN3MessageReceived;
+            Network.N3MessageSent += OnN3MessageSent;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester loaded. Select a mission terminal, then use /missionharvest start <slot 1-11> <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester loaded. Use /missionharvest observe <targetQL> before rolling with Malis.", ChatColor.Gold);
         }
 
         public override void Teardown()
         {
             Stop("plugin_teardown");
             Network.N3MessageReceived -= OnN3MessageReceived;
+            Network.N3MessageSent -= OnN3MessageSent;
             Game.OnUpdate -= OnUpdate;
         }
 
@@ -62,12 +67,30 @@ namespace AORebirth.MissionEvidence
             }
             if (parameters.Length == 1 && string.Equals(parameters[0], "status", StringComparison.OrdinalIgnoreCase))
             {
-                Chat.WriteLine(string.Format("Harvester active={0}, requests={1}/{2}, complete cohorts={3}, pending={4}", _active, _issuedRequestCount, _requestedRequestCount, _completedCohortCount, _pendingRequestId ?? "none"));
+                string mode = !_active ? "idle" : (_observeExternalRequests ? "observe" : "active");
+                string requested = _active && _observeExternalRequests ? "continuous" : _requestedRequestCount.ToString(CultureInfo.InvariantCulture);
+                Chat.WriteLine(string.Format("Harvester active={0}, mode={1}, requests={2}/{3}, complete cohorts={4}, pending={5}", _active, mode, _issuedRequestCount, requested, _completedCohortCount, _pendingRequestId ?? "none"));
+                return;
+            }
+            if (parameters.Length == 2 && string.Equals(parameters[0], "observe", StringComparison.OrdinalIgnoreCase))
+            {
+                int observedTargetQl;
+                if (!int.TryParse(parameters[1], out observedTargetQl) || observedTargetQl < 1 || observedTargetQl > 250)
+                {
+                    Chat.WriteLine("Target QL must be between 1 and 250.");
+                    return;
+                }
+                if (_terminal == null || !_terminal.IsValid)
+                {
+                    Chat.WriteLine("Select/use an ordinary mission terminal before observing Malis.");
+                    return;
+                }
+                StartObserve(observedTargetQl);
                 return;
             }
             if (parameters.Length < 4 || !string.Equals(parameters[0], "start", StringComparison.OrdinalIgnoreCase))
             {
-                Chat.WriteLine("Usage: /missionharvest start <slot 1-11> <targetQL> <requests> [intervalSeconds] | stop | status");
+                Chat.WriteLine("Usage: /missionharvest observe <targetQL> | start <slot 1-11> <targetQL> <requests> [intervalSeconds] | stop | status");
                 return;
             }
             int slot;
@@ -92,10 +115,20 @@ namespace AORebirth.MissionEvidence
                 Chat.WriteLine("Select/use an ordinary mission terminal before starting.");
                 return;
             }
-            Start(slot, targetQl, requestCount, interval);
+            StartActive(slot, targetQl, requestCount, interval);
         }
 
-        private void Start(int slot, int targetQl, int requestCount, double interval)
+        private void StartActive(int slot, int targetQl, int requestCount, double interval)
+        {
+            BeginSession(slot, targetQl, requestCount, interval, false);
+        }
+
+        private void StartObserve(int targetQl)
+        {
+            BeginSession(0, targetQl, 0, 0, true);
+        }
+
+        private void BeginSession(int slot, int targetQl, int requestCount, double interval, bool observeExternalRequests)
         {
             Stop("replaced_by_new_session");
             string stamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmssfffZ");
@@ -106,15 +139,17 @@ namespace AORebirth.MissionEvidence
             _targetMissionQl = targetQl;
             _requestedRequestCount = requestCount;
             _intervalSeconds = interval;
+            _observeExternalRequests = observeExternalRequests;
             _issuedRequestCount = 0;
             _completedCohortCount = 0;
             _pendingRequestId = null;
+            _hasPendingTerminalIdentity = false;
             _lastCohortFingerprint = null;
             _lastCohortRequestId = null;
             _active = true;
             _nextRequestUtc = DateTime.UtcNow;
             _journal.Append("session_started", _sessionId, null, BuildSessionPayload());
-            Chat.WriteLine("Mission evidence session started: " + _sessionId, ChatColor.Gold);
+            Chat.WriteLine("Mission evidence session started in " + (_observeExternalRequests ? "Malis observe" : "active request") + " mode: " + _sessionId, ChatColor.Gold);
         }
 
         private void Stop(string reason)
@@ -132,7 +167,9 @@ namespace AORebirth.MissionEvidence
                 _journal = null;
             }
             _active = false;
+            _observeExternalRequests = false;
             _pendingRequestId = null;
+            _hasPendingTerminalIdentity = false;
         }
 
         private void OnUpdate(object sender, float deltaTime)
@@ -150,10 +187,13 @@ namespace AORebirth.MissionEvidence
                         ["possible_causes"] = new[] { "terminal_rejection", "insufficient_credits", "network_interruption", "disconnect", "unknown" }
                     });
                     _pendingRequestId = null;
+                    _hasPendingTerminalIdentity = false;
                     _nextRequestUtc = now.AddSeconds(_intervalSeconds);
                 }
                 return;
             }
+            if (_observeExternalRequests)
+                return;
             if (_issuedRequestCount >= _requestedRequestCount)
             {
                 Stop("requested_count_completed");
@@ -175,15 +215,52 @@ namespace AORebirth.MissionEvidence
             _issuedRequestCount++;
             _pendingRequestId = string.Format("{0}/request/{1:D8}", _sessionId, _issuedRequestCount);
             _pendingSinceUtc = now;
+            _pendingTerminalIdentity = _terminal.Identity;
+            _hasPendingTerminalIdentity = true;
             _journal.Append("request_started", _sessionId, _pendingRequestId, new Dictionary<string, object>
             {
                 ["request_sequence"] = _issuedRequestCount,
                 ["difficulty_slot"] = _difficultySlot,
                 ["target_mission_ql"] = _targetMissionQl,
                 ["target_mission_ql_semantics"] = "planner_input_not_direct_server_offer_field",
+                ["request_origin"] = "HARVESTER_ACTIVE_DRIVER",
+                ["terminal_identity"] = IdentityPayload(_pendingTerminalIdentity),
                 ["sliders"] = SliderPayload((byte)_difficultySlot, 255, 255, 255, 255, 255, 255)
             });
             _terminal.RequestMissions((byte)_difficultySlot, 255, 255, 255, 255, 255, 255);
+        }
+
+        private void OnN3MessageSent(object sender, N3Message message)
+        {
+            QuestAlternativeMessage request = message as QuestAlternativeMessage;
+            if (request == null || !_active || !_observeExternalRequests)
+                return;
+
+            if (_pendingRequestId != null)
+            {
+                _journal.Append("request_timeout", _sessionId, _pendingRequestId, new Dictionary<string, object>
+                {
+                    ["timeout_seconds"] = (DateTime.UtcNow - _pendingSinceUtc).TotalSeconds,
+                    ["possible_causes"] = new[] { "superseded_by_next_external_request" }
+                });
+            }
+
+            _issuedRequestCount++;
+            _pendingRequestId = string.Format("{0}/request/{1:D8}", _sessionId, _issuedRequestCount);
+            _pendingSinceUtc = DateTime.UtcNow;
+            _pendingTerminalIdentity = request.Terminal;
+            _hasPendingTerminalIdentity = true;
+            _difficultySlot = request.MissionSliders.Difficulty;
+            _journal.Append("request_started", _sessionId, _pendingRequestId, new Dictionary<string, object>
+            {
+                ["request_sequence"] = _issuedRequestCount,
+                ["difficulty_slot"] = _difficultySlot,
+                ["target_mission_ql"] = _targetMissionQl,
+                ["target_mission_ql_semantics"] = "operator_planner_input_not_direct_server_offer_field",
+                ["request_origin"] = "PASSIVELY_OBSERVED_EXTERNAL_AOSHARP_PLUGIN",
+                ["terminal_identity"] = IdentityPayload(_pendingTerminalIdentity),
+                ["sliders"] = SliderPayload(request.MissionSliders.Difficulty, request.MissionSliders.GoodBad, request.MissionSliders.OrderChaos, request.MissionSliders.OpenHidden, request.MissionSliders.PhysicalMystical, request.MissionSliders.HeadonStealth, request.MissionSliders.CreditsXp)
+            });
         }
 
         private void OnN3MessageReceived(object sender, N3Message message)
@@ -200,13 +277,14 @@ namespace AORebirth.MissionEvidence
             QuestAlternativeMessage response = message as QuestAlternativeMessage;
             if (response == null || !_active)
                 return;
-            if (_terminal == null || response.Terminal != _terminal.Identity)
+            Identity expectedTerminal = _hasPendingTerminalIdentity ? _pendingTerminalIdentity : (_terminal == null ? new Identity() : _terminal.Identity);
+            if ((_hasPendingTerminalIdentity || _terminal != null) && response.Terminal != expectedTerminal)
             {
                 _journal.Append("error", _sessionId, _pendingRequestId, new Dictionary<string, object>
                 {
                     ["code"] = "RESPONSE_TERMINAL_MISMATCH",
                     ["response_terminal"] = IdentityPayload(response.Terminal),
-                    ["selected_terminal"] = _terminal == null ? null : IdentityPayload(_terminal.Identity)
+                    ["selected_terminal"] = IdentityPayload(expectedTerminal)
                 });
                 return;
             }
@@ -245,6 +323,7 @@ namespace AORebirth.MissionEvidence
             _lastCohortRequestId = completedRequestId;
             _completedCohortCount++;
             _pendingRequestId = null;
+            _hasPendingTerminalIdentity = false;
             _nextRequestUtc = DateTime.UtcNow.AddSeconds(_intervalSeconds);
         }
 
@@ -291,15 +370,16 @@ namespace AORebirth.MissionEvidence
                 ["terminal_identity"] = IdentityPayload(_terminal.Identity),
                 ["terminal_playfield"] = IdentityPayload(Playfield.ModelIdentity),
                 ["terminal_coordinates"] = VectorPayload(terminalPosition),
-                ["difficulty_slot"] = _difficultySlot,
+                ["capture_mode"] = _observeExternalRequests ? "PASSIVE_EXTERNAL_REQUEST_OBSERVER" : "ACTIVE_REQUEST_DRIVER",
+                ["difficulty_slot"] = _observeExternalRequests ? (object)null : _difficultySlot,
                 ["target_mission_ql"] = _targetMissionQl,
-                ["requested_request_count"] = _requestedRequestCount,
+                ["requested_request_count"] = _observeExternalRequests ? (object)null : _requestedRequestCount,
                 ["minimum_request_interval_seconds"] = MinimumIntervalSeconds,
-                ["configured_request_interval_seconds"] = _intervalSeconds,
+                ["configured_request_interval_seconds"] = _observeExternalRequests ? (object)null : _intervalSeconds,
                 ["one_outstanding_request_only"] = true,
                 ["client_version_label"] = null,
                 ["client_version_availability"] = "NOT_EXPOSED_BY_INSPECTED_AOSHARP_API",
-                ["aosharp_expected_package_version"] = "1.0.106",
+                ["aosharp_compile_target"] = "INSTALLED_RUNTIME_ASSEMBLY_SET_RECORDED_IN_DEPLOYMENT_MANIFEST",
                 ["aosharp_observed_assembly_version"] = typeof(AOPluginEntry).Assembly.GetName().Version.ToString(),
                 ["harvester_version"] = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
                 ["raw_event_format"] = "incremental_jsonl_flush_true"
