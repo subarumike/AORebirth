@@ -1,0 +1,16 @@
+{
+  "CountUnits": {
+    "Cohort": "One completed mission-terminal response retained as one request boundary.",
+    "Offer": "One mission offer inside a cohort.",
+    "Request": "One request attempt, including attempts with no completed cohort."
+  },
+  "SchemaVersion": 1,
+  "SessionEntryContract": {
+    "CharacterLevel": "integer captured at session start",
+    "NormalizedOfferJsonl": "repository-relative path to mission_offer.jsonl",
+    "NormalizedRequestJsonl": "repository-relative path to mission_request.jsonl",
+    "RawEventsJsonl": "repository-relative retained raw append-only journal",
+    "SessionId": "stable harvester session identity"
+  },
+  "Sessions": []
+}

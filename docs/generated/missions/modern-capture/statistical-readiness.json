@@ -1,0 +1,4513 @@
+{
+  "CountUnits": [
+    "requests",
+    "complete cohorts",
+    "offers",
+    "reward observations",
+    "objective observations"
+  ],
+  "MissionQls": [
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 1,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 2,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 3,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 4,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 5,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 6,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 7,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 8,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 9,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 10,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 11,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 12,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 13,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 14,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 15,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 16,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 17,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 18,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 19,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 20,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 21,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 22,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 23,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 24,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 25,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 26,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 27,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 28,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 29,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 30,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 31,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 32,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 33,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 34,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 35,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 36,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 37,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 38,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 39,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 40,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 41,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 42,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 43,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 44,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 45,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 46,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 47,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 48,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 49,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 50,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 51,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 52,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 53,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 54,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 55,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 56,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 57,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 58,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 59,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 60,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 61,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 62,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 63,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 64,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 65,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 66,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 67,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 68,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 69,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 70,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 71,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 72,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 73,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 74,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 75,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 76,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 77,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 78,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 79,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 80,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 81,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 82,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 83,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 84,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 85,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 86,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 87,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 88,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 89,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 90,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 91,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 92,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 93,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 94,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 95,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 96,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 97,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 98,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 99,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 100,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 101,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 102,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 103,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 104,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 105,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 106,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 107,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 108,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 109,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 110,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 111,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 112,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 113,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 114,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 115,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 116,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 117,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 118,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 119,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 120,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 121,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 122,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 123,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 124,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 125,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 126,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 127,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 128,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 129,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 130,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 131,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 132,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 133,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 134,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 135,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 136,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 137,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 138,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 139,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 140,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 141,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 142,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 143,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 144,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 145,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 146,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 147,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 148,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 149,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 150,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 151,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 152,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 153,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 154,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 155,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 156,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 157,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 158,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 159,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 160,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 161,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 162,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 163,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 164,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 165,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 166,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 167,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 168,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 169,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 170,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 171,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 172,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 173,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 174,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 175,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 176,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 177,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 178,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 179,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 180,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 181,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 182,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 183,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 184,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 185,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 186,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 187,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 188,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 189,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 190,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 191,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 192,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 193,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 194,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 195,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 196,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 197,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 198,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 199,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 200,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 201,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 202,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 203,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 204,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 205,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 206,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 207,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 208,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 209,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 210,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 211,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 212,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 213,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 214,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 215,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 216,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 217,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 218,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 219,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 220,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 221,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 222,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 223,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 224,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 225,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 226,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 227,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 228,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 229,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 230,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 231,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 232,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 233,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 234,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 235,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 236,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 237,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 238,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 239,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 240,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 241,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 242,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 243,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 244,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 245,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 246,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 247,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 248,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 249,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    },
+    {
+      "CompleteCohortCount": 0,
+      "MissionQl": 250,
+      "NewRewardIdentitiesInRecentWindow": 0,
+      "OfferCount": 0,
+      "ReadinessLabels": [
+        "LOW_SAMPLE",
+        "DISTRIBUTION_NOT_PROVEN"
+      ],
+      "RecentRewardObservationWindow": 0,
+      "RequestAttemptCount": 0,
+      "RewardFrequencyHalfSplitTotalVariation": null,
+      "RewardObservationCount": 0,
+      "UniqueDestinationPlayfieldCount": 0,
+      "UniqueMissionIconCount": 0,
+      "UniqueObjectiveIdentityCount": 0,
+      "UniqueRewardIdentityPairCount": 0
+    }
+  ],
+  "ProbabilityCaution": "Observed output frequencies and stability diagnostics are not Funcom internal RNG weights or proven server probabilities.",
+  "SchemaVersion": 1
+}

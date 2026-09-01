@@ -1,0 +1,4253 @@
+{
+  "Levels": [
+    {
+      "CaptureAccess": "UNAVAILABLE_IN_MODERN_STARTER_FLOW",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 1,
+      "LiveUsabilityStatus": "CHARACTER_LEVEL_1_CAPTURE_BLOCKED",
+      "MissionQlCount": 0,
+      "MissionQls": []
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [
+        1
+      ],
+      "Level": 2,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 3,
+      "MissionQls": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 3,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 4,
+      "MissionQls": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 4,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 6,
+      "MissionQls": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 5,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 6,
+      "MissionQls": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 6,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 6,
+      "MissionQls": [
+        4,
+        5,
+        6,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 7,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 8,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 9,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        16
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 10,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        17
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 11,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        16,
+        19
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 12,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        18,
+        21
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 13,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        19,
+        23
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 14,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        18,
+        21,
+        25
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 15,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        18,
+        19,
+        22,
+        26
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 16,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        11,
+        12,
+        13,
+        14,
+        16,
+        17,
+        19,
+        20,
+        24,
+        28
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 17,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        20,
+        22,
+        25,
+        30
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 18,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19,
+        21,
+        23,
+        27,
+        32
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 19,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        22,
+        24,
+        28,
+        34
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 20,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        22,
+        24,
+        26,
+        30,
+        35
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 21,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        21,
+        23,
+        25,
+        27,
+        31,
+        37
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 22,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        22,
+        24,
+        26,
+        28,
+        33,
+        39
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 23,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        23,
+        25,
+        27,
+        29,
+        34,
+        41
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 24,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        16,
+        18,
+        19,
+        20,
+        21,
+        24,
+        26,
+        28,
+        31,
+        36,
+        42
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 25,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        17,
+        18,
+        20,
+        21,
+        22,
+        25,
+        27,
+        30,
+        32,
+        37,
+        44
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 26,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        18,
+        19,
+        20,
+        22,
+        23,
+        26,
+        28,
+        31,
+        33,
+        39,
+        46
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 27,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        18,
+        20,
+        21,
+        22,
+        24,
+        27,
+        29,
+        32,
+        35,
+        40,
+        48
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 28,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        19,
+        21,
+        22,
+        23,
+        25,
+        28,
+        30,
+        33,
+        36,
+        42,
+        50
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 29,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        20,
+        21,
+        23,
+        24,
+        26,
+        29,
+        31,
+        34,
+        37,
+        43,
+        51
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 30,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        21,
+        22,
+        24,
+        25,
+        27,
+        30,
+        33,
+        36,
+        39,
+        45,
+        53
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 31,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        21,
+        23,
+        24,
+        26,
+        27,
+        31,
+        34,
+        37,
+        40,
+        46,
+        55
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 32,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        22,
+        24,
+        25,
+        27,
+        28,
+        32,
+        35,
+        38,
+        41,
+        48,
+        57
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 33,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        23,
+        24,
+        26,
+        28,
+        29,
+        33,
+        36,
+        39,
+        42,
+        49,
+        59
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 34,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        23,
+        25,
+        27,
+        28,
+        30,
+        34,
+        37,
+        40,
+        44,
+        51,
+        60
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 35,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        24,
+        26,
+        28,
+        29,
+        31,
+        35,
+        38,
+        42,
+        45,
+        52,
+        62
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 36,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        25,
+        27,
+        28,
+        30,
+        32,
+        36,
+        39,
+        43,
+        46,
+        54,
+        64
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 37,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        25,
+        27,
+        29,
+        31,
+        33,
+        37,
+        40,
+        44,
+        48,
+        55,
+        66
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 38,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        26,
+        28,
+        30,
+        32,
+        34,
+        38,
+        41,
+        45,
+        49,
+        57,
+        68
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 39,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        27,
+        29,
+        31,
+        33,
+        35,
+        39,
+        42,
+        46,
+        50,
+        58,
+        69
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 40,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        28,
+        30,
+        32,
+        34,
+        36,
+        40,
+        44,
+        48,
+        52,
+        60,
+        71
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 41,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        28,
+        30,
+        32,
+        34,
+        36,
+        41,
+        45,
+        49,
+        53,
+        61,
+        73
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 42,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        29,
+        31,
+        33,
+        35,
+        37,
+        42,
+        46,
+        50,
+        54,
+        63,
+        75
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 43,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        30,
+        32,
+        34,
+        36,
+        38,
+        43,
+        47,
+        51,
+        55,
+        64,
+        77
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 44,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        30,
+        33,
+        35,
+        37,
+        39,
+        44,
+        48,
+        52,
+        57,
+        66,
+        78
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 45,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        31,
+        33,
+        36,
+        38,
+        40,
+        45,
+        49,
+        54,
+        58,
+        67,
+        80
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 46,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        32,
+        34,
+        36,
+        39,
+        41,
+        46,
+        50,
+        55,
+        59,
+        69,
+        82
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 47,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        32,
+        35,
+        37,
+        39,
+        42,
+        47,
+        51,
+        56,
+        61,
+        70,
+        84
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 48,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        33,
+        36,
+        38,
+        40,
+        43,
+        48,
+        52,
+        57,
+        62,
+        72,
+        85
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 49,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        34,
+        36,
+        39,
+        41,
+        44,
+        49,
+        53,
+        58,
+        63,
+        73,
+        87
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 50,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        35,
+        37,
+        40,
+        42,
+        45,
+        50,
+        55,
+        60,
+        65,
+        75,
+        89
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 51,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        35,
+        38,
+        40,
+        43,
+        45,
+        51,
+        56,
+        61,
+        66,
+        76,
+        91
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 52,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        36,
+        39,
+        41,
+        44,
+        46,
+        52,
+        57,
+        62,
+        67,
+        78,
+        93
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 53,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        37,
+        39,
+        42,
+        45,
+        47,
+        53,
+        58,
+        63,
+        68,
+        79,
+        94
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 54,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        37,
+        40,
+        43,
+        45,
+        48,
+        54,
+        59,
+        64,
+        70,
+        81,
+        96
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 55,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        38,
+        41,
+        44,
+        46,
+        49,
+        55,
+        60,
+        66,
+        71,
+        82,
+        98
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 56,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        39,
+        42,
+        44,
+        47,
+        50,
+        56,
+        61,
+        67,
+        72,
+        84,
+        100
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 57,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        39,
+        42,
+        45,
+        48,
+        51,
+        57,
+        62,
+        68,
+        74,
+        85,
+        102
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 58,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        40,
+        43,
+        46,
+        49,
+        52,
+        58,
+        63,
+        69,
+        75,
+        87,
+        103
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 59,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        41,
+        44,
+        47,
+        50,
+        53,
+        59,
+        64,
+        70,
+        76,
+        88,
+        105
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 60,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        42,
+        45,
+        48,
+        51,
+        54,
+        60,
+        66,
+        72,
+        78,
+        90,
+        107
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 61,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        42,
+        45,
+        48,
+        51,
+        54,
+        61,
+        67,
+        73,
+        79,
+        91,
+        109
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 62,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        43,
+        46,
+        49,
+        52,
+        55,
+        62,
+        68,
+        74,
+        80,
+        93,
+        111
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 63,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        44,
+        47,
+        50,
+        53,
+        56,
+        63,
+        69,
+        75,
+        81,
+        94,
+        112
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 64,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        44,
+        48,
+        51,
+        54,
+        57,
+        64,
+        70,
+        76,
+        83,
+        96,
+        114
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 65,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        45,
+        48,
+        52,
+        55,
+        58,
+        65,
+        71,
+        78,
+        84,
+        97,
+        116
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 66,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        46,
+        49,
+        52,
+        56,
+        59,
+        66,
+        72,
+        79,
+        85,
+        99,
+        118
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 67,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        46,
+        50,
+        53,
+        56,
+        60,
+        67,
+        73,
+        80,
+        87,
+        100,
+        120
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 68,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        47,
+        51,
+        54,
+        57,
+        61,
+        68,
+        74,
+        81,
+        88,
+        102,
+        121
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 69,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        48,
+        51,
+        55,
+        58,
+        62,
+        69,
+        75,
+        82,
+        89,
+        103,
+        123
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 70,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        49,
+        52,
+        56,
+        59,
+        63,
+        70,
+        77,
+        84,
+        91,
+        105,
+        125
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 71,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        49,
+        53,
+        56,
+        60,
+        63,
+        71,
+        78,
+        85,
+        92,
+        106,
+        127
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 72,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        50,
+        54,
+        57,
+        61,
+        64,
+        72,
+        79,
+        86,
+        93,
+        108,
+        128
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 73,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        51,
+        54,
+        58,
+        62,
+        65,
+        73,
+        80,
+        87,
+        94,
+        109,
+        130
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 74,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        51,
+        55,
+        59,
+        62,
+        66,
+        74,
+        81,
+        88,
+        96,
+        111,
+        132
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 75,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        52,
+        56,
+        60,
+        63,
+        67,
+        75,
+        82,
+        90,
+        97,
+        112,
+        134
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 76,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        53,
+        57,
+        60,
+        64,
+        68,
+        76,
+        83,
+        91,
+        98,
+        114,
+        136
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 77,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        53,
+        57,
+        61,
+        65,
+        69,
+        77,
+        84,
+        92,
+        100,
+        115,
+        137
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 78,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        54,
+        58,
+        62,
+        66,
+        70,
+        78,
+        85,
+        93,
+        101,
+        117,
+        139
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 79,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        55,
+        59,
+        63,
+        67,
+        71,
+        79,
+        86,
+        94,
+        102,
+        118,
+        141
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 80,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        56,
+        60,
+        64,
+        68,
+        72,
+        80,
+        88,
+        96,
+        104,
+        120,
+        143
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 81,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        56,
+        60,
+        64,
+        68,
+        72,
+        81,
+        89,
+        97,
+        105,
+        121,
+        145
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 82,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        57,
+        61,
+        65,
+        69,
+        73,
+        82,
+        90,
+        98,
+        106,
+        123,
+        146
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 83,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        58,
+        62,
+        66,
+        70,
+        74,
+        83,
+        91,
+        99,
+        107,
+        124,
+        148
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 84,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        58,
+        63,
+        67,
+        71,
+        75,
+        84,
+        92,
+        100,
+        109,
+        126,
+        150
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 85,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        59,
+        63,
+        68,
+        72,
+        76,
+        85,
+        93,
+        102,
+        110,
+        127,
+        152
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 86,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        60,
+        64,
+        68,
+        73,
+        77,
+        86,
+        94,
+        103,
+        111,
+        129,
+        154
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 87,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        60,
+        65,
+        69,
+        73,
+        78,
+        87,
+        95,
+        104,
+        113,
+        130,
+        155
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 88,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        61,
+        66,
+        70,
+        74,
+        79,
+        88,
+        96,
+        105,
+        114,
+        132,
+        157
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 89,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        62,
+        66,
+        71,
+        75,
+        80,
+        89,
+        97,
+        106,
+        115,
+        133,
+        159
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 90,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        63,
+        67,
+        72,
+        76,
+        81,
+        90,
+        99,
+        108,
+        116,
+        135,
+        161
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 91,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        63,
+        68,
+        72,
+        77,
+        81,
+        91,
+        100,
+        109,
+        118,
+        136,
+        163
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 92,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        64,
+        69,
+        73,
+        78,
+        82,
+        92,
+        101,
+        110,
+        119,
+        138,
+        164
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 93,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        65,
+        69,
+        74,
+        79,
+        83,
+        93,
+        102,
+        111,
+        120,
+        139,
+        166
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 94,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        65,
+        70,
+        75,
+        79,
+        84,
+        94,
+        103,
+        112,
+        122,
+        141,
+        168
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 95,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        66,
+        71,
+        76,
+        80,
+        85,
+        95,
+        104,
+        114,
+        123,
+        142,
+        170
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 96,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        67,
+        72,
+        76,
+        81,
+        86,
+        96,
+        105,
+        115,
+        124,
+        144,
+        171
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 97,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        67,
+        72,
+        77,
+        82,
+        87,
+        97,
+        106,
+        116,
+        126,
+        145,
+        173
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 98,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        68,
+        73,
+        78,
+        83,
+        88,
+        98,
+        107,
+        117,
+        127,
+        147,
+        175
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 99,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        69,
+        74,
+        79,
+        84,
+        89,
+        99,
+        108,
+        118,
+        128,
+        148,
+        177
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 100,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        70,
+        75,
+        80,
+        85,
+        90,
+        100,
+        110,
+        120,
+        130,
+        150,
+        179
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 101,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        70,
+        75,
+        80,
+        85,
+        90,
+        101,
+        111,
+        121,
+        131,
+        151,
+        180
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 102,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        71,
+        76,
+        81,
+        86,
+        91,
+        102,
+        112,
+        122,
+        132,
+        153,
+        182
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 103,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        72,
+        77,
+        82,
+        87,
+        92,
+        103,
+        113,
+        123,
+        133,
+        154,
+        184
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 104,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        72,
+        78,
+        83,
+        88,
+        93,
+        104,
+        114,
+        124,
+        135,
+        156,
+        186
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 105,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        73,
+        78,
+        84,
+        89,
+        94,
+        105,
+        115,
+        126,
+        136,
+        157,
+        188
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 106,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        74,
+        79,
+        84,
+        90,
+        95,
+        106,
+        116,
+        127,
+        137,
+        159,
+        189
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 107,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        74,
+        80,
+        85,
+        90,
+        96,
+        107,
+        117,
+        128,
+        139,
+        160,
+        191
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 108,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        75,
+        81,
+        86,
+        91,
+        97,
+        108,
+        118,
+        129,
+        140,
+        162,
+        193
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 109,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        76,
+        81,
+        87,
+        92,
+        98,
+        109,
+        119,
+        130,
+        141,
+        163,
+        195
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 110,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        77,
+        82,
+        88,
+        93,
+        99,
+        110,
+        121,
+        132,
+        143,
+        165,
+        197
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 111,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        77,
+        83,
+        88,
+        94,
+        99,
+        111,
+        122,
+        133,
+        144,
+        166,
+        198
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 112,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        78,
+        84,
+        89,
+        95,
+        100,
+        112,
+        123,
+        134,
+        145,
+        168,
+        200
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 113,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        79,
+        84,
+        90,
+        96,
+        101,
+        113,
+        124,
+        135,
+        146,
+        169,
+        202
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 114,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        79,
+        85,
+        91,
+        96,
+        102,
+        114,
+        125,
+        136,
+        148,
+        171,
+        204
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 115,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        80,
+        86,
+        92,
+        97,
+        103,
+        115,
+        126,
+        138,
+        149,
+        172,
+        205
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 116,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        81,
+        87,
+        92,
+        98,
+        104,
+        116,
+        127,
+        139,
+        150,
+        174,
+        207
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 117,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        81,
+        87,
+        93,
+        99,
+        105,
+        117,
+        128,
+        140,
+        152,
+        175,
+        209
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 118,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        82,
+        88,
+        94,
+        100,
+        106,
+        118,
+        129,
+        141,
+        153,
+        177,
+        211
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 119,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        83,
+        89,
+        95,
+        101,
+        107,
+        119,
+        130,
+        142,
+        154,
+        178,
+        213
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 120,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        84,
+        90,
+        96,
+        102,
+        108,
+        120,
+        132,
+        144,
+        156,
+        180,
+        214
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 121,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        84,
+        90,
+        96,
+        102,
+        108,
+        121,
+        133,
+        145,
+        157,
+        181,
+        216
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 122,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        85,
+        91,
+        97,
+        103,
+        109,
+        122,
+        134,
+        146,
+        158,
+        183,
+        218
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 123,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        86,
+        92,
+        98,
+        104,
+        110,
+        123,
+        135,
+        147,
+        159,
+        184,
+        220
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 124,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        86,
+        93,
+        99,
+        105,
+        111,
+        124,
+        136,
+        148,
+        161,
+        186,
+        222
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 125,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        87,
+        93,
+        100,
+        106,
+        112,
+        125,
+        137,
+        150,
+        162,
+        187,
+        223
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 126,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        88,
+        94,
+        100,
+        107,
+        113,
+        126,
+        138,
+        151,
+        163,
+        189,
+        225
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 127,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        88,
+        95,
+        101,
+        107,
+        114,
+        127,
+        139,
+        152,
+        165,
+        190,
+        227
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 128,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        89,
+        96,
+        102,
+        108,
+        115,
+        128,
+        140,
+        153,
+        166,
+        192,
+        229
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 129,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        90,
+        96,
+        103,
+        109,
+        116,
+        129,
+        141,
+        154,
+        167,
+        193,
+        231
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 130,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        91,
+        97,
+        104,
+        110,
+        117,
+        130,
+        143,
+        156,
+        169,
+        195,
+        232
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 131,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        91,
+        98,
+        104,
+        111,
+        117,
+        131,
+        144,
+        157,
+        170,
+        196,
+        234
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 132,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        92,
+        99,
+        105,
+        112,
+        118,
+        132,
+        145,
+        158,
+        171,
+        198,
+        236
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 133,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        93,
+        99,
+        106,
+        113,
+        119,
+        133,
+        146,
+        159,
+        172,
+        199,
+        238
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 134,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        93,
+        100,
+        107,
+        113,
+        120,
+        134,
+        147,
+        160,
+        174,
+        201,
+        240
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 135,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        94,
+        101,
+        108,
+        114,
+        121,
+        135,
+        148,
+        162,
+        175,
+        202,
+        241
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 136,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        95,
+        102,
+        108,
+        115,
+        122,
+        136,
+        149,
+        163,
+        176,
+        204,
+        243
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 137,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        95,
+        102,
+        109,
+        116,
+        123,
+        137,
+        150,
+        164,
+        178,
+        205,
+        245
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 138,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        96,
+        103,
+        110,
+        117,
+        124,
+        138,
+        151,
+        165,
+        179,
+        207,
+        247
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 139,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        97,
+        104,
+        111,
+        118,
+        125,
+        139,
+        152,
+        166,
+        180,
+        208,
+        248
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 140,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        98,
+        105,
+        112,
+        119,
+        126,
+        140,
+        154,
+        168,
+        182,
+        210,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 141,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        98,
+        105,
+        112,
+        119,
+        126,
+        141,
+        155,
+        169,
+        183,
+        211,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 142,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        99,
+        106,
+        113,
+        120,
+        127,
+        142,
+        156,
+        170,
+        184,
+        213,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 143,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        100,
+        107,
+        114,
+        121,
+        128,
+        143,
+        157,
+        171,
+        185,
+        214,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 144,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        100,
+        108,
+        115,
+        122,
+        129,
+        144,
+        158,
+        172,
+        187,
+        216,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 145,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        101,
+        108,
+        116,
+        123,
+        130,
+        145,
+        159,
+        174,
+        188,
+        217,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 146,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        102,
+        109,
+        116,
+        124,
+        131,
+        146,
+        160,
+        175,
+        189,
+        219,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 147,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        102,
+        110,
+        117,
+        124,
+        132,
+        147,
+        161,
+        176,
+        191,
+        220,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 148,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        103,
+        111,
+        118,
+        125,
+        133,
+        148,
+        162,
+        177,
+        192,
+        222,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 149,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        104,
+        111,
+        119,
+        126,
+        134,
+        149,
+        163,
+        178,
+        193,
+        223,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 150,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        105,
+        112,
+        120,
+        127,
+        135,
+        150,
+        165,
+        180,
+        195,
+        225,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 151,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        105,
+        113,
+        120,
+        128,
+        135,
+        151,
+        166,
+        181,
+        196,
+        226,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 152,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        106,
+        114,
+        121,
+        129,
+        136,
+        152,
+        167,
+        182,
+        197,
+        228,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 153,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        107,
+        114,
+        122,
+        130,
+        137,
+        153,
+        168,
+        183,
+        198,
+        229,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 154,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        107,
+        115,
+        123,
+        130,
+        138,
+        154,
+        169,
+        184,
+        200,
+        231,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 155,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        108,
+        116,
+        124,
+        131,
+        139,
+        155,
+        170,
+        186,
+        201,
+        232,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 156,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        109,
+        117,
+        124,
+        132,
+        140,
+        156,
+        171,
+        187,
+        202,
+        234,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 157,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        109,
+        117,
+        125,
+        133,
+        141,
+        157,
+        172,
+        188,
+        204,
+        235,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 158,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        110,
+        118,
+        126,
+        134,
+        142,
+        158,
+        173,
+        189,
+        205,
+        237,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 159,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        111,
+        119,
+        127,
+        135,
+        143,
+        159,
+        174,
+        190,
+        206,
+        238,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 160,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        112,
+        120,
+        128,
+        136,
+        144,
+        160,
+        176,
+        192,
+        208,
+        240,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 161,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        112,
+        120,
+        128,
+        136,
+        144,
+        161,
+        177,
+        193,
+        209,
+        241,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 162,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        113,
+        121,
+        129,
+        137,
+        145,
+        162,
+        178,
+        194,
+        210,
+        243,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 163,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        114,
+        122,
+        130,
+        138,
+        146,
+        163,
+        179,
+        195,
+        211,
+        244,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 164,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        114,
+        123,
+        131,
+        139,
+        147,
+        164,
+        180,
+        196,
+        213,
+        246,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 165,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        115,
+        123,
+        132,
+        140,
+        148,
+        165,
+        181,
+        198,
+        214,
+        247,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 166,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 11,
+      "MissionQls": [
+        116,
+        124,
+        132,
+        141,
+        149,
+        166,
+        182,
+        199,
+        215,
+        249,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 167,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        116,
+        125,
+        133,
+        141,
+        150,
+        167,
+        183,
+        200,
+        217,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 168,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        117,
+        126,
+        134,
+        142,
+        151,
+        168,
+        184,
+        201,
+        218,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 169,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        118,
+        126,
+        135,
+        143,
+        152,
+        169,
+        185,
+        202,
+        219,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 170,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        119,
+        127,
+        136,
+        144,
+        153,
+        170,
+        187,
+        204,
+        220,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 171,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        119,
+        128,
+        136,
+        145,
+        153,
+        171,
+        188,
+        205,
+        222,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 172,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        120,
+        129,
+        137,
+        146,
+        154,
+        172,
+        189,
+        206,
+        223,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 173,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        121,
+        129,
+        138,
+        147,
+        155,
+        173,
+        190,
+        207,
+        224,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 174,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        121,
+        130,
+        139,
+        147,
+        156,
+        174,
+        191,
+        208,
+        226,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 175,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        122,
+        131,
+        140,
+        148,
+        157,
+        175,
+        192,
+        210,
+        227,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 176,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        123,
+        132,
+        140,
+        149,
+        158,
+        176,
+        193,
+        211,
+        228,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 177,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        123,
+        132,
+        141,
+        150,
+        159,
+        177,
+        194,
+        212,
+        230,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 178,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        124,
+        133,
+        142,
+        151,
+        160,
+        178,
+        195,
+        213,
+        231,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 179,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        125,
+        134,
+        143,
+        152,
+        161,
+        179,
+        196,
+        214,
+        232,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 180,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        126,
+        135,
+        144,
+        153,
+        162,
+        180,
+        198,
+        216,
+        233,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 181,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        126,
+        135,
+        144,
+        153,
+        162,
+        181,
+        199,
+        217,
+        235,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 182,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        127,
+        136,
+        145,
+        154,
+        163,
+        182,
+        200,
+        218,
+        236,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 183,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        128,
+        137,
+        146,
+        155,
+        164,
+        183,
+        201,
+        219,
+        237,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 184,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        128,
+        138,
+        147,
+        156,
+        165,
+        184,
+        202,
+        220,
+        239,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 185,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        129,
+        138,
+        148,
+        157,
+        166,
+        185,
+        203,
+        222,
+        240,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 186,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        130,
+        139,
+        148,
+        158,
+        167,
+        186,
+        204,
+        223,
+        241,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 187,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        130,
+        140,
+        149,
+        158,
+        168,
+        187,
+        205,
+        224,
+        243,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 188,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        131,
+        141,
+        150,
+        159,
+        169,
+        188,
+        206,
+        225,
+        244,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 189,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        132,
+        141,
+        151,
+        160,
+        170,
+        189,
+        207,
+        226,
+        245,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 190,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        133,
+        142,
+        152,
+        161,
+        171,
+        190,
+        209,
+        228,
+        246,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 191,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        133,
+        143,
+        152,
+        162,
+        171,
+        191,
+        210,
+        229,
+        248,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 192,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 10,
+      "MissionQls": [
+        134,
+        144,
+        153,
+        163,
+        172,
+        192,
+        211,
+        230,
+        249,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 193,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        135,
+        144,
+        154,
+        164,
+        173,
+        193,
+        212,
+        231,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 194,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        135,
+        145,
+        155,
+        164,
+        174,
+        194,
+        213,
+        232,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 195,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        136,
+        146,
+        156,
+        165,
+        175,
+        195,
+        214,
+        234,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 196,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        137,
+        147,
+        156,
+        166,
+        176,
+        196,
+        215,
+        235,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 197,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        137,
+        147,
+        157,
+        167,
+        177,
+        197,
+        216,
+        236,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 198,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        138,
+        148,
+        158,
+        168,
+        178,
+        198,
+        217,
+        237,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 199,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        139,
+        149,
+        159,
+        169,
+        179,
+        199,
+        218,
+        238,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 200,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        140,
+        150,
+        160,
+        170,
+        180,
+        200,
+        220,
+        240,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [
+        221
+      ],
+      "Level": 201,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        140,
+        150,
+        160,
+        170,
+        180,
+        201,
+        221,
+        241,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 202,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        141,
+        151,
+        161,
+        171,
+        181,
+        202,
+        222,
+        242,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 203,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        142,
+        152,
+        162,
+        172,
+        182,
+        203,
+        223,
+        243,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 204,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        142,
+        153,
+        163,
+        173,
+        183,
+        204,
+        224,
+        244,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 205,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        143,
+        153,
+        164,
+        174,
+        184,
+        205,
+        225,
+        246,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 206,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        144,
+        154,
+        164,
+        175,
+        185,
+        206,
+        226,
+        247,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 207,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        144,
+        155,
+        165,
+        175,
+        186,
+        207,
+        227,
+        248,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 208,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 9,
+      "MissionQls": [
+        145,
+        156,
+        166,
+        176,
+        187,
+        208,
+        228,
+        249,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 209,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        146,
+        156,
+        167,
+        177,
+        188,
+        209,
+        229,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 210,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        147,
+        157,
+        168,
+        178,
+        189,
+        210,
+        231,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 211,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        147,
+        158,
+        168,
+        179,
+        189,
+        211,
+        232,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 212,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        148,
+        159,
+        169,
+        180,
+        190,
+        212,
+        233,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 213,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        149,
+        159,
+        170,
+        181,
+        191,
+        213,
+        234,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 214,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        149,
+        160,
+        171,
+        181,
+        192,
+        214,
+        235,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 215,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        150,
+        161,
+        172,
+        182,
+        193,
+        215,
+        236,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 216,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        151,
+        162,
+        172,
+        183,
+        194,
+        216,
+        237,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 217,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        151,
+        162,
+        173,
+        184,
+        195,
+        217,
+        238,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 218,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        152,
+        163,
+        174,
+        185,
+        196,
+        218,
+        239,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 219,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        153,
+        164,
+        175,
+        186,
+        197,
+        219,
+        240,
+        250
+      ]
+    },
+    {
+      "CaptureAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+      "ExclusiveMissionQlsAmongLevels2Through220": [],
+      "Level": 220,
+      "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+      "MissionQlCount": 8,
+      "MissionQls": [
+        154,
+        165,
+        176,
+        187,
+        198,
+        220,
+        242,
+        250
+      ]
+    }
+  ],
+  "SchemaVersion": 1
+}

@@ -1,0 +1,388 @@
+{
+  "HighValueCharacterLevels": [
+    {
+      "CharacterLevel": 2,
+      "Reason": "lowest known table level not blocked by the modern level-1 starter rule; reaches QL1"
+    },
+    {
+      "CharacterLevel": 10,
+      "Reason": "first Malis/canonical value disagreement"
+    },
+    {
+      "CharacterLevel": 12,
+      "Reason": "dense cluster of Malis missing/disputed cells"
+    },
+    {
+      "CharacterLevel": 13,
+      "Reason": "dense cluster of Malis missing/disputed cells"
+    },
+    {
+      "CharacterLevel": 52,
+      "Reason": "historically corrected difficulty-11 boundary"
+    },
+    {
+      "CharacterLevel": 53,
+      "Reason": "historically corrected difficulty-11 boundary"
+    },
+    {
+      "CharacterLevel": 54,
+      "Reason": "historically corrected difficulty-11 boundary"
+    },
+    {
+      "CharacterLevel": 60,
+      "Reason": "historically corrected difficulty-11 boundary"
+    },
+    {
+      "CharacterLevel": 80,
+      "Reason": "historically corrected difficulty-11 value 144 to 143"
+    },
+    {
+      "CharacterLevel": 200,
+      "Reason": "QL200 transition control below level 201"
+    },
+    {
+      "CharacterLevel": 201,
+      "Reason": "Malis QL200 filtering behavior begins above character level 200"
+    },
+    {
+      "CharacterLevel": 209,
+      "Reason": "high-level transition coverage"
+    },
+    {
+      "CharacterLevel": 219,
+      "Reason": "upper-bound neighbor"
+    },
+    {
+      "CharacterLevel": 220,
+      "Reason": "maximum represented character level and QL250 reachability"
+    }
+  ],
+  "HighValueMissionQls": [
+    {
+      "CandidateCharacterLevelCount": 1,
+      "MissionQl": 1,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 3,
+      "MissionQl": 2,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 3,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 9,
+      "MissionQl": 9,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 9,
+      "MissionQl": 10,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 8,
+      "MissionQl": 11,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 10,
+      "MissionQl": 12,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 10,
+      "MissionQl": 13,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 14,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 15,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 13,
+      "MissionQl": 16,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 9,
+      "MissionQl": 17,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 13,
+      "MissionQl": 18,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 19,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 21,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 10,
+      "MissionQl": 23,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 10,
+      "MissionQl": 35,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 14,
+      "MissionQl": 39,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 12,
+      "MissionQl": 57,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 9,
+      "MissionQl": 59,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 10,
+      "MissionQl": 61,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 8,
+      "MissionQl": 65,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 10,
+      "MissionQl": 92,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 12,
+      "MissionQl": 111,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 13,
+      "MissionQl": 114,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 12,
+      "MissionQl": 116,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 118,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 13,
+      "MissionQl": 126,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 13,
+      "MissionQl": 136,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 139,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 13,
+      "MissionQl": 141,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 12,
+      "MissionQl": 150,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 11,
+      "MissionQl": 152,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 9,
+      "MissionQl": 180,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 7,
+      "MissionQl": 182,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 8,
+      "MissionQl": 184,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 6,
+      "MissionQl": 186,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 197,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 200,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 201,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 2,
+      "MissionQl": 203,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 6,
+      "MissionQl": 205,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 206,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 207,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 209,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 6,
+      "MissionQl": 213,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 6,
+      "MissionQl": 214,
+      "Reason": "special/disputed edge"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 216,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 219,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 1,
+      "MissionQl": 221,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 223,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 3,
+      "MissionQl": 227,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 229,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 2,
+      "MissionQl": 230,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 231,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 2,
+      "MissionQl": 233,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 234,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 238,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 2,
+      "MissionQl": 239,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 5,
+      "MissionQl": 240,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 4,
+      "MissionQl": 241,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 2,
+      "MissionQl": 242,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 2,
+      "MissionQl": 245,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 3,
+      "MissionQl": 247,
+      "Reason": "unique or sparse static reachability"
+    },
+    {
+      "CandidateCharacterLevelCount": 81,
+      "MissionQl": 250,
+      "Reason": "special/disputed edge"
+    }
+  ],
+  "SchemaVersion": 1
+}

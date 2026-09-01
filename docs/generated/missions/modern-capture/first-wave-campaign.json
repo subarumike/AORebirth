@@ -1,0 +1,611 @@
+{
+  "SchemaVersion": 1,
+  "Waves": [
+    {
+      "ApproximateCohortCountIfAllComplete": 55,
+      "ApproximateOfferCountIfFivePerCohort": 275,
+      "ApproximateRequestCount": 55,
+      "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
+      "Name": "Wave 1 - reachability validation",
+      "Purpose": "Validate that a terminal-capable level-2 character can request all table slots, especially QL1.",
+      "RequestsPerTarget": 5,
+      "Targets": [
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 1
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 2,
+          "TargetMissionQl": 1
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 3,
+          "TargetMissionQl": 1
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 4,
+          "TargetMissionQl": 1
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 5,
+          "TargetMissionQl": 1
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 2
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 2
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 2
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 2
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 3
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 3
+        }
+      ]
+    },
+    {
+      "ApproximateCohortCountIfAllComplete": 180,
+      "ApproximateOfferCountIfFivePerCohort": 900,
+      "ApproximateRequestCount": 180,
+      "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
+      "Name": "Wave 2 - disputed low-level cells",
+      "Purpose": "Resolve the first and densest Malis versus canonical table disagreements.",
+      "RequestsPerTarget": 10,
+      "Targets": [
+        {
+          "CharacterLevel": 10,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 17
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 3,
+          "TargetMissionQl": 9
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 5,
+          "TargetMissionQl": 10
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 12
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 13
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 14
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 15
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 18
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 21
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 2,
+          "TargetMissionQl": 9
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 3,
+          "TargetMissionQl": 10
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 5,
+          "TargetMissionQl": 11
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 13
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 14
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 15
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 16
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 19
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 23
+        }
+      ]
+    },
+    {
+      "ApproximateCohortCountIfAllComplete": 50,
+      "ApproximateOfferCountIfFivePerCohort": 250,
+      "ApproximateRequestCount": 50,
+      "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
+      "Name": "Wave 3 - corrected historical boundaries",
+      "Purpose": "Retest known difficulty-11 corrections, including the level-80 QL143 boundary.",
+      "RequestsPerTarget": 10,
+      "Targets": [
+        {
+          "CharacterLevel": 52,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 93
+        },
+        {
+          "CharacterLevel": 53,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 94
+        },
+        {
+          "CharacterLevel": 54,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 96
+        },
+        {
+          "CharacterLevel": 60,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 107
+        },
+        {
+          "CharacterLevel": 80,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 143
+        }
+      ]
+    },
+    {
+      "ApproximateCohortCountIfAllComplete": 300,
+      "ApproximateOfferCountIfFivePerCohort": 1500,
+      "ApproximateRequestCount": 300,
+      "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
+      "Name": "Wave 4 - QL200 and above-200 behavior",
+      "Purpose": "Test QL200 controls and distinguish planned table selection from Malis client filtering above level 200.",
+      "RequestsPerTarget": 10,
+      "Targets": [
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 200
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 220
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 240
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 201
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 221
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 241
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 209
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 229
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 219
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 240
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 220
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 7,
+          "TargetMissionQl": 242
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 8,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 9,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 10,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        }
+      ]
+    },
+    {
+      "ApproximateCohortCountIfAllComplete": 210,
+      "ApproximateOfferCountIfFivePerCohort": 1050,
+      "ApproximateRequestCount": 210,
+      "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
+      "Name": "Wave 5 - coarse practical-set sweep",
+      "Purpose": "Acquire modest low/neutral/high cohorts across the 14-level practical validation set before deep sampling.",
+      "RequestsPerTarget": 5,
+      "Targets": [
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 1
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 2
+        },
+        {
+          "CharacterLevel": 2,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 3
+        },
+        {
+          "CharacterLevel": 10,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 7
+        },
+        {
+          "CharacterLevel": 10,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 10
+        },
+        {
+          "CharacterLevel": 10,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 17
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 8
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 12
+        },
+        {
+          "CharacterLevel": 12,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 21
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 9
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 13
+        },
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 23
+        },
+        {
+          "CharacterLevel": 52,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 36
+        },
+        {
+          "CharacterLevel": 52,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 52
+        },
+        {
+          "CharacterLevel": 52,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 93
+        },
+        {
+          "CharacterLevel": 53,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 37
+        },
+        {
+          "CharacterLevel": 53,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 53
+        },
+        {
+          "CharacterLevel": 53,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 94
+        },
+        {
+          "CharacterLevel": 54,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 37
+        },
+        {
+          "CharacterLevel": 54,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 54
+        },
+        {
+          "CharacterLevel": 54,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 96
+        },
+        {
+          "CharacterLevel": 60,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 42
+        },
+        {
+          "CharacterLevel": 60,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 60
+        },
+        {
+          "CharacterLevel": 60,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 107
+        },
+        {
+          "CharacterLevel": 80,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 56
+        },
+        {
+          "CharacterLevel": 80,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 80
+        },
+        {
+          "CharacterLevel": 80,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 143
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 140
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 200
+        },
+        {
+          "CharacterLevel": 200,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 140
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 201
+        },
+        {
+          "CharacterLevel": 201,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 146
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 209
+        },
+        {
+          "CharacterLevel": 209,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 153
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 219
+        },
+        {
+          "CharacterLevel": 219,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 1,
+          "TargetMissionQl": 154
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 220
+        },
+        {
+          "CharacterLevel": 220,
+          "DifficultySlot": 11,
+          "TargetMissionQl": 250
+        }
+      ]
+    },
+    {
+      "ApproximateCohortCountIfAllComplete": 40,
+      "ApproximateOfferCountIfFivePerCohort": 200,
+      "ApproximateRequestCount": 40,
+      "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
+      "Name": "Wave 6 - controlled refinement",
+      "Purpose": "Run one-variable-at-a-time character-level controls at the same target QL; split terminal and faction controls into separate sessions.",
+      "RequestsPerTarget": 20,
+      "Targets": [
+        {
+          "CharacterLevel": 60,
+          "DifficultySlot": 6,
+          "TargetMissionQl": 60
+        },
+        {
+          "CharacterLevel": 80,
+          "DifficultySlot": 2,
+          "TargetMissionQl": 60
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "GeneratedFiles": [
+    {
+      "Path": "docs/generated/missions/modern-capture/analysis-summary.json",
+      "Sha256": "9b07c36512b27287db4bf5df579add6dd950be2225e35c5739d09ce04e90378d"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/character-level-coverage.json",
+      "Sha256": "c53193ea1c9776ea7fa6af7eaecb893f0f43fd7f709d524b3e4b0a684404cd4e"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/first-wave-campaign.json",
+      "Sha256": "4314f117bf4e70612c5686f796b5d17e00415b0ad9c3ab743d3059426e206329"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/harvester-schema.json",
+      "Sha256": "0f14fc636ab571af54008c272daa4cada48188ceb12cbb58bef40a0b1db01a34"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/high-value-targets.json",
+      "Sha256": "f161f7db984e23a8074c55344e718a5ae1e927cad02822fb99a722640dfa2c18"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/mission-ql-reachability.json",
+      "Sha256": "ed84dbc8dc259ffc0d47021a4031ce17b64a43f436f15c68ea7d6653d3d3590e"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/next-best-capture-targets.json",
+      "Sha256": "0ef4f77878238f76572780d1f59c25bd0c1273bd429f8bf3828e9ae719b57d21"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/reachability-graph.jsonl",
+      "Sha256": "a39b7ea6d4d4fcf28f4fb5bbbe0a2d565f5c3ba8da6013f2dcd16b9fe4e949b5"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/set-cover-solutions.json",
+      "Sha256": "3a776b800845f83ecfdcaa55ccf14da15268ecb5f0d851391632f54242ed970c"
+    },
+    {
+      "Path": "docs/generated/missions/modern-capture/statistical-readiness.json",
+      "Sha256": "62e3cd4b1bccf2f05132482a94aa5e7d1780f6ebda6a70f47451b4cc0e29648f"
+    }
+  ],
+  "Generator": "Tools/modern_mission_capture_planner.py",
+  "Inputs": [
+    {
+      "Path": "AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv",
+      "Sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f"
+    },
+    {
+      "Path": "docs/generated/missions/malis/character-level-mission-ql.csv",
+      "Sha256": "21f707f3ba96167e9cad682d6377cae2657a24d9f8ecd2c39a92df58ce64fbc7"
+    },
+    {
+      "Path": "docs/generated/missions/malis/mission-level-comparison.json",
+      "Sha256": "9f2a1ac94e55df454a0139c9acf9da22b4ee792c56f607fbe2ee8233839e7a80"
+    },
+    {
+      "Path": "docs/generated/missions/arpa3/normalized-roll-observations.csv",
+      "Sha256": "aa7f9658a86f119dbfddb6b291414fd0e4c0a96f2ec26a5d2fc028dbd07f94f1"
+    },
+    {
+      "Path": "docs/generated/missions/arpa3/clicksaver-item-catalog.csv",
+      "Sha256": "85a1480d2e8eda7332df2a2bd43c3f28c0aa29fdfd441f963200dd7d789de23f"
+    },
+    {
+      "Path": "docs/generated/missions/arpa3/clicksaver-playfield-catalog.json",
+      "Sha256": "095262b9eab1c2f7ee839a7cbc555796b139b6e61d813e0cd8c47fbb287b7011"
+    },
+    {
+      "Path": "docs/generated/missions/malis/mission-type-catalog.json",
+      "Sha256": "8eb64313aa7c2e5674a050a95d2b8ac8cca5d6a32f323d24f9b48c508e0e1560"
+    },
+    {
+      "Path": "docs/reference/missions/modern-capture/character-level-capture-access.json",
+      "Sha256": "a88cdc480b0f0e6dcc5fac145d079e1e037d8a27db7cde3c70f59a7711a631b4"
+    },
+    {
+      "Path": "docs/reference/missions/modern-capture/capture-session-index.json",
+      "Sha256": "070532a27a2dcdeb654220dea9fdbbf9a76d01504164aacacca3fc26a2367a19"
+    }
+  ],
+  "RuntimeMissionLogicChanged": false,
+  "SchemaVersion": 1
+}
