@@ -262,53 +262,45 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
-            if (!hasCapturedContract)
-            {
-                this.EnsureNpcCharacterWeapon(attacker, initialDelaySeconds);
-            }
+            this.EnsureNpcCharacterWeapon(attacker, initialDelaySeconds);
         }
 
         private void EnsureNpcCharacterWeapon(ICharacter attacker, double initialAttackDelaySeconds)
         {
+            if (this.playfield == null || attacker == null)
+            {
+                return;
+            }
+
+            this.playfield.ConfigureWeaponsFromEquipment(attacker);
+
             Character character = attacker as Character;
             if (character == null)
             {
                 return;
             }
 
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
-            double attackSpeed = initialAttackDelaySeconds > 0.0
-                                     ? initialAttackDelaySeconds
-                                     : CharacterWeapon.DefaultAttackSpeedSeconds;
-            double rechargeSpeed = CharacterWeapon.DefaultRechargeSpeedSeconds;
-            if (attackSource != null)
+            CapturedEnemyCombatContract capturedContract;
+            bool hasCapturedContract = CapturedEnemyCombatRuntimeRegistry.TryGet(
+                                           attacker.Identity.Instance,
+                                           out capturedContract)
+                                       && capturedContract.IsCombatReady;
+            if (hasCapturedContract)
             {
-                if (attackSource.AttackSpeedSeconds > 0.0)
-                {
-                    attackSpeed = attackSource.AttackSpeedSeconds;
-                }
+                // Captured schedules own hits; keep inventory (incl. 44008) but do not arm CharacterWeapon clocks.
+                character.ClearWeapons();
+                return;
+            }
 
-                if (attackSource.RechargeOnlySeconds > 0.0)
+            if (initialAttackDelaySeconds > 0.0)
+            {
+                CharacterWeapon main;
+                if (character.Weapons.TryGetValue(WeaponSlot.MainHand, out main) && main != null)
                 {
-                    rechargeSpeed = attackSource.RechargeOnlySeconds;
-                }
-                else if (attackSource.RechargeSeconds > 0.0)
-                {
-                    // Legacy combined cycle: treat majority as recharge after first swing.
-                    rechargeSpeed = attackSource.RechargeSeconds;
+                    main.ConfigureSpeeds(initialAttackDelaySeconds, main.RechargeSpeed);
                 }
             }
 
-            if (PetCombatRules.IsPlayerOwnedPet(attacker)
-                && !PetCombatRules.IsPlayerOwnedHealingPet(attacker))
-            {
-                attackSpeed = CharacterWeapon.DefaultAttackSpeedSeconds;
-                rechargeSpeed = PetCombatRules.AttackPetRechargeSeconds;
-            }
-
-            CharacterWeapon weapon = new CharacterWeapon();
-            weapon.ConfigureSpeeds(attackSpeed, rechargeSpeed);
-            character.SetWeapon(WeaponSlot.MainHand, weapon);
             character.ResetAllWeaponAttacks();
         }
 
@@ -737,47 +729,47 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            int currentHealth = target.Stats[StatIds.health].Value;
-            int damage = this.CalculateCombatDamage(attacker, attackSource);
-            int newHealth = Math.Max(0, currentHealth - damage);
-            bool killingHit = newHealth == 0;
-            if (killingHit && attackSource.LethalAttackInfoUnknown.HasValue)
+            Character attackerCharacter = attacker as Character;
+            if (attackerCharacter == null)
             {
-                attackSource.AttackInfoUnk1 =
-                    attackSource.LethalAttackInfoUnknown.Value;
+                return;
+            }
+
+            AORebirth.Core.Combat.CombatStrikeContext strikeContext =
+                this.BuildStrikeContext(attackerCharacter, attackSource);
+            if (strikeContext == null)
+            {
+                return;
             }
 
             this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
-            CombatDamageSource damageSource = attackSource.UsesEquippedWeapon
-                                                  ? CombatDamageSource.WeaponAutoAttack
-                                                  : CombatDamageSource.UnarmedAutoAttack;
-            this.AnnounceCombatDamage(
-                attacker,
-                target,
-                damage,
-                attackSource,
-                damageSource);
-            target.Stats[StatIds.health].Value = newHealth;
+
+            AORebirth.Core.Combat.CombatStrikeResult strikeResult =
+                attackerCharacter.Strike(target, strikeContext);
+
+            if (strikeResult.Outcome != AORebirth.Core.Combat.StrikeOutcome.Applied)
+            {
+                return;
+            }
+
             if (attackSource.CompletesCapturedOpeningAttack)
             {
                 this.completedCapturedOpeningAttacks.Add(attacker.Identity.Instance);
             }
 
-            target.SendChangedStats();
-            this.playfield.NotifyNpcCombatDamage(target);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 string.Format(
                     "Combat hit attacker={0} target={1} damage={2} health={3}/{4} weaponBased={5} slot={6}",
                     attacker.Identity,
                     target.Identity,
-                    damage,
-                    newHealth,
+                    strikeResult.Damage,
+                    strikeResult.NewHealth,
                     target.Stats[StatIds.life].Value,
                     attackSource.UsesEquippedWeapon ? 1 : 0,
                     attackSource.AttackInfoWeaponSlot));
 
-            if (killingHit)
+            if (strikeResult.KillingHit)
             {
                 if (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker))
                 {
@@ -788,9 +780,37 @@ namespace AORebirth.Core.Playfields
                             Unknown1 = 1
                         });
                 }
-
-                this.playfield.HandleCombatKillingHit(attacker, target);
             }
+        }
+
+        private AORebirth.Core.Combat.CombatStrikeContext BuildStrikeContext(
+            Character attackerCharacter,
+            CombatAttackSource attackSource)
+        {
+            if (attackerCharacter == null || attackSource == null)
+            {
+                return null;
+            }
+
+            AORebirth.Core.Combat.CombatStrikeContext strikeContext =
+                AORebirth.Core.Combat.CharacterCombatStrikeBuilder.Build(
+                    attackerCharacter,
+                    AORebirth.Core.Entities.WeaponSlot.MainHand);
+            if (strikeContext == null)
+            {
+                return null;
+            }
+
+            strikeContext.Range = attackSource.Range > 0.0
+                                    ? attackSource.Range
+                                    : strikeContext.Range;
+            strikeContext.AttackInfoAmmoCount = attackSource.AttackInfoAmmoCount;
+            strikeContext.AttackInfoWeaponSlot = attackSource.AttackInfoWeaponSlot;
+            strikeContext.AttackInfoHitType = attackSource.AttackInfoHitType;
+            strikeContext.AttackInfoWeaponInstance = attackSource.AttackInfoWeaponInstance;
+            strikeContext.SendAttackInfo = attackSource.SendAttackInfo;
+            strikeContext.DamageSource = AORebirth.Core.Combat.CombatDamageSource.WeaponAutoAttack;
+            return strikeContext;
         }
 
         private bool TryApplyCapturedWeaponAmmo(
@@ -1022,24 +1042,6 @@ namespace AORebirth.Core.Playfields
                     target.Identity,
                     decision,
                     detail));
-        }
-
-        private int CalculateCombatDamage(ICharacter attacker, CombatAttackSource attackSource)
-        {
-            if (attackSource.CapturedDamageObservations != null
-                && attackSource.CapturedDamageObservations.Length > 0)
-            {
-                return this.capturedDamageObservationCursor.Select(
-                    attacker.Identity.Instance,
-                    attackSource.CapturedDamageObservations);
-            }
-
-            return CombatDamageRules.Calculate(
-                attackSource.MinDamage,
-                attackSource.MaxDamage,
-                attackSource.DamageBonus,
-                attacker.Stats[StatIds.level].Value,
-                false);
         }
 
         private double ResolveLandedRechargeSeconds(
@@ -1408,41 +1410,40 @@ namespace AORebirth.Core.Playfields
             }
 
             CapturedBasicCombatStreamDefinition stream = streams[dueIndex];
-            CapturedBasicCombatDamageObservation observation =
-                this.SelectBasicDamageObservation(
-                    attacker.Identity.Instance,
-                    dueIndex,
-                    stream,
-                    streams.Length);
+            Character attackerCharacter = attacker as Character;
+            if (attackerCharacter == null)
+            {
+                return;
+            }
+
             var attackSource = new CombatAttackSource
             {
-                MinDamage = observation.Amount,
-                MaxDamage = observation.Amount,
-                DamageBonus = 0,
                 Range = attackRange,
                 RechargeSeconds = 0.0d,
-                UsesEquippedWeapon = false,
+                UsesEquippedWeapon = true,
                 AttackInfoAmmoCount = stream.AttackInfoAmmoCount,
                 AttackInfoWeaponSlot = stream.AttackInfoWeaponSlot,
-                AttackInfoUnk1 = observation.AttackInfoDamageTypeWire,
+                AttackInfoUnk1 = stream.AttackInfoHitTypeWire,
                 AttackInfoHitType = stream.AttackInfoHitTypeWire,
                 AttackInfoWeaponInstance = stream.AttackInfoWeaponInstance,
                 AttackInfoN3Unknown = stream.AttackInfoN3Byte,
                 SendAttackInfo = true
             };
 
-            int currentHealth = target.Stats[StatIds.health].Value;
-            int damage = this.CalculateCombatDamage(attacker, attackSource);
-            int newHealth = Math.Max(0, currentHealth - damage);
-            this.AnnounceCombatDamage(
-                attacker,
-                target,
-                damage,
-                attackSource,
-                CombatDamageSource.BasicCaptureBackedOrdinaryAutoAttack);
-            target.Stats[StatIds.health].Value = newHealth;
-            target.SendChangedStats();
-            this.playfield.NotifyNpcCombatDamage(target);
+            AORebirth.Core.Combat.CombatStrikeContext strikeContext =
+                this.BuildStrikeContext(attackerCharacter, attackSource);
+            if (strikeContext == null)
+            {
+                return;
+            }
+
+            AORebirth.Core.Combat.CombatStrikeResult strikeResult =
+                attackerCharacter.Strike(target, strikeContext);
+            if (strikeResult.Outcome != AORebirth.Core.Combat.StrikeOutcome.Applied)
+            {
+                return;
+            }
+
             nextTicks[dueIndex] = now + TimeSpan.FromSeconds(
                 this.SelectBasicLandedIntervalObservation(
                     attacker.Identity.Instance,
@@ -1459,15 +1460,10 @@ namespace AORebirth.Core.Playfields
                     target.Identity,
                     stream.StreamId,
                     stream.AttackInfoWeaponSlot,
-                    damage,
-                    observation.AttackInfoDamageTypeWire,
-                    newHealth,
+                    strikeResult.Damage,
+                    stream.AttackInfoHitTypeWire,
+                    strikeResult.NewHealth,
                     target.Stats[StatIds.life].Value));
-
-            if (newHealth == 0)
-            {
-                this.playfield.HandleCombatKillingHit(attacker, target);
-            }
         }
 
         private double SelectBasicInitialDelayObservation(
@@ -1642,23 +1638,26 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            int currentHealth = target.Stats[StatIds.health].Value;
-            int damage = this.CalculateCombatDamage(attacker, attackSource);
-            int newHealth = Math.Max(0, currentHealth - damage);
-            if (newHealth == 0 && attackSource.LethalAttackInfoUnknown.HasValue)
+            Character attackerCharacter = attacker as Character;
+            if (attackerCharacter == null)
             {
-                attackSource.AttackInfoUnk1 =
-                    attackSource.LethalAttackInfoUnknown.Value;
+                return;
             }
-            this.AnnounceCombatDamage(
-                attacker,
-                target,
-                damage,
-                attackSource,
-                CombatDamageSource.UnarmedAutoAttack);
-            target.Stats[StatIds.health].Value = newHealth;
-            target.SendChangedStats();
-            this.playfield.NotifyNpcCombatDamage(target);
+
+            AORebirth.Core.Combat.CombatStrikeContext strikeContext =
+                this.BuildStrikeContext(attackerCharacter, attackSource);
+            if (strikeContext == null)
+            {
+                return;
+            }
+
+            AORebirth.Core.Combat.CombatStrikeResult strikeResult =
+                attackerCharacter.Strike(target, strikeContext);
+            if (strikeResult.Outcome != AORebirth.Core.Combat.StrikeOutcome.Applied)
+            {
+                return;
+            }
+
             nextTicks[dueIndex] = streams[dueIndex].ResolveNextTickAfterHit(now);
 
             LogUtil.Debug(
@@ -1669,14 +1668,9 @@ namespace AORebirth.Core.Playfields
                     attacker.Identity,
                     target.Identity,
                     dueIndex,
-                    damage,
-                    newHealth,
+                    strikeResult.Damage,
+                    strikeResult.NewHealth,
                     target.Stats[StatIds.life].Value));
-
-            if (newHealth == 0)
-            {
-                this.playfield.HandleCombatKillingHit(attacker, target);
-            }
         }
 
         private void AnnounceCapturedEnemyAttackStartContext(

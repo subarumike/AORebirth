@@ -303,7 +303,7 @@ namespace ZoneEngine.Core
                 int instance = Pool.Instance.GetFreeInstance<Character>(1000000, IdentityType.CanbeAffected);
                 var identity = new Identity { Type = IdentityType.CanbeAffected, Instance = instance };
                 var controller = new NPCController();
-                character = new Character(playfield.Identity, identity, controller);
+                character = new NpcCharacter(playfield.Identity, identity, controller);
                 character.Read();
                 controller.Character = character;
                 character.Playfield = playfield;

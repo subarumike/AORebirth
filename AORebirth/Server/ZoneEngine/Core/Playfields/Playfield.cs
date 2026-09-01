@@ -121,7 +121,16 @@ namespace AORebirth.Core.Playfields
 
         private readonly object lifetimeSync = new object();
 
+        private readonly PlayfieldDynelRegistry dynelRegistry;
+
         private readonly PlayfieldRuntimeSystems runtimeSystems;
+
+        private readonly PlayfieldCharacterCombatSubscriptions characterCombatSubscriptions;
+
+        internal PlayfieldDynelRegistry DynelRegistry
+        {
+            get { return this.dynelRegistry; }
+        }
 
         private DateTime lastHeartbeatUtc;
 
@@ -253,15 +262,19 @@ namespace AORebirth.Core.Playfields
         {
             this.server = zoneServer;
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
+            this.dynelRegistry = new PlayfieldDynelRegistry(this.Identity);
             this.runtimeSystems =
                 new PlayfieldRuntimeSystems(
                     this,
                     this.Identity,
+                    this.dynelRegistry,
                     IsPrivateCityPlayfieldCandidate,
                     PlayfieldStatelTransitionRuntimeService.IsCapturedMontroyalPrivateCityInstance,
                     ResolveCharacterOrganizationInstance,
                     ResolveOrganizationName,
                     ResolveCharacterStatWireValue);
+
+            this.characterCombatSubscriptions = new PlayfieldCharacterCombatSubscriptions(this);
 
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(
@@ -606,16 +619,38 @@ namespace AORebirth.Core.Playfields
         public void ActivateNpc(ICharacter character)
         {
             this.runtimeSystems.ActivateNpc(character);
+            this.RegisterCharacterCombatEvents(character);
         }
 
         public void RegisterDynel(IEntity entity)
         {
             this.runtimeSystems.RegisterDynel(entity);
+            ICharacter character = entity as ICharacter;
+            if (character != null)
+            {
+                this.RegisterCharacterCombatEvents(character);
+            }
         }
 
         public void UnregisterDynel(Identity identity)
         {
+            ICharacter character = this.FindByIdentity<ICharacter>(identity);
+            if (character != null)
+            {
+                this.UnregisterCharacterCombatEvents(character);
+            }
+
             this.runtimeSystems.UnregisterDynel(identity);
+        }
+
+        internal void RegisterCharacterCombatEvents(ICharacter character)
+        {
+            this.characterCombatSubscriptions.Register(character);
+        }
+
+        internal void UnregisterCharacterCombatEvents(ICharacter character)
+        {
+            this.characterCombatSubscriptions.Unregister(character);
         }
 
         public void AcquireNpcAggro(ICharacter attacker, ICharacter target)
@@ -1568,7 +1603,6 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessCharacterTick(ICharacter dynel, double deltaTime)
         {
-            this.EnsureCharacterTickHandlers(dynel);
             dynel.Tick(deltaTime);
             this.runtimeSystems.ProcessCharacterRegeneration(dynel, deltaTime, SendChangedStats);
             if (dynel.Controller is NPCController)
@@ -1577,42 +1611,35 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        private void EnsureCharacterTickHandlers(ICharacter character)
-        {
-            Character c = character as Character;
-            if (c == null)
-            {
-                return;
-            }
-
-            if (c.CombatSwingHandler == null)
-            {
-                ICharacter captured = character;
-                c.CombatSwingHandler = slot => this.ApplyCombatSwingFromWeapon(captured, slot);
-            }
-        }
-
-        private void ApplyCombatSwingFromWeapon(ICharacter attacker, WeaponSlot slot)
+        internal void ApplyCombatSwingFromWeapon(ICharacter attacker, WeaponSlot slot)
         {
             if (attacker == null || this.disposed)
             {
                 return;
             }
 
-            if (attacker.Controller is NPCController)
+            Character c = attacker as Character;
+            if (c == null)
             {
-                this.runtimeSystems.ApplyNpcCombatHit(attacker);
                 return;
             }
 
-            this.runtimeSystems.ProcessPlayerCombatTick(
-                attacker,
-                slot,
-                this.ClearCombatTracking,
-                this.FindPlayerCombatTarget,
-                target => this.IsValidPlayerCombatTarget(attacker, target),
-                this.LogInvalidPlayerCombatTickTarget,
-                this.ProcessValidatedPlayerCombatTick);
+            if (c is PlayerCharacter)
+            {
+                ICharacter target = this.FindByIdentity<ICharacter>(attacker.FightingTarget);
+                string missionSpatialFailure;
+                if (target != null
+                    && !MissionAcgSpatialRuntime.TryValidateCombatPair(
+                        attacker,
+                        target,
+                        out missionSpatialFailure))
+                {
+                    this.CancelPlayerAttack(attacker);
+                    return;
+                }
+            }
+
+            c.ProcessWeaponSwing(slot);
         }
 
         public void ResetCombatTick(Identity attacker)
@@ -1620,7 +1647,6 @@ namespace AORebirth.Core.Playfields
             ICharacter character = this.FindByIdentity<ICharacter>(attacker);
             if (character != null && character.Controller is NPCController)
             {
-                this.EnsureCharacterTickHandlers(character);
                 this.runtimeSystems.ResetNpcCombatTick(character);
             }
             else
@@ -1636,10 +1662,9 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            this.EnsureCharacterTickHandlers(character);
-            // Arm only (no heartBeatSync). First swing runs after Attack+SAW packets.
+            // Arm only; CharacterWeapon clocks drive swings after Attack+SAW.
             this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);
-            this.ConfigurePlayerWeaponsFromEquipment(character);
+            this.ConfigureWeaponsFromEquipment(character);
         }
 
         /// <summary>
@@ -1660,45 +1685,6 @@ namespace AORebirth.Core.Playfields
             return distance <= attackRange + 1.5;
         }
 
-        /// <summary>
-        /// First auto-attack swing after combat-start Attack+SAW have been sent to the client.
-        /// </summary>
-        public void TryPlayerFirstCombatTick(ICharacter character)
-        {
-            if (character == null || this.disposed)
-            {
-                return;
-            }
-
-            this.EnsureCharacterTickHandlers(character);
-            Character c = character as Character;
-            WeaponSlot slot = WeaponSlot.MainHand;
-            if (c != null)
-            {
-                if (!c.Weapons.ContainsKey(WeaponSlot.MainHand))
-                {
-                    if (c.Weapons.ContainsKey(WeaponSlot.CombinedMA))
-                    {
-                        slot = WeaponSlot.CombinedMA;
-                    }
-                    else if (c.Weapons.ContainsKey(WeaponSlot.OffHand))
-                    {
-                        slot = WeaponSlot.OffHand;
-                    }
-                }
-            }
-
-            this.ApplyCombatSwingFromWeapon(character, slot);
-            if (c != null)
-            {
-                CharacterWeapon weapon;
-                if (c.Weapons.TryGetValue(slot, out weapon) && weapon != null)
-                {
-                    weapon.EnterRecharging();
-                }
-            }
-        }
-
         public void CancelPlayerAttack(ICharacter character)
         {
             Character c = character as Character;
@@ -1710,7 +1696,7 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);
         }
 
-        private void ConfigurePlayerWeaponsFromEquipment(ICharacter character)
+        internal void ConfigureWeaponsFromEquipment(ICharacter character)
         {
             Character c = character as Character;
             if (c == null)
@@ -1720,18 +1706,29 @@ namespace AORebirth.Core.Playfields
 
             c.ClearWeapons();
 
+            IInventoryPage weaponPage = null;
             IItem rightHand = null;
             IItem leftHand = null;
             if (character.BaseInventory != null
-                && character.BaseInventory.Pages.ContainsKey((int)IdentityType.WeaponPage))
+                && character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
             {
-                IInventoryPage weaponPage = character.BaseInventory.Pages[(int)IdentityType.WeaponPage];
                 rightHand = weaponPage[(int)WeaponSlots.Righthand];
                 leftHand = weaponPage[(int)WeaponSlots.LeftHand];
             }
 
             bool rightHandUsable = this.IsWieldableCombatWeapon(rightHand);
             bool leftHandUsable = this.IsWieldableCombatWeapon(leftHand);
+
+            if (!rightHandUsable && !leftHandUsable && c is NpcCharacter && weaponPage != null)
+            {
+                IItem defaultWeapon = NpcCharacter.TryCreateDefaultWeaponItem();
+                if (defaultWeapon != null
+                    && weaponPage.Add((int)WeaponSlots.Righthand, defaultWeapon) == InventoryError.OK)
+                {
+                    rightHand = defaultWeapon;
+                    rightHandUsable = this.IsWieldableCombatWeapon(rightHand);
+                }
+            }
 
             if (rightHandUsable)
             {
@@ -1768,6 +1765,20 @@ namespace AORebirth.Core.Playfields
                 c.SetWeapon(WeaponSlot.MainHand, unarmed);
             }
 
+            if (PetCombatRules.IsPlayerOwnedPet(character)
+                && !PetCombatRules.IsPlayerOwnedHealingPet(character))
+            {
+                foreach (CharacterWeapon weapon in c.Weapons.Values)
+                {
+                    if (weapon != null)
+                    {
+                        weapon.ConfigureSpeeds(
+                            CharacterWeapon.DefaultAttackSpeedSeconds,
+                            PetCombatRules.AttackPetRechargeSeconds);
+                    }
+                }
+            }
+
             c.ResetAllWeaponAttacks();
         }
 
@@ -1785,92 +1796,6 @@ namespace AORebirth.Core.Playfields
             }
 
             return Math.Max(0.05, normalized / 100.0);
-        }
-
-        /// <summary>
-        /// Applies a capture-backed secondary special (FlingShot / Burst / Brawl / Dimach):
-        /// rolls weapon/unarmed damage, subtracts HP, handles kill.
-        /// Caller sends SpecialAttackInfo / SpecialUsed packets.
-        /// Capture 20260724-001643: Brawl/Dimach use EquipSlot=0 AmmoCount=-1 when unarmed.
-        /// </summary>
-        public bool TryApplyPlayerSpecialAttack(
-            ICharacter attacker,
-            ICharacter target,
-            int specialStatId,
-            out int damage,
-            out int ammoCount,
-            out int equipSlot)
-        {
-            damage = 0;
-            ammoCount = 0;
-            equipSlot = (int)WeaponSlots.Righthand;
-
-            if (attacker == null || target == null || !PlayerSpecialAttackRules.IsSupportedSpecial(specialStatId))
-            {
-                return false;
-            }
-
-            string missionSpatialFailure;
-            if (!MissionAcgSpatialRuntime.TryValidateCombatPair(
-                attacker,
-                target,
-                out missionSpatialFailure))
-            {
-                return false;
-            }
-
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker, WeaponSlot.MainHand);
-            if (attackSource == null)
-            {
-                return false;
-            }
-
-            double attackRange = attackSource.Range > 0.0 ? attackSource.Range : MaxMeleeCombatDistance;
-            double distance = attacker.Coordinates().Distance3D(target.Coordinates());
-            if (distance > attackRange + 1.5)
-            {
-                return false;
-            }
-
-            // Capture Brawl/Dimach: EquipSlot=0 AmmoCount=-1 (unarmed). Do not coerce slot 0 → Righthand.
-            equipSlot = attackSource.AttackInfoWeaponSlot;
-            ammoCount = attackSource.AttackInfoAmmoCount;
-
-            int hitCount = PlayerSpecialAttackRules.ResolveHitCount(specialStatId);
-            int damageScale = PlayerSpecialAttackRules.ResolveDamageScale(specialStatId);
-            int totalDamage = 0;
-            for (int i = 0; i < hitCount; i++)
-            {
-                totalDamage += this.CalculateCombatDamage(attacker, attackSource);
-            }
-
-            damage = Math.Max(1, totalDamage * Math.Max(1, damageScale));
-            int currentHealth = target.Stats[StatIds.health].Value;
-            int newHealth = Math.Max(0, currentHealth - damage);
-            bool killingHit = newHealth == 0;
-
-            target.Stats[StatIds.health].Value = newHealth;
-            MissionAcgOperationalRuntime.NotifyHealthChanged(target, newHealth);
-            this.runtimeSystems.SendChangedStats(target, SendChangedStats);
-
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    "SpecialAttack hit attacker={0} target={1} special={2} damage={3} health={4}/{5} hits={6}",
-                    attacker.Identity,
-                    target.Identity,
-                    specialStatId,
-                    damage,
-                    newHealth,
-                    target.Stats[StatIds.life].Value,
-                    hitCount));
-
-            if (killingHit)
-            {
-                this.HandleCombatKillingHit(attacker, target);
-            }
-
-            return true;
         }
 
         private void ResetPlayerCombatTick(Identity attacker)
@@ -2093,140 +2018,6 @@ namespace AORebirth.Core.Playfields
                     character.Identity));
         }
 
-        private void ProcessValidatedPlayerCombatTick(
-            ICharacter attacker,
-            ICharacter target,
-            WeaponSlot preferredSlot)
-        {
-            string missionSpatialFailure;
-            if (!MissionAcgSpatialRuntime.TryValidateCombatPair(
-                attacker,
-                target,
-                out missionSpatialFailure))
-            {
-                this.CancelPlayerAttack(attacker);
-                return;
-            }
-
-            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker, preferredSlot);
-            if (attackSource == null)
-            {
-                return;
-            }
-
-            // Soft weapon range gate (Mike D2: hits from across PF). Grace for coord lag;
-            // far beyond weapon range cancels auto-attack. Attack-start also checks range.
-            double attackRange = attackSource.Range > 0.0 ? attackSource.Range : MaxMeleeCombatDistance;
-            double distance = attacker.Coordinates().Distance3D(target.Coordinates());
-            if (distance > attackRange * 3.0)
-            {
-                this.CancelPlayerAttack(attacker);
-                return;
-            }
-
-            if (distance > attackRange + 1.5)
-            {
-                // Out of soft range: skip this swing; CharacterWeapon recharge will retry.
-                return;
-            }
-
-            int currentHealth = target.Stats[StatIds.health].Value;
-            DamageCalculationResult damageResult = this.CalculateCombatDamageDetailed(attacker, attackSource);
-            int damage = damageResult.FinalTargetDamage;
-            int newHealth = Math.Max(0, currentHealth - damage);
-            bool killingHit = newHealth == 0;
-
-            this.AnnounceCombatDamage(
-                attacker,
-                target,
-                damage,
-                attackSource,
-                attackSource.UsesEquippedWeapon
-                    ? CombatDamageSource.WeaponAutoAttack
-                    : CombatDamageSource.UnarmedAutoAttack);
-            target.Stats[StatIds.health].Value = newHealth;
-            MissionAcgOperationalRuntime.NotifyHealthChanged(target, newHealth);
-            this.runtimeSystems.SendChangedStats(target, SendChangedStats);
-            LogUtil.Debug(
-                DebugInfoDetail.Network,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Combat hit attacker={0} target={1} damage={2} health={3}/{4} weaponBased={5} slot={6} cycleSeconds={7:0.00} range={8:0.00}",
-                    attacker.Identity,
-                    target.Identity,
-                    damage,
-                    newHealth,
-                    target.Stats[StatIds.life].Value,
-                    attackSource.UsesEquippedWeapon ? 1 : 0,
-                    attackSource.AttackInfoWeaponSlot,
-                    attackSource.RechargeSeconds,
-                    attackSource.Range));
-            if (damageResult != null)
-            {
-                this.TryWriteWeaponDamageEvidence(
-                    attacker,
-                    target,
-                    attackSource,
-                    damageResult,
-                    currentHealth,
-                    newHealth);
-            }
-
-            if (killingHit)
-            {
-                this.HandleCombatKillingHit(attacker, target);
-                return;
-            }
-
-            if (target.Controller is NPCController)
-            {
-                this.AcquireNpcAggro(attacker, target);
-                this.SuspendNpcRegen(target);
-            }
-        }
-
-        private ICharacter FindPlayerCombatTarget(Identity target)
-        {
-            return this.FindByIdentity<ICharacter>(target);
-        }
-
-        private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)
-        {
-            return target != null
-                   && target.InPlayfield(this.Identity)
-                   && target.Stats[StatIds.health].Value > 0
-                   && PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(attacker, target);
-        }
-
-        private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)
-        {
-            LogUtil.Debug(
-                DebugInfoDetail.Error,
-                string.Format(
-                    "CombatTickTargetInvalid attacker={0} target={1} found={2} inPlayfield={3} health={4}",
-                    attacker.Identity,
-                    attacker.FightingTarget,
-                    target != null,
-                    target != null && target.InPlayfield(this.Identity),
-                    target == null ? 0 : target.Stats[StatIds.health].Value));
-        }
-
-        private int CalculateCombatDamage(ICharacter attacker, CombatAttackSource attackSource)
-        {
-            return this.CalculateCombatDamageDetailed(attacker, attackSource).FinalTargetDamage;
-        }
-
-        private DamageCalculationResult CalculateCombatDamageDetailed(ICharacter attacker, CombatAttackSource attackSource)
-        {
-            return CombatDamageRules.CalculateDetailed(
-                attackSource.MinDamage,
-                attackSource.MaxDamage,
-                attackSource.DamageBonus,
-                attacker.Stats[StatIds.level].Value,
-                attacker.Controller is PlayerController,
-                null);
-        }
-
         internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)
         {
             return this.runtimeSystems.IsInNpcCombatRange(attacker, target, range);
@@ -2426,88 +2217,6 @@ namespace AORebirth.Core.Playfields
                        AttackInfoHitType = NormalAttackInfoHitType,
                        AttackInfoWeaponInstance = 0
                     };
-        }
-
-        private void TryWriteWeaponDamageEvidence(
-            ICharacter attacker,
-            ICharacter target,
-            CombatAttackSource attackSource,
-            DamageCalculationResult damageResult,
-            int targetHealthBefore,
-            int targetHealthAfter)
-        {
-            string sessionId = Environment.GetEnvironmentVariable("AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_SESSION");
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                return;
-            }
-
-            if (attacker == null || target == null || attackSource == null)
-            {
-                return;
-            }
-
-            if (!attackSource.UsesEquippedWeapon)
-            {
-                return;
-            }
-
-            string evidenceDirectory = Environment.GetEnvironmentVariable("AO_REBIRTH_WEAPON_DAMAGE_EVIDENCE_DIR");
-            if (string.IsNullOrEmpty(evidenceDirectory))
-            {
-                evidenceDirectory = Path.Combine(".local", "weapon-damage-evidence", sessionId);
-            }
-
-            try
-            {
-                string rawDirectory = Path.Combine(evidenceDirectory, "raw");
-                Directory.CreateDirectory(rawDirectory);
-                string targetArmorField = "null";
-                DamageType mappedDamageType;
-                if (TryMapRawDamageType(attackSource.RawDamageType, out mappedDamageType))
-                {
-                    int armorStatId;
-                    if (DamageCalculator.TryGetArmorStatForDamageType(mappedDamageType, out armorStatId))
-                    {
-                        int? targetArmor = TryGetStatValue(target, armorStatId);
-                        targetArmorField = targetArmor.HasValue ? targetArmor.Value.ToString(CultureInfo.InvariantCulture) : "null";
-                    }
-                }
-
-                string line = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{{\"schemaVersion\":\"1.0\",\"sessionId\":\"{0}\",\"timestampUtc\":\"{1:O}\",\"sourceKind\":\"PrivateServerControlled\",\"eventKind\":\"ordinary-weapon-hit\",\"attackerIdentity\":\"{2}\",\"targetIdentity\":\"{3}\",\"weaponTemplateIdentity\":\"{4}\",\"weaponHighId\":{5},\"weaponQualityLevel\":{6},\"weaponMinimum\":{7},\"weaponMaximum\":{8},\"legacyDamageBonus\":{9},\"rawDamageType\":{10},\"mappedDamageType\":\"{11}\",\"attackSkillDefinitions\":\"{12}\",\"attackSkillValues\":\"{13}\",\"effectiveAttackRating\":{14},\"addAllOff\":{15},\"targetMatchingArmor\":{16},\"hitKind\":\"{17}\",\"attackInfoHitType\":{18},\"baseRoll\":{19},\"selectedProductionStrategy\":\"{20}\",\"observedDamage\":{21},\"targetHealthBefore\":{22},\"targetHealthAfter\":{23},\"multipleDamageSourcesPossible\":false,\"externalDamagePossible\":false,\"packetOrderComplete\":true,\"criticalStateEvidencePresent\":true,\"evidenceReference\":\"ZoneEngine weapon-damage evidence log\"}}",
-                    JsonEscape(sessionId),
-                    DateTime.UtcNow,
-                    JsonEscape(attacker.Identity.ToString(true)),
-                    JsonEscape(target.Identity.ToString(true)),
-                    JsonEscape(attackSource.WeaponLowId.ToString(CultureInfo.InvariantCulture)),
-                    attackSource.WeaponHighId,
-                    attackSource.WeaponQualityLevel,
-                    attackSource.MinDamage,
-                    attackSource.MaxDamage,
-                    attackSource.DamageBonus,
-                    attackSource.RawDamageType,
-                    JsonEscape(mappedDamageType.ToString()),
-                    JsonEscape(attackSource.AttackSkillDefinitions),
-                    JsonEscape(attackSource.AttackSkillValues),
-                    NullableIntJson(attackSource.EffectiveAttackRating),
-                    NullableIntJson(attackSource.AddAllOff),
-                    targetArmorField,
-                    attackSource.AttackInfoHitType == NormalAttackInfoHitType ? "KnownNormal" : "UnknownHitKind",
-                    attackSource.AttackInfoHitType,
-                    damageResult.BaseRoll,
-                    JsonEscape(damageResult.Strategy.ToString()),
-                    damageResult.FinalTargetDamage,
-                    targetHealthBefore,
-                    targetHealthAfter);
-
-                File.AppendAllText(Path.Combine(rawDirectory, "server-weapon-damage-events.jsonl"), line + Environment.NewLine);
-            }
-            catch (Exception exception)
-            {
-                LogUtil.Debug(DebugInfoDetail.Error, "WeaponDamageEvidenceLog failed: " + exception.Message);
-            }
         }
 
         private static string GetAttackSkillDefinitions(IItem weapon)

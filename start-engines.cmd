@@ -15,7 +15,7 @@ if not "%PREFLIGHT_EXIT%"=="0" (
     exit /b %PREFLIGHT_EXIT%
 )
 
-powershell -NoProfile -File "%~dp0start-engines.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1"
 set "START_EXIT=%ERRORLEVEL%"
 popd >nul
 exit /b %START_EXIT%

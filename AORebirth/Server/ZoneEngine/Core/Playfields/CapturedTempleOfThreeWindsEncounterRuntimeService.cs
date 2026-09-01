@@ -1684,7 +1684,7 @@ namespace AORebirth.Core.Playfields
                 Instance = instance
             };
             var controller = new NPCController();
-            var character = new Character(this.playfield.Identity, identity, controller);
+            var character = new NpcCharacter(this.playfield.Identity, identity, controller);
             character.Read();
             controller.Character = character;
             character.Playfield = this.playfield;

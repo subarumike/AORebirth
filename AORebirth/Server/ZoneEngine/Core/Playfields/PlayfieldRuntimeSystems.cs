@@ -109,6 +109,7 @@ namespace ZoneEngine.Core.Playfields
         internal PlayfieldRuntimeSystems(
             Playfield playfield,
             Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry,
             Func<Identity, bool> isPrivateCityPlayfieldCandidate,
             Func<int, bool> isCapturedMontroyalPrivateCityInstance,
             Func<ICharacter, int> resolveCharacterOrganizationInstance,
@@ -118,6 +119,11 @@ namespace ZoneEngine.Core.Playfields
             if (playfield == null)
             {
                 throw new ArgumentNullException("playfield");
+            }
+
+            if (dynelRegistry == null)
+            {
+                throw new ArgumentNullException("dynelRegistry");
             }
 
             this.playfield = playfield;
@@ -145,7 +151,7 @@ namespace ZoneEngine.Core.Playfields
             this.aotomationDelivery = new PlayfieldAOtomationDeliveryRuntimeService();
             this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();
             this.characterHeartbeat = new PlayfieldCharacterHeartbeatRuntimeService();
-            this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
+            this.dynelRegistry = dynelRegistry;
             this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.objectMaterialization = new PlayfieldObjectMaterializationRuntimeService();
