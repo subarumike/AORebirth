@@ -380,17 +380,32 @@ verify_unit_static() { [[ "${test_mode}" == "1" ]] || systemd-analyze verify "${
 
 environment_value()
 {
-    local environment_file="$1" key="$2" line
-    line="$(grep -m 1 "^${key}=" "${environment_file}")" \
-        || fail "${key} is unavailable in ${environment_file}"
+    local environment_file="$1" key="$2" count line
+    count="$(grep -Ec "^[[:space:]]*${key}[[:space:]]*=" "${environment_file}" || true)"
+    [[ "${count}" == "1" ]] \
+        || fail "${key} is missing or duplicated in ${environment_file}"
+    line="$(grep -E "^[[:space:]]*${key}[[:space:]]*=" "${environment_file}")"
+    [[ "${line}" == "${key}="* ]] \
+        || fail "${key} must use canonical KEY=value formatting in ${environment_file}"
     [[ -n "${line#*=}" ]] || fail "${key} is empty in ${environment_file}"
     printf '%s' "${line#*=}"
 }
 
 validate_candidate_database_contract()
 {
+    local login_config_path zone_config_path
+    login_config_path="$(environment_value "${LOGIN_ENV}" AO_REBIRTH_CONFIG_PATH)"
+    zone_config_path="$(environment_value "${ZONE_ENV}" AO_REBIRTH_CONFIG_PATH)"
+    [[ "${login_config_path}" == "${LOGIN_CONFIG}" ]] \
+        || fail "candidate LoginEngine configuration path diverges from the governed production path"
+    [[ "${zone_config_path}" == "${ZONE_CONFIG}" ]] \
+        || fail "candidate ZoneEngine configuration path diverges from the governed production path"
+    require_regular_file "${login_config_path}"
+    require_regular_file "${zone_config_path}"
     if [[ "${test_mode}" == "1" ]]; then
         local fixture_validation
+        printf '%s\n' "${login_config_path}" > "${TEST_STATE}/candidate-login-config"
+        printf '%s\n' "${zone_config_path}" > "${TEST_STATE}/candidate-zone-config"
         fixture_validation="$(cat "${TEST_STATE}/candidate-validation")"
         if [[ "${fixture_validation}" == PASS_RESTART_ZONE ]]; then
             local fixture_restarts
@@ -414,7 +429,7 @@ validate_candidate_database_contract()
         AO_REBIRTH_REQUIRED_SQL_TYPE=MySql \
         AO_REBIRTH_EXPECTED_DATABASE="${EXPECTED_DATABASE}" \
         AO_REBIRTH_BIND_MODE=Public \
-        AO_REBIRTH_CONFIG_PATH="${LOGIN_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_CONFIG_PATH="${login_config_path}" \
         AO_REBIRTH_MYSQL_CONNECTION="${login_connection}" \
         "${LOGIN_ARTIFACT_DIR}/LoginEngine" --validate-startup >/dev/null; then
         fail "candidate LoginEngine startup contract validation failed"
@@ -423,7 +438,7 @@ validate_candidate_database_contract()
         AO_REBIRTH_REQUIRED_SQL_TYPE=MySql \
         AO_REBIRTH_EXPECTED_DATABASE="${EXPECTED_DATABASE}" \
         AO_REBIRTH_BIND_MODE=Public \
-        AO_REBIRTH_CONFIG_PATH="${LOGIN_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_CONFIG_PATH="${login_config_path}" \
         AO_REBIRTH_MYSQL_CONNECTION="${login_connection}" \
         "${LOGIN_ARTIFACT_DIR}/LoginEngine" --validate-database >/dev/null; then
         fail "candidate LoginEngine database contract validation failed"
@@ -435,7 +450,7 @@ validate_candidate_database_contract()
         AO_REBIRTH_STAGE10_PUBLIC_PLAYER_ACCESS=1 \
         AO_REBIRTH_ZONE_LISTEN_IP=0.0.0.0 \
         AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1 \
-        AO_REBIRTH_CONFIG_PATH="${ZONE_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_CONFIG_PATH="${zone_config_path}" \
         AO_REBIRTH_MYSQL_CONNECTION="${zone_connection}" \
         "${ZONE_ARTIFACT_DIR}/ZoneEngine" --validate-startup >/dev/null; then
         fail "candidate ZoneEngine startup contract validation failed"
@@ -447,7 +462,7 @@ validate_candidate_database_contract()
         AO_REBIRTH_STAGE10_PUBLIC_PLAYER_ACCESS=1 \
         AO_REBIRTH_ZONE_LISTEN_IP=0.0.0.0 \
         AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1 \
-        AO_REBIRTH_CONFIG_PATH="${ZONE_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_CONFIG_PATH="${zone_config_path}" \
         AO_REBIRTH_MYSQL_CONNECTION="${zone_connection}" \
         "${ZONE_ARTIFACT_DIR}/ZoneEngine" --validate-database >/dev/null; then
         fail "candidate ZoneEngine database contract validation failed"
@@ -588,6 +603,7 @@ require_rollback_material()
     require_regular_file "${LOGIN_ENV}"
     require_regular_file "${ZONE_ENV}"
     require_regular_file "${LOGIN_CONFIG}"
+    require_regular_file "${ZONE_CONFIG}"
     PREVIOUS_LOGIN_ARTIFACT_SHA256="$(sha256sum "${PREVIOUS_LOGIN_RELEASE}/LoginEngine" | awk '{print $1}')"
     PREVIOUS_ZONE_ARTIFACT_SHA256="$(sha256sum "${PREVIOUS_ZONE_RELEASE}/ZoneEngine" | awk '{print $1}')"
     PREVIOUS_LOGIN_UNIT_SHA256="$(sha256sum "${LOGIN_UNIT_TARGET}" | awk '{print $1}')"

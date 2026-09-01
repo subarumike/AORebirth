@@ -19,6 +19,15 @@ disconnect or invented drain path. LoginEngine stops first so it cannot accept a
 new session; ZoneEngine then stops. Startup is LoginEngine followed by ZoneEngine,
 matching the ZoneEngine systemd dependency.
 
+Before validation, each root-controlled environment file must contain exactly one
+`AO_REBIRTH_CONFIG_PATH` assignment. LoginEngine must name
+`/etc/ao-rebirth/loginengine/Config.xml`, and ZoneEngine must name
+`/etc/ao-rebirth/zoneengine/Config.xml`. Candidate validation uses those preserved
+external configurations because they are the configurations systemd will use in
+production; the portable artifact configurations intentionally remain loopback
+safe. Missing, duplicate, or divergent assignments fail before service or release
+mutation.
+
 Run non-mutating validation first:
 
 ```bash

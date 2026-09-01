@@ -143,10 +143,10 @@ create_fixture()
     prior_zone_release="$(realpath -e -- "${root}/opt/ao-rebirth/zoneengine/current")"
     printf 'old login unit\n' > "${root}/etc/systemd/system/ao-rebirth-loginengine.service"
     printf 'old zone unit\n' > "${root}/etc/systemd/system/ao-rebirth-zoneengine.service"
-    printf 'environment\n' > "${root}/etc/ao-rebirth/loginengine/loginengine.env"
-    printf 'environment\n' > "${root}/etc/ao-rebirth/zoneengine/zoneengine.env"
-    printf '<Config />\n' > "${root}/etc/ao-rebirth/loginengine/Config.xml"
-    printf '<Config />\n' > "${root}/etc/ao-rebirth/zoneengine/Config.xml"
+    printf 'AO_REBIRTH_CONFIG_PATH=%s\n' "${root}/etc/ao-rebirth/loginengine/Config.xml" > "${root}/etc/ao-rebirth/loginengine/loginengine.env"
+    printf 'AO_REBIRTH_CONFIG_PATH=%s\n' "${root}/etc/ao-rebirth/zoneengine/Config.xml" > "${root}/etc/ao-rebirth/zoneengine/zoneengine.env"
+    printf '<Config><ZoneIP>2.24.96.30</ZoneIP></Config>\n' > "${root}/etc/ao-rebirth/loginengine/Config.xml"
+    printf '<Config><ZoneIP>2.24.96.30</ZoneIP></Config>\n' > "${root}/etc/ao-rebirth/zoneengine/Config.xml"
     printf 'active\n' > "${state}/login.active"; printf 'active\n' > "${state}/zone.active"
     printf '0\n' > "${state}/login.restarts"; printf '0\n' > "${state}/zone.restarts"
     printf '0\n' > "${state}/login.starts"; printf '0\n' > "${state}/zone.starts"; printf '0\n' > "${state}/online"
@@ -161,6 +161,8 @@ create_fixture()
     printf '0\n' > "${state}/login.listener-checks"; printf '0\n' > "${state}/zone.listener-checks"
     create_artifact "${input}/login" LoginEngine
     create_artifact "${input}/zone" ZoneEngine
+    printf '<Config><ZoneIP>127.0.0.1</ZoneIP></Config>\n' > "${input}/login/Config.xml"
+    printf '<Config><ZoneIP>127.0.0.1</ZoneIP></Config>\n' > "${input}/zone/Config.xml"
     cp -- "${login_unit_source}" "${input}/login.service"
     cp -- "${zone_unit_source}" "${input}/zone.service"
     manifest="${input}/release.manifest"
@@ -313,9 +315,23 @@ behavior_hash_before="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngi
     "${repository_root}/AORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs" \
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 
+login_config_uses="$(grep -Fc 'AO_REBIRTH_CONFIG_PATH="${login_config_path}"' "${upgrader}" || true)"
+zone_config_uses="$(grep -Fc 'AO_REBIRTH_CONFIG_PATH="${zone_config_path}"' "${upgrader}" || true)"
+require test "${login_config_uses}" = 2
+require test "${zone_config_uses}" = 2
+if grep -F 'AO_REBIRTH_CONFIG_PATH="${LOGIN_ARTIFACT_DIR}/Config.xml"' "${upgrader}" >/dev/null; then
+    fail "candidate LoginEngine validation reverted to the portable artifact config"
+fi
+if grep -F 'AO_REBIRTH_CONFIG_PATH="${ZONE_ARTIFACT_DIR}/Config.xml"' "${upgrader}" >/dev/null; then
+    fail "candidate ZoneEngine validation reverted to a config that may differ from production"
+fi
+tests_run=$((tests_run + 1))
+
 create_fixture; expect_preflight_failure "${other_sha}"
 create_fixture; set_manifest_value "${manifest}" LOGINENGINE_ARTIFACT_SHA256 "$(printf bad | sha256sum | awk '{print $1}')"; expect_preflight_failure
 create_fixture; set_manifest_value "${manifest}" ZONEENGINE_ARTIFACT_SHA256 "$(printf bad | sha256sum | awk '{print $1}')"; expect_preflight_failure
+create_fixture; printf 'AO_REBIRTH_CONFIG_PATH=%s\n' "${input}/login/Config.xml" > "${root}/etc/ao-rebirth/loginengine/loginengine.env"; expect_preflight_failure; require grep -F 'candidate LoginEngine configuration path diverges from the governed production path' "${fixture}/output"
+create_fixture; printf 'AO_REBIRTH_CONFIG_PATH=%s\n AO_REBIRTH_CONFIG_PATH=%s\n' "${root}/etc/ao-rebirth/zoneengine/Config.xml" "${input}/zone/Config.xml" > "${root}/etc/ao-rebirth/zoneengine/zoneengine.env"; expect_preflight_failure; require grep -F 'AO_REBIRTH_CONFIG_PATH is missing or duplicated' "${fixture}/output"
 create_fixture; rm -f -- "${input}/zone/Content/Official/PlayfieldPlacements/official-placement-build-manifest.json"; expect_preflight_failure
 create_fixture; printf 'tampered\n' >> "${input}/zone/Content/Official/PlayfieldPlacements/official-placement-summary.json"; expect_preflight_failure
 create_fixture; set_manifest_value "${manifest}" PLACEMENT_BUILD_MANIFEST_SHA256 "$(printf bad | sha256sum | awk '{print $1}')"; expect_preflight_failure
@@ -369,6 +385,12 @@ env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_RO
 require grep -F 'ZONEENGINE_OUTAGE_RECOVERY_PRECONDITION=PASS' "${fixture}/output"
 require grep -F 'CANDIDATE_DATABASE_COMPATIBILITY=PASS' "${fixture}/output"
 require grep -F 'DRY_RUN=PASS' "${fixture}/output"
+require test "$(cat "${state}/candidate-login-config")" = "${root}/etc/ao-rebirth/loginengine/Config.xml"
+require test "$(cat "${state}/candidate-zone-config")" = "${root}/etc/ao-rebirth/zoneengine/Config.xml"
+require grep -F '<ZoneIP>2.24.96.30</ZoneIP>' "$(cat "${state}/candidate-login-config")"
+require grep -F '<ZoneIP>2.24.96.30</ZoneIP>' "$(cat "${state}/candidate-zone-config")"
+require grep -F '<ZoneIP>127.0.0.1</ZoneIP>' "${input}/login/Config.xml"
+require grep -F '<ZoneIP>127.0.0.1</ZoneIP>' "${input}/zone/Config.xml"
 assert_old_targets
 require test "$(cat "${state}/login.active")" = active
 require test "$(cat "${state}/zone.active")" = inactive
@@ -502,5 +524,5 @@ behavior_hash_after="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngin
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 require test "${behavior_hash_before}" = "${behavior_hash_after}"
 tests_run=$((tests_run + 1))
-require test "${tests_run}" = 38
-echo "PASS: production deployment workflow tests (38/38)"
+require test "${tests_run}" = 41
+echo "PASS: production deployment workflow tests (41/41)"

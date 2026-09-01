@@ -41,6 +41,14 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("ZoneEngine validation lifecycle cannot be production ExecStart"), "production upgrader does not reject the listener-free ZoneEngine validation runtime");
             Require(upgrader.Contains("--recover-zone-outage"), "production upgrader lacks explicit stopped-Zone recovery mode");
             Require(upgrader.Contains("CANDIDATE_DATABASE_COMPATIBILITY=PASS"), "production upgrader does not validate candidate binaries against the live schema");
+            Require(CountOccurrences(upgrader, "AO_REBIRTH_CONFIG_PATH=\"${login_config_path}\"") == 2, "candidate LoginEngine validation does not use the governed production config exactly twice");
+            Require(CountOccurrences(upgrader, "AO_REBIRTH_CONFIG_PATH=\"${zone_config_path}\"") == 2, "candidate ZoneEngine validation does not use the governed production config exactly twice");
+            Require(!upgrader.Contains("AO_REBIRTH_CONFIG_PATH=\"${LOGIN_ARTIFACT_DIR}/Config.xml\""), "candidate LoginEngine validation reverted to the portable loopback artifact config");
+            Require(!upgrader.Contains("AO_REBIRTH_CONFIG_PATH=\"${ZONE_ARTIFACT_DIR}/Config.xml\""), "candidate ZoneEngine validation reverted to a config that may differ from production");
+            Require(upgrader.Contains("is missing or duplicated in ${environment_file}"), "production environment parsing does not reject duplicate assignments");
+            Require(upgrader.Contains("^[[:space:]]*${key}[[:space:]]*="), "production environment parsing misses whitespace-prefixed systemd assignments");
+            Require(upgrader.Contains("must use canonical KEY=value formatting"), "production environment parsing does not require canonical assignments");
+            Require(upgrader.Contains("configuration path diverges from the governed production path"), "candidate validation does not bind runtime config paths to governed production paths");
             Require(upgrader.Contains("ZONEENGINE_OUTAGE_FROZEN=PASS"), "production upgrader does not prove the outage remains frozen");
             Require(upgrader.Contains("PRESTOP_BOUNDARY=PASS onlineCharacters=0"), "production upgrader does not recheck zero online characters before closing admission");
             Require(upgrader.Contains("LOGIN_ADMISSION_CLOSED_BOUNDARY=PASS onlineCharacters=0"), "production upgrader does not recheck zero online characters after LoginEngine closes admission");
@@ -74,7 +82,9 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(manifest.Contains("ZONEENGINE_UNIT_SHA256="), "release manifest lacks ZoneEngine unit hash");
             Require(manifest.Contains("repository HEAD does not match expected source SHA"), "manifest generator lost immutable SHA gate");
 
-            Require(tests.Contains("production deployment workflow tests (38/38)"), "deployment fixture suite count changed");
+            Require(tests.Contains("production deployment workflow tests (41/41)"), "deployment fixture suite count changed");
+            Require(tests.Contains("candidate LoginEngine configuration path diverges from the governed production path"), "deployment fixtures do not reject a divergent LoginEngine config path");
+            Require(tests.Contains("AO_REBIRTH_CONFIG_PATH is missing or duplicated"), "deployment fixtures do not reject duplicate config-path assignments");
             Require(tests.Contains("outage recovery accepted an active ZoneEngine"), "deployment fixtures do not reject misuse of outage recovery");
             Require(tests.Contains("outage recovery accepted a non-stopped ZoneEngine state"), "deployment fixtures do not require an exact stopped ZoneEngine state");
             Require(tests.Contains("outage recovery accepted an occupied ZoneEngine port"), "deployment fixtures do not reject a stale ZoneEngine listener");
@@ -120,6 +130,11 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
         private static void Require(bool condition, string message)
         {
             if (!condition) { throw new InvalidOperationException(message); }
+        }
+
+        private static int CountOccurrences(string source, string value)
+        {
+            return source.Split(new[] { value }, StringSplitOptions.None).Length - 1;
         }
     }
 }
