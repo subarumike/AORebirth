@@ -179,7 +179,7 @@ namespace AORebirth.Core.Combat
             maxDamage -= targetArmorClass / 10;
 
             bool isBurst = context.SpecialAttackStat.HasValue && context.SpecialAttackStat.Value == StatIds.burst;
-            int critIncrease = attacker.Stats[StatIds.criticalincrease].Value;
+            int critIncrease = attacker.Stats[StatIds.criticalincrease].Value; // TODO: Set base to 3 after new stat system is implemented.
             if (!isBurst && randomSource.NextInt(0, 100) < critIncrease)
             {
                 result.HitType = HitType.Critical;
