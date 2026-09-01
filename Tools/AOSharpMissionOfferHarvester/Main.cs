@@ -24,6 +24,7 @@ namespace AORebirth.MissionEvidence
         private JsonLineJournal _journal;
         private string _sessionId;
         private string _pendingRequestId;
+        private IDictionary<string, object> _pendingRollOrigin;
         private DateTime _pendingSinceUtc;
         private DateTime _nextRequestUtc;
         private int _characterLevel;
@@ -48,7 +49,7 @@ namespace AORebirth.MissionEvidence
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester loaded. Select a mission terminal, then use /missionharvest start <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester 1.2 loaded (roll origin + mission destination + type + rewards). Select a mission terminal, then use /missionharvest start <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
         }
 
         public override void Teardown()
@@ -149,7 +150,7 @@ namespace AORebirth.MissionEvidence
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Harvester active={0}; session={1}; level={2}; targetQL={3}; slot={4}; requests={5}/{6}; completeCohorts={7}; harvestedOffers={8}; pending={9}; stopReason={10}; output={11}",
+                    "Harvester active={0}; captureContract=2; session={1}; level={2}; targetQL={3}; slot={4}; requests={5}/{6}; completeCohorts={7}; harvestedOffers={8}; pending={9}; stopReason={10}; output={11}",
                     _active,
                     _sessionId,
                     _characterLevel,
@@ -187,6 +188,7 @@ namespace AORebirth.MissionEvidence
             _completedCohortCount = 0;
             _harvestedOfferCount = 0;
             _pendingRequestId = null;
+            _pendingRollOrigin = null;
             _lastCohortFingerprint = null;
             _lastCohortRequestId = null;
             _lastStopReason = null;
@@ -196,7 +198,7 @@ namespace AORebirth.MissionEvidence
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Mission evidence session started: {0}; level={1}; targetQL={2}; slot={3}; requests={4}; output={5}",
+                    "Mission evidence session started: {0}; captureContract=2; level={1}; targetQL={2}; slot={3}; requests={4}; output={5}",
                     _sessionId,
                     _characterLevel,
                     _targetMissionQl,
@@ -224,6 +226,7 @@ namespace AORebirth.MissionEvidence
             }
             _active = false;
             _pendingRequestId = null;
+            _pendingRollOrigin = null;
             _lastStopReason = reason;
             if (announce && hadActiveSession)
             {
@@ -286,6 +289,7 @@ namespace AORebirth.MissionEvidence
             _issuedRequestCount++;
             _pendingRequestId = string.Format("{0}/request/{1:D8}", _sessionId, _issuedRequestCount);
             _pendingSinceUtc = now;
+            _pendingRollOrigin = BuildRollOriginPayload("REQUEST_STARTED");
             _journal.Append("request_started", _sessionId, _pendingRequestId, new Dictionary<string, object>
             {
                 ["request_sequence"] = _issuedRequestCount,
@@ -295,6 +299,7 @@ namespace AORebirth.MissionEvidence
                 ["target_mission_ql_semantics"] = "exact_character_level_table_lookup_resolved_to_first_matching_difficulty_slot",
                 ["mission_ql_table_source"] = MissionQlResolver.SourceRepositoryPath,
                 ["mission_ql_table_sha256"] = MissionQlResolver.SourceSha256,
+                ["roll_origin"] = _pendingRollOrigin,
                 ["sliders"] = SliderPayload((byte)_difficultySlot, 255, 255, 255, 255, 255, 255)
             });
             _terminal.RequestMissions((byte)_difficultySlot, 255, 255, 255, 255, 255, 255);
@@ -361,17 +366,24 @@ namespace AORebirth.MissionEvidence
             _harvestedOfferCount +=
                 response.MissionDetails == null ? 0 : response.MissionDetails.Length;
             _pendingRequestId = null;
+            _pendingRollOrigin = null;
             _nextRequestUtc = DateTime.UtcNow.AddSeconds(_intervalSeconds);
         }
 
         private IDictionary<string, object> BuildCohortPayload(QuestAlternativeMessage response, out string fingerprint)
         {
             MissionInfo[] details = response.MissionDetails ?? new MissionInfo[0];
+            IDictionary<string, object> rollOrigin =
+                _pendingRollOrigin ?? BuildRollOriginPayload("UNMATCHED_RESPONSE_CURRENT_SNAPSHOT");
             var offers = new List<object>();
             for (int index = 0; index < details.Length; index++)
-                offers.Add(OfferPayload(details[index], index + 1));
+                offers.Add(OfferPayload(details[index], index + 1, rollOrigin));
             var envelope = new Dictionary<string, object>
             {
+                ["identity"] = IdentityPayload(response.Identity),
+                ["packet_type"] = (int)response.PacketType,
+                ["n3_message_type"] = (int)response.N3MessageType,
+                ["unknown"] = response.Unknown,
                 ["unknown1"] = response.Unknown1,
                 ["unknown2"] = response.Unknown2,
                 ["scope"] = (int)response.Scope,
@@ -380,6 +392,7 @@ namespace AORebirth.MissionEvidence
             var payload = new Dictionary<string, object>
             {
                 ["message_envelope"] = envelope,
+                ["roll_origin"] = rollOrigin,
                 ["sliders"] = SliderPayload(response.MissionSliders.Difficulty, response.MissionSliders.GoodBad, response.MissionSliders.OrderChaos, response.MissionSliders.OpenHidden, response.MissionSliders.PhysicalMystical, response.MissionSliders.HeadonStealth, response.MissionSliders.CreditsXp),
                 ["offers"] = offers
             };
@@ -407,6 +420,7 @@ namespace AORebirth.MissionEvidence
                 ["terminal_identity"] = IdentityPayload(_terminal.Identity),
                 ["terminal_playfield"] = IdentityPayload(Playfield.ModelIdentity),
                 ["terminal_coordinates"] = VectorPayload(terminalPosition),
+                ["roll_origin"] = BuildRollOriginPayload("SESSION_STARTED"),
                 ["difficulty_slot"] = _difficultySlot,
                 ["target_mission_ql"] = _targetMissionQl,
                 ["target_resolution"] = "EXACT_FIRST_MATCHING_SLOT",
@@ -423,11 +437,24 @@ namespace AORebirth.MissionEvidence
                 ["aosharp_expected_package_version"] = "1.0.106",
                 ["aosharp_observed_assembly_version"] = typeof(AOPluginEntry).Assembly.GetName().Version.ToString(),
                 ["harvester_version"] = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                ["capture_contract_version"] = 2,
+                ["mission_type_catalog_source"] = "docs/generated/missions/malis/mission-type-catalog.json",
+                ["aosharp_mission_info_public_fields_captured"] = new[]
+                {
+                    "Credits", "Description", "Location", "MissionIcon",
+                    "MissionIdentity", "MissionItemData", "Playfield",
+                    "RewardDescriptorVersion", "TerminalIdentity", "Title",
+                    "Unk1", "UnkChunk1", "UnkChunk2", "UnkChunk3",
+                    "UnkChunk4", "UnkChunk5", "UnkChunk6", "XpReward"
+                },
                 ["raw_event_format"] = "incremental_jsonl_flush_true"
             };
         }
 
-        private static IDictionary<string, object> OfferPayload(MissionInfo offer, int offerIndex)
+        private static IDictionary<string, object> OfferPayload(
+            MissionInfo offer,
+            int offerIndex,
+            IDictionary<string, object> rollOrigin)
         {
             var rewards = new List<object>();
             foreach (MissionItemReward reward in offer.MissionItemData ?? new MissionItemReward[0])
@@ -437,9 +464,18 @@ namespace AORebirth.MissionEvidence
                     ["low_id"] = reward.LowId,
                     ["high_id"] = reward.HighId,
                     ["ql"] = reward.Ql,
-                    ["unknown"] = reward.Unk
+                    ["unknown"] = reward.Unk,
+                    ["identity_semantics"] = reward.LowId == reward.HighId
+                        ? "EXACT_TEMPLATE_ID_AND_QL"
+                        : "LOW_HIGH_TEMPLATE_PAIR_AND_QL"
                 });
             }
+            IDictionary<string, object> destination = new Dictionary<string, object>
+            {
+                ["playfield_identity"] = IdentityPayload(offer.Playfield),
+                ["coordinates"] = VectorPayload(offer.Location),
+                ["availability"] = "DIRECT_AOSHARP_MISSIONINFO"
+            };
             return new Dictionary<string, object>
             {
                 ["offer_index"] = offerIndex,
@@ -451,9 +487,14 @@ namespace AORebirth.MissionEvidence
                 ["credits"] = offer.Credits,
                 ["xp_reward"] = offer.XpReward,
                 ["mission_items"] = rewards,
+                ["reward_items"] = rewards,
+                ["reward_item_count"] = rewards.Count,
                 ["mission_icon"] = offer.MissionIcon,
+                ["mission_type"] = MissionTypePayload(offer.MissionIcon),
                 ["playfield"] = IdentityPayload(offer.Playfield),
                 ["location"] = VectorPayload(offer.Location),
+                ["mission_destination"] = destination,
+                ["roll_origin"] = rollOrigin,
                 ["unknown_fields"] = new Dictionary<string, object>
                 {
                     ["Unk1"] = offer.Unk1,
@@ -475,6 +516,73 @@ namespace AORebirth.MissionEvidence
                     ["destination_entrance_identity"] = null,
                     ["faction_requirements"] = null
                 }
+            };
+        }
+
+        private IDictionary<string, object> BuildRollOriginPayload(string capturePhase)
+        {
+            LocalPlayer player = DynelManager.LocalPlayer;
+            return new Dictionary<string, object>
+            {
+                ["capture_phase"] = capturePhase,
+                ["captured_at_utc"] = DateTime.UtcNow.ToString("o"),
+                ["terminal_identity"] = _terminal == null ? null : IdentityPayload(_terminal.Identity),
+                ["terminal_name"] = _terminal == null ? null : _terminal.Name,
+                ["terminal_playfield_identity"] = IdentityPayload(Playfield.ModelIdentity),
+                ["terminal_local_coordinates"] = _terminal == null ? null : VectorPayload(_terminal.Position),
+                ["terminal_global_coordinates"] = _terminal == null ? null : VectorPayload(_terminal.GlobalPosition),
+                ["terminal_rotation"] = _terminal == null ? null : QuaternionPayload(_terminal.Rotation),
+                ["terminal_is_valid"] = _terminal != null && _terminal.IsValid,
+                ["player_identity"] = player == null ? null : IdentityPayload(player.Identity),
+                ["player_playfield_identity"] = IdentityPayload(Playfield.ModelIdentity),
+                ["player_coordinates"] = player == null ? null : VectorPayload(player.Position),
+                ["provenance"] = "REQUEST_TIME_CLIENT_DYNEL_SNAPSHOT"
+            };
+        }
+
+        private static IDictionary<string, object> MissionTypePayload(int missionIcon)
+        {
+            string captureBackedType = null;
+            string malisDisplayName = null;
+            string clickSaverWireCode = null;
+            switch (missionIcon)
+            {
+                case 11329:
+                    captureBackedType = "FindItemReturn";
+                    malisDisplayName = "Return Item";
+                    clickSaverWireCode = "0x2C41";
+                    break;
+                case 11330:
+                    captureBackedType = "KillPerson";
+                    malisDisplayName = "Kill Target";
+                    clickSaverWireCode = "0x2C42";
+                    break;
+                case 11335:
+                    captureBackedType = "FindPerson";
+                    malisDisplayName = "Find Target";
+                    clickSaverWireCode = "0x2C47";
+                    break;
+                case 11337:
+                    captureBackedType = "FindItem";
+                    malisDisplayName = "Find Item";
+                    clickSaverWireCode = "0x2C49";
+                    break;
+                case 11342:
+                    captureBackedType = "RepairMachine";
+                    malisDisplayName = "Use Item";
+                    clickSaverWireCode = "0x2C4E";
+                    break;
+            }
+            return new Dictionary<string, object>
+            {
+                ["mission_icon"] = missionIcon,
+                ["capture_backed_type"] = captureBackedType,
+                ["malis_display_name"] = malisDisplayName,
+                ["clicksaver_wire_code"] = clickSaverWireCode,
+                ["classification_status"] = captureBackedType == null
+                    ? "UNKNOWN_ICON_RAW_VALUE_PRESERVED"
+                    : "CAPTURE_BACKED_EXACT_ICON_MAPPING",
+                ["catalog_source"] = "docs/generated/missions/malis/mission-type-catalog.json"
             };
         }
 
@@ -500,6 +608,17 @@ namespace AORebirth.MissionEvidence
         private static IDictionary<string, object> VectorPayload(Vector3 vector)
         {
             return new Dictionary<string, object> { ["x"] = vector.X, ["y"] = vector.Y, ["z"] = vector.Z };
+        }
+
+        private static IDictionary<string, object> QuaternionPayload(Quaternion quaternion)
+        {
+            return new Dictionary<string, object>
+            {
+                ["x"] = quaternion.X,
+                ["y"] = quaternion.Y,
+                ["z"] = quaternion.Z,
+                ["w"] = quaternion.W
+            };
         }
 
         private static object StatValue(Dynel dynel, string statName)

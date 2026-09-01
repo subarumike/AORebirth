@@ -53,7 +53,13 @@ completion matrices and dated evidence retain detailed provenance.
   not claimed optimal. The recommended 54-character roster is proven minimal
   when all 233 Helpbot-backed QLs must use a pinned Helpbot level/QL edge; only
   the 17 absent QLs use inferred high-level rows. Runtime mission generation
-  is unchanged. Plan: `docs/mission-harvest/mission-ql-1-250-plan.md`.
+  is unchanged. MissionHarvest capture-contract version 2 now correlates every
+  offer with its request-time terminal origin, preserves destination coordinates,
+  emits the five exact capture-backed mission-icon types, records reward-item
+  descriptors, and retains every public AOSharp `MissionInfo` field plus raw
+  unknown chunks. The normalizer keeps the new origin/destination structures and
+  accepts earlier schema-version-1 journals. Plan:
+  `docs/mission-harvest/mission-ql-1-250-plan.md`.
 
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted

@@ -25,7 +25,7 @@ namespace AORebirth.MissionEvidence
             var record = new Dictionary<string, object>
             {
                 ["event_type"] = eventType,
-                ["schema_version"] = 1,
+                ["schema_version"] = 2,
                 ["session_id"] = sessionId,
                 ["request_id"] = requestId,
                 ["timestamp_utc"] = DateTime.UtcNow.ToString("o"),

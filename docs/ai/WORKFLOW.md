@@ -423,6 +423,15 @@ MissionHarvest resolves the first exact matching slot for the current character
 level. It must send no request when the target is absent; nearest-QL substitution
 is forbidden.
 
+Harvester capture-contract version 2 records a request-time roll-origin snapshot
+on every request, cohort, and offer: terminal identity/name, terminal playfield,
+local/global coordinates, rotation, and player coordinates. Each offer separately
+records the destination playfield/coordinates, all AOSharp `MissionInfo` fields,
+reward item low/high IDs and QL, all raw unknown chunks, and the exact
+capture-backed mission type for known icons. Unknown icons remain unclassified
+with their numeric value preserved. The normalizer retains both the origin and
+destination and remains backward-compatible with schema-version-1 journals.
+
 ## Database-Wide Official Playfield Placement Import
 
 Import the verified official type-`1000014` placement corpus from the read-only

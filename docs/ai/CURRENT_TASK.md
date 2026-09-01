@@ -10,7 +10,11 @@ and reports completion plus output location. Mike owns AO client, plugin, and
 terminal interaction; Codex analyzes only completed session folders. Use
 `docs/mission-harvest/mission-ql-1-250-plan.md` as the literal runbook. Do not
 substitute a nearby QL, infer response-side mission QL from request metadata, or
-change AORebirth mission generation from static planning evidence.
+change AORebirth mission generation from static planning evidence. Harvester
+capture-contract version 2 must preserve the request-time terminal origin,
+mission destination, exact known icon type, reward-item descriptors, and every
+AOSharp-exposed offer field; a finite roll sample is never proof of pool
+exhaustion.
 
 ## Prior active checkpoint
 

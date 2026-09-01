@@ -58,6 +58,11 @@ access; level 201 is required by the current table for QL221.
 Output is written to
 `<AOSharp plugin local-data>\sessions\<session-id>\events.jsonl`.
 One request is one terminal refresh and normally records five offers.
+Harvester 1.2 records the request-time terminal identity/playfield/coordinates,
+mission destination playfield/coordinates, capture-backed mission type, reward
+item low/high IDs and QL, title, description, credits, XP, and raw unknown fields
+for every offer. Complete per-roll capture does not prove that a finite sample
+has exhausted AO's possible items, destinations, or probabilities.
 
 ## Complete QL-to-character rollability matrix
 

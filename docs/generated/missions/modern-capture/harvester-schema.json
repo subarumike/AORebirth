@@ -1,7 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "BackwardCompatibility": "schema 1 journals normalize with session-level roll-origin fallback when terminal location fields are present",
+  "CaptureContractV2": "request-time terminal origin, mission destination, capture-backed mission-icon type, reward-item descriptors, every public MissionInfo field, and every public QuestAlternativeMessage envelope field",
   "Durability": "one JSON object per line; append and Flush(true) after every event",
-  "SemanticBoundary": "target_mission_ql is a planner input; MissionInfo 1.0.106 does not expose server mission QL",
+  "SemanticBoundary": "schema 2 target_mission_ql is resolved to an exact character-level table slot at request time; MissionInfo 1.0.106 still does not expose a response-side mission QL",
   "additionalProperties": true,
   "properties": {
     "event_type": {
@@ -26,7 +28,10 @@
       ]
     },
     "schema_version": {
-      "const": 1
+      "enum": [
+        1,
+        2
+      ]
     },
     "session_id": {
       "type": "string"
