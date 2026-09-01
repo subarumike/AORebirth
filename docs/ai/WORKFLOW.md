@@ -428,9 +428,12 @@ on every request, cohort, and offer: terminal identity/name, terminal playfield,
 local/global coordinates, rotation, and player coordinates. Each offer separately
 records the destination playfield/coordinates, all AOSharp `MissionInfo` fields,
 reward item low/high IDs and QL, all raw unknown chunks, and the exact
-capture-backed mission type for known icons. Unknown icons remain unclassified
-with their numeric value preserved. The normalizer retains both the origin and
-destination and remains backward-compatible with schema-version-1 journals.
+capture-backed mission type for known icons. Known types also carry the five
+canonical Rubi-Ka labels: Find Item, Return Item, Repair, Find Person, and Kill
+Person; the original Malis label remains as provenance. Unknown icons remain
+unclassified with their numeric value preserved. The normalizer retains both
+the origin and destination and remains backward-compatible with schema-version-1
+journals.
 
 ## Database-Wide Official Playfield Placement Import
 

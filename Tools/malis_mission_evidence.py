@@ -635,18 +635,21 @@ def build_outputs(output_root: Path) -> None:
     main_window_source = source.read("MainWindow.cs").decode("utf-8-sig")
     icon_filters = parse_mission_icon_filters(main_window_source)
     type_mapping = {
-        "ReturnItem": ("Return Item", "FindItemReturn", "0x2C41"),
-        "KillTarget": ("Kill Target", "KillPerson", "0x2C42"),
-        "FindTarget": ("Find Target", "FindPerson", "0x2C47"),
-        "FindItem": ("Find Item", "FindItem", "0x2C49"),
-        "UseItem": ("Use Item", "RepairMachine", "0x2C4E"),
+        "ReturnItem": ("Return Item", "FindItemReturn", "RETURN_ITEM", "Return Item", "0x2C41"),
+        "KillTarget": ("Kill Target", "KillPerson", "KILL_PERSON", "Kill Person", "0x2C42"),
+        "FindTarget": ("Find Target", "FindPerson", "FIND_PERSON", "Find Person", "0x2C47"),
+        "FindItem": ("Find Item", "FindItem", "FIND_ITEM", "Find Item", "0x2C49"),
+        "UseItem": ("Use Item", "RepairMachine", "REPAIR", "Repair", "0x2C4E"),
     }
     mission_types = []
     for setting_name, icon in icon_filters:
-        display, aorebirth_type, clicksaver_code = type_mapping[setting_name]
+        display, aorebirth_type, canonical_type, canonical_display, clicksaver_code = type_mapping[setting_name]
         mission_types.append(
             {
                 "AORebirthCaptureBackedType": aorebirth_type,
+                "CanonicalMissionType": canonical_type,
+                "CanonicalDisplayName": canonical_display,
+                "CanonicalNameSource": "https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664",
                 "ClickSaverWireCode": clicksaver_code,
                 "MalisDisplayName": display,
                 "MalisFilterSetting": setting_name,

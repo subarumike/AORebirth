@@ -1,6 +1,9 @@
 [
   {
     "AORebirthCaptureBackedType": "FindItemReturn",
+    "CanonicalDisplayName": "Return Item",
+    "CanonicalMissionType": "RETURN_ITEM",
+    "CanonicalNameSource": "https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664",
     "ClickSaverWireCode": "0x2C41",
     "MalisDisplayName": "Return Item",
     "MalisFilterSetting": "ReturnItem",
@@ -9,6 +12,9 @@
   },
   {
     "AORebirthCaptureBackedType": "KillPerson",
+    "CanonicalDisplayName": "Kill Person",
+    "CanonicalMissionType": "KILL_PERSON",
+    "CanonicalNameSource": "https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664",
     "ClickSaverWireCode": "0x2C42",
     "MalisDisplayName": "Kill Target",
     "MalisFilterSetting": "KillTarget",
@@ -17,6 +23,9 @@
   },
   {
     "AORebirthCaptureBackedType": "FindPerson",
+    "CanonicalDisplayName": "Find Person",
+    "CanonicalMissionType": "FIND_PERSON",
+    "CanonicalNameSource": "https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664",
     "ClickSaverWireCode": "0x2C47",
     "MalisDisplayName": "Find Target",
     "MalisFilterSetting": "FindTarget",
@@ -25,6 +34,9 @@
   },
   {
     "AORebirthCaptureBackedType": "FindItem",
+    "CanonicalDisplayName": "Find Item",
+    "CanonicalMissionType": "FIND_ITEM",
+    "CanonicalNameSource": "https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664",
     "ClickSaverWireCode": "0x2C49",
     "MalisDisplayName": "Find Item",
     "MalisFilterSetting": "FindItem",
@@ -33,6 +45,9 @@
   },
   {
     "AORebirthCaptureBackedType": "RepairMachine",
+    "CanonicalDisplayName": "Repair",
+    "CanonicalMissionType": "REPAIR",
+    "CanonicalNameSource": "https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664",
     "ClickSaverWireCode": "0x2C4E",
     "MalisDisplayName": "Use Item",
     "MalisFilterSetting": "UseItem",
