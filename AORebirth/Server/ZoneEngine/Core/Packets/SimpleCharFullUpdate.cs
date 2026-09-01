@@ -1056,12 +1056,20 @@ namespace ZoneEngine.Core.Packets
         public static void SendToPlayfield(IZoneClient client)
         {
             SimpleCharFullUpdateMessage message = ConstructMessage(client);
+            ICharacter character = client.Controller.Character;
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
                 PlayfieldLifecycleTrace.StageJoiningCharacterSimpleCharFullUpdateBroadcast,
                 PlayfieldLifecycleTrace.MessageSimpleCharFullUpdate,
-                client.Controller.Character.Identity);
-            client.Controller.Character.Playfield.Announce(message);
+                character.Identity);
+
+            // The joining character is not guaranteed to be registered as its own visibility
+            // recipient yet. A playfield-only announcement therefore intermittently omitted the
+            // character's own SCFU during zone login, leaving the client unable to apply the
+            // following FullCharacter inventory and GM stats. Prime the joining client directly,
+            // then publish the same appearance update to every other visible player exactly once.
+            character.Send(message);
+            character.Playfield.AnnounceOthers(message, character.Identity);
         }
 
         #endregion
