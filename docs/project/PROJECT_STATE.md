@@ -43,6 +43,18 @@ completion matrices and dated evidence retain detailed provenance.
   logic remains unchanged. Evidence:
   `docs/evidence/MODERN_MISSION_CAPTURE_PLANNER_20260901.md`.
 
+- The live Rubi-Ka mission QL 1-250 harvest now has a generated, validated
+  exact-once assignment and literal command runbook. The AOSharp offer
+  harvester accepts a target QL, resolves the first exact difficulty slot for
+  the current character level, refuses unavailable targets without sending a
+  request, and reports completed cohorts, harvested offer count, stop reason,
+  and output path. Levels 2-220 cover every target. The minimum unrestricted
+  roster is bounded at 36-40 characters; 40 is the best valid witness and is
+  not claimed optimal. The recommended 54-character roster is proven minimal
+  when all 233 Helpbot-backed QLs must use a pinned Helpbot level/QL edge; only
+  the 17 absent QLs use inferred high-level rows. Runtime mission generation
+  is unchanged. Plan: `docs/mission-harvest/mission-ql-1-250-plan.md`.
+
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted
   source SHA `b1b17e6c43e25d3ce3115ca5c60a842dfe07dd19`. LoginEngine and ZoneEngine

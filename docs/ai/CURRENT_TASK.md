@@ -2,15 +2,15 @@
 
 ## Active
 
-Complete the PF620 Mercenary Camp wiki-loot supplement. AOWiki revision 45756
-resolves 24 local source items across 48 boss/item memberships. Ian Warr's 100%
-Breastplate of Azure Reveries, Nelly Johnson's 100% Little Black Dress, and Ris
-Lee's 100% Fancy Stethoscopic Glasses are active. Random Azure, Notum Tank,
-extra-item, and approximate-rate memberships remain inactive because per-item
-probabilities or duplicate behavior are not published. No PF620 specialized
-population exists, so the three active mappings remain dormant. Do not infer
-missing rates, selection weights, duplicate behavior, or spawn behavior from
-the wiki.
+Harvest one complete live Rubi-Ka mission-terminal offer cohort for every
+target QL 1-250. The generated plan assigns every target exactly once to an
+exact character-level/difficulty-slot pair and the AOSharp harvester now
+resolves target QL to the exact slot, fails closed when a target is unavailable,
+and reports completion plus output location. Mike owns AO client, plugin, and
+terminal interaction; Codex analyzes only completed session folders. Use
+`docs/mission-harvest/mission-ql-1-250-plan.md` as the literal runbook. Do not
+substitute a nearby QL, infer response-side mission QL from request metadata, or
+change AORebirth mission generation from static planning evidence.
 
 ## Prior active checkpoint
 

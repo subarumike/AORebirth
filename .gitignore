@@ -135,6 +135,7 @@ tools-temp/screen-captures/
 tools-temp/worktree-snapshots/
 tools-temp/AOSharpCaptureAnalyzer/snapshots/
 tools-temp/AOSharpCaptureAnalyzer/reviewed/
+tools-temp/AOSharpMissionOfferHarvesterBuild/
 tools-temp/db-backups/
 .local/
 /diagnostics/

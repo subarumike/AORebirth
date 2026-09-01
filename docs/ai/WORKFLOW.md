@@ -384,6 +384,45 @@ The upstream ODS is conflicting legacy provenance and its mission cells after
 level 133 were precision-coerced. Do not generate the complete graph from that
 ODS. Levels 150-220 remain outside the pinned Helpbot proof boundary.
 
+### Mission QL 1-250 Live Harvest Plan
+
+Regenerate the MissionHarvest plugin's compiled character-level/QL resolver
+after an intentional mission-level table change with:
+
+```cmd
+cmd /d /c Tools\generate_mission_harvester_ql_table.cmd
+```
+
+Build the evidence-only plugin with its exact retained AOSharp SDK through:
+
+```cmd
+cmd /d /c Tools\build_mission_offer_harvester.cmd
+```
+
+The build fails if the generated 220×11 resolver differs from the governed
+mission-level CSV. Codex must not inject or load the resulting DLL; Mike controls
+the AOSharp client/plugin lifecycle.
+
+Generate and validate the complete 250-QL assignment, rollability matrix, and
+literal in-game command runbook with:
+
+```cmd
+cmd /d /c Tools\generate_mission_ql_harvest_plan.cmd
+cmd /d /c Tools\generate_mission_ql_harvest_plan.cmd --check
+```
+
+The in-game command accepts a target QL directly:
+
+```text
+/missionharvest start <targetQL> <requestCount> [intervalSeconds]
+/missionharvest status
+/missionharvest stop
+```
+
+MissionHarvest resolves the first exact matching slot for the current character
+level. It must send no request when the target is absent; nearest-QL substitution
+is forbidden.
+
 ## Database-Wide Official Playfield Placement Import
 
 Import the verified official type-`1000014` placement corpus from the read-only
