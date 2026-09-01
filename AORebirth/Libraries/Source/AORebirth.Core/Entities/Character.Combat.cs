@@ -77,11 +77,11 @@ namespace AORebirth.Core.Entities
             int totalDamage = 0;
             StrikeOutcome lastOutcome = StrikeOutcome.RejectedInvalidTarget;
             CombatStrikeContext strikeContext = context;
-            if (specialStatId == StatIds.burst)
-            {
-                strikeContext = CloneContext(context);
-                strikeContext.SpecialAttackStat = null;
-            }
+            // if (specialStatId == StatIds.burst)
+            // {
+            //     strikeContext = CloneContext(context);
+            //     strikeContext.SpecialAttackStat = null;
+            // }
 
             for (int hitIndex = 0; hitIndex < hitCount; hitIndex++)
             {
