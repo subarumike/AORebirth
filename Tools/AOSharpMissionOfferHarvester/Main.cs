@@ -26,13 +26,18 @@ namespace AORebirth.MissionEvidence
         private string _pendingRequestId;
         private DateTime _pendingSinceUtc;
         private DateTime _nextRequestUtc;
+        private int _characterLevel;
         private int _difficultySlot;
         private int _targetMissionQl;
         private int _requestedRequestCount;
         private int _issuedRequestCount;
         private int _completedCohortCount;
+        private int _harvestedOfferCount;
         private double _intervalSeconds;
         private bool _active;
+        private string _sessionDirectory;
+        private string _sessionOutputPath;
+        private string _lastStopReason;
         private string _lastCohortFingerprint;
         private string _lastCohortRequestId;
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
@@ -43,12 +48,12 @@ namespace AORebirth.MissionEvidence
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester loaded. Select a mission terminal, then use /missionharvest start <slot 1-11> <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester loaded. Select a mission terminal, then use /missionharvest start <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
         }
 
         public override void Teardown()
         {
-            Stop("plugin_teardown");
+            Stop("plugin_teardown", false);
             Network.N3MessageReceived -= OnN3MessageReceived;
             Game.OnUpdate -= OnUpdate;
         }
@@ -57,29 +62,38 @@ namespace AORebirth.MissionEvidence
         {
             if (parameters.Length == 1 && string.Equals(parameters[0], "stop", StringComparison.OrdinalIgnoreCase))
             {
-                Stop("user_stop");
+                Stop("user_stop", true);
                 return;
             }
             if (parameters.Length == 1 && string.Equals(parameters[0], "status", StringComparison.OrdinalIgnoreCase))
             {
-                Chat.WriteLine(string.Format("Harvester active={0}, requests={1}/{2}, complete cohorts={3}, pending={4}", _active, _issuedRequestCount, _requestedRequestCount, _completedCohortCount, _pendingRequestId ?? "none"));
+                WriteStatus();
                 return;
             }
-            if (parameters.Length < 4 || !string.Equals(parameters[0], "start", StringComparison.OrdinalIgnoreCase))
+            if ((parameters.Length < 3 || parameters.Length > 4)
+                || !string.Equals(parameters[0], "start", StringComparison.OrdinalIgnoreCase))
             {
-                Chat.WriteLine("Usage: /missionharvest start <slot 1-11> <targetQL> <requests> [intervalSeconds] | stop | status");
+                WriteUsage();
                 return;
             }
-            int slot;
             int targetQl;
             int requestCount;
             double interval = DefaultIntervalSeconds;
-            if (!int.TryParse(parameters[1], out slot) || slot < 1 || slot > 11 ||
-                !int.TryParse(parameters[2], out targetQl) || targetQl < 1 || targetQl > 250 ||
-                !int.TryParse(parameters[3], out requestCount) || requestCount < 1 || requestCount > 100000 ||
-                (parameters.Length >= 5 && !double.TryParse(parameters[4], NumberStyles.Float, CultureInfo.InvariantCulture, out interval)))
+            if (!int.TryParse(parameters[1], out targetQl)
+                || targetQl < 1
+                || targetQl > 250
+                || !int.TryParse(parameters[2], out requestCount)
+                || requestCount < 1
+                || requestCount > 100000
+                || (parameters.Length == 4
+                    && !double.TryParse(
+                        parameters[3],
+                        NumberStyles.Float,
+                        CultureInfo.InvariantCulture,
+                        out interval)))
             {
                 Chat.WriteLine("Invalid start arguments.");
+                WriteUsage();
                 return;
             }
             if (interval < MinimumIntervalSeconds)
@@ -87,38 +101,114 @@ namespace AORebirth.MissionEvidence
                 Chat.WriteLine("Interval must be at least 1.5 seconds.");
                 return;
             }
+            if (_active)
+            {
+                Chat.WriteLine(
+                    "A mission evidence session is already active. Stop it before starting another target.",
+                    ChatColor.Red);
+                return;
+            }
             if (_terminal == null || !_terminal.IsValid)
             {
                 Chat.WriteLine("Select/use an ordinary mission terminal before starting.");
                 return;
             }
-            Start(slot, targetQl, requestCount, interval);
+            int characterLevel = DynelManager.LocalPlayer.GetStat(Stat.Level);
+            int slot;
+            if (!MissionQlResolver.TryResolveFirstSlot(
+                    characterLevel,
+                    targetQl,
+                    out slot))
+            {
+                Chat.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Target QL {0} is not exactly rollable by character level {1}; no request was sent.",
+                        targetQl,
+                        characterLevel),
+                    ChatColor.Red);
+                return;
+            }
+            Start(characterLevel, slot, targetQl, requestCount, interval);
         }
 
-        private void Start(int slot, int targetQl, int requestCount, double interval)
+        private static void WriteUsage()
         {
-            Stop("replaced_by_new_session");
+            Chat.WriteLine(
+                "Usage: /missionharvest start <targetQL 1-250> <requests 1-100000> [intervalSeconds] | stop | status");
+        }
+
+        private void WriteStatus()
+        {
+            if (string.IsNullOrEmpty(_sessionId))
+            {
+                Chat.WriteLine("Mission harvester has not started a session.");
+                return;
+            }
+
+            Chat.WriteLine(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Harvester active={0}; session={1}; level={2}; targetQL={3}; slot={4}; requests={5}/{6}; completeCohorts={7}; harvestedOffers={8}; pending={9}; stopReason={10}; output={11}",
+                    _active,
+                    _sessionId,
+                    _characterLevel,
+                    _targetMissionQl,
+                    _difficultySlot,
+                    _issuedRequestCount,
+                    _requestedRequestCount,
+                    _completedCohortCount,
+                    _harvestedOfferCount,
+                    _pendingRequestId ?? "none",
+                    _lastStopReason ?? "none",
+                    _sessionOutputPath ?? "unknown"));
+        }
+
+        private void Start(
+            int characterLevel,
+            int slot,
+            int targetQl,
+            int requestCount,
+            double interval)
+        {
+            if (_active || _journal != null)
+                Stop("replaced_by_new_session", true);
             string stamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmssfffZ");
             _sessionId = string.Format("mission-{0}-{1}-{2}", stamp, DynelManager.LocalPlayer.Identity.Instance, Guid.NewGuid().ToString("N").Substring(0, 8));
-            string sessionDirectory = System.IO.Path.Combine(PluginDataDirectory.FullName, "sessions", _sessionId);
-            _journal = new JsonLineJournal(System.IO.Path.Combine(sessionDirectory, "events.jsonl"));
+            _sessionDirectory = System.IO.Path.Combine(PluginDataDirectory.FullName, "sessions", _sessionId);
+            _sessionOutputPath = System.IO.Path.Combine(_sessionDirectory, "events.jsonl");
+            _journal = new JsonLineJournal(_sessionOutputPath);
+            _characterLevel = characterLevel;
             _difficultySlot = slot;
             _targetMissionQl = targetQl;
             _requestedRequestCount = requestCount;
             _intervalSeconds = interval;
             _issuedRequestCount = 0;
             _completedCohortCount = 0;
+            _harvestedOfferCount = 0;
             _pendingRequestId = null;
             _lastCohortFingerprint = null;
             _lastCohortRequestId = null;
+            _lastStopReason = null;
             _active = true;
             _nextRequestUtc = DateTime.UtcNow;
             _journal.Append("session_started", _sessionId, null, BuildSessionPayload());
-            Chat.WriteLine("Mission evidence session started: " + _sessionId, ChatColor.Gold);
+            Chat.WriteLine(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Mission evidence session started: {0}; level={1}; targetQL={2}; slot={3}; requests={4}; output={5}",
+                    _sessionId,
+                    _characterLevel,
+                    _targetMissionQl,
+                    _difficultySlot,
+                    _requestedRequestCount,
+                    _sessionOutputPath),
+                ChatColor.Gold);
         }
 
-        private void Stop(string reason)
+        private void Stop(string reason, bool announce)
         {
+            bool hadActiveSession = _active || _journal != null;
             if (_journal != null)
             {
                 _journal.Append("session_stopped", _sessionId, null, new Dictionary<string, object>
@@ -126,6 +216,7 @@ namespace AORebirth.MissionEvidence
                     ["reason"] = reason,
                     ["issued_request_count"] = _issuedRequestCount,
                     ["completed_cohort_count"] = _completedCohortCount,
+                    ["harvested_offer_count"] = _harvestedOfferCount,
                     ["pending_request_id"] = _pendingRequestId
                 });
                 _journal.Dispose();
@@ -133,6 +224,26 @@ namespace AORebirth.MissionEvidence
             }
             _active = false;
             _pendingRequestId = null;
+            _lastStopReason = reason;
+            if (announce && hadActiveSession)
+            {
+                Chat.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mission evidence session stopped: {0}; reason={1}; requests={2}/{3}; completeCohorts={4}; harvestedOffers={5}; output={6}",
+                        _sessionId,
+                        reason,
+                        _issuedRequestCount,
+                        _requestedRequestCount,
+                        _completedCohortCount,
+                        _harvestedOfferCount,
+                        _sessionOutputPath ?? "unknown"),
+                    ChatColor.Gold);
+            }
+            else if (announce)
+            {
+                Chat.WriteLine("No mission evidence session is active.");
+            }
         }
 
         private void OnUpdate(object sender, float deltaTime)
@@ -156,7 +267,7 @@ namespace AORebirth.MissionEvidence
             }
             if (_issuedRequestCount >= _requestedRequestCount)
             {
-                Stop("requested_count_completed");
+                Stop("requested_count_completed", true);
                 return;
             }
             if (now < _nextRequestUtc)
@@ -164,7 +275,7 @@ namespace AORebirth.MissionEvidence
             if (_terminal == null || !_terminal.IsValid)
             {
                 _journal.Append("error", _sessionId, null, new Dictionary<string, object> { ["code"] = "TERMINAL_NO_LONGER_VALID" });
-                Stop("terminal_invalid");
+                Stop("terminal_invalid", true);
                 return;
             }
             IssueRequest(now);
@@ -178,9 +289,12 @@ namespace AORebirth.MissionEvidence
             _journal.Append("request_started", _sessionId, _pendingRequestId, new Dictionary<string, object>
             {
                 ["request_sequence"] = _issuedRequestCount,
+                ["character_level"] = _characterLevel,
                 ["difficulty_slot"] = _difficultySlot,
                 ["target_mission_ql"] = _targetMissionQl,
-                ["target_mission_ql_semantics"] = "planner_input_not_direct_server_offer_field",
+                ["target_mission_ql_semantics"] = "exact_character_level_table_lookup_resolved_to_first_matching_difficulty_slot",
+                ["mission_ql_table_source"] = MissionQlResolver.SourceRepositoryPath,
+                ["mission_ql_table_sha256"] = MissionQlResolver.SourceSha256,
                 ["sliders"] = SliderPayload((byte)_difficultySlot, 255, 255, 255, 255, 255, 255)
             });
             _terminal.RequestMissions((byte)_difficultySlot, 255, 255, 255, 255, 255, 255);
@@ -244,6 +358,8 @@ namespace AORebirth.MissionEvidence
             _lastCohortFingerprint = fingerprint;
             _lastCohortRequestId = completedRequestId;
             _completedCohortCount++;
+            _harvestedOfferCount +=
+                response.MissionDetails == null ? 0 : response.MissionDetails.Length;
             _pendingRequestId = null;
             _nextRequestUtc = DateTime.UtcNow.AddSeconds(_intervalSeconds);
         }
@@ -293,10 +409,15 @@ namespace AORebirth.MissionEvidence
                 ["terminal_coordinates"] = VectorPayload(terminalPosition),
                 ["difficulty_slot"] = _difficultySlot,
                 ["target_mission_ql"] = _targetMissionQl,
+                ["target_resolution"] = "EXACT_FIRST_MATCHING_SLOT",
+                ["mission_ql_table_source"] = MissionQlResolver.SourceRepositoryPath,
+                ["mission_ql_table_sha256"] = MissionQlResolver.SourceSha256,
                 ["requested_request_count"] = _requestedRequestCount,
                 ["minimum_request_interval_seconds"] = MinimumIntervalSeconds,
                 ["configured_request_interval_seconds"] = _intervalSeconds,
                 ["one_outstanding_request_only"] = true,
+                ["session_output_directory"] = _sessionDirectory,
+                ["session_output_path"] = _sessionOutputPath,
                 ["client_version_label"] = null,
                 ["client_version_availability"] = "NOT_EXPOSED_BY_INSPECTED_AOSHARP_API",
                 ["aosharp_expected_package_version"] = "1.0.106",
