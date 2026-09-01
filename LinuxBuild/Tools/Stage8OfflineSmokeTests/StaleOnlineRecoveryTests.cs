@@ -280,7 +280,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 && stage6Integration.Contains("schema-active-nano-missing-column-accepted")
                 && stage6Integration.Contains("schema-active-nano-unsigned-drift-accepted")
                 && stage6Integration.Contains("schema-active-nano-null-default-drift-accepted")
-                && stage6Integration.Contains("schema-active-nano-index-contract"),
+                && stage6Integration.Contains("schema-active-nano-index-count-contract"),
                 "disposable MySQL active-nano schema regression coverage is incomplete");
         }
 
