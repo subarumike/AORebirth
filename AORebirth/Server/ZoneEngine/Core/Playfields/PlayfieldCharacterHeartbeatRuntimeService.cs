@@ -89,6 +89,39 @@ namespace ZoneEngine.Core.Playfields
 
             AmbientRestorationAuraRuntime.ProcessTick(dynel);
 
+            Character character = dynel as Character;
+            if (character != null)
+            {
+                int healIntervalSeconds = dynel.Stats[StatIds.healinterval].Value;
+                int healDelta = dynel.Stats[StatIds.healdelta].Value;
+                if (healIntervalSeconds > 0 && healDelta != 0)
+                {
+                    character.HealRegenElapsed += deltaTime;
+                    if (character.HealRegenElapsed >= healIntervalSeconds)
+                    {
+                        dynel.Stats[StatIds.health].Value =
+                            Math.Min(
+                                dynel.Stats[StatIds.life].Value,
+                                dynel.Stats[StatIds.health].Value + healDelta);
+                        character.HealRegenElapsed = 0.0;
+                        changed = true;
+                    }
+                }
+
+                int nanoIntervalSeconds = dynel.Stats[StatIds.nanointerval].Value;
+                int nanoDelta = dynel.Stats[StatIds.nanodelta].Value;
+                if (nanoIntervalSeconds > 0 && nanoDelta != 0)
+                {
+                    character.NanoRegenElapsed += deltaTime;
+                    if (character.NanoRegenElapsed >= nanoIntervalSeconds)
+                    {
+                        dynel.Stats[StatIds.currentnano].Value += nanoDelta;
+                        character.NanoRegenElapsed = 0.0;
+                        changed = true;
+                    }
+                }
+            }
+
             if (changed)
 
             {
@@ -390,4 +423,3 @@ namespace ZoneEngine.Core.Playfields
     }
 
 }
-

@@ -623,18 +623,18 @@ namespace ZoneEngine.Core.Playfields
             return this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity);
         }
 
-        internal void ForceCharacterVisibilityToRecipient(
+        internal bool ForceCharacterVisibilityToRecipient(
             ICharacter source,
             ICharacter recipient,
             Action<ICharacter, MessageBody> sendVisibilityMessage)
         {
             if (source == null || recipient == null)
             {
-                return;
+                return false;
             }
 
             this.visibilityInterest.Register(source);
-            this.visibilityPackets.SendCharacterVisibilityEntry(
+            return this.visibilityPackets.SendCharacterVisibilityEntry(
                 source,
                 recipient,
                 messageBody => sendVisibilityMessage(recipient, messageBody));

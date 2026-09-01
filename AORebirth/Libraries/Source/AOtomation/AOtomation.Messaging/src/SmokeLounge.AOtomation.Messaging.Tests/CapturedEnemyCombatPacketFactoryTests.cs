@@ -3111,7 +3111,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(visibility.Contains("CapturedEnemyCombatPacketFactory.CreateWeaponDefinition("));
             Assert.IsTrue(visibility.Contains("item.MultipleCount"));
             Assert.IsFalse(coordinator.Contains("SendIncomingHitChatIfPlayer"));
-            Assert.IsFalse(coordinator.Contains("hit you for"));
+            Assert.IsFalse(coordinator.Contains("new ChatTextMessage"));
             Assert.IsFalse(templeCatalog.Contains("new AttackInfoMessage"));
             Assert.IsFalse(templeCatalog.Contains("new AttackMessage"));
             Assert.IsFalse(templeCatalog.Contains("new SpecialAttackWeaponMessage"));

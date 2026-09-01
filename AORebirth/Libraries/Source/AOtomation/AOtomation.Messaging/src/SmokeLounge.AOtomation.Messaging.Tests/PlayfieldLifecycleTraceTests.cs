@@ -763,15 +763,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playerCombatText.Contains("Func<Identity, ICharacter> findTarget")
                 && playerCombatText.Contains("Func<ICharacter, bool> isValidTarget")
                 && playerCombatText.Contains("Action<ICharacter, ICharacter> logInvalidTarget")
-                && playerCombatText.Contains("Action<ICharacter, ICharacter> processValidatedCombatTick")
+                && playerCombatText.Contains("WeaponSlot preferredSlot")
+                && playerCombatText.Contains("Action<ICharacter, ICharacter, WeaponSlot> processValidatedCombatTick")
                 && playerCombatText.Contains("if (attacker.FightingTarget.Instance == 0)")
                 && playerCombatText.Contains("clearCombatTracking(attacker.Identity);")
                 && playerCombatText.Contains("ICharacter target = findTarget(attacker.FightingTarget);")
                 && playerCombatText.Contains("if (!isValidTarget(target))")
                 && playerCombatText.Contains(
                     "this.ClearInvalidCombatTarget(attacker, target, logInvalidTarget, clearCombatTracking);")
-                && playerCombatText.Contains("processValidatedCombatTick(attacker, target);"),
-                "PlayerCombatRuntimeService must own player combat tick target/clear orchestration.");
+                && playerCombatText.Contains("processValidatedCombatTick(attacker, target, preferredSlot);"),
+                "PlayerCombatRuntimeService must own player combat tick target/clear orchestration and preserve the firing weapon slot.");
             string invalidTargetClear = ExtractMethodBlock(playerCombatText, "internal void ClearInvalidCombatTarget");
             Assert.IsTrue(
                 invalidTargetClear.Contains("Require(logInvalidTarget, \"logInvalidTarget\");")
@@ -882,30 +883,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || attackHandlerText.Contains("KillPlayerTarget"),
                 "AttackMessageHandler must not own combat damage, killing-hit, or death lifecycle behavior.");
 
-            string combatTick = ExtractMethodBlock(playfieldText, "private void DoCombatTick");
+            string combatTick = ExtractMethodBlock(playfieldText, "private void ApplyCombatSwingFromWeapon");
             Assert.IsTrue(
-                combatTick.Contains("if (attacker.Controller is NPCController)")
-                && combatTick.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);")
+                combatTick.Contains("if (attacker == null || this.disposed)")
+                && combatTick.Contains("if (attacker.Controller is NPCController)")
+                && combatTick.Contains("this.runtimeSystems.ApplyNpcCombatHit(attacker);")
                 && combatTick.Contains("this.runtimeSystems.ProcessPlayerCombatTick(")
+                && combatTick.Contains("slot,")
                 && combatTick.Contains("this.FindPlayerCombatTarget")
                 && combatTick.Contains("this.IsValidPlayerCombatTarget")
                 && combatTick.Contains("this.LogInvalidPlayerCombatTickTarget")
                 && combatTick.Contains("this.ProcessValidatedPlayerCombatTick"),
-                "Playfield DoCombatTick must delegate player combat tick entry through PlayfieldRuntimeSystems.");
+                "Playfield weapon-clock swings must delegate NPC and slot-specific player combat through PlayfieldRuntimeSystems.");
 
             string playerCombatTick = ExtractMethodBlock(playfieldText, "private void ProcessValidatedPlayerCombatTick");
             Assert.IsTrue(
                 playfieldText.Contains("private ICharacter FindPlayerCombatTarget(Identity target)")
                 && playfieldText.Contains("private bool IsValidPlayerCombatTarget(ICharacter attacker, ICharacter target)")
                 && playfieldText.Contains("private void LogInvalidPlayerCombatTickTarget(ICharacter attacker, ICharacter target)")
-                && playerCombatTick.Contains("CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);")
+                && playerCombatTick.Contains("CombatAttackSource attackSource = this.GetCombatAttackSource(attacker, preferredSlot);")
                 && playerCombatTick.Contains("this.HandleCombatKillingHit(attacker, target);"),
                 "Playfield must keep target lookup helpers and validated tick algorithms behind service callbacks.");
             Assert.IsTrue(
                 playfieldText.Contains("public void StartPlayerAttack(ICharacter character, Identity target)")
                 && playfieldText.Contains("this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);")
+                && playfieldText.Contains("this.ConfigurePlayerWeaponsFromEquipment(character);")
                 && !playfieldText.Contains("private void ApplyPlayerAttackStart(ICharacter character, Identity target)"),
-                "Playfield must route player attack-start orchestration through the player combat facade.");
+                "Playfield must route player attack-start orchestration through the player combat facade and arm the weapon clocks.");
             Assert.IsTrue(
                 playfieldText.Contains("public void CancelPlayerAttack(ICharacter character)")
                 && playfieldText.Contains("this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);")
@@ -954,11 +958,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearCombatTracking);")
                 && playfieldText.Contains("this.SendCombatStopMessage(character);"),
                 "Playfield must keep mixed player/NPC StopFight packet emission while routing player target clear through the facade.");
+            string clearCombatTracking = ExtractMethodBlock(
+                playfieldText,
+                "internal void ClearCombatTracking(Identity identity)");
             Assert.IsTrue(
-                playfieldText.Contains("internal void ClearCombatTracking(Identity identity)")
-                && playfieldText.Contains("this.nextCombatTicks.Remove(identity.Instance);")
-                && playfieldText.Contains("this.runtimeSystems.ClearNpcCombatTracking(identity);"),
-                "Playfield currently owns shared combat tick tracking while delegating NPC tracking cleanup.");
+                clearCombatTracking.Contains("Character c = character as Character;")
+                && clearCombatTracking.Contains("c.ClearWeapons();")
+                && clearCombatTracking.Contains("this.lastCombatWeaponSlots.Remove(identity.Instance);")
+                && clearCombatTracking.Contains("this.runtimeSystems.ClearNpcCombatTracking(identity);"),
+                "Playfield must clear per-character weapon clocks and slot tracking while delegating NPC tracking cleanup.");
 
             Assert.IsTrue(
                 checkpointText.Contains("PlayerCombatRuntimeService")
@@ -5027,6 +5035,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
+            string characterEntityText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs"));
             string aotomationDeliveryText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -5418,18 +5430,58 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 projectText.Contains(@"Core\Playfields\PlayfieldTransferRuntimeService.cs"),
                 "ZoneEngine project must compile PlayfieldTransferRuntimeService.");
+            string characterRegeneration = ExtractMethodBlock(
+                characterHeartbeatText,
+                "internal void ProcessRegeneration");
+            string characterEntityTick = ExtractMethodBlock(
+                characterEntityText,
+                "public override void Tick");
             Assert.IsTrue(
                 characterHeartbeatText.Contains("internal sealed class PlayfieldCharacterHeartbeatRuntimeService")
-                && characterHeartbeatText.Contains("internal void ProcessRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)")
-                && characterHeartbeatText.Contains("StatHealInterval healInterval")
-                && characterHeartbeatText.Contains("StatNanoInterval nanoInterval")
-                && characterHeartbeatText.Contains("sendChangedStats(dynel);")
+                && characterHeartbeatText.Contains("internal void ProcessRegeneration(ICharacter dynel, double deltaTime, Action<ICharacter> sendChangedStats)")
+                && characterRegeneration.Contains("if (PetCombatRules.IsPlayerOwnedPet(dynel))")
+                && characterRegeneration.Contains("if (dynel.Controller is NPCController)")
+                && characterRegeneration.Contains("character.HealRegenElapsed += deltaTime;")
+                && characterRegeneration.Contains("character.NanoRegenElapsed += deltaTime;")
+                && characterRegeneration.Contains("sendChangedStats(dynel);")
+                && characterEntityTick.Contains("this.TickWeapons(deltaTime);")
+                && !characterEntityTick.Contains("HealRegenElapsed")
+                && !characterEntityTick.Contains("NanoRegenElapsed")
                 && characterHeartbeatText.Contains("internal void ProcessFollow(ICharacter dynel)")
                 && characterHeartbeatText.Contains("dynel.Controller.DoFollow();")
                 && characterHeartbeatText.Contains("internal void ProcessPlayerCollisionChecks(")
                 && characterHeartbeatText.Contains("checkWallCollision(dynel);")
                 && characterHeartbeatText.Contains("checkStatelCollision(dynel);"),
-                "PlayfieldCharacterHeartbeatRuntimeService must own regeneration, follow, and player-collision callback sequencing.");
+                "PlayfieldCharacterHeartbeatRuntimeService must own player-only delta-time regeneration, follow, and player-collision sequencing while Character.Tick owns weapon clocks only.");
+            AssertTextBefore(
+                characterRegeneration,
+                "if (PetCombatRules.IsPlayerOwnedPet(dynel))",
+                "character.HealRegenElapsed += deltaTime;");
+            AssertTextBefore(
+                characterRegeneration,
+                "if (dynel.Controller is NPCController)",
+                "character.HealRegenElapsed += deltaTime;");
+            int petGuard = characterRegeneration.IndexOf(
+                "if (PetCombatRules.IsPlayerOwnedPet(dynel))",
+                StringComparison.Ordinal);
+            int petReturn = petGuard < 0
+                                ? -1
+                                : characterRegeneration.IndexOf("return;", petGuard, StringComparison.Ordinal);
+            int npcGuard = characterRegeneration.IndexOf(
+                "if (dynel.Controller is NPCController)",
+                StringComparison.Ordinal);
+            int npcReturn = npcGuard < 0
+                                ? -1
+                                : characterRegeneration.IndexOf("return;", npcGuard, StringComparison.Ordinal);
+            int playerRegen = characterRegeneration.IndexOf(
+                "character.HealRegenElapsed += deltaTime;",
+                StringComparison.Ordinal);
+            Assert.IsTrue(
+                petReturn > petGuard
+                && petReturn < playerRegen
+                && npcReturn > npcGuard
+                && npcReturn < playerRegen,
+                "Pet and NPC specialized regeneration branches must return before generic player regeneration.");
             Assert.IsFalse(
                 characterHeartbeatText.Contains("DoCombatTick")
                 || characterHeartbeatText.Contains("WallCollision.CheckCollision(")
@@ -5797,8 +5849,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && timedLifecycleText.Contains("if (dynel.Starting)")
                 && timedLifecycleText.Contains("if (processDeadNpcDespawn(dynel))")
                 && timedLifecycleText.Contains("if (dynel.DoNotDoTimers)")
-                && timedLifecycleText.Contains("processRegeneration(dynel);")
-                && timedLifecycleText.Contains("processCombatTick(dynel);")
+                && timedLifecycleText.Contains("processCharacterTick(dynel, deltaTime);")
                 && timedLifecycleText.Contains("processNpcPatrolTick(dynel);")
                 && timedLifecycleText.Contains("processFollow(dynel);")
                 && timedLifecycleText.Contains("processPlayerCollision(dynel);"),
@@ -5815,16 +5866,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "PlayfieldTimedLifecycleRuntimeService must not own algorithms, packets, collision internals, or inventory.");
 
             string heartbeatTimer = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer");
+            string playfieldCharacterTick = ExtractMethodBlock(playfieldText, "private void ProcessCharacterTick");
             Assert.IsTrue(
                 heartbeatTimer.Contains("this.runtimeSystems.ProcessHeartbeatTimedLifecycle(")
+                && heartbeatTimer.Contains("deltaTime,")
                 && heartbeatTimer.Contains("this.ProcessPendingCorpseSpawns")
                 && heartbeatTimer.Contains("this.ProcessCorpseDespawns")
                 && heartbeatTimer.Contains("this.ProcessPendingCorpseCreditAwards")
-                && heartbeatTimer.Contains("this.runtimeSystems.ProcessCharacterRegeneration(dynel, SendChangedStats)")
-                && heartbeatTimer.Contains("this.DoCombatTick")
+                && heartbeatTimer.Contains("this.ProcessCharacterTick")
                 && heartbeatTimer.Contains("this.runtimeSystems.ProcessCharacterFollow")
                 && heartbeatTimer.Contains("this.runtimeSystems.ProcessPlayerCollisionChecks("),
                 "Playfield heartbeat must delegate timed lifecycle sequencing through PlayfieldRuntimeSystems.");
+            Assert.IsTrue(
+                playfieldCharacterTick.Contains("this.EnsureCharacterTickHandlers(dynel);")
+                && playfieldCharacterTick.Contains("dynel.Tick(deltaTime);")
+                && playfieldCharacterTick.Contains(
+                    "this.runtimeSystems.ProcessCharacterRegeneration(dynel, deltaTime, SendChangedStats);")
+                && playfieldCharacterTick.Contains("this.runtimeSystems.ProcessNpcCombatTick(dynel);"),
+                "The character tick must sequence weapon clocks, heartbeat regeneration, and NPC legacy/captured combat through their owned boundaries.");
+            AssertTextBefore(
+                playfieldCharacterTick,
+                "dynel.Tick(deltaTime);",
+                "this.runtimeSystems.ProcessCharacterRegeneration(dynel, deltaTime, SendChangedStats);");
             Assert.IsFalse(
                 heartbeatTimer.Contains("foreach (ICharacter dynel in dynels)")
                 || heartbeatTimer.Contains("this.runtimeSystems.ProcessDeadNpcDespawn(dynel)")
@@ -5884,7 +5947,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("this.runtimeSystems.SendPrivateCityPlayfieldReadyBlock(client, character);"),
                 "Playfield must delegate private-city ready block sending through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(attacker);"),
+                playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(dynel);"),
                 "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.ClearInvalidNpcCombatTarget(attacker);")
@@ -7669,9 +7732,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string visibilityPacketSequenceText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             Assert.AreEqual(
-                2,
+                3,
                 CountOccurrences(visibilityPacketSequenceText, "this.packetSequences.RunVisibilityPacketPairSequence("),
-                "Playfield visibility packet runtime must keep one ordinary and one guardian-wire SCFU -> weapons -> CharInPlay packet-pair implementation.");
+                "Playfield visibility packet runtime must keep ordinary, guardian-wire, and Havaris-wire SCFU -> weapons -> CharInPlay packet-pair implementations.");
             string initialVisibility = ExtractMethodBlock(
                 visibilityPacketSequenceText,
                 "internal void SendExistingCharacterVisibilityToClient(");

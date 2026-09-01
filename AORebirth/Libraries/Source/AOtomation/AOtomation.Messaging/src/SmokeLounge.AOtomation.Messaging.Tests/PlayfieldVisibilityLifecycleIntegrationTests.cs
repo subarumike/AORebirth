@@ -123,6 +123,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string playfieldText = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string runtimeSystemsText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
+            string visibilityPacketsText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs");
             string coordinatorText = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs");
             string visibilityGate = ExtractBlock(
@@ -131,23 +135,72 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string damageGate = ExtractBlock(
                 coordinatorText,
                 "private bool CanApplyNpcDamage(");
-            string combatTick = ExtractBlock(
+            string capturedCombatTick = ExtractBlock(
                 coordinatorText,
                 "internal void ProcessCombatTick(ICharacter attacker)");
+            string ordinaryCombatHit = ExtractBlock(
+                coordinatorText,
+                "internal void ApplyCombatHit(ICharacter attacker)");
+            string damageCore = ExtractBlock(
+                coordinatorText,
+                "private void ApplyNpcCombatHitCore(");
+            string playfieldForceVisibility = ExtractBlock(
+                playfieldText,
+                "internal bool ForceCharacterVisibilityToRecipient(");
+            string runtimeForceVisibility = ExtractBlock(
+                runtimeSystemsText,
+                "internal bool ForceCharacterVisibilityToRecipient(");
 
-            AssertBefore(
-                visibilityGate,
+            const string visibilityLookup =
+                "this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity)";
+            int initialVisibilityLookup = visibilityGate.IndexOf(visibilityLookup, StringComparison.Ordinal);
+            int refreshVisibility = visibilityGate.IndexOf(
                 "this.runtimeSystems.RefreshCharacterVisibility(",
-                "this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity)",
-                "The attacker SCFU/WIFU/CharInPlay sequence must be reconciled before visibility is accepted.");
+                StringComparison.Ordinal);
+            int refreshedVisibilityLookup = initialVisibilityLookup < 0
+                                                ? -1
+                                                : visibilityGate.IndexOf(
+                                                    visibilityLookup,
+                                                    initialVisibilityLookup + visibilityLookup.Length,
+                                                    StringComparison.Ordinal);
+            int forceVisibility = visibilityGate.IndexOf(
+                "visible = this.ForceCharacterVisibilityToRecipient(attacker, target);",
+                StringComparison.Ordinal);
+
+            Assert.IsTrue(
+                initialVisibilityLookup >= 0
+                && refreshVisibility > initialVisibilityLookup
+                && refreshedVisibilityLookup > refreshVisibility
+                && forceVisibility > refreshedVisibilityLookup
+                && !visibilityGate.Contains("visible = true;"),
+                "Existing visibility must be reused, then refresh/forced SCFU-WIFU-CharInPlay entry must return success before visibility is accepted.");
+            Assert.IsTrue(
+                playfieldForceVisibility.Contains("return false;")
+                && playfieldForceVisibility.Contains(
+                    "return this.runtimeSystems.ForceCharacterVisibilityToRecipient(")
+                && runtimeForceVisibility.Contains("return false;")
+                && runtimeForceVisibility.Contains(
+                    "return this.visibilityPackets.SendCharacterVisibilityEntry(")
+                && visibilityPacketsText.Contains("internal bool SendCharacterVisibilityEntry("),
+                "Both force-visibility wrappers must propagate packet-entry failure instead of inventing success.");
             Assert.IsTrue(
                 damageGate.Contains("this.playfield.EnsureNpcCombatVisibility(attacker, target)"),
                 "NPC damage must fail closed when the target has not received the attacker visibility sequence.");
             AssertBefore(
-                combatTick,
+                capturedCombatTick,
                 "this.CanApplyNpcDamage(",
+                "this.ApplyNpcCombatHitCore(",
+                "Captured NPC combat must prove visibility before entering the shared damage core.");
+            AssertBefore(
+                ordinaryCombatHit,
+                "this.CanApplyNpcDamage(",
+                "this.ApplyNpcCombatHitCore(",
+                "Ordinary weapon-clock combat must prove visibility before entering the shared damage core.");
+            AssertBefore(
+                damageCore,
                 "int damage = this.CalculateCombatDamage(attacker, attackSource);",
-                "Visibility must be proven before damage is selected or player health changes.");
+                "target.Stats[StatIds.health].Value = newHealth;",
+                "The shared NPC damage core must calculate damage before mutating player health.");
         }
 
         [TestMethod]
