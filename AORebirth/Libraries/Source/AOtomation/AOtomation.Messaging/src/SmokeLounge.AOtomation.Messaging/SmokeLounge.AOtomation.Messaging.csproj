@@ -161,6 +161,7 @@
     <Compile Include="GameData\LoginCharacterInfo.cs" />
     <Compile Include="GameData\CharacterStat.cs" />
     <Compile Include="GameData\Gender.cs" />
+    <Compile Include="GameData\HitType.cs" />
     <Compile Include="GameData\Identity.cs" />
     <Compile Include="GameData\IdentityType.cs" />
     <Compile Include="GameData\Mesh.cs" />

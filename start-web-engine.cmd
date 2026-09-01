@@ -78,7 +78,7 @@ if errorlevel 1 (
     exit /b 3
 )
 
-powershell -NoProfile -File "%~dp0start-engines.ps1" -WebOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -WebOnly
 set "START_EXIT=%ERRORLEVEL%"
 popd >nul
 exit /b %START_EXIT%

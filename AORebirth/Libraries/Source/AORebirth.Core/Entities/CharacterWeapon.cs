@@ -78,15 +78,6 @@ namespace AORebirth.Core.Entities
             this.State = WeaponState.Attacking;
         }
 
-        /// <summary>
-        /// After an immediate first-swing apply, park the clock in Recharging.
-        /// </summary>
-        public void EnterRecharging()
-        {
-            this.timer = 0.0;
-            this.State = WeaponState.Recharging;
-        }
-
         public void ConfigureSpeeds(double attackSpeedSeconds, double rechargeSpeedSeconds)
         {
             this.AttackSpeed = attackSpeedSeconds > 0.0

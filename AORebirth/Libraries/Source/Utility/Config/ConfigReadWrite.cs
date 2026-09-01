@@ -126,6 +126,17 @@ namespace Utility.Config
         #region Public Methods and Operators
 
         /// <summary>
+        /// Absolute or relative path to the configuration file that will be loaded.
+        /// </summary>
+        public static string ResolvedConfigPath
+        {
+            get
+            {
+                return GetConfigPath();
+            }
+        }
+
+        /// <summary>
         /// Saves the current config back to the file
         /// </summary>
         /// <returns>true, if successful</returns>
@@ -147,7 +158,7 @@ namespace Utility.Config
 #else
                 MemoryStream ms = new MemoryStream();
                 ser.Serialize(ms, this._config);
-                File.WriteAllText("config.xml", Encoding.UTF8.GetString(ms.GetBuffer()));
+                File.WriteAllText(GetConfigPath(), Encoding.UTF8.GetString(ms.GetBuffer()));
 #endif
             }
             catch
@@ -160,13 +171,17 @@ namespace Utility.Config
 
         private static string GetConfigPath()
         {
-#if AOREBIRTH_LINUX
             string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
             if (!string.IsNullOrWhiteSpace(configuredPath))
             {
                 return configuredPath;
             }
-#endif
+
+            string baseDirectoryConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
+            if (File.Exists(baseDirectoryConfig))
+            {
+                return baseDirectoryConfig;
+            }
 
             return "Config.xml";
         }

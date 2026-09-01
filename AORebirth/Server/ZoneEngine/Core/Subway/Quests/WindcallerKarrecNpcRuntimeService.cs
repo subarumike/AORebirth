@@ -113,7 +113,7 @@ namespace ZoneEngine.Core.Subway.Quests
             int instance = Pool.Instance.GetFreeInstance<Character>(1000000, IdentityType.CanbeAffected);
             var identity = new Identity { Type = IdentityType.CanbeAffected, Instance = instance };
             var controller = new NPCController { AiProfile = NpcAiProfile.Social };
-            var character = new Character(playfieldIdentity, identity, controller);
+            var character = new NpcCharacter(playfieldIdentity, identity, controller);
             character.Read();
             controller.Character = character;
             character.Playfield = playfield;

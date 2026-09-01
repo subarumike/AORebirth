@@ -232,6 +232,11 @@ namespace Utility.Config
         public int PlayfieldTickRate { get; set; }
 
         /// <summary>
+        /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Combat). Defaults to Engine,Error when omitted.
+        /// </summary>
+        public string DebugInfoDetail { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public string WebHostName { get; set; }

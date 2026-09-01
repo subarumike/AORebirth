@@ -19,7 +19,10 @@ if (-not [string]::IsNullOrEmpty($processPath)) {
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $engineDir = Join-Path $root "AORebirth\Built\Debug"
-$configPath = Join-Path $root "AORebirth\Config\Config.xml"
+$configPath = $env:AO_REBIRTH_CONFIG_PATH
+if ([string]::IsNullOrWhiteSpace($configPath)) {
+    $configPath = Join-Path $root "AORebirth\Config\Config.xml"
+}
 $logDir = Join-Path $root "logs\engines"
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"

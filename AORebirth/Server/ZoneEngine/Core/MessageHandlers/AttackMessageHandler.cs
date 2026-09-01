@@ -178,15 +178,6 @@ namespace ZoneEngine.Core.MessageHandlers
             this.ResetCombatTick(character);
         }
 
-        private void TryPlayerFirstCombatTick(ICharacter character)
-        {
-            Playfield playfield = character.Playfield as Playfield;
-            if (playfield != null)
-            {
-                playfield.TryPlayerFirstCombatTick(character);
-            }
-        }
-
         private void CancelPlayerAttack(ICharacter character)
         {
             Playfield playfield = character.Playfield as Playfield;
