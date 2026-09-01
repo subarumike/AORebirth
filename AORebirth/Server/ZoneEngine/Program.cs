@@ -253,6 +253,22 @@ namespace ZoneEngine
         {
             Console.WriteLine("Starting ZoneEngine in headless mode.");
             StartTheServer();
+#if AOREBIRTH_LINUX
+            if (zoneServer == null || !zoneServer.IsRunning || !zoneServer.TCPEnabled)
+            {
+                throw new InvalidOperationException("ZoneEngine listener did not reach the running state.");
+            }
+
+            if (!NotifySystemd("READY=1\nSTATUS=ZoneEngine listener is ready"))
+            {
+                throw new InvalidOperationException("ZoneEngine could not notify systemd readiness.");
+            }
+
+            Console.WriteLine(
+                "ZONEENGINE_HEADLESS_READY listener="
+                + ConfigReadWrite.Instance.CurrentConfig.ZonePort
+                + " systemdNotification=sent-or-not-required");
+#endif
 
             string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             while (!exited)
@@ -268,6 +284,41 @@ namespace ZoneEngine
                 Thread.Sleep(1000);
             }
         }
+
+#if AOREBIRTH_LINUX
+        private static bool NotifySystemd(string state)
+        {
+            string notifySocket = Environment.GetEnvironmentVariable("NOTIFY_SOCKET");
+            if (string.IsNullOrWhiteSpace(notifySocket))
+            {
+                return true;
+            }
+
+            if (notifySocket[0] == '@')
+            {
+                notifySocket = "\0" + notifySocket.Substring(1);
+            }
+
+            try
+            {
+                byte[] payload = System.Text.Encoding.UTF8.GetBytes(state);
+                using (var socket = new System.Net.Sockets.Socket(
+                    System.Net.Sockets.AddressFamily.Unix,
+                    System.Net.Sockets.SocketType.Dgram,
+                    System.Net.Sockets.ProtocolType.Unspecified))
+                {
+                    socket.SendTo(payload, new System.Net.Sockets.UnixDomainSocketEndPoint(notifySocket));
+                }
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine("systemd notification failed: " + exception.Message);
+                return false;
+            }
+        }
+#endif
 
         /// <summary>
         /// </summary>
@@ -378,7 +429,7 @@ namespace ZoneEngine
         /// <returns>
         /// true if ok
         /// </returns>
-        private static bool Initialize()
+        private static bool Initialize(bool databaseAlreadyValidated)
         {
             Console.WriteLine();
             Colouring.Push(ConsoleColor.Green);
@@ -428,7 +479,7 @@ namespace ZoneEngine
                 return false;
             }
 
-            if (!Misc.CheckDatabase())
+            if (!CheckRuntimeDatabase(databaseAlreadyValidated))
             {
                 Colouring.Push(ConsoleColor.Red);
                 Console.WriteLine(locales.ErrorInitializingDatabase);
@@ -454,7 +505,9 @@ namespace ZoneEngine
             }
 
             // Local debug restarts can kill ZoneEngine before player logout saves the offline flag.
+#if !AOREBIRTH_LINUX
             Misc.LogOffAll();
+#endif
 
             Colouring.Push(ConsoleColor.Green);
             if (!LoadItemsAndNanos())
@@ -488,6 +541,15 @@ namespace ZoneEngine
             Colouring.Pop();
 
             return true;
+        }
+
+        private static bool CheckRuntimeDatabase(bool databaseAlreadyValidated)
+        {
+#if AOREBIRTH_LINUX
+            return databaseAlreadyValidated;
+#else
+            return Misc.CheckDatabase();
+#endif
         }
 
         /// <summary>
@@ -1556,6 +1618,19 @@ namespace ZoneEngine
                 ConfigureHeadlessConsoleLogging(args);
             }
 
+            bool runtimeDatabaseValidated = false;
+#if AOREBIRTH_LINUX
+            int headlessDatabaseValidation = ValidateDatabase();
+            if (headlessDatabaseValidation != 0)
+            {
+                Environment.ExitCode = headlessDatabaseValidation;
+                FlushHeadlessConsoleLogging();
+                return;
+            }
+
+            runtimeDatabaseValidated = true;
+#endif
+
             Console.CancelKeyPress += ConsoleCancelKeyPress;
 
             OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
@@ -1563,8 +1638,16 @@ namespace ZoneEngine
             Console.WriteLine();
             Console.WriteLine(locales.ServerConsoleMainText, DateTime.Now.Year);
 
-            if (!Initialize())
+            if (!Initialize(runtimeDatabaseValidated))
             {
+                if (headless)
+                {
+                    Console.Error.WriteLine("ZONEENGINE_HEADLESS_INITIALIZATION_FAILED");
+                    Environment.ExitCode = 1;
+                    FlushHeadlessConsoleLogging();
+                    return;
+                }
+
                 Console.WriteLine(locales.ErrorInitializingEngine);
                 Console.WriteLine("Press enter to exit");
                 Console.ReadLine();
@@ -1644,6 +1727,9 @@ namespace ZoneEngine
         /// </param>
         private static void ShutDownServer(string[] parts)
         {
+#if AOREBIRTH_LINUX
+            NotifySystemd("STOPPING=1\nSTATUS=ZoneEngine is stopping");
+#endif
             MissionAcgExpiryRuntime.Stop();
             if (zoneServer.IsRunning)
             {

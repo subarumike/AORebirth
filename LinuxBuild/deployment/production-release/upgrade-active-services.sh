@@ -17,6 +17,7 @@ manifest_path=""
 expected_sha=""
 dry_run=false
 recover_zone_outage=false
+resume_stopped_recovery=false
 deploy_root="${AO_REBIRTH_DEPLOY_TEST_ROOT:-}"
 test_mode="${AO_REBIRTH_DEPLOY_TEST_MODE:-0}"
 failure_step="${AO_REBIRTH_DEPLOY_TEST_FAIL_STEP:-}"
@@ -26,9 +27,13 @@ rolling_back=false
 snapshot_dir=""
 rollback_first_failure=""
 ZONE_RESTARTS_START_BASELINE=""
+ZONE_NOTIFY_DROPIN_WAS_PRESENT=NO
+ZONE_EFFECTIVE_TYPE_BEFORE=""
+ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE=""
+ZONE_EFFECTIVE_DROPIN_PATHS_BEFORE=""
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
-usage() { echo "usage: upgrade-active-services.sh --manifest <release.manifest> --expected-sha <sha> [--dry-run] [--recover-zone-outage]" >&2; }
+usage() { echo "usage: upgrade-active-services.sh --manifest <release.manifest> --expected-sha <sha> [--dry-run] [--recover-zone-outage [--resume-stopped-recovery]]" >&2; }
 root_path() { printf '%s%s' "${deploy_root}" "$1"; }
 
 while [[ "$#" -gt 0 ]]; do
@@ -37,10 +42,19 @@ while [[ "$#" -gt 0 ]]; do
         --expected-sha) expected_sha="${2:-}"; shift 2 ;;
         --dry-run) dry_run=true; shift ;;
         --recover-zone-outage) recover_zone_outage=true; shift ;;
+        --resume-stopped-recovery) resume_stopped_recovery=true; shift ;;
         --help) usage; exit 0 ;;
         *) usage; exit 2 ;;
     esac
 done
+
+[[ "${resume_stopped_recovery}" != true || "${recover_zone_outage}" == true ]] \
+    || fail "--resume-stopped-recovery requires --recover-zone-outage"
+
+recovery_requested()
+{
+    [[ "${recover_zone_outage}" == true ]]
+}
 
 [[ "${test_mode}" == "1" || "${EUID}" -eq 0 ]] || fail "run as root"
 [[ "${expected_sha}" =~ ^[0-9a-f]{40}$ ]] || fail "invalid expected source SHA"
@@ -93,6 +107,11 @@ readonly LOGIN_CURRENT="${LOGIN_INSTALL_ROOT}/current"
 readonly ZONE_CURRENT="${ZONE_INSTALL_ROOT}/current"
 readonly LOGIN_UNIT_TARGET="$(root_path /etc/systemd/system/ao-rebirth-loginengine.service)"
 readonly ZONE_UNIT_TARGET="$(root_path /etc/systemd/system/ao-rebirth-zoneengine.service)"
+readonly ZONE_DROPIN_DIR="$(root_path /etc/systemd/system/ao-rebirth-zoneengine.service.d)"
+readonly ZONE_STALE_NOTIFY_DROPIN="${ZONE_DROPIN_DIR}/10-type-simple.conf"
+readonly ZONE_STALE_NOTIFY_DROPIN_SHA256="2d1ebd0ffd7534c6357830891a35d2343428b56c8093b05223abe7635f67b55f"
+readonly ZONE_DAILY_LOGIN_DROPIN="${ZONE_DROPIN_DIR}/20-daily-login.conf"
+readonly ZONE_DAILY_LOGIN_DROPIN_SHA256="4ea8e3ba780f564a17ba454fa46121a6618985da3ef449d792016a41f8ac0e29"
 readonly LOGIN_ENV="$(root_path /etc/ao-rebirth/loginengine/loginengine.env)"
 readonly ZONE_ENV="$(root_path /etc/ao-rebirth/zoneengine/zoneengine.env)"
 readonly LOGIN_CONFIG="$(root_path /etc/ao-rebirth/loginengine/Config.xml)"
@@ -251,6 +270,125 @@ listener_absent()
         [[ -z "${listener_output}" ]]
     fi
 }
+
+zone_effective_property()
+{
+    local property="$1"
+    if [[ "${test_mode}" == "1" ]]; then
+        case "${property}" in
+            Type) cat "${TEST_STATE}/zone.effective-type" ;;
+            NotifyAccess) cat "${TEST_STATE}/zone.notify-access" ;;
+            DropInPaths) cat "${TEST_STATE}/zone.dropin-paths" ;;
+            *) return 1 ;;
+        esac
+        return
+    fi
+    systemctl show "${ZONE_SERVICE}" -p "${property}" --value
+}
+
+zone_daily_login_dropin_governed()
+{
+    [[ -f "${ZONE_DAILY_LOGIN_DROPIN}" && ! -L "${ZONE_DAILY_LOGIN_DROPIN}" ]] \
+        && [[ "$(sha256sum "${ZONE_DAILY_LOGIN_DROPIN}" | awk '{print $1}')" == "${ZONE_DAILY_LOGIN_DROPIN_SHA256}" ]]
+}
+
+zone_effective_notify_contract()
+{
+    zone_daily_login_dropin_governed \
+        && [[ "$(zone_effective_property Type)" == notify ]] \
+        && [[ "$(zone_effective_property NotifyAccess)" == main ]] \
+        && [[ "$(zone_effective_property DropInPaths)" == "${ZONE_DAILY_LOGIN_DROPIN}" ]]
+}
+
+validate_zone_dropin_preflight()
+{
+    local entry
+    if [[ -e "${ZONE_DROPIN_DIR}" || -L "${ZONE_DROPIN_DIR}" ]]; then
+        [[ -d "${ZONE_DROPIN_DIR}" && ! -L "${ZONE_DROPIN_DIR}" ]] \
+            || fail "ZoneEngine drop-in directory is unsafe"
+        shopt -s nullglob dotglob
+        local entries=("${ZONE_DROPIN_DIR}"/*)
+        shopt -u nullglob dotglob
+        for entry in "${entries[@]}"; do
+            [[ "${entry}" == "${ZONE_STALE_NOTIFY_DROPIN}" \
+                || "${entry}" == "${ZONE_DAILY_LOGIN_DROPIN}" ]] \
+                || fail "unmanaged ZoneEngine systemd drop-in is present: ${entry}"
+            require_regular_file "${entry}"
+        done
+    fi
+
+    zone_daily_login_dropin_governed \
+        || fail "ZoneEngine daily-login drop-in content is not the governed production bridge"
+
+    ZONE_EFFECTIVE_TYPE_BEFORE="$(zone_effective_property Type)"
+    ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE="$(zone_effective_property NotifyAccess)"
+    ZONE_EFFECTIVE_DROPIN_PATHS_BEFORE="$(zone_effective_property DropInPaths)"
+    if [[ -e "${ZONE_STALE_NOTIFY_DROPIN}" || -L "${ZONE_STALE_NOTIFY_DROPIN}" ]]; then
+        require_regular_file "${ZONE_STALE_NOTIFY_DROPIN}"
+        [[ "$(sha256sum "${ZONE_STALE_NOTIFY_DROPIN}" | awk '{print $1}')" == "${ZONE_STALE_NOTIFY_DROPIN_SHA256}" ]] \
+            || fail "ZoneEngine stale readiness drop-in content is not the governed production override"
+        [[ "${ZONE_EFFECTIVE_TYPE_BEFORE}" == simple \
+            && "${ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE}" == none \
+            && "${ZONE_EFFECTIVE_DROPIN_PATHS_BEFORE}" == "${ZONE_STALE_NOTIFY_DROPIN} ${ZONE_DAILY_LOGIN_DROPIN}" ]] \
+            || fail "ZoneEngine stale readiness drop-in does not match the effective unit state"
+        ZONE_NOTIFY_DROPIN_WAS_PRESENT=YES
+        echo "ZONEENGINE_STALE_READINESS_DROPIN=GOVERNED_REMOVAL_REQUIRED"
+        return
+    fi
+
+    [[ "${ZONE_EFFECTIVE_TYPE_BEFORE}" == notify \
+        && "${ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE}" == main \
+        && "${ZONE_EFFECTIVE_DROPIN_PATHS_BEFORE}" == "${ZONE_DAILY_LOGIN_DROPIN}" ]] \
+        || fail "ZoneEngine effective readiness contract is unmanaged"
+    ZONE_NOTIFY_DROPIN_WAS_PRESENT=NO
+    echo "ZONEENGINE_STALE_READINESS_DROPIN=ABSENT"
+}
+
+remove_zone_stale_notify_dropin()
+{
+    if [[ "${ZONE_NOTIFY_DROPIN_WAS_PRESENT}" == YES ]]; then
+        rm -f -- "${ZONE_STALE_NOTIFY_DROPIN}"
+        [[ ! -e "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]] \
+            || fail "ZoneEngine stale readiness drop-in removal failed"
+        echo "ZONEENGINE_STALE_READINESS_DROPIN_REMOVED=PASS"
+        return
+    fi
+    [[ ! -e "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]] \
+        || fail "ZoneEngine readiness drop-in appeared during deployment"
+}
+
+restore_zone_notify_dropin()
+{
+    if [[ "${ZONE_NOTIFY_DROPIN_WAS_PRESENT}" == YES ]]; then
+        [[ -f "${snapshot_dir}/zoneengine.10-type-simple.conf" \
+            && ! -L "${snapshot_dir}/zoneengine.10-type-simple.conf" ]] || return 1
+        [[ "$(sha256sum "${snapshot_dir}/zoneengine.10-type-simple.conf" | awk '{print $1}')" == "${ZONE_STALE_NOTIFY_DROPIN_SHA256}" ]] \
+            || return 1
+        [[ -d "${ZONE_DROPIN_DIR}" && ! -L "${ZONE_DROPIN_DIR}" ]] || return 1
+        local swap="${ZONE_STALE_NOTIFY_DROPIN}.production-release.$$"
+        install -m 0644 "${snapshot_dir}/zoneengine.10-type-simple.conf" "${swap}" || return 1
+        mv -fT -- "${swap}" "${ZONE_STALE_NOTIFY_DROPIN}" || return 1
+        return
+    fi
+    [[ ! -e "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]]
+}
+
+verify_zone_dropin_rollback()
+{
+    zone_daily_login_dropin_governed || return 1
+    if [[ "${ZONE_NOTIFY_DROPIN_WAS_PRESENT}" == YES ]]; then
+        [[ -f "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]] || return 1
+        [[ "$(sha256sum "${ZONE_STALE_NOTIFY_DROPIN}" | awk '{print $1}')" == "${ZONE_STALE_NOTIFY_DROPIN_SHA256}" ]] \
+            || return 1
+    else
+        [[ ! -e "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]] || return 1
+    fi
+    [[ "$(zone_effective_property Type)" == "${ZONE_EFFECTIVE_TYPE_BEFORE}" ]] || return 1
+    [[ "$(zone_effective_property NotifyAccess)" == "${ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE}" ]] || return 1
+    [[ "$(zone_effective_property DropInPaths)" == "${ZONE_EFFECTIVE_DROPIN_PATHS_BEFORE}" ]] || return 1
+    echo "ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=${ZONE_EFFECTIVE_TYPE_BEFORE} notifyAccess=${ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE}"
+}
+
 service_restarts()
 {
     if [[ "${test_mode}" == "1" ]]; then cat "${TEST_STATE}/$1.restarts"; else systemctl show "$2" -p NRestarts --value; fi
@@ -375,7 +513,34 @@ online_count()
 {
     if [[ "${test_mode}" == "1" ]]; then cat "${TEST_STATE}/online"; else docker exec -i "${DATABASE_CONTAINER}" sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" '"${EXPECTED_DATABASE}"' --batch --raw --skip-column-names -e "SELECT COUNT(*) FROM characters WHERE Online IS NOT NULL AND Online <> 0;"'; fi
 }
-daemon_reload() { [[ "${test_mode}" == "1" ]] || systemctl daemon-reload; }
+daemon_reload()
+{
+    if [[ "${test_mode}" == "1" ]]; then
+        if [[ "${rolling_back}" != true \
+            && -f "${TEST_STATE}/daily-login-dropin-tamper-after-reload" \
+            && "$(cat "${TEST_STATE}/daily-login-dropin-tamper-after-reload")" == YES ]]; then
+            printf '# concurrent fixture drift\n' >> "${ZONE_DAILY_LOGIN_DROPIN}"
+            printf 'NO\n' > "${TEST_STATE}/daily-login-dropin-tamper-after-reload"
+        fi
+        if [[ -f "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]]; then
+            printf 'simple\n' > "${TEST_STATE}/zone.effective-type"
+            printf 'none\n' > "${TEST_STATE}/zone.notify-access"
+            printf '%s %s\n' "${ZONE_STALE_NOTIFY_DROPIN}" "${ZONE_DAILY_LOGIN_DROPIN}" > "${TEST_STATE}/zone.dropin-paths"
+        elif [[ "${rolling_back}" != true \
+            && -f "${TEST_STATE}/zone.effective-mismatch-after-reload" \
+            && "$(cat "${TEST_STATE}/zone.effective-mismatch-after-reload")" == YES ]]; then
+            printf 'simple\n' > "${TEST_STATE}/zone.effective-type"
+            printf 'none\n' > "${TEST_STATE}/zone.notify-access"
+            printf '/run/systemd/system/ao-rebirth-zoneengine.service.d/99-fixture.conf\n' > "${TEST_STATE}/zone.dropin-paths"
+        else
+            printf 'notify\n' > "${TEST_STATE}/zone.effective-type"
+            printf 'main\n' > "${TEST_STATE}/zone.notify-access"
+            printf '%s\n' "${ZONE_DAILY_LOGIN_DROPIN}" > "${TEST_STATE}/zone.dropin-paths"
+        fi
+        return
+    fi
+    systemctl daemon-reload
+}
 verify_unit_static() { [[ "${test_mode}" == "1" ]] || systemd-analyze verify "${LOGIN_UNIT_SOURCE}" "${ZONE_UNIT_SOURCE}" >/dev/null; }
 
 environment_value()
@@ -407,12 +572,28 @@ validate_candidate_database_contract()
         printf '%s\n' "${login_config_path}" > "${TEST_STATE}/candidate-login-config"
         printf '%s\n' "${zone_config_path}" > "${TEST_STATE}/candidate-zone-config"
         fixture_validation="$(cat "${TEST_STATE}/candidate-validation")"
-        if [[ "${fixture_validation}" == PASS_RESTART_ZONE ]]; then
-            local fixture_restarts
-            fixture_restarts="$(cat "${TEST_STATE}/zone.restarts")"
-            printf '%s\n' "$((fixture_restarts + 1))" > "${TEST_STATE}/zone.restarts"
-            fixture_validation=PASS
-        fi
+        case "${fixture_validation}" in
+            PASS_RESTART_ZONE)
+                local fixture_restarts
+                fixture_restarts="$(cat "${TEST_STATE}/zone.restarts")"
+                printf '%s\n' "$((fixture_restarts + 1))" > "${TEST_STATE}/zone.restarts"
+                fixture_validation=PASS
+                ;;
+            PASS_RESTART_LOGIN)
+                local fixture_login_restarts
+                fixture_login_restarts="$(cat "${TEST_STATE}/login.restarts")"
+                printf '%s\n' "$((fixture_login_restarts + 1))" > "${TEST_STATE}/login.restarts"
+                fixture_validation=PASS
+                ;;
+            PASS_ACTIVATE_LOGIN)
+                printf 'active\n' > "${TEST_STATE}/login.active"
+                fixture_validation=PASS
+                ;;
+            PASS_ONLINE)
+                printf '1\n' > "${TEST_STATE}/online"
+                fixture_validation=PASS
+                ;;
+        esac
         [[ "${fixture_validation}" == PASS ]] \
             || fail "candidate database compatibility validation failed"
         echo "CANDIDATE_DATABASE_COMPATIBILITY=PASS"
@@ -472,7 +653,7 @@ validate_candidate_database_contract()
 
 verify_recovery_frozen()
 {
-    [[ "${recover_zone_outage}" == true ]] || return 0
+    recovery_requested || return 0
     service_stopped zone "${ZONE_SERVICE}" \
         || fail "ZoneEngine is not in an exact stopped state for outage recovery"
     listener_absent zone 7501 "${ZONE_SERVICE}" \
@@ -480,10 +661,26 @@ verify_recovery_frozen()
     [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_BEFORE}" ]] \
         || fail "ZoneEngine restart count changed while outage recovery was frozen"
     echo "ZONEENGINE_OUTAGE_FROZEN=PASS"
+    if [[ "${resume_stopped_recovery}" == true ]]; then
+        service_stopped login "${LOGIN_SERVICE}" \
+            || fail "LoginEngine is not in an exact stopped state for stopped-pair recovery"
+        listener_absent login 7500 "${LOGIN_SERVICE}" \
+            || fail "port 7500 reopened during stopped-pair recovery"
+        [[ "$(service_restarts login "${LOGIN_SERVICE}")" == "${LOGIN_RESTARTS_BEFORE}" ]] \
+            || fail "LoginEngine restart count changed while stopped-pair recovery was frozen"
+        echo "STOPPED_PAIR_RECOVERY_FROZEN=PASS"
+    fi
 }
 
 verify_pre_stop_boundary()
 {
+    if [[ "${resume_stopped_recovery}" == true ]]; then
+        verify_recovery_frozen
+        [[ "$(online_count)" == 0 ]] \
+            || fail "online characters appeared before stopped-pair recovery mutation"
+        echo "PRESTOP_BOUNDARY=PASS onlineCharacters=0 mode=stopped-pair"
+        return
+    fi
     service_active login "${LOGIN_SERVICE}" \
         || fail "LoginEngine stopped before deployment mutation"
     listener_present login 7500 "${LOGIN_SERVICE}" \
@@ -496,7 +693,7 @@ verify_pre_stop_boundary()
 
 verify_zone_pre_stop_invariant()
 {
-    if [[ "${recover_zone_outage}" == true ]]; then
+    if recovery_requested; then
         service_stopped zone "${ZONE_SERVICE}" \
             || fail "ZoneEngine recovery state changed before release mutation"
         listener_absent zone 7501 "${ZONE_SERVICE}" \
@@ -509,7 +706,7 @@ verify_zone_pre_stop_invariant()
     fi
     [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_BEFORE}" ]] \
         || fail "ZoneEngine restart count changed before its controlled deployment stop"
-    echo "ZONE_PRESTOP_INVARIANT=PASS mode=$([[ "${recover_zone_outage}" == true ]] && printf stopped || printf active)"
+    echo "ZONE_PRESTOP_INVARIANT=PASS mode=$(recovery_requested && printf stopped || printf active)"
 }
 
 verify_login_admission_closed_boundary()
@@ -617,6 +814,40 @@ require_rollback_material()
     echo "ROLLBACK_READINESS=PASS"
 }
 
+deployed_manifest_value()
+{
+    local key="$1" count line
+    count="$(grep -Ec "^${key}=" "${DEPLOYED_MANIFEST}" || true)"
+    [[ "${count}" == 1 ]] || fail "deployed release key ${key} is missing or duplicated"
+    line="$(grep -E "^${key}=" "${DEPLOYED_MANIFEST}")"
+    printf '%s' "${line#*=}"
+}
+
+require_stopped_recovery_provenance()
+{
+    [[ "${resume_stopped_recovery}" == true ]] || return 0
+    require_regular_file "${PREVIOUS_LOGIN_RELEASE}/SOURCE_SHA"
+    require_regular_file "${PREVIOUS_ZONE_RELEASE}/SOURCE_SHA"
+    require_regular_file "${DEPLOYED_MANIFEST}"
+    local prior_login_sha prior_zone_sha deployed_sha
+    prior_login_sha="$(tr -d '\r\n\t ' < "${PREVIOUS_LOGIN_RELEASE}/SOURCE_SHA")"
+    prior_zone_sha="$(tr -d '\r\n\t ' < "${PREVIOUS_ZONE_RELEASE}/SOURCE_SHA")"
+    deployed_sha="$(deployed_manifest_value SOURCE_SHA)"
+    [[ "${prior_login_sha}" =~ ^[0-9a-f]{40}$ \
+        && "${prior_login_sha}" == "${prior_zone_sha}" \
+        && "${prior_login_sha}" == "${deployed_sha}" ]] \
+        || fail "stopped recovery prior release SHA provenance is incoherent"
+    [[ "$(deployed_manifest_value LOGINENGINE_RELEASE)" == "${PREVIOUS_LOGIN_RELEASE}" \
+        && "$(deployed_manifest_value ZONEENGINE_RELEASE)" == "${PREVIOUS_ZONE_RELEASE}" ]] \
+        || fail "stopped recovery prior release paths are incoherent"
+    [[ "$(deployed_manifest_value LOGINENGINE_ARTIFACT_SHA256)" == "${PREVIOUS_LOGIN_ARTIFACT_SHA256}" \
+        && "$(deployed_manifest_value ZONEENGINE_ARTIFACT_SHA256)" == "${PREVIOUS_ZONE_ARTIFACT_SHA256}" \
+        && "$(deployed_manifest_value LOGINENGINE_UNIT_SHA256)" == "${PREVIOUS_LOGIN_UNIT_SHA256}" \
+        && "$(deployed_manifest_value ZONEENGINE_UNIT_SHA256)" == "${PREVIOUS_ZONE_UNIT_SHA256}" ]] \
+        || fail "stopped recovery prior artifact or unit provenance is incoherent"
+    echo "STOPPED_PAIR_ROLLBACK_PROVENANCE=PASS sourceSha=${prior_login_sha}"
+}
+
 preflight()
 {
     validate_manifest_shape
@@ -625,30 +856,45 @@ preflight()
     require_zone_placement_artifact "${ZONE_ARTIFACT_DIR}"
     validate_units
     verify_unit_static
+    validate_zone_dropin_preflight
     [[ "${test_mode}" == "1" ]] || id "${EXPECTED_SERVICE_USER}" >/dev/null 2>&1
     [[ "${test_mode}" == "1" ]] || [[ "$(id -gn "${EXPECTED_SERVICE_USER}")" == "${EXPECTED_SERVICE_GROUP}" ]]
-    service_active login "${LOGIN_SERVICE}" || fail "LoginEngine is not active before deployment"
     LOGIN_RESTARTS_BEFORE="$(service_restarts login "${LOGIN_SERVICE}")"
     ZONE_RESTARTS_BEFORE="$(service_restarts zone "${ZONE_SERVICE}")"
     readonly LOGIN_RESTARTS_BEFORE ZONE_RESTARTS_BEFORE
-    listener_present login 7500 "${LOGIN_SERVICE}" || fail "port 7500 predeploy listener is missing"
-    if [[ "${recover_zone_outage}" == true ]]; then
+    if [[ "${resume_stopped_recovery}" == true ]]; then
+        service_stopped login "${LOGIN_SERVICE}" || fail "LoginEngine must be exactly stopped for stopped-pair recovery"
+        listener_absent login 7500 "${LOGIN_SERVICE}" || fail "port 7500 must be closed for stopped-pair recovery"
+        service_stopped zone "${ZONE_SERVICE}" || fail "ZoneEngine must be exactly stopped for stopped-pair recovery"
+        listener_absent zone 7501 "${ZONE_SERVICE}" || fail "port 7501 must be closed for stopped-pair recovery"
+        echo "STOPPED_PAIR_RECOVERY_PRECONDITION=PASS"
+    elif [[ "${recover_zone_outage}" == true ]]; then
+        service_active login "${LOGIN_SERVICE}" || fail "LoginEngine is not active before outage recovery"
+        listener_present login 7500 "${LOGIN_SERVICE}" || fail "port 7500 predeploy listener is missing"
         service_stopped zone "${ZONE_SERVICE}" || fail "ZoneEngine must already be stopped for outage recovery"
         listener_absent zone 7501 "${ZONE_SERVICE}" || fail "port 7501 must be closed for outage recovery"
         echo "ZONEENGINE_OUTAGE_RECOVERY_PRECONDITION=PASS"
     else
+        service_active login "${LOGIN_SERVICE}" || fail "LoginEngine is not active before deployment"
+        listener_present login 7500 "${LOGIN_SERVICE}" || fail "port 7500 predeploy listener is missing"
         service_active zone "${ZONE_SERVICE}" || fail "ZoneEngine is not active before deployment"
         listener_present zone 7501 "${ZONE_SERVICE}" || fail "port 7501 predeploy listener is missing"
     fi
     require_rollback_material
+    require_stopped_recovery_provenance
     check_shared_directory
     ONLINE_BEFORE="$(online_count)"
     readonly ONLINE_BEFORE
     [[ "${ONLINE_BEFORE}" =~ ^[0-9]+$ ]] || fail "could not determine online character count"
-    echo "LOGINENGINE_PREDEPLOY_STATUS=active"
-    if [[ "${recover_zone_outage}" == true ]]; then
-        echo "ZONEENGINE_PREDEPLOY_STATUS=stopped-outage"
+    if [[ "${resume_stopped_recovery}" == true ]]; then
+        echo "LOGINENGINE_PREDEPLOY_STATUS=stopped-recovery"
+        echo "ZONEENGINE_PREDEPLOY_STATUS=stopped-recovery"
     else
+        echo "LOGINENGINE_PREDEPLOY_STATUS=active"
+    fi
+    if [[ "${recover_zone_outage}" == true && "${resume_stopped_recovery}" != true ]]; then
+        echo "ZONEENGINE_PREDEPLOY_STATUS=stopped-outage"
+    elif [[ "${resume_stopped_recovery}" != true ]]; then
         echo "ZONEENGINE_PREDEPLOY_STATUS=active"
     fi
     echo "LOGINENGINE_PREDEPLOY_RESTARTS=${LOGIN_RESTARTS_BEFORE}"
@@ -675,14 +921,18 @@ current_release_matches()
     placement_require_build_provenance "${ZONE_CURRENT}/BUILD_PROVENANCE.env" >/dev/null 2>&1 || return 1
     [[ "$(sha256sum "${LOGIN_UNIT_TARGET}" | awk '{print $1}')" == "${LOGIN_UNIT_SHA}" ]] || return 1
     [[ "$(sha256sum "${ZONE_UNIT_TARGET}" | awk '{print $1}')" == "${ZONE_UNIT_SHA}" ]] || return 1
+    [[ ! -e "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]] || return 1
+    zone_effective_notify_contract || return 1
     [[ -d "${OWNERSHIP_DIR}" ]] || return 1
     [[ "${test_mode}" == 1 || "$(stat -c '%a' "${OWNERSHIP_DIR}")" == 700 ]] || return 1
 }
 
 create_snapshot()
 {
+    local login_was_active=YES
     local zone_was_active=YES
-    [[ "${recover_zone_outage}" != true ]] || zone_was_active=NO
+    [[ "${resume_stopped_recovery}" != true ]] || login_was_active=NO
+    if recovery_requested; then zone_was_active=NO; fi
     snapshot_dir="${SNAPSHOT_ROOT}/${RELEASE_NAME}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
     if [[ "${test_mode}" == "1" ]]; then mkdir -p -- "${snapshot_dir}"; else install -d -m 0700 "${snapshot_dir}"; fi
     cp -p -- "${LOGIN_UNIT_TARGET}" "${snapshot_dir}/loginengine.service"
@@ -691,6 +941,9 @@ create_snapshot()
     cp -p -- "${ZONE_ENV}" "${snapshot_dir}/zoneengine.env"
     cp -p -- "${LOGIN_CONFIG}" "${snapshot_dir}/loginengine.Config.xml"
     [[ ! -f "${ZONE_CONFIG}" ]] || cp -p -- "${ZONE_CONFIG}" "${snapshot_dir}/zoneengine.Config.xml"
+    if [[ "${ZONE_NOTIFY_DROPIN_WAS_PRESENT}" == YES ]]; then
+        cp -p -- "${ZONE_STALE_NOTIFY_DROPIN}" "${snapshot_dir}/zoneengine.10-type-simple.conf"
+    fi
     cat > "${snapshot_dir}/rollback.env" <<EOF
 SOURCE_SHA=${SOURCE_SHA}
 PREVIOUS_LOGINENGINE_RELEASE=${PREVIOUS_LOGIN_RELEASE}
@@ -701,8 +954,11 @@ PREVIOUS_LOGINENGINE_ARTIFACT_SHA256=${PREVIOUS_LOGIN_ARTIFACT_SHA256}
 PREVIOUS_ZONEENGINE_ARTIFACT_SHA256=${PREVIOUS_ZONE_ARTIFACT_SHA256}
 PREVIOUS_LOGINENGINE_UNIT_SHA256=${PREVIOUS_LOGIN_UNIT_SHA256}
 PREVIOUS_ZONEENGINE_UNIT_SHA256=${PREVIOUS_ZONE_UNIT_SHA256}
-LOGINENGINE_WAS_ACTIVE=YES
+LOGINENGINE_WAS_ACTIVE=${login_was_active}
 ZONEENGINE_WAS_ACTIVE=${zone_was_active}
+ZONEENGINE_STALE_NOTIFY_DROPIN_WAS_PRESENT=${ZONE_NOTIFY_DROPIN_WAS_PRESENT}
+ZONEENGINE_EFFECTIVE_TYPE_BEFORE=${ZONE_EFFECTIVE_TYPE_BEFORE}
+ZONEENGINE_EFFECTIVE_NOTIFY_ACCESS_BEFORE=${ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE}
 EOF
     [[ "${test_mode}" == "1" ]] || chmod 0600 "${snapshot_dir}"/*
     echo "ROLLBACK_SNAPSHOT_PATH=${snapshot_dir}"
@@ -808,6 +1064,7 @@ post_health()
 {
     service_active login "${LOGIN_SERVICE}" && service_active zone "${ZONE_SERVICE}" \
         && listener_present login 7500 "${LOGIN_SERVICE}" && listener_present zone 7501 "${ZONE_SERVICE}" \
+        && zone_effective_notify_contract \
         && [[ "$(service_restarts login "${LOGIN_SERVICE}")" == "${LOGIN_RESTARTS_BEFORE}" ]] \
         && [[ -n "${ZONE_RESTARTS_START_BASELINE}" ]] \
         && [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_START_BASELINE}" ]] \
@@ -838,6 +1095,7 @@ verify_rollback_state()
     [[ "$(sha256sum "${ZONE_CURRENT}/ZoneEngine" | awk '{print $1}')" == "${PREVIOUS_ZONE_ARTIFACT_SHA256}" ]] || return 1
     [[ "$(sha256sum "${LOGIN_UNIT_TARGET}" | awk '{print $1}')" == "${PREVIOUS_LOGIN_UNIT_SHA256}" ]] || return 1
     [[ "$(sha256sum "${ZONE_UNIT_TARGET}" | awk '{print $1}')" == "${PREVIOUS_ZONE_UNIT_SHA256}" ]] || return 1
+    verify_zone_dropin_rollback || return 1
     echo "ROLLBACK_EXACT_PRIOR_TARGETS=PASS"
     echo "ROLLBACK_PRIOR_ARTIFACTS_AND_UNITS=PASS"
     echo "ROLLBACK_NO_MIXED_STATE=PASS"
@@ -869,6 +1127,7 @@ rollback()
     rollback_operation RESTORE_ZONE_CURRENT switch_link "${ZONE_CURRENT}" "${PREVIOUS_ZONE_LINK_TARGET}" || failed=true
     rollback_operation RESTORE_LOGIN_UNIT install -m 0644 "${snapshot_dir}/loginengine.service" "${LOGIN_UNIT_TARGET}" || failed=true
     rollback_operation RESTORE_ZONE_UNIT install -m 0644 "${snapshot_dir}/zoneengine.service" "${ZONE_UNIT_TARGET}" || failed=true
+    rollback_operation RESTORE_ZONE_NOTIFY_DROPIN restore_zone_notify_dropin || failed=true
     rollback_operation DAEMON_RELOAD daemon_reload || failed=true
     rollback_operation VERIFY_EXACT_PRIOR_STATE verify_rollback_state || failed=true
     if [[ "${recover_zone_outage}" == true ]]; then
@@ -876,6 +1135,8 @@ rollback()
         echo "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
         return
     fi
+    [[ "${failed}" == false ]] \
+        || { echo "ROLLBACK_BOTH_SERVICES=FAIL" >&2; return 1; }
     rollback_operation START_LOGIN service_start login "${LOGIN_SERVICE}" || failed=true
     rollback_operation LOGIN_READINESS wait_for_readiness login 7500 "${LOGIN_SERVICE}" || failed=true
     rollback_operation START_ZONE service_start zone "${ZONE_SERVICE}" || failed=true
@@ -911,9 +1172,13 @@ main()
     create_snapshot
     mutation_started=true
     trap on_exit EXIT
-    service_stop login "${LOGIN_SERVICE}"
+    if [[ "${resume_stopped_recovery}" != true ]]; then
+        service_stop login "${LOGIN_SERVICE}"
+    fi
     verify_login_admission_closed_boundary
-    service_stop zone "${ZONE_SERVICE}"
+    if ! recovery_requested; then
+        service_stop zone "${ZONE_SERVICE}"
+    fi
     verify_closed_engine_boundary
     inject_failure artifact_install
     install_release "${LOGIN_ARTIFACT_DIR}" LoginEngine "${LOGIN_ARTIFACT_SHA}" "${LOGIN_RELEASE_TARGET}" "${LOGIN_RELEASES}"
@@ -923,8 +1188,12 @@ main()
     switch_link "${LOGIN_CURRENT}" "${LOGIN_RELEASE_TARGET}"
     switch_link "${ZONE_CURRENT}" "${ZONE_RELEASE_TARGET}"
     create_shared_directory
+    remove_zone_stale_notify_dropin
     daemon_reload
     verify_unit_static
+    zone_effective_notify_contract \
+        || fail "ZoneEngine effective Type=notify readiness contract failed after installation"
+    echo "ZONEENGINE_EFFECTIVE_READINESS_CONTRACT=PASS type=notify notifyAccess=main dropInPaths=governed-daily-login"
     service_start login "${LOGIN_SERVICE}" || fail "LoginEngine failed startup"
     wait_for_readiness login 7500 "${LOGIN_SERVICE}" || fail "LoginEngine readiness timed out after startup"
     if [[ "${recover_zone_outage}" == true ]]; then

@@ -61,5 +61,17 @@ the prior pair is known to be incompatible, a failed recovery restores its exact
 artifacts and units but leaves both engines stopped instead of starting an invalid
 rollback generation.
 
+If a governed recovery attempt fails and its rollback leaves both engines stopped,
+retry with `--recover-zone-outage --resume-stopped-recovery`. The resume modifier
+is accepted only with outage recovery and requires both services and listeners to
+remain stopped, unchanged restart counts, zero online characters, and exact
+agreement between the deployed-release marker and both rollback artifacts, units,
+and source SHAs. It never takes the already-deployed no-op path. A retry failure
+restores the exact prior pair and leaves both engines stopped again.
+
 The transaction does not modify production environment files, configuration,
 database schema, bind policy, lifecycle behavior, recovery behavior, or gameplay.
+It recognizes and transactionally removes only the pinned obsolete
+`10-type-simple.conf` ZoneEngine override, proves the effective unit is
+`Type=notify`/`NotifyAccess=main`, preserves the governed daily-login drop-in, and
+restores the obsolete override byte-for-byte if rollback is required.

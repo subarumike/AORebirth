@@ -127,9 +127,12 @@ create_fixture()
     state="${root}/test-state"
     mkdir -p "${root}/opt/ao-rebirth/loginengine/releases/old-login" "${root}/opt/ao-rebirth/zoneengine/releases/old-zone" \
         "${root}/opt/ao-rebirth/deployment-snapshots" "${root}/etc/systemd/system" \
+        "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d" \
         "${root}/etc/ao-rebirth/loginengine" "${root}/etc/ao-rebirth/zoneengine" "${root}/var/lib" "${state}" "${input}"
     printf 'old-login\n' > "${root}/opt/ao-rebirth/loginengine/releases/old-login/LoginEngine"
     printf 'old-zone\n' > "${root}/opt/ao-rebirth/zoneengine/releases/old-zone/ZoneEngine"
+    printf '%s\n' "${other_sha}" > "${root}/opt/ao-rebirth/loginengine/releases/old-login/SOURCE_SHA"
+    printf '%s\n' "${other_sha}" > "${root}/opt/ao-rebirth/zoneengine/releases/old-zone/SOURCE_SHA"
     chmod 0755 "${root}/opt/ao-rebirth/loginengine/releases/old-login/LoginEngine" "${root}/opt/ao-rebirth/zoneengine/releases/old-zone/ZoneEngine"
     prior_login_link_target="releases/old-login"
     prior_zone_link_target="releases/old-zone"
@@ -143,6 +146,8 @@ create_fixture()
     prior_zone_release="$(realpath -e -- "${root}/opt/ao-rebirth/zoneengine/current")"
     printf 'old login unit\n' > "${root}/etc/systemd/system/ao-rebirth-loginengine.service"
     printf 'old zone unit\n' > "${root}/etc/systemd/system/ao-rebirth-zoneengine.service"
+    printf '[Service]\nType=simple\nNotifyAccess=none\n' > "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+    printf '[Service]\nEnvironment=AO_REBIRTH_DAILY_LOGIN_REWARDS_JSON=/opt/ao-rebirth/website/src/uwg.daily.icc-rk/rewards.json\n' > "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf"
     printf 'AO_REBIRTH_CONFIG_PATH=%s\n' "${root}/etc/ao-rebirth/loginengine/Config.xml" > "${root}/etc/ao-rebirth/loginengine/loginengine.env"
     printf 'AO_REBIRTH_CONFIG_PATH=%s\n' "${root}/etc/ao-rebirth/zoneengine/Config.xml" > "${root}/etc/ao-rebirth/zoneengine/zoneengine.env"
     printf '<Config><ZoneIP>2.24.96.30</ZoneIP></Config>\n' > "${root}/etc/ao-rebirth/loginengine/Config.xml"
@@ -153,6 +158,14 @@ create_fixture()
     printf 'PASS\n' > "${state}/candidate-validation"
     printf 'NO\n' > "${state}/login.port-occupied"; printf 'NO\n' > "${state}/zone.port-occupied"
     printf 'PASS\n' > "${state}/login.port-inspection"; printf 'PASS\n' > "${state}/zone.port-inspection"
+    printf 'simple\n' > "${state}/zone.effective-type"
+    printf 'none\n' > "${state}/zone.notify-access"
+    printf '%s %s\n' \
+        "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf" \
+        "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf" \
+        > "${state}/zone.dropin-paths"
+    printf 'NO\n' > "${state}/zone.effective-mismatch-after-reload"
+    printf 'NO\n' > "${state}/daily-login-dropin-tamper-after-reload"
     printf 'NO\n' > "${state}/zone.restart-on-start"
     printf 'NO\n' > "${state}/online-on-zone-start"
     printf 'NO\n' > "${state}/online-on-login-stop"
@@ -198,6 +211,8 @@ PREVIOUS_ZONEENGINE_RELEASE=
 EOF
     old_login_unit_hash="$(sha256sum "${root}/etc/systemd/system/ao-rebirth-loginengine.service" | awk '{print $1}')"
     old_zone_unit_hash="$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service" | awk '{print $1}')"
+    old_zone_dropin_hash="$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf" | awk '{print $1}')"
+    daily_login_dropin_hash="$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf" | awk '{print $1}')"
     old_login_artifact_hash="$(sha256sum "${prior_login_release}/LoginEngine" | awk '{print $1}')"
     old_zone_artifact_hash="$(sha256sum "${prior_zone_release}/ZoneEngine" | awk '{print $1}')"
     new_login_unit_hash="$(sha256sum "${input}/login.service" | awk '{print $1}')"
@@ -208,6 +223,17 @@ EOF
     require test "${old_zone_unit_hash}" != "${new_zone_unit_hash}"
     require test "${old_login_artifact_hash}" != "${new_login_artifact_hash}"
     require test "${old_zone_artifact_hash}" != "${new_zone_artifact_hash}"
+    require test "${old_zone_dropin_hash}" = 2d1ebd0ffd7534c6357830891a35d2343428b56c8093b05223abe7635f67b55f
+    require test "${daily_login_dropin_hash}" = 4ea8e3ba780f564a17ba454fa46121a6618985da3ef449d792016a41f8ac0e29
+    cat > "${root}/opt/ao-rebirth/deployed-release.env" <<EOF
+SOURCE_SHA=${other_sha}
+LOGINENGINE_RELEASE=${prior_login_release}
+ZONEENGINE_RELEASE=${prior_zone_release}
+LOGINENGINE_ARTIFACT_SHA256=${old_login_artifact_hash}
+ZONEENGINE_ARTIFACT_SHA256=${old_zone_artifact_hash}
+LOGINENGINE_UNIT_SHA256=${old_login_unit_hash}
+ZONEENGINE_UNIT_SHA256=${old_zone_unit_hash}
+EOF
 }
 run_upgrade()
 {
@@ -218,6 +244,32 @@ run_recovery_upgrade()
 {
     env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" AO_REBIRTH_DEPLOY_TEST_FAIL_STEP="${2:-}" \
         bash "${upgrader}" --manifest "${manifest}" --expected-sha "${1:-${fake_sha}}" --recover-zone-outage
+}
+run_stopped_recovery_upgrade()
+{
+    env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" AO_REBIRTH_DEPLOY_TEST_FAIL_STEP="${2:-}" \
+        bash "${upgrader}" --manifest "${manifest}" --expected-sha "${1:-${fake_sha}}" --recover-zone-outage --resume-stopped-recovery
+}
+set_stopped_pair()
+{
+    printf 'inactive\n' > "${state}/login.active"
+    printf 'inactive\n' > "${state}/zone.active"
+}
+remove_governed_dropin()
+{
+    rm -f -- "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+    printf 'notify\n' > "${state}/zone.effective-type"
+    printf 'main\n' > "${state}/zone.notify-access"
+    printf '%s\n' "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf" > "${state}/zone.dropin-paths"
+}
+assert_governed_dropin_restored()
+{
+    require test -f "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+    require test ! -L "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+    require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf" | awk '{print $1}')" = "${old_zone_dropin_hash}"
+    require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf" | awk '{print $1}')" = "${daily_login_dropin_hash}"
+    require test "$(cat "${state}/zone.effective-type")" = simple
+    require test "$(cat "${state}/zone.notify-access")" = none
 }
 assert_old_targets()
 {
@@ -260,6 +312,7 @@ expect_transaction_failure()
     grep -F 'ROLLBACK_STEP_LOGIN_READINESS=PASS' "${fixture}/output" >/dev/null || fail "LoginEngine rollback readiness did not pass for $1"
     grep -F 'ROLLBACK_STEP_ZONE_READINESS=PASS' "${fixture}/output" >/dev/null || fail "ZoneEngine rollback readiness did not pass for $1"
     assert_old_pair
+    assert_governed_dropin_restored
     tests_run=$((tests_run + 1))
 }
 
@@ -272,6 +325,9 @@ case "${AO_REBIRTH_DEPLOY_TEST_CASE:-all}" in
         require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/success-output"
         require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/success-output"
         require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/success-output"
+        require test ! -e "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+        require test "$(cat "${state}/zone.effective-type")" = notify
+        require test "$(cat "${state}/zone.notify-access")" = main
         echo "PASS: production deployment workflow successful startup (1/1)"
         exit 0
         ;;
@@ -486,8 +542,166 @@ printf 'inactive\n' > "${state}/zone.active"
 if run_recovery_upgrade "${fake_sha}" login_start > "${fixture}/output" 2>&1; then fail "expected outage-recovery transaction failure"; fi
 require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
 assert_old_targets
+assert_governed_dropin_restored
 require test "$(cat "${state}/login.active")" = inactive
 require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+if env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" \
+    bash "${upgrader}" --manifest "${manifest}" --expected-sha "${fake_sha}" --resume-stopped-recovery > "${fixture}/output" 2>&1; then
+    fail "stopped recovery modifier was accepted without outage recovery mode"
+fi
+require grep -F -- '--resume-stopped-recovery requires --recover-zone-outage' "${fixture}/output"
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf '[Service]\nEnvironment=UNMANAGED=1\n' > "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-unmanaged.conf"
+if run_upgrade > "${fixture}/output" 2>&1; then fail "deployment accepted an unmanaged ZoneEngine systemd drop-in"; fi
+require grep -F 'unmanaged ZoneEngine systemd drop-in is present' "${fixture}/output"
+assert_old_pair
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf '# changed\n' >> "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+if run_upgrade > "${fixture}/output" 2>&1; then fail "deployment accepted unknown stale readiness drop-in content"; fi
+require grep -F 'stale readiness drop-in content is not the governed production override' "${fixture}/output"
+assert_old_pair
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'YES\n' > "${state}/zone.effective-mismatch-after-reload"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted an ineffective ZoneEngine readiness unit"; fi
+require grep -F 'effective Type=notify readiness contract failed after installation' "${fixture}/output"
+require grep -F 'ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=simple notifyAccess=none' "${fixture}/output"
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+assert_old_targets
+assert_governed_dropin_restored
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'YES\n' > "${state}/daily-login-dropin-tamper-after-reload"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted concurrent daily-login drop-in drift"; fi
+require grep -F 'effective Type=notify readiness contract failed after installation' "${fixture}/output"
+require grep -F 'ROLLBACK_STEP_VERIFY_EXACT_PRIOR_STATE=FAIL' "${fixture}/output"
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=FAIL' "${fixture}/output"
+assert_old_targets
+require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf" | awk '{print $1}')" = "${old_zone_dropin_hash}"
+require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf" | awk '{print $1}')" != "${daily_login_dropin_hash}"
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+require test "$(cat "${state}/login.starts")" = 0
+require test "$(cat "${state}/zone.starts")" = 0
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+dropin_hash_before="$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf" | awk '{print $1}')"
+env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" \
+    bash "${upgrader}" --manifest "${manifest}" --expected-sha "${fake_sha}" --recover-zone-outage --resume-stopped-recovery --dry-run > "${fixture}/output"
+require grep -F 'STOPPED_PAIR_RECOVERY_PRECONDITION=PASS' "${fixture}/output"
+require grep -F 'STOPPED_PAIR_ROLLBACK_PROVENANCE=PASS' "${fixture}/output"
+require grep -F 'DRY_RUN=PASS' "${fixture}/output"
+require grep -F 'PRODUCTION_MUTATION=NO' "${fixture}/output"
+require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf" | awk '{print $1}')" = "${dropin_hash_before}"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+run_stopped_recovery_upgrade > "${fixture}/output"
+require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/output"
+require grep -F 'ZONEENGINE_EFFECTIVE_READINESS_CONTRACT=PASS type=notify notifyAccess=main dropInPaths=governed-daily-login' "${fixture}/output"
+require grep -F 'LOGINENGINE_WAS_ACTIVE=NO' "${root}/opt/ao-rebirth/deployment-snapshots/"*/rollback.env
+require grep -F 'ZONEENGINE_WAS_ACTIVE=NO' "${root}/opt/ao-rebirth/deployment-snapshots/"*/rollback.env
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = active
+require test ! -e "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+require test "$(cat "${state}/zone.effective-type")" = notify
+require test "$(cat "${state}/zone.notify-access")" = main
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'YES\n' > "${state}/login.port-occupied"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted an occupied LoginEngine port"; fi
+require grep -F 'port 7500 must be closed for stopped-pair recovery' "${fixture}/output"
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'FAIL\n' > "${state}/login.port-inspection"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted failed LoginEngine port inspection"; fi
+require grep -F 'could not inspect port 7500' "${fixture}/output"
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'PASS_ACTIVATE_LOGIN\n' > "${state}/candidate-validation"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted LoginEngine state drift"; fi
+require grep -F 'LoginEngine is not in an exact stopped state for stopped-pair recovery' "${fixture}/output"
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'PASS_RESTART_LOGIN\n' > "${state}/candidate-validation"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted LoginEngine restart drift"; fi
+require grep -F 'LoginEngine restart count changed while stopped-pair recovery was frozen' "${fixture}/output"
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+printf 'PASS_ONLINE\n' > "${state}/candidate-validation"
+if run_stopped_recovery_upgrade > "${fixture}/output" 2>&1; then fail "stopped recovery accepted Online drift before mutation"; fi
+require grep -F 'online characters appeared before stopped-pair recovery mutation' "${fixture}/output"
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+if run_stopped_recovery_upgrade "${fake_sha}" login_start > "${fixture}/output" 2>&1; then fail "expected stopped-recovery transaction failure"; fi
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+require grep -F 'ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=simple notifyAccess=none' "${fixture}/output"
+assert_old_targets
+assert_governed_dropin_restored
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+set_stopped_pair
+remove_governed_dropin
+if run_stopped_recovery_upgrade "${fake_sha}" login_start > "${fixture}/output" 2>&1; then fail "expected stopped-recovery failure without a prior drop-in"; fi
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+require grep -F 'ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=notify notifyAccess=main' "${fixture}/output"
+assert_old_targets
+require test ! -e "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+require test "$(cat "${state}/zone.effective-type")" = notify
+require test "$(cat "${state}/zone.notify-access")" = main
+tests_run=$((tests_run + 1))
+
+create_fixture
+run_upgrade > "${fixture}/first-output"
+set_stopped_pair
+login_starts_before="$(cat "${state}/login.starts")"
+zone_starts_before="$(cat "${state}/zone.starts")"
+run_stopped_recovery_upgrade > "${fixture}/output"
+require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/output"
+if grep -Fq 'ALREADY_DEPLOYED=YES' "${fixture}/output"; then fail "stopped-pair recovery took an idempotent no-op path"; fi
+require test "$(cat "${state}/login.starts")" = "$((login_starts_before + 1))"
+require test "$(cat "${state}/zone.starts")" = "$((zone_starts_before + 1))"
 tests_run=$((tests_run + 1))
 
 create_fixture; printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"; expect_transaction_failure artifact_install; require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/output"; require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/output"
@@ -508,6 +722,10 @@ require test "$(sha256sum "${root}/opt/ao-rebirth/zoneengine/current/Content/Off
 require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-loginengine.service" | awk '{print $1}')" = "$(sha256sum "${input}/login.service" | awk '{print $1}')"
 require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service" | awk '{print $1}')" = "$(sha256sum "${input}/zone.service" | awk '{print $1}')"
 require test -d "${root}/var/lib/ao-rebirth/session-ownership"
+require test ! -e "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/10-type-simple.conf"
+require test "$(cat "${state}/zone.effective-type")" = notify
+require test "$(cat "${state}/zone.notify-access")" = main
+require test "$(cat "${state}/zone.dropin-paths")" = "${root}/etc/systemd/system/ao-rebirth-zoneengine.service.d/20-daily-login.conf"
 tests_run=$((tests_run + 1))
 
 login_starts_before="$(cat "${state}/login.starts")"; zone_starts_before="$(cat "${state}/zone.starts")"
@@ -524,5 +742,5 @@ behavior_hash_after="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngin
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 require test "${behavior_hash_before}" = "${behavior_hash_after}"
 tests_run=$((tests_run + 1))
-require test "${tests_run}" = 41
-echo "PASS: production deployment workflow tests (41/41)"
+require test "${tests_run}" = 56
+echo "PASS: production deployment workflow tests (56/56)"

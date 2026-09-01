@@ -16,6 +16,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             string zoneArtifactGate = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "zone-stage9", "upgrade-live-service.sh"));
             string zoneArtifactTests = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "zone-stage9", "test-artifact-provenance.sh"));
             string zoneUnit = File.ReadAllText(Path.Combine(repositoryRoot, "LinuxBuild", "deployment", "systemd", "ao-rebirth-zoneengine.service"));
+            string zoneProgram = File.ReadAllText(Path.Combine(repositoryRoot, "AORebirth", "Server", "ZoneEngine", "Program.cs"));
 
             Require(upgrader.Contains("--dry-run"), "production upgrader lost dry-run mode");
             Require(upgrader.Contains("manifest source SHA mismatch"), "production upgrader lost source SHA gating");
@@ -40,6 +41,10 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("ZoneEngine production executable contract failed"), "production upgrader does not require the headless ZoneEngine runtime");
             Require(upgrader.Contains("ZoneEngine validation lifecycle cannot be production ExecStart"), "production upgrader does not reject the listener-free ZoneEngine validation runtime");
             Require(upgrader.Contains("--recover-zone-outage"), "production upgrader lacks explicit stopped-Zone recovery mode");
+            Require(upgrader.Contains("--resume-stopped-recovery"), "production upgrader cannot resume after its fail-closed outage rollback");
+            Require(upgrader.Contains("STOPPED_PAIR_RECOVERY_PRECONDITION=PASS"), "stopped-pair recovery lacks an exact stopped-state precondition");
+            Require(upgrader.Contains("STOPPED_PAIR_ROLLBACK_PROVENANCE=PASS"), "stopped-pair recovery lacks coherent prior-release provenance");
+            Require(upgrader.Contains("STOPPED_PAIR_RECOVERY_FROZEN=PASS"), "stopped-pair recovery does not freeze both engines before mutation");
             Require(upgrader.Contains("CANDIDATE_DATABASE_COMPATIBILITY=PASS"), "production upgrader does not validate candidate binaries against the live schema");
             Require(CountOccurrences(upgrader, "AO_REBIRTH_CONFIG_PATH=\"${login_config_path}\"") == 2, "candidate LoginEngine validation does not use the governed production config exactly twice");
             Require(CountOccurrences(upgrader, "AO_REBIRTH_CONFIG_PATH=\"${zone_config_path}\"") == 2, "candidate ZoneEngine validation does not use the governed production config exactly twice");
@@ -57,6 +62,12 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("ZONEENGINE_RESTART_COUNTER_RESET=PASS"), "production upgrader does not establish a zero restart baseline for controlled recovery");
             Require(upgrader.Contains("POST_START_STABILITY=PASS"), "production upgrader lacks bounded post-start restart stability");
             Require(upgrader.Contains("ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"), "outage recovery can restart a known-incompatible rollback pair");
+            Require(upgrader.Contains("2d1ebd0ffd7534c6357830891a35d2343428b56c8093b05223abe7635f67b55f"), "production upgrader does not pin the exact stale ZoneEngine readiness override");
+            Require(upgrader.Contains("4ea8e3ba780f564a17ba454fa46121a6618985da3ef449d792016a41f8ac0e29"), "production upgrader does not preserve the governed daily-login drop-in");
+            Require(upgrader.Contains("remove_zone_stale_notify_dropin"), "production upgrader does not remove the governed stale readiness override");
+            Require(upgrader.Contains("restore_zone_notify_dropin"), "production rollback does not restore the prior readiness override exactly");
+            Require(upgrader.Contains("DropInPaths"), "production upgrader does not validate all effective systemd drop-ins");
+            Require(upgrader.Contains("ZONEENGINE_EFFECTIVE_READINESS_CONTRACT=PASS"), "production upgrader does not prove the effective Type=notify contract");
             Require(upgrader.Contains("[[ \"${FORMAT}\" == \"2\" ]]"), "production upgrader does not require the placement-aware manifest format");
             Require(upgrader.Contains("require_zone_placement_artifact"), "production upgrader does not fail closed on placement provenance");
             Require(upgrader.Contains("PLACEMENT_BUILD_MANIFEST_SHA256"), "production upgrader does not pin the placement build manifest");
@@ -66,12 +77,60 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown"), "production ZoneEngine unit does not start the headless listener runtime");
             Require(!zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle"), "production ZoneEngine unit incorrectly starts the listener-free lifecycle validator");
 
+            int headlessDatabaseGate = zoneProgram.IndexOf("int headlessDatabaseValidation = ValidateDatabase();", StringComparison.Ordinal);
+            int databaseValidatedState = zoneProgram.IndexOf("runtimeDatabaseValidated = true;", StringComparison.Ordinal);
+            int runtimeInitialize = zoneProgram.LastIndexOf("if (!Initialize(runtimeDatabaseValidated))", StringComparison.Ordinal);
+            int databasePolicyStart = zoneProgram.IndexOf("private static bool CheckRuntimeDatabase(bool databaseAlreadyValidated)", StringComparison.Ordinal);
+            int databasePolicyEnd = databasePolicyStart < 0
+                ? -1
+                : zoneProgram.IndexOf("        /// <summary>", databasePolicyStart, StringComparison.Ordinal);
+            string databasePolicy = databasePolicyStart >= 0 && databasePolicyEnd > databasePolicyStart
+                ? zoneProgram.Substring(databasePolicyStart, databasePolicyEnd - databasePolicyStart)
+                : string.Empty;
+            int headlessRuntime = zoneProgram.IndexOf("private static void RunHeadless", StringComparison.Ordinal);
+            int headlessListenerStart = zoneProgram.IndexOf("StartTheServer();", headlessRuntime, StringComparison.Ordinal);
+            int headlessListenerReadyCheck = zoneProgram.IndexOf("zoneServer == null || !zoneServer.IsRunning || !zoneServer.TCPEnabled", headlessRuntime, StringComparison.Ordinal);
+            int headlessReady = zoneProgram.IndexOf("NotifySystemd(\"READY=1\\nSTATUS=ZoneEngine listener is ready\")", headlessRuntime, StringComparison.Ordinal);
+            int headlessInitializationFailure = zoneProgram.IndexOf("ZONEENGINE_HEADLESS_INITIALIZATION_FAILED", StringComparison.Ordinal);
+            int headlessInitializationExit = zoneProgram.IndexOf("Environment.ExitCode = 1;", headlessInitializationFailure, StringComparison.Ordinal);
+            int headlessInitializationFlush = zoneProgram.IndexOf("FlushHeadlessConsoleLogging();", headlessInitializationFailure, StringComparison.Ordinal);
+            int headlessInitializationReturn = zoneProgram.IndexOf("return;", headlessInitializationFailure, StringComparison.Ordinal);
+            int legacyLogOffAll = zoneProgram.IndexOf("Misc.LogOffAll();", StringComparison.Ordinal);
+            int legacyLogOffGuard = zoneProgram.LastIndexOf("#if !AOREBIRTH_LINUX", legacyLogOffAll, StringComparison.Ordinal);
+            int legacyLogOffEnd = legacyLogOffGuard < 0
+                ? -1
+                : zoneProgram.IndexOf("#endif", legacyLogOffGuard, StringComparison.Ordinal);
+            Require(CountOccurrences(zoneProgram, "int headlessDatabaseValidation = ValidateDatabase();") == 1, "Linux ZoneEngine does not have exactly one governed in-process database gate");
+            Require(headlessDatabaseGate >= 0 && databaseValidatedState > headlessDatabaseGate && runtimeInitialize > databaseValidatedState, "Linux ZoneEngine does not pass a successful governed database validation into initialization");
+            Require(zoneProgram.Contains("private static bool Initialize(bool databaseAlreadyValidated)"), "ZoneEngine initialization lacks explicit database validation state");
+            Require(zoneProgram.Contains("if (!CheckRuntimeDatabase(databaseAlreadyValidated))"), "ZoneEngine initialization bypasses the platform-scoped database policy");
+            Require(databasePolicy.Contains("#if AOREBIRTH_LINUX") && databasePolicy.Contains("return databaseAlreadyValidated;"), "Linux ZoneEngine initialization can bypass the proven database state");
+            Require(databasePolicy.Contains("#else") && databasePolicy.Contains("return Misc.CheckDatabase();"), "non-Linux interactive database bootstrap contract changed unexpectedly");
+            Require(!databasePolicy.Contains("ValidateDatabase()"), "Linux ZoneEngine repeats the governed database validation during initialization");
+            Require(zoneProgram.Contains("ZONEENGINE_HEADLESS_INITIALIZATION_FAILED"), "headless ZoneEngine initialization failure lacks a noninteractive error boundary");
+            Require(headlessInitializationFailure >= 0 && headlessInitializationExit > headlessInitializationFailure && headlessInitializationFlush > headlessInitializationExit && headlessInitializationReturn > headlessInitializationFlush, "headless ZoneEngine initialization failure can prompt or exit successfully");
+            Require(headlessListenerStart >= 0 && headlessListenerReadyCheck > headlessListenerStart && headlessReady > headlessListenerReadyCheck, "ZoneEngine reports systemd readiness before proving its TCP listener");
+            Require(zoneProgram.Contains("zoneServer == null || !zoneServer.IsRunning || !zoneServer.TCPEnabled"), "ZoneEngine readiness does not require a running TCP listener");
+            Require(zoneProgram.Contains("ZONEENGINE_HEADLESS_READY listener="), "ZoneEngine lacks deterministic headless readiness evidence");
+            Require(zoneProgram.Contains("Environment.GetEnvironmentVariable(\"NOTIFY_SOCKET\")"), "ZoneEngine cannot notify systemd readiness");
+            Require(zoneProgram.Contains("ZoneEngine could not notify systemd readiness."), "ZoneEngine does not fail closed when configured systemd notification fails");
+            Require(zoneProgram.Contains("NotifySystemd(\"STOPPING=1\\nSTATUS=ZoneEngine is stopping\")"), "ZoneEngine does not notify systemd before governed shutdown");
+            Require(legacyLogOffGuard >= 0 && legacyLogOffGuard < legacyLogOffAll && legacyLogOffAll < legacyLogOffEnd, "Linux ZoneEngine can still perform legacy global Online mutation during initialization");
+
             int stopLogin = upgrader.IndexOf("service_stop login", StringComparison.Ordinal);
             int stopZone = upgrader.IndexOf("service_stop zone", StringComparison.Ordinal);
             int startLogin = upgrader.LastIndexOf("service_start login", StringComparison.Ordinal);
             int startZone = upgrader.LastIndexOf("service_start zone", StringComparison.Ordinal);
+            int rollbackFunction = upgrader.IndexOf("rollback()", StringComparison.Ordinal);
+            int rollbackStartLogin = rollbackFunction < 0
+                ? -1
+                : upgrader.IndexOf("rollback_operation START_LOGIN", rollbackFunction, StringComparison.Ordinal);
+            int rollbackVerifiedBeforeRestart = rollbackStartLogin < 0
+                ? -1
+                : upgrader.LastIndexOf("[[ \"${failed}\" == false ]]", rollbackStartLogin, StringComparison.Ordinal);
             Require(stopLogin >= 0 && stopLogin < stopZone, "production stop order is not LoginEngine then ZoneEngine");
             Require(startLogin >= 0 && startLogin < startZone, "production start order is not LoginEngine then ZoneEngine");
+            Require(rollbackFunction >= 0 && rollbackVerifiedBeforeRestart > rollbackFunction && rollbackStartLogin > rollbackVerifiedBeforeRestart, "general rollback can restart services before exact prior-state restoration passes");
 
             Require(manifest.Contains("LOGINENGINE_ARTIFACT_SHA256="), "release manifest lacks LoginEngine artifact hash");
             Require(manifest.Contains("ZONEENGINE_ARTIFACT_SHA256="), "release manifest lacks ZoneEngine artifact hash");
@@ -82,7 +141,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(manifest.Contains("ZONEENGINE_UNIT_SHA256="), "release manifest lacks ZoneEngine unit hash");
             Require(manifest.Contains("repository HEAD does not match expected source SHA"), "manifest generator lost immutable SHA gate");
 
-            Require(tests.Contains("production deployment workflow tests (41/41)"), "deployment fixture suite count changed");
+            Require(tests.Contains("production deployment workflow tests (56/56)"), "deployment fixture suite count changed");
             Require(tests.Contains("candidate LoginEngine configuration path diverges from the governed production path"), "deployment fixtures do not reject a divergent LoginEngine config path");
             Require(tests.Contains("AO_REBIRTH_CONFIG_PATH is missing or duplicated"), "deployment fixtures do not reject duplicate config-path assignments");
             Require(tests.Contains("outage recovery accepted an active ZoneEngine"), "deployment fixtures do not reject misuse of outage recovery");
@@ -93,6 +152,16 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(tests.Contains("outage recovery accepted a changing frozen restart count"), "deployment fixtures do not prove that outage recovery remains frozen");
             Require(tests.Contains("outage recovery left an already-deployed ZoneEngine stopped"), "deployment fixtures allow recovery to take the stopped idempotent no-op path");
             Require(tests.Contains("outage recovery accepted a ZoneEngine auto-restart"), "deployment fixtures do not require post-start restart stability");
+            Require(tests.Contains("stopped recovery modifier was accepted without outage recovery mode"), "deployment fixtures do not constrain stopped-pair recovery authority");
+            Require(tests.Contains("stopped recovery accepted an occupied LoginEngine port"), "deployment fixtures do not reject an occupied LoginEngine port during retry");
+            Require(tests.Contains("stopped recovery accepted failed LoginEngine port inspection"), "deployment fixtures allow a failed stopped-pair listener inspection to pass open");
+            Require(tests.Contains("stopped recovery accepted LoginEngine state drift"), "deployment fixtures do not freeze the stopped LoginEngine state");
+            Require(tests.Contains("stopped recovery accepted LoginEngine restart drift"), "deployment fixtures do not freeze the LoginEngine restart count");
+            Require(tests.Contains("stopped recovery accepted Online drift before mutation"), "deployment fixtures do not recheck Online state before stopped-pair mutation");
+            Require(tests.Contains("stopped-pair recovery took an idempotent no-op path"), "deployment fixtures permit a stopped candidate to remain stopped");
+            Require(tests.Contains("deployment accepted an unmanaged ZoneEngine systemd drop-in"), "deployment fixtures do not reject unmanaged effective unit overrides");
+            Require(tests.Contains("stopped recovery accepted an ineffective ZoneEngine readiness unit"), "deployment fixtures do not prove effective Type=notify after installation");
+            Require(tests.Contains("stopped recovery accepted concurrent daily-login drop-in drift"), "deployment fixtures do not fail closed on governed drop-in byte drift");
             Require(tests.Contains("outage recovery accepted an online character after admission closed"), "deployment fixtures do not close the zero-online race before mutation");
             Require(tests.Contains("outage recovery accepted a ZoneEngine state change before mutation"), "deployment fixtures do not preserve ZoneEngine state around the Online boundary");
             Require(tests.Contains("artifact_install"), "deployment fixture suite lacks artifact rollback failure");
