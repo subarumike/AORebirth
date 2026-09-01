@@ -630,7 +630,13 @@ The plugin retains the complete inbound and outbound raw stream in
 `scfu-appearance.csv`, current AOSharp dynels plus exact raw entity/corpse
 evidence into `world-snapshot.csv`, player position/stats/evades/armor/buffs/
 weapons into `player-combat-context.csv`, and attack-boundary distance evidence
-into `aggro-observations.csv`. Capture start/end, manual marks/snapshots, and
+into `aggro-observations.csv`. Every live visibility sample also preserves the
+entity heading quaternion and derived horizontal forward vector. Before an
+attack boundary can update or turn the NPC, the plugin retains the immediately
+preceding source/target sample; each aggro row includes that pre-aggro heading,
+positions, distance, sample age, and relative approach angle alongside the
+event-time heading. Unprovoked aggro without this pre-aggro heading correlation
+validates incomplete. Capture start/end, manual marks/snapshots, and
 opened-container updates write the main inventory plus every loaded open
 backpack into `inventory-snapshots.csv`, including the complete slot and unique
 identities, low/high template IDs, QL, name, charges, and container provenance.
