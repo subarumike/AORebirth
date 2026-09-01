@@ -498,8 +498,11 @@ printf 'inactive\n' > "${state}/zone.active"
 printf 'YES\n' > "${state}/online-on-login-stop"
 if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted an online character after admission closed"; fi
 require grep -F 'online characters appeared after LoginEngine admission closed' "${fixture}/output"
+require grep -F 'ROLLBACK_STEP_RESTORE_ZONE_NOTIFY_DROPIN=PASS' "${fixture}/output"
+require grep -F 'ROLLBACK_STEP_DAEMON_RELOAD=PASS' "${fixture}/output"
 require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
 assert_old_targets
+assert_governed_dropin_restored
 require test "$(cat "${state}/login.active")" = inactive
 require test "$(cat "${state}/zone.active")" = inactive
 tests_run=$((tests_run + 1))

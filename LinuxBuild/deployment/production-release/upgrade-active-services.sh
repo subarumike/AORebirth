@@ -368,7 +368,7 @@ restore_zone_notify_dropin()
         local swap="${ZONE_STALE_NOTIFY_DROPIN}.production-release.$$"
         install -m 0644 "${snapshot_dir}/zoneengine.10-type-simple.conf" "${swap}" || return 1
         mv -fT -- "${swap}" "${ZONE_STALE_NOTIFY_DROPIN}" || return 1
-        return
+        return 0
     fi
     [[ ! -e "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]]
 }
@@ -519,25 +519,25 @@ daemon_reload()
         if [[ "${rolling_back}" != true \
             && -f "${TEST_STATE}/daily-login-dropin-tamper-after-reload" \
             && "$(cat "${TEST_STATE}/daily-login-dropin-tamper-after-reload")" == YES ]]; then
-            printf '# concurrent fixture drift\n' >> "${ZONE_DAILY_LOGIN_DROPIN}"
-            printf 'NO\n' > "${TEST_STATE}/daily-login-dropin-tamper-after-reload"
+            printf '# concurrent fixture drift\n' >> "${ZONE_DAILY_LOGIN_DROPIN}" || return 1
+            printf 'NO\n' > "${TEST_STATE}/daily-login-dropin-tamper-after-reload" || return 1
         fi
         if [[ -f "${ZONE_STALE_NOTIFY_DROPIN}" && ! -L "${ZONE_STALE_NOTIFY_DROPIN}" ]]; then
-            printf 'simple\n' > "${TEST_STATE}/zone.effective-type"
-            printf 'none\n' > "${TEST_STATE}/zone.notify-access"
-            printf '%s %s\n' "${ZONE_STALE_NOTIFY_DROPIN}" "${ZONE_DAILY_LOGIN_DROPIN}" > "${TEST_STATE}/zone.dropin-paths"
+            printf 'simple\n' > "${TEST_STATE}/zone.effective-type" || return 1
+            printf 'none\n' > "${TEST_STATE}/zone.notify-access" || return 1
+            printf '%s %s\n' "${ZONE_STALE_NOTIFY_DROPIN}" "${ZONE_DAILY_LOGIN_DROPIN}" > "${TEST_STATE}/zone.dropin-paths" || return 1
         elif [[ "${rolling_back}" != true \
             && -f "${TEST_STATE}/zone.effective-mismatch-after-reload" \
             && "$(cat "${TEST_STATE}/zone.effective-mismatch-after-reload")" == YES ]]; then
-            printf 'simple\n' > "${TEST_STATE}/zone.effective-type"
-            printf 'none\n' > "${TEST_STATE}/zone.notify-access"
-            printf '/run/systemd/system/ao-rebirth-zoneengine.service.d/99-fixture.conf\n' > "${TEST_STATE}/zone.dropin-paths"
+            printf 'simple\n' > "${TEST_STATE}/zone.effective-type" || return 1
+            printf 'none\n' > "${TEST_STATE}/zone.notify-access" || return 1
+            printf '/run/systemd/system/ao-rebirth-zoneengine.service.d/99-fixture.conf\n' > "${TEST_STATE}/zone.dropin-paths" || return 1
         else
-            printf 'notify\n' > "${TEST_STATE}/zone.effective-type"
-            printf 'main\n' > "${TEST_STATE}/zone.notify-access"
-            printf '%s\n' "${ZONE_DAILY_LOGIN_DROPIN}" > "${TEST_STATE}/zone.dropin-paths"
+            printf 'notify\n' > "${TEST_STATE}/zone.effective-type" || return 1
+            printf 'main\n' > "${TEST_STATE}/zone.notify-access" || return 1
+            printf '%s\n' "${ZONE_DAILY_LOGIN_DROPIN}" > "${TEST_STATE}/zone.dropin-paths" || return 1
         fi
-        return
+        return 0
     fi
     systemctl daemon-reload
 }
