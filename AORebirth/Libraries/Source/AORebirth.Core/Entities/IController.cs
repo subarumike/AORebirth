@@ -408,6 +408,8 @@ namespace AORebirth.Core.Entities
         /// </param>
         void SendChangedStats();
 
+        void SendCombatHealthStatWire(uint wireHealth);
+
         /// <summary>
         /// </summary>
         /// <param name="function">

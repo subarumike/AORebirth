@@ -36,11 +36,14 @@ namespace Utility
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Reflection;
 
     using NLog;
     using NLog.Config;
     using NLog.Targets;
+
+    using Utility.Config;
 
     #endregion
 
@@ -62,7 +65,9 @@ namespace Utility
         /// </summary>
         private static bool init;
 
-        private static DebugInfoDetail debugInfoDetail = DebugInfoDetail.Engine | DebugInfoDetail.Error;
+        private static DebugInfoDetail debugInfoDetail = DefaultDebugInfoDetail;
+
+        private static readonly DebugInfoDetail DefaultDebugInfoDetail = DebugInfoDetail.Engine | DebugInfoDetail.Error;
 
         // Start with Engine messages enabled
 
@@ -84,6 +89,20 @@ namespace Utility
             {
                 Debug(msg);
             }
+        }
+
+        public static void ApplyConfiguredDebugDetails()
+        {
+            debugInfoDetail = ParseDebugInfoDetail(ConfigReadWrite.Instance.CurrentConfig.DebugInfoDetail);
+            Console.WriteLine(
+                "Config: {0} | DebugInfoDetail: {1}",
+                Path.GetFullPath(ConfigReadWrite.ResolvedConfigPath),
+                FormatEnabledDebugDetails());
+        }
+
+        public static void ApplyConfiguredDebugDetails(string configuredValue)
+        {
+            debugInfoDetail = ParseDebugInfoDetail(configuredValue);
         }
 
         public static void Toggle(DebugInfoDetail detail)
@@ -520,6 +539,57 @@ namespace Utility
             logger(string.Format("OS: {0} - CLR: {1}", Environment.OSVersion, Environment.Version));
         }
 
+        private static DebugInfoDetail ParseDebugInfoDetail(string configuredValue)
+        {
+            if (string.IsNullOrWhiteSpace(configuredValue))
+            {
+                return DefaultDebugInfoDetail;
+            }
+
+            DebugInfoDetail parsed = 0;
+            string[] parts = configuredValue.Split(new[] { ',', '|', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string part in parts)
+            {
+                DebugInfoDetail detail;
+                if (TryParseDebugInfoDetailName(part.Trim(), out detail))
+                {
+                    parsed |= detail;
+                }
+                else
+                {
+                    Debug(string.Format("Unknown DebugInfoDetail '{0}' in config; ignoring.", part.Trim()));
+                }
+            }
+
+            return parsed == 0 ? DefaultDebugInfoDetail : parsed;
+        }
+
+        private static bool TryParseDebugInfoDetailName(string name, out DebugInfoDetail detail)
+        {
+            return Enum.TryParse(name, true, out detail);
+        }
+
+        private static string FormatEnabledDebugDetails()
+        {
+            var enabled = new List<string>();
+            FieldInfo[] fields = typeof(DebugInfoDetail).GetFields();
+            foreach (FieldInfo info in fields)
+            {
+                if (!info.IsLiteral)
+                {
+                    continue;
+                }
+
+                var flag = (DebugInfoDetail)info.GetRawConstantValue();
+                if (debugInfoDetail.HasFlag(flag))
+                {
+                    enabled.Add(info.Name);
+                }
+            }
+
+            return enabled.Count == 0 ? "(none)" : string.Join(", ", enabled);
+        }
+
         #endregion
     }
 
@@ -557,5 +627,7 @@ namespace Utility
         Pool = 16384,
 
         Shopping = 32768,
+
+        Combat = 65536,
     }
 }

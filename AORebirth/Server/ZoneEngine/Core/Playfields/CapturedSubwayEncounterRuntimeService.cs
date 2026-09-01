@@ -914,7 +914,7 @@ namespace AORebirth.Core.Playfields
             int instance = Pool.Instance.GetFreeInstance<Character>(1000000, IdentityType.CanbeAffected);
             var identity = new Identity { Type = IdentityType.CanbeAffected, Instance = instance };
             var controller = new NPCController();
-            var character = new Character(this.playfield.Identity, identity, controller);
+            var character = new NpcCharacter(this.playfield.Identity, identity, controller);
             character.Read();
             controller.Character = character;
             character.Playfield = this.playfield;

@@ -241,7 +241,6 @@
     <Compile Include="Core\Nascence\Quests\NascenceAbanFalaQuestRuntime.cs" />
     <Compile Include="Core\Nascence\Quests\NascenceAbanFalaTradeAdapter.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
-    <Compile Include="Core\CombatDamageRules.cs" />
     <Compile Include="Core\PlayerSpecialAttackRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
     <Compile Include="Core\DailyLoginRewardRuntime.cs" />
@@ -726,6 +725,7 @@
     <Compile Include="Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldAnnouncementRuntimeService.cs" />
+    <Compile Include="Core\Playfields\PlayfieldCharacterCombatSubscriptions.cs" />
     <Compile Include="Core\Playfields\PlayfieldCharacterHeartbeatHealthRules.cs" />
     <Compile Include="Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs" />

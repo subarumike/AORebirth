@@ -794,6 +794,7 @@ namespace ChatEngine
             {
                 // Setup and enable NLog logging.
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogUtil.ApplyConfiguredDebugDetails();
                 #if !AOREBIRTH_LINUX
                 LogUtil.SetupFileLogging("${basedir}/ChatEngineLog.txt", LogLevel.Trace);
 

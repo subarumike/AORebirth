@@ -12,6 +12,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     using System;
 
+    using AORebirth.Core.Combat;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Playfields;
     using AORebirth.Enums;
@@ -182,35 +183,17 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             int newHealth = Math.Max(0, current + delta);
             int actualDamage = current - newHealth;
+            if (actualDamage <= 0)
+            {
+                affected.Stats[StatIds.health].Value = newHealth;
+                SendStats(affected);
+                return true;
+            }
+
             affected.Stats[StatIds.health].Value = newHealth;
             SendStats(affected);
 
-            if (actualDamage <= 0 || source == null || affected.Playfield == null)
-            {
-                return true;
-            }
-
-            Playfield playfield = affected.Playfield as Playfield;
-            if (playfield == null)
-            {
-                return true;
-            }
-
-            playfield.Announce(
-                new AttackInfoMessage
-                {
-                    Identity = source.Identity,
-                    Unknown = 0,
-                    Target = affected.Identity,
-                    Unknown1 = actualDamage,
-                    Unknown2 = UnarmedAttackInfoAmmoCount,
-                    Unknown3 = AttackInfoWeaponSlot,
-                    Unknown4 = AttackInfoUnk1,
-                    Unknown5 = AttackInfoHitType,
-                    Unknown6 = 0
-                });
-
-            if (source.Controller != null && source.Controller.Client != null)
+            if (source != null && source.Controller != null && source.Controller.Client != null)
             {
                 ChatTextMessageHandler.Default.Send(
                     source,
@@ -218,19 +201,6 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         "You hit {0} for {1} points of energy damage.",
                         string.IsNullOrWhiteSpace(affected.Name) ? "target" : affected.Name,
                         actualDamage));
-            }
-
-            // Incoming hit text: AttackInfo alone fills Combat chat; ChatText would also flood General.
-
-            if (source.Identity != affected.Identity)
-            {
-                playfield.AcquireNpcAggro(source, affected);
-                playfield.SuspendNpcRegen(affected);
-            }
-
-            if (newHealth == 0)
-            {
-                playfield.HandleCombatKillingHit(source, affected);
             }
 
             return true;

@@ -568,6 +568,7 @@ namespace ZoneEngine
             {
                 // Setup and enable NLog logging to file
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
 
 #if !AOREBIRTH_LINUX

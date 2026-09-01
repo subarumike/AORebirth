@@ -8,6 +8,10 @@
   <ZonePort>7501</ZonePort>
   <LoginPort>7500</LoginPort>
   <CommPort>6996</CommPort>
+  <!-- Playfield simulation ticks per second (default 32) -->
+  <PlayfieldTickRate>32</PlayfieldTickRate>
+  <!-- Debug console categories: comma-separated DebugInfoDetail names (default Engine,Error) -->
+  <!-- <DebugInfoDetail>Engine,Error,Combat</DebugInfoDetail> -->
   <!-- Log Area -->
   <SqlLog>true</SqlLog>
   <LogChat>false</LogChat>

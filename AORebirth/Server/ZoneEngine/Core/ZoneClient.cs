@@ -394,7 +394,7 @@ namespace ZoneEngine.Core
 
             if (pooledCharacter == null)
             {
-                this.Controller.Character = new Character(
+                this.Controller.Character = new PlayerCharacter(
                     pf.Identity,
                     characterIdentity,
                     this.Controller);
@@ -442,7 +442,7 @@ namespace ZoneEngine.Core
                         pooledCharacter = null;
                         this.IsPlayfieldTransferLogin = false;
                         preserveLogoutSitOnConnect = false;
-                        this.Controller.Character = new Character(
+                        this.Controller.Character = new PlayerCharacter(
                             pf.Identity,
                             characterIdentity,
                             this.Controller);
