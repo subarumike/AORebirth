@@ -74,7 +74,7 @@ Captured/table anchors are:
 | 60 | `8` | `72` |
 | 60 | `9` | `78` |
 | 60 | `10` | `90` |
-| 60 | `11` | `107` |
+| 60 | `11` | `108` |
 | 220 | `1` | `154` |
 | 220 | `2` | `165` |
 | 220 | `3` | `176` |
@@ -91,20 +91,27 @@ The character level used to select a table row is bounded to the table's support
 The canonical exact source table is
 `AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv`. After normalizing
 repository text line endings to LF, its SHA-256 is
-`295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f`.
+`393308fe4ac80f7513743aaedabaaaf5c372d081f15f9afc489b3c4df8c03b6a`.
 It contains one exact header plus 220 level rows, eleven mission-quality
 positions per row, and the existing token column.
 
-`Mission_Tables_Level_Restrictions_Teaming_Levels.ods` remains upstream
-provenance with SHA-256
-`5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`.
-Its expanded ODF cells match the canonical mission positions and token values
-through level 133. The mission cells for levels 134–220 were coerced to
-floating-point scientific notation and lost low-order digits. The ODS therefore
-cannot reproduce the exact complete graph and is not a production or generation
-dependency.
+`docs/evidence/data/helpbot-mission-ql-levels-1-149.json` now governs exact
+published mission-QL parity for levels 1-149. It is extracted from pinned
+AOWiki revision `44808`; its raw wikitext SHA-256 is
+`f8841253af7ed9b63aa2d9d1a2d48e487239b4f8e44e57b225cc7b3855c04488`.
+The eleven detents are derived with integer arithmetic and an exact exhaustive
+de-duplication comparison against every published row.
 
-`tools/generate_mission_level_graph.cmd` validates the canonical CSV and emits
+`Mission_Tables_Level_Restrictions_Teaming_Levels.ods` remains conflicting
+legacy provenance with SHA-256
+`5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`.
+It conflicts with the pinned Helpbot reference below level 134. Its mission
+cells for levels 134–220 were also coerced to floating-point scientific
+notation and lost low-order digits. The ODS therefore cannot reproduce the
+exact complete graph and is not a production or generation dependency.
+
+`tools/generate_mission_level_graph.cmd` validates the canonical CSV against
+the Helpbot artifact for all 1,639 covered detent cells and emits
 `Core/Missions/MissionLevelGraphData.g.cs`. A `--check` invocation performs a
 byte-for-byte reproducibility check. The generated artifact embeds the source
 path, canonical source/payload hash, ODS provenance hash and limitation, and
@@ -120,7 +127,8 @@ Before mission rolling can use a QL, the runtime loader requires:
 - canonical unsigned-decimal tokens without signs, whitespace, or leading
   zeroes;
 - mission QLs in `1..250` and the unchanged token values in `1..9`;
-- nondecreasing QLs within every row and down every difficulty column;
+- nondecreasing QLs within every row;
+- exact Helpbot-reference parity for every level 1-149 detent;
 - the official neutral invariant `Q5 == level`;
 - nondecreasing existing token values;
 - exact payload SHA-256 and byte-identical canonical reserialization.
@@ -132,9 +140,10 @@ row admission, default row, interpolation, guessed value, runtime file search,
 or legacy QL formula fallback. If no valid graph exists, the roll path emits a
 specific diagnostic and player message and returns before credits are charged.
 
-This hardening does not alter the official values, character-level clamp,
-one-based difficulty wire mapping, location selection, slider behavior,
-rewards, token progress, ACG layout selection, or authored quests.
+The 2026-09-01 Helpbot reconciliation supersedes 43 detent cells across 41
+levels. It does not alter the character-level clamp, one-based difficulty wire
+mapping, location selection, slider behavior, rewards, token progress, ACG
+layout selection, or authored quests.
 
 ### Continuous sliders
 

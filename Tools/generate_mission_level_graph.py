@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Generate the compiled official mission-level graph from its canonical CSV.
+"""Generate the compiled mission-level graph from its canonical CSV.
 
-The checked-in CSV is the exact local source for all 220 levels. The earlier ODS
-is retained as provenance only: its mission cells match levels 1-133, but rows
-134-220 were precision-coerced by the spreadsheet and cannot reproduce the
-exact graph.
+The checked-in Helpbot artifact governs levels 1-149. The earlier ODS is retained
+as conflicting legacy provenance only, and levels 150-220 remain outside the
+Helpbot reference's coverage.
 """
 
 from __future__ import annotations
@@ -13,6 +12,13 @@ import argparse
 import hashlib
 from pathlib import Path
 import sys
+
+from helpbot_mission_ql_reference import (
+    DEFAULT_REFERENCE as HELPBOT_REFERENCE,
+    ReferenceError,
+    derive_detents,
+    load_reference,
+)
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
@@ -42,8 +48,21 @@ UPSTREAM_ODS_SHA256 = (
     "5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7"
 )
 UPSTREAM_ODS_VERIFICATION = (
-    "Levels 1-133 match exactly; levels 134-220 are precision-coerced "
-    "and are not an exact source."
+    "Legacy provenance only. It conflicts with the pinned Helpbot reference "
+    "below level 134, and levels 134-220 are precision-coerced and not exact."
+)
+HELPBOT_REFERENCE_REPOSITORY_PATH = (
+    "docs/evidence/data/helpbot-mission-ql-levels-1-149.json"
+)
+HELPBOT_REFERENCE_REVISION_URL = (
+    "https://wiki.aodb.us/index.php?title=Level_Parameters&oldid=44808"
+)
+HELPBOT_REFERENCE_RAW_SHA256 = (
+    "f8841253af7ed9b63aa2d9d1a2d48e487239b4f8e44e57b225cc7b3855c04488"
+)
+HELPBOT_REFERENCE_VERIFICATION = (
+    "Published mission-QL lists are proven for levels 1-149; the eleven "
+    "difficulty detents are deterministically derived and exhaustively checked."
 )
 
 MIN_LEVEL = 1
@@ -160,14 +179,6 @@ def validate_canonical_csv(text: str) -> list[str]:
         qualities.append(row_qualities)
         tokens.append(token_count)
 
-    for difficulty_index in range(DIFFICULTY_COUNT):
-        for level_index in range(MAX_LEVEL - 1):
-            if qualities[level_index][difficulty_index] > qualities[level_index + 1][difficulty_index]:
-                raise ValidationError(
-                    f"Q{difficulty_index} decreases between levels "
-                    f"{level_index + 1} and {level_index + 2}."
-                )
-
     for level_index in range(MAX_LEVEL - 1):
         if tokens[level_index] > tokens[level_index + 1]:
             raise ValidationError(
@@ -176,6 +187,23 @@ def validate_canonical_csv(text: str) -> list[str]:
             )
 
     return rows
+
+
+def validate_helpbot_reference(rows: list[str]) -> None:
+    try:
+        _, reference_rows = load_reference(HELPBOT_REFERENCE)
+    except ReferenceError as error:
+        raise ValidationError(str(error)) from error
+
+    for level, published in reference_rows.items():
+        cells = rows[level].split(",")
+        actual = [int(cells[1 + index]) for index in range(DIFFICULTY_COUNT)]
+        expected = derive_detents(level, published)
+        if actual != expected:
+            raise ValidationError(
+                f"Level {level} differs from the pinned Helpbot reference: "
+                f"expected {expected}, found {actual}."
+            )
 
 
 def csharp_string(value: str) -> str:
@@ -214,6 +242,18 @@ namespace ZoneEngine.Core.Missions
         internal const string UpstreamOdsVerification =
             {csharp_string(UPSTREAM_ODS_VERIFICATION)};
 
+        internal const string HelpbotReferenceRepositoryPath =
+            {csharp_string(HELPBOT_REFERENCE_REPOSITORY_PATH)};
+
+        internal const string HelpbotReferenceRevisionUrl =
+            {csharp_string(HELPBOT_REFERENCE_REVISION_URL)};
+
+        internal const string HelpbotReferenceRawSha256 =
+            {csharp_string(HELPBOT_REFERENCE_RAW_SHA256)};
+
+        internal const string HelpbotReferenceVerification =
+            {csharp_string(HELPBOT_REFERENCE_VERIFICATION)};
+
         private static readonly string[] Rows =
         {{
 {generated_rows}
@@ -241,6 +281,7 @@ def main() -> int:
     canonical_csv = normalize_source(source_bytes)
     source_sha256 = hashlib.sha256(canonical_csv.encode("utf-8")).hexdigest()
     rows = validate_canonical_csv(canonical_csv)
+    validate_helpbot_reference(rows)
     payload_sha256 = hashlib.sha256(canonical_csv.encode("utf-8")).hexdigest()
     generated = generate_source(rows, source_sha256, payload_sha256)
     generated_bytes = generated.encode("utf-8")

@@ -349,6 +349,25 @@ script invocation.
 
 ### Official Mission-Level Graph
 
+Verify the tracked Helpbot reference and all 1,639 governed runtime detents for
+levels 1-149 with:
+
+```cmd
+cmd /d /c Tools\helpbot_mission_ql_reference.cmd
+```
+
+To reproduce acquisition, download the raw form of pinned AOWiki revision
+`44808` from the URL and SHA-256 recorded in
+`docs/evidence/data/helpbot-mission-ql-levels-1-149.json`, then run:
+
+```cmd
+cmd /d /c Tools\helpbot_mission_ql_reference.cmd --extract-raw "<pinned-raw-wikitext>" --update-graph
+```
+
+The command fails unless the raw bytes match the pinned source hash, extraction
+finds exactly levels 1-149, and the reconstructed eleven detents reproduce every
+published list after adjacent duplicates are removed.
+
 Regenerate the compiled graph from the canonical checked-in CSV with:
 
 ```cmd
@@ -361,9 +380,9 @@ Verify byte-for-byte reproducibility without writing with:
 cmd /d /c tools\generate_mission_level_graph.cmd --check
 ```
 
-The upstream ODS is provenance only because its mission cells after level 133
-were precision-coerced. Do not generate the complete graph from that ODS and do
-not make production depend on either spreadsheet file.
+The upstream ODS is conflicting legacy provenance and its mission cells after
+level 133 were precision-coerced. Do not generate the complete graph from that
+ODS. Levels 150-220 remain outside the pinned Helpbot proof boundary.
 
 ## Database-Wide Official Playfield Placement Import
 

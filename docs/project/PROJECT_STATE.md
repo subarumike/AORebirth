@@ -9,6 +9,13 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Helpbot mission-terminal QL reconstruction now governs exact levels 1-149
+  from pinned AOWiki revision `44808`. All 149 published rows and 1,639 derived
+  detent cells pass exhaustive parity; 43 runtime cells across 41 levels were
+  corrected while levels 150-220 remain unchanged and explicitly outside the
+  reference's proof boundary. Evidence:
+  `docs/evidence/HELPBOT_MISSION_QL_RECONSTRUCTION_20260901.md`.
+
 - ARPA3/ClickSaver Rubi-Ka mission evidence is archived and normalized offline
   with source/member SHA-256 provenance, deterministic regeneration, and no
   runtime dependency. The two retained ClickSaver 3.x catalogs decode to a
@@ -280,7 +287,7 @@ completion matrices and dated evidence retain detailed provenance.
   the sole password mutation boundary. Evidence:
   `docs/project/PASSWORD_MANAGEMENT_PRODUCTION_EVIDENCE_20260831.md`.
 
-- Complete AOtomation suite: PASS (1003/1003).
+- Complete AOtomation suite: PASS (1137/1137).
 - Arete regular-mob combat uses a scoped forward reconciliation against the
   current capture corpus. The retired post-cutoff 60/60 script is not restored;
   the current focused gameplay gate validates supported combat behavior and

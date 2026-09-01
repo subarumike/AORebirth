@@ -1,0 +1,4340 @@
+{
+  "schema_version": 1,
+  "source": {
+    "title": "AOWiki Level Parameters",
+    "page_url": "https://wiki.aodb.us/wiki/Level_Parameters",
+    "revision_url": "https://wiki.aodb.us/index.php?title=Level_Parameters&oldid=44808",
+    "raw_url": "https://wiki.aodb.us/index.php?title=Level_Parameters&oldid=44808&action=raw",
+    "revision_id": 44808,
+    "retrieved_utc": "2026-09-01T11:41:39Z",
+    "raw_wikitext_sha256": "f8841253af7ed9b63aa2d9d1a2d48e487239b4f8e44e57b225cc7b3855c04488",
+    "provenance_statement": "The page states that its level data was obtained exclusively in game with /tell helpbot level X."
+  },
+  "coverage": {
+    "minimum_character_level": 1,
+    "maximum_character_level": 149,
+    "published_lists_status": "PROVEN",
+    "detent_reconstruction_status": "DERIVED",
+    "levels_150_220_status": "UNKNOWN_FROM_THIS_REFERENCE"
+  },
+  "reconstruction": {
+    "difficulty_wire_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "base_integer_percentages_for_wires_1_10": [
+      70,
+      75,
+      80,
+      85,
+      90,
+      100,
+      110,
+      120,
+      130,
+      150
+    ],
+    "base_rounding": "floor(level * percentage / 100), minimum 1",
+    "wire_11_rule": "last value in the published Helpbot list",
+    "published_list_rule": "remove adjacent duplicate detent QLs",
+    "authoritative_anomalies": [
+      {
+        "character_level": 77,
+        "difficulty_wire": 3,
+        "mission_ql": 60
+      },
+      {
+        "character_level": 77,
+        "difficulty_wire": 4,
+        "mission_ql": 64
+      },
+      {
+        "character_level": 77,
+        "difficulty_wire": 8,
+        "mission_ql": 91
+      },
+      {
+        "character_level": 112,
+        "difficulty_wire": 7,
+        "mission_ql": 122
+      },
+      {
+        "character_level": 142,
+        "difficulty_wire": 10,
+        "mission_ql": 212
+      }
+    ]
+  },
+  "levels": [
+    {
+      "character_level": 1,
+      "published_mission_qls": [
+        1
+      ],
+      "derived_detent_qls": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "character_level": 2,
+      "published_mission_qls": [
+        1,
+        2,
+        3
+      ],
+      "derived_detent_qls": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3
+      ]
+    },
+    {
+      "character_level": 3,
+      "published_mission_qls": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "derived_detent_qls": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "character_level": 4,
+      "published_mission_qls": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "derived_detent_qls": [
+        2,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "character_level": 5,
+      "published_mission_qls": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "derived_detent_qls": [
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "character_level": 6,
+      "published_mission_qls": [
+        4,
+        5,
+        6,
+        7,
+        9,
+        10
+      ],
+      "derived_detent_qls": [
+        4,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "character_level": 7,
+      "published_mission_qls": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12
+      ],
+      "derived_detent_qls": [
+        4,
+        5,
+        5,
+        5,
+        6,
+        7,
+        7,
+        8,
+        9,
+        10,
+        12
+      ]
+    },
+    {
+      "character_level": 8,
+      "published_mission_qls": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14
+      ],
+      "derived_detent_qls": [
+        5,
+        6,
+        6,
+        6,
+        7,
+        8,
+        8,
+        9,
+        10,
+        12,
+        14
+      ]
+    },
+    {
+      "character_level": 9,
+      "published_mission_qls": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        16
+      ],
+      "derived_detent_qls": [
+        6,
+        6,
+        7,
+        7,
+        8,
+        9,
+        9,
+        10,
+        11,
+        13,
+        16
+      ]
+    },
+    {
+      "character_level": 10,
+      "published_mission_qls": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        18
+      ],
+      "derived_detent_qls": [
+        7,
+        7,
+        8,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        18
+      ]
+    },
+    {
+      "character_level": 11,
+      "published_mission_qls": [
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        16,
+        19
+      ],
+      "derived_detent_qls": [
+        7,
+        8,
+        8,
+        9,
+        9,
+        11,
+        12,
+        13,
+        14,
+        16,
+        19
+      ]
+    },
+    {
+      "character_level": 12,
+      "published_mission_qls": [
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        18,
+        21
+      ],
+      "derived_detent_qls": [
+        8,
+        9,
+        9,
+        10,
+        10,
+        12,
+        13,
+        14,
+        15,
+        18,
+        21
+      ]
+    },
+    {
+      "character_level": 13,
+      "published_mission_qls": [
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        19,
+        22
+      ],
+      "derived_detent_qls": [
+        9,
+        9,
+        10,
+        11,
+        11,
+        13,
+        14,
+        15,
+        16,
+        19,
+        22
+      ]
+    },
+    {
+      "character_level": 14,
+      "published_mission_qls": [
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        18,
+        21,
+        24
+      ],
+      "derived_detent_qls": [
+        9,
+        10,
+        11,
+        11,
+        12,
+        14,
+        15,
+        16,
+        18,
+        21,
+        24
+      ]
+    },
+    {
+      "character_level": 15,
+      "published_mission_qls": [
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        18,
+        19,
+        22,
+        26
+      ],
+      "derived_detent_qls": [
+        10,
+        11,
+        12,
+        12,
+        13,
+        15,
+        16,
+        18,
+        19,
+        22,
+        26
+      ]
+    },
+    {
+      "character_level": 16,
+      "published_mission_qls": [
+        11,
+        12,
+        13,
+        14,
+        16,
+        17,
+        19,
+        20,
+        24,
+        28
+      ],
+      "derived_detent_qls": [
+        11,
+        12,
+        12,
+        13,
+        14,
+        16,
+        17,
+        19,
+        20,
+        24,
+        28
+      ]
+    },
+    {
+      "character_level": 17,
+      "published_mission_qls": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        20,
+        22,
+        25,
+        30
+      ],
+      "derived_detent_qls": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        20,
+        22,
+        25,
+        30
+      ]
+    },
+    {
+      "character_level": 18,
+      "published_mission_qls": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19,
+        21,
+        23,
+        27,
+        32
+      ],
+      "derived_detent_qls": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19,
+        21,
+        23,
+        27,
+        32
+      ]
+    },
+    {
+      "character_level": 19,
+      "published_mission_qls": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        22,
+        24,
+        28,
+        34
+      ],
+      "derived_detent_qls": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        22,
+        24,
+        28,
+        34
+      ]
+    },
+    {
+      "character_level": 20,
+      "published_mission_qls": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        22,
+        24,
+        26,
+        30,
+        36
+      ],
+      "derived_detent_qls": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        22,
+        24,
+        26,
+        30,
+        36
+      ]
+    },
+    {
+      "character_level": 21,
+      "published_mission_qls": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        21,
+        23,
+        25,
+        27,
+        31,
+        37
+      ],
+      "derived_detent_qls": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        21,
+        23,
+        25,
+        27,
+        31,
+        37
+      ]
+    },
+    {
+      "character_level": 22,
+      "published_mission_qls": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        22,
+        24,
+        26,
+        28,
+        33,
+        38
+      ],
+      "derived_detent_qls": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        22,
+        24,
+        26,
+        28,
+        33,
+        38
+      ]
+    },
+    {
+      "character_level": 23,
+      "published_mission_qls": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        23,
+        25,
+        27,
+        29,
+        34,
+        41
+      ],
+      "derived_detent_qls": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        23,
+        25,
+        27,
+        29,
+        34,
+        41
+      ]
+    },
+    {
+      "character_level": 24,
+      "published_mission_qls": [
+        16,
+        18,
+        19,
+        20,
+        21,
+        24,
+        26,
+        28,
+        31,
+        36,
+        42
+      ],
+      "derived_detent_qls": [
+        16,
+        18,
+        19,
+        20,
+        21,
+        24,
+        26,
+        28,
+        31,
+        36,
+        42
+      ]
+    },
+    {
+      "character_level": 25,
+      "published_mission_qls": [
+        17,
+        18,
+        20,
+        21,
+        22,
+        25,
+        27,
+        30,
+        32,
+        37,
+        44
+      ],
+      "derived_detent_qls": [
+        17,
+        18,
+        20,
+        21,
+        22,
+        25,
+        27,
+        30,
+        32,
+        37,
+        44
+      ]
+    },
+    {
+      "character_level": 26,
+      "published_mission_qls": [
+        18,
+        19,
+        20,
+        22,
+        23,
+        26,
+        28,
+        31,
+        33,
+        39,
+        46
+      ],
+      "derived_detent_qls": [
+        18,
+        19,
+        20,
+        22,
+        23,
+        26,
+        28,
+        31,
+        33,
+        39,
+        46
+      ]
+    },
+    {
+      "character_level": 27,
+      "published_mission_qls": [
+        18,
+        20,
+        21,
+        22,
+        24,
+        27,
+        29,
+        32,
+        35,
+        40,
+        48
+      ],
+      "derived_detent_qls": [
+        18,
+        20,
+        21,
+        22,
+        24,
+        27,
+        29,
+        32,
+        35,
+        40,
+        48
+      ]
+    },
+    {
+      "character_level": 28,
+      "published_mission_qls": [
+        19,
+        21,
+        22,
+        23,
+        25,
+        28,
+        30,
+        33,
+        36,
+        42,
+        50
+      ],
+      "derived_detent_qls": [
+        19,
+        21,
+        22,
+        23,
+        25,
+        28,
+        30,
+        33,
+        36,
+        42,
+        50
+      ]
+    },
+    {
+      "character_level": 29,
+      "published_mission_qls": [
+        20,
+        21,
+        23,
+        24,
+        26,
+        29,
+        31,
+        34,
+        37,
+        43,
+        51
+      ],
+      "derived_detent_qls": [
+        20,
+        21,
+        23,
+        24,
+        26,
+        29,
+        31,
+        34,
+        37,
+        43,
+        51
+      ]
+    },
+    {
+      "character_level": 30,
+      "published_mission_qls": [
+        21,
+        22,
+        24,
+        25,
+        27,
+        30,
+        33,
+        36,
+        39,
+        45,
+        53
+      ],
+      "derived_detent_qls": [
+        21,
+        22,
+        24,
+        25,
+        27,
+        30,
+        33,
+        36,
+        39,
+        45,
+        53
+      ]
+    },
+    {
+      "character_level": 31,
+      "published_mission_qls": [
+        21,
+        23,
+        24,
+        26,
+        27,
+        31,
+        34,
+        37,
+        40,
+        46,
+        55
+      ],
+      "derived_detent_qls": [
+        21,
+        23,
+        24,
+        26,
+        27,
+        31,
+        34,
+        37,
+        40,
+        46,
+        55
+      ]
+    },
+    {
+      "character_level": 32,
+      "published_mission_qls": [
+        22,
+        24,
+        25,
+        27,
+        28,
+        32,
+        35,
+        38,
+        41,
+        48,
+        56
+      ],
+      "derived_detent_qls": [
+        22,
+        24,
+        25,
+        27,
+        28,
+        32,
+        35,
+        38,
+        41,
+        48,
+        56
+      ]
+    },
+    {
+      "character_level": 33,
+      "published_mission_qls": [
+        23,
+        24,
+        26,
+        28,
+        29,
+        33,
+        36,
+        39,
+        42,
+        49,
+        58
+      ],
+      "derived_detent_qls": [
+        23,
+        24,
+        26,
+        28,
+        29,
+        33,
+        36,
+        39,
+        42,
+        49,
+        58
+      ]
+    },
+    {
+      "character_level": 34,
+      "published_mission_qls": [
+        23,
+        25,
+        27,
+        28,
+        30,
+        34,
+        37,
+        40,
+        44,
+        51,
+        60
+      ],
+      "derived_detent_qls": [
+        23,
+        25,
+        27,
+        28,
+        30,
+        34,
+        37,
+        40,
+        44,
+        51,
+        60
+      ]
+    },
+    {
+      "character_level": 35,
+      "published_mission_qls": [
+        24,
+        26,
+        28,
+        29,
+        31,
+        35,
+        38,
+        42,
+        45,
+        52,
+        62
+      ],
+      "derived_detent_qls": [
+        24,
+        26,
+        28,
+        29,
+        31,
+        35,
+        38,
+        42,
+        45,
+        52,
+        62
+      ]
+    },
+    {
+      "character_level": 36,
+      "published_mission_qls": [
+        25,
+        27,
+        28,
+        30,
+        32,
+        36,
+        39,
+        43,
+        46,
+        54,
+        64
+      ],
+      "derived_detent_qls": [
+        25,
+        27,
+        28,
+        30,
+        32,
+        36,
+        39,
+        43,
+        46,
+        54,
+        64
+      ]
+    },
+    {
+      "character_level": 37,
+      "published_mission_qls": [
+        25,
+        27,
+        29,
+        31,
+        33,
+        37,
+        40,
+        44,
+        48,
+        55,
+        66
+      ],
+      "derived_detent_qls": [
+        25,
+        27,
+        29,
+        31,
+        33,
+        37,
+        40,
+        44,
+        48,
+        55,
+        66
+      ]
+    },
+    {
+      "character_level": 38,
+      "published_mission_qls": [
+        26,
+        28,
+        30,
+        32,
+        34,
+        38,
+        41,
+        45,
+        49,
+        57,
+        68
+      ],
+      "derived_detent_qls": [
+        26,
+        28,
+        30,
+        32,
+        34,
+        38,
+        41,
+        45,
+        49,
+        57,
+        68
+      ]
+    },
+    {
+      "character_level": 39,
+      "published_mission_qls": [
+        27,
+        29,
+        31,
+        33,
+        35,
+        39,
+        42,
+        46,
+        50,
+        58,
+        69
+      ],
+      "derived_detent_qls": [
+        27,
+        29,
+        31,
+        33,
+        35,
+        39,
+        42,
+        46,
+        50,
+        58,
+        69
+      ]
+    },
+    {
+      "character_level": 40,
+      "published_mission_qls": [
+        28,
+        30,
+        32,
+        34,
+        36,
+        40,
+        44,
+        48,
+        52,
+        60,
+        71
+      ],
+      "derived_detent_qls": [
+        28,
+        30,
+        32,
+        34,
+        36,
+        40,
+        44,
+        48,
+        52,
+        60,
+        71
+      ]
+    },
+    {
+      "character_level": 41,
+      "published_mission_qls": [
+        28,
+        30,
+        32,
+        34,
+        36,
+        41,
+        45,
+        49,
+        53,
+        61,
+        73
+      ],
+      "derived_detent_qls": [
+        28,
+        30,
+        32,
+        34,
+        36,
+        41,
+        45,
+        49,
+        53,
+        61,
+        73
+      ]
+    },
+    {
+      "character_level": 42,
+      "published_mission_qls": [
+        29,
+        31,
+        33,
+        35,
+        37,
+        42,
+        46,
+        50,
+        54,
+        63,
+        75
+      ],
+      "derived_detent_qls": [
+        29,
+        31,
+        33,
+        35,
+        37,
+        42,
+        46,
+        50,
+        54,
+        63,
+        75
+      ]
+    },
+    {
+      "character_level": 43,
+      "published_mission_qls": [
+        30,
+        32,
+        34,
+        36,
+        38,
+        43,
+        47,
+        51,
+        55,
+        64,
+        77
+      ],
+      "derived_detent_qls": [
+        30,
+        32,
+        34,
+        36,
+        38,
+        43,
+        47,
+        51,
+        55,
+        64,
+        77
+      ]
+    },
+    {
+      "character_level": 44,
+      "published_mission_qls": [
+        30,
+        33,
+        35,
+        37,
+        39,
+        44,
+        48,
+        52,
+        57,
+        66,
+        78
+      ],
+      "derived_detent_qls": [
+        30,
+        33,
+        35,
+        37,
+        39,
+        44,
+        48,
+        52,
+        57,
+        66,
+        78
+      ]
+    },
+    {
+      "character_level": 45,
+      "published_mission_qls": [
+        31,
+        33,
+        36,
+        38,
+        40,
+        45,
+        49,
+        54,
+        58,
+        67,
+        80
+      ],
+      "derived_detent_qls": [
+        31,
+        33,
+        36,
+        38,
+        40,
+        45,
+        49,
+        54,
+        58,
+        67,
+        80
+      ]
+    },
+    {
+      "character_level": 46,
+      "published_mission_qls": [
+        32,
+        34,
+        36,
+        39,
+        41,
+        46,
+        50,
+        55,
+        59,
+        69,
+        82
+      ],
+      "derived_detent_qls": [
+        32,
+        34,
+        36,
+        39,
+        41,
+        46,
+        50,
+        55,
+        59,
+        69,
+        82
+      ]
+    },
+    {
+      "character_level": 47,
+      "published_mission_qls": [
+        32,
+        35,
+        37,
+        39,
+        42,
+        47,
+        51,
+        56,
+        61,
+        70,
+        84
+      ],
+      "derived_detent_qls": [
+        32,
+        35,
+        37,
+        39,
+        42,
+        47,
+        51,
+        56,
+        61,
+        70,
+        84
+      ]
+    },
+    {
+      "character_level": 48,
+      "published_mission_qls": [
+        33,
+        36,
+        38,
+        40,
+        43,
+        48,
+        52,
+        57,
+        62,
+        72,
+        85
+      ],
+      "derived_detent_qls": [
+        33,
+        36,
+        38,
+        40,
+        43,
+        48,
+        52,
+        57,
+        62,
+        72,
+        85
+      ]
+    },
+    {
+      "character_level": 49,
+      "published_mission_qls": [
+        34,
+        36,
+        39,
+        41,
+        44,
+        49,
+        53,
+        58,
+        63,
+        73,
+        87
+      ],
+      "derived_detent_qls": [
+        34,
+        36,
+        39,
+        41,
+        44,
+        49,
+        53,
+        58,
+        63,
+        73,
+        87
+      ]
+    },
+    {
+      "character_level": 50,
+      "published_mission_qls": [
+        35,
+        37,
+        40,
+        42,
+        45,
+        50,
+        55,
+        60,
+        65,
+        75,
+        89
+      ],
+      "derived_detent_qls": [
+        35,
+        37,
+        40,
+        42,
+        45,
+        50,
+        55,
+        60,
+        65,
+        75,
+        89
+      ]
+    },
+    {
+      "character_level": 51,
+      "published_mission_qls": [
+        35,
+        38,
+        40,
+        43,
+        45,
+        51,
+        56,
+        61,
+        66,
+        76,
+        91
+      ],
+      "derived_detent_qls": [
+        35,
+        38,
+        40,
+        43,
+        45,
+        51,
+        56,
+        61,
+        66,
+        76,
+        91
+      ]
+    },
+    {
+      "character_level": 52,
+      "published_mission_qls": [
+        36,
+        39,
+        41,
+        44,
+        46,
+        52,
+        57,
+        62,
+        67,
+        78,
+        92
+      ],
+      "derived_detent_qls": [
+        36,
+        39,
+        41,
+        44,
+        46,
+        52,
+        57,
+        62,
+        67,
+        78,
+        92
+      ]
+    },
+    {
+      "character_level": 53,
+      "published_mission_qls": [
+        37,
+        39,
+        42,
+        45,
+        47,
+        53,
+        58,
+        63,
+        68,
+        79,
+        95
+      ],
+      "derived_detent_qls": [
+        37,
+        39,
+        42,
+        45,
+        47,
+        53,
+        58,
+        63,
+        68,
+        79,
+        95
+      ]
+    },
+    {
+      "character_level": 54,
+      "published_mission_qls": [
+        37,
+        40,
+        43,
+        45,
+        48,
+        54,
+        59,
+        64,
+        70,
+        81,
+        97
+      ],
+      "derived_detent_qls": [
+        37,
+        40,
+        43,
+        45,
+        48,
+        54,
+        59,
+        64,
+        70,
+        81,
+        97
+      ]
+    },
+    {
+      "character_level": 55,
+      "published_mission_qls": [
+        38,
+        41,
+        44,
+        46,
+        49,
+        55,
+        60,
+        66,
+        71,
+        82,
+        98
+      ],
+      "derived_detent_qls": [
+        38,
+        41,
+        44,
+        46,
+        49,
+        55,
+        60,
+        66,
+        71,
+        82,
+        98
+      ]
+    },
+    {
+      "character_level": 56,
+      "published_mission_qls": [
+        39,
+        42,
+        44,
+        47,
+        50,
+        56,
+        61,
+        67,
+        72,
+        84,
+        100
+      ],
+      "derived_detent_qls": [
+        39,
+        42,
+        44,
+        47,
+        50,
+        56,
+        61,
+        67,
+        72,
+        84,
+        100
+      ]
+    },
+    {
+      "character_level": 57,
+      "published_mission_qls": [
+        39,
+        42,
+        45,
+        48,
+        51,
+        57,
+        62,
+        68,
+        74,
+        85,
+        102
+      ],
+      "derived_detent_qls": [
+        39,
+        42,
+        45,
+        48,
+        51,
+        57,
+        62,
+        68,
+        74,
+        85,
+        102
+      ]
+    },
+    {
+      "character_level": 58,
+      "published_mission_qls": [
+        40,
+        43,
+        46,
+        49,
+        52,
+        58,
+        63,
+        69,
+        75,
+        87,
+        103
+      ],
+      "derived_detent_qls": [
+        40,
+        43,
+        46,
+        49,
+        52,
+        58,
+        63,
+        69,
+        75,
+        87,
+        103
+      ]
+    },
+    {
+      "character_level": 59,
+      "published_mission_qls": [
+        41,
+        44,
+        47,
+        50,
+        53,
+        59,
+        64,
+        70,
+        76,
+        88,
+        105
+      ],
+      "derived_detent_qls": [
+        41,
+        44,
+        47,
+        50,
+        53,
+        59,
+        64,
+        70,
+        76,
+        88,
+        105
+      ]
+    },
+    {
+      "character_level": 60,
+      "published_mission_qls": [
+        42,
+        45,
+        48,
+        51,
+        54,
+        60,
+        66,
+        72,
+        78,
+        90,
+        108
+      ],
+      "derived_detent_qls": [
+        42,
+        45,
+        48,
+        51,
+        54,
+        60,
+        66,
+        72,
+        78,
+        90,
+        108
+      ]
+    },
+    {
+      "character_level": 61,
+      "published_mission_qls": [
+        42,
+        45,
+        48,
+        51,
+        54,
+        61,
+        67,
+        73,
+        79,
+        91,
+        109
+      ],
+      "derived_detent_qls": [
+        42,
+        45,
+        48,
+        51,
+        54,
+        61,
+        67,
+        73,
+        79,
+        91,
+        109
+      ]
+    },
+    {
+      "character_level": 62,
+      "published_mission_qls": [
+        43,
+        46,
+        49,
+        52,
+        55,
+        62,
+        68,
+        74,
+        80,
+        93,
+        110
+      ],
+      "derived_detent_qls": [
+        43,
+        46,
+        49,
+        52,
+        55,
+        62,
+        68,
+        74,
+        80,
+        93,
+        110
+      ]
+    },
+    {
+      "character_level": 63,
+      "published_mission_qls": [
+        44,
+        47,
+        50,
+        53,
+        56,
+        63,
+        69,
+        75,
+        81,
+        94,
+        112
+      ],
+      "derived_detent_qls": [
+        44,
+        47,
+        50,
+        53,
+        56,
+        63,
+        69,
+        75,
+        81,
+        94,
+        112
+      ]
+    },
+    {
+      "character_level": 64,
+      "published_mission_qls": [
+        44,
+        48,
+        51,
+        54,
+        57,
+        64,
+        70,
+        76,
+        83,
+        96,
+        114
+      ],
+      "derived_detent_qls": [
+        44,
+        48,
+        51,
+        54,
+        57,
+        64,
+        70,
+        76,
+        83,
+        96,
+        114
+      ]
+    },
+    {
+      "character_level": 65,
+      "published_mission_qls": [
+        45,
+        48,
+        52,
+        55,
+        58,
+        65,
+        71,
+        78,
+        84,
+        97,
+        116
+      ],
+      "derived_detent_qls": [
+        45,
+        48,
+        52,
+        55,
+        58,
+        65,
+        71,
+        78,
+        84,
+        97,
+        116
+      ]
+    },
+    {
+      "character_level": 66,
+      "published_mission_qls": [
+        46,
+        49,
+        52,
+        56,
+        59,
+        66,
+        72,
+        79,
+        85,
+        99,
+        118
+      ],
+      "derived_detent_qls": [
+        46,
+        49,
+        52,
+        56,
+        59,
+        66,
+        72,
+        79,
+        85,
+        99,
+        118
+      ]
+    },
+    {
+      "character_level": 67,
+      "published_mission_qls": [
+        46,
+        50,
+        53,
+        56,
+        60,
+        67,
+        73,
+        80,
+        87,
+        100,
+        120
+      ],
+      "derived_detent_qls": [
+        46,
+        50,
+        53,
+        56,
+        60,
+        67,
+        73,
+        80,
+        87,
+        100,
+        120
+      ]
+    },
+    {
+      "character_level": 68,
+      "published_mission_qls": [
+        47,
+        51,
+        54,
+        57,
+        61,
+        68,
+        74,
+        81,
+        88,
+        102,
+        121
+      ],
+      "derived_detent_qls": [
+        47,
+        51,
+        54,
+        57,
+        61,
+        68,
+        74,
+        81,
+        88,
+        102,
+        121
+      ]
+    },
+    {
+      "character_level": 69,
+      "published_mission_qls": [
+        48,
+        51,
+        55,
+        58,
+        62,
+        69,
+        75,
+        82,
+        89,
+        103,
+        123
+      ],
+      "derived_detent_qls": [
+        48,
+        51,
+        55,
+        58,
+        62,
+        69,
+        75,
+        82,
+        89,
+        103,
+        123
+      ]
+    },
+    {
+      "character_level": 70,
+      "published_mission_qls": [
+        49,
+        52,
+        56,
+        59,
+        63,
+        70,
+        77,
+        84,
+        91,
+        105,
+        125
+      ],
+      "derived_detent_qls": [
+        49,
+        52,
+        56,
+        59,
+        63,
+        70,
+        77,
+        84,
+        91,
+        105,
+        125
+      ]
+    },
+    {
+      "character_level": 71,
+      "published_mission_qls": [
+        49,
+        53,
+        56,
+        60,
+        63,
+        71,
+        78,
+        85,
+        92,
+        106,
+        127
+      ],
+      "derived_detent_qls": [
+        49,
+        53,
+        56,
+        60,
+        63,
+        71,
+        78,
+        85,
+        92,
+        106,
+        127
+      ]
+    },
+    {
+      "character_level": 72,
+      "published_mission_qls": [
+        50,
+        54,
+        57,
+        61,
+        64,
+        72,
+        79,
+        86,
+        93,
+        108,
+        128
+      ],
+      "derived_detent_qls": [
+        50,
+        54,
+        57,
+        61,
+        64,
+        72,
+        79,
+        86,
+        93,
+        108,
+        128
+      ]
+    },
+    {
+      "character_level": 73,
+      "published_mission_qls": [
+        51,
+        54,
+        58,
+        62,
+        65,
+        73,
+        80,
+        87,
+        94,
+        109,
+        130
+      ],
+      "derived_detent_qls": [
+        51,
+        54,
+        58,
+        62,
+        65,
+        73,
+        80,
+        87,
+        94,
+        109,
+        130
+      ]
+    },
+    {
+      "character_level": 74,
+      "published_mission_qls": [
+        51,
+        55,
+        59,
+        62,
+        66,
+        74,
+        81,
+        88,
+        96,
+        111,
+        132
+      ],
+      "derived_detent_qls": [
+        51,
+        55,
+        59,
+        62,
+        66,
+        74,
+        81,
+        88,
+        96,
+        111,
+        132
+      ]
+    },
+    {
+      "character_level": 75,
+      "published_mission_qls": [
+        52,
+        56,
+        60,
+        63,
+        67,
+        75,
+        82,
+        90,
+        97,
+        112,
+        134
+      ],
+      "derived_detent_qls": [
+        52,
+        56,
+        60,
+        63,
+        67,
+        75,
+        82,
+        90,
+        97,
+        112,
+        134
+      ]
+    },
+    {
+      "character_level": 76,
+      "published_mission_qls": [
+        53,
+        57,
+        60,
+        64,
+        68,
+        76,
+        83,
+        91,
+        98,
+        114,
+        135
+      ],
+      "derived_detent_qls": [
+        53,
+        57,
+        60,
+        64,
+        68,
+        76,
+        83,
+        91,
+        98,
+        114,
+        135
+      ]
+    },
+    {
+      "character_level": 77,
+      "published_mission_qls": [
+        53,
+        57,
+        60,
+        64,
+        69,
+        77,
+        84,
+        91,
+        100,
+        115,
+        137
+      ],
+      "derived_detent_qls": [
+        53,
+        57,
+        60,
+        64,
+        69,
+        77,
+        84,
+        91,
+        100,
+        115,
+        137
+      ]
+    },
+    {
+      "character_level": 78,
+      "published_mission_qls": [
+        54,
+        58,
+        62,
+        66,
+        70,
+        78,
+        85,
+        93,
+        101,
+        117,
+        138
+      ],
+      "derived_detent_qls": [
+        54,
+        58,
+        62,
+        66,
+        70,
+        78,
+        85,
+        93,
+        101,
+        117,
+        138
+      ]
+    },
+    {
+      "character_level": 79,
+      "published_mission_qls": [
+        55,
+        59,
+        63,
+        67,
+        71,
+        79,
+        86,
+        94,
+        102,
+        118,
+        139
+      ],
+      "derived_detent_qls": [
+        55,
+        59,
+        63,
+        67,
+        71,
+        79,
+        86,
+        94,
+        102,
+        118,
+        139
+      ]
+    },
+    {
+      "character_level": 80,
+      "published_mission_qls": [
+        56,
+        60,
+        64,
+        68,
+        72,
+        80,
+        88,
+        96,
+        104,
+        120,
+        144
+      ],
+      "derived_detent_qls": [
+        56,
+        60,
+        64,
+        68,
+        72,
+        80,
+        88,
+        96,
+        104,
+        120,
+        144
+      ]
+    },
+    {
+      "character_level": 81,
+      "published_mission_qls": [
+        56,
+        60,
+        64,
+        68,
+        72,
+        81,
+        89,
+        97,
+        105,
+        121,
+        145
+      ],
+      "derived_detent_qls": [
+        56,
+        60,
+        64,
+        68,
+        72,
+        81,
+        89,
+        97,
+        105,
+        121,
+        145
+      ]
+    },
+    {
+      "character_level": 82,
+      "published_mission_qls": [
+        57,
+        61,
+        65,
+        69,
+        73,
+        82,
+        90,
+        98,
+        106,
+        123,
+        146
+      ],
+      "derived_detent_qls": [
+        57,
+        61,
+        65,
+        69,
+        73,
+        82,
+        90,
+        98,
+        106,
+        123,
+        146
+      ]
+    },
+    {
+      "character_level": 83,
+      "published_mission_qls": [
+        58,
+        62,
+        66,
+        70,
+        74,
+        83,
+        91,
+        99,
+        107,
+        124,
+        148
+      ],
+      "derived_detent_qls": [
+        58,
+        62,
+        66,
+        70,
+        74,
+        83,
+        91,
+        99,
+        107,
+        124,
+        148
+      ]
+    },
+    {
+      "character_level": 84,
+      "published_mission_qls": [
+        58,
+        63,
+        67,
+        71,
+        75,
+        84,
+        92,
+        100,
+        109,
+        126,
+        149
+      ],
+      "derived_detent_qls": [
+        58,
+        63,
+        67,
+        71,
+        75,
+        84,
+        92,
+        100,
+        109,
+        126,
+        149
+      ]
+    },
+    {
+      "character_level": 85,
+      "published_mission_qls": [
+        59,
+        63,
+        68,
+        72,
+        76,
+        85,
+        93,
+        102,
+        110,
+        127,
+        151
+      ],
+      "derived_detent_qls": [
+        59,
+        63,
+        68,
+        72,
+        76,
+        85,
+        93,
+        102,
+        110,
+        127,
+        151
+      ]
+    },
+    {
+      "character_level": 86,
+      "published_mission_qls": [
+        60,
+        64,
+        68,
+        73,
+        77,
+        86,
+        94,
+        103,
+        111,
+        129,
+        154
+      ],
+      "derived_detent_qls": [
+        60,
+        64,
+        68,
+        73,
+        77,
+        86,
+        94,
+        103,
+        111,
+        129,
+        154
+      ]
+    },
+    {
+      "character_level": 87,
+      "published_mission_qls": [
+        60,
+        65,
+        69,
+        73,
+        78,
+        87,
+        95,
+        104,
+        113,
+        130,
+        155
+      ],
+      "derived_detent_qls": [
+        60,
+        65,
+        69,
+        73,
+        78,
+        87,
+        95,
+        104,
+        113,
+        130,
+        155
+      ]
+    },
+    {
+      "character_level": 88,
+      "published_mission_qls": [
+        61,
+        66,
+        70,
+        74,
+        79,
+        88,
+        96,
+        105,
+        114,
+        132,
+        157
+      ],
+      "derived_detent_qls": [
+        61,
+        66,
+        70,
+        74,
+        79,
+        88,
+        96,
+        105,
+        114,
+        132,
+        157
+      ]
+    },
+    {
+      "character_level": 89,
+      "published_mission_qls": [
+        62,
+        66,
+        71,
+        75,
+        80,
+        89,
+        97,
+        106,
+        115,
+        133,
+        159
+      ],
+      "derived_detent_qls": [
+        62,
+        66,
+        71,
+        75,
+        80,
+        89,
+        97,
+        106,
+        115,
+        133,
+        159
+      ]
+    },
+    {
+      "character_level": 90,
+      "published_mission_qls": [
+        63,
+        67,
+        72,
+        76,
+        81,
+        90,
+        99,
+        108,
+        117,
+        135,
+        161
+      ],
+      "derived_detent_qls": [
+        63,
+        67,
+        72,
+        76,
+        81,
+        90,
+        99,
+        108,
+        117,
+        135,
+        161
+      ]
+    },
+    {
+      "character_level": 91,
+      "published_mission_qls": [
+        63,
+        68,
+        72,
+        77,
+        81,
+        91,
+        100,
+        109,
+        118,
+        136,
+        163
+      ],
+      "derived_detent_qls": [
+        63,
+        68,
+        72,
+        77,
+        81,
+        91,
+        100,
+        109,
+        118,
+        136,
+        163
+      ]
+    },
+    {
+      "character_level": 92,
+      "published_mission_qls": [
+        64,
+        69,
+        73,
+        78,
+        82,
+        92,
+        101,
+        110,
+        119,
+        138,
+        164
+      ],
+      "derived_detent_qls": [
+        64,
+        69,
+        73,
+        78,
+        82,
+        92,
+        101,
+        110,
+        119,
+        138,
+        164
+      ]
+    },
+    {
+      "character_level": 93,
+      "published_mission_qls": [
+        65,
+        69,
+        74,
+        79,
+        83,
+        93,
+        102,
+        111,
+        120,
+        139,
+        166
+      ],
+      "derived_detent_qls": [
+        65,
+        69,
+        74,
+        79,
+        83,
+        93,
+        102,
+        111,
+        120,
+        139,
+        166
+      ]
+    },
+    {
+      "character_level": 94,
+      "published_mission_qls": [
+        65,
+        70,
+        75,
+        79,
+        84,
+        94,
+        103,
+        112,
+        122,
+        141,
+        168
+      ],
+      "derived_detent_qls": [
+        65,
+        70,
+        75,
+        79,
+        84,
+        94,
+        103,
+        112,
+        122,
+        141,
+        168
+      ]
+    },
+    {
+      "character_level": 95,
+      "published_mission_qls": [
+        66,
+        71,
+        76,
+        80,
+        85,
+        95,
+        104,
+        114,
+        123,
+        142,
+        170
+      ],
+      "derived_detent_qls": [
+        66,
+        71,
+        76,
+        80,
+        85,
+        95,
+        104,
+        114,
+        123,
+        142,
+        170
+      ]
+    },
+    {
+      "character_level": 96,
+      "published_mission_qls": [
+        67,
+        72,
+        76,
+        81,
+        86,
+        96,
+        105,
+        115,
+        124,
+        144,
+        171
+      ],
+      "derived_detent_qls": [
+        67,
+        72,
+        76,
+        81,
+        86,
+        96,
+        105,
+        115,
+        124,
+        144,
+        171
+      ]
+    },
+    {
+      "character_level": 97,
+      "published_mission_qls": [
+        67,
+        72,
+        77,
+        82,
+        87,
+        97,
+        106,
+        116,
+        126,
+        145,
+        173
+      ],
+      "derived_detent_qls": [
+        67,
+        72,
+        77,
+        82,
+        87,
+        97,
+        106,
+        116,
+        126,
+        145,
+        173
+      ]
+    },
+    {
+      "character_level": 98,
+      "published_mission_qls": [
+        68,
+        73,
+        78,
+        83,
+        88,
+        98,
+        107,
+        117,
+        127,
+        147,
+        175
+      ],
+      "derived_detent_qls": [
+        68,
+        73,
+        78,
+        83,
+        88,
+        98,
+        107,
+        117,
+        127,
+        147,
+        175
+      ]
+    },
+    {
+      "character_level": 99,
+      "published_mission_qls": [
+        69,
+        74,
+        79,
+        84,
+        89,
+        99,
+        108,
+        118,
+        128,
+        148,
+        177
+      ],
+      "derived_detent_qls": [
+        69,
+        74,
+        79,
+        84,
+        89,
+        99,
+        108,
+        118,
+        128,
+        148,
+        177
+      ]
+    },
+    {
+      "character_level": 100,
+      "published_mission_qls": [
+        70,
+        75,
+        80,
+        85,
+        90,
+        100,
+        110,
+        120,
+        130,
+        150,
+        179
+      ],
+      "derived_detent_qls": [
+        70,
+        75,
+        80,
+        85,
+        90,
+        100,
+        110,
+        120,
+        130,
+        150,
+        179
+      ]
+    },
+    {
+      "character_level": 101,
+      "published_mission_qls": [
+        70,
+        75,
+        80,
+        85,
+        90,
+        101,
+        111,
+        121,
+        131,
+        151,
+        184
+      ],
+      "derived_detent_qls": [
+        70,
+        75,
+        80,
+        85,
+        90,
+        101,
+        111,
+        121,
+        131,
+        151,
+        184
+      ]
+    },
+    {
+      "character_level": 102,
+      "published_mission_qls": [
+        71,
+        76,
+        81,
+        86,
+        91,
+        102,
+        112,
+        122,
+        132,
+        153,
+        186
+      ],
+      "derived_detent_qls": [
+        71,
+        76,
+        81,
+        86,
+        91,
+        102,
+        112,
+        122,
+        132,
+        153,
+        186
+      ]
+    },
+    {
+      "character_level": 103,
+      "published_mission_qls": [
+        72,
+        77,
+        82,
+        87,
+        92,
+        103,
+        113,
+        123,
+        133,
+        154,
+        185
+      ],
+      "derived_detent_qls": [
+        72,
+        77,
+        82,
+        87,
+        92,
+        103,
+        113,
+        123,
+        133,
+        154,
+        185
+      ]
+    },
+    {
+      "character_level": 104,
+      "published_mission_qls": [
+        72,
+        78,
+        83,
+        88,
+        93,
+        104,
+        114,
+        124,
+        135,
+        156,
+        187
+      ],
+      "derived_detent_qls": [
+        72,
+        78,
+        83,
+        88,
+        93,
+        104,
+        114,
+        124,
+        135,
+        156,
+        187
+      ]
+    },
+    {
+      "character_level": 105,
+      "published_mission_qls": [
+        73,
+        78,
+        84,
+        89,
+        94,
+        105,
+        115,
+        126,
+        136,
+        157,
+        188
+      ],
+      "derived_detent_qls": [
+        73,
+        78,
+        84,
+        89,
+        94,
+        105,
+        115,
+        126,
+        136,
+        157,
+        188
+      ]
+    },
+    {
+      "character_level": 106,
+      "published_mission_qls": [
+        74,
+        79,
+        84,
+        90,
+        95,
+        106,
+        116,
+        127,
+        137,
+        159,
+        189
+      ],
+      "derived_detent_qls": [
+        74,
+        79,
+        84,
+        90,
+        95,
+        106,
+        116,
+        127,
+        137,
+        159,
+        189
+      ]
+    },
+    {
+      "character_level": 107,
+      "published_mission_qls": [
+        74,
+        80,
+        85,
+        90,
+        96,
+        107,
+        117,
+        128,
+        139,
+        160,
+        191
+      ],
+      "derived_detent_qls": [
+        74,
+        80,
+        85,
+        90,
+        96,
+        107,
+        117,
+        128,
+        139,
+        160,
+        191
+      ]
+    },
+    {
+      "character_level": 108,
+      "published_mission_qls": [
+        75,
+        81,
+        86,
+        91,
+        97,
+        108,
+        118,
+        129,
+        140,
+        162,
+        193
+      ],
+      "derived_detent_qls": [
+        75,
+        81,
+        86,
+        91,
+        97,
+        108,
+        118,
+        129,
+        140,
+        162,
+        193
+      ]
+    },
+    {
+      "character_level": 109,
+      "published_mission_qls": [
+        76,
+        81,
+        87,
+        92,
+        98,
+        109,
+        119,
+        130,
+        141,
+        163,
+        195
+      ],
+      "derived_detent_qls": [
+        76,
+        81,
+        87,
+        92,
+        98,
+        109,
+        119,
+        130,
+        141,
+        163,
+        195
+      ]
+    },
+    {
+      "character_level": 110,
+      "published_mission_qls": [
+        77,
+        82,
+        88,
+        93,
+        99,
+        110,
+        121,
+        132,
+        143,
+        165,
+        197
+      ],
+      "derived_detent_qls": [
+        77,
+        82,
+        88,
+        93,
+        99,
+        110,
+        121,
+        132,
+        143,
+        165,
+        197
+      ]
+    },
+    {
+      "character_level": 111,
+      "published_mission_qls": [
+        77,
+        83,
+        88,
+        94,
+        99,
+        111,
+        122,
+        133,
+        144,
+        166,
+        198
+      ],
+      "derived_detent_qls": [
+        77,
+        83,
+        88,
+        94,
+        99,
+        111,
+        122,
+        133,
+        144,
+        166,
+        198
+      ]
+    },
+    {
+      "character_level": 112,
+      "published_mission_qls": [
+        78,
+        84,
+        89,
+        95,
+        100,
+        112,
+        122,
+        134,
+        145,
+        168,
+        200
+      ],
+      "derived_detent_qls": [
+        78,
+        84,
+        89,
+        95,
+        100,
+        112,
+        122,
+        134,
+        145,
+        168,
+        200
+      ]
+    },
+    {
+      "character_level": 113,
+      "published_mission_qls": [
+        79,
+        84,
+        90,
+        96,
+        101,
+        113,
+        124,
+        135,
+        146,
+        169,
+        202
+      ],
+      "derived_detent_qls": [
+        79,
+        84,
+        90,
+        96,
+        101,
+        113,
+        124,
+        135,
+        146,
+        169,
+        202
+      ]
+    },
+    {
+      "character_level": 114,
+      "published_mission_qls": [
+        79,
+        85,
+        91,
+        96,
+        102,
+        114,
+        125,
+        136,
+        148,
+        171,
+        204
+      ],
+      "derived_detent_qls": [
+        79,
+        85,
+        91,
+        96,
+        102,
+        114,
+        125,
+        136,
+        148,
+        171,
+        204
+      ]
+    },
+    {
+      "character_level": 115,
+      "published_mission_qls": [
+        80,
+        86,
+        92,
+        97,
+        103,
+        115,
+        126,
+        138,
+        149,
+        172,
+        206
+      ],
+      "derived_detent_qls": [
+        80,
+        86,
+        92,
+        97,
+        103,
+        115,
+        126,
+        138,
+        149,
+        172,
+        206
+      ]
+    },
+    {
+      "character_level": 116,
+      "published_mission_qls": [
+        81,
+        87,
+        92,
+        98,
+        104,
+        116,
+        127,
+        139,
+        150,
+        174,
+        208
+      ],
+      "derived_detent_qls": [
+        81,
+        87,
+        92,
+        98,
+        104,
+        116,
+        127,
+        139,
+        150,
+        174,
+        208
+      ]
+    },
+    {
+      "character_level": 117,
+      "published_mission_qls": [
+        81,
+        87,
+        93,
+        99,
+        105,
+        117,
+        128,
+        140,
+        152,
+        175,
+        210
+      ],
+      "derived_detent_qls": [
+        81,
+        87,
+        93,
+        99,
+        105,
+        117,
+        128,
+        140,
+        152,
+        175,
+        210
+      ]
+    },
+    {
+      "character_level": 118,
+      "published_mission_qls": [
+        82,
+        88,
+        94,
+        100,
+        106,
+        118,
+        129,
+        141,
+        153,
+        177,
+        211
+      ],
+      "derived_detent_qls": [
+        82,
+        88,
+        94,
+        100,
+        106,
+        118,
+        129,
+        141,
+        153,
+        177,
+        211
+      ]
+    },
+    {
+      "character_level": 119,
+      "published_mission_qls": [
+        83,
+        89,
+        95,
+        101,
+        107,
+        119,
+        130,
+        142,
+        154,
+        178,
+        214
+      ],
+      "derived_detent_qls": [
+        83,
+        89,
+        95,
+        101,
+        107,
+        119,
+        130,
+        142,
+        154,
+        178,
+        214
+      ]
+    },
+    {
+      "character_level": 120,
+      "published_mission_qls": [
+        84,
+        90,
+        96,
+        102,
+        108,
+        120,
+        132,
+        144,
+        156,
+        180,
+        215
+      ],
+      "derived_detent_qls": [
+        84,
+        90,
+        96,
+        102,
+        108,
+        120,
+        132,
+        144,
+        156,
+        180,
+        215
+      ]
+    },
+    {
+      "character_level": 121,
+      "published_mission_qls": [
+        84,
+        90,
+        96,
+        102,
+        108,
+        121,
+        133,
+        145,
+        157,
+        181,
+        217
+      ],
+      "derived_detent_qls": [
+        84,
+        90,
+        96,
+        102,
+        108,
+        121,
+        133,
+        145,
+        157,
+        181,
+        217
+      ]
+    },
+    {
+      "character_level": 122,
+      "published_mission_qls": [
+        85,
+        91,
+        97,
+        103,
+        109,
+        122,
+        134,
+        146,
+        158,
+        183,
+        218
+      ],
+      "derived_detent_qls": [
+        85,
+        91,
+        97,
+        103,
+        109,
+        122,
+        134,
+        146,
+        158,
+        183,
+        218
+      ]
+    },
+    {
+      "character_level": 123,
+      "published_mission_qls": [
+        86,
+        92,
+        98,
+        104,
+        110,
+        123,
+        135,
+        147,
+        159,
+        184,
+        220
+      ],
+      "derived_detent_qls": [
+        86,
+        92,
+        98,
+        104,
+        110,
+        123,
+        135,
+        147,
+        159,
+        184,
+        220
+      ]
+    },
+    {
+      "character_level": 124,
+      "published_mission_qls": [
+        86,
+        93,
+        99,
+        105,
+        111,
+        124,
+        136,
+        148,
+        161,
+        186,
+        222
+      ],
+      "derived_detent_qls": [
+        86,
+        93,
+        99,
+        105,
+        111,
+        124,
+        136,
+        148,
+        161,
+        186,
+        222
+      ]
+    },
+    {
+      "character_level": 125,
+      "published_mission_qls": [
+        87,
+        93,
+        100,
+        106,
+        112,
+        125,
+        137,
+        150,
+        162,
+        187,
+        224
+      ],
+      "derived_detent_qls": [
+        87,
+        93,
+        100,
+        106,
+        112,
+        125,
+        137,
+        150,
+        162,
+        187,
+        224
+      ]
+    },
+    {
+      "character_level": 126,
+      "published_mission_qls": [
+        88,
+        94,
+        100,
+        107,
+        113,
+        126,
+        138,
+        151,
+        163,
+        189,
+        225
+      ],
+      "derived_detent_qls": [
+        88,
+        94,
+        100,
+        107,
+        113,
+        126,
+        138,
+        151,
+        163,
+        189,
+        225
+      ]
+    },
+    {
+      "character_level": 127,
+      "published_mission_qls": [
+        88,
+        95,
+        101,
+        107,
+        114,
+        127,
+        139,
+        152,
+        165,
+        190,
+        225
+      ],
+      "derived_detent_qls": [
+        88,
+        95,
+        101,
+        107,
+        114,
+        127,
+        139,
+        152,
+        165,
+        190,
+        225
+      ]
+    },
+    {
+      "character_level": 128,
+      "published_mission_qls": [
+        89,
+        96,
+        102,
+        108,
+        115,
+        128,
+        140,
+        153,
+        166,
+        192,
+        226
+      ],
+      "derived_detent_qls": [
+        89,
+        96,
+        102,
+        108,
+        115,
+        128,
+        140,
+        153,
+        166,
+        192,
+        226
+      ]
+    },
+    {
+      "character_level": 129,
+      "published_mission_qls": [
+        90,
+        96,
+        103,
+        109,
+        116,
+        129,
+        141,
+        154,
+        167,
+        193,
+        227
+      ],
+      "derived_detent_qls": [
+        90,
+        96,
+        103,
+        109,
+        116,
+        129,
+        141,
+        154,
+        167,
+        193,
+        227
+      ]
+    },
+    {
+      "character_level": 130,
+      "published_mission_qls": [
+        91,
+        97,
+        104,
+        110,
+        117,
+        130,
+        143,
+        156,
+        169,
+        195,
+        232
+      ],
+      "derived_detent_qls": [
+        91,
+        97,
+        104,
+        110,
+        117,
+        130,
+        143,
+        156,
+        169,
+        195,
+        232
+      ]
+    },
+    {
+      "character_level": 131,
+      "published_mission_qls": [
+        91,
+        98,
+        104,
+        111,
+        117,
+        131,
+        144,
+        157,
+        170,
+        196,
+        235
+      ],
+      "derived_detent_qls": [
+        91,
+        98,
+        104,
+        111,
+        117,
+        131,
+        144,
+        157,
+        170,
+        196,
+        235
+      ]
+    },
+    {
+      "character_level": 132,
+      "published_mission_qls": [
+        92,
+        99,
+        105,
+        112,
+        118,
+        132,
+        145,
+        158,
+        171,
+        198,
+        236
+      ],
+      "derived_detent_qls": [
+        92,
+        99,
+        105,
+        112,
+        118,
+        132,
+        145,
+        158,
+        171,
+        198,
+        236
+      ]
+    },
+    {
+      "character_level": 133,
+      "published_mission_qls": [
+        93,
+        99,
+        106,
+        113,
+        119,
+        133,
+        146,
+        159,
+        172,
+        199,
+        237
+      ],
+      "derived_detent_qls": [
+        93,
+        99,
+        106,
+        113,
+        119,
+        133,
+        146,
+        159,
+        172,
+        199,
+        237
+      ]
+    },
+    {
+      "character_level": 134,
+      "published_mission_qls": [
+        93,
+        100,
+        107,
+        113,
+        120,
+        134,
+        147,
+        160,
+        174,
+        201,
+        238
+      ],
+      "derived_detent_qls": [
+        93,
+        100,
+        107,
+        113,
+        120,
+        134,
+        147,
+        160,
+        174,
+        201,
+        238
+      ]
+    },
+    {
+      "character_level": 135,
+      "published_mission_qls": [
+        94,
+        101,
+        108,
+        114,
+        121,
+        135,
+        148,
+        162,
+        175,
+        202,
+        239
+      ],
+      "derived_detent_qls": [
+        94,
+        101,
+        108,
+        114,
+        121,
+        135,
+        148,
+        162,
+        175,
+        202,
+        239
+      ]
+    },
+    {
+      "character_level": 136,
+      "published_mission_qls": [
+        95,
+        102,
+        108,
+        115,
+        122,
+        136,
+        149,
+        163,
+        176,
+        204,
+        243
+      ],
+      "derived_detent_qls": [
+        95,
+        102,
+        108,
+        115,
+        122,
+        136,
+        149,
+        163,
+        176,
+        204,
+        243
+      ]
+    },
+    {
+      "character_level": 137,
+      "published_mission_qls": [
+        95,
+        102,
+        109,
+        116,
+        123,
+        137,
+        150,
+        164,
+        178,
+        205,
+        245
+      ],
+      "derived_detent_qls": [
+        95,
+        102,
+        109,
+        116,
+        123,
+        137,
+        150,
+        164,
+        178,
+        205,
+        245
+      ]
+    },
+    {
+      "character_level": 138,
+      "published_mission_qls": [
+        96,
+        103,
+        110,
+        117,
+        124,
+        138,
+        151,
+        165,
+        179,
+        207,
+        246
+      ],
+      "derived_detent_qls": [
+        96,
+        103,
+        110,
+        117,
+        124,
+        138,
+        151,
+        165,
+        179,
+        207,
+        246
+      ]
+    },
+    {
+      "character_level": 139,
+      "published_mission_qls": [
+        97,
+        104,
+        111,
+        118,
+        125,
+        139,
+        152,
+        166,
+        180,
+        208,
+        248
+      ],
+      "derived_detent_qls": [
+        97,
+        104,
+        111,
+        118,
+        125,
+        139,
+        152,
+        166,
+        180,
+        208,
+        248
+      ]
+    },
+    {
+      "character_level": 140,
+      "published_mission_qls": [
+        98,
+        105,
+        112,
+        119,
+        126,
+        140,
+        154,
+        168,
+        182,
+        210,
+        250
+      ],
+      "derived_detent_qls": [
+        98,
+        105,
+        112,
+        119,
+        126,
+        140,
+        154,
+        168,
+        182,
+        210,
+        250
+      ]
+    },
+    {
+      "character_level": 141,
+      "published_mission_qls": [
+        98,
+        105,
+        112,
+        119,
+        126,
+        141,
+        155,
+        169,
+        183,
+        211,
+        250
+      ],
+      "derived_detent_qls": [
+        98,
+        105,
+        112,
+        119,
+        126,
+        141,
+        155,
+        169,
+        183,
+        211,
+        250
+      ]
+    },
+    {
+      "character_level": 142,
+      "published_mission_qls": [
+        99,
+        106,
+        113,
+        120,
+        127,
+        142,
+        156,
+        170,
+        184,
+        212,
+        250
+      ],
+      "derived_detent_qls": [
+        99,
+        106,
+        113,
+        120,
+        127,
+        142,
+        156,
+        170,
+        184,
+        212,
+        250
+      ]
+    },
+    {
+      "character_level": 143,
+      "published_mission_qls": [
+        100,
+        107,
+        114,
+        121,
+        128,
+        143,
+        157,
+        171,
+        185,
+        214,
+        250
+      ],
+      "derived_detent_qls": [
+        100,
+        107,
+        114,
+        121,
+        128,
+        143,
+        157,
+        171,
+        185,
+        214,
+        250
+      ]
+    },
+    {
+      "character_level": 144,
+      "published_mission_qls": [
+        100,
+        108,
+        115,
+        122,
+        129,
+        144,
+        158,
+        172,
+        187,
+        216,
+        250
+      ],
+      "derived_detent_qls": [
+        100,
+        108,
+        115,
+        122,
+        129,
+        144,
+        158,
+        172,
+        187,
+        216,
+        250
+      ]
+    },
+    {
+      "character_level": 145,
+      "published_mission_qls": [
+        101,
+        108,
+        116,
+        123,
+        130,
+        145,
+        159,
+        174,
+        188,
+        217,
+        250
+      ],
+      "derived_detent_qls": [
+        101,
+        108,
+        116,
+        123,
+        130,
+        145,
+        159,
+        174,
+        188,
+        217,
+        250
+      ]
+    },
+    {
+      "character_level": 146,
+      "published_mission_qls": [
+        102,
+        109,
+        116,
+        124,
+        131,
+        146,
+        160,
+        175,
+        189,
+        219,
+        250
+      ],
+      "derived_detent_qls": [
+        102,
+        109,
+        116,
+        124,
+        131,
+        146,
+        160,
+        175,
+        189,
+        219,
+        250
+      ]
+    },
+    {
+      "character_level": 147,
+      "published_mission_qls": [
+        102,
+        110,
+        117,
+        124,
+        132,
+        147,
+        161,
+        176,
+        191,
+        220,
+        250
+      ],
+      "derived_detent_qls": [
+        102,
+        110,
+        117,
+        124,
+        132,
+        147,
+        161,
+        176,
+        191,
+        220,
+        250
+      ]
+    },
+    {
+      "character_level": 148,
+      "published_mission_qls": [
+        103,
+        111,
+        118,
+        125,
+        133,
+        148,
+        162,
+        177,
+        192,
+        222,
+        250
+      ],
+      "derived_detent_qls": [
+        103,
+        111,
+        118,
+        125,
+        133,
+        148,
+        162,
+        177,
+        192,
+        222,
+        250
+      ]
+    },
+    {
+      "character_level": 149,
+      "published_mission_qls": [
+        104,
+        111,
+        119,
+        126,
+        134,
+        149,
+        163,
+        178,
+        193,
+        223,
+        250
+      ],
+      "derived_detent_qls": [
+        104,
+        111,
+        119,
+        126,
+        134,
+        149,
+        163,
+        178,
+        193,
+        223,
+        250
+      ]
+    }
+  ]
+}
