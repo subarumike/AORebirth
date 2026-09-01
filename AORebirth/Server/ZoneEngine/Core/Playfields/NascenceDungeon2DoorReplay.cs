@@ -47,10 +47,6 @@ namespace AORebirth.Core.Playfields
 
         internal static void SendForCharacter(IZoneClient client, ICharacter character)
         {
-            // Match D1: flood all door/terminal/chest cells on zone-in so buttons, treasure,
-            // and doors are present immediately and remain visible across the dungeon.
-            // (Progressive entry-only left buttons/treasure unreachable and doors cullable.)
-            NascenceDungeon2RevealZones.Reset();
             ClearSent(character);
             foreach (long zoneKey in NascenceDungeon2RevealZones.AllZoneKeys())
             {
@@ -58,10 +54,6 @@ namespace AORebirth.Core.Playfields
             }
 
             SendAllTreasureChests(client, character);
-            LogUtil.Debug(
-                DebugInfoDetail.Zoning,
-                "NascenceDungeon2DoorReplay SendForCharacter flooded zones+chests char="
-                + (character != null ? character.Identity.Instance.ToString("X8") : "null"));
         }
 
         internal static void SendAllTreasureChests(IZoneClient client, ICharacter character)
@@ -313,7 +305,7 @@ namespace AORebirth.Core.Playfields
             var playfield = character.Playfield as Playfield;
             if (playfield != null)
             {
-                playfield.RefreshCharacterVisibility(character);
+                // Zone change already re-sends chest/door interest; full reconcile re-SCFU's pinned NPCs.
             }
         }
 

@@ -1,6 +1,8 @@
 namespace AORebirth.Core.Playfields
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -20,6 +22,17 @@ namespace AORebirth.Core.Playfields
 
         /// <summary>Prior dyn instance from 20260823-182854 — still accepted for in-progress sessions.</summary>
         internal const int LegacyDungeonPlayfieldId = unchecked((int)0x00208047);
+
+        // Same ACG dyn band as live / D1. Fresh lease each entry so client PF Map fog resets
+        // (reusing one id preserves explored map cells).
+        private const int DynamicPlayfieldFloor = unchecked((int)0x00208000);
+
+        private const int DynamicPlayfieldMask = 0x00007FFF;
+
+        private static int nextDynamicPlayfieldSlot = Environment.TickCount ^ unchecked((int)0x5A5A5A5A);
+
+        private static readonly ConcurrentDictionary<int, byte> DynamicPlayfieldIds =
+            new ConcurrentDictionary<int, byte>();
 
         /// <summary>Live N3Teleport / PAF PlayfieldId1 — ACGEntrance (NOT D1 C00010D6).</summary>
         internal const IdentityType BuildingGeneratorType = (IdentityType)0x0000C7A1;
@@ -132,8 +145,60 @@ namespace AORebirth.Core.Playfields
 
         internal static bool IsDungeonPlayfield(int playfieldInstance)
         {
+            // D3/D4 leases share the live ACG band; never claim them as D2 (wrong doors/buttons).
+            if (NascenceDungeon3Rules.IsDungeonPlayfield(playfieldInstance)
+                || NascenceDungeon4Rules.IsDungeonPlayfield(playfieldInstance))
+            {
+                return false;
+            }
+
             return playfieldInstance == DungeonPlayfieldId
-                   || playfieldInstance == LegacyDungeonPlayfieldId;
+                   || playfieldInstance == LegacyDungeonPlayfieldId
+                   || DynamicPlayfieldIds.ContainsKey(playfieldInstance);
+        }
+
+        /// <summary>
+        /// Allocates a fresh client-visible lease for one D2 entry so PF Map fog starts black.
+        /// </summary>
+        internal static int AllocateDynamicPlayfieldId()
+        {
+            for (int attempt = 0; attempt < 64; attempt++)
+            {
+                int slot = Interlocked.Increment(ref nextDynamicPlayfieldSlot) & DynamicPlayfieldMask;
+                int playfieldInstance = DynamicPlayfieldFloor | slot;
+                if (playfieldInstance == DungeonPlayfieldId
+                    || playfieldInstance == LegacyDungeonPlayfieldId
+                    || playfieldInstance == NascenceDungeon1Rules.DungeonPlayfieldId
+                    || playfieldInstance == NascenceDungeon1Rules.ReservedDungeonPlayfieldId
+                    || playfieldInstance == NascenceDungeon3Rules.DungeonPlayfieldId
+                    || NascenceDungeon3Rules.IsDungeonPlayfield(playfieldInstance)
+                    || playfieldInstance == NascenceDungeon4Rules.DungeonPlayfieldId
+                    || NascenceDungeon4Rules.IsDungeonPlayfield(playfieldInstance))
+                {
+                    continue;
+                }
+
+                if (DynamicPlayfieldIds.TryAdd(playfieldInstance, 0))
+                {
+                    return playfieldInstance;
+                }
+            }
+
+            int fallback = DynamicPlayfieldFloor
+                           | (Interlocked.Increment(ref nextDynamicPlayfieldSlot) & DynamicPlayfieldMask);
+            DynamicPlayfieldIds[fallback] = 0;
+            return fallback;
+        }
+
+        /// <summary>Re-claim a saved dyn PF after ZoneEngine restart (login rehydrate).</summary>
+        internal static void AdoptLease(int playfieldInstance)
+        {
+            if (playfieldInstance == 0)
+            {
+                return;
+            }
+
+            DynamicPlayfieldIds[playfieldInstance] = 0;
         }
 
         internal static bool IsSourcePlayfield(int playfieldInstance)

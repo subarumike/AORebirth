@@ -225,6 +225,8 @@
     <Compile Include="Core\Nascence\Quests\RosenblattDemonicPacketSender.cs" />
     <Compile Include="Core\Nascence\Quests\RosenblattDemonicQuestRuntime.cs" />
     <Compile Include="Core\Nascence\Quests\RosenblattDemonicTradeAdapter.cs" />
+    <!-- Combat action-lock clear (UseActionFinished); required by AttackMessageHandler et al. -->
+    <Compile Include="Core\Playfields\ClientActionBusyRuntime.cs" />
     <Compile Include="Core\Nascence\Quests\RosenblattClientActionLock.cs" />
     <Compile Include="Core\Nascence\Quests\NascenceLifeRodriguezInteractionRules.cs" />
     <Compile Include="Core\Nascence\Quests\NascenceLifeRodriguezPacketSender.cs" />
@@ -580,6 +582,8 @@
     <Compile Include="Core\Playfields\Content\NascenceLifeContentModule.cs" />
     <Compile Include="Core\Playfields\Content\NascenceDungeon1ContentModule.cs" />
     <Compile Include="Core\Playfields\Content\NascenceDungeon2ContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\NascenceDungeon3ContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\NascenceDungeon4ContentModule.cs" />
     <Compile Include="Core\Playfields\Content\ThrakOmniGardenContentModule.cs" />
     <Compile Include="Core\Playfields\Content\RomeBlueCityContentModule.cs" />
     <Compile Include="Core\Playfields\Content\AndromedaIccHqContentModule.cs" />
@@ -627,6 +631,39 @@
     <Compile Include="Core\Playfields\NascenceDungeon2Spawn.cs" />
     <Compile Include="Core\Playfields\NascenceDungeon2SpawnData.cs" />
     <Compile Include="Core\MessageHandlers\NascenceDungeon2InteractionHandler.cs" />
+    <!-- Nascence Dungeon 3/4 capture-backed playfield runtime (WIP local) -->
+    <Compile Include="Core\Playfields\NascenceDungeon3AcgLayout.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3CorpseCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3DoorCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3BossRoomRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3HavarisScfuWire.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3DoorReplay.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3RevealZones.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3MobCombat.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3Rules.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeonLeaseRehydrate.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3FactionRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3TreasureLootService.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3SearchRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3Spawn.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon3SpawnData.cs" />
+    <Compile Include="Core\MessageHandlers\NascenceDungeon3InteractionHandler.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4AcgLayout.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4CorpseCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4DoorCapture.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4BossRoomRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4HavarisScfuWire.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4DoorReplay.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4RevealZones.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4MobCombat.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4Rules.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4FactionRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceTreasureShadowCrystalLoot.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4TreasureLootService.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4SearchRuntime.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4Spawn.cs" />
+    <Compile Include="Core\Playfields\NascenceDungeon4SpawnData.cs" />
+    <Compile Include="Core\MessageHandlers\NascenceDungeon4InteractionHandler.cs" />
     <Compile Include="Core\Playfields\NascenceLifeSpawn.cs" />
     <Compile Include="Core\Playfields\NascenceSwampClanMobRuntime.cs" />
     <Compile Include="Core\Playfields\NascenceFrontierOutdoorMobRuntime.cs" />

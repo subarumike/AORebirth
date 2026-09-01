@@ -190,6 +190,7 @@
     <Compile Include="Playfields\PlayfieldWalls.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requirements\IRequirements.cs" />
+    <Compile Include="Requirements\EquipmentRequirementChecks.cs" />
     <Compile Include="Requirements\RequirementLambdaCreator.cs" />
     <Compile Include="Requirements\Requirements.cs" />
     <Compile Include="Statels\Door.cs" />

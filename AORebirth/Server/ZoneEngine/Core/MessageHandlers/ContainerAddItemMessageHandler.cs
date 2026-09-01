@@ -105,6 +105,24 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (NascenceDungeon3TreasureLootService.TryLootItem(
+                client,
+                message.SourceContainer,
+                message.Target,
+                message.TargetPlacement))
+            {
+                return;
+            }
+
+            if (NascenceDungeon4TreasureLootService.TryLootItem(
+                client,
+                message.SourceContainer,
+                message.Target,
+                message.TargetPlacement))
+            {
+                return;
+            }
+
             if (client.Controller.Character.Playfield.TryLootCorpseItem(
                 client.Controller.Character,
                 message.SourceContainer,

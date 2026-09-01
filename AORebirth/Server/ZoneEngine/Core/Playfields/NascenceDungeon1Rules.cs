@@ -1,6 +1,8 @@
 namespace AORebirth.Core.Playfields
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -25,6 +27,17 @@ namespace AORebirth.Core.Playfields
 
         /// <summary>Live dyn PF stamp from capture 20260824-220326 (Playfield2:2080EE).</summary>
         internal const int LiveCapturedPlayfieldId220326 = unchecked((int)0x002080EE);
+
+        // Captures show a fresh Playfield2 lease for each ACG entry (for example 208038,
+        // 2080EE, and 208851).  Reusing one id preserves the client's explored PF-map cells.
+        private const int DynamicPlayfieldFloor = unchecked((int)0x00208000);
+
+        private const int DynamicPlayfieldMask = 0x00007FFF;
+
+        private static int nextDynamicPlayfieldSlot = Environment.TickCount;
+
+        private static readonly ConcurrentDictionary<int, byte> DynamicPlayfieldIds =
+            new ConcurrentDictionary<int, byte>();
 
         /// <summary>Live N3Teleport / PAF PlayfieldId1 — ACGEntrance.</summary>
         internal const IdentityType BuildingGeneratorType = (IdentityType)0x0000C7A1;
@@ -126,9 +139,68 @@ namespace AORebirth.Core.Playfields
 
         internal static bool IsDungeonPlayfield(int playfieldInstance)
         {
-            return playfieldInstance == DungeonPlayfieldId
+            // D2/D3/D4 leases share the live ACG band; never claim them as D1 (wrong PAF/layout).
+            if (NascenceDungeon2Rules.IsDungeonPlayfield(playfieldInstance)
+                || NascenceDungeon3Rules.IsDungeonPlayfield(playfieldInstance)
+                || NascenceDungeon4Rules.IsDungeonPlayfield(playfieldInstance))
+            {
+                return false;
+            }
+
+            // Lease dictionary only — do NOT claim the whole 0x00208xxx band (that stole D3
+            // logins after ZoneEngine restart and stamped the wrong cave).
+            return DynamicPlayfieldIds.ContainsKey(playfieldInstance)
+                   || playfieldInstance == DungeonPlayfieldId
                    || playfieldInstance == ReservedDungeonPlayfieldId
-                   || playfieldInstance == LegacyCapturedPlayfieldId;
+                   || playfieldInstance == LegacyCapturedPlayfieldId
+                   || playfieldInstance == LiveCapturedPlayfieldId220326;
+        }
+
+        /// <summary>
+        /// Allocates the client-visible lease for one fresh D1 entry.  The physical playfield is
+        /// created through ZoneServer's normal GetOrCreate path and receives the same D1 content.
+        /// Fresh id each entry so client PF Map fog starts black (reuse preserves explored cells).
+        /// </summary>
+        internal static int AllocateDynamicPlayfieldId()
+        {
+            for (int attempt = 0; attempt < 64; attempt++)
+            {
+                int slot = Interlocked.Increment(ref nextDynamicPlayfieldSlot) & DynamicPlayfieldMask;
+                int playfieldInstance = DynamicPlayfieldFloor | slot;
+                if (playfieldInstance == DungeonPlayfieldId
+                    || playfieldInstance == ReservedDungeonPlayfieldId
+                    || playfieldInstance == NascenceDungeon2Rules.DungeonPlayfieldId
+                    || playfieldInstance == NascenceDungeon2Rules.LegacyDungeonPlayfieldId
+                    || NascenceDungeon2Rules.IsDungeonPlayfield(playfieldInstance)
+                    || playfieldInstance == NascenceDungeon3Rules.DungeonPlayfieldId
+                    || NascenceDungeon3Rules.IsDungeonPlayfield(playfieldInstance)
+                    || playfieldInstance == NascenceDungeon4Rules.DungeonPlayfieldId
+                    || NascenceDungeon4Rules.IsDungeonPlayfield(playfieldInstance))
+                {
+                    continue;
+                }
+
+                if (DynamicPlayfieldIds.TryAdd(playfieldInstance, 0))
+                {
+                    return playfieldInstance;
+                }
+            }
+
+            int fallback = DynamicPlayfieldFloor
+                           | (Interlocked.Increment(ref nextDynamicPlayfieldSlot) & DynamicPlayfieldMask);
+            DynamicPlayfieldIds[fallback] = 0;
+            return fallback;
+        }
+
+        /// <summary>Re-claim a saved dyn PF after ZoneEngine restart (login rehydrate).</summary>
+        internal static void AdoptLease(int playfieldInstance)
+        {
+            if (playfieldInstance == 0)
+            {
+                return;
+            }
+
+            DynamicPlayfieldIds[playfieldInstance] = 0;
         }
 
         internal static bool IsSourcePlayfield(int playfieldInstance)
@@ -141,6 +213,7 @@ namespace AORebirth.Core.Playfields
         {
             return playfieldInstance == LegacyCapturedPlayfieldId
                    || playfieldInstance == ReservedDungeonPlayfieldId
+                   || playfieldInstance == LiveCapturedPlayfieldId220326
                    || playfieldInstance == unchecked((int)0x0016FFF0)
                    || playfieldInstance == 362;
         }

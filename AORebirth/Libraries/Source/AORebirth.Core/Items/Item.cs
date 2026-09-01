@@ -398,8 +398,10 @@ namespace AORebirth.Core.Items
                         {
                             temp.Requirements[reqnum].Value =
                                 Convert.ToInt32(
-                                    factor
-                                    * (highActions.Requirements[reqnum].Value - lowActions.Requirements[reqnum].Value));
+                                    lowActions.Requirements[reqnum].Value
+                                    + (factor
+                                       * (highActions.Requirements[reqnum].Value
+                                          - lowActions.Requirements[reqnum].Value)));
                         }
 
                         this.actions.Add(temp);

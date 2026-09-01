@@ -146,6 +146,7 @@ namespace ZoneEngine.Core.PacketHandlers
             }
 
             // Capture 20260823-171238 / 182854: MissionEntrance door status on Nascence Frontier zone-in.
+            // D1/D2 share outdoor PF 4310; D3 Collapsed Temple is on PF 4311.
             if (client.Controller.Character.Playfield != null
                 && NascenceDungeon1Rules.IsSourcePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))
@@ -153,6 +154,15 @@ namespace ZoneEngine.Core.PacketHandlers
                 DoorStatusUpdateMessageHandler.Default.SendCapturedNascenceDungeonEntranceStatus(
                     client.Controller.Character);
                 DoorStatusUpdateMessageHandler.Default.SendCapturedNascenceDungeon2EntranceStatus(
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                && NascenceDungeon3Rules.IsSourcePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                DoorStatusUpdateMessageHandler.Default.SendCapturedNascenceDungeon3EntranceStatus(
+                    client.Controller.Character);
+                DoorStatusUpdateMessageHandler.Default.SendCapturedNascenceDungeon4EntranceStatus(
                     client.Controller.Character);
             }
 
@@ -173,6 +183,22 @@ namespace ZoneEngine.Core.PacketHandlers
                     client.Controller.Character.Playfield.Identity.Instance))
             {
                 NascenceDungeon2DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                && NascenceDungeon3Rules.IsDungeonPlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                NascenceDungeon3DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                && NascenceDungeon4Rules.IsDungeonPlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                NascenceDungeon4DoorReplay.SendForCharacter(
                     client,
                     client.Controller.Character);
             }
@@ -359,6 +385,10 @@ client.Controller.Character.Playfield.Identity,
                     CombatXpRuntimeService.SyncXpBarStatsOnLogin(
                         client.Controller.Character,
                         isPlayfieldTransfer);
+                    // Capture 20260830-123257: PF Map honors standalone MapsC StatMessage
+                    // (Overview of Nascence and Jobe), same timing as XP-bar after FullCharacter.
+                    NanoEventRuntimeService.Default.SyncOverviewMapFlags(
+                        client.Controller.Character);
                     CombatXpRuntimeService.LogXpWireSnapshot(
                         client.Controller.Character,
                         "ClientConnected",
@@ -613,53 +643,49 @@ client.Controller.Character.Playfield.Identity,
             }
 
 
-            // Start adding GM/Expansion in stats
-            var character = client.Controller.Character;
-
-            // 1. take a character from the DB (the only valid way for you)
-            var characterData = CharacterDao.Instance
-                .GetAll(new { })
-                .FirstOrDefault(c => c.Id == character.Identity.Instance);
-
-            if (characterData == null)
-            {
-                Console.WriteLine($"[GM/EXP DEBUG] Character NOT FOUND ID={character.Identity.Instance}");
-                return;
-            }
-
-            // 2. get login data via Username
-            var login = LoginDataDao.Instance.GetByUsername(characterData.Username);
-
-            if (login == null)
-            {
-                Console.WriteLine($"[GM/EXP DEBUG] LOGIN NOT FOUND for {characterData.Username}");
-                return;
-            }
-
-            Console.WriteLine($"[GM/EXP DEBUG] CharacterID = {character.Identity.Instance}");
-            Console.WriteLine($"[GM/EXP DEBUG] Username = {characterData.Username}");
-            Console.WriteLine($"[GM/EXP DEBUG] GM = {login.GM}");
-            Console.WriteLine($"[GM/EXP DEBUG] EXP = {login.Expansions}");
-
-            // 3. REGISTRATION IN STATS (CORRECT FOR IStatList - NO Add/Contains)
-            SetStat(client, StatIds.gmlevel, login.GM);
-            SetStat(client, StatIds.expansion, login.Expansions | 2); // Shadowlands bit — CellAO statue OnUse requires it
-
-            UpsertCharacterStat(character.Identity.Instance, StatIds.gmlevel, login.GM);
-            UpsertCharacterStat(character.Identity.Instance, StatIds.expansion, login.Expansions | 2);
-
-            // optional safety reset (if engine ask refresh)
-            client.Controller.SendChangedStats();
-
-            // End Here
-
-
+            // Always restore actionable baseline before optional login lookups.
             SetStat(client, StatIds.currentstate, 0);
             SetStat(client, StatIds.waitstate, 0);
             SetStat(client, StatIds.socialstatus, 4);
             SetStat(client, StatIds.specialcondition, 3);
             SetStat(client, StatIds.actioncategory, 0);
-         
+
+            // Most armor ToWear templates require Shadowlands expansion (BitAnd 2).
+            int expansionValue = 2;
+            ICharacter character = client.Controller.Character;
+            DBCharacter characterData = CharacterDao.Instance.Get(character.Identity.Instance);
+            if (characterData == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "InitializeActionableState character not found id={0}; actionable baseline still applied",
+                        character.Identity.Instance));
+                SetStat(client, StatIds.expansion, expansionValue);
+                UpsertCharacterStat(character.Identity.Instance, StatIds.expansion, expansionValue);
+                client.Controller.SendChangedStats();
+                return;
+            }
+
+            DBLoginData login = LoginDataDao.Instance.GetByUsername(characterData.Username);
+            if (login == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "InitializeActionableState login not found user={0}; actionable baseline still applied",
+                        characterData.Username));
+            }
+            else
+            {
+                expansionValue = login.Expansions | 2;
+                SetStat(client, StatIds.gmlevel, login.GM);
+                UpsertCharacterStat(character.Identity.Instance, StatIds.gmlevel, login.GM);
+            }
+
+            SetStat(client, StatIds.expansion, expansionValue);
+            UpsertCharacterStat(character.Identity.Instance, StatIds.expansion, expansionValue);
+            client.Controller.SendChangedStats();
         }
 
         private static void SyncVitalStats(ICharacter character)

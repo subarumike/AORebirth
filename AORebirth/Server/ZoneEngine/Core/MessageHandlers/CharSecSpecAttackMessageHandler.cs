@@ -20,6 +20,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -41,6 +42,8 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 return;
             }
+
+            ClientActionBusyRuntime.Clear(character);
 
             int specialStatId = message.Stat;
             Identity targetId = message.Target;

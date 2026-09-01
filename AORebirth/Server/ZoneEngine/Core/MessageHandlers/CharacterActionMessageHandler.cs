@@ -144,6 +144,22 @@ namespace ZoneEngine.Core.MessageHandlers
                         break;
                     }
 
+                    if (zoneClient != null
+                        && AORebirth.Core.Playfields.NascenceDungeon3SearchRuntime.TryHandleSearch(
+                            zoneClient,
+                            client.Controller.Character))
+                    {
+                        break;
+                    }
+
+                    if (zoneClient != null
+                        && AORebirth.Core.Playfields.NascenceDungeon4SearchRuntime.TryHandleSearch(
+                            zoneClient,
+                            client.Controller.Character))
+                    {
+                        break;
+                    }
+
                     /* Msg 110:136744723 = "No hidden objects found." */
                     FeedbackMessageHandler.Default.Send(client.Controller.Character, 110, 136744723);
                     break;
@@ -845,8 +861,14 @@ namespace ZoneEngine.Core.MessageHandlers
                     target,
                     strain))
                 {
+                    // Capture 20260830-110744 / 124309: Overview of Nascence and Jobe (223767)
+                    // must land in ActiveNanos. Sending SetNanoDuration without Apply makes the
+                    // client SetFlag MapsC (PF map unlock) while server has no NCU entry — map
+                    // stays open after cancel/relog without the nano uploaded/cast.
+                    const int overviewOfNascenceAndJobeNanoId = 223767;
                     if (AdventurerMorphFlightRuntime.IsMorphFlightNano(unknown1)
-                        || AdventurerMorphFlightRuntime.IsVehicleMorphNano(unknown1))
+                        || AdventurerMorphFlightRuntime.IsVehicleMorphNano(unknown1)
+                        || unknown1 == overviewOfNascenceAndJobeNanoId)
                     {
                         ActiveNanoRuntimeService.Default.ApplyActiveNano(
                             recipient,

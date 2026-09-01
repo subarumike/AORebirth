@@ -802,7 +802,9 @@ namespace ZoneEngine.Core.Missions
             // NOT a generated mission PF2 — treating it as claimed blocks AcquireAggro via
             // MissionAcgSpatialRuntime.TryValidateCombatPair.
             if (AORebirth.Core.Playfields.NascenceDungeon1Rules.IsDungeonPlayfield(livePlayfield2)
-                || AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(livePlayfield2))
+                || AORebirth.Core.Playfields.NascenceDungeon2Rules.IsDungeonPlayfield(livePlayfield2)
+                || AORebirth.Core.Playfields.NascenceDungeon3Rules.IsDungeonPlayfield(livePlayfield2)
+                || AORebirth.Core.Playfields.NascenceDungeon4Rules.IsDungeonPlayfield(livePlayfield2))
             {
                 return false;
             }

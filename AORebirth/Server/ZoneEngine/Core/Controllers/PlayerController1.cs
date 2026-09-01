@@ -506,6 +506,8 @@ namespace ZoneEngine.Core.Controllers
                 }
 
                 NanoEventRuntimeService.Default.ExecuteOnUseEvents(this.Character, nano);
+                // Flush OnUse stat writes. MapsC SetFlag (585) is a no-op; Sync after duration.
+                this.SendChangedStats();
                 // Mongo Slam (100198) taunt AoE is in nanos.dat OnUse only.
                 // Do not inject slam effects onto Composite Utility Expertise (287046).
                 Character slamCaster = this.Character as Character;
@@ -545,6 +547,9 @@ namespace ZoneEngine.Core.Controllers
                         nanoId,
                         AdventurerMorphFlightRuntime.FallbackNcuDurationCentiseconds);
                 }
+
+                // Sole MapsC writer: unlock only while Overview is in ActiveNanos.
+                NanoEventRuntimeService.Default.SyncOverviewMapFlags(this.Character);
             }
 
             Thread.Sleep(nano.getItemAttribute(210) * 10); // Recharge Delay

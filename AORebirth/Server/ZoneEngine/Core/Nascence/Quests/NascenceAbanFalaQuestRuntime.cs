@@ -1148,7 +1148,7 @@ namespace ZoneEngine.Core.Nascence.Quests
                     "NASCENCE_ABAN_FALA offer failed quest="
                     + questId
                     + " status="
-                    + offer.Status.ToString(CultureInfo.InvariantCulture));
+                    + offer.Status.ToString());
             }
 
             MissionRuntime.Service.AcceptMission(characterId, questId);

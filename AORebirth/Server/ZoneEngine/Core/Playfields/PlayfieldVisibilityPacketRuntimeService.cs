@@ -425,8 +425,12 @@ namespace ZoneEngine.Core.Playfields
             SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
             bool joiningCharacter)
         {
+            // D1/D2/D3/D4 Havaris use capture wire (ExtTex + Monster side). ConstructMessage alone
+            // hides the boss mesh on D3 (same class of bug as prior dungeon).
             if (!NascenceDungeon1HavarisScfuWire.IsHavaris(npc)
-                && !NascenceDungeon2HavarisScfuWire.IsHavaris(npc))
+                && !NascenceDungeon2HavarisScfuWire.IsHavaris(npc)
+                && !NascenceDungeon3HavarisScfuWire.IsHavaris(npc)
+                && !NascenceDungeon4HavarisScfuWire.IsHavaris(npc))
             {
                 return false;
             }
@@ -461,7 +465,15 @@ namespace ZoneEngine.Core.Playfields
                             SubwayVisibilityDiagnosticPacketKind.SimpleCharFullUpdate,
                             0))
                         {
-                            if (NascenceDungeon2HavarisScfuWire.IsHavaris(npc))
+                            if (NascenceDungeon4HavarisScfuWire.IsHavaris(npc))
+                            {
+                                NascenceDungeon4HavarisScfuWire.SendToRecipient(recipientClient, npc);
+                            }
+                            else if (NascenceDungeon3HavarisScfuWire.IsHavaris(npc))
+                            {
+                                NascenceDungeon3HavarisScfuWire.SendToRecipient(recipientClient, npc);
+                            }
+                            else if (NascenceDungeon2HavarisScfuWire.IsHavaris(npc))
                             {
                                 NascenceDungeon2HavarisScfuWire.SendToRecipient(recipientClient, npc);
                             }
