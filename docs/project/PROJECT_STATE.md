@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-30
+Updated: 2026-09-01
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,16 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- ARPA3/ClickSaver Rubi-Ka mission evidence is archived and normalized offline
+  with source/member SHA-256 provenance, deterministic regeneration, and no
+  runtime dependency. The two retained ClickSaver 3.x catalogs decode to a
+  34,560-item union; 34,559 IDs bridge exactly to the hashed AORebirth
+  `items.dat`. The full ARPA3 query corpus remains unavailable because the
+  published robots policy disallows its `/cgi-bin` backend, so missing rows are
+  not negative rollability evidence and no mission-generator behavior was
+  changed. Evidence:
+  `docs/evidence/ARPA3_CLICKSAVER_MISSION_RECONSTRUCTION_20260901.md`.
 
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted

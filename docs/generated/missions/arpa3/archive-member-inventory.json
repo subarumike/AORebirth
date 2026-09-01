@@ -1,0 +1,24 @@
+[
+  {
+    "byte_length": 6299800,
+    "extraction_status": "DECODED_CUSTOM_CDB",
+    "member": "All.cdb",
+    "parent_archive": "docs/reference/missions/clicksaver/raw/cs3-all-noicons-localdb-18-8-0.zip",
+    "sha256": "cb86badc24e4b2429fb8b7568aea4cb26d3c6e80149a7af56ae582572c949150"
+  },
+  {
+    "byte_length": 2951144,
+    "extraction_status": "DECODED_CUSTOM_CDB",
+    "member": "Tiny.cdb",
+    "parent_archive": "docs/reference/missions/clicksaver/raw/cs310-v2.zip",
+    "sha256": "2f9a6fcff91f09f68575623aac5dc9b0c36d9884e5db03599f902693f58d1747"
+  },
+  {
+    "byte_length": 96807936,
+    "extraction_status": "OPAQUE_BERKELEY_DB_4_ARTIFACT",
+    "member": "AODatabase.bdb",
+    "parent_archive": "docs/reference/missions/clicksaver/raw/cs23-24-localdb-18-8-0.zip",
+    "prefix_hex": "0000000001000000000000006115060007000000000200000008000000000000",
+    "sha256": "ead90992fa86250e034eb44d221b3dc0f5289497b11db67484ea796777111f69"
+  }
+]

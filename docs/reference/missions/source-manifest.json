@@ -1,0 +1,411 @@
+{
+  "AcquisitionPolicy": {
+    "BackendBulkExtractionAttempted": false,
+    "CgiPathsRequested": false,
+    "ExternalHistoricalFilesAreRuntimeDependencies": false,
+    "RobotsCrawlDelaySeconds": 4.0,
+    "RobotsDisallowCgi": true
+  },
+  "Artifacts": [
+    {
+      "ArtifactId": "arpa3-robots",
+      "ByteLength": 561,
+      "FinalUrl": "https://arpa3.net/robots.txt",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/robots.txt",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/robots.txt",
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "561",
+        "Content-Type": "text/plain",
+        "Date": "Tue, 01 Sep 2026 03:27:48 GMT",
+        "Last-Modified": "Wed, 27 May 2015 10:43:18 GMT",
+        "Server": "LiteSpeed",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "ROBOTS_POLICY",
+      "Sha256": "74756bddc6d6d6ba0fee21e25b978bf711120f4978dfb242e205734f689107aa"
+    },
+    {
+      "ArtifactId": "javierarpa-robots",
+      "ByteLength": 561,
+      "FinalUrl": "https://javierarpa.com/robots.txt",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/javierarpa-robots.txt",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://javierarpa.com/robots.txt",
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "561",
+        "Content-Type": "text/plain",
+        "Date": "Tue, 01 Sep 2026 03:27:53 GMT",
+        "Last-Modified": "Wed, 27 May 2015 10:43:18 GMT",
+        "Server": "LiteSpeed",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "ROBOTS_POLICY",
+      "Sha256": "74756bddc6d6d6ba0fee21e25b978bf711120f4978dfb242e205734f689107aa"
+    },
+    {
+      "ArtifactId": "rollability-page",
+      "ByteLength": 22378,
+      "FinalUrl": "https://arpa3.net/ao/rollability.html",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/rollability.html",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/ao/rollability.html",
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Type": "text/html",
+        "Date": "Tue, 01 Sep 2026 03:27:57 GMT",
+        "Server": "LiteSpeed",
+        "Transfer-Encoding": "chunked",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "ROLLABILITY_UI_HTML",
+      "Sha256": "c678d72e9db5c7ab2a6ea4f0d3f01858c7f6f97c73eedca6eb615e6c27cea3ea"
+    },
+    {
+      "ArtifactId": "rollability-about",
+      "ByteLength": 13332,
+      "FinalUrl": "https://arpa3.net/ao/rollability-about.html",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/rollability-about.html",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/ao/rollability-about.html",
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Type": "text/html",
+        "Date": "Tue, 01 Sep 2026 03:28:02 GMT",
+        "Server": "LiteSpeed",
+        "Transfer-Encoding": "chunked",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "ROLLABILITY_METHODOLOGY_HTML",
+      "Sha256": "dcac4b855136354c89f32b78a76534468a8745c7f169a9c0e18994a62d77ec66"
+    },
+    {
+      "ArtifactId": "clicksaver-page",
+      "ByteLength": 50045,
+      "FinalUrl": "https://arpa3.net/ao/clicksaver.shtml",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/clicksaver.shtml",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/ao/clicksaver.shtml",
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Type": "text/html",
+        "Date": "Tue, 01 Sep 2026 03:28:07 GMT",
+        "Server": "LiteSpeed",
+        "Transfer-Encoding": "chunked",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_HISTORY_HTML",
+      "Sha256": "6d809ff4ea516d7b32509b09168ab090f3340c2b3eb99157acb9d41e56441e0f"
+    },
+    {
+      "ArtifactId": "clicksaver-databases-page",
+      "ByteLength": 12819,
+      "FinalUrl": "https://arpa3.net/ao/clicksaver-premade-local-databases.html",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/clicksaver-premade-local-databases.html",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/ao/clicksaver-premade-local-databases.html",
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Type": "text/html",
+        "Date": "Tue, 01 Sep 2026 03:28:11 GMT",
+        "Server": "LiteSpeed",
+        "Transfer-Encoding": "chunked",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_DATABASE_DOWNLOADS_HTML",
+      "Sha256": "e8a308ae6b365cb309ec0210aff073863bea10b694c6f70afec87712c0697495"
+    },
+    {
+      "ArtifactId": "clicksaver-database-creation-page",
+      "ByteLength": 19348,
+      "FinalUrl": "https://arpa3.net/ao/clicksaver-local-database-creation.html",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/clicksaver-local-database-creation.html",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/ao/clicksaver-local-database-creation.html",
+      "ResponseHeaders": {
+        "Connection": "close",
+        "Content-Type": "text/html",
+        "Date": "Tue, 01 Sep 2026 03:28:17 GMT",
+        "Server": "LiteSpeed",
+        "Transfer-Encoding": "chunked",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_DATABASE_FORMAT_HISTORY_HTML",
+      "Sha256": "850ea56b48f583e37a16c77fd6e205367dda95b1b2e85ee004fb88d4400607b3"
+    },
+    {
+      "ArtifactId": "rollability-javascript",
+      "ByteLength": 3459,
+      "FinalUrl": "https://arpa3.net/ao/isitrollable.js",
+      "HttpStatus": 200,
+      "RelativePath": "arpa3/raw/isitrollable.js",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "Referer": "https://arpa3.net/ao/rollability.html",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://arpa3.net/ao/isitrollable.js",
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "3459",
+        "Content-Type": "text/javascript",
+        "Date": "Tue, 01 Sep 2026 03:28:21 GMT",
+        "Last-Modified": "Thu, 23 Feb 2023 11:43:36 GMT",
+        "Server": "LiteSpeed",
+        "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "ROLLABILITY_UI_JAVASCRIPT",
+      "Sha256": "2186aa148a73cc923683538d57f72224616be4b1c6495baedcf22ed155a7dc75"
+    },
+    {
+      "ArtifactId": "clicksaver-3.1.0-package",
+      "ByteLength": 2229895,
+      "FinalUrl": "http://arpa3.net/ao/dl/cs310-v2-temp/cs310-v2.zip",
+      "HttpStatus": 200,
+      "RelativePath": "clicksaver/raw/cs310-v2.zip",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "http://arpa3.net/ao/dl/cs310-v2-temp/cs310-v2.zip",
+      "ResponseHeaders": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "2229895",
+        "Content-Type": "application/zip",
+        "Date": "Tue, 01 Sep 2026 03:28:26 GMT",
+        "Last-Modified": "Tue, 06 Aug 2024 08:31:29 GMT",
+        "Server": "LiteSpeed"
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_BINARY_AND_TINY_CDB_ARCHIVE",
+      "Sha256": "d6aa6764b719dbe32f020f815bd877ae3f82f845de46eacd4a9b46f14c04d097"
+    },
+    {
+      "ArtifactId": "clicksaver-source-commit",
+      "ByteLength": 1150769,
+      "FinalUrl": "https://codeload.github.com/pzychotic/ClickSaver/zip/38f9347aca020ce2dd0e2e0b752829fc582b1532",
+      "HttpStatus": 200,
+      "RelativePath": "clicksaver/raw/clicksaver-source-38f9347aca020ce2dd0e2e0b752829fc582b1532.zip",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://github.com/pzychotic/ClickSaver/archive/38f9347aca020ce2dd0e2e0b752829fc582b1532.zip",
+      "ResponseHeaders": {
+        "Access-Control-Allow-Origin": "https://render.githubusercontent.com",
+        "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+        "Content-Type": "application/zip",
+        "Date": "Tue, 01 Sep 2026 03:28:29 GMT",
+        "ETag": "\"8b94cc972f73b0432ed3211e83b8ddd20298e9581cda547d68fc94918e6f7b65\"",
+        "Strict-Transport-Security": "max-age=31536000",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Authorization,Accept-Encoding",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "deny",
+        "X-GitHub-Request-Id": "DEB4:24B86E:1357EF:25969F:6A96465D",
+        "X-XSS-Protection": "1; mode=block",
+        "connection": "close",
+        "content-disposition": "attachment; filename=ClickSaver-38f9347aca020ce2dd0e2e0b752829fc582b1532.zip",
+        "cross-origin-resource-policy": "cross-origin",
+        "x-github-edge-region": "iad"
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_SOURCE_ARCHIVE",
+      "Sha256": "1d2d049a157711409b43da93717347e684febe200edd3f13ac2805cea455165a"
+    },
+    {
+      "ArtifactId": "clicksaver-all-cdb-no-icons-landing",
+      "ByteLength": 334330,
+      "FinalUrl": "https://www.mediafire.com/download/4tdx3vm9n4t9gm7/cs3-all-noicons-localdb-18-8-0.zip",
+      "HttpStatus": 200,
+      "RelativePath": "clicksaver/raw/cs3-all-noicons-localdb-18-8-0.mediafire.html",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://www.mediafire.com/download/4tdx3vm9n4t9gm7/cs3-all-noicons-localdb-18-8-0.zip",
+      "ResponseHeaders": {
+        "Access-Control-Allow-Origin": "https://www.mediafire.com",
+        "CF-Cache-Status": "DYNAMIC",
+        "CF-Ray": "a3412f6bcf6ee1db-ORD",
+        "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0, post-check=0, pre-check=0",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Date": "Tue, 01 Sep 2026 03:28:30 GMT",
+        "Expires": "0",
+        "Pragma": "no-cache",
+        "Server": "cloudflare",
+        "Set-Cookie": "conv_tracking_data-2=%7B%22mf_source%22%3A%22regular_download-59%22%2C%22mf_content%22%3A%22Free%22%2C%22mf_medium%22%3A%22unknown%5C%2FDefault%20Browser%22%2C%22mf_campaign%22%3A%224tdx3vm9n4t9gm7%22%2C%22mf_term%22%3A%22129c47b82b87bfb6%22%7D; expires=Thu, 01-Oct-2026 03:28:30 GMT; Max-Age=2592000; path=/; domain=.mediafire.com",
+        "Strict-Transport-Security": "max-age=0",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding",
+        "access-control-allow-methods": "OPTIONS, POST, GET",
+        "alt-svc": "h3=\":443\"; ma=86400",
+        "set-cookie": "__cf_bm=DEJllbuE4DhcFHfzWr2g75thAmvS9SiQ64hCfAeK714-1788233310.049183-1.0.1.1-jjmoKAq.3tQDhBBZ3xirj6oZLpZ5ISOAiHSPWI87Kzj3.XaBhBqmq7mL90Ff4Dd6ceuHn8Ge3DDf.KfjUXgC.qt_p9x8erHtgIXpqRSP0_M_W50YI8RCZWHInpuEhi9P; HttpOnly; SameSite=None; Secure; Path=/; Domain=mediafire.com; Expires=Tue, 01 Sep 2026 03:58:30 GMT",
+        "x-by": "",
+        "x-frame-options": "SAMEORIGIN",
+        "x-mf-env": "liveApi",
+        "x-mf-fe": "mf2",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "DOWNLOAD_LANDING_HTML",
+      "Sha256": "c09d1601e011afeaf0987a5c5935d34be0919ec100b628945e29282dac56bc61"
+    },
+    {
+      "ArtifactId": "clicksaver-all-cdb-no-icons",
+      "ByteLength": 1262206,
+      "FinalUrl": "https://download1638.mediafire.com/2ux0k4rxw9vgQ80JU_s_euob0Ypw-37zDf1VeHeAVB_zB5LbPq5HMnTq-Hfh2TrBMpjJ8OIXclYef48pupXLZk7BMh_cassNMFwxjmBj1oqGc5JZhG9aHX5wwtjgB0ILxj9czArX2BOCX5ld6PBKPfO-OYFXL7kAFWyzBr6iJBkpQ98/4tdx3vm9n4t9gm7/cs3-all-noicons-localdb-18-8-0.zip",
+      "HttpStatus": 200,
+      "RelativePath": "clicksaver/raw/cs3-all-noicons-localdb-18-8-0.zip",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "Referer": "https://www.mediafire.com/download/4tdx3vm9n4t9gm7/cs3-all-noicons-localdb-18-8-0.zip",
+        "Resolved-Download-Url": "https://download1638.mediafire.com/2ux0k4rxw9vgQ80JU_s_euob0Ypw-37zDf1VeHeAVB_zB5LbPq5HMnTq-Hfh2TrBMpjJ8OIXclYef48pupXLZk7BMh_cassNMFwxjmBj1oqGc5JZhG9aHX5wwtjgB0ILxj9czArX2BOCX5ld6PBKPfO-OYFXL7kAFWyzBr6iJBkpQ98/4tdx3vm9n4t9gm7/cs3-all-noicons-localdb-18-8-0.zip",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://www.mediafire.com/download/4tdx3vm9n4t9gm7/cs3-all-noicons-localdb-18-8-0.zip",
+      "ResponseHeaders": {
+        "accept-ranges": "bytes",
+        "cache-control": "no-store",
+        "connection": "close",
+        "content-disposition": "attachment; filename=\"cs3-all-noicons-localdb-18-8-0.zip\"",
+        "content-length": "1262206",
+        "content-type": "application/zip",
+        "date": "Tue, 01 Sep 2026 03:28:30 GMT",
+        "server": "bd-0.1.30",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_ALL_CDB_18_8_0_ARCHIVE",
+      "Sha256": "a32fed2cbab9cb92bf03b92fd00a6c7739e2a095ea7203d19f35206dafa3ca77"
+    },
+    {
+      "ArtifactId": "clicksaver-aodatabase-bdb-landing",
+      "ByteLength": 334169,
+      "FinalUrl": "https://www.mediafire.com/download/drjqk656a56jvjg/cs23-24-localdb-18-8-0.zip",
+      "HttpStatus": 200,
+      "RelativePath": "clicksaver/raw/cs23-24-localdb-18-8-0.mediafire.html",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://www.mediafire.com/download/drjqk656a56jvjg/cs23-24-localdb-18-8-0.zip",
+      "ResponseHeaders": {
+        "Access-Control-Allow-Origin": "https://www.mediafire.com",
+        "CF-Cache-Status": "DYNAMIC",
+        "CF-Ray": "a3412f742f360c73-MSP",
+        "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0, post-check=0, pre-check=0",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Date": "Tue, 01 Sep 2026 03:28:31 GMT",
+        "Expires": "0",
+        "Pragma": "no-cache",
+        "Server": "cloudflare",
+        "Set-Cookie": "conv_tracking_data-2=%7B%22mf_source%22%3A%22regular_download-59%22%2C%22mf_content%22%3A%22Free%22%2C%22mf_medium%22%3A%22unknown%5C%2FDefault%20Browser%22%2C%22mf_campaign%22%3A%22drjqk656a56jvjg%22%2C%22mf_term%22%3A%22129c47b82b87bfb6%22%7D; expires=Thu, 01-Oct-2026 03:28:31 GMT; Max-Age=2592000; path=/; domain=.mediafire.com",
+        "Strict-Transport-Security": "max-age=0",
+        "Transfer-Encoding": "chunked",
+        "Vary": "Accept-Encoding",
+        "access-control-allow-methods": "OPTIONS, POST, GET",
+        "alt-svc": "h3=\":443\"; ma=86400",
+        "set-cookie": "__cf_bm=QBT3Ju5P4rGmSSepjgdUoJPz89R4ffkmgYrR79l6BJc-1788233311.3853862-1.0.1.1-MqN5rGcrbYPrC2Jnd28nZAjnObvyrOvHhoE5VY813ZDutLSZqOnVOqisW0cwRVrfH6htb18YWs7LlAobTAWI2TGo3fRldi9S1l51BopcPDpuplpXvJbiLUAcfY3J4iXu; HttpOnly; SameSite=None; Secure; Path=/; Domain=mediafire.com; Expires=Tue, 01 Sep 2026 03:58:31 GMT",
+        "x-by": "",
+        "x-frame-options": "SAMEORIGIN",
+        "x-mf-env": "liveApi",
+        "x-mf-fe": "mf2",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "DOWNLOAD_LANDING_HTML",
+      "Sha256": "607939d67cf389f90fdee0e25e62df22cb699fd80b1257a485ee0d45c0e0cd81"
+    },
+    {
+      "ArtifactId": "clicksaver-aodatabase-bdb",
+      "ByteLength": 30168513,
+      "FinalUrl": "https://download1351.mediafire.com/btvi16w6ea0gcbWWkZig0knILU4mQrlHw0jR29h4TXgQhPPfPhh8xAKFzcsOt6TQc-joYug_Vtyl5_hrugmeaPlTXFZ8b8eXpmoYY0ivG15Xiuda233Cr_8KZzldrMlkjdj-XX0yW1C_DcGU-n3R2C-v3NBMRqDM3oAYbHz3g0Q_xbs/drjqk656a56jvjg/cs23-24-localdb-18-8-0.zip",
+      "HttpStatus": 200,
+      "RelativePath": "clicksaver/raw/cs23-24-localdb-18-8-0.zip",
+      "RequestHeaders": {
+        "Accept": "*/*",
+        "Accept-Encoding": "identity",
+        "Referer": "https://www.mediafire.com/download/drjqk656a56jvjg/cs23-24-localdb-18-8-0.zip",
+        "Resolved-Download-Url": "https://download1351.mediafire.com/btvi16w6ea0gcbWWkZig0knILU4mQrlHw0jR29h4TXgQhPPfPhh8xAKFzcsOt6TQc-joYug_Vtyl5_hrugmeaPlTXFZ8b8eXpmoYY0ivG15Xiuda233Cr_8KZzldrMlkjdj-XX0yW1C_DcGU-n3R2C-v3NBMRqDM3oAYbHz3g0Q_xbs/drjqk656a56jvjg/cs23-24-localdb-18-8-0.zip",
+        "User-Agent": "AORebirth mission evidence collector/1.0 (+offline archival)"
+      },
+      "RequestedUrl": "https://www.mediafire.com/download/drjqk656a56jvjg/cs23-24-localdb-18-8-0.zip",
+      "ResponseHeaders": {
+        "accept-ranges": "bytes",
+        "cache-control": "no-store",
+        "connection": "close",
+        "content-disposition": "attachment; filename=\"cs23-24-localdb-18-8-0.zip\"",
+        "content-length": "30168513",
+        "content-type": "application/zip",
+        "date": "Tue, 01 Sep 2026 03:28:31 GMT",
+        "server": "bd-0.1.30",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+      "Role": "CLICKSAVER_AODATABASE_BDB_18_8_0_ARCHIVE",
+      "Sha256": "dfaebbdab8460befab00fc524af82b83dc6b3bdd4c86df300800471313f1afb0"
+    }
+  ],
+  "ClickSaverSourceCommit": "38f9347aca020ce2dd0e2e0b752829fc582b1532",
+  "ParserToolVersion": "1.0.0",
+  "RetrievedAtUtc": "2026-09-01T03:25:00Z",
+  "SchemaVersion": 1
+}

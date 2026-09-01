@@ -19,6 +19,77 @@ namespace AOSharpCaptureAnalyzer
 
     internal static class ItemTemplateProjection
     {
+        public static int RunAll(
+            string itemDatabasePath,
+            string expectedSha256,
+            string expectedByteLengthText,
+            string outputPath)
+        {
+            try
+            {
+                long expectedByteLength;
+                if (!long.TryParse(
+                    expectedByteLengthText,
+                    NumberStyles.None,
+                    CultureInfo.InvariantCulture,
+                    out expectedByteLength)
+                    || expectedByteLength < 0)
+                {
+                    throw new InvalidDataException("Item database byte length is invalid.");
+                }
+
+                VerifyItemDatabase(itemDatabasePath, expectedSha256, expectedByteLength);
+                ItemTemplate[] templates = MessagePackZip
+                    .UncompressData<ItemTemplate>(itemDatabasePath)
+                    .OrderBy(value => value.ID)
+                    .ToArray();
+                if (templates.Length == 0)
+                {
+                    throw new InvalidDataException("Item database contains no templates.");
+                }
+
+                JavaScriptSerializer serializer = new JavaScriptSerializer
+                {
+                    MaxJsonLength = int.MaxValue,
+                    RecursionLimit = 256,
+                };
+                using (StreamWriter writer = new StreamWriter(
+                    outputPath,
+                    false,
+                    new UTF8Encoding(false)))
+                {
+                    foreach (ItemTemplate template in templates)
+                    {
+                        writer.WriteLine(
+                            serializer.Serialize(
+                                new SortedDictionary<string, object>(StringComparer.Ordinal)
+                                {
+                                    { "flags", template.Flags },
+                                    { "item_id", template.ID },
+                                    { "item_type", template.ItemType },
+                                    { "quality_level", template.Quality },
+                                    {
+                                        "relations",
+                                        (template.Relations ?? new List<int>())
+                                            .OrderBy(value => value)
+                                            .ToArray()
+                                    },
+                                }));
+                    }
+                }
+
+                Console.WriteLine(
+                    "AORebirth item template export PASS templates="
+                    + templates.Length.ToString(CultureInfo.InvariantCulture));
+                return 0;
+            }
+            catch (Exception error)
+            {
+                Console.Error.WriteLine("Item template export failed: " + error.Message);
+                return 1;
+            }
+        }
+
         public static int Run(
             string itemDatabasePath,
             string expectedSha256,

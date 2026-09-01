@@ -1,0 +1,65 @@
+[
+  {
+    "delta": 11,
+    "delta_absolute": 11,
+    "evidence_level": "DOCUMENTED_EXACT_QL_EXCEPTION",
+    "item_name": "Nano Crystal (Anima of The Abomination)",
+    "item_ql": 239,
+    "mission_ql": 250,
+    "source_line": 433
+  },
+  {
+    "delta": 20,
+    "delta_absolute": 20,
+    "evidence_level": "DOCUMENTED_EXACT_QL_EXCEPTION",
+    "item_name": "Nano Crystal (Sneaking Terror)",
+    "item_ql": 70,
+    "mission_ql": 90,
+    "source_line": 434
+  },
+  {
+    "delta": 14,
+    "delta_absolute": 14,
+    "evidence_level": "DOCUMENTED_EXACT_QL_EXCEPTION",
+    "item_name": "Nano Crystal (A Clear Sense of Scheol)",
+    "item_ql": 60,
+    "mission_ql": 74,
+    "source_line": 435
+  },
+  {
+    "delta": 23,
+    "delta_absolute": 23,
+    "evidence_level": "DOCUMENTED_EXACT_QL_EXCEPTION",
+    "item_name": "Nano Crystal (Mind Scream)",
+    "item_ql": 37,
+    "mission_ql": 60,
+    "source_line": 436
+  },
+  {
+    "delta": 15,
+    "delta_absolute": 15,
+    "evidence_level": "DOCUMENTED_EXACT_QL_EXCEPTION",
+    "item_name": "Nano Crystal (Overview of Elysium)",
+    "item_ql": 30,
+    "mission_ql": 45,
+    "source_line": 437
+  },
+  {
+    "delta": -52,
+    "delta_absolute": 52,
+    "evidence_level": "DOCUMENTED_APPROXIMATE_QL_EXCEPTION",
+    "item_name": "Nano Crystal (Greater Hold Victim)",
+    "item_ql": 132,
+    "mission_ql": 80,
+    "source_line": 440
+  },
+  {
+    "delta": 47,
+    "delta_absolute": 47,
+    "evidence_level": "DOCUMENTED_APPROXIMATE_QL_EXCEPTION",
+    "item_name": "Nano Crystal (Hold Victim)",
+    "item_ql": 83,
+    "mission_ql": 130,
+    "source_line": 441
+  }
+]

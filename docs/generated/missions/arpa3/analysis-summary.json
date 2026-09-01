@@ -1,0 +1,76 @@
+{
+  "aorebirth_item_template_count": 120842,
+  "aorebirth_resolution_counts": {
+    "EXACT_ID": 15046,
+    "EXACT_ID_AND_REWARD_ENDPOINT": 19495,
+    "EXACT_ID_PARTIAL_RELATION": 18,
+    "UNRESOLVED": 1
+  },
+  "aorebirth_reward_catalog_row_count": 23994,
+  "arpa3_live_rdb_complete": false,
+  "arpa3_query_backend_bulk_extraction_permitted": false,
+  "clicksaver_all": {
+    "byte_length": 6299800,
+    "decoded_name_record_count": 35175,
+    "item_identity_count": 34559,
+    "item_missing_name_count": 8,
+    "item_table_offset": 5344056,
+    "named_record_count": 35175,
+    "named_record_flag_counts": {
+      "1": 616,
+      "2": 34559
+    },
+    "names_end_offset": 1495848,
+    "opaque_payload_bytes_between_names_and_table": 3848208,
+    "playfield_identity_count": 616,
+    "resource_record_count": 119468,
+    "resource_record_flag_counts": {
+      "1": 616,
+      "2": 118852
+    }
+  },
+  "clicksaver_bdb_byte_length": 96807936,
+  "clicksaver_cross_version_name_conflict_count": 108,
+  "clicksaver_playfield_cross_version_name_conflict_count": 21,
+  "clicksaver_playfield_union_count": 619,
+  "clicksaver_tiny": {
+    "byte_length": 2951144,
+    "decoded_name_record_count": 14845,
+    "item_identity_count": 14235,
+    "item_missing_name_count": 0,
+    "item_table_offset": 2749896,
+    "named_record_count": 14845,
+    "named_record_flag_counts": {
+      "1": 610,
+      "2": 14235
+    },
+    "names_end_offset": 622797,
+    "opaque_payload_bytes_between_names_and_table": 2127099,
+    "playfield_identity_count": 610,
+    "resource_record_count": 25156,
+    "resource_record_flag_counts": {
+      "1": 610,
+      "2": 23952,
+      "3": 594
+    }
+  },
+  "clicksaver_tiny_only_item_count": 1,
+  "clicksaver_union_item_count": 34560,
+  "documented_clicksaver_log_missions": 5,
+  "documented_ql_exception_count": 7,
+  "documented_ql_exception_max_absolute_delta": 52,
+  "documented_ql_exception_max_delta": 47,
+  "documented_ql_exception_min_delta": -52,
+  "exact_full_corpus_per_mission_ql_counts": null,
+  "exact_full_corpus_repeatability_probabilities": null,
+  "exact_full_corpus_reward_composition_distribution": null,
+  "exact_full_corpus_reward_type_distribution": null,
+  "observed_fixture_item_count": 2,
+  "observed_fixture_max_absolute_delta": 4,
+  "observed_fixture_max_delta": 4,
+  "observed_fixture_min_delta": 0,
+  "observed_fixture_mission_ql_row_count": 10,
+  "observed_fixture_overall_row_count": 2,
+  "runtime_dependency_created": false,
+  "runtime_mission_logic_changed": false
+}
