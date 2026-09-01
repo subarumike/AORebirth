@@ -706,6 +706,7 @@ namespace ChatEngine
             {
                 // Setup and enable NLog logging.
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/ChatEngineLog.txt", LogLevel.Trace);
 
                 // NBug initialization

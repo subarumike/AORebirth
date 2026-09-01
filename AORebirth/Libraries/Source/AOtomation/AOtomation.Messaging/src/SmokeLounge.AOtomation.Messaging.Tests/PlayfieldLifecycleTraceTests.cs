@@ -7952,7 +7952,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void PlayfieldDynelRegistryIsOwnedByRuntimeSystemsAndFeedsSafeLookupPaths()
+        public void PlayfieldDynelRegistryIsOwnedByPlayfieldAndFeedsSafeLookupPaths()
         {
             string repositoryRoot = FindRepositoryRoot();
             string playfieldText = File.ReadAllText(
@@ -7996,16 +7996,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry"),
-                "PlayfieldRuntimeSystems must own PlayfieldDynelRegistry.");
+                playfieldText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry"),
+                "Playfield must own PlayfieldDynelRegistry.");
+            Assert.IsTrue(
+                playfieldText.Contains("internal PlayfieldDynelRegistry DynelRegistry"),
+                "Playfield must expose DynelRegistry for playfield-scoped access.");
             Assert.AreEqual(
                 1,
-                CountOccurrences(runtimeSystemsText, "new PlayfieldDynelRegistry(playfieldIdentity)"),
-                "PlayfieldRuntimeSystems must construct one dynel registry.");
+                CountOccurrences(playfieldText, "new PlayfieldDynelRegistry("),
+                "Playfield must construct one dynel registry.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry"),
+                "PlayfieldRuntimeSystems must hold an injected PlayfieldDynelRegistry reference.");
             Assert.AreEqual(
                 0,
-                CountOccurrences(playfieldText, "new PlayfieldDynelRegistry("),
-                "Playfield must not directly construct PlayfieldDynelRegistry.");
+                CountOccurrences(runtimeSystemsText, "new PlayfieldDynelRegistry("),
+                "PlayfieldRuntimeSystems must not construct PlayfieldDynelRegistry.");
 
             string[] runtimeDelegations =
                 {
