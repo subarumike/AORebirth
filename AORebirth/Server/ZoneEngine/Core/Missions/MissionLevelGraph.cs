@@ -418,33 +418,6 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
-            for (int difficultyIndex = 0;
-                 difficultyIndex < MissionLevelGraph.DifficultyCount;
-                 difficultyIndex++)
-            {
-                for (int levelOffset = 1;
-                     levelOffset < MissionLevelGraph.MaximumLevel;
-                     levelOffset++)
-                {
-                    int previous =
-                        qualities[
-                            ((levelOffset - 1)
-                             * MissionLevelGraph.DifficultyCount)
-                            + difficultyIndex];
-                    int current =
-                        qualities[
-                            (levelOffset
-                             * MissionLevelGraph.DifficultyCount)
-                            + difficultyIndex];
-                    if (current < previous)
-                    {
-                        failure =
-                            "Official mission-level graph decreases between levels.";
-                        return false;
-                    }
-                }
-            }
-
             if (!IsNondecreasing(tokens))
             {
                 failure =

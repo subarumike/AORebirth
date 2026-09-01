@@ -14,7 +14,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class MissionLevelGraphTests
     {
         private const string CanonicalSourceSha256 =
-            "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f";
+            "393308fe4ac80f7513743aaedabaaaf5c372d081f15f9afc489b3c4df8c03b6a";
 
         private const string UpstreamOdsSha256 =
             "5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7";
@@ -69,7 +69,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void LevelFourAndCapturedLevelSixtyRowsRemainExact()
+        public void HelpbotAnchorsAndDerivedDetentsRemainExact()
         {
             MissionLevelGraphPublication publication = PublishCanonical();
             int[] levelFour =
@@ -104,6 +104,78 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     publication,
                     60,
                     1));
+            Assert.AreEqual(
+                18,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    10,
+                    11));
+            Assert.AreEqual(
+                108,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    60,
+                    11));
+            Assert.AreEqual(
+                60,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    77,
+                    3));
+            Assert.AreEqual(
+                64,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    77,
+                    4));
+            Assert.AreEqual(
+                91,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    77,
+                    8));
+            Assert.AreEqual(
+                117,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    90,
+                    9));
+            Assert.AreEqual(
+                122,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    112,
+                    7));
+            Assert.AreEqual(
+                212,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    142,
+                    10));
+            Assert.AreEqual(
+                250,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    149,
+                    11));
+        }
+
+        [TestMethod]
+        public void PublishedLevelOneHundredThreeMaximumDecreaseIsPreserved()
+        {
+            MissionLevelGraphPublication publication = PublishCanonical();
+            Assert.AreEqual(
+                186,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    102,
+                    11));
+            Assert.AreEqual(
+                185,
+                MissionLevelTable.GetRequiredMissionQualityForRoll(
+                    publication,
+                    103,
+                    11));
         }
 
         [TestMethod]
@@ -284,7 +356,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void ImpossibleSemanticValuesFailClosed()
+        public void ImpossibleRowSemanticValuesFailClosed()
         {
             AssertRejected(
                 ReplaceCell(60, 2, "41"),
@@ -292,9 +364,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertRejected(
                 ReplaceCell(60, 6, "61"),
                 "impossible neutral-difficulty value");
-            AssertRejected(
-                ReplaceCell(61, 1, "41"),
-                "decreases between levels");
             AssertRejected(
                 ReplaceCell(77, 12, "3"),
                 "token counts decrease between levels");
@@ -336,6 +405,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 UpstreamOdsSha256,
                 MissionLevelGraphData.UpstreamOdsSha256);
+            Assert.AreEqual(
+                "docs/evidence/data/helpbot-mission-ql-levels-1-149.json",
+                MissionLevelGraphData.HelpbotReferenceRepositoryPath);
+            Assert.AreEqual(
+                "f8841253af7ed9b63aa2d9d1a2d48e487239b4f8e44e57b225cc7b3855c04488",
+                MissionLevelGraphData.HelpbotReferenceRawSha256);
 
             string path = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
