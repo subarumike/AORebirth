@@ -1,0 +1,85 @@
+{
+  "Architecture": "SERVER_OFFER_FILTERING",
+  "ArpaEquivalentClassification": "NO_EQUIVALENT_DATA",
+  "GeneratorReadiness": [
+    {
+      "Basis": "AORebirth already has a governed exact 220-row table; Malis corroborates most cells but is not the authority.",
+      "Status": "READY",
+      "Subsystem": "character level -> mission QL"
+    },
+    {
+      "Basis": "One-based difficulty 1..11 to table index 0..10 is source- and capture-backed.",
+      "Status": "READY",
+      "Subsystem": "difficulty slider mapping"
+    },
+    {
+      "Basis": "Five icons bridge exactly across Malis, ClickSaver codes, AOSharp actions, and AORebirth captures.",
+      "Status": "READY",
+      "Subsystem": "mission type representation"
+    },
+    {
+      "Basis": "Exact typed response fields and cohort transport are source/package backed.",
+      "Status": "READY",
+      "Subsystem": "AOSharp offer field representation"
+    },
+    {
+      "Basis": "Malis implements a filter assumption with an uncertainty comment; no retained offer corpus proves the server boundary.",
+      "Status": "NOT_READY",
+      "Subsystem": "QL200 reward behavior above level 200"
+    },
+    {
+      "Basis": "No complete eligibility matrix.",
+      "Status": "NOT_READY",
+      "Subsystem": "reward eligibility"
+    },
+    {
+      "Basis": "No frequency or true weight evidence.",
+      "Status": "NOT_READY",
+      "Subsystem": "reward weighting"
+    },
+    {
+      "Basis": "Description matching is post-offer filtering, not selection evidence.",
+      "Status": "NOT_READY",
+      "Subsystem": "objective-item selection"
+    },
+    {
+      "Basis": "The 46-entry list is a user filter, not a server destination pool.",
+      "Status": "NOT_READY",
+      "Subsystem": "destination selection"
+    },
+    {
+      "Basis": "Representation is known; cross-offer constraints and selection law are not.",
+      "Status": "NOT_READY",
+      "Subsystem": "five-offer generation"
+    }
+  ],
+  "HighestValueTargetedCaptures": [
+    "At character levels 200, 201, and 220, request every difficulty detent while targeting the same scalable non-nano QL200 item; retain every reward low/high ID and reward QL.",
+    "Repeat the >200 comparison for a QL200 nano and a scalable item with distinct low/high endpoints to separate cap, nano, and interpolation behavior.",
+    "Capture level 80 difficulty 11 and the divergent/missing Malis cells (levels 12, 13, 209-219 difficulty 11) to distinguish table defects from server behavior.",
+    "For exact target items, retain complete five-offer cohorts and accepted-mission actions so reward-array matches and objective-description matches become separate channels.",
+    "If probabilities are a later target, retain ordered no-success-filter cohorts with terminal, character, sliders, costs, all five offers, and repeated requests; do not sample only matches."
+  ],
+  "ItemExistenceIsEligibility": false,
+  "MalisCommit": "3ac9943a4943b8cb80eda9e40359729e656686b0",
+  "MalisMissionKnowledge": [
+    "A client-side 220-row, 11-position-intended mission-level table and one-based difficulty selection path",
+    "Typed AOSharp QuestAlternative offer fields and ordered cohort handling",
+    "Five mission icon/type filters",
+    "Post-offer reward/template/QL matching plus description-string matching",
+    "A 46-playfield client-side destination allowlist with optional X/Z bounds",
+    "A special non-nano QL200 search path for characters strictly above level 200"
+  ],
+  "NoObservationCounts": true,
+  "NoRewardFrequencies": true,
+  "NoRuntimeDependencyAdded": true,
+  "NoRuntimeMissionLogicChanged": true,
+  "ProvenanceClassification": {
+    "AOSharpTypedFields": "PROVEN_FROM_SOURCE_AND_EXACT_PACKAGE_METADATA",
+    "ItemCatalogs": "PROVEN_FROM_STATIC_DATA; upstream provenance UNKNOWN",
+    "Level80Change": "PROVEN_FROM_SOURCE_HISTORY; rationale UNKNOWN",
+    "MissionLevelTable": "PROVEN_FROM_STATIC_DATA; upstream provenance UNKNOWN",
+    "Ql200SpecialCase": "PROVEN_FROM_SOURCE_AS_CLIENT_BEHAVIOR; AO server rule HYPOTHESIS"
+  },
+  "RuntimeMissionLogicChanged": false
+}

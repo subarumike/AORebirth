@@ -1,0 +1,42 @@
+[
+  {
+    "AORebirthCaptureBackedType": "FindItemReturn",
+    "ClickSaverWireCode": "0x2C41",
+    "MalisDisplayName": "Return Item",
+    "MalisFilterSetting": "ReturnItem",
+    "MissionIcon": 11329,
+    "Representation": "SERVER_RESPONSE_MISSION_ICON_FILTERED_BY_MALIS"
+  },
+  {
+    "AORebirthCaptureBackedType": "KillPerson",
+    "ClickSaverWireCode": "0x2C42",
+    "MalisDisplayName": "Kill Target",
+    "MalisFilterSetting": "KillTarget",
+    "MissionIcon": 11330,
+    "Representation": "SERVER_RESPONSE_MISSION_ICON_FILTERED_BY_MALIS"
+  },
+  {
+    "AORebirthCaptureBackedType": "FindPerson",
+    "ClickSaverWireCode": "0x2C47",
+    "MalisDisplayName": "Find Target",
+    "MalisFilterSetting": "FindTarget",
+    "MissionIcon": 11335,
+    "Representation": "SERVER_RESPONSE_MISSION_ICON_FILTERED_BY_MALIS"
+  },
+  {
+    "AORebirthCaptureBackedType": "FindItem",
+    "ClickSaverWireCode": "0x2C49",
+    "MalisDisplayName": "Find Item",
+    "MalisFilterSetting": "FindItem",
+    "MissionIcon": 11337,
+    "Representation": "SERVER_RESPONSE_MISSION_ICON_FILTERED_BY_MALIS"
+  },
+  {
+    "AORebirthCaptureBackedType": "RepairMachine",
+    "ClickSaverWireCode": "0x2C4E",
+    "MalisDisplayName": "Use Item",
+    "MalisFilterSetting": "UseItem",
+    "MissionIcon": 11342,
+    "Representation": "SERVER_RESPONSE_MISSION_ICON_FILTERED_BY_MALIS"
+  }
+]

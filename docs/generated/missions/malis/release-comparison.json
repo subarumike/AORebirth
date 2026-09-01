@@ -1,0 +1,778 @@
+{
+  "AdditionalMissionDatasetsAbsentFromSource": [],
+  "MissionRollerMembers": [
+    {
+      "ByteLength": 472064,
+      "Path": "AOSharp.Common.dll",
+      "Sha256": "e3363aed0f870cad5ad98b8544ce4ec464d3a09f497840002fb5558e9f14c820"
+    },
+    {
+      "ByteLength": 192000,
+      "Path": "AOSharp.Core.dll",
+      "Sha256": "9861ff874ee197e10b43d98b40ae7760fd94efab61ad3aada212ecb644ff4776"
+    },
+    {
+      "ByteLength": 11327,
+      "Path": "JSON/Default_Settings.json",
+      "Sha256": "5de0cde70871913a8bd3a3b05a897a4a08ed7b6f781e72a28b5f4577051d3b7e"
+    },
+    {
+      "ByteLength": 1549309,
+      "Path": "JSON/ItemDB_Implants.json",
+      "Sha256": "e51e3aa50de21ad1a9e96005bb47398be38405759483b5e3a2f47a4aa5fb41ab"
+    },
+    {
+      "ByteLength": 97715,
+      "Path": "JSON/ItemDb_Clusters.json",
+      "Sha256": "da95a9401920dd8368be559696af239497b3bed2e4c4b4688b60d2ebac7cb984"
+    },
+    {
+      "ByteLength": 805512,
+      "Path": "JSON/ItemDb_Nanos.json",
+      "Sha256": "ce5d1403cba36e9fdc6c7add9d322bd13f23170b7b50635d2c2befc7bd88c751"
+    },
+    {
+      "ByteLength": 1746304,
+      "Path": "JSON/ItemDb_Refined.json",
+      "Sha256": "a88b127d77226cdf23bcb9120b6acf9f4f02dec95d7986e379d237edb5048542"
+    },
+    {
+      "ByteLength": 702478,
+      "Path": "JSON/ItemDb_Rest.json",
+      "Sha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c"
+    },
+    {
+      "ByteLength": 25076,
+      "Path": "JSON/MissionLevels.json",
+      "Sha256": "cccee41a7a26bcd5e9f4179ed010adfd924c32734ab9e478313890a47cdb8214"
+    },
+    {
+      "ByteLength": 10434,
+      "Path": "JSON/ModTags.json",
+      "Sha256": "44f336330813e9df750c0f8b40585577abe2ac7a4b20bba1074500608391593f"
+    },
+    {
+      "ByteLength": 75264,
+      "Path": "Malis Mission Roller 2.dll",
+      "Sha256": "87e434b9e783ba6a917f5ef0f7cdfbc20b864b74928605979b2e1c1cc4db70fa"
+    },
+    {
+      "ByteLength": 432,
+      "Path": "Malis Mission Roller 2.dll.config",
+      "Sha256": "d635d56f6d1bd958309253803e5800dbf1059a495d3abc7a9f33812d33ef0752"
+    },
+    {
+      "ByteLength": 128512,
+      "Path": "Malis Mission Roller 2.pdb",
+      "Sha256": "098e2d9ede3e295dfbb71010662c6f05e7e275ce95fdff717943d309074c29e0"
+    },
+    {
+      "ByteLength": 711952,
+      "Path": "Newtonsoft.Json.dll",
+      "Sha256": "e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d"
+    },
+    {
+      "ByteLength": 713541,
+      "Path": "Newtonsoft.Json.xml",
+      "Sha256": "79ee87d4ede8783461de05b93379d576f6e8575d4ab49359f15897a854b643c4"
+    },
+    {
+      "ByteLength": 1067122,
+      "Path": "Sound/Alert.wav",
+      "Sha256": "25a0ae83b8ec921c91e14d546a651fc2b5ae30cdd3e6bfc9033fbea9c0b31c91"
+    },
+    {
+      "ByteLength": 21444,
+      "Path": "Sound/Click.wav",
+      "Sha256": "8ba38b0e70526285910c889ec8cc860dfc914ee85596406a259e03619e75ea0a"
+    },
+    {
+      "ByteLength": 1799,
+      "Path": "UI/Textures/001_AcceptButton.png",
+      "Sha256": "56627cf5e11b17629119232fbd1547e304b815779ecad71088c1e78737c95463"
+    },
+    {
+      "ByteLength": 1959,
+      "Path": "UI/Textures/002_GreenCircle.png",
+      "Sha256": "600363a19b3bcb539fb64c5709611b9d51930dcd1e0219db6818a0c95425a7fb"
+    },
+    {
+      "ByteLength": 1995,
+      "Path": "UI/Textures/003_GreenPlus.png",
+      "Sha256": "130694c6a419cc61e2a01c7ce0f3389145804278a636e809b112e11a0a94c685"
+    },
+    {
+      "ByteLength": 1844,
+      "Path": "UI/Textures/004_HeaderBg.png",
+      "Sha256": "287e63e3adf5172eaed16c52a35f208f5ef8736eae23b7f2bb3e6da9b4413f5a"
+    },
+    {
+      "ByteLength": 2212,
+      "Path": "UI/Textures/005_HeaderIcon.png",
+      "Sha256": "13e405b3e874ab599eb5b5766ede13c6698f5d06f84321e7bc3db390b4f03a3c"
+    },
+    {
+      "ByteLength": 1867,
+      "Path": "UI/Textures/006_HelpButton.png",
+      "Sha256": "219e0398b4fc8e62a74143f323050bdb4628385532f12556111a83815e2def6c"
+    },
+    {
+      "ByteLength": 2910,
+      "Path": "UI/Textures/007_ItemPreviewBg.png",
+      "Sha256": "1c9a8623285aa284e9b398036fefda286ace2c334a5d8cda125740aa9e2f89fe"
+    },
+    {
+      "ByteLength": 1996,
+      "Path": "UI/Textures/008_LocationPreviewBg.png",
+      "Sha256": "42cd74554e2254a3049c2dc015bf2e17361ba59a1e6d2384a8b4bc643e43ef10"
+    },
+    {
+      "ByteLength": 2438,
+      "Path": "UI/Textures/009_MissionsButton.png",
+      "Sha256": "3580e962f4516f8714fb634afce2a964114af60ad7d15171b9aa4b5ea60db444"
+    },
+    {
+      "ByteLength": 2786,
+      "Path": "UI/Textures/010_MissionSlotBg.png",
+      "Sha256": "790a642544a197ca4a49977e610f3e01131e08b986f4127d64122d651c6f8677"
+    },
+    {
+      "ByteLength": 1795,
+      "Path": "UI/Textures/011_PingButton.png",
+      "Sha256": "764a9b50752b668c9bf28a341b559cbac6fc8881b3e92743b55169254aab03ea"
+    },
+    {
+      "ByteLength": 1963,
+      "Path": "UI/Textures/012_RedCircle.png",
+      "Sha256": "ac3336bb634c4e5f8e12e2ab0b3a3ec27ad80fb3b49245c851cb9d132b47ca4c"
+    },
+    {
+      "ByteLength": 1963,
+      "Path": "UI/Textures/013_RedMinus.png",
+      "Sha256": "32df4815bfc15493813b7dab19ce07dd7c12c2e62c9361411a5536e04a4c3fb0"
+    },
+    {
+      "ByteLength": 2509,
+      "Path": "UI/Textures/014_RequestButton.png",
+      "Sha256": "9309a7e51459aa2ff0f0d8410507656555e5f311a595ad97f835d24b612176dc"
+    },
+    {
+      "ByteLength": 3926,
+      "Path": "UI/Textures/015_SearchWindowBg.png",
+      "Sha256": "a22895b34a905f0e0d9ed6142c30602276629a97911a109943165b1d0633af7b"
+    },
+    {
+      "ByteLength": 2429,
+      "Path": "UI/Textures/016_SettingsButton.png",
+      "Sha256": "cd9ba6d280cfb1660bd0179939fa02b2253346e664f03ac77a393a95063a4046"
+    },
+    {
+      "ByteLength": 2271,
+      "Path": "UI/Textures/017_SliderArrow.png",
+      "Sha256": "cd2a119f3ce72e01a1b892e1e63a2a056b2d446045713f91645aeb5f4ee6f58b"
+    },
+    {
+      "ByteLength": 1683,
+      "Path": "UI/Textures/018_SliderBg.png",
+      "Sha256": "2b681888f54590626339d019eebddb16fb1f64c082f0b32a80f0606506180f34"
+    },
+    {
+      "ByteLength": 2438,
+      "Path": "UI/Textures/019_StartStopButton.png",
+      "Sha256": "751d81f69a3b8bc78bc6211dd29a17e428a94d4d6afed323a725d7f5421b04e2"
+    },
+    {
+      "ByteLength": 2002,
+      "Path": "UI/Textures/020_WindowBg.png",
+      "Sha256": "9622cb3cfd3298c0ed8d5cc2dcd997b3a665bda1f7b70ae5ac508fbdad5565ed"
+    },
+    {
+      "ByteLength": 2513,
+      "Path": "UI/Textures/021_LocationsBg.png",
+      "Sha256": "c91a322d5e01dfc681cfb11bff609b044b93f5a3575969d8021885fadb6ede15"
+    },
+    {
+      "ByteLength": 2707,
+      "Path": "UI/Textures/022_SlidersBg.png",
+      "Sha256": "6badf6db9ff48d965fc48ae1f09fa3deeff91019d0c97dc11374577a2040dadb"
+    },
+    {
+      "ByteLength": 2575,
+      "Path": "UI/Textures/023_TypesBg.png",
+      "Sha256": "668daea4046db8a3635dbe3eb53765c7fed41452524104ae2c16c2ad6583c8cd"
+    },
+    {
+      "ByteLength": 2767,
+      "Path": "UI/Textures/024_ExtrasBg.png",
+      "Sha256": "8c0980096224d68284c710b8af072fe74b539492277fa0c338270162fb47bef7"
+    },
+    {
+      "ByteLength": 3927,
+      "Path": "UI/Textures/025_SearchWindowBg2.png",
+      "Sha256": "6f18fef5aec4cda0d54d9556afcede40618c88fe7c509e99a70bd096f233ea7c"
+    },
+    {
+      "ByteLength": 2626,
+      "Path": "UI/Textures/026_ItemPreviewBg2.png",
+      "Sha256": "89302af91d874147aa0040389f3ef3fefa0f89c2024c4de100148f69eccd2f18"
+    },
+    {
+      "ByteLength": 3100,
+      "Path": "UI/Textures/027_BoundsButton.png",
+      "Sha256": "a2277abd5ffde805ea198a40f42d8dc47bfc441f9506a1a405553ec1a1708c37"
+    },
+    {
+      "ByteLength": 3108,
+      "Path": "UI/Textures/028_BoundsButton2.png",
+      "Sha256": "58c7c299fea0ddab25c05e4168b42f7737ff131a0407550afb1f6806c870dfaa"
+    },
+    {
+      "ByteLength": 10312,
+      "Path": "UI/Textures/029_BigLogo.png",
+      "Sha256": "b14251ea75916e251434db54f74087280cfc5aef59f04b097f615cf399152cff"
+    },
+    {
+      "ByteLength": 2822,
+      "Path": "UI/Textures/030_RedCloseButton.png",
+      "Sha256": "2dacd312a9f017e20fd4b8a6e6497426cb95cbc4977c7926d9097359474069bf"
+    },
+    {
+      "ByteLength": 2889,
+      "Path": "UI/Textures/031_11330.png",
+      "Sha256": "c27dd8a66a21ce37529f6e0be4d83910c6ca7aaf4b3a9fbe96b685a60c77d389"
+    },
+    {
+      "ByteLength": 2798,
+      "Path": "UI/Textures/032_11335.png",
+      "Sha256": "3bc8896a09d1bbe69432c11ced43f0d240b78dcc49c331259e80a00b1c5745be"
+    },
+    {
+      "ByteLength": 2836,
+      "Path": "UI/Textures/033_11337.png",
+      "Sha256": "bbd913b5a53c7402ccc56570aedd24a862c8dbc0d6ee184f03bef11ec99587ce"
+    },
+    {
+      "ByteLength": 2877,
+      "Path": "UI/Textures/034_11342.png",
+      "Sha256": "e8765185caaaaca5703a3a4757eadc03870f95b2e39e126fc39506521a832f38"
+    },
+    {
+      "ByteLength": 2853,
+      "Path": "UI/Textures/035_11329.png",
+      "Sha256": "01196e8c145f0cee3c85296b912d422a8304066558050db67fdbc8e8b6033922"
+    },
+    {
+      "ByteLength": 2647,
+      "Path": "UI/Textures/036_DevButton.png",
+      "Sha256": "a05a352f9232ae832b75ea605550e4cc6384447dabb61143d6833ea44fe9d88a"
+    },
+    {
+      "ByteLength": 3132,
+      "Path": "UI/Textures/037_DisableAllButton.png",
+      "Sha256": "4d64387ce4627f6d6012ea92cabea5e4f14250c2608aedc16f9d654548ff8170"
+    },
+    {
+      "ByteLength": 3141,
+      "Path": "UI/Textures/038_EnableAllButton.png",
+      "Sha256": "ea5ef33d12c6d90d9020cfef56653452380de96b6a80db349df04861f087d57a"
+    },
+    {
+      "ByteLength": 3240,
+      "Path": "UI/Textures/039_GraphicalGuideButton.png",
+      "Sha256": "7e42cf85d8c15e86f7a6d246f9a997f509b7254228050e6b02693c7bf09f4f3c"
+    },
+    {
+      "ByteLength": 64129,
+      "Path": "UI/Textures/040_GraphicalGuide.png",
+      "Sha256": "6098fc09d72ac90e8119f1a69975f90591ac0d8d728c3e1288b987b5493bdd07"
+    },
+    {
+      "ByteLength": 1010,
+      "Path": "UI/Views/BrowserEntryView.xml",
+      "Sha256": "59e5ed15b8f00ae15418d3229adfd47a287b774d3697782bbdbb4dea211ee251"
+    },
+    {
+      "ByteLength": 1879,
+      "Path": "UI/Views/ExtrasView.xml",
+      "Sha256": "240ab9af8cf74bea4863d803724243bacdc9a2bfcc4ef39302d5468dfdf750e7"
+    },
+    {
+      "ByteLength": 714,
+      "Path": "UI/Views/HeaderView.xml",
+      "Sha256": "8839ef014f89ee1ab1b6afc8f3660769d6b2d3bfb2115d9afe2b041e3bd001f1"
+    },
+    {
+      "ByteLength": 2552,
+      "Path": "UI/Views/ItemDisplayView.xml",
+      "Sha256": "abaec7bc952dfd63098914590f4df1fafed698fbfac17bfb87d222eca9415c39"
+    },
+    {
+      "ByteLength": 1787,
+      "Path": "UI/Views/MissionView.xml",
+      "Sha256": "27adf0d9b701a7560bb485fd6ffe5fd735465fed5aa44fb13ef988837658d1a2"
+    },
+    {
+      "ByteLength": 823,
+      "Path": "UI/Views/PlayfieldEntryView.xml",
+      "Sha256": "533cd6000f55bcf3d343b5291ea1cad4ee28bfddc7472af02340d1fcd95707e9"
+    },
+    {
+      "ByteLength": 913,
+      "Path": "UI/Views/PlayfieldView.xml",
+      "Sha256": "55b8f3ac49de049baf41d0173940df803fff0dba057486fa5e4e87bf988349a7"
+    },
+    {
+      "ByteLength": 1017,
+      "Path": "UI/Views/RollEntryView.xml",
+      "Sha256": "1eb5bc9ed58a43eeef7a3a9f9b7b0a6c3482a26d8f5683300d30cea5da209fca"
+    },
+    {
+      "ByteLength": 584,
+      "Path": "UI/Views/SettingsView.xml",
+      "Sha256": "0bb6371dc711dabd551741766bfd014f2043f839965bbb0a705c497f73585a80"
+    },
+    {
+      "ByteLength": 2451,
+      "Path": "UI/Views/SliderView.xml",
+      "Sha256": "af83ac7292b75f281ba49adc03ee69ab40ded54bd44d39686724df269f83b0a5"
+    },
+    {
+      "ByteLength": 1641,
+      "Path": "UI/Views/TypesView.xml",
+      "Sha256": "b21a0deff1d7bc73c4185339d0ee8e321d38697d9a98f72260e4ae8fd9ee31fe"
+    },
+    {
+      "ByteLength": 253,
+      "Path": "UI/Windows/GraphicalHelpWindow.xml",
+      "Sha256": "13f8f83154d0aecd135bd16b4d44090376f932d91b01f97bf0902d6d804dd011"
+    },
+    {
+      "ByteLength": 874,
+      "Path": "UI/Windows/HelpWindow.xml",
+      "Sha256": "2c366ca5b007ffc8394847c72b6b5278511b3e212bb6dda7adfd68176091ce4f"
+    },
+    {
+      "ByteLength": 344,
+      "Path": "UI/Windows/MainWindow.xml",
+      "Sha256": "b533865d836c214009cf0a1d1bf4fb3736170527c1916ed9a34b50d5a57e53a0"
+    },
+    {
+      "ByteLength": 216,
+      "Path": "packages.config",
+      "Sha256": "770e13f13c7f592859cf6623db0937b9eb588cccf4206dc053a0dc259ff3ffc6"
+    }
+  ],
+  "ReleaseOnlyMembers": [
+    "AOSharp.Common.dll",
+    "AOSharp.Core.dll",
+    "Malis Mission Roller 2.dll",
+    "Malis Mission Roller 2.pdb",
+    "Newtonsoft.Json.dll",
+    "Newtonsoft.Json.xml"
+  ],
+  "Safety": "The archive was inspected without executing bundled EXE or DLL files.",
+  "SourceStaticComparison": [
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/Default_Settings.json",
+      "SourcePath": "JSON/Default_Settings.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/ItemDB_Implants.json",
+      "SourcePath": "JSON/ItemDB_Implants.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/ItemDb_Clusters.json",
+      "SourcePath": "JSON/ItemDb_Clusters.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/ItemDb_Nanos.json",
+      "SourcePath": "JSON/ItemDb_Nanos.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/ItemDb_Refined.json",
+      "SourcePath": "JSON/ItemDb_Refined.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/ItemDb_Rest.json",
+      "SourcePath": "JSON/ItemDb_Rest.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/MissionLevels.json",
+      "SourcePath": "JSON/MissionLevels.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "JSON/ModTags.json",
+      "SourcePath": "JSON/ModTags.json"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "Sound/Alert.wav",
+      "SourcePath": "Sound/Alert.wav"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "Sound/Click.wav",
+      "SourcePath": "Sound/Click.wav"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/001_AcceptButton.png",
+      "SourcePath": "UI/Textures/001_AcceptButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/002_GreenCircle.png",
+      "SourcePath": "UI/Textures/002_GreenCircle.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/003_GreenPlus.png",
+      "SourcePath": "UI/Textures/003_GreenPlus.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/004_HeaderBg.png",
+      "SourcePath": "UI/Textures/004_HeaderBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/005_HeaderIcon.png",
+      "SourcePath": "UI/Textures/005_HeaderIcon.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/006_HelpButton.png",
+      "SourcePath": "UI/Textures/006_HelpButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/007_ItemPreviewBg.png",
+      "SourcePath": "UI/Textures/007_ItemPreviewBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/008_LocationPreviewBg.png",
+      "SourcePath": "UI/Textures/008_LocationPreviewBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/009_MissionsButton.png",
+      "SourcePath": "UI/Textures/009_MissionsButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/010_MissionSlotBg.png",
+      "SourcePath": "UI/Textures/010_MissionSlotBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/011_PingButton.png",
+      "SourcePath": "UI/Textures/011_PingButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/012_RedCircle.png",
+      "SourcePath": "UI/Textures/012_RedCircle.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/013_RedMinus.png",
+      "SourcePath": "UI/Textures/013_RedMinus.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/014_RequestButton.png",
+      "SourcePath": "UI/Textures/014_RequestButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/015_SearchWindowBg.png",
+      "SourcePath": "UI/Textures/015_SearchWindowBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/016_SettingsButton.png",
+      "SourcePath": "UI/Textures/016_SettingsButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/017_SliderArrow.png",
+      "SourcePath": "UI/Textures/017_SliderArrow.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/018_SliderBg.png",
+      "SourcePath": "UI/Textures/018_SliderBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/019_StartStopButton.png",
+      "SourcePath": "UI/Textures/019_StartStopButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/020_WindowBg.png",
+      "SourcePath": "UI/Textures/020_WindowBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/021_LocationsBg.png",
+      "SourcePath": "UI/Textures/021_LocationsBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/022_SlidersBg.png",
+      "SourcePath": "UI/Textures/022_SlidersBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/023_TypesBg.png",
+      "SourcePath": "UI/Textures/023_TypesBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/024_ExtrasBg.png",
+      "SourcePath": "UI/Textures/024_ExtrasBg.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/025_SearchWindowBg2.png",
+      "SourcePath": "UI/Textures/025_SearchWindowBg2.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/026_ItemPreviewBg2.png",
+      "SourcePath": "UI/Textures/026_ItemPreviewBg2.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/027_BoundsButton.png",
+      "SourcePath": "UI/Textures/027_BoundsButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/028_BoundsButton2.png",
+      "SourcePath": "UI/Textures/028_BoundsButton2.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/029_BigLogo.png",
+      "SourcePath": "UI/Textures/029_BigLogo.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/030_RedCloseButton.png",
+      "SourcePath": "UI/Textures/030_RedCloseButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/031_11330.png",
+      "SourcePath": "UI/Textures/031_11330.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/032_11335.png",
+      "SourcePath": "UI/Textures/032_11335.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/033_11337.png",
+      "SourcePath": "UI/Textures/033_11337.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/034_11342.png",
+      "SourcePath": "UI/Textures/034_11342.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/035_11329.png",
+      "SourcePath": "UI/Textures/035_11329.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/036_DevButton.png",
+      "SourcePath": "UI/Textures/036_DevButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/037_DisableAllButton.png",
+      "SourcePath": "UI/Textures/037_DisableAllButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/038_EnableAllButton.png",
+      "SourcePath": "UI/Textures/038_EnableAllButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/039_GraphicalGuideButton.png",
+      "SourcePath": "UI/Textures/039_GraphicalGuideButton.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Textures/040_GraphicalGuide.png",
+      "SourcePath": "UI/Textures/040_GraphicalGuide.png"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/BrowserEntryView.xml",
+      "SourcePath": "UI/Views/BrowserEntryView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/ExtrasView.xml",
+      "SourcePath": "UI/Views/ExtrasView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/HeaderView.xml",
+      "SourcePath": "UI/Views/HeaderView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/ItemDisplayView.xml",
+      "SourcePath": "UI/Views/ItemDisplayView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/MissionView.xml",
+      "SourcePath": "UI/Views/MissionView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/PlayfieldEntryView.xml",
+      "SourcePath": "UI/Views/PlayfieldEntryView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/PlayfieldView.xml",
+      "SourcePath": "UI/Views/PlayfieldView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/RollEntryView.xml",
+      "SourcePath": "UI/Views/RollEntryView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/SettingsView.xml",
+      "SourcePath": "UI/Views/SettingsView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/SliderView.xml",
+      "SourcePath": "UI/Views/SliderView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Views/TypesView.xml",
+      "SourcePath": "UI/Views/TypesView.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Windows/GraphicalHelpWindow.xml",
+      "SourcePath": "UI/Windows/GraphicalHelpWindow.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Windows/HelpWindow.xml",
+      "SourcePath": "UI/Windows/HelpWindow.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "UI/Windows/MainWindow.xml",
+      "SourcePath": "UI/Windows/MainWindow.xml"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "Malis Mission Roller 2.dll.config",
+      "SourcePath": "app.config"
+    },
+    {
+      "ByteIdentical": true,
+      "PresentInRelease": true,
+      "ReleasePath": "packages.config",
+      "SourcePath": "packages.config"
+    }
+  ],
+  "Summary": {
+    "ByteIdenticalStaticFiles": 66,
+    "MismatchedStaticFiles": 0,
+    "MissingSourceStaticFilesInRelease": 0,
+    "ReleaseOnlyMissionRollerMembers": 6
+  }
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "Classification": "DOES_NOT_FILL",
+    "Evidence": "Search catalogs contain item templates only; no eligibility rows.",
+    "Gap": "A",
+    "Question": "Complete item -> mission QL eligibility"
+  },
+  {
+    "Classification": "DOES_NOT_FILL",
+    "Evidence": "No repeated offer observations or item/mission-QL occurrence records.",
+    "Gap": "B",
+    "Question": "Complete observed item -> mission QL matrix"
+  },
+  {
+    "Classification": "DOES_NOT_FILL",
+    "Evidence": "Malis checks reward arrays and description text after offers but ships no channel matrix.",
+    "Gap": "C",
+    "Question": "Reward vs objective-item eligibility matrix"
+  },
+  {
+    "Classification": "DOES_NOT_FILL",
+    "Evidence": "No observation corpus or counters are shipped.",
+    "Gap": "D",
+    "Question": "Observation counts"
+  },
+  {
+    "Classification": "DOES_NOT_FILL",
+    "Evidence": "No frequency data are shipped.",
+    "Gap": "E",
+    "Question": "Reward frequency"
+  },
+  {
+    "Classification": "DOES_NOT_FILL",
+    "Evidence": "Malis requests and filters server-generated offers.",
+    "Gap": "F",
+    "Question": "Generator weighting"
+  },
+  {
+    "Classification": "STRUCTURAL_EVIDENCE_ONLY",
+    "Evidence": "Reward QL is exposed and matched; the >200 feature targets QL200 non-nanos but preserves no distribution.",
+    "Gap": "G",
+    "Question": "Reward QL distribution"
+  },
+  {
+    "Classification": "FILLS_PARTIALLY",
+    "Evidence": "A 220-row client table exists, but 13 difficulty slots are missing and 55 present cells differ from AORebirth's canonical table.",
+    "Gap": "H",
+    "Question": "Character level -> available mission QLs"
+  },
+  {
+    "Classification": "FILLS_PARTIALLY",
+    "Evidence": "Malis proves its one-based table-index/request mapping, not the Funcom implementation; table anomalies remain.",
+    "Gap": "I",
+    "Question": "Difficulty slider -> mission QL"
+  },
+  {
+    "Classification": "STRUCTURAL_EVIDENCE_ONLY",
+    "Evidence": "Five response icons/types are filtered; no generation weights or constraints are supplied.",
+    "Gap": "J",
+    "Question": "Mission type generation structure"
+  },
+  {
+    "Classification": "STRUCTURAL_EVIDENCE_ONLY",
+    "Evidence": "Forty-six client-side allowed destinations and X/Z bounds are present; no server eligibility/weighting table exists.",
+    "Gap": "K",
+    "Question": "Destination eligibility"
+  },
+  {
+    "Classification": "STRUCTURAL_EVIDENCE_ONLY",
+    "Evidence": "One ordered array is processed as five offers; no cohort ID, independence, duplicates, or weighting rule is exposed.",
+    "Gap": "L",
+    "Question": "Five-offer cohort behavior"
+  }
+]

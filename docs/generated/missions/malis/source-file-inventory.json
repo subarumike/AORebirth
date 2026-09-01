@@ -1,0 +1,524 @@
+[
+  {
+    "ByteLength": 2581,
+    "Path": ".gitattributes",
+    "Role": "REPOSITORY_METADATA",
+    "Sha256": "462475ee5301e77d2a54a64757d95c3f21fc3a79e92e6ec94bdfcc8b36e48964"
+  },
+  {
+    "ByteLength": 6585,
+    "Path": ".gitignore",
+    "Role": "REPOSITORY_METADATA",
+    "Sha256": "cecdcf578be42a04a093cf13b289090a5108e0ba6413a08fd5beec9ee482cc47"
+  },
+  {
+    "ByteLength": 4478,
+    "Path": "Extensions.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "5a5a7f9c4961d2be309dfe9f4a26ee4e00ca2becf1325db619e67f8875510088"
+  },
+  {
+    "ByteLength": 11327,
+    "Path": "JSON/Default_Settings.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "5de0cde70871913a8bd3a3b05a897a4a08ed7b6f781e72a28b5f4577051d3b7e"
+  },
+  {
+    "ByteLength": 1549309,
+    "Path": "JSON/ItemDB_Implants.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "e51e3aa50de21ad1a9e96005bb47398be38405759483b5e3a2f47a4aa5fb41ab"
+  },
+  {
+    "ByteLength": 97715,
+    "Path": "JSON/ItemDb_Clusters.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "da95a9401920dd8368be559696af239497b3bed2e4c4b4688b60d2ebac7cb984"
+  },
+  {
+    "ByteLength": 805512,
+    "Path": "JSON/ItemDb_Nanos.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "ce5d1403cba36e9fdc6c7add9d322bd13f23170b7b50635d2c2befc7bd88c751"
+  },
+  {
+    "ByteLength": 1746304,
+    "Path": "JSON/ItemDb_Refined.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "a88b127d77226cdf23bcb9120b6acf9f4f02dec95d7986e379d237edb5048542"
+  },
+  {
+    "ByteLength": 702478,
+    "Path": "JSON/ItemDb_Rest.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c"
+  },
+  {
+    "ByteLength": 25076,
+    "Path": "JSON/MissionLevels.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "cccee41a7a26bcd5e9f4179ed010adfd924c32734ab9e478313890a47cdb8214"
+  },
+  {
+    "ByteLength": 10434,
+    "Path": "JSON/ModTags.json",
+    "Role": "STATIC_JSON_DATA",
+    "Sha256": "44f336330813e9df750c0f8b40585577abe2ac7a4b20bba1074500608391593f"
+  },
+  {
+    "ByteLength": 5155,
+    "Path": "Main.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "33085cf511d7e003002e232f694307210a648c5c7141d9b5845aa76939b0816b"
+  },
+  {
+    "ByteLength": 11967,
+    "Path": "MainWindow.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "c930bc9dd89cdf30092e1de6605b744eb828bf68c08be135c87da2cd220913bc"
+  },
+  {
+    "ByteLength": 11980,
+    "Path": "Malis Mission Roller 2.csproj",
+    "Role": "BUILD_OR_DEPENDENCY_METADATA",
+    "Sha256": "eb448ceecf913c27d1c6624b08c8e5aff39b2a6673b8ba20b410779cb82af7c8"
+  },
+  {
+    "ByteLength": 1148,
+    "Path": "Malis Mission Roller 2.sln",
+    "Role": "BUILD_OR_DEPENDENCY_METADATA",
+    "Sha256": "1c4b6a0d522cb4886898f965800c0e34b03e4ad718b19bac649a7d9526471b7f"
+  },
+  {
+    "ByteLength": 3009,
+    "Path": "Midi.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "807ca96caffa530f0314564bb6f9f36d5ef93c0a248d5cc88426a54eb03bb5a4"
+  },
+  {
+    "ByteLength": 1453,
+    "Path": "Properties/AssemblyInfo.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "b5901a97668afcba17db1e2a693bd0779f14ff1ea20f363c451a97e6f41a201d"
+  },
+  {
+    "ByteLength": 5385,
+    "Path": "RollEntryProcessor.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "0feb0c7c064f1ed1693f57db7f992eb21e3e1525ac5e2a44a9927508647525fc"
+  },
+  {
+    "ByteLength": 3837,
+    "Path": "Settings.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "f8290e79205d9ec6b40f52af73931f3502e67720ac500bd9c46aa63520202697"
+  },
+  {
+    "ByteLength": 1067122,
+    "Path": "Sound/Alert.wav",
+    "Role": "SOUND_ASSET",
+    "Sha256": "25a0ae83b8ec921c91e14d546a651fc2b5ae30cdd3e6bfc9033fbea9c0b31c91"
+  },
+  {
+    "ByteLength": 21444,
+    "Path": "Sound/Click.wav",
+    "Role": "SOUND_ASSET",
+    "Sha256": "8ba38b0e70526285910c889ec8cc860dfc914ee85596406a259e03619e75ea0a"
+  },
+  {
+    "ByteLength": 18985,
+    "Path": "Stat.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "a5a54a75b0d36e6f66f11144ea35f7309073a8feb303d6d73226dab49cef9fd7"
+  },
+  {
+    "ByteLength": 1799,
+    "Path": "UI/Textures/001_AcceptButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "56627cf5e11b17629119232fbd1547e304b815779ecad71088c1e78737c95463"
+  },
+  {
+    "ByteLength": 1959,
+    "Path": "UI/Textures/002_GreenCircle.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "600363a19b3bcb539fb64c5709611b9d51930dcd1e0219db6818a0c95425a7fb"
+  },
+  {
+    "ByteLength": 1995,
+    "Path": "UI/Textures/003_GreenPlus.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "130694c6a419cc61e2a01c7ce0f3389145804278a636e809b112e11a0a94c685"
+  },
+  {
+    "ByteLength": 1844,
+    "Path": "UI/Textures/004_HeaderBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "287e63e3adf5172eaed16c52a35f208f5ef8736eae23b7f2bb3e6da9b4413f5a"
+  },
+  {
+    "ByteLength": 2212,
+    "Path": "UI/Textures/005_HeaderIcon.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "13e405b3e874ab599eb5b5766ede13c6698f5d06f84321e7bc3db390b4f03a3c"
+  },
+  {
+    "ByteLength": 1867,
+    "Path": "UI/Textures/006_HelpButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "219e0398b4fc8e62a74143f323050bdb4628385532f12556111a83815e2def6c"
+  },
+  {
+    "ByteLength": 2910,
+    "Path": "UI/Textures/007_ItemPreviewBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "1c9a8623285aa284e9b398036fefda286ace2c334a5d8cda125740aa9e2f89fe"
+  },
+  {
+    "ByteLength": 1996,
+    "Path": "UI/Textures/008_LocationPreviewBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "42cd74554e2254a3049c2dc015bf2e17361ba59a1e6d2384a8b4bc643e43ef10"
+  },
+  {
+    "ByteLength": 2438,
+    "Path": "UI/Textures/009_MissionsButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "3580e962f4516f8714fb634afce2a964114af60ad7d15171b9aa4b5ea60db444"
+  },
+  {
+    "ByteLength": 2786,
+    "Path": "UI/Textures/010_MissionSlotBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "790a642544a197ca4a49977e610f3e01131e08b986f4127d64122d651c6f8677"
+  },
+  {
+    "ByteLength": 1795,
+    "Path": "UI/Textures/011_PingButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "764a9b50752b668c9bf28a341b559cbac6fc8881b3e92743b55169254aab03ea"
+  },
+  {
+    "ByteLength": 1963,
+    "Path": "UI/Textures/012_RedCircle.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "ac3336bb634c4e5f8e12e2ab0b3a3ec27ad80fb3b49245c851cb9d132b47ca4c"
+  },
+  {
+    "ByteLength": 1963,
+    "Path": "UI/Textures/013_RedMinus.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "32df4815bfc15493813b7dab19ce07dd7c12c2e62c9361411a5536e04a4c3fb0"
+  },
+  {
+    "ByteLength": 2509,
+    "Path": "UI/Textures/014_RequestButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "9309a7e51459aa2ff0f0d8410507656555e5f311a595ad97f835d24b612176dc"
+  },
+  {
+    "ByteLength": 3926,
+    "Path": "UI/Textures/015_SearchWindowBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "a22895b34a905f0e0d9ed6142c30602276629a97911a109943165b1d0633af7b"
+  },
+  {
+    "ByteLength": 2429,
+    "Path": "UI/Textures/016_SettingsButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "cd9ba6d280cfb1660bd0179939fa02b2253346e664f03ac77a393a95063a4046"
+  },
+  {
+    "ByteLength": 2271,
+    "Path": "UI/Textures/017_SliderArrow.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "cd2a119f3ce72e01a1b892e1e63a2a056b2d446045713f91645aeb5f4ee6f58b"
+  },
+  {
+    "ByteLength": 1683,
+    "Path": "UI/Textures/018_SliderBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "2b681888f54590626339d019eebddb16fb1f64c082f0b32a80f0606506180f34"
+  },
+  {
+    "ByteLength": 2438,
+    "Path": "UI/Textures/019_StartStopButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "751d81f69a3b8bc78bc6211dd29a17e428a94d4d6afed323a725d7f5421b04e2"
+  },
+  {
+    "ByteLength": 2002,
+    "Path": "UI/Textures/020_WindowBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "9622cb3cfd3298c0ed8d5cc2dcd997b3a665bda1f7b70ae5ac508fbdad5565ed"
+  },
+  {
+    "ByteLength": 2513,
+    "Path": "UI/Textures/021_LocationsBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "c91a322d5e01dfc681cfb11bff609b044b93f5a3575969d8021885fadb6ede15"
+  },
+  {
+    "ByteLength": 2707,
+    "Path": "UI/Textures/022_SlidersBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "6badf6db9ff48d965fc48ae1f09fa3deeff91019d0c97dc11374577a2040dadb"
+  },
+  {
+    "ByteLength": 2575,
+    "Path": "UI/Textures/023_TypesBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "668daea4046db8a3635dbe3eb53765c7fed41452524104ae2c16c2ad6583c8cd"
+  },
+  {
+    "ByteLength": 2767,
+    "Path": "UI/Textures/024_ExtrasBg.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "8c0980096224d68284c710b8af072fe74b539492277fa0c338270162fb47bef7"
+  },
+  {
+    "ByteLength": 3927,
+    "Path": "UI/Textures/025_SearchWindowBg2.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "6f18fef5aec4cda0d54d9556afcede40618c88fe7c509e99a70bd096f233ea7c"
+  },
+  {
+    "ByteLength": 2626,
+    "Path": "UI/Textures/026_ItemPreviewBg2.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "89302af91d874147aa0040389f3ef3fefa0f89c2024c4de100148f69eccd2f18"
+  },
+  {
+    "ByteLength": 3100,
+    "Path": "UI/Textures/027_BoundsButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "a2277abd5ffde805ea198a40f42d8dc47bfc441f9506a1a405553ec1a1708c37"
+  },
+  {
+    "ByteLength": 3108,
+    "Path": "UI/Textures/028_BoundsButton2.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "58c7c299fea0ddab25c05e4168b42f7737ff131a0407550afb1f6806c870dfaa"
+  },
+  {
+    "ByteLength": 10312,
+    "Path": "UI/Textures/029_BigLogo.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "b14251ea75916e251434db54f74087280cfc5aef59f04b097f615cf399152cff"
+  },
+  {
+    "ByteLength": 2822,
+    "Path": "UI/Textures/030_RedCloseButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "2dacd312a9f017e20fd4b8a6e6497426cb95cbc4977c7926d9097359474069bf"
+  },
+  {
+    "ByteLength": 2889,
+    "Path": "UI/Textures/031_11330.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "c27dd8a66a21ce37529f6e0be4d83910c6ca7aaf4b3a9fbe96b685a60c77d389"
+  },
+  {
+    "ByteLength": 2798,
+    "Path": "UI/Textures/032_11335.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "3bc8896a09d1bbe69432c11ced43f0d240b78dcc49c331259e80a00b1c5745be"
+  },
+  {
+    "ByteLength": 2836,
+    "Path": "UI/Textures/033_11337.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "bbd913b5a53c7402ccc56570aedd24a862c8dbc0d6ee184f03bef11ec99587ce"
+  },
+  {
+    "ByteLength": 2877,
+    "Path": "UI/Textures/034_11342.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "e8765185caaaaca5703a3a4757eadc03870f95b2e39e126fc39506521a832f38"
+  },
+  {
+    "ByteLength": 2853,
+    "Path": "UI/Textures/035_11329.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "01196e8c145f0cee3c85296b912d422a8304066558050db67fdbc8e8b6033922"
+  },
+  {
+    "ByteLength": 2647,
+    "Path": "UI/Textures/036_DevButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "a05a352f9232ae832b75ea605550e4cc6384447dabb61143d6833ea44fe9d88a"
+  },
+  {
+    "ByteLength": 3132,
+    "Path": "UI/Textures/037_DisableAllButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "4d64387ce4627f6d6012ea92cabea5e4f14250c2608aedc16f9d654548ff8170"
+  },
+  {
+    "ByteLength": 3141,
+    "Path": "UI/Textures/038_EnableAllButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "ea5ef33d12c6d90d9020cfef56653452380de96b6a80db349df04861f087d57a"
+  },
+  {
+    "ByteLength": 3240,
+    "Path": "UI/Textures/039_GraphicalGuideButton.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "7e42cf85d8c15e86f7a6d246f9a997f509b7254228050e6b02693c7bf09f4f3c"
+  },
+  {
+    "ByteLength": 64129,
+    "Path": "UI/Textures/040_GraphicalGuide.png",
+    "Role": "UI_TEXTURE",
+    "Sha256": "6098fc09d72ac90e8119f1a69975f90591ac0d8d728c3e1288b987b5493bdd07"
+  },
+  {
+    "ByteLength": 1010,
+    "Path": "UI/Views/BrowserEntryView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "59e5ed15b8f00ae15418d3229adfd47a287b774d3697782bbdbb4dea211ee251"
+  },
+  {
+    "ByteLength": 1879,
+    "Path": "UI/Views/ExtrasView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "240ab9af8cf74bea4863d803724243bacdc9a2bfcc4ef39302d5468dfdf750e7"
+  },
+  {
+    "ByteLength": 714,
+    "Path": "UI/Views/HeaderView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "8839ef014f89ee1ab1b6afc8f3660769d6b2d3bfb2115d9afe2b041e3bd001f1"
+  },
+  {
+    "ByteLength": 2552,
+    "Path": "UI/Views/ItemDisplayView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "abaec7bc952dfd63098914590f4df1fafed698fbfac17bfb87d222eca9415c39"
+  },
+  {
+    "ByteLength": 1787,
+    "Path": "UI/Views/MissionView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "27adf0d9b701a7560bb485fd6ffe5fd735465fed5aa44fb13ef988837658d1a2"
+  },
+  {
+    "ByteLength": 823,
+    "Path": "UI/Views/PlayfieldEntryView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "533cd6000f55bcf3d343b5291ea1cad4ee28bfddc7472af02340d1fcd95707e9"
+  },
+  {
+    "ByteLength": 913,
+    "Path": "UI/Views/PlayfieldView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "55b8f3ac49de049baf41d0173940df803fff0dba057486fa5e4e87bf988349a7"
+  },
+  {
+    "ByteLength": 1017,
+    "Path": "UI/Views/RollEntryView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "1eb5bc9ed58a43eeef7a3a9f9b7b0a6c3482a26d8f5683300d30cea5da209fca"
+  },
+  {
+    "ByteLength": 584,
+    "Path": "UI/Views/SettingsView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "0bb6371dc711dabd551741766bfd014f2043f839965bbb0a705c497f73585a80"
+  },
+  {
+    "ByteLength": 2451,
+    "Path": "UI/Views/SliderView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "af83ac7292b75f281ba49adc03ee69ab40ded54bd44d39686724df269f83b0a5"
+  },
+  {
+    "ByteLength": 1641,
+    "Path": "UI/Views/TypesView.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "b21a0deff1d7bc73c4185339d0ee8e321d38697d9a98f72260e4ae8fd9ee31fe"
+  },
+  {
+    "ByteLength": 253,
+    "Path": "UI/Windows/GraphicalHelpWindow.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "13f8f83154d0aecd135bd16b4d44090376f932d91b01f97bf0902d6d804dd011"
+  },
+  {
+    "ByteLength": 874,
+    "Path": "UI/Windows/HelpWindow.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "2c366ca5b007ffc8394847c72b6b5278511b3e212bb6dda7adfd68176091ce4f"
+  },
+  {
+    "ByteLength": 344,
+    "Path": "UI/Windows/MainWindow.xml",
+    "Role": "UI_LAYOUT_OR_CONFIG",
+    "Sha256": "b533865d836c214009cf0a1d1bf4fb3736170527c1916ed9a34b50d5a57e53a0"
+  },
+  {
+    "ByteLength": 3581,
+    "Path": "Views/ExtrasView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "2b6c9836c71ce4db826f2ba3db97da54a0f51d3e5d255fbe5458fcb5edc724aa"
+  },
+  {
+    "ByteLength": 1989,
+    "Path": "Views/HeaderView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "b8ca75c4ac527e534168b9cb938fcd1c1d64bea3443a2a082b04d492cb702db9"
+  },
+  {
+    "ByteLength": 4530,
+    "Path": "Views/HelpWindow.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "ac772b88a9f41f5b3adb4e40d7ea2ac4d8d919ad0add9a69cafd4cb86d70475f"
+  },
+  {
+    "ByteLength": 21840,
+    "Path": "Views/ItemDisplayView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "824474389243b99171ab4f182dfddc79471de49c146511b1f11ffd09f46f92a0"
+  },
+  {
+    "ByteLength": 7705,
+    "Path": "Views/MissionView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "e52f75ce891f192ebaa9f72465a38e413fcd54375684ed5bcb87d1addee5a635"
+  },
+  {
+    "ByteLength": 12112,
+    "Path": "Views/PlayfieldView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "7fbf0015e27d3af7a661a8cd83c44ca8183c7ca3793aaf996ca64ca29a1b41af"
+  },
+  {
+    "ByteLength": 2231,
+    "Path": "Views/SettingsView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "36ad8832056741ee2236fee3d03724f44ab743b149e775016988d326e129eda2"
+  },
+  {
+    "ByteLength": 3104,
+    "Path": "Views/SliderView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "01abb05276610b352b1beca2e4865b0a6918b34140b42bb8be44308bf019f11c"
+  },
+  {
+    "ByteLength": 2367,
+    "Path": "Views/TypesView.cs",
+    "Role": "CSHARP_SOURCE",
+    "Sha256": "62585c1d1c47da76785745081d45eb646298e5dc5b4e12d4475e2cbeba06c162"
+  },
+  {
+    "ByteLength": 432,
+    "Path": "app.config",
+    "Role": "BUILD_OR_DEPENDENCY_METADATA",
+    "Sha256": "d635d56f6d1bd958309253803e5800dbf1059a495d3abc7a9f33812d33ef0752"
+  },
+  {
+    "ByteLength": 216,
+    "Path": "packages.config",
+    "Role": "BUILD_OR_DEPENDENCY_METADATA",
+    "Sha256": "770e13f13c7f592859cf6623db0937b9eb588cccf4206dc053a0dc259ff3ffc6"
+  }
+]

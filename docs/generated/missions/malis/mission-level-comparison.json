@@ -1,0 +1,749 @@
+{
+  "AORebirthCanonicalTable": "AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv",
+  "CellSummary": {
+    "AORebirthExpectedCells": 2420,
+    "ExactCells": 2352,
+    "MalisPresentCells": 2407,
+    "MissingMalisCells": 13,
+    "ValueDifferences": 55
+  },
+  "Differences": [
+    {
+      "AORebirthQl": 17,
+      "CharacterLevel": 10,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 18
+    },
+    {
+      "AORebirthQl": 9,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 3,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 10
+    },
+    {
+      "AORebirthQl": 10,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 5,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 12
+    },
+    {
+      "AORebirthQl": 12,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 6,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 13
+    },
+    {
+      "AORebirthQl": 13,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 7,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 14
+    },
+    {
+      "AORebirthQl": 14,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 8,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 15
+    },
+    {
+      "AORebirthQl": 15,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 9,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 18
+    },
+    {
+      "AORebirthQl": 18,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 10,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 21
+    },
+    {
+      "AORebirthQl": 21,
+      "CharacterLevel": 12,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 9,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 2,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 10
+    },
+    {
+      "AORebirthQl": 10,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 3,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 11
+    },
+    {
+      "AORebirthQl": 11,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 5,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 13
+    },
+    {
+      "AORebirthQl": 13,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 6,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 14
+    },
+    {
+      "AORebirthQl": 14,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 7,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 15
+    },
+    {
+      "AORebirthQl": 15,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 8,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 16
+    },
+    {
+      "AORebirthQl": 16,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 9,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 19
+    },
+    {
+      "AORebirthQl": 19,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 10,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 22
+    },
+    {
+      "AORebirthQl": 23,
+      "CharacterLevel": 13,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 35,
+      "CharacterLevel": 20,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 36
+    },
+    {
+      "AORebirthQl": 39,
+      "CharacterLevel": 22,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 38
+    },
+    {
+      "AORebirthQl": 57,
+      "CharacterLevel": 32,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 56
+    },
+    {
+      "AORebirthQl": 59,
+      "CharacterLevel": 33,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 58
+    },
+    {
+      "AORebirthQl": 111,
+      "CharacterLevel": 62,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 110
+    },
+    {
+      "AORebirthQl": 136,
+      "CharacterLevel": 76,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 135
+    },
+    {
+      "AORebirthQl": 61,
+      "CharacterLevel": 77,
+      "DifficultyWireValue": 3,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 60
+    },
+    {
+      "AORebirthQl": 65,
+      "CharacterLevel": 77,
+      "DifficultyWireValue": 4,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 64
+    },
+    {
+      "AORebirthQl": 92,
+      "CharacterLevel": 77,
+      "DifficultyWireValue": 8,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 91
+    },
+    {
+      "AORebirthQl": 139,
+      "CharacterLevel": 78,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 138
+    },
+    {
+      "AORebirthQl": 141,
+      "CharacterLevel": 79,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 139
+    },
+    {
+      "AORebirthQl": 150,
+      "CharacterLevel": 84,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 149
+    },
+    {
+      "AORebirthQl": 152,
+      "CharacterLevel": 85,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 151
+    },
+    {
+      "AORebirthQl": 116,
+      "CharacterLevel": 90,
+      "DifficultyWireValue": 9,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 117
+    },
+    {
+      "AORebirthQl": 180,
+      "CharacterLevel": 101,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 184
+    },
+    {
+      "AORebirthQl": 182,
+      "CharacterLevel": 102,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 186
+    },
+    {
+      "AORebirthQl": 184,
+      "CharacterLevel": 103,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 185
+    },
+    {
+      "AORebirthQl": 186,
+      "CharacterLevel": 104,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 187
+    },
+    {
+      "AORebirthQl": 205,
+      "CharacterLevel": 115,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 206
+    },
+    {
+      "AORebirthQl": 207,
+      "CharacterLevel": 116,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 208
+    },
+    {
+      "AORebirthQl": 209,
+      "CharacterLevel": 117,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 210
+    },
+    {
+      "AORebirthQl": 213,
+      "CharacterLevel": 119,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 214
+    },
+    {
+      "AORebirthQl": 214,
+      "CharacterLevel": 120,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 215
+    },
+    {
+      "AORebirthQl": 216,
+      "CharacterLevel": 121,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 217
+    },
+    {
+      "AORebirthQl": 223,
+      "CharacterLevel": 125,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 224
+    },
+    {
+      "AORebirthQl": 227,
+      "CharacterLevel": 127,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 225
+    },
+    {
+      "AORebirthQl": 229,
+      "CharacterLevel": 128,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 226
+    },
+    {
+      "AORebirthQl": 231,
+      "CharacterLevel": 129,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 227
+    },
+    {
+      "AORebirthQl": 234,
+      "CharacterLevel": 131,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 235
+    },
+    {
+      "AORebirthQl": 238,
+      "CharacterLevel": 133,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 237
+    },
+    {
+      "AORebirthQl": 240,
+      "CharacterLevel": 134,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 238
+    },
+    {
+      "AORebirthQl": 241,
+      "CharacterLevel": 135,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 239
+    },
+    {
+      "AORebirthQl": 247,
+      "CharacterLevel": 138,
+      "DifficultyWireValue": 11,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 246
+    },
+    {
+      "AORebirthQl": 213,
+      "CharacterLevel": 142,
+      "DifficultyWireValue": 10,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 212
+    },
+    {
+      "AORebirthQl": 118,
+      "CharacterLevel": 158,
+      "DifficultyWireValue": 2,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 119
+    },
+    {
+      "AORebirthQl": 114,
+      "CharacterLevel": 163,
+      "DifficultyWireValue": 1,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 113
+    },
+    {
+      "AORebirthQl": 126,
+      "CharacterLevel": 168,
+      "DifficultyWireValue": 2,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 124
+    },
+    {
+      "AORebirthQl": 206,
+      "CharacterLevel": 172,
+      "DifficultyWireValue": 8,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 205
+    },
+    {
+      "AORebirthQl": 229,
+      "CharacterLevel": 209,
+      "DifficultyWireValue": 7,
+      "Kind": "VALUE_DIFFERENCE",
+      "MalisQl": 228
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 209,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 210,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 211,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 212,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 213,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 214,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 215,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 216,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 217,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 218,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    },
+    {
+      "AORebirthQl": 250,
+      "CharacterLevel": 219,
+      "DifficultyWireValue": 11,
+      "Kind": "MALIS_MISSING_SLOT",
+      "MalisQl": null
+    }
+  ],
+  "ExactRows": 170,
+  "HistoricalPointCorrections": [
+    {
+      "After": 93,
+      "Before": 92,
+      "CharacterLevel": 52,
+      "Commit": "6543610386e87a99243d12282a7ba474995d710d",
+      "CommitDate": "2022-07-30T22:34:45+02:00",
+      "DifficultyWireValue": 11,
+      "Subject": "fixed MissionLevels table for lvl54,53,52"
+    },
+    {
+      "After": 94,
+      "Before": 95,
+      "CharacterLevel": 53,
+      "Commit": "6543610386e87a99243d12282a7ba474995d710d",
+      "CommitDate": "2022-07-30T22:34:45+02:00",
+      "DifficultyWireValue": 11,
+      "Subject": "fixed MissionLevels table for lvl54,53,52"
+    },
+    {
+      "After": 96,
+      "Before": 97,
+      "CharacterLevel": 54,
+      "Commit": "6543610386e87a99243d12282a7ba474995d710d",
+      "CommitDate": "2022-07-30T22:34:45+02:00",
+      "DifficultyWireValue": 11,
+      "Subject": "fixed MissionLevels table for lvl54,53,52"
+    },
+    {
+      "After": 107,
+      "Before": 108,
+      "CharacterLevel": 60,
+      "Commit": "ec4416970f5f38854e5a547a90ae44f40acc6b63",
+      "CommitDate": "2024-05-31T05:03:14+02:00",
+      "DifficultyWireValue": 11,
+      "Subject": "Fixed lvl 60 mission range"
+    },
+    {
+      "After": 143,
+      "Before": 144,
+      "CharacterLevel": 80,
+      "Commit": "e19bb1ddc25e2647688c7996c8b09d50198fc486",
+      "CommitDate": "2025-03-17T21:39:48+01:00",
+      "DifficultyWireValue": 11,
+      "Subject": "Fixed level 80 mission table"
+    }
+  ],
+  "Level80Finding": {
+    "AORebirthCanonicalValue": 143,
+    "Conclusion": "The final difficulty slot changed 144 to 143; no issue, comment, formula, or upstream citation explains why.",
+    "CorrectedMalisValue": 143,
+    "OldMalisValue": 144
+  },
+  "MalisRowShapeAnomalies": [
+    {
+      "CharacterLevel": 12,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 13,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 209,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 210,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 211,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 212,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 213,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 214,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 215,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 216,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 217,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 218,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    },
+    {
+      "CharacterLevel": 219,
+      "MissingDifficultySlots": [
+        11
+      ],
+      "PresentDifficultySlots": 10
+    }
+  ],
+  "Ql200Above200ClientSpecialCase": {
+    "Architecture": "CLIENT_SIDE_SEARCH_AND_DIFFICULTY_SELECTION",
+    "Mappings": [
+      {
+        "CharacterLevel": 201,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 201
+      },
+      {
+        "CharacterLevel": 202,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 202
+      },
+      {
+        "CharacterLevel": 203,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 203
+      },
+      {
+        "CharacterLevel": 204,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 204
+      },
+      {
+        "CharacterLevel": 205,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 205
+      },
+      {
+        "CharacterLevel": 206,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 206
+      },
+      {
+        "CharacterLevel": 207,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 207
+      },
+      {
+        "CharacterLevel": 208,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 208
+      },
+      {
+        "CharacterLevel": 209,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 209
+      },
+      {
+        "CharacterLevel": 210,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 210
+      },
+      {
+        "CharacterLevel": 211,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 211
+      },
+      {
+        "CharacterLevel": 212,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 212
+      },
+      {
+        "CharacterLevel": 213,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 213
+      },
+      {
+        "CharacterLevel": 214,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 214
+      },
+      {
+        "CharacterLevel": 215,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 215
+      },
+      {
+        "CharacterLevel": 216,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 216
+      },
+      {
+        "CharacterLevel": 217,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 217
+      },
+      {
+        "CharacterLevel": 218,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 218
+      },
+      {
+        "CharacterLevel": 219,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 219
+      },
+      {
+        "CharacterLevel": 220,
+        "DifficultyWireValue": 6,
+        "RequestedMissionQl": 220
+      }
+    ],
+    "Rule": "For playerLevel > 200, itemQL == 200, and a non-nano name, choose the first table mission QL >= 200.",
+    "ServerRuleProven": false
+  },
+  "SliderMapping": {
+    "AutoSelection": "IndexOf(selected mission QL) + 1; duplicate QLs choose the first difficulty slot",
+    "DefaultDifficultyWireValue": 6,
+    "DifficultyWireValues": "1..11, passed unchanged as a byte to AOSharp MissionTerminal.RequestMissions",
+    "OtherSliderCentering": "GoodBad, OrderChaos, OpenHidden, PhysicalMystical, HeadonStealth, and CreditsXp map UI value 0 to signed -1 encoded as byte 255; difficulty is not remapped",
+    "TableIndex": "difficulty wire value - 1"
+  }
+}
