@@ -179,6 +179,109 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(
                 source.Contains("ZoneEngine database readiness requires zero online characters."),
                 "strict Online validation failure changed");
+            Require(
+                source.Contains("\"account_password_reset_tokens\""),
+                "legitimate password-reset extension table is not explicit");
+            Require(
+                source.Contains("Unexpected database table: "),
+                "unexpected database table drift no longer fails closed");
+            Require(
+                source.Contains("ValidateRequiredDatabaseColumn(")
+                && source.Contains("\"NanoInstance\"")
+                && source.Contains("\"DurationCentiseconds\"")
+                && source.Contains("\"ExpiresAtUtcTicks\""),
+                "active-nano persistence column validation is missing");
+            Require(
+                source.Contains("schema contract mismatch: column is missing."),
+                "missing active-nano column no longer fails before runtime");
+            Require(
+                source.Contains("SELECT data_type, column_type, is_nullable, column_default")
+                && source.Contains("expectedColumnType")
+                && source.Contains("expectedOrdinalPosition")
+                && source.Contains("expectedExtra")
+                && source.Contains("generation_expression")
+                && source.Contains("charactersactivenanos table contract mismatch"),
+                "active-nano column validation is no longer exact");
+
+            string activeNanoSchema = File.ReadAllText(
+                Stage8RepositoryRootResolver.ResolveRequiredFile(
+                    repositoryRoot,
+                    "AORebirth",
+                    "Libraries",
+                    "Source",
+                    "AORebirth.Database",
+                    "SqlTables",
+                    "charactersactivenanos.sql"));
+            Require(
+                activeNanoSchema.Contains("`NanoInstance` int(32) NOT NULL DEFAULT 0")
+                && activeNanoSchema.Contains("`DurationCentiseconds` int(32) NOT NULL DEFAULT 0")
+                && activeNanoSchema.Contains("`ExpiresAtUtcTicks` bigint(20) NOT NULL DEFAULT 0"),
+                "governed base schema lacks the authoritative active-nano persistence cohort");
+
+            string activeNanoAlter = File.ReadAllText(
+                Stage8RepositoryRootResolver.ResolveRequiredFile(
+                    repositoryRoot,
+                    "AORebirth",
+                    "Libraries",
+                    "Source",
+                    "AORebirth.Database",
+                    "SqlTables",
+                    "charactersactivenanos_alter.sql"));
+            Require(
+                activeNanoAlter.Contains("`NanoInstance` int(32) NOT NULL DEFAULT 0")
+                && activeNanoAlter.Contains("`DurationCentiseconds` int(32) NOT NULL DEFAULT 0")
+                && activeNanoAlter.Contains("`ExpiresAtUtcTicks` bigint(20) NOT NULL DEFAULT 0"),
+                "forward active-nano migration diverges from the governed base schema cohort");
+
+            string bootstrap = File.ReadAllText(
+                Stage8RepositoryRootResolver.ResolveRequiredFile(
+                    repositoryRoot,
+                    "LinuxBuild",
+                    "deployment",
+                    "mysql-stage6",
+                    "apply-governed-schema.sh"));
+            Require(
+                bootstrap.Contains("require_column_contract charactersactivenanos Id int int NO '<NULL>' auto_increment 1")
+                && bootstrap.Contains("require_column_contract charactersactivenanos NanoInstance int int NO 0 '' 5")
+                && bootstrap.Contains("require_column_contract charactersactivenanos DurationCentiseconds int int NO 0 '' 6")
+                && bootstrap.Contains("require_column_contract charactersactivenanos ExpiresAtUtcTicks bigint bigint NO 0 '' 7")
+                && bootstrap.Contains("ACTIVE_NANO_FORWARD_MIGRATION_CONTRACT=PASS")
+                && bootstrap.Contains("active_nano_column_count")
+                && bootstrap.Contains("active_nano_index_contract")
+                && bootstrap.Contains("active_nano_table_contract"),
+                "governed bootstrap does not validate the exact active-nano table and forward migration");
+
+            string databaseProject = File.ReadAllText(
+                Stage8RepositoryRootResolver.ResolveRequiredFile(
+                    repositoryRoot,
+                    "AORebirth",
+                    "Libraries",
+                    "Source",
+                    "AORebirth.Database",
+                    "AORebirth.Database.csproj"));
+            Require(
+                databaseProject.Contains("SqlTables\\charactersactivenanos_alter.sql"),
+                "authoritative active-nano forward migration is not packaged as governed database content");
+
+            string stage6Integration = File.ReadAllText(
+                Stage8RepositoryRootResolver.ResolveRequiredFile(
+                    repositoryRoot,
+                    "LinuxBuild",
+                    "Tools",
+                    "Stage6MySqlIntegrationTests",
+                    "Program.cs"));
+            Require(
+                stage6Integration.Contains("schema-active-nano-instance-contract")
+                && stage6Integration.Contains("schema-active-nano-duration-contract")
+                && stage6Integration.Contains("schema-active-nano-expiry-contract")
+                && stage6Integration.Contains("schema-active-nano-column-count-contract")
+                && stage6Integration.Contains("schema-active-nano-primary-key-contract")
+                && stage6Integration.Contains("schema-active-nano-table-contract")
+                && stage6Integration.Contains("schema-active-nano-missing-column-accepted")
+                && stage6Integration.Contains("schema-active-nano-unsigned-drift-accepted")
+                && stage6Integration.Contains("schema-active-nano-null-default-drift-accepted")
+                && stage6Integration.Contains("schema-active-nano-index-contract"),
+                "disposable MySQL active-nano schema regression coverage is incomplete");
         }
 
         private static void ServiceRunsRecoveryImmediatelyBeforeValidation(string repositoryRoot)

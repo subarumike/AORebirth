@@ -1190,6 +1190,128 @@ namespace ZoneEngine
                         }
                     }
 
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "Id",
+                        "int",
+                        "int",
+                        "NO",
+                        null,
+                        "auto_increment",
+                        1);
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "CharacterId",
+                        "int",
+                        "int",
+                        "NO",
+                        null,
+                        string.Empty,
+                        2);
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "NanoId",
+                        "int",
+                        "int unsigned",
+                        "NO",
+                        null,
+                        string.Empty,
+                        3);
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "Strain",
+                        "int",
+                        "int unsigned",
+                        "NO",
+                        null,
+                        string.Empty,
+                        4);
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "NanoInstance",
+                        "int",
+                        "int",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        5);
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "DurationCentiseconds",
+                        "int",
+                        "int",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        6);
+                    ValidateRequiredDatabaseColumn(
+                        connection,
+                        "charactersactivenanos",
+                        "ExpiresAtUtcTicks",
+                        "bigint",
+                        "bigint",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        7);
+
+                    long activeNanoColumnCount;
+                    long activeNanoIndexCount;
+                    long activeNanoPrimaryKeyCount;
+                    string activeNanoTableContract;
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM information_schema.columns "
+                            + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos'";
+                        activeNanoColumnCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM information_schema.statistics "
+                            + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos'";
+                        activeNanoIndexCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM information_schema.statistics "
+                            + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos' "
+                            + "AND index_name='PRIMARY' AND non_unique=0 AND seq_in_index=1 "
+                            + "AND column_name='Id'";
+                        activeNanoPrimaryKeyCount = Convert.ToInt64(command.ExecuteScalar());
+                    }
+
+                    using (IDbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            "SELECT CONCAT(engine, '|', table_collation) "
+                            + "FROM information_schema.tables "
+                            + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos' "
+                            + "AND table_type='BASE TABLE'";
+                        activeNanoTableContract = Convert.ToString(command.ExecuteScalar());
+                    }
+
+                    if (activeNanoColumnCount != 7
+                        || activeNanoIndexCount != 1
+                        || activeNanoPrimaryKeyCount != 1
+                        || !string.Equals(
+                            activeNanoTableContract,
+                            "InnoDB|latin1_swedish_ci",
+                            StringComparison.Ordinal))
+                    {
+                        throw new InvalidDataException("charactersactivenanos table contract mismatch.");
+                    }
+
                     long onlineColumnCount;
                     using (IDbCommand command = connection.CreateCommand())
                     {
@@ -1235,6 +1357,70 @@ namespace ZoneEngine
             {
                 Console.Error.WriteLine("ZONEENGINE_DATABASE_FAILED error=" + e.Message);
                 return 1;
+            }
+        }
+
+        private static void ValidateRequiredDatabaseColumn(
+            IDbConnection connection,
+            string tableName,
+            string columnName,
+            string expectedDataType,
+            string expectedColumnType,
+            string expectedNullable,
+            string expectedDefault,
+            string expectedExtra,
+            int expectedOrdinalPosition)
+        {
+            using (IDbCommand command = connection.CreateCommand())
+            {
+                command.CommandText =
+                    "SELECT data_type, column_type, is_nullable, column_default, "
+                    + "extra, generation_expression, ordinal_position "
+                    + "FROM information_schema.columns "
+                    + "WHERE table_schema=DATABASE() AND table_name=@tableName "
+                    + "AND column_name=@columnName";
+
+                IDbDataParameter tableParameter = command.CreateParameter();
+                tableParameter.ParameterName = "@tableName";
+                tableParameter.Value = tableName;
+                command.Parameters.Add(tableParameter);
+
+                IDbDataParameter columnParameter = command.CreateParameter();
+                columnParameter.ParameterName = "@columnName";
+                columnParameter.Value = columnName;
+                command.Parameters.Add(columnParameter);
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        throw new InvalidDataException(
+                            tableName + "." + columnName + " schema contract mismatch: column is missing.");
+                    }
+
+                    string actualDataType = Convert.ToString(reader.GetValue(0));
+                    string actualColumnType = Convert.ToString(reader.GetValue(1));
+                    string actualNullable = Convert.ToString(reader.GetValue(2));
+                    string actualDefault = reader.IsDBNull(3)
+                        ? null
+                        : Convert.ToString(reader.GetValue(3));
+                    string actualExtra = Convert.ToString(reader.GetValue(4));
+                    string actualGenerationExpression = Convert.ToString(reader.GetValue(5));
+                    int actualOrdinalPosition = Convert.ToInt32(reader.GetValue(6));
+
+                    if (!string.Equals(actualDataType, expectedDataType, StringComparison.OrdinalIgnoreCase)
+                        || !string.Equals(actualColumnType, expectedColumnType, StringComparison.OrdinalIgnoreCase)
+                        || !string.Equals(actualNullable, expectedNullable, StringComparison.Ordinal)
+                        || !string.Equals(actualDefault, expectedDefault, StringComparison.Ordinal)
+                        || !string.Equals(actualExtra, expectedExtra, StringComparison.Ordinal)
+                        || actualGenerationExpression.Length != 0
+                        || actualOrdinalPosition != expectedOrdinalPosition
+                        || reader.Read())
+                    {
+                        throw new InvalidDataException(
+                            tableName + "." + columnName + " schema contract mismatch.");
+                    }
+                }
             }
         }
 

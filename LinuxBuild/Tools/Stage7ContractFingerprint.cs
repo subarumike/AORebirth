@@ -897,7 +897,14 @@ namespace AORebirth.LinuxBuild.Contracts
             string inventoryPath = RequireFile(Path.Combine(root, "LinuxBuild", "source-inventory", "AORebirth.Database.ContentItems.props"), "Database SQL content inventory");
             XDocument inventory = LoadXml(inventoryPath);
             XElement[] content = inventory.Descendants().Where(element => element.Name.LocalName == "Content").ToArray();
-            Assert(content.Length == 34, "Database SQL content inventory must contain exactly 34 assets.");
+            Assert(content.Length == 35, "Database SQL content inventory must contain exactly 35 governed assets.");
+            Assert(
+                content.Count(
+                    item => string.Equals(
+                        RequireAttribute(item, "Link"),
+                        "SqlTables/charactersactivenanos_alter.sql",
+                        StringComparison.Ordinal)) == 1,
+                "Database SQL content inventory must include the authoritative active-nano migration exactly once.");
             foreach (XElement item in content)
             {
                 string source = NormalizeInventoryInclude(RequireAttribute(item, "Include"));

@@ -442,6 +442,157 @@ namespace AORebirth.LinuxBuild.Stage6MySqlIntegrationTests
                 Require(
                     ExecuteScalarLong(connection, "SELECT COUNT(*) FROM characters WHERE Online <> 0") == 0,
                     "schema-online-character-residue");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "Id",
+                        "int",
+                        "int",
+                        "NO",
+                        null,
+                        "auto_increment",
+                        1),
+                    "schema-active-nano-id-contract");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "CharacterId",
+                        "int",
+                        "int",
+                        "NO",
+                        null,
+                        string.Empty,
+                        2),
+                    "schema-active-nano-character-contract");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "NanoId",
+                        "int",
+                        "int unsigned",
+                        "NO",
+                        null,
+                        string.Empty,
+                        3),
+                    "schema-active-nano-id-value-contract");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "Strain",
+                        "int",
+                        "int unsigned",
+                        "NO",
+                        null,
+                        string.Empty,
+                        4),
+                    "schema-active-nano-strain-contract");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "NanoInstance",
+                        "int",
+                        "int",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        5),
+                    "schema-active-nano-instance-contract");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "DurationCentiseconds",
+                        "int",
+                        "int",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        6),
+                    "schema-active-nano-duration-contract");
+                Require(
+                    ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "ExpiresAtUtcTicks",
+                        "bigint",
+                        "bigint",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        7),
+                    "schema-active-nano-expiry-contract");
+                Require(
+                    !ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "MissingNanoInstance",
+                        "int",
+                        "int",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        5),
+                    "schema-active-nano-missing-column-accepted");
+                Require(
+                    !ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "NanoInstance",
+                        "int",
+                        "int unsigned",
+                        "NO",
+                        "0",
+                        string.Empty,
+                        5),
+                    "schema-active-nano-unsigned-drift-accepted");
+                Require(
+                    !ColumnContractMatches(
+                        connection,
+                        "charactersactivenanos",
+                        "NanoInstance",
+                        "int",
+                        "int",
+                        "YES",
+                        null,
+                        string.Empty,
+                        5),
+                    "schema-active-nano-null-default-drift-accepted");
+                Require(
+                    ExecuteScalarLong(
+                        connection,
+                        "SELECT COUNT(*) FROM information_schema.columns "
+                        + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos'") == 7,
+                    "schema-active-nano-column-count-contract");
+                Require(
+                    ExecuteScalarLong(
+                        connection,
+                        "SELECT COUNT(*) FROM information_schema.statistics "
+                        + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos'") == 1,
+                    "schema-active-nano-index-count-contract");
+                Require(
+                    ExecuteScalarLong(
+                        connection,
+                        "SELECT COUNT(*) FROM information_schema.statistics "
+                        + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos' "
+                        + "AND index_name='PRIMARY' AND non_unique=0 AND seq_in_index=1 "
+                        + "AND column_name='Id'") == 1,
+                    "schema-active-nano-primary-key-contract");
+                Require(
+                    string.Equals(
+                        ExecuteScalarString(
+                            connection,
+                            "SELECT CONCAT(engine, '|', table_collation) "
+                            + "FROM information_schema.tables "
+                            + "WHERE table_schema=DATABASE() AND table_name='charactersactivenanos' "
+                            + "AND table_type='BASE TABLE'"),
+                        "InnoDB|latin1_swedish_ci",
+                        StringComparison.Ordinal),
+                    "schema-active-nano-table-contract");
 
                 string[] initiallyEmptyTables =
                 {
@@ -457,6 +608,78 @@ namespace AORebirth.LinuxBuild.Stage6MySqlIntegrationTests
                         ExecuteScalarLong(connection, "SELECT COUNT(*) FROM `" + tableName + "`") == 0,
                         "schema-mutable-table-not-empty");
                 }
+            }
+        }
+
+        private static bool ColumnContractMatches(
+            IDbConnection connection,
+            string tableName,
+            string columnName,
+            string expectedDataType,
+            string expectedColumnType,
+            string expectedNullable,
+            string expectedDefault,
+            string expectedExtra,
+            int expectedOrdinalPosition)
+        {
+            using (IDbCommand command = connection.CreateCommand())
+            {
+                command.CommandText =
+                    "SELECT data_type, column_type, is_nullable, column_default, "
+                    + "extra, generation_expression, ordinal_position "
+                    + "FROM information_schema.columns "
+                    + "WHERE table_schema=DATABASE() AND table_name=@tableName "
+                    + "AND column_name=@columnName";
+
+                IDbDataParameter tableParameter = command.CreateParameter();
+                tableParameter.ParameterName = "@tableName";
+                tableParameter.Value = tableName;
+                command.Parameters.Add(tableParameter);
+
+                IDbDataParameter columnParameter = command.CreateParameter();
+                columnParameter.ParameterName = "@columnName";
+                columnParameter.Value = columnName;
+                command.Parameters.Add(columnParameter);
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        return false;
+                    }
+
+                    string actualDataType = Convert.ToString(reader.GetValue(0), CultureInfo.InvariantCulture);
+                    string actualColumnType = Convert.ToString(reader.GetValue(1), CultureInfo.InvariantCulture);
+                    string actualNullable = Convert.ToString(reader.GetValue(2), CultureInfo.InvariantCulture);
+                    string actualDefault = reader.IsDBNull(3)
+                        ? null
+                        : Convert.ToString(reader.GetValue(3), CultureInfo.InvariantCulture);
+                    string actualExtra = Convert.ToString(reader.GetValue(4), CultureInfo.InvariantCulture);
+                    string actualGenerationExpression = Convert.ToString(
+                        reader.GetValue(5),
+                        CultureInfo.InvariantCulture);
+                    int actualOrdinalPosition = Convert.ToInt32(
+                        reader.GetValue(6),
+                        CultureInfo.InvariantCulture);
+
+                    return string.Equals(actualDataType, expectedDataType, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(actualColumnType, expectedColumnType, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(actualNullable, expectedNullable, StringComparison.Ordinal)
+                        && string.Equals(actualDefault, expectedDefault, StringComparison.Ordinal)
+                        && string.Equals(actualExtra, expectedExtra, StringComparison.Ordinal)
+                        && actualGenerationExpression.Length == 0
+                        && actualOrdinalPosition == expectedOrdinalPosition
+                        && !reader.Read();
+                }
+            }
+        }
+
+        private static string ExecuteScalarString(IDbConnection connection, string commandText)
+        {
+            using (IDbCommand command = connection.CreateCommand())
+            {
+                command.CommandText = commandText;
+                return Convert.ToString(command.ExecuteScalar(), CultureInfo.InvariantCulture);
             }
         }
 

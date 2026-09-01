@@ -39,6 +39,16 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(upgrader.Contains("state=${state_value} restarts=${restart_value}"), "readiness timeout service diagnostics are missing");
             Require(upgrader.Contains("ZoneEngine production executable contract failed"), "production upgrader does not require the headless ZoneEngine runtime");
             Require(upgrader.Contains("ZoneEngine validation lifecycle cannot be production ExecStart"), "production upgrader does not reject the listener-free ZoneEngine validation runtime");
+            Require(upgrader.Contains("--recover-zone-outage"), "production upgrader lacks explicit stopped-Zone recovery mode");
+            Require(upgrader.Contains("CANDIDATE_DATABASE_COMPATIBILITY=PASS"), "production upgrader does not validate candidate binaries against the live schema");
+            Require(upgrader.Contains("ZONEENGINE_OUTAGE_FROZEN=PASS"), "production upgrader does not prove the outage remains frozen");
+            Require(upgrader.Contains("PRESTOP_BOUNDARY=PASS onlineCharacters=0"), "production upgrader does not recheck zero online characters before closing admission");
+            Require(upgrader.Contains("LOGIN_ADMISSION_CLOSED_BOUNDARY=PASS onlineCharacters=0"), "production upgrader does not recheck zero online characters after LoginEngine closes admission");
+            Require(upgrader.Contains("ZONE_PRESTOP_INVARIANT=PASS"), "production upgrader does not preserve ZoneEngine state around the closed-admission Online check");
+            Require(upgrader.Contains("CLOSED_ENGINE_MUTATION_BOUNDARY=PASS onlineCharacters=0"), "production upgrader does not recheck zero online characters after both engines stop");
+            Require(upgrader.Contains("ZONEENGINE_RESTART_COUNTER_RESET=PASS"), "production upgrader does not establish a zero restart baseline for controlled recovery");
+            Require(upgrader.Contains("POST_START_STABILITY=PASS"), "production upgrader lacks bounded post-start restart stability");
+            Require(upgrader.Contains("ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"), "outage recovery can restart a known-incompatible rollback pair");
             Require(upgrader.Contains("[[ \"${FORMAT}\" == \"2\" ]]"), "production upgrader does not require the placement-aware manifest format");
             Require(upgrader.Contains("require_zone_placement_artifact"), "production upgrader does not fail closed on placement provenance");
             Require(upgrader.Contains("PLACEMENT_BUILD_MANIFEST_SHA256"), "production upgrader does not pin the placement build manifest");
@@ -64,7 +74,17 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(manifest.Contains("ZONEENGINE_UNIT_SHA256="), "release manifest lacks ZoneEngine unit hash");
             Require(manifest.Contains("repository HEAD does not match expected source SHA"), "manifest generator lost immutable SHA gate");
 
-            Require(tests.Contains("production deployment workflow tests (24/24)"), "deployment fixture suite count changed");
+            Require(tests.Contains("production deployment workflow tests (38/38)"), "deployment fixture suite count changed");
+            Require(tests.Contains("outage recovery accepted an active ZoneEngine"), "deployment fixtures do not reject misuse of outage recovery");
+            Require(tests.Contains("outage recovery accepted a non-stopped ZoneEngine state"), "deployment fixtures do not require an exact stopped ZoneEngine state");
+            Require(tests.Contains("outage recovery accepted an occupied ZoneEngine port"), "deployment fixtures do not reject a stale ZoneEngine listener");
+            Require(tests.Contains("outage recovery accepted a failed ZoneEngine port inspection"), "deployment fixtures allow a failed listener inspection to pass open");
+            Require(tests.Contains("outage recovery accepted an incompatible candidate database contract"), "deployment fixtures do not fail closed on candidate/schema mismatch");
+            Require(tests.Contains("outage recovery accepted a changing frozen restart count"), "deployment fixtures do not prove that outage recovery remains frozen");
+            Require(tests.Contains("outage recovery left an already-deployed ZoneEngine stopped"), "deployment fixtures allow recovery to take the stopped idempotent no-op path");
+            Require(tests.Contains("outage recovery accepted a ZoneEngine auto-restart"), "deployment fixtures do not require post-start restart stability");
+            Require(tests.Contains("outage recovery accepted an online character after admission closed"), "deployment fixtures do not close the zero-online race before mutation");
+            Require(tests.Contains("outage recovery accepted a ZoneEngine state change before mutation"), "deployment fixtures do not preserve ZoneEngine state around the Online boundary");
             Require(tests.Contains("artifact_install"), "deployment fixture suite lacks artifact rollback failure");
             Require(tests.Contains("unit_install"), "deployment fixture suite lacks unit rollback failure");
             Require(tests.Contains("login_start"), "deployment fixture suite lacks first-service startup failure");

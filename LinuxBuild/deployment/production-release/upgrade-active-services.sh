@@ -9,12 +9,14 @@ readonly EXPECTED_DATABASE="aorebirth_chatengine_stage6"
 readonly DATABASE_CONTAINER="aorebirth-chatengine-mysql-stage6"
 readonly READINESS_TIMEOUT_SECONDS=30
 readonly READINESS_POLL_INTERVAL_SECONDS=1
+readonly POST_START_STABILITY_SECONDS=10
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../placement-provenance.sh"
 
 manifest_path=""
 expected_sha=""
 dry_run=false
+recover_zone_outage=false
 deploy_root="${AO_REBIRTH_DEPLOY_TEST_ROOT:-}"
 test_mode="${AO_REBIRTH_DEPLOY_TEST_MODE:-0}"
 failure_step="${AO_REBIRTH_DEPLOY_TEST_FAIL_STEP:-}"
@@ -23,9 +25,10 @@ deployment_committed=false
 rolling_back=false
 snapshot_dir=""
 rollback_first_failure=""
+ZONE_RESTARTS_START_BASELINE=""
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
-usage() { echo "usage: upgrade-active-services.sh --manifest <release.manifest> --expected-sha <sha> [--dry-run]" >&2; }
+usage() { echo "usage: upgrade-active-services.sh --manifest <release.manifest> --expected-sha <sha> [--dry-run] [--recover-zone-outage]" >&2; }
 root_path() { printf '%s%s' "${deploy_root}" "$1"; }
 
 while [[ "$#" -gt 0 ]]; do
@@ -33,6 +36,7 @@ while [[ "$#" -gt 0 ]]; do
         --manifest) manifest_path="${2:-}"; shift 2 ;;
         --expected-sha) expected_sha="${2:-}"; shift 2 ;;
         --dry-run) dry_run=true; shift ;;
+        --recover-zone-outage) recover_zone_outage=true; shift ;;
         --help) usage; exit 0 ;;
         *) usage; exit 2 ;;
     esac
@@ -220,13 +224,65 @@ service_active()
 {
     if [[ "${test_mode}" == "1" ]]; then [[ "$(cat "${TEST_STATE}/$1.active")" == active ]]; else systemctl is-active --quiet "$2"; fi
 }
+service_stopped()
+{
+    local engine="$1" service="$2" state substate main_pid
+    if [[ "${test_mode}" == "1" ]]; then
+        state="$(cat "${TEST_STATE}/${engine}.active")"
+        [[ "${state}" == inactive || "${state}" == failed ]]
+        return
+    fi
+    state="$(systemctl show "${service}" -p ActiveState --value)"
+    substate="$(systemctl show "${service}" -p SubState --value)"
+    main_pid="$(systemctl show "${service}" -p MainPID --value)"
+    [[ "${main_pid}" == 0 ]] || return 1
+    [[ "${state}/${substate}" == inactive/dead || "${state}/${substate}" == failed/failed ]]
+}
+listener_absent()
+{
+    local engine="$1" port="$2" service="$3" listener_output
+    if [[ "${test_mode}" == "1" ]]; then
+        [[ "$(cat "${TEST_STATE}/${engine}.port-inspection")" == PASS ]] \
+            || fail "could not inspect port ${port}"
+        [[ "$(cat "${TEST_STATE}/${engine}.port-occupied")" == NO ]]
+    else
+        listener_output="$(ss -H -ltn "sport = :${port}")" \
+            || fail "could not inspect port ${port}"
+        [[ -z "${listener_output}" ]]
+    fi
+}
 service_restarts()
 {
     if [[ "${test_mode}" == "1" ]]; then cat "${TEST_STATE}/$1.restarts"; else systemctl show "$2" -p NRestarts --value; fi
 }
+service_reset_failed()
+{
+    if [[ "${test_mode}" == "1" ]]; then
+        printf '0\n' > "${TEST_STATE}/$1.restarts"
+        [[ "$(cat "${TEST_STATE}/$1.active")" != failed ]] \
+            || printf 'inactive\n' > "${TEST_STATE}/$1.active"
+    else
+        systemctl reset-failed "$2"
+    fi
+}
 service_stop()
 {
-    if [[ "${test_mode}" == "1" ]]; then printf 'inactive\n' > "${TEST_STATE}/$1.active"; else systemctl stop "$2"; fi
+    if [[ "${test_mode}" == "1" ]]; then
+        printf 'inactive\n' > "${TEST_STATE}/$1.active"
+        if [[ "$1" == login && "$(cat "${TEST_STATE}/online-on-login-stop")" == YES ]]; then
+            printf '1\n' > "${TEST_STATE}/online"
+            printf 'NO\n' > "${TEST_STATE}/online-on-login-stop"
+        fi
+        if [[ "$1" == login && "$(cat "${TEST_STATE}/zone-change-on-login-stop")" == YES ]]; then
+            local zone_restarts
+            zone_restarts="$(cat "${TEST_STATE}/zone.restarts")"
+            printf '%s\n' "$((zone_restarts + 1))" > "${TEST_STATE}/zone.restarts"
+            printf 'active\n' > "${TEST_STATE}/zone.active"
+            printf 'NO\n' > "${TEST_STATE}/zone-change-on-login-stop"
+        fi
+    else
+        systemctl stop "$2"
+    fi
 }
 service_start()
 {
@@ -236,6 +292,15 @@ service_start()
         printf 'active\n' > "${TEST_STATE}/${engine}.active"
         local starts="$(cat "${TEST_STATE}/${engine}.starts")"
         printf '%s\n' "$((starts + 1))" > "${TEST_STATE}/${engine}.starts"
+        if [[ "${engine}" == zone && "$(cat "${TEST_STATE}/zone.restart-on-start")" == YES ]]; then
+            local restarts="$(cat "${TEST_STATE}/zone.restarts")"
+            printf '%s\n' "$((restarts + 1))" > "${TEST_STATE}/zone.restarts"
+            printf 'NO\n' > "${TEST_STATE}/zone.restart-on-start"
+        fi
+        if [[ "${engine}" == zone && "$(cat "${TEST_STATE}/online-on-zone-start")" == YES ]]; then
+            printf '1\n' > "${TEST_STATE}/online"
+            printf 'NO\n' > "${TEST_STATE}/online-on-zone-start"
+        fi
     else
         systemctl start "$2"
     fi
@@ -244,9 +309,11 @@ listener_present()
 {
     local engine="$1" port="$2" service="$3"
     if [[ "${test_mode}" == "1" ]]; then
-        [[ "${mutation_started}" != "true" || "${rolling_back}" == "true" || "${failure_step}" != listener ]] || return 1
+        local starts
+        starts="$(cat "${TEST_STATE}/${engine}.starts")"
+        [[ "${mutation_started}" != "true" || "${rolling_back}" == "true" || "${failure_step}" != listener || "${starts}" -eq 0 ]] || return 1
         service_active "${engine}" "${service}" || return 1
-        if [[ "${mutation_started}" == "true" ]]; then
+        if [[ "${mutation_started}" == "true" && "${starts}" -gt 0 ]]; then
             local delay checks
             delay="$(cat "${TEST_STATE}/${engine}.listener-delay")"
             checks="$(cat "${TEST_STATE}/${engine}.listener-checks")"
@@ -310,6 +377,153 @@ online_count()
 }
 daemon_reload() { [[ "${test_mode}" == "1" ]] || systemctl daemon-reload; }
 verify_unit_static() { [[ "${test_mode}" == "1" ]] || systemd-analyze verify "${LOGIN_UNIT_SOURCE}" "${ZONE_UNIT_SOURCE}" >/dev/null; }
+
+environment_value()
+{
+    local environment_file="$1" key="$2" line
+    line="$(grep -m 1 "^${key}=" "${environment_file}")" \
+        || fail "${key} is unavailable in ${environment_file}"
+    [[ -n "${line#*=}" ]] || fail "${key} is empty in ${environment_file}"
+    printf '%s' "${line#*=}"
+}
+
+validate_candidate_database_contract()
+{
+    if [[ "${test_mode}" == "1" ]]; then
+        local fixture_validation
+        fixture_validation="$(cat "${TEST_STATE}/candidate-validation")"
+        if [[ "${fixture_validation}" == PASS_RESTART_ZONE ]]; then
+            local fixture_restarts
+            fixture_restarts="$(cat "${TEST_STATE}/zone.restarts")"
+            printf '%s\n' "$((fixture_restarts + 1))" > "${TEST_STATE}/zone.restarts"
+            fixture_validation=PASS
+        fi
+        [[ "${fixture_validation}" == PASS ]] \
+            || fail "candidate database compatibility validation failed"
+        echo "CANDIDATE_DATABASE_COMPATIBILITY=PASS"
+        return
+    fi
+
+    require_regular_file "${LOGIN_ARTIFACT_DIR}/Config.xml"
+    require_regular_file "${ZONE_ARTIFACT_DIR}/Config.xml"
+    local login_connection zone_connection
+    login_connection="$(environment_value "${LOGIN_ENV}" AO_REBIRTH_MYSQL_CONNECTION)"
+    zone_connection="$(environment_value "${ZONE_ENV}" AO_REBIRTH_MYSQL_CONNECTION)"
+
+    if ! runuser -u "${EXPECTED_SERVICE_USER}" -g "${EXPECTED_SERVICE_GROUP}" -- env \
+        AO_REBIRTH_REQUIRED_SQL_TYPE=MySql \
+        AO_REBIRTH_EXPECTED_DATABASE="${EXPECTED_DATABASE}" \
+        AO_REBIRTH_BIND_MODE=Public \
+        AO_REBIRTH_CONFIG_PATH="${LOGIN_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_MYSQL_CONNECTION="${login_connection}" \
+        "${LOGIN_ARTIFACT_DIR}/LoginEngine" --validate-startup >/dev/null; then
+        fail "candidate LoginEngine startup contract validation failed"
+    fi
+    if ! runuser -u "${EXPECTED_SERVICE_USER}" -g "${EXPECTED_SERVICE_GROUP}" -- env \
+        AO_REBIRTH_REQUIRED_SQL_TYPE=MySql \
+        AO_REBIRTH_EXPECTED_DATABASE="${EXPECTED_DATABASE}" \
+        AO_REBIRTH_BIND_MODE=Public \
+        AO_REBIRTH_CONFIG_PATH="${LOGIN_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_MYSQL_CONNECTION="${login_connection}" \
+        "${LOGIN_ARTIFACT_DIR}/LoginEngine" --validate-database >/dev/null; then
+        fail "candidate LoginEngine database contract validation failed"
+    fi
+    if ! runuser -u "${EXPECTED_SERVICE_USER}" -g "${EXPECTED_SERVICE_GROUP}" -- env \
+        AO_REBIRTH_REQUIRED_SQL_TYPE=MySql \
+        AO_REBIRTH_EXPECTED_DATABASE="${EXPECTED_DATABASE}" \
+        AO_REBIRTH_BIND_MODE=Public \
+        AO_REBIRTH_STAGE10_PUBLIC_PLAYER_ACCESS=1 \
+        AO_REBIRTH_ZONE_LISTEN_IP=0.0.0.0 \
+        AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1 \
+        AO_REBIRTH_CONFIG_PATH="${ZONE_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_MYSQL_CONNECTION="${zone_connection}" \
+        "${ZONE_ARTIFACT_DIR}/ZoneEngine" --validate-startup >/dev/null; then
+        fail "candidate ZoneEngine startup contract validation failed"
+    fi
+    if ! runuser -u "${EXPECTED_SERVICE_USER}" -g "${EXPECTED_SERVICE_GROUP}" -- env \
+        AO_REBIRTH_REQUIRED_SQL_TYPE=MySql \
+        AO_REBIRTH_EXPECTED_DATABASE="${EXPECTED_DATABASE}" \
+        AO_REBIRTH_BIND_MODE=Public \
+        AO_REBIRTH_STAGE10_PUBLIC_PLAYER_ACCESS=1 \
+        AO_REBIRTH_ZONE_LISTEN_IP=0.0.0.0 \
+        AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1 \
+        AO_REBIRTH_CONFIG_PATH="${ZONE_ARTIFACT_DIR}/Config.xml" \
+        AO_REBIRTH_MYSQL_CONNECTION="${zone_connection}" \
+        "${ZONE_ARTIFACT_DIR}/ZoneEngine" --validate-database >/dev/null; then
+        fail "candidate ZoneEngine database contract validation failed"
+    fi
+    echo "CANDIDATE_DATABASE_COMPATIBILITY=PASS"
+}
+
+verify_recovery_frozen()
+{
+    [[ "${recover_zone_outage}" == true ]] || return 0
+    service_stopped zone "${ZONE_SERVICE}" \
+        || fail "ZoneEngine is not in an exact stopped state for outage recovery"
+    listener_absent zone 7501 "${ZONE_SERVICE}" \
+        || fail "port 7501 must remain closed for outage recovery"
+    [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_BEFORE}" ]] \
+        || fail "ZoneEngine restart count changed while outage recovery was frozen"
+    echo "ZONEENGINE_OUTAGE_FROZEN=PASS"
+}
+
+verify_pre_stop_boundary()
+{
+    service_active login "${LOGIN_SERVICE}" \
+        || fail "LoginEngine stopped before deployment mutation"
+    listener_present login 7500 "${LOGIN_SERVICE}" \
+        || fail "port 7500 listener disappeared before deployment mutation"
+    [[ "$(online_count)" == 0 ]] \
+        || fail "online characters appeared before deployment mutation"
+    verify_recovery_frozen
+    echo "PRESTOP_BOUNDARY=PASS onlineCharacters=0"
+}
+
+verify_zone_pre_stop_invariant()
+{
+    if [[ "${recover_zone_outage}" == true ]]; then
+        service_stopped zone "${ZONE_SERVICE}" \
+            || fail "ZoneEngine recovery state changed before release mutation"
+        listener_absent zone 7501 "${ZONE_SERVICE}" \
+            || fail "port 7501 reopened before release mutation"
+    else
+        service_active zone "${ZONE_SERVICE}" \
+            || fail "ZoneEngine stopped before its controlled deployment stop"
+        listener_present zone 7501 "${ZONE_SERVICE}" \
+            || fail "port 7501 listener changed before its controlled deployment stop"
+    fi
+    [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_BEFORE}" ]] \
+        || fail "ZoneEngine restart count changed before its controlled deployment stop"
+    echo "ZONE_PRESTOP_INVARIANT=PASS mode=$([[ "${recover_zone_outage}" == true ]] && printf stopped || printf active)"
+}
+
+verify_login_admission_closed_boundary()
+{
+    service_stopped login "${LOGIN_SERVICE}" \
+        || fail "LoginEngine did not reach an exact stopped state before deployment mutation"
+    listener_absent login 7500 "${LOGIN_SERVICE}" \
+        || fail "port 7500 remained open after LoginEngine admission closed"
+    verify_zone_pre_stop_invariant
+    [[ "$(online_count)" == 0 ]] \
+        || fail "online characters appeared after LoginEngine admission closed"
+    verify_zone_pre_stop_invariant
+    echo "LOGIN_ADMISSION_CLOSED_BOUNDARY=PASS onlineCharacters=0"
+}
+
+verify_closed_engine_boundary()
+{
+    service_stopped login "${LOGIN_SERVICE}" \
+        || fail "LoginEngine did not remain stopped before deployment mutation"
+    service_stopped zone "${ZONE_SERVICE}" \
+        || fail "ZoneEngine did not reach an exact stopped state before deployment mutation"
+    listener_absent login 7500 "${LOGIN_SERVICE}" \
+        || fail "port 7500 reopened before deployment mutation"
+    listener_absent zone 7501 "${ZONE_SERVICE}" \
+        || fail "port 7501 remained open after ZoneEngine admission closed"
+    [[ "$(online_count)" == 0 ]] \
+        || fail "online characters appeared before the closed-engine mutation boundary"
+    echo "CLOSED_ENGINE_MUTATION_BOUNDARY=PASS onlineCharacters=0"
+}
 
 require_current_release()
 {
@@ -398,22 +612,35 @@ preflight()
     [[ "${test_mode}" == "1" ]] || id "${EXPECTED_SERVICE_USER}" >/dev/null 2>&1
     [[ "${test_mode}" == "1" ]] || [[ "$(id -gn "${EXPECTED_SERVICE_USER}")" == "${EXPECTED_SERVICE_GROUP}" ]]
     service_active login "${LOGIN_SERVICE}" || fail "LoginEngine is not active before deployment"
-    service_active zone "${ZONE_SERVICE}" || fail "ZoneEngine is not active before deployment"
     LOGIN_RESTARTS_BEFORE="$(service_restarts login "${LOGIN_SERVICE}")"
     ZONE_RESTARTS_BEFORE="$(service_restarts zone "${ZONE_SERVICE}")"
     readonly LOGIN_RESTARTS_BEFORE ZONE_RESTARTS_BEFORE
     listener_present login 7500 "${LOGIN_SERVICE}" || fail "port 7500 predeploy listener is missing"
-    listener_present zone 7501 "${ZONE_SERVICE}" || fail "port 7501 predeploy listener is missing"
+    if [[ "${recover_zone_outage}" == true ]]; then
+        service_stopped zone "${ZONE_SERVICE}" || fail "ZoneEngine must already be stopped for outage recovery"
+        listener_absent zone 7501 "${ZONE_SERVICE}" || fail "port 7501 must be closed for outage recovery"
+        echo "ZONEENGINE_OUTAGE_RECOVERY_PRECONDITION=PASS"
+    else
+        service_active zone "${ZONE_SERVICE}" || fail "ZoneEngine is not active before deployment"
+        listener_present zone 7501 "${ZONE_SERVICE}" || fail "port 7501 predeploy listener is missing"
+    fi
     require_rollback_material
     check_shared_directory
     ONLINE_BEFORE="$(online_count)"
     readonly ONLINE_BEFORE
     [[ "${ONLINE_BEFORE}" =~ ^[0-9]+$ ]] || fail "could not determine online character count"
     echo "LOGINENGINE_PREDEPLOY_STATUS=active"
-    echo "ZONEENGINE_PREDEPLOY_STATUS=active"
+    if [[ "${recover_zone_outage}" == true ]]; then
+        echo "ZONEENGINE_PREDEPLOY_STATUS=stopped-outage"
+    else
+        echo "ZONEENGINE_PREDEPLOY_STATUS=active"
+    fi
     echo "LOGINENGINE_PREDEPLOY_RESTARTS=${LOGIN_RESTARTS_BEFORE}"
     echo "ZONEENGINE_PREDEPLOY_RESTARTS=${ZONE_RESTARTS_BEFORE}"
     echo "ONLINE_NONZERO_ROWS_PREDEPLOY=${ONLINE_BEFORE}"
+    [[ "${ONLINE_BEFORE}" == 0 ]] || fail "online characters present; deployment policy is fail closed"
+    validate_candidate_database_contract
+    verify_recovery_frozen
     echo "PREDEPLOY_HEALTH_CHECK=PASS"
 }
 
@@ -438,6 +665,8 @@ current_release_matches()
 
 create_snapshot()
 {
+    local zone_was_active=YES
+    [[ "${recover_zone_outage}" != true ]] || zone_was_active=NO
     snapshot_dir="${SNAPSHOT_ROOT}/${RELEASE_NAME}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
     if [[ "${test_mode}" == "1" ]]; then mkdir -p -- "${snapshot_dir}"; else install -d -m 0700 "${snapshot_dir}"; fi
     cp -p -- "${LOGIN_UNIT_TARGET}" "${snapshot_dir}/loginengine.service"
@@ -457,7 +686,7 @@ PREVIOUS_ZONEENGINE_ARTIFACT_SHA256=${PREVIOUS_ZONE_ARTIFACT_SHA256}
 PREVIOUS_LOGINENGINE_UNIT_SHA256=${PREVIOUS_LOGIN_UNIT_SHA256}
 PREVIOUS_ZONEENGINE_UNIT_SHA256=${PREVIOUS_ZONE_UNIT_SHA256}
 LOGINENGINE_WAS_ACTIVE=YES
-ZONEENGINE_WAS_ACTIVE=YES
+ZONEENGINE_WAS_ACTIVE=${zone_was_active}
 EOF
     [[ "${test_mode}" == "1" ]] || chmod 0600 "${snapshot_dir}"/*
     echo "ROLLBACK_SNAPSHOT_PATH=${snapshot_dir}"
@@ -564,8 +793,21 @@ post_health()
     service_active login "${LOGIN_SERVICE}" && service_active zone "${ZONE_SERVICE}" \
         && listener_present login 7500 "${LOGIN_SERVICE}" && listener_present zone 7501 "${ZONE_SERVICE}" \
         && [[ "$(service_restarts login "${LOGIN_SERVICE}")" == "${LOGIN_RESTARTS_BEFORE}" ]] \
-        && [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_BEFORE}" ]] \
-        && [[ "$(online_count)" == 0 ]] && current_release_matches
+        && [[ -n "${ZONE_RESTARTS_START_BASELINE}" ]] \
+        && [[ "$(service_restarts zone "${ZONE_SERVICE}")" == "${ZONE_RESTARTS_START_BASELINE}" ]] \
+        && current_release_matches
+}
+
+post_start_stability()
+{
+    local elapsed=0
+    while true; do
+        post_health || return 1
+        (( elapsed >= POST_START_STABILITY_SECONDS )) && break
+        readiness_pause
+        elapsed=$((elapsed + READINESS_POLL_INTERVAL_SECONDS))
+    done
+    echo "POST_START_STABILITY=PASS seconds=${POST_START_STABILITY_SECONDS} zoneRestarts=${ZONE_RESTARTS_START_BASELINE}"
 }
 
 verify_rollback_state()
@@ -613,6 +855,11 @@ rollback()
     rollback_operation RESTORE_ZONE_UNIT install -m 0644 "${snapshot_dir}/zoneengine.service" "${ZONE_UNIT_TARGET}" || failed=true
     rollback_operation DAEMON_RELOAD daemon_reload || failed=true
     rollback_operation VERIFY_EXACT_PRIOR_STATE verify_rollback_state || failed=true
+    if [[ "${recover_zone_outage}" == true ]]; then
+        [[ "${failed}" == false ]] || { echo "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=FAIL" >&2; return 1; }
+        echo "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+        return
+    fi
     rollback_operation START_LOGIN service_start login "${LOGIN_SERVICE}" || failed=true
     rollback_operation LOGIN_READINESS wait_for_readiness login 7500 "${LOGIN_SERVICE}" || failed=true
     rollback_operation START_ZONE service_start zone "${ZONE_SERVICE}" || failed=true
@@ -632,21 +879,26 @@ on_exit()
 main()
 {
     preflight
-    if current_release_matches; then
+    if [[ "${recover_zone_outage}" != true ]] && current_release_matches; then
         echo "ALREADY_DEPLOYED=YES"
         echo "IDEMPOTENT_REDEPLOY=PASS"
         echo "DEPLOYED_SHA=${SOURCE_SHA}"
         return
     fi
-    [[ "${ONLINE_BEFORE}" == 0 ]] || fail "online characters present; deployment policy is fail closed"
     echo "ONLINE_PLAYER_DEPLOYMENT_POLICY=REQUIRE_ZERO_NONZERO_ONLINE_ROWS"
+    if [[ "${recover_zone_outage}" == true ]]; then
+        echo "ROLLBACK_POLICY=RESTORE_INCOMPATIBLE_PRIOR_PAIR_BUT_LEAVE_STOPPED"
+    fi
+    verify_pre_stop_boundary
     if [[ "${dry_run}" == true ]]; then echo "DRY_RUN=PASS"; echo "PRODUCTION_MUTATION=NO"; return; fi
 
     create_snapshot
     mutation_started=true
     trap on_exit EXIT
     service_stop login "${LOGIN_SERVICE}"
+    verify_login_admission_closed_boundary
     service_stop zone "${ZONE_SERVICE}"
+    verify_closed_engine_boundary
     inject_failure artifact_install
     install_release "${LOGIN_ARTIFACT_DIR}" LoginEngine "${LOGIN_ARTIFACT_SHA}" "${LOGIN_RELEASE_TARGET}" "${LOGIN_RELEASES}"
     install_release "${ZONE_ARTIFACT_DIR}" ZoneEngine "${ZONE_ARTIFACT_SHA}" "${ZONE_RELEASE_TARGET}" "${ZONE_RELEASES}"
@@ -659,9 +911,16 @@ main()
     verify_unit_static
     service_start login "${LOGIN_SERVICE}" || fail "LoginEngine failed startup"
     wait_for_readiness login 7500 "${LOGIN_SERVICE}" || fail "LoginEngine readiness timed out after startup"
+    if [[ "${recover_zone_outage}" == true ]]; then
+        service_reset_failed zone "${ZONE_SERVICE}"
+        [[ "$(service_restarts zone "${ZONE_SERVICE}")" == 0 ]] \
+            || fail "ZoneEngine restart counter did not reset before controlled startup"
+        echo "ZONEENGINE_RESTART_COUNTER_RESET=PASS previous=${ZONE_RESTARTS_BEFORE} baseline=0"
+    fi
+    ZONE_RESTARTS_START_BASELINE="$(service_restarts zone "${ZONE_SERVICE}")"
     service_start zone "${ZONE_SERVICE}" || fail "ZoneEngine failed startup"
     wait_for_readiness zone 7501 "${ZONE_SERVICE}" || fail "ZoneEngine readiness timed out after startup"
-    post_health || fail "post-deployment health check failed"
+    post_start_stability || fail "post-deployment stability check failed"
     write_deployed_manifest
     deployment_committed=true
     trap - EXIT

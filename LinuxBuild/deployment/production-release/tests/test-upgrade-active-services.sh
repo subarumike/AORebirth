@@ -150,6 +150,13 @@ create_fixture()
     printf 'active\n' > "${state}/login.active"; printf 'active\n' > "${state}/zone.active"
     printf '0\n' > "${state}/login.restarts"; printf '0\n' > "${state}/zone.restarts"
     printf '0\n' > "${state}/login.starts"; printf '0\n' > "${state}/zone.starts"; printf '0\n' > "${state}/online"
+    printf 'PASS\n' > "${state}/candidate-validation"
+    printf 'NO\n' > "${state}/login.port-occupied"; printf 'NO\n' > "${state}/zone.port-occupied"
+    printf 'PASS\n' > "${state}/login.port-inspection"; printf 'PASS\n' > "${state}/zone.port-inspection"
+    printf 'NO\n' > "${state}/zone.restart-on-start"
+    printf 'NO\n' > "${state}/online-on-zone-start"
+    printf 'NO\n' > "${state}/online-on-login-stop"
+    printf 'NO\n' > "${state}/zone-change-on-login-stop"
     printf '0\n' > "${state}/login.listener-delay"; printf '0\n' > "${state}/zone.listener-delay"
     printf '0\n' > "${state}/login.listener-checks"; printf '0\n' > "${state}/zone.listener-checks"
     create_artifact "${input}/login" LoginEngine
@@ -205,7 +212,12 @@ run_upgrade()
     env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" AO_REBIRTH_DEPLOY_TEST_FAIL_STEP="${2:-}" \
         bash "${upgrader}" --manifest "${manifest}" --expected-sha "${1:-${fake_sha}}"
 }
-assert_old_pair()
+run_recovery_upgrade()
+{
+    env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" AO_REBIRTH_DEPLOY_TEST_FAIL_STEP="${2:-}" \
+        bash "${upgrader}" --manifest "${manifest}" --expected-sha "${1:-${fake_sha}}" --recover-zone-outage
+}
+assert_old_targets()
 {
     require test -L "${root}/opt/ao-rebirth/loginengine/current"
     require test -L "${root}/opt/ao-rebirth/zoneengine/current"
@@ -223,6 +235,10 @@ assert_old_pair()
     require test "$(sha256sum "${root}/opt/ao-rebirth/zoneengine/current/ZoneEngine" | awk '{print $1}')" != "${new_zone_artifact_hash}"
     require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-loginengine.service" | awk '{print $1}')" != "${new_login_unit_hash}"
     require test "$(sha256sum "${root}/etc/systemd/system/ao-rebirth-zoneengine.service" | awk '{print $1}')" != "${new_zone_unit_hash}"
+}
+assert_old_pair()
+{
+    assert_old_targets
     require test "$(cat "${state}/login.active")" = active
     require test "$(cat "${state}/zone.active")" = active
 }
@@ -313,6 +329,145 @@ create_fixture; sed -i 's|/var/lib/ao-rebirth/session-ownership|/tmp/session-own
 create_fixture; sed -i '/^PrivateTmp=true$/d' "${input}/login.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i '/ZoneEngine --recover-stale-online/d' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i 's|ZoneEngine --headless --shutdown-file|ZoneEngine --validate-lifecycle --shutdown-file|' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure; require grep -F 'ZoneEngine production executable contract failed' "${fixture}/output"
+
+create_fixture
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted an active ZoneEngine"; fi
+assert_old_pair
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'activating\n' > "${state}/zone.active"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted a non-stopped ZoneEngine state"; fi
+assert_old_targets
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = activating
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'YES\n' > "${state}/zone.port-occupied"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted an occupied ZoneEngine port"; fi
+assert_old_targets
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'FAIL\n' > "${state}/zone.port-inspection"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted a failed ZoneEngine port inspection"; fi
+require grep -F 'could not inspect port 7501' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" \
+    bash "${upgrader}" --manifest "${manifest}" --expected-sha "${fake_sha}" --recover-zone-outage --dry-run > "${fixture}/output"
+require grep -F 'ZONEENGINE_OUTAGE_RECOVERY_PRECONDITION=PASS' "${fixture}/output"
+require grep -F 'CANDIDATE_DATABASE_COMPATIBILITY=PASS' "${fixture}/output"
+require grep -F 'DRY_RUN=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'FAIL\n' > "${state}/candidate-validation"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted an incompatible candidate database contract"; fi
+require grep -F 'candidate database compatibility validation failed' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'PASS_RESTART_ZONE\n' > "${state}/candidate-validation"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted a changing frozen restart count"; fi
+require grep -F 'ZoneEngine restart count changed while outage recovery was frozen' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+run_recovery_upgrade > "${fixture}/output"
+require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/output"
+require grep -F 'ROLLBACK_POLICY=RESTORE_INCOMPATIBLE_PRIOR_PAIR_BUT_LEAVE_STOPPED' "${fixture}/output"
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = active
+require grep -F 'ZONEENGINE_WAS_ACTIVE=NO' "${root}/opt/ao-rebirth/deployment-snapshots/"*/rollback.env
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'YES\n' > "${state}/online-on-zone-start"
+run_recovery_upgrade > "${fixture}/output"
+require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/output"
+require grep -F 'POST_START_STABILITY=PASS' "${fixture}/output"
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = active
+require test "$(cat "${state}/online")" = 1
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'YES\n' > "${state}/online-on-login-stop"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted an online character after admission closed"; fi
+require grep -F 'online characters appeared after LoginEngine admission closed' "${fixture}/output"
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'YES\n' > "${state}/zone-change-on-login-stop"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted a ZoneEngine state change before mutation"; fi
+require grep -F 'ZoneEngine recovery state changed before release mutation' "${fixture}/output"
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+run_upgrade > "${fixture}/first-output"
+printf 'inactive\n' > "${state}/zone.active"
+run_recovery_upgrade > "${fixture}/output"
+require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/output"
+if grep -Fq 'ALREADY_DEPLOYED=YES' "${fixture}/output"; then fail "outage recovery left an already-deployed ZoneEngine stopped"; fi
+require test "$(cat "${state}/login.active")" = active
+require test "$(cat "${state}/zone.active")" = active
+require test "$(cat "${state}/zone.starts")" = 2
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+printf 'YES\n' > "${state}/zone.restart-on-start"
+if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted a ZoneEngine auto-restart"; fi
+require grep -F 'post-deployment stability check failed' "${fixture}/output"
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_fixture
+printf 'inactive\n' > "${state}/zone.active"
+if run_recovery_upgrade "${fake_sha}" login_start > "${fixture}/output" 2>&1; then fail "expected outage-recovery transaction failure"; fi
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
 create_fixture; printf '7\n' > "${state}/login.listener-delay"; printf '7\n' > "${state}/zone.listener-delay"; expect_transaction_failure artifact_install; require grep -F 'READINESS_WAIT=PASS engine=login elapsedSeconds=7' "${fixture}/output"; require grep -F 'READINESS_WAIT=PASS engine=zone elapsedSeconds=7' "${fixture}/output"
 create_fixture; expect_transaction_failure unit_install
 create_fixture; expect_transaction_failure login_start
@@ -347,5 +502,5 @@ behavior_hash_after="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngin
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 require test "${behavior_hash_before}" = "${behavior_hash_after}"
 tests_run=$((tests_run + 1))
-require test "${tests_run}" = 24
-echo "PASS: production deployment workflow tests (24/24)"
+require test "${tests_run}" = 38
+echo "PASS: production deployment workflow tests (38/38)"
