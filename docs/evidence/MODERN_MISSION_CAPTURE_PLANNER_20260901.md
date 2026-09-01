@@ -1,7 +1,9 @@
 # Modern AO Mission Capture Planner and Evidence Harvester
 
-Date: 2026-09-01  
-Scope: offline reachability planning and evidence acquisition only  
+Date: 2026-09-01
+
+Scope: offline reachability planning and evidence acquisition only
+
 Runtime mission generation changed: **NO**
 
 ## Repository and evidence baseline
