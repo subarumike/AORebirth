@@ -630,7 +630,16 @@ The plugin retains the complete inbound and outbound raw stream in
 `scfu-appearance.csv`, current AOSharp dynels plus exact raw entity/corpse
 evidence into `world-snapshot.csv`, player position/stats/evades/armor/buffs/
 weapons into `player-combat-context.csv`, and attack-boundary distance evidence
-into `aggro-observations.csv`. While a session is active, the compatibility
+into `aggro-observations.csv`. Capture start/end, manual marks/snapshots, and
+opened-container updates write the main inventory plus every loaded open
+backpack into `inventory-snapshots.csv`, including the complete slot and unique
+identities, low/high template IDs, QL, name, charges, and container provenance.
+For every outbound item-slot `GenericCmd Use`, `item-use-observations.csv`
+resolves that exact slot before a consumable can be deleted, then correlates the
+server acknowledgment and `DeleteItem` by complete identity. An unresolved item
+use is retained explicitly and makes validation incomplete without changing raw
+recapture policy. Items may be used normally from an open backpack; moving them
+to the main inventory is not required. While a session is active, the compatibility
 plugin samples the AOSharp live dynel set every 500 milliseconds and writes
 baseline, appeared, and disappeared observations with player/entity position
 brackets and distances to `visibility-observations.csv`. For every non-local

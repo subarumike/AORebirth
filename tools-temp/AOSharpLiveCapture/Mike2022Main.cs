@@ -11,6 +11,10 @@ using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
 using AORebirth.CaptureProtocol;
+using AOBackpack = AOSharp.Core.Inventory.Backpack;
+using AOContainer = AOSharp.Core.Inventory.Container;
+using AOInventory = AOSharp.Core.Inventory.Inventory;
+using AOItem = AOSharp.Core.Inventory.Item;
 
 namespace AOSharpLiveCapture.Mike2022
 {
@@ -26,9 +30,13 @@ namespace AOSharpLiveCapture.Mike2022
         private const int AttackInfoMessage = 0x46002F16;
         private const int MissedAttackInfoMessage = 0x5C654B28;
         private const int CharacterActionMessage = 0x5E477770;
+        private const int GenericCmdMessage = 0x52526858;
         private const int CorpseFullUpdateMessage = 0x4F474E05;
         private const int InventoryUpdateMessage = 0x4E536976;
         private const int DespawnMessage = 0x36510078;
+        private const int GenericCmdUseAction = 3;
+        private const int DeleteItemAction = 112;
+        private const int ItemUseCorrelationSeconds = 30;
         private const int CheckpointSeconds = 2;
         private const int VisibilitySampleMilliseconds = 500;
         private const double AggroPositionWindowSeconds = 2.0;
@@ -105,6 +113,35 @@ namespace AOSharpLiveCapture.Mike2022
             internal bool PlayerPreviouslyAttackedSource;
         }
 
+        private sealed class ItemSnapshot
+        {
+            internal DateTime CapturedUtc;
+            internal string ContainerKind;
+            internal string ContainerIdentity;
+            internal string ContainerName;
+            internal string ContainerSlotIdentity;
+            internal string SlotIdentity;
+            internal string UniqueIdentity;
+            internal int LowId;
+            internal int HighId;
+            internal int QualityLevel;
+            internal int Charges;
+            internal string Name;
+            internal string ResolutionStatus;
+            internal string Error;
+        }
+
+        private sealed class PendingItemUse
+        {
+            internal DateTime CapturedUtc;
+            internal double ElapsedMilliseconds;
+            internal long GlobalOrdinal;
+            internal int Sequence;
+            internal string SourceIdentity;
+            internal string TargetSlotIdentity;
+            internal ItemSnapshot Item;
+        }
+
         private readonly object syncRoot = new object();
         private readonly Stopwatch captureClock = new Stopwatch();
         private string pluginDirectory = string.Empty;
@@ -117,6 +154,8 @@ namespace AOSharpLiveCapture.Mike2022
         private StreamWriter playerCombatContextLog;
         private StreamWriter aggroObservationLog;
         private StreamWriter visibilityObservationLog;
+        private StreamWriter inventorySnapshotLog;
+        private StreamWriter itemUseObservationLog;
         private StreamWriter eventLog;
         private readonly Dictionary<string, EntitySnapshot> knownEntities =
             new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
@@ -131,10 +170,15 @@ namespace AOSharpLiveCapture.Mike2022
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, EntitySnapshot> previousVisibleDynels =
             new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, ItemSnapshot> latestItemsBySlot =
+            new Dictionary<string, ItemSnapshot>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, PendingItemUse> pendingItemUses =
+            new Dictionary<string, PendingItemUse>(StringComparer.OrdinalIgnoreCase);
         private bool enabled;
         private bool stopRequested;
         private bool automaticCaptureEnabled;
         private bool teardownRequested;
+        private bool inventorySnapshotRequested;
         private DateTime captureStartUtc;
         private DateTime stopRequestedUtc;
         private DateTime lastPacketUtc;
@@ -188,6 +232,15 @@ namespace AOSharpLiveCapture.Mike2022
         private int inPlayStateObservations;
         private int inPlayTransitionRows;
         private int inPlayReadErrors;
+        private int inventorySnapshotRows;
+        private int inventorySnapshotErrors;
+        private int itemUseRequests;
+        private int resolvedItemUseRequests;
+        private int itemUseAcknowledgements;
+        private int deleteItemActions;
+        private int correlatedDeleteItems;
+        private int itemUseObservationRows;
+        private int itemUseObservationErrors;
 
         public override void Run(string pluginDir)
         {
@@ -196,6 +249,7 @@ namespace AOSharpLiveCapture.Mike2022
             {
                 Network.PacketReceived += this.OnPacketReceived;
                 Network.PacketSent += this.OnPacketSent;
+                AOInventory.ContainerOpened += this.OnContainerOpened;
                 Game.OnUpdate += this.OnUpdate;
                 Chat.RegisterCommand("aocap", this.OnCommand);
                 Chat.WriteLine(
@@ -239,6 +293,7 @@ namespace AOSharpLiveCapture.Mike2022
                                 this.WriteEvent("MANUAL-START", "Existing session retained; automatic continuation disabled.");
                                 this.WriteWorldSnapshot("manual-start");
                                 this.WritePlayerCombatContext("manual-start");
+                                this.WriteInventorySnapshot("manual-start");
                             }
                             else
                             {
@@ -284,6 +339,7 @@ namespace AOSharpLiveCapture.Mike2022
                             this.WriteEvent("MARK", JoinArguments(args, 1));
                             this.WriteWorldSnapshot("mark");
                             this.WritePlayerCombatContext("mark");
+                            this.WriteInventorySnapshot("mark");
                         }
 
                         chatWindow.WriteLine("AO capture marker written.", ChatColor.Gold);
@@ -294,10 +350,11 @@ namespace AOSharpLiveCapture.Mike2022
                         {
                             this.WriteWorldSnapshot("manual-snapshot");
                             this.WritePlayerCombatContext("manual-snapshot");
+                            this.WriteInventorySnapshot("manual-snapshot");
                             this.WriteCaptureInfo(false, "manual snapshot");
                         }
 
-                        chatWindow.WriteLine("AO capture world and player snapshot written.", ChatColor.Gold);
+                        chatWindow.WriteLine("AO capture world, player, and inventory snapshot written.", ChatColor.Gold);
                         break;
 
                     case "auto":
@@ -346,6 +403,8 @@ namespace AOSharpLiveCapture.Mike2022
                                 + " attacks=" + this.attackStarts.ToString(CultureInfo.InvariantCulture)
                                 + " corpses=" + this.corpseFullUpdatePackets.ToString(CultureInfo.InvariantCulture)
                                 + " loot=" + this.inventoryUpdatePackets.ToString(CultureInfo.InvariantCulture)
+                                + " itemuses=" + this.resolvedItemUseRequests.ToString(CultureInfo.InvariantCulture)
+                                + "/" + this.itemUseRequests.ToString(CultureInfo.InvariantCulture)
                                 + (string.IsNullOrWhiteSpace(this.sessionDirectory) ? string.Empty : " folder=" + this.sessionDirectory),
                                 ChatColor.Gold);
                         }
@@ -390,6 +449,8 @@ namespace AOSharpLiveCapture.Mike2022
                 this.playerCombatContextLog = CreateWriter(Path.Combine(this.sessionDirectory, "player-combat-context.csv"));
                 this.aggroObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "aggro-observations.csv"));
                 this.visibilityObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "visibility-observations.csv"));
+                this.inventorySnapshotLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-snapshots.csv"));
+                this.itemUseObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "item-use-observations.csv"));
                 this.eventLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
                 this.rawPacketLog.WriteLine(
                     "CapturedUtc,ElapsedMilliseconds,Direction,GlobalOrdinal,Sequence,PacketLength,N3TypeValue,N3TypeName,IdentityType,IdentityInstance,PreservationStatus,RawHex");
@@ -404,6 +465,10 @@ namespace AOSharpLiveCapture.Mike2022
                     "CapturedUtc,ElapsedMilliseconds,GlobalOrdinal,Direction,Sequence,SourceIdentity,SourceName,TargetIdentity,TargetName,InitiatorRole,PlayerPreviouslyAttackedSource,SourcePositionUtc,SourcePositionMessage,SourceX,SourceY,SourceZ,TargetPositionUtc,TargetPositionMessage,TargetX,TargetY,TargetZ,PreviousTargetPositionUtc,PreviousTargetX,PreviousTargetY,PreviousTargetZ,TriggerDistance,PreviousDistance,DistanceBracketMin,DistanceBracketMax,SourcePositionDeltaMs,TargetPositionDeltaMs,CorrelationStatus");
                 this.visibilityObservationLog.WriteLine(
                     "CapturedUtc,ElapsedMilliseconds,SampleIndex,Phase,Observation,Identity,Name,Kind,PlayfieldId,PlayerX,PlayerY,PlayerZ,EntityX,EntityY,EntityZ,Distance,PreviousSampleUtc,PreviousPlayerX,PreviousPlayerY,PreviousPlayerZ,PreviousEntityX,PreviousEntityY,PreviousEntityZ,PreviousDistance,LineOfSight,PreviousLineOfSight,IsInPlay,PreviousIsInPlay,Direction,Sequence,GlobalOrdinal,EvidenceSource");
+                this.inventorySnapshotLog.WriteLine(
+                    "CapturedUtc,ElapsedMilliseconds,Phase,ContainerKind,ContainerIdentity,ContainerName,ContainerSlotIdentity,ContainerOpen,ItemSlotIdentity,ItemUniqueIdentity,LowId,HighId,QualityLevel,Name,Charges,ResolutionStatus,Error");
+                this.itemUseObservationLog.WriteLine(
+                    "CapturedUtc,ElapsedMilliseconds,Phase,Direction,GlobalOrdinal,Sequence,SourceIdentity,Action,TargetSlotIdentity,ContainerKind,ContainerIdentity,ContainerName,ContainerSlotIdentity,ItemUniqueIdentity,LowId,HighId,QualityLevel,Name,Charges,ItemSnapshotUtc,ResolutionStatus,RelatedUseUtc,RelatedUseOrdinal,RelatedUseSequence,EvidenceSource,Error");
             }
             catch
             {
@@ -415,6 +480,8 @@ namespace AOSharpLiveCapture.Mike2022
                 this.playerCombatContextLog = CloseWriter(this.playerCombatContextLog);
                 this.aggroObservationLog = CloseWriter(this.aggroObservationLog);
                 this.visibilityObservationLog = CloseWriter(this.visibilityObservationLog);
+                this.inventorySnapshotLog = CloseWriter(this.inventorySnapshotLog);
+                this.itemUseObservationLog = CloseWriter(this.itemUseObservationLog);
                 this.eventLog = CloseWriter(this.eventLog);
                 throw;
             }
@@ -460,6 +527,15 @@ namespace AOSharpLiveCapture.Mike2022
             this.inPlayStateObservations = 0;
             this.inPlayTransitionRows = 0;
             this.inPlayReadErrors = 0;
+            this.inventorySnapshotRows = 0;
+            this.inventorySnapshotErrors = 0;
+            this.itemUseRequests = 0;
+            this.resolvedItemUseRequests = 0;
+            this.itemUseAcknowledgements = 0;
+            this.deleteItemActions = 0;
+            this.correlatedDeleteItems = 0;
+            this.itemUseObservationRows = 0;
+            this.itemUseObservationErrors = 0;
             this.knownEntities.Clear();
             this.knownCorpses.Clear();
             this.positions.Clear();
@@ -467,11 +543,14 @@ namespace AOSharpLiveCapture.Mike2022
             this.playerAttackTargets.Clear();
             this.observedCorpseIdentities.Clear();
             this.previousVisibleDynels.Clear();
+            this.latestItemsBySlot.Clear();
+            this.pendingItemUses.Clear();
             this.previousVisibilityPlayer = null;
             this.previousVisibilitySampleUtc = DateTime.MinValue;
             this.lastValidationStatus = "RUNNING";
             this.lastValidationSummary = string.Empty;
             this.stopRequested = false;
+            this.inventorySnapshotRequested = false;
             this.captureStartUtc = DateTime.UtcNow;
             this.lastPacketUtc = this.captureStartUtc;
             this.captureClock.Restart();
@@ -481,6 +560,7 @@ namespace AOSharpLiveCapture.Mike2022
             this.WriteEvent("START", "AOSharp Mike 2022 compatibility capture started: " + reason);
             this.WriteWorldSnapshot("capture-start");
             this.WritePlayerCombatContext("capture-start");
+            this.WriteInventorySnapshot("capture-start");
             this.WriteCaptureInfo(false, reason);
         }
 
@@ -492,6 +572,19 @@ namespace AOSharpLiveCapture.Mike2022
         private void OnPacketSent(object sender, byte[] packet)
         {
             this.CapturePacket("OUT", packet, false);
+        }
+
+        private void OnContainerOpened(object sender, AOContainer container)
+        {
+            lock (this.syncRoot)
+            {
+                if (!this.enabled)
+                {
+                    return;
+                }
+
+                this.inventorySnapshotRequested = true;
+            }
         }
 
         private void CapturePacket(string direction, byte[] packet, bool inbound)
@@ -620,6 +713,18 @@ namespace AOSharpLiveCapture.Mike2022
                 return;
             }
 
+            if (messageType == GenericCmdMessage)
+            {
+                this.CaptureGenericCmdItemUse(
+                    capturedUtc,
+                    elapsedMilliseconds,
+                    ordinal,
+                    direction,
+                    sequence,
+                    packet);
+                return;
+            }
+
             if (messageType == AttackMessage)
             {
                 this.CaptureAttackStart(
@@ -646,9 +751,21 @@ namespace AOSharpLiveCapture.Mike2022
 
             if (messageType == CharacterActionMessage)
             {
-                if (packet.Length >= 33 && ReadInt32BigEndian(packet, 29) == 99)
+                int action = packet.Length >= 33 ? ReadInt32BigEndian(packet, 29) : 0;
+                if (action == 99)
                 {
                     this.deathActions++;
+                }
+
+                if (action == DeleteItemAction)
+                {
+                    this.CaptureDeleteItemObservation(
+                        capturedUtc,
+                        elapsedMilliseconds,
+                        ordinal,
+                        direction,
+                        sequence,
+                        packet);
                 }
 
                 return;
@@ -663,11 +780,753 @@ namespace AOSharpLiveCapture.Mike2022
             if (messageType == InventoryUpdateMessage)
             {
                 this.inventoryUpdatePackets++;
+                this.latestItemsBySlot.Clear();
+                this.inventorySnapshotRequested = true;
                 if (this.PacketContainsObservedCorpseIdentity(packet))
                 {
                     this.identityLinkedInventoryPackets++;
                 }
             }
+        }
+
+        private void CaptureGenericCmdItemUse(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            long ordinal,
+            string direction,
+            int sequence,
+            byte[] packet)
+        {
+            if (packet.Length < 61 || ReadInt32BigEndian(packet, 37) != GenericCmdUseAction)
+            {
+                return;
+            }
+
+            uint userType;
+            uint userInstance;
+            uint targetType;
+            uint targetInstance;
+            if (!TryReadIdentity(packet, 45, out userType, out userInstance)
+                || !TryReadIdentity(packet, 53, out targetType, out targetInstance)
+                || !IsPotentialItemSlotType(targetType))
+            {
+                return;
+            }
+
+            string sourceIdentity = FormatIdentity(userType, userInstance);
+            string targetSlotIdentity = FormatIdentity(targetType, targetInstance);
+            this.RefreshPlayerIdentity();
+            if (this.playerIdentity.Length > 0
+                && !IdentityEquals(sourceIdentity, this.playerIdentity))
+            {
+                return;
+            }
+
+            bool outbound = string.Equals(direction, "OUT", StringComparison.OrdinalIgnoreCase);
+            ItemSnapshot item = null;
+            string resolutionError = string.Empty;
+            string resolutionStatus;
+            PendingItemUse relatedUse = null;
+
+            if (outbound)
+            {
+                this.itemUseRequests++;
+                if (this.TryResolveItemSlot(
+                        new Identity((IdentityType)targetType, unchecked((int)targetInstance)),
+                        capturedUtc,
+                        out item,
+                        out resolutionError))
+                {
+                    this.resolvedItemUseRequests++;
+                    resolutionStatus = item.ResolutionStatus;
+                }
+                else
+                {
+                    resolutionStatus = "UNRESOLVED";
+                }
+
+                relatedUse = new PendingItemUse
+                {
+                    CapturedUtc = capturedUtc,
+                    ElapsedMilliseconds = elapsedMilliseconds,
+                    GlobalOrdinal = ordinal,
+                    Sequence = sequence,
+                    SourceIdentity = sourceIdentity,
+                    TargetSlotIdentity = targetSlotIdentity,
+                    Item = item
+                };
+                this.pendingItemUses[targetSlotIdentity] = relatedUse;
+            }
+            else
+            {
+                this.itemUseAcknowledgements++;
+                if (this.TryGetRecentPendingItemUse(targetSlotIdentity, capturedUtc, out relatedUse))
+                {
+                    item = relatedUse.Item;
+                    resolutionStatus = item == null ? "ACK_CORRELATED_UNRESOLVED" : "ACK_CORRELATED_RESOLVED";
+                    if (item == null)
+                    {
+                        resolutionError = "The acknowledged slot was unresolved at the outbound use boundary.";
+                    }
+                }
+                else if (this.TryResolveItemSlot(
+                             new Identity((IdentityType)targetType, unchecked((int)targetInstance)),
+                             capturedUtc,
+                             out item,
+                             out resolutionError))
+                {
+                    resolutionStatus = "ACK_" + item.ResolutionStatus;
+                }
+                else
+                {
+                    resolutionStatus = "ACK_UNRESOLVED";
+                }
+            }
+
+            this.WriteItemUseObservation(
+                capturedUtc,
+                elapsedMilliseconds,
+                outbound ? "USE_REQUEST" : "USE_ACK",
+                direction,
+                ordinal,
+                sequence,
+                sourceIdentity,
+                "Use",
+                targetSlotIdentity,
+                item,
+                resolutionStatus,
+                relatedUse,
+                "RawGenericCmd+AOSharpInventory",
+                resolutionError);
+        }
+
+        private void CaptureDeleteItemObservation(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            long ordinal,
+            string direction,
+            int sequence,
+            byte[] packet)
+        {
+            uint sourceType;
+            uint sourceInstance;
+            uint targetType;
+            uint targetInstance;
+            if (packet.Length < 45
+                || !TryReadIdentity(packet, 20, out sourceType, out sourceInstance)
+                || !TryReadIdentity(packet, 37, out targetType, out targetInstance)
+                || !IsPotentialItemSlotType(targetType))
+            {
+                return;
+            }
+
+            string sourceIdentity = FormatIdentity(sourceType, sourceInstance);
+            string targetSlotIdentity = FormatIdentity(targetType, targetInstance);
+            this.RefreshPlayerIdentity();
+            if (this.playerIdentity.Length > 0
+                && !IdentityEquals(sourceIdentity, this.playerIdentity))
+            {
+                return;
+            }
+
+            this.deleteItemActions++;
+            PendingItemUse relatedUse;
+            ItemSnapshot item = null;
+            string resolutionError = string.Empty;
+            string resolutionStatus;
+            if (this.TryGetRecentPendingItemUse(targetSlotIdentity, capturedUtc, out relatedUse))
+            {
+                this.correlatedDeleteItems++;
+                item = relatedUse.Item;
+                resolutionStatus = item == null ? "DELETE_CORRELATED_UNRESOLVED" : "DELETE_CORRELATED_RESOLVED";
+                if (item == null)
+                {
+                    resolutionError = "The deleted slot was unresolved at the outbound use boundary.";
+                }
+
+                this.pendingItemUses.Remove(targetSlotIdentity);
+            }
+            else if (this.TryResolveItemSlot(
+                         new Identity((IdentityType)targetType, unchecked((int)targetInstance)),
+                         capturedUtc,
+                         out item,
+                         out resolutionError))
+            {
+                relatedUse = null;
+                resolutionStatus = "DELETE_" + item.ResolutionStatus;
+            }
+            else
+            {
+                relatedUse = null;
+                resolutionStatus = "DELETE_UNRESOLVED";
+            }
+
+            this.WriteItemUseObservation(
+                capturedUtc,
+                elapsedMilliseconds,
+                "DELETE_ITEM",
+                direction,
+                ordinal,
+                sequence,
+                sourceIdentity,
+                "DeleteItem",
+                targetSlotIdentity,
+                item,
+                resolutionStatus,
+                relatedUse,
+                "RawCharacterAction+PendingItemUse",
+                resolutionError);
+        }
+
+        private bool TryGetRecentPendingItemUse(
+            string targetSlotIdentity,
+            DateTime capturedUtc,
+            out PendingItemUse pending)
+        {
+            if (this.pendingItemUses.TryGetValue(targetSlotIdentity, out pending)
+                && capturedUtc >= pending.CapturedUtc
+                && capturedUtc - pending.CapturedUtc <= TimeSpan.FromSeconds(ItemUseCorrelationSeconds))
+            {
+                return true;
+            }
+
+            pending = null;
+            return false;
+        }
+
+        private bool TryResolveItemSlot(
+            Identity slot,
+            DateTime capturedUtc,
+            out ItemSnapshot snapshot,
+            out string error)
+        {
+            snapshot = null;
+            var errors = new List<string>();
+            try
+            {
+                AOItem item;
+                if (AOInventory.Find(slot, out item) && item != null)
+                {
+                    snapshot = this.CreateItemSnapshot(
+                        capturedUtc,
+                        "MAIN_INVENTORY",
+                        this.playerIdentity,
+                        GetLocalPlayerNameNoThrow(),
+                        string.Empty,
+                        item,
+                        "RESOLVED_LIVE");
+                    this.latestItemsBySlot[snapshot.SlotIdentity] = snapshot;
+                    error = string.Empty;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                errors.Add("main inventory: " + ex.GetType().Name + ": " + OneLine(ex.Message));
+            }
+
+            try
+            {
+                List<AOBackpack> backpacks = AOInventory.Backpacks;
+                foreach (AOBackpack backpack in backpacks)
+                {
+                    try
+                    {
+                        if (backpack == null || !backpack.IsOpen)
+                        {
+                            continue;
+                        }
+
+                        AOItem item;
+                        if (!backpack.Find(slot, out item) || item == null)
+                        {
+                            continue;
+                        }
+
+                        snapshot = this.CreateItemSnapshot(
+                            capturedUtc,
+                            "BACKPACK",
+                            FormatRuntimeIdentity(backpack.Identity),
+                            GetBackpackNameNoThrow(backpack),
+                            FormatRuntimeIdentity(backpack.Slot),
+                            item,
+                            "RESOLVED_LIVE");
+                        this.latestItemsBySlot[snapshot.SlotIdentity] = snapshot;
+                        error = string.Empty;
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add("backpack: " + ex.GetType().Name + ": " + OneLine(ex.Message));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errors.Add("backpack list: " + ex.GetType().Name + ": " + OneLine(ex.Message));
+            }
+
+            ItemSnapshot cached;
+            string slotIdentity = FormatRuntimeIdentity(slot);
+            if (this.latestItemsBySlot.TryGetValue(slotIdentity, out cached)
+                && capturedUtc >= cached.CapturedUtc
+                && capturedUtc - cached.CapturedUtc <= TimeSpan.FromSeconds(ItemUseCorrelationSeconds))
+            {
+                snapshot = CloneItemSnapshot(cached, "RESOLVED_RECENT_SNAPSHOT");
+                error = errors.Count == 0 ? string.Empty : string.Join(" | ", errors.ToArray());
+                return true;
+            }
+
+            error = errors.Count == 0
+                        ? "Slot was not found in the main inventory or any loaded open backpack."
+                        : string.Join(" | ", errors.ToArray());
+            return false;
+        }
+
+        private ItemSnapshot CreateItemSnapshot(
+            DateTime capturedUtc,
+            string containerKind,
+            string containerIdentity,
+            string containerName,
+            string containerSlotIdentity,
+            AOItem item,
+            string resolutionStatus)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            return new ItemSnapshot
+            {
+                CapturedUtc = capturedUtc,
+                ContainerKind = containerKind ?? string.Empty,
+                ContainerIdentity = containerIdentity ?? string.Empty,
+                ContainerName = containerName ?? string.Empty,
+                ContainerSlotIdentity = containerSlotIdentity ?? string.Empty,
+                SlotIdentity = FormatRuntimeIdentity(item.Slot),
+                UniqueIdentity = FormatRuntimeIdentity(item.UniqueIdentity),
+                LowId = item.Id,
+                HighId = item.HighId,
+                QualityLevel = item.QualityLevel,
+                Charges = item.Charges,
+                Name = item.Name ?? string.Empty,
+                ResolutionStatus = resolutionStatus ?? string.Empty,
+                Error = string.Empty
+            };
+        }
+
+        private static ItemSnapshot CloneItemSnapshot(ItemSnapshot source, string resolutionStatus)
+        {
+            return new ItemSnapshot
+            {
+                CapturedUtc = source.CapturedUtc,
+                ContainerKind = source.ContainerKind,
+                ContainerIdentity = source.ContainerIdentity,
+                ContainerName = source.ContainerName,
+                ContainerSlotIdentity = source.ContainerSlotIdentity,
+                SlotIdentity = source.SlotIdentity,
+                UniqueIdentity = source.UniqueIdentity,
+                LowId = source.LowId,
+                HighId = source.HighId,
+                QualityLevel = source.QualityLevel,
+                Charges = source.Charges,
+                Name = source.Name,
+                ResolutionStatus = resolutionStatus,
+                Error = source.Error
+            };
+        }
+
+        private void WriteInventorySnapshot(string phase)
+        {
+            if (this.inventorySnapshotLog == null)
+            {
+                return;
+            }
+
+            DateTime capturedUtc = DateTime.UtcNow;
+            this.RefreshPlayerIdentity();
+            string playerName = GetLocalPlayerNameNoThrow();
+            try
+            {
+                List<AOItem> items = AOInventory.Items;
+                if (items == null || items.Count == 0)
+                {
+                    this.WriteInventorySnapshotRow(
+                        capturedUtc,
+                        phase,
+                        true,
+                        ContainerStatusSnapshot(
+                            capturedUtc,
+                            "MAIN_INVENTORY",
+                            this.playerIdentity,
+                            playerName,
+                            string.Empty),
+                        "EMPTY",
+                        string.Empty);
+                }
+                else
+                {
+                    foreach (AOItem item in items)
+                    {
+                        try
+                        {
+                            ItemSnapshot snapshot = this.CreateItemSnapshot(
+                                capturedUtc,
+                                "MAIN_INVENTORY",
+                                this.playerIdentity,
+                                playerName,
+                                string.Empty,
+                                item,
+                                "SNAPSHOT");
+                            this.latestItemsBySlot[snapshot.SlotIdentity] = snapshot;
+                            this.WriteInventorySnapshotRow(
+                                capturedUtc,
+                                phase,
+                                true,
+                                snapshot,
+                                "ITEM",
+                                string.Empty);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.inventorySnapshotErrors++;
+                            this.WriteInventorySnapshotRow(
+                                capturedUtc,
+                                phase,
+                                true,
+                                ContainerStatusSnapshot(
+                                    capturedUtc,
+                                    "MAIN_INVENTORY",
+                                    this.playerIdentity,
+                                    playerName,
+                                    string.Empty),
+                                "ITEM_READ_ERROR",
+                                ex.GetType().Name + ": " + OneLine(ex.Message));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.inventorySnapshotErrors++;
+                this.WriteInventorySnapshotRow(
+                    capturedUtc,
+                    phase,
+                    true,
+                    ContainerStatusSnapshot(
+                        capturedUtc,
+                        "MAIN_INVENTORY",
+                        this.playerIdentity,
+                        playerName,
+                        string.Empty),
+                    "CONTAINER_READ_ERROR",
+                    ex.GetType().Name + ": " + OneLine(ex.Message));
+            }
+
+            List<AOBackpack> backpacks;
+            try
+            {
+                backpacks = AOInventory.Backpacks;
+            }
+            catch (Exception ex)
+            {
+                this.inventorySnapshotErrors++;
+                this.WriteInventorySnapshotRow(
+                    capturedUtc,
+                    phase,
+                    false,
+                    ContainerStatusSnapshot(
+                        capturedUtc,
+                        "BACKPACKS",
+                        string.Empty,
+                        string.Empty,
+                        string.Empty),
+                    "CONTAINER_LIST_ERROR",
+                    ex.GetType().Name + ": " + OneLine(ex.Message));
+                return;
+            }
+
+            foreach (AOBackpack backpack in backpacks)
+            {
+                if (backpack == null)
+                {
+                    continue;
+                }
+
+                string containerIdentity = FormatRuntimeIdentity(backpack.Identity);
+                string containerSlotIdentity = FormatRuntimeIdentity(backpack.Slot);
+                string containerName = GetBackpackNameNoThrow(backpack);
+                bool isOpen;
+                try
+                {
+                    isOpen = backpack.IsOpen;
+                }
+                catch (Exception ex)
+                {
+                    this.inventorySnapshotErrors++;
+                    this.WriteInventorySnapshotRow(
+                        capturedUtc,
+                        phase,
+                        false,
+                        ContainerStatusSnapshot(
+                            capturedUtc,
+                            "BACKPACK",
+                            containerIdentity,
+                            containerName,
+                            containerSlotIdentity),
+                        "OPEN_STATE_ERROR",
+                        ex.GetType().Name + ": " + OneLine(ex.Message));
+                    continue;
+                }
+
+                if (!isOpen)
+                {
+                    this.WriteInventorySnapshotRow(
+                        capturedUtc,
+                        phase,
+                        false,
+                        ContainerStatusSnapshot(
+                            capturedUtc,
+                            "BACKPACK",
+                            containerIdentity,
+                            containerName,
+                            containerSlotIdentity),
+                        "CLOSED",
+                        string.Empty);
+                    continue;
+                }
+
+                try
+                {
+                    List<AOItem> items = backpack.Items;
+                    if (items == null || items.Count == 0)
+                    {
+                        this.WriteInventorySnapshotRow(
+                            capturedUtc,
+                            phase,
+                            true,
+                            ContainerStatusSnapshot(
+                                capturedUtc,
+                                "BACKPACK",
+                                containerIdentity,
+                                containerName,
+                                containerSlotIdentity),
+                            "OPEN_EMPTY",
+                            string.Empty);
+                        continue;
+                    }
+
+                    foreach (AOItem item in items)
+                    {
+                        try
+                        {
+                            ItemSnapshot snapshot = this.CreateItemSnapshot(
+                                capturedUtc,
+                                "BACKPACK",
+                                containerIdentity,
+                                containerName,
+                                containerSlotIdentity,
+                                item,
+                                "SNAPSHOT");
+                            this.latestItemsBySlot[snapshot.SlotIdentity] = snapshot;
+                            this.WriteInventorySnapshotRow(
+                                capturedUtc,
+                                phase,
+                                true,
+                                snapshot,
+                                "ITEM",
+                                string.Empty);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.inventorySnapshotErrors++;
+                            this.WriteInventorySnapshotRow(
+                                capturedUtc,
+                                phase,
+                                true,
+                                ContainerStatusSnapshot(
+                                    capturedUtc,
+                                    "BACKPACK",
+                                    containerIdentity,
+                                    containerName,
+                                    containerSlotIdentity),
+                                "ITEM_READ_ERROR",
+                                ex.GetType().Name + ": " + OneLine(ex.Message));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.inventorySnapshotErrors++;
+                    this.WriteInventorySnapshotRow(
+                        capturedUtc,
+                        phase,
+                        true,
+                        ContainerStatusSnapshot(
+                            capturedUtc,
+                            "BACKPACK",
+                            containerIdentity,
+                            containerName,
+                            containerSlotIdentity),
+                        "CONTAINER_READ_ERROR",
+                        ex.GetType().Name + ": " + OneLine(ex.Message));
+                }
+            }
+        }
+
+        private void WriteInventorySnapshotRow(
+            DateTime capturedUtc,
+            string phase,
+            bool containerOpen,
+            ItemSnapshot item,
+            string status,
+            string error)
+        {
+            if (this.inventorySnapshotLog == null || item == null)
+            {
+                return;
+            }
+
+            try
+            {
+                this.inventorySnapshotLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        this.captureClock.Elapsed.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture),
+                        Csv(phase),
+                        Csv(item.ContainerKind),
+                        Csv(item.ContainerIdentity),
+                        Csv(item.ContainerName),
+                        Csv(item.ContainerSlotIdentity),
+                        Csv(containerOpen ? "true" : "false"),
+                        Csv(item.SlotIdentity),
+                        Csv(item.UniqueIdentity),
+                        item.SlotIdentity.Length == 0 ? string.Empty : item.LowId.ToString(CultureInfo.InvariantCulture),
+                        item.SlotIdentity.Length == 0 ? string.Empty : item.HighId.ToString(CultureInfo.InvariantCulture),
+                        item.SlotIdentity.Length == 0 ? string.Empty : item.QualityLevel.ToString(CultureInfo.InvariantCulture),
+                        Csv(item.Name),
+                        item.SlotIdentity.Length == 0 ? string.Empty : item.Charges.ToString(CultureInfo.InvariantCulture),
+                        Csv(status),
+                        Csv(error)));
+                this.inventorySnapshotRows++;
+            }
+            catch (Exception ex)
+            {
+                this.inventorySnapshotErrors++;
+                this.WriteFallbackError("InventorySnapshot.Write", ex);
+            }
+        }
+
+        private void WriteItemUseObservation(
+            DateTime capturedUtc,
+            double elapsedMilliseconds,
+            string phase,
+            string direction,
+            long ordinal,
+            int sequence,
+            string sourceIdentity,
+            string action,
+            string targetSlotIdentity,
+            ItemSnapshot item,
+            string resolutionStatus,
+            PendingItemUse relatedUse,
+            string evidenceSource,
+            string error)
+        {
+            if (this.itemUseObservationLog == null)
+            {
+                return;
+            }
+
+            bool includeRelated = relatedUse != null
+                                  && !string.Equals(phase, "USE_REQUEST", StringComparison.OrdinalIgnoreCase);
+            try
+            {
+                this.itemUseObservationLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        elapsedMilliseconds.ToString("0.###", CultureInfo.InvariantCulture),
+                        Csv(phase),
+                        Csv(direction),
+                        ordinal.ToString(CultureInfo.InvariantCulture),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(sourceIdentity),
+                        Csv(action),
+                        Csv(targetSlotIdentity),
+                        Csv(item == null ? string.Empty : item.ContainerKind),
+                        Csv(item == null ? string.Empty : item.ContainerIdentity),
+                        Csv(item == null ? string.Empty : item.ContainerName),
+                        Csv(item == null ? string.Empty : item.ContainerSlotIdentity),
+                        Csv(item == null ? string.Empty : item.UniqueIdentity),
+                        item == null ? string.Empty : item.LowId.ToString(CultureInfo.InvariantCulture),
+                        item == null ? string.Empty : item.HighId.ToString(CultureInfo.InvariantCulture),
+                        item == null ? string.Empty : item.QualityLevel.ToString(CultureInfo.InvariantCulture),
+                        Csv(item == null ? string.Empty : item.Name),
+                        item == null ? string.Empty : item.Charges.ToString(CultureInfo.InvariantCulture),
+                        Csv(item == null ? string.Empty : item.CapturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(resolutionStatus),
+                        Csv(includeRelated ? relatedUse.CapturedUtc.ToString("o", CultureInfo.InvariantCulture) : string.Empty),
+                        includeRelated ? relatedUse.GlobalOrdinal.ToString(CultureInfo.InvariantCulture) : string.Empty,
+                        includeRelated ? relatedUse.Sequence.ToString(CultureInfo.InvariantCulture) : string.Empty,
+                        Csv(evidenceSource),
+                        Csv(error)));
+                this.itemUseObservationRows++;
+            }
+            catch (Exception ex)
+            {
+                this.itemUseObservationErrors++;
+                this.WriteFallbackError("ItemUseObservation.Write", ex);
+            }
+        }
+
+        private static ItemSnapshot ContainerStatusSnapshot(
+            DateTime capturedUtc,
+            string containerKind,
+            string containerIdentity,
+            string containerName,
+            string containerSlotIdentity)
+        {
+            return new ItemSnapshot
+            {
+                CapturedUtc = capturedUtc,
+                ContainerKind = containerKind ?? string.Empty,
+                ContainerIdentity = containerIdentity ?? string.Empty,
+                ContainerName = containerName ?? string.Empty,
+                ContainerSlotIdentity = containerSlotIdentity ?? string.Empty,
+                SlotIdentity = string.Empty,
+                UniqueIdentity = string.Empty,
+                Name = string.Empty,
+                ResolutionStatus = string.Empty,
+                Error = string.Empty
+            };
+        }
+
+        private static bool IsPotentialItemSlotType(uint identityType)
+        {
+            return (identityType >= 0x65 && identityType <= 0x6F)
+                   || identityType == 0x73;
+        }
+
+        private static string FormatRuntimeIdentity(Identity identity)
+        {
+            return FormatIdentity(
+                unchecked((uint)(int)identity.Type),
+                unchecked((uint)identity.Instance));
+        }
+
+        private static string GetLocalPlayerNameNoThrow()
+        {
+            try { return DynelManager.LocalPlayer == null ? string.Empty : DynelManager.LocalPlayer.Name; }
+            catch { return string.Empty; }
+        }
+
+        private static string GetBackpackNameNoThrow(AOBackpack backpack)
+        {
+            try { return backpack == null ? string.Empty : backpack.Name ?? string.Empty; }
+            catch { return string.Empty; }
         }
 
         private void CaptureSimpleCharFullUpdate(
@@ -1635,6 +2494,12 @@ namespace AOSharpLiveCapture.Mike2022
                 }
                 else
                 {
+                    if (this.inventorySnapshotRequested)
+                    {
+                        this.inventorySnapshotRequested = false;
+                        this.WriteInventorySnapshot("deferred-inventory-refresh");
+                    }
+
                     if (now >= this.nextVisibilitySampleUtc)
                     {
                         this.CaptureLiveWorldSnapshot(now, "periodic-visibility", false);
@@ -1684,6 +2549,8 @@ namespace AOSharpLiveCapture.Mike2022
                 && this.playerCombatContextLog == null
                 && this.aggroObservationLog == null
                 && this.visibilityObservationLog == null
+                && this.inventorySnapshotLog == null
+                && this.itemUseObservationLog == null
                 && this.eventLog == null)
             {
                 return;
@@ -1697,6 +2564,7 @@ namespace AOSharpLiveCapture.Mike2022
             {
                 this.WriteWorldSnapshot("capture-end");
                 this.WritePlayerCombatContext("capture-end");
+                this.WriteInventorySnapshot("capture-end");
             }
             else
             {
@@ -1717,6 +2585,8 @@ namespace AOSharpLiveCapture.Mike2022
             this.playerCombatContextLog = CloseWriter(this.playerCombatContextLog);
             this.aggroObservationLog = CloseWriter(this.aggroObservationLog);
             this.visibilityObservationLog = CloseWriter(this.visibilityObservationLog);
+            this.inventorySnapshotLog = CloseWriter(this.inventorySnapshotLog);
+            this.itemUseObservationLog = CloseWriter(this.itemUseObservationLog);
             this.eventLog = CloseWriter(this.eventLog);
         }
 
@@ -1783,7 +2653,16 @@ namespace AOSharpLiveCapture.Mike2022
             json.AppendLine("    \"lineOfSightReadErrors\": " + this.lineOfSightReadErrors.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"inPlayStateObservations\": " + this.inPlayStateObservations.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"inPlayTransitionRows\": " + this.inPlayTransitionRows.ToString(CultureInfo.InvariantCulture) + ",");
-            json.AppendLine("    \"inPlayReadErrors\": " + this.inPlayReadErrors.ToString(CultureInfo.InvariantCulture));
+            json.AppendLine("    \"inPlayReadErrors\": " + this.inPlayReadErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"inventorySnapshotRows\": " + this.inventorySnapshotRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"inventorySnapshotErrors\": " + this.inventorySnapshotErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"itemUseRequests\": " + this.itemUseRequests.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"resolvedItemUseRequests\": " + this.resolvedItemUseRequests.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"itemUseAcknowledgements\": " + this.itemUseAcknowledgements.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"deleteItemActions\": " + this.deleteItemActions.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"correlatedDeleteItems\": " + this.correlatedDeleteItems.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"itemUseObservationRows\": " + this.itemUseObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"itemUseObservationErrors\": " + this.itemUseObservationErrors.ToString(CultureInfo.InvariantCulture));
             json.AppendLine("  },");
             json.AppendLine("  \"validationStatus\": " + Json(this.lastValidationStatus) + ",");
             json.AppendLine("  \"validationSummary\": " + Json(this.lastValidationSummary) + ",");
@@ -2711,6 +3590,27 @@ namespace AOSharpLiveCapture.Mike2022
                 issues.Add("player combat context incomplete");
             }
 
+            if (this.inventorySnapshotRows == 0)
+            {
+                issues.Add("no player inventory snapshot rows");
+            }
+            else if (this.inventorySnapshotErrors > 0)
+            {
+                issues.Add("player inventory snapshot errors=" + this.inventorySnapshotErrors.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (this.itemUseRequests > this.resolvedItemUseRequests)
+            {
+                issues.Add(
+                    "unresolved item-use slot identities="
+                    + (this.itemUseRequests - this.resolvedItemUseRequests).ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (this.itemUseObservationErrors > 0)
+            {
+                issues.Add("item-use observation write errors=" + this.itemUseObservationErrors.ToString(CultureInfo.InvariantCulture));
+            }
+
             this.lastValidationStatus = this.rawWriteErrors > 0 || this.rawMissingPackets > 0
                                             ? "FAIL"
                                             : issues.Count == 0
@@ -2747,7 +3647,9 @@ namespace AOSharpLiveCapture.Mike2022
                 json.AppendLine("    \"npcToPlayerAggro\": " + (this.npcToPlayerAggroObservationRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"unprovokedAggroRange\": " + (this.unprovokedNpcAggroObservationRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"deathOrCorpse\": " + (this.deathActions > 0 || this.corpseFullUpdatePackets > 0 ? "true" : "false") + ",");
-                json.AppendLine("    \"identityLinkedLoot\": " + (this.identityLinkedInventoryPackets > 0 ? "true" : "false"));
+                json.AppendLine("    \"identityLinkedLoot\": " + (this.identityLinkedInventoryPackets > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"playerInventorySnapshot\": " + (this.inventorySnapshotRows > 0 && this.inventorySnapshotErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"itemUseIdentity\": " + (this.itemUseRequests > 0 && this.itemUseRequests == this.resolvedItemUseRequests && this.itemUseObservationErrors == 0 ? "true" : "false"));
                 json.AppendLine("  },");
                 json.AppendLine("  \"issues\": [");
                 for (int index = 0; index < issues.Count; index++)
@@ -2796,6 +3698,8 @@ namespace AOSharpLiveCapture.Mike2022
             TryFlush(this.playerCombatContextLog);
             TryFlush(this.aggroObservationLog);
             TryFlush(this.visibilityObservationLog);
+            TryFlush(this.inventorySnapshotLog);
+            TryFlush(this.itemUseObservationLog);
             TryFlush(this.eventLog);
         }
 
@@ -2803,6 +3707,7 @@ namespace AOSharpLiveCapture.Mike2022
         {
             try { Network.PacketReceived -= this.OnPacketReceived; } catch { }
             try { Network.PacketSent -= this.OnPacketSent; } catch { }
+            try { AOInventory.ContainerOpened -= this.OnContainerOpened; } catch { }
             try { Game.OnUpdate -= this.OnUpdate; } catch { }
         }
 
