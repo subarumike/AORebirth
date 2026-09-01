@@ -1,0 +1,646 @@
+[
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-15T10:35:50Z",
+    "CommitDate": "2022-06-15T10:35:50Z",
+    "Sha": "07981b10404f26463fcb1c2115d6a232b3ac0271",
+    "Subject": "Initial commit"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-15T12:37:26+02:00",
+    "CommitDate": "2022-06-15T12:37:26+02:00",
+    "Sha": "7d81fba2be517007f73ff912b889c832b93b216c",
+    "Subject": "Add project files."
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-15T10:39:16Z",
+    "CommitDate": "2022-06-15T10:39:16Z",
+    "Sha": "2809b2255104a5f4bf83db34d4fa4d87e54e300b",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-15T19:12:42Z",
+    "CommitDate": "2022-06-15T19:12:42Z",
+    "Sha": "74c2e8ac1d121285fa300973a198ebba89810bd0",
+    "Subject": "Delete README.md"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T11:07:17+02:00",
+    "CommitDate": "2022-06-16T11:07:17+02:00",
+    "Sha": "a68a75401cd9914d7669a7ed9915e0b2b96850d3",
+    "Subject": "Redesigned locations UI, fixed small issues"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T09:07:34Z",
+    "CommitDate": "2022-06-16T09:07:34Z",
+    "Sha": "186215860ac84e7a18899efb451b1050e182bc62",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T11:10:26+02:00",
+    "CommitDate": "2022-06-16T11:10:26+02:00",
+    "Sha": "f37e86b01a528475e6a5fcb0f723b57a001ab9e1",
+    "Subject": "offcenter name"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T09:10:54Z",
+    "CommitDate": "2022-06-16T09:10:54Z",
+    "Sha": "c7688a25e22c7a57a8d68dbd260d1eca92680927",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T14:11:51+02:00",
+    "CommitDate": "2022-06-16T14:11:51+02:00",
+    "Sha": "3a4f83e8222019aee2612770ab729e6189021017",
+    "Subject": "Changed auto lvl adjustment option logic"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T12:12:30Z",
+    "CommitDate": "2022-06-16T12:12:30Z",
+    "Sha": "2d851e03da87d1a5ab1021d70b17441dffcfa7db",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T14:29:01+02:00",
+    "CommitDate": "2022-06-16T14:29:01+02:00",
+    "Sha": "9e5c5af00f3f0271f1741bf2f04b1f872e5ed088",
+    "Subject": "Adjustment to request timer"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-16T12:29:22Z",
+    "CommitDate": "2022-06-16T12:29:22Z",
+    "Sha": "3db297ffca5e58a17b5e5d50e1cd48fd7912f084",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-17T06:09:04+02:00",
+    "CommitDate": "2022-06-17T06:09:04+02:00",
+    "Sha": "1dd6f5e7b7657c1d6831cf21b8d45a30c2667c29",
+    "Subject": "little cleanup"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-17T04:09:27Z",
+    "CommitDate": "2022-06-17T04:09:27Z",
+    "Sha": "975ad958c1843e3cd97768c8bf0fb23fef96bdb9",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-23T22:00:14+02:00",
+    "CommitDate": "2022-06-23T22:00:14+02:00",
+    "Sha": "1318767279bc18618a870bbeeaeae11dd802666c",
+    "Subject": "added combined credits reward / rolling by cred value feature"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-23T20:01:43Z",
+    "CommitDate": "2022-06-23T20:01:43Z",
+    "Sha": "6ec09b0b9af50d6627b69b961fc9d29cd7534c68",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T09:22:10+02:00",
+    "CommitDate": "2022-06-24T09:22:10+02:00",
+    "Sha": "dd747b966a0d94f90f9904dba1cb2e9697fe32a7",
+    "Subject": "attempted resolution fix"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T07:22:36Z",
+    "CommitDate": "2022-06-24T07:22:36Z",
+    "Sha": "541b09ee4fe816e559ebc034dd09dcc0fe2f2de4",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T09:28:48+02:00",
+    "CommitDate": "2022-06-24T09:28:48+02:00",
+    "Sha": "6180d64c65048bce034b39fa26903b02f67441d6",
+    "Subject": "resolution fix attempt"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T07:29:11Z",
+    "CommitDate": "2022-06-24T07:29:11Z",
+    "Sha": "fda58537209757d07a07fd2d32045ad78c080a30",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T09:38:22+02:00",
+    "CommitDate": "2022-06-24T09:38:22+02:00",
+    "Sha": "0b93c6fe59c1ab2cebca97022b794e246605e882",
+    "Subject": "resolution fix attempt"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T09:39:36+02:00",
+    "CommitDate": "2022-06-24T09:39:36+02:00",
+    "Sha": "620123c71e65cb5e516503c3dcdc6cd51e18f574",
+    "Subject": "resolution fix attempt"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T07:39:59Z",
+    "CommitDate": "2022-06-24T07:39:59Z",
+    "Sha": "cde81feab50f7b3113db0ae55145be43003fb528",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T09:43:35+02:00",
+    "CommitDate": "2022-06-24T09:43:35+02:00",
+    "Sha": "3b51a01cc4d650f4df0620c65b3d42d163be59f7",
+    "Subject": "resolution fix attempt"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T07:43:52Z",
+    "CommitDate": "2022-06-24T07:43:52Z",
+    "Sha": "d6f8880d6f3fb56ce19aa43994df07a155df1989",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T12:02:07+02:00",
+    "CommitDate": "2022-06-24T12:02:07+02:00",
+    "Sha": "e194ba87bf30183c4e3a38d1bdaee0f10dd55424",
+    "Subject": "Replaced MediaPlayer  with winmm"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T12:38:31+02:00",
+    "CommitDate": "2022-06-24T12:38:31+02:00",
+    "Sha": "ea0956b33ce1fc0263cc3c3addc7fbfd7c757e93",
+    "Subject": "Replaced MediaPlayer with Windows Multimedia"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T10:38:51Z",
+    "CommitDate": "2022-06-24T10:38:51Z",
+    "Sha": "ea338d26a4b340c76a4d51f16b5de98315be1587",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T12:40:30+02:00",
+    "CommitDate": "2022-06-24T12:40:30+02:00",
+    "Sha": "1c3a3e6c51fe4761af00b8b125c92b65c85d98f2",
+    "Subject": "removed unused references"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T10:40:58Z",
+    "CommitDate": "2022-06-24T10:40:58Z",
+    "Sha": "d6cc140703bb80759c1e78bec78adb67ea5d6cfe",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-24T15:19:22+02:00",
+    "CommitDate": "2022-06-24T15:19:22+02:00",
+    "Sha": "05b78b6079d4d4d6a7fccc5851e83b8ae991b843",
+    "Subject": "changed credit item tag"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-25T21:22:44+02:00",
+    "CommitDate": "2022-06-25T21:22:44+02:00",
+    "Sha": "198d6f123271ed8db753b29d7ba1cfc8e4983a47",
+    "Subject": "Added starting graphical guide"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-25T19:23:04Z",
+    "CommitDate": "2022-06-25T19:23:04Z",
+    "Sha": "a9bf64c4b0e9fb22684503b146858cbbb1f86217",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-25T22:26:29+02:00",
+    "CommitDate": "2022-06-25T22:26:29+02:00",
+    "Sha": "1cd3276474629c4fd38018d58b7169203e9eb77f",
+    "Subject": "Slight help window adjustments"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-25T20:26:53Z",
+    "CommitDate": "2022-06-25T20:26:53Z",
+    "Sha": "fd08f3354542fe9e50d08f10f8b4c664966b9b9f",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-26T12:41:31+02:00",
+    "CommitDate": "2022-06-26T12:41:31+02:00",
+    "Sha": "5451fe83f186fb56f0251d729913a7936753cb29",
+    "Subject": "added credit rolling guide"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-26T10:42:06Z",
+    "CommitDate": "2022-06-26T10:42:06Z",
+    "Sha": "f5462f7e931b5d419db3d671263a17da9803ed8f",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-28T12:13:30+02:00",
+    "CommitDate": "2022-06-28T12:13:30+02:00",
+    "Sha": "791afd9f142c2a48e8c048f3b48f5691ff847ba9",
+    "Subject": "added some missing nanos"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-28T10:13:58Z",
+    "CommitDate": "2022-06-28T10:13:58Z",
+    "Sha": "669538fb1989fbcfbfa451fc86e013b588203074",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-29T11:40:03+02:00",
+    "CommitDate": "2022-06-29T11:40:03+02:00",
+    "Sha": "b1f4a946b6a9e93a17d35389cee566f5338f2e9c",
+    "Subject": "added more missing nanos"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-06-29T09:40:39Z",
+    "CommitDate": "2022-06-29T09:40:39Z",
+    "Sha": "43f901f6e5fec76a9c3fe25e36048555b511b40b",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-07-02T21:17:48+02:00",
+    "CommitDate": "2022-07-02T21:17:48+02:00",
+    "Sha": "8f2730d2cf942ea4c97edb58f436f71bc0193174",
+    "Subject": "added missing refined empty implants"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-07-02T19:18:13Z",
+    "CommitDate": "2022-07-02T19:18:13Z",
+    "Sha": "f7272fd13afeb8de2f04e72d00ae46b5b3047227",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-07-24T20:21:32+02:00",
+    "CommitDate": "2022-07-24T20:21:32+02:00",
+    "Sha": "206f91d98a7f5b60fb8608dc5fb4cfe15253f238",
+    "Subject": "added nano delta clusters"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-07-24T18:22:05Z",
+    "CommitDate": "2022-07-24T18:22:05Z",
+    "Sha": "b75c3224ed76b1902ffad1aaeace3eb824da0bce",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-07-30T22:34:45+02:00",
+    "CommitDate": "2022-07-30T22:34:45+02:00",
+    "Sha": "6543610386e87a99243d12282a7ba474995d710d",
+    "Subject": "fixed MissionLevels table for lvl54,53,52"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-07-30T20:35:30Z",
+    "CommitDate": "2022-07-30T20:35:30Z",
+    "Sha": "2cdf70042c2d7474330fb2d973871c194cb37c76",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-08-21T22:18:12+02:00",
+    "CommitDate": "2022-08-21T22:18:12+02:00",
+    "Sha": "3a27c7cbabcaf341b572163eb89212495c4d1173",
+    "Subject": "fixed a bug that caused crashing, made saving more frequent"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-08-21T20:30:09Z",
+    "CommitDate": "2022-08-21T20:30:09Z",
+    "Sha": "ee3032e130845026cf71596f565cf61dd8252501",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-09-26T03:35:42+02:00",
+    "CommitDate": "2022-09-26T03:35:42+02:00",
+    "Sha": "521fd234b84f30100b5b11321d8ca9806fba76ea",
+    "Subject": "updated SDK version"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-09-26T01:36:42Z",
+    "CommitDate": "2022-09-26T01:36:42Z",
+    "Sha": "0fa4fd7ea692f71f253f12772f6747f84cc16cd4",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-10-15T22:39:33+02:00",
+    "CommitDate": "2022-10-15T22:39:33+02:00",
+    "Sha": "7f28e92e835008d7cf1abf8e74840fe270841ba9",
+    "Subject": "fixed issue with coordinate bounds"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-10-15T20:40:00Z",
+    "CommitDate": "2022-10-15T20:40:00Z",
+    "Sha": "c583717633148e60614c3d7c53c923c8766dea52",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-10-15T23:22:33+02:00",
+    "CommitDate": "2022-10-15T23:22:33+02:00",
+    "Sha": "6290a4bbb73918b5d8ff31a54b1553ccb5556d32",
+    "Subject": "fixed Midi path with spaces issue"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-10-15T21:22:50Z",
+    "CommitDate": "2022-10-15T21:22:50Z",
+    "Sha": "a3b8d4a9abccb46cf12eda192ebe5f647880bc78",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-10-16T00:42:47+02:00",
+    "CommitDate": "2022-10-16T00:42:47+02:00",
+    "Sha": "7e95bddcc2edf7c6c8be10b188165ba93acf5d65",
+    "Subject": "fixed nuget package reference issue"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-10-15T22:43:10Z",
+    "CommitDate": "2022-10-15T22:43:10Z",
+    "Sha": "669850089d80172e46fac63695e43e95019ffc5f",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-11-09T16:27:16+01:00",
+    "CommitDate": "2022-11-09T16:27:16+01:00",
+    "Sha": "bc49b8872043b61b8fb1056f2189559fc3a3a937",
+    "Subject": "coordinate bounds now save automatically"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-11-09T16:34:07+01:00",
+    "CommitDate": "2022-11-09T16:34:07+01:00",
+    "Sha": "a59b691032df4e73b49c25426a40b25aa3164e94",
+    "Subject": "all button related views now save automtaically"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2022-11-09T15:34:39Z",
+    "CommitDate": "2022-11-09T15:34:39Z",
+    "Sha": "d20080c0e1d28727ad2fd860f81ab58cd37cd4bd",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-01-30T20:05:25+01:00",
+    "CommitDate": "2023-01-30T20:05:25+01:00",
+    "Sha": "fb7ea4b7933f1b804eb924c5ba3a83996afe1f1a",
+    "Subject": "Remapped slider centering to match AO's offset"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-01-30T19:07:24Z",
+    "CommitDate": "2023-01-30T19:07:24Z",
+    "Sha": "c97c7dfe362fceaca74df7b1588d43b13b71c095",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-03-20T14:43:20+01:00",
+    "CommitDate": "2023-03-20T14:43:20+01:00",
+    "Sha": "4d57c321e6966187585b580c67f1bd3725419806",
+    "Subject": "Fixed team mission rolling bug"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-03-20T13:44:26Z",
+    "CommitDate": "2023-03-20T13:44:26Z",
+    "Sha": "36fe43a8c720f0aeacc60af40be2e98e4c38e81c",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-03-27T17:31:42+02:00",
+    "CommitDate": "2023-03-27T17:31:42+02:00",
+    "Sha": "29d430900072aae4b7e75a4d7352dc5e14867808",
+    "Subject": "Fixed a rolling issue for a few specific items"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-03-27T15:32:19Z",
+    "CommitDate": "2023-03-27T15:32:19Z",
+    "Sha": "8794ff416cc82d8e95c5838c54c549c9ae77908d",
+    "Subject": "Merge branch 'master' into 'main'"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-08-28T07:06:57+02:00",
+    "CommitDate": "2023-08-28T07:06:57+02:00",
+    "Sha": "e7e3b9424e4c797425b6e162a778a0272e5087e1",
+    "Subject": "Updated to latest nuget package"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-09-04T20:42:37+02:00",
+    "CommitDate": "2023-09-04T20:42:37+02:00",
+    "Sha": "4c66fcfad06550a75e0eef4db476da4f3e52034c",
+    "Subject": "Added missing Nano Crystal (Summon Wrath Incarnation)"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-09-04T21:33:29+02:00",
+    "CommitDate": "2023-09-04T21:33:29+02:00",
+    "Sha": "477dd412dc95569247769b6fffbc15151acf4975",
+    "Subject": "Added missing yatamutchy rifles"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-09-05T12:23:19+02:00",
+    "CommitDate": "2023-09-05T12:23:19+02:00",
+    "Sha": "2403649095c82584e647e82f6520b205dfdb6dae",
+    "Subject": "Added nano profession filtering (type profession name in mods), building will not overwrite settings / rolllist files anymore"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-10-01T16:42:01+02:00",
+    "CommitDate": "2023-10-01T16:42:01+02:00",
+    "Sha": "b833da27b125093a818a9208ff3c0640ed8d9972",
+    "Subject": "Updated nuget package"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-12-19T12:32:29+01:00",
+    "CommitDate": "2023-12-19T12:32:29+01:00",
+    "Sha": "ac2186007a61a8b1d14cc63054befeff4ad86261",
+    "Subject": "Updated to latest aosharp version"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2023-12-28T20:58:45+01:00",
+    "CommitDate": "2023-12-28T20:58:45+01:00",
+    "Sha": "c3ef3a82cc8c8c0fd0c0fe77bef618c648d63a5b",
+    "Subject": "Changed from local refs to nuget package"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-01-02T21:47:29+01:00",
+    "CommitDate": "2024-01-02T21:47:29+01:00",
+    "Sha": "090456d7c6418029476a142e9dd4f987fd454d27",
+    "Subject": "Fixed crash on logout"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-01-07T20:06:33+01:00",
+    "CommitDate": "2024-01-07T20:06:33+01:00",
+    "Sha": "4fb0781afe3b1f650770d76de73b1f4ffe81726c",
+    "Subject": "Some terminal stuff"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-01-27T09:54:02+01:00",
+    "CommitDate": "2024-01-27T09:54:02+01:00",
+    "Sha": "c362fd3561b44a8d27723fbe2806f450e7f0ad02",
+    "Subject": "Updated to latest nuget package version"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-02-10T10:55:22+01:00",
+    "CommitDate": "2024-02-10T10:55:22+01:00",
+    "Sha": "88700e3e580aabbeec87468106a437bcd7afc841",
+    "Subject": "Updated nuget packages"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-03-19T03:47:51+01:00",
+    "CommitDate": "2024-03-19T03:47:51+01:00",
+    "Sha": "bd6c697da55410fafcc12c4fcda362dc53638ada",
+    "Subject": "Removed letter limit for item names"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-04-06T17:38:42+02:00",
+    "CommitDate": "2024-04-06T17:38:42+02:00",
+    "Sha": "b8360e311719c0001acc8fb87a92c21f5434a1fa",
+    "Subject": "Corrected min ql for  Omni-Pol Elite Armor set"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-04-06T18:48:15+02:00",
+    "CommitDate": "2024-04-06T18:48:15+02:00",
+    "Sha": "bb56a1c8b093f69ba7fc8a7bc8ad17ca6124a22a",
+    "Subject": "Corrected NCU Memory Ql ranges"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-05-31T05:03:14+02:00",
+    "CommitDate": "2024-05-31T05:03:14+02:00",
+    "Sha": "ec4416970f5f38854e5a547a90ae44f40acc6b63",
+    "Subject": "Fixed lvl 60 mission range"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-08-18T12:36:41+02:00",
+    "CommitDate": "2024-08-18T12:36:41+02:00",
+    "Sha": "87c176938bea323da4ab9613ec886653dcbefd11",
+    "Subject": "Updated nuget"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-09-19T16:12:29+02:00",
+    "CommitDate": "2024-09-19T16:12:29+02:00",
+    "Sha": "7de4a81aba8c85a20d69e27fb6a8cf6b89c16b2d",
+    "Subject": "Fixed deflection shields, ignore cloaking device for reward rolling"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2024-09-19T16:22:06+02:00",
+    "CommitDate": "2024-09-19T16:22:06+02:00",
+    "Sha": "b4b5d0d3be0e1c2714d5063bd595f14320aca8fd",
+    "Subject": "ui out of bounds fix"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2025-02-22T14:57:03+01:00",
+    "CommitDate": "2025-02-22T14:57:03+01:00",
+    "Sha": "71fc00c221bfdd720e09550f0adf76fec657d2c0",
+    "Subject": "Added missing MP nanos"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2025-02-23T17:51:13+01:00",
+    "CommitDate": "2025-02-23T17:51:13+01:00",
+    "Sha": "9b61e0578b350a4449ac0063b6e452ea079912ea",
+    "Subject": "Filtering by item id, separated refined implants into their own section"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2025-02-23T18:06:54+01:00",
+    "CommitDate": "2025-02-23T18:06:54+01:00",
+    "Sha": "13b09dabd116cc91dc12891f507ed62c405f6b3f",
+    "Subject": "Fixed filtering"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2025-03-17T21:39:48+01:00",
+    "CommitDate": "2025-03-17T21:39:48+01:00",
+    "Sha": "e19bb1ddc25e2647688c7996c8b09d50198fc486",
+    "Subject": "Fixed level 80 mission table"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2025-07-26T22:33:23+02:00",
+    "CommitDate": "2025-07-26T22:33:23+02:00",
+    "Sha": "0a0032138d249d04a96e26d6c3eb02c4a6c8e994",
+    "Subject": "Try catch settings import"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2026-01-07T21:02:20+01:00",
+    "CommitDate": "2026-01-07T21:02:20+01:00",
+    "Sha": "7e5b921cebabee99051252a4883f324b38a519fc",
+    "Subject": "Added support for ql200 item rolling when character is above level 200"
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2026-01-07T21:04:38+01:00",
+    "CommitDate": "2026-01-07T21:04:38+01:00",
+    "Sha": "c5a7894ab18f6818ec0b9fa674a73ecc2a8dc6ee",
+    "Subject": "."
+  },
+  {
+    "Author": "Pixelmania",
+    "AuthorDate": "2026-01-27T17:16:08+01:00",
+    "CommitDate": "2026-01-27T17:16:08+01:00",
+    "Sha": "3ac9943a4943b8cb80eda9e40359729e656686b0",
+    "Subject": "Updated sdk version"
+  }
+]

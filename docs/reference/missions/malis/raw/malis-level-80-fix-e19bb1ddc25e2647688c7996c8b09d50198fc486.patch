@@ -1,0 +1,21 @@
+commit e19bb1ddc25e2647688c7996c8b09d50198fc486
+Author:     Pixelmania <abdulah.karic@outlook.com>
+AuthorDate: Mon Mar 17 21:39:48 2025 +0100
+Commit:     Pixelmania <abdulah.karic@outlook.com>
+CommitDate: Mon Mar 17 21:39:48 2025 +0100
+
+    Fixed level 80 mission table
+
+diff --git a/JSON/MissionLevels.json b/JSON/MissionLevels.json
+index 63e4571..9ea19f9 100644
+--- a/JSON/MissionLevels.json
++++ b/JSON/MissionLevels.json
+@@ -1035,7 +1035,7 @@
+     96,
+     104,
+     120,
+-    144
++    143
+   ],
+   [
+     56,

@@ -1,0 +1,231 @@
+commit 7e5b921cebabee99051252a4883f324b38a519fc
+Author:     Pixelmania <abdulah.karic@outlook.com>
+AuthorDate: Wed Jan 7 21:02:20 2026 +0100
+Commit:     Pixelmania <abdulah.karic@outlook.com>
+CommitDate: Wed Jan 7 21:02:20 2026 +0100
+
+    Added support for ql200 item rolling when character is above level 200
+
+diff --git a/MainWindow.cs b/MainWindow.cs
+index 678d648..26b5b36 100644
+--- a/MainWindow.cs
++++ b/MainWindow.cs
+@@ -156,41 +156,28 @@ namespace MaliMissionRoller2
+ 
+             if ((bool)SettingsView.ExtraOptions.AutoAdjustQl.Tag && _isRolling)
+             {
++                var rollProcessor = new RollEntryProcessor(MissionLvls);
+ 
+-                var rollEntry = SettingsView.ItemDisplay.RollEntryViews
+-                    .FirstOrDefault(entry => MissionLvls[DynelManager.LocalPlayer.Level - 1]
+-                    .Any(missionRange => entry.RollEntryModel.Ql - missionRange == 0 || 
+-                    new[] { "Nano Crystal", "NanoCrystal" }.Any(entry.RollEntryModel.Name.Contains) && Math.Abs(entry.RollEntryModel.Ql - missionRange) <= 10) ||
+-                    entry.RollEntryModel.LowId == 297315);
++                var result = rollProcessor.ProcessRollEntry(SettingsView.ItemDisplay.RollEntryViews);
+ 
+-                if (rollEntry == null)
++                if (result.NoValidEntry)
+                 {
+                     Midi.Play("Alert");
+-
+-                    Chat.WriteLine("Remaining roll items outside characters level reach.\n" +
++                    Chat.WriteLine(
++                        "Remaining roll items outside characters level reach.\n" +
+                         "If you think this is wrong, disable the 'Auto Adjust Level Slider'\n" +
+                         "temporarily and contact me so I can update the mission level table!\n" +
+                         "(press '?' in the top right corner for contact details)");
+-
+                     _isRolling = false;
+-                    return;
+                 }
+-
+-                if (rollEntry.RollEntryModel.LowId != 297315)
++                else if (result.IsSpecialCredit)
+                 {
+-                    _missionLevel = MissionLvls[DynelManager.LocalPlayer.Level - 1].OrderBy(x => Math.Abs(x - rollEntry.RollEntryModel.Ql)).FirstOrDefault();
+-                    int count = SettingsView.ItemDisplay.RollEntryViews
+-                        .Count(y => Math.Abs(_missionLevel - y.RollEntryModel.Ql) <= 10 && new[] { "Nano Crystal", "NanoCrystal" }
+-                        .Any(y.RollEntryModel.Name.Contains) ||
+-                        _missionLevel - y.RollEntryModel.Ql == 0);
+-
+-                    SettingsView.Sliders.EasyHard.Value = MissionLvls[DynelManager.LocalPlayer.Level - 1].IndexOf(_missionLevel) + 1;
+-
+-                    Chat.WriteLine($"Mission level set to: {_missionLevel}\n Unique items to roll in this range: {count}");
++                    Chat.WriteLine($"Rolling for missions with combined credit reward >= {result.CreditReward}");
+                 }
+                 else
+                 {
+-                    Chat.WriteLine($"Rolling for missions with combined credit reward >= {rollEntry.RollEntryModel.Ql}");
++                    SettingsView.Sliders.EasyHard.Value = result.SliderValue;
++                    Chat.WriteLine($"Mission level set to: {result.MissionLevel}\nUnique items to roll in this range: {result.UniqueItemCount}");
+                 }
+             }
+ 
+diff --git a/Malis Mission Roller 2.csproj b/Malis Mission Roller 2.csproj
+index cc0c82c..21e2059 100644
+--- a/Malis Mission Roller 2.csproj	
++++ b/Malis Mission Roller 2.csproj	
+@@ -45,6 +45,7 @@
+     <Reference Include="System" />
+   </ItemGroup>
+   <ItemGroup>
++    <Compile Include="RollEntryProcessor.cs" />
+     <Compile Include="Stat.cs" />
+     <Compile Include="Midi.cs" />
+     <Compile Include="Settings.cs" />
+diff --git a/RollEntryProcessor.cs b/RollEntryProcessor.cs
+new file mode 100644
+index 0000000..1075bb8
+--- /dev/null
++++ b/RollEntryProcessor.cs
+@@ -0,0 +1,149 @@
++ï»¿using AOSharp.Core;
++using MaliMissionRoller2;
++using System;
++using System.Collections.Generic;
++using System.Linq;
++
++public class RollEntryProcessor
++{
++    private const int SPECIAL_CREDIT_ITEM_ID = 297315;
++    private const int QL200 = 200;
++    private const int NANO_CRYSTAL_QL_TOLERANCE = 10;
++
++    private readonly List<List<int>> _missionLvls;
++    private int _missionLevel;
++
++    public RollEntryProcessor(List<List<int>> missionLvls)
++    {
++        _missionLvls = missionLvls;
++    }
++
++    public RollEntryResult ProcessRollEntry(IEnumerable<RollEntryView> rollEntryViews)
++    {
++        var rollEntry = FindNextRollEntry(rollEntryViews);
++
++        if (rollEntry == null)
++        {
++            return RollEntryResult.NoValidEntrys();
++        }
++
++        if (IsSpecialCreditItem(rollEntry))
++        {
++            return RollEntryResult.SpecialCredit(rollEntry.RollEntryModel.Ql);
++        }
++
++        return ProcessStandardRollEntry(rollEntry, rollEntryViews);
++    }
++
++    private RollEntryView FindNextRollEntry(IEnumerable<RollEntryView> rollEntryViews)
++    {
++        var playerLevel = DynelManager.LocalPlayer.Level;
++        var availableMissionLevels = _missionLvls[playerLevel - 1];
++        return rollEntryViews.FirstOrDefault(entry => IsEntryRollable(entry, availableMissionLevels, playerLevel));
++    }
++
++    private bool IsEntryRollable(RollEntryView entry, List<int> missionLevels, int playerLevel)
++    {
++        if (IsSpecialCreditItem(entry))
++            return true;
++
++        var itemQl = entry.RollEntryModel.Ql;
++        var itemName = entry.RollEntryModel.Name;
++
++        // Level 200 and above characters can roll ql 200 items (which aren't nano crystals?)
++        if (playerLevel > QL200 && itemQl == QL200 && !IsNanoCrystal(itemName))
++            return true;
++
++        // Other scenarios include nano tolerance rolls (+= 10QLs in our case), or an exact match in quality
++        return missionLevels.Any(missionLvl => IsQlMatch(itemQl, missionLvl, IsNanoCrystal(itemName)));
++    }
++
++    private bool IsQlMatch(int itemQl, int missionLevel, bool isNanoCrystal)
++    {
++        return isNanoCrystal ? Math.Abs(itemQl - missionLevel) <= NANO_CRYSTAL_QL_TOLERANCE : itemQl == missionLevel;
++    }
++
++    private bool IsSpecialCreditItem(RollEntryView entry)
++    {
++        return entry.RollEntryModel.LowId == SPECIAL_CREDIT_ITEM_ID;
++    }
++
++    private bool IsNanoCrystal(string itemName)
++    {
++        return new[] { "Nano Crystal", "NanoCrystal" }.Any(itemName.Contains);
++    }
++
++    private RollEntryResult ProcessStandardRollEntry(RollEntryView entry, IEnumerable<RollEntryView> allEntries)
++    {
++        var playerLevel = DynelManager.LocalPlayer.Level;
++        var itemQl = entry.RollEntryModel.Ql;
++        var itemName = entry.RollEntryModel.Name;
++        var availableMissionLevels = _missionLvls[playerLevel - 1];
++
++        _missionLevel = DetermineMissionLevel(itemQl, itemName, playerLevel, availableMissionLevels);
++
++        int uniqueItemCount = CountRollableItems(allEntries);
++        int sliderValue = availableMissionLevels.IndexOf(_missionLevel) + 1;
++
++        return RollEntryResult.Success(sliderValue, _missionLevel, uniqueItemCount);
++    }
++
++    private int DetermineMissionLevel(int itemQl, string itemName, int playerLevel, List<int> missionLevels)
++    {
++        // If player is level 200+, just grab first >= 200 entry from the table
++        return playerLevel > QL200 && itemQl == QL200 && !IsNanoCrystal(itemName) ? 
++            missionLevels.FirstOrDefault(lvl => lvl >= QL200) : 
++            missionLevels.OrderBy(lvl => Math.Abs(lvl - itemQl)).First();
++    }
++
++    private int CountRollableItems(IEnumerable<RollEntryView> entries)
++    {
++        return entries.Count(entry =>
++        {
++            var itemQl = entry.RollEntryModel.Ql;
++            var itemName = entry.RollEntryModel.Name;
++
++            if (IsNanoCrystal(itemName))
++                return Math.Abs(_missionLevel - itemQl) <= NANO_CRYSTAL_QL_TOLERANCE;
++
++            return _missionLevel == itemQl;
++        });
++    }
++}
++
++public class RollEntryResult
++{
++    public bool IsSuccess { get; }
++    public int SliderValue { get; }
++    public int MissionLevel { get; }
++    public int UniqueItemCount { get; }
++    public int CreditReward { get; }
++    public bool IsSpecialCredit { get; }
++    public bool NoValidEntry { get; }
++
++    private RollEntryResult(bool isSuccess, int sliderValue, int missionLevel, int uniqueItemCount, int creditReward, bool isSpecialCredit, bool noValidEntry)
++    {
++        IsSuccess = isSuccess;
++        SliderValue = sliderValue;
++        MissionLevel = missionLevel;
++        UniqueItemCount = uniqueItemCount;
++        CreditReward = creditReward;
++        IsSpecialCredit = isSpecialCredit;
++        NoValidEntry = noValidEntry;
++    }
++
++    public static RollEntryResult Success(int sliderValue, int missionLevel, int uniqueItemCount)
++    {
++        return new RollEntryResult(true, sliderValue, missionLevel, uniqueItemCount, 0, false, false);
++    }
++
++    public static RollEntryResult SpecialCredit(int creditReward)
++    {
++        return new RollEntryResult(true, 0, 0, 0, creditReward, true, false);
++    }
++
++    public static RollEntryResult NoValidEntrys()
++    {
++        return new RollEntryResult(false, 0, 0, 0, 0, false, true);
++    }
++}
+\ No newline at end of file

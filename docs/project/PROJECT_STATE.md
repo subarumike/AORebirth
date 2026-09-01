@@ -19,6 +19,14 @@ completion matrices and dated evidence retain detailed provenance.
   changed. Evidence:
   `docs/evidence/ARPA3_CLICKSAVER_MISSION_RECONSTRUCTION_20260901.md`.
 
+- Malis Mission Roller 2.0 source, full history, exact AOSharp SDK dependency,
+  and its separate public toolkit release are archived with deterministic
+  offline reconstruction. Malis is a server-offer filter with no ARPA-like
+  eligibility, observation, frequency, or weighting database. Its level/slider,
+  type, offer-field, item, playfield, and cohort evidence is retained without
+  changing runtime mission logic. Evidence:
+  `docs/evidence/MALIS_MISSION_ROLLER_FORENSIC_RECONSTRUCTION_20260901.md`.
+
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted
   source SHA `b1b17e6c43e25d3ce3115ca5c60a842dfe07dd19`. LoginEngine and ZoneEngine

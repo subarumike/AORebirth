@@ -1,0 +1,489 @@
+{
+  "ExactPackage": {
+    "NuGetSha256": "4c2946f10aaa3d92a902be66149a09e4a24ca13bffd8110db37c5def4c578f22",
+    "Version": "1.0.106"
+  },
+  "FieldAvailability": [
+    {
+      "AOSharpRepresentation": "MissionInfo.MissionIdentity",
+      "Field": "mission identity",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": null,
+      "Field": "mission QL",
+      "Status": "NOT_EXPOSED_BY_AOSHARP_MISSIONINFO_1_0_106"
+    },
+    {
+      "AOSharpRepresentation": "MissionItemReward.LowId",
+      "Field": "reward low ID",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionItemReward.HighId",
+      "Field": "reward high ID",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionItemReward.Ql",
+      "Field": "reward QL",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.Description only; accepted Mission.Actions later exposes identities",
+      "Field": "objective item",
+      "Status": "NOT_A_TYPED_OFFER_FIELD"
+    },
+    {
+      "AOSharpRepresentation": null,
+      "Field": "objective item QL",
+      "Status": "NOT_EXPOSED"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.MissionIcon; accepted Mission.Actions later exposes action enum",
+      "Field": "mission type",
+      "Status": "ICON_DIRECT_ACTION_POST_ACCEPT"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.Playfield",
+      "Field": "destination playfield",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.Location Vector3",
+      "Field": "destination coordinates",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.Credits",
+      "Field": "credits",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.XpReward",
+      "Field": "XP reward",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": null,
+      "Field": "token reward",
+      "Status": "NOT_EXPOSED"
+    },
+    {
+      "AOSharpRepresentation": null,
+      "Field": "faction",
+      "Status": "NOT_EXPOSED"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.Description",
+      "Field": "mission description",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.MissionIcon",
+      "Field": "mission icon",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": null,
+      "Field": "mission entrance identity",
+      "Status": "NOT_EXPOSED_IN_OFFER"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo.TerminalIdentity and QuestAlternativeMessage.Terminal",
+      "Field": "terminal identity",
+      "Status": "DIRECT_SERVER_RESPONSE"
+    },
+    {
+      "AOSharpRepresentation": "MissionInfo[] array index",
+      "Field": "offer slot",
+      "Status": "DERIVED_FROM_ORDER"
+    },
+    {
+      "AOSharpRepresentation": null,
+      "Field": "five-offer cohort identity",
+      "Status": "ONE_EVENT_ARRAY_WITH_NO_EXPLICIT_COHORT_ID"
+    }
+  ],
+  "OfferFieldCatalog": [
+    {
+      "AOSharpType": "QuestAlternativeMessage",
+      "AoMemberOrdinal": 0,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Unknown1",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/Messages/N3Messages/QuestAlternativeMessage.cs"
+    },
+    {
+      "AOSharpType": "QuestAlternativeMessage",
+      "AoMemberOrdinal": 1,
+      "DataType": "MissionSliders",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "MissionSliders",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/Messages/N3Messages/QuestAlternativeMessage.cs"
+    },
+    {
+      "AOSharpType": "QuestAlternativeMessage",
+      "AoMemberOrdinal": 2,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Unknown2",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/Messages/N3Messages/QuestAlternativeMessage.cs"
+    },
+    {
+      "AOSharpType": "QuestAlternativeMessage",
+      "AoMemberOrdinal": 3,
+      "DataType": "MissionScope",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Scope",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/Messages/N3Messages/QuestAlternativeMessage.cs"
+    },
+    {
+      "AOSharpType": "QuestAlternativeMessage",
+      "AoMemberOrdinal": 4,
+      "DataType": "Identity",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Terminal",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/Messages/N3Messages/QuestAlternativeMessage.cs"
+    },
+    {
+      "AOSharpType": "QuestAlternativeMessage",
+      "AoMemberOrdinal": 5,
+      "DataType": "MissionInfo[]",
+      "FixedSizeLength": null,
+      "MalisUse": "ordered offer cohort delivered to Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "MissionDetails",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/Messages/N3Messages/QuestAlternativeMessage.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 0,
+      "DataType": "Identity",
+      "FixedSizeLength": null,
+      "MalisUse": "accept and map-ping identity",
+      "Origin": "QuestAlternative packet field",
+      "Property": "MissionIdentity",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 1,
+      "DataType": "byte[]",
+      "FixedSizeLength": 16,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "UnkChunk1",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 2,
+      "DataType": "string",
+      "FixedSizeLength": null,
+      "MalisUse": "display",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Title",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 3,
+      "DataType": "string",
+      "FixedSizeLength": null,
+      "MalisUse": "string matching for nanos and objective/find-item-like text",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Description",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 4,
+      "DataType": "Identity",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "TerminalIdentity",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 5,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "RewardDescriptorVersion",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 6,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "display and combined reward value",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Credits",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 7,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Unk1",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 8,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "display",
+      "Origin": "QuestAlternative packet field",
+      "Property": "XpReward",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 9,
+      "DataType": "byte[]",
+      "FixedSizeLength": 8,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "UnkChunk2",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 10,
+      "DataType": "MissionItemReward[]",
+      "FixedSizeLength": null,
+      "MalisUse": "reward display, value calculation, and exact ID/QL matching",
+      "Origin": "QuestAlternative packet field",
+      "Property": "MissionItemData",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 11,
+      "DataType": "byte[]",
+      "FixedSizeLength": 44,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "UnkChunk3",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 12,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "five-type filtering and display",
+      "Origin": "QuestAlternative packet field",
+      "Property": "MissionIcon",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 13,
+      "DataType": "byte[]",
+      "FixedSizeLength": 120,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "UnkChunk4",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 14,
+      "DataType": "Identity",
+      "FixedSizeLength": null,
+      "MalisUse": "destination allowlist and display-name lookup",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Playfield",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 15,
+      "DataType": "byte[]",
+      "FixedSizeLength": 8,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "UnkChunk5",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 16,
+      "DataType": "Vector3",
+      "FixedSizeLength": null,
+      "MalisUse": "optional X/Z bounds filtering",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Location",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionInfo",
+      "AoMemberOrdinal": 17,
+      "DataType": "byte[]",
+      "FixedSizeLength": 61,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "UnkChunk6",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionInfo.cs"
+    },
+    {
+      "AOSharpType": "MissionItemReward",
+      "AoMemberOrdinal": 0,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "reward identity and single-template matching",
+      "Origin": "QuestAlternative packet field",
+      "Property": "LowId",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionItemReward.cs"
+    },
+    {
+      "AOSharpType": "MissionItemReward",
+      "AoMemberOrdinal": 1,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "reward identity and primary template-pair matching",
+      "Origin": "QuestAlternative packet field",
+      "Property": "HighId",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionItemReward.cs"
+    },
+    {
+      "AOSharpType": "MissionItemReward",
+      "AoMemberOrdinal": 2,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "reward quality matching and dummy-item construction",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Ql",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionItemReward.cs"
+    },
+    {
+      "AOSharpType": "MissionItemReward",
+      "AoMemberOrdinal": 3,
+      "DataType": "int",
+      "FixedSizeLength": null,
+      "MalisUse": "unused/unknown in Malis",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Unk",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionItemReward.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 0,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request difficulty forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "Difficulty",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 1,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request slider forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "GoodBad",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 2,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request slider forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "OrderChaos",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 3,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request slider forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "OpenHidden",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 4,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request slider forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "PhysicalMystical",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 5,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request slider forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "HeadonStealth",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    },
+    {
+      "AOSharpType": "MissionSliders",
+      "AoMemberOrdinal": 6,
+      "DataType": "byte",
+      "FixedSizeLength": null,
+      "MalisUse": "request slider forwarded by AOSharp",
+      "Origin": "QuestAlternative packet field",
+      "Property": "CreditsXp",
+      "SourcePath": "AOSharp.Common/SmokeLounge/AOtomation/Messaging/GameData/MissionSliders.cs"
+    }
+  ],
+  "PostAcceptanceApi": {
+    "Actions": [
+      "FindPerson(0x10)",
+      "FindItem(0x0F)",
+      "UseItemOnItem(0x08)",
+      "KillPerson(0x01)"
+    ],
+    "Fields": [
+      "Identity",
+      "DisplayName",
+      "Source",
+      "PlayfieldInstance",
+      "Location",
+      "Actions"
+    ],
+    "MalisUse": "Malis calls only static Mission.UploadToMap for an offered mission identity; it does not inspect accepted Mission.Actions."
+  },
+  "SourceCorrelation": {
+    "Commit": "b45b7a05f9ffd9676d37e620f2f7d481b82ed212",
+    "ExactPackageToCommitBridge": "UNKNOWN; the NuGet package has no repository commit metadata",
+    "Finding": "The relevant public source files at this same-day commit are unchanged through the inspected public HEAD and agree with exact package metadata."
+  },
+  "TransportPath": [
+    "AO server returns QuestAlternative N3 message",
+    "AO client receives the message",
+    "AOSharp deserializes QuestAlternativeMessage and calls Mission.OnRollListChanged",
+    "Malis receives RollListChangedArgs.MissionDetails in array order",
+    "Malis displays and filters each MissionInfo; it never predicts a server offer"
+  ]
+}

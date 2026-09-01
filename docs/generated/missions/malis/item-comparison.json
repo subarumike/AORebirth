@@ -1,0 +1,102 @@
+{
+  "AORebirthEndpointIdentityMatches": 43075,
+  "AORebirthEndpointIdentityMissing": [],
+  "AORebirthRewardCatalogSemanticComparison": {
+    "clusters": {
+      "AORebirthByteSha256": "da95a9401920dd8368be559696af239497b3bed2e4c4b4688b60d2ebac7cb984",
+      "MalisByteSha256": "da95a9401920dd8368be559696af239497b3bed2e4c4b4688b60d2ebac7cb984",
+      "SemanticEquality": true
+    },
+    "implants": {
+      "AORebirthByteSha256": "e51e3aa50de21ad1a9e96005bb47398be38405759483b5e3a2f47a4aa5fb41ab",
+      "MalisByteSha256": "e51e3aa50de21ad1a9e96005bb47398be38405759483b5e3a2f47a4aa5fb41ab",
+      "SemanticEquality": true
+    },
+    "nanos": {
+      "AORebirthByteSha256": "00805abce680f03c2496b5fc032d83300303f928d11f26311bdbfb1f91342a98",
+      "MalisByteSha256": "ce5d1403cba36e9fdc6c7add9d322bd13f23170b7b50635d2c2befc7bd88c751",
+      "SemanticEquality": true
+    },
+    "refined": {
+      "AORebirthByteSha256": "a88b127d77226cdf23bcb9120b6acf9f4f02dec95d7986e379d237edb5048542",
+      "MalisByteSha256": "a88b127d77226cdf23bcb9120b6acf9f4f02dec95d7986e379d237edb5048542",
+      "SemanticEquality": true
+    },
+    "rest": {
+      "AORebirthByteSha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c",
+      "MalisByteSha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c",
+      "SemanticEquality": true
+    }
+  },
+  "ClickSaver": {
+    "ExactEndpointIdentityMatches": 19513,
+    "ExactTemplatePairMatches": 15954,
+    "InterpolatedRelationMembersBeyondEndpoints": 0,
+    "ItemIdentities": 34560,
+    "ItemIdentitiesWithoutMalisEndpoint": 15047,
+    "MalisEndpointsAbsentFromClickSaver": 23562
+  },
+  "Duplicates": {
+    "ConflictingTemplatePairs": [
+      {
+        "DistinctRecords": 2,
+        "HighId": 36785,
+        "LowId": 36777,
+        "RecordCount": 2
+      },
+      {
+        "DistinctRecords": 2,
+        "HighId": 95520,
+        "LowId": 36781,
+        "RecordCount": 2
+      },
+      {
+        "DistinctRecords": 2,
+        "HighId": 36777,
+        "LowId": 36782,
+        "RecordCount": 2
+      },
+      {
+        "DistinctRecords": 2,
+        "HighId": 36782,
+        "LowId": 36783,
+        "RecordCount": 2
+      },
+      {
+        "DistinctRecords": 2,
+        "HighId": 36787,
+        "LowId": 36784,
+        "RecordCount": 2
+      },
+      {
+        "DistinctRecords": 2,
+        "HighId": 36784,
+        "LowId": 36785,
+        "RecordCount": 2
+      }
+    ],
+    "ExactDuplicateRecordExcess": 2,
+    "RepeatedTemplatePairExcess": 8,
+    "UniqueTemplatePairs": 23985
+  },
+  "Malis": {
+    "ActualItemRows": 23993,
+    "CategoryCountsIncludingPseudoEntry": {
+      "clusters": 516,
+      "implants": 8474,
+      "nanos": 2112,
+      "refined": 8613,
+      "rest": 4279
+    },
+    "EndpointIdentities": 43075,
+    "PseudoRewardSearchEntries": 1,
+    "RowsIncludingPseudoEntry": 23994,
+    "UniqueTemplatePairs": 23985
+  },
+  "UnresolvedHistoricalItem89622": {
+    "ExactEndpointMatch": false,
+    "ExactTemplatePairMatch": false,
+    "NormalizedNameDiagnosticMatch": false,
+    "Resolution": "UNRESOLVED"
+  }
+}

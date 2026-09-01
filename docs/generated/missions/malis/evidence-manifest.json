@@ -1,0 +1,68 @@
+{
+  "Generator": "Tools/malis_mission_evidence.py",
+  "GeneratorVersion": 1,
+  "MalisSourceCommit": "3ac9943a4943b8cb80eda9e40359729e656686b0",
+  "Outputs": [
+    {
+      "ByteLength": 4082,
+      "RelativePath": "docs/generated/missions/malis/analysis-summary.json",
+      "Sha256": "71708451fe82e0c33523a7d3a5aff772416b89f21971aa911b2d6aac9fe8cfe1"
+    },
+    {
+      "ByteLength": 17298,
+      "RelativePath": "docs/generated/missions/malis/aosharp-mission-field-catalog.json",
+      "Sha256": "6235b6ee3494dbd6243186b43254ee2e308c6db2d9c7c9496252c83632143d15"
+    },
+    {
+      "ByteLength": 2655,
+      "RelativePath": "docs/generated/missions/malis/arpa-gap-matrix.json",
+      "Sha256": "760050889e44acb7f07affb0a59321cacd7f7e586f1598bc6e53804a47da5726"
+    },
+    {
+      "ByteLength": 9377,
+      "RelativePath": "docs/generated/missions/malis/character-level-mission-ql.csv",
+      "Sha256": "21f707f3ba96167e9cad682d6377cae2657a24d9f8ecd2c39a92df58ce64fbc7"
+    },
+    {
+      "ByteLength": 3080,
+      "RelativePath": "docs/generated/missions/malis/item-comparison.json",
+      "Sha256": "81db1c9fe13e5eda6631e93ea3459769199b480849d4a7fe7e4286fb44b1c1ab"
+    },
+    {
+      "ByteLength": 17370,
+      "RelativePath": "docs/generated/missions/malis/mission-level-comparison.json",
+      "Sha256": "9f2a1ac94e55df454a0139c9acf9da22b4ee792c56f607fbe2ee8233839e7a80"
+    },
+    {
+      "ByteLength": 1343,
+      "RelativePath": "docs/generated/missions/malis/mission-type-catalog.json",
+      "Sha256": "8eb64313aa7c2e5674a050a95d2b8ac8cca5d6a32f323d24f9b48c508e0e1560"
+    },
+    {
+      "ByteLength": 12939,
+      "RelativePath": "docs/generated/missions/malis/playfield-comparison.json",
+      "Sha256": "da2264ac4e3409b5111698d9a8aa06827b16e1f0c2f07b12f80a3cda0fee504c"
+    },
+    {
+      "ByteLength": 24418,
+      "RelativePath": "docs/generated/missions/malis/release-comparison.json",
+      "Sha256": "733367cca5ced005a8c3430f608095ce11f9b57739a582f39217c9acce55a1c7"
+    },
+    {
+      "ByteLength": 16111,
+      "RelativePath": "docs/generated/missions/malis/source-file-inventory.json",
+      "Sha256": "c566c2ba55f21991cada5a9fa64844f85f0c5d1df1220a36a1df084fc94e2644"
+    },
+    {
+      "ByteLength": 120176,
+      "RelativePath": "docs/generated/missions/malis/source-history-findings.json",
+      "Sha256": "b5418e366f679480dc618fa1e5b04b6c5f29c7cada9e99a2c15e8ac18066fd0f"
+    },
+    {
+      "ByteLength": 6913,
+      "RelativePath": "docs/generated/missions/malis/static-dataset-inventory.json",
+      "Sha256": "0617c6b0f7935bbd891b94045ad4fa502f54a09c211054f018c9efa2919a6c20"
+    }
+  ],
+  "RuntimeMissionLogicChanged": false
+}

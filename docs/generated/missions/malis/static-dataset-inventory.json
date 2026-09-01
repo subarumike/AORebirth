@@ -1,0 +1,139 @@
+[
+  {
+    "AppearsGeneratedOrMaintained": "STATIC_EXPORT_WITH_MANUAL_HISTORY_AMENDMENTS",
+    "ByteLength": 1549309,
+    "Dataset": "implants",
+    "Path": "JSON/ItemDB_Implants.json",
+    "Purpose": "SEARCHABLE_ITEM_TEMPLATE_CATALOG_NOT_ROLLABILITY_DATA",
+    "RecordCount": 8474,
+    "RuntimeConsumer": "Main.Run -> Extensions.FormatItemDb -> ItemDisplayView search and roll-list entry creation",
+    "Schema": "Array<KeyValuePair<ItemInfo,List<Stat>>>; Key={LowId,HighId,LowQl,HighQl,Tags,Name}",
+    "Sha256": "e51e3aa50de21ad1a9e96005bb47398be38405759483b5e3a2f47a4aa5fb41ab",
+    "SourceProvenance": "UNKNOWN; commit history documents manual additions and corrections but names no upstream dataset"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "STATIC_EXPORT_WITH_MANUAL_HISTORY_AMENDMENTS",
+    "ByteLength": 1746304,
+    "Dataset": "refined",
+    "Path": "JSON/ItemDb_Refined.json",
+    "Purpose": "SEARCHABLE_ITEM_TEMPLATE_CATALOG_NOT_ROLLABILITY_DATA",
+    "RecordCount": 8613,
+    "RuntimeConsumer": "Main.Run -> Extensions.FormatItemDb -> ItemDisplayView search and roll-list entry creation",
+    "Schema": "Array<KeyValuePair<ItemInfo,List<Stat>>>; Key={LowId,HighId,LowQl,HighQl,Tags,Name}",
+    "Sha256": "a88b127d77226cdf23bcb9120b6acf9f4f02dec95d7986e379d237edb5048542",
+    "SourceProvenance": "UNKNOWN; commit history documents manual additions and corrections but names no upstream dataset"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "STATIC_EXPORT_WITH_MANUAL_HISTORY_AMENDMENTS",
+    "ByteLength": 97715,
+    "Dataset": "clusters",
+    "Path": "JSON/ItemDb_Clusters.json",
+    "Purpose": "SEARCHABLE_ITEM_TEMPLATE_CATALOG_NOT_ROLLABILITY_DATA",
+    "RecordCount": 516,
+    "RuntimeConsumer": "Main.Run -> Extensions.FormatItemDb -> ItemDisplayView search and roll-list entry creation",
+    "Schema": "Array<KeyValuePair<ItemInfo,List<Stat>>>; Key={LowId,HighId,LowQl,HighQl,Tags,Name}",
+    "Sha256": "da95a9401920dd8368be559696af239497b3bed2e4c4b4688b60d2ebac7cb984",
+    "SourceProvenance": "UNKNOWN; commit history documents manual additions and corrections but names no upstream dataset"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "STATIC_EXPORT_WITH_MANUAL_HISTORY_AMENDMENTS",
+    "ByteLength": 805512,
+    "Dataset": "nanos",
+    "Path": "JSON/ItemDb_Nanos.json",
+    "Purpose": "SEARCHABLE_ITEM_TEMPLATE_CATALOG_NOT_ROLLABILITY_DATA",
+    "RecordCount": 2112,
+    "RuntimeConsumer": "Main.Run -> Extensions.FormatItemDb -> ItemDisplayView search and roll-list entry creation",
+    "Schema": "Array<KeyValuePair<ItemInfo,List<Stat>>>; Key={LowId,HighId,LowQl,HighQl,Tags,Name}",
+    "Sha256": "ce5d1403cba36e9fdc6c7add9d322bd13f23170b7b50635d2c2befc7bd88c751",
+    "SourceProvenance": "UNKNOWN; commit history documents manual additions and corrections but names no upstream dataset"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "STATIC_EXPORT_WITH_MANUAL_HISTORY_AMENDMENTS",
+    "ByteLength": 702478,
+    "Dataset": "rest",
+    "Path": "JSON/ItemDb_Rest.json",
+    "Purpose": "SEARCHABLE_ITEM_TEMPLATE_CATALOG_NOT_ROLLABILITY_DATA",
+    "RecordCount": 4279,
+    "RuntimeConsumer": "Main.Run -> Extensions.FormatItemDb -> ItemDisplayView search and roll-list entry creation",
+    "Schema": "Array<KeyValuePair<ItemInfo,List<Stat>>>; Key={LowId,HighId,LowQl,HighQl,Tags,Name}",
+    "Sha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c",
+    "SourceProvenance": "UNKNOWN; commit history documents manual additions and corrections but names no upstream dataset"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "MANUALLY_MAINTAINED_LOOKUP_TABLE",
+    "ByteLength": 25076,
+    "Dataset": "mission_levels",
+    "Path": "JSON/MissionLevels.json",
+    "Purpose": "CLIENT_SIDE_CHARACTER_LEVEL_AND_DIFFICULTY_TO_REQUESTED_MISSION_QL",
+    "RecordCount": 220,
+    "RuntimeConsumer": "MainWindow and RollEntryProcessor",
+    "Schema": "220 arrays intended to contain 11 ordered mission QLs; 13 rows are short in current source",
+    "Sha256": "cccee41a7a26bcd5e9f4179ed010adfd924c32734ab9e478313890a47cdb8214",
+    "SourceProvenance": "UNKNOWN; source history contains five point corrections without an upstream citation"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "MANUALLY_MAINTAINED_SEARCH_SYNONYMS",
+    "ByteLength": 10434,
+    "Dataset": "mod_tags",
+    "Path": "JSON/ModTags.json",
+    "Purpose": "ITEM_BROWSER_STAT_AND_PROFESSION_TEXT_FILTERING",
+    "RecordCount": 175,
+    "RuntimeConsumer": "ItemDisplayView.SearchQuery",
+    "Schema": "Object<StatOrNumericKey,string[]>",
+    "Sha256": "44f336330813e9df750c0f8b40585577abe2ac7a4b20bba1074500608391593f",
+    "SourceProvenance": "UNKNOWN"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "MANUALLY_MAINTAINED_DEFAULT_CONFIGURATION",
+    "ByteLength": 11327,
+    "Dataset": "default_settings",
+    "Path": "JSON/Default_Settings.json",
+    "Purpose": "MISSION_TYPE_FILTERS_SLIDERS_DATABASE_SELECTION_LOCATION_ALLOWLIST_AND_UI_DEFAULTS",
+    "RecordCount": 7,
+    "RuntimeConsumer": "Main.Run and Settings/Views",
+    "Schema": {
+      "Database": 5,
+      "Dev": 2,
+      "Extras": 6,
+      "Frame": 2,
+      "Locations": 46,
+      "Sliders": 7,
+      "Types": 5
+    },
+    "Sha256": "5de0cde70871913a8bd3a3b05a897a4a08ed7b6f781e72a28b5f4577051d3b7e",
+    "SourceProvenance": "MALIS_PROJECT_DEFAULTS; AO playfield names are resolved from the client at runtime"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "HARDCODED_MANUAL_ARRAY",
+    "Dataset": "mission_destination_playfield_allowlist",
+    "Path": "Views/PlayfieldView.cs",
+    "Purpose": "ENABLE_DISABLE_AND_OPTIONAL_XZ_BOUND_FILTERING",
+    "RecordCount": 46,
+    "RuntimeConsumer": "PlayfieldView and MainWindow.RollMatchCheck",
+    "Schema": "int[] playfield IDs paired by order with Default_Settings.Locations",
+    "Sha256": "7fbf0015e27d3af7a661a8cd83c44ca8183c7ca3793aaf996ca64ca29a1b41af",
+    "SourceProvenance": "UNKNOWN"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "HARDCODED_CLIENT_RESPONSE_CLASSIFICATION",
+    "Dataset": "mission_type_icons",
+    "Path": "MainWindow.cs",
+    "Purpose": "POST_OFFER_MISSION_TYPE_FILTERING",
+    "RecordCount": 5,
+    "RuntimeConsumer": "MainWindow.RollMatchCheck",
+    "Schema": "MissionIcon integer to UI filter",
+    "Sha256": "c930bc9dd89cdf30092e1de6605b744eb828bf68c08be135c87da2cd220913bc",
+    "SourceProvenance": "MALIS_SOURCE; independently bridged by capture-backed AORebirth MissionTypeCatalog"
+  },
+  {
+    "AppearsGeneratedOrMaintained": "HARDCODED_UI_SHAPE",
+    "Dataset": "five_offer_slots",
+    "Path": "Views/MissionView.cs",
+    "Purpose": "DISPLAY_AND_PROCESS_ONE_SERVER_RESPONSE_COHORT",
+    "RecordCount": 5,
+    "RuntimeConsumer": "MissionView and MainWindow.RollMatchCheck",
+    "Schema": "Five ordered MissionInfo entries",
+    "Sha256": "e52f75ce891f192ebaa9f72465a38e413fcd54375684ed5bcb87d1addee5a635",
+    "SourceProvenance": "MALIS_SOURCE_AND_AOSHARP_SERVER_RESPONSE_ARRAY"
+  }
+]

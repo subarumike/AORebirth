@@ -1,0 +1,521 @@
+{
+  "Counts": {
+    "ClickSaverPlayfields": 619,
+    "ExactIdAndNameMatches": 36,
+    "IdMatches": 46,
+    "IdMatchesWithNameDisagreement": 10,
+    "MalisPlayfields": 46,
+    "MissingHistoricalPlayfields": 573,
+    "NewMalisPlayfields": 0,
+    "NormalizedNameDiagnosticMatches": 38
+  },
+  "Rows": [
+    {
+      "ClickSaverNames": [
+        "4 Holes",
+        "4 Holes"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "4 Holes",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 760
+    },
+    {
+      "ClickSaverNames": [
+        "Aegean",
+        "Aegean"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Aegean",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 585
+    },
+    {
+      "ClickSaverNames": [
+        "Andromeda",
+        "Andromeda"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Andromeda",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 655
+    },
+    {
+      "ClickSaverNames": [
+        "Athen Shire",
+        "Athen Shire"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Athen Shire",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 550
+    },
+    {
+      "ClickSaverNames": [
+        "West Athens",
+        "West Athens"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Athen West",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 545
+    },
+    {
+      "ClickSaverNames": [
+        "Avalon",
+        "Avalon"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Avalon",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 505
+    },
+    {
+      "ClickSaverNames": [
+        "Belial Forest",
+        "Belial Forest"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Belial Forest",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 605
+    },
+    {
+      "ClickSaverNames": [
+        "Borealis",
+        "Borealis"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Borealis City",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 800
+    },
+    {
+      "ClickSaverNames": [
+        "Broken Shores",
+        "Broken Shores"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Broken Shores",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 665
+    },
+    {
+      "ClickSaverNames": [
+        "Central Artery Valley",
+        "Central Artery Valley"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Central Artery Valley",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 590
+    },
+    {
+      "ClickSaverNames": [
+        "Clondyke",
+        "Clondyke"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Clondyke",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 670
+    },
+    {
+      "ClickSaverNames": [
+        "Deep Artery Valley",
+        "Deep Artery Valley"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Deep Artery Valley",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 595
+    },
+    {
+      "ClickSaverNames": [
+        "Eastern Fouls Plains",
+        "Eastern Fouls Plains"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Eastern Fouls Plains",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 620
+    },
+    {
+      "ClickSaverNames": [
+        "Galway County",
+        "Galway County"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Galway County",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 685
+    },
+    {
+      "ClickSaverNames": [
+        "Galway Shire",
+        "Galway Shire"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Galway Shire",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 687
+    },
+    {
+      "ClickSaverNames": [
+        "Greater Omni Forest",
+        "Greater Omni Forest"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Greater Omni Forest",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 717
+    },
+    {
+      "ClickSaverNames": [
+        "Greater Tir County",
+        "Greater Tir County"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Greater Tir County",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 647
+    },
+    {
+      "ClickSaverNames": [
+        "Holes in the Wall",
+        "Holes in the Wall"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Holes In the Wall",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 791
+    },
+    {
+      "ClickSaverNames": [
+        "Lush Fields",
+        "Lush Fields"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Lush Fields",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 695
+    },
+    {
+      "ClickSaverNames": [
+        "Milky Way",
+        "Milky Way"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Milky Way",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 625
+    },
+    {
+      "ClickSaverNames": [
+        "Mort",
+        "Mort"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Mort",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 560
+    },
+    {
+      "ClickSaverNames": [
+        "Mutant Domain",
+        "Mutant Domain"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Mutant Domain",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 696
+    },
+    {
+      "ClickSaverNames": [
+        "Newland",
+        "Newland"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Newland",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 567
+    },
+    {
+      "ClickSaverNames": [
+        "Newland City",
+        "Newland City"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Newland City",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 566
+    },
+    {
+      "ClickSaverNames": [
+        "Newland Desert",
+        "Newland Desert"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Newland Desert",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 565
+    },
+    {
+      "ClickSaverNames": [
+        "Old Athen",
+        "Old Athen"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Old Athen",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 540
+    },
+    {
+      "ClickSaverNames": [
+        "Omni Forest",
+        "Omni Forest"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Omni Forest",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 716
+    },
+    {
+      "ClickSaverNames": [
+        "Omni1 Entertainment",
+        "Omni1 Entertainment"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Omni-1 Entertainment",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 705
+    },
+    {
+      "ClickSaverNames": [
+        "Omni1-HEADQUARTER",
+        "Omni1-HEADQUARTER"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Omni-1 HQ",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 700
+    },
+    {
+      "ClickSaverNames": [
+        "Omni-1 Trade",
+        "Omni-1 Trade"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Omni-1 Trade",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 710
+    },
+    {
+      "ClickSaverNames": [
+        "The Perpetual Wastelands ",
+        "The Perpetual Wastelands "
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Perpetual Wastelands",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 570
+    },
+    {
+      "ClickSaverNames": [
+        "Pleasant Meadows",
+        "Pleasant Meadows"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Pleasant Meadows",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 630
+    },
+    {
+      "ClickSaverNames": [
+        "Rome Blue",
+        "Rome Blue"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Rome Blue district",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 735
+    },
+    {
+      "ClickSaverNames": [
+        "Rome Green",
+        "Rome Green"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Rome Green district",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 740
+    },
+    {
+      "ClickSaverNames": [
+        "Rome Park",
+        "Rome Park"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Rome Red district",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": false,
+      "PlayfieldId": 730
+    },
+    {
+      "ClickSaverNames": [
+        "Southern Artery Valley ",
+        "Southern Artery Valley "
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Southern Artery Valley",
+      "NameExactMatch": false,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 610
+    },
+    {
+      "ClickSaverNames": [
+        "Southern Fouls Hills",
+        "Southern Fouls Hills"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Southern Fouls Hills",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 615
+    },
+    {
+      "ClickSaverNames": [
+        "Stret East Bank",
+        "Stret East Bank GOLD"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Stret East Bank",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 635
+    },
+    {
+      "ClickSaverNames": [
+        "Stret West Bank",
+        "Stret West Bank"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Stret West Bank",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 790
+    },
+    {
+      "ClickSaverNames": [
+        "The Longest Road",
+        "The Longest Road"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "The Longest Road",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 795
+    },
+    {
+      "ClickSaverNames": [
+        "Tir",
+        "Tir"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Tir",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 640
+    },
+    {
+      "ClickSaverNames": [
+        "Tir County",
+        "Tir County"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Tir County",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 646
+    },
+    {
+      "ClickSaverNames": [
+        "Upper Stret East Bank",
+        "Upper Stret East Bank"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Upper Stret East Bank",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 650
+    },
+    {
+      "ClickSaverNames": [
+        "Varmint Woods",
+        "Varmint Woods"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Varmint Woods",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 600
+    },
+    {
+      "ClickSaverNames": [
+        "Wailing Wastes",
+        "Wailing Wastes"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Wailing Wastes",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 551
+    },
+    {
+      "ClickSaverNames": [
+        "Wartorn Valley",
+        "Wartorn Valley"
+      ],
+      "IdPresentInClickSaver": true,
+      "MalisName": "Wartorn Valley",
+      "NameExactMatch": true,
+      "NameNormalizedDiagnosticMatch": true,
+      "PlayfieldId": 586
+    }
+  ],
+  "Semantics": "Malis list is a client-side inclusion/filter list, not destination eligibility or weighting evidence."
+}

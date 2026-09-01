@@ -1,0 +1,118 @@
+{
+  "Acquisition": {
+    "AOSharpNuGetVersion": "1.0.106",
+    "AOSharpSourceCorrelationCommit": "b45b7a05f9ffd9676d37e620f2f7d481b82ed212",
+    "Branch": "main",
+    "MalisCommit": "3ac9943a4943b8cb80eda9e40359729e656686b0",
+    "MalisRepository": "https://gitlab.com/Pixelmania/malis-mission-roller-2.0.git",
+    "ReleaseBinariesExecuted": false,
+    "RetrievedAtUtc": "2026-09-01T04:29:44Z"
+  },
+  "Artifacts": [
+    {
+      "ByteLength": 11839297,
+      "RelativePath": "raw/Malis-AO-Toolkit-27-01-26.zip",
+      "Role": "MALIS_PUBLIC_TOOLKIT_RELEASE",
+      "Sha256": "b9873762c86b7d0a2069c6d1bc830b5a96ed0dbc352466b2ddc410224efdf0ac",
+      "Source": "https://mega.nz/folder/XThTRBKD#w0JD-dp-Cxg9syfNEcIwiA"
+    },
+    {
+      "ByteLength": 3680827,
+      "RelativePath": "raw/aosharp-source-b45b7a05f9ffd9676d37e620f2f7d481b82ed212.zip",
+      "Role": "AOSHARP_PUBLIC_SOURCE_CORRELATION",
+      "Sha256": "f668e29309ebba790dbac540df94666e6ce1803d8e169f21c7124e6a79777564",
+      "Source": "https://gitlab.com/never-knows-best/aosharp.git"
+    },
+    {
+      "ByteLength": 272139,
+      "RelativePath": "raw/aosharpsdk.1.0.106.nupkg",
+      "Role": "AOSHARP_SDK_EXACT_PACKAGE",
+      "Sha256": "4c2946f10aaa3d92a902be66149a09e4a24ca13bffd8110db37c5def4c578f22",
+      "Source": "https://api.nuget.org/v3-flatcontainer/aosharpsdk/1.0.106/aosharpsdk.1.0.106.nupkg"
+    },
+    {
+      "ByteLength": 2,
+      "RelativePath": "raw/gitlab-7e5b921cebabee99051252a4883f324b38a519fc-comments.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "Source": "https://gitlab.com/api/v4/projects/37047089/repository/commits/7e5b921cebabee99051252a4883f324b38a519fc/comments"
+    },
+    {
+      "ByteLength": 2,
+      "RelativePath": "raw/gitlab-e19bb1ddc25e2647688c7996c8b09d50198fc486-comments.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "Source": "https://gitlab.com/api/v4/projects/37047089/repository/commits/e19bb1ddc25e2647688c7996c8b09d50198fc486/comments"
+    },
+    {
+      "ByteLength": 2,
+      "RelativePath": "raw/gitlab-issues.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "Source": "https://gitlab.com/api/v4/projects/37047089/issues?scope=all&per_page=100"
+    },
+    {
+      "ByteLength": 85667,
+      "RelativePath": "raw/gitlab-merge-requests.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "cb52660f84c519096151928a0e6a00e7a514beffb2b070248fd0cd2233b3dfb8",
+      "Source": "https://gitlab.com/api/v4/projects/37047089/merge_requests?scope=all&per_page=100"
+    },
+    {
+      "ByteLength": 1385,
+      "RelativePath": "raw/gitlab-project.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "41120e56f0d4016586b72222042c68f4be8bcb145ac32e6a865cbc21db289884",
+      "Source": "https://gitlab.com/api/v4/projects/37047089"
+    },
+    {
+      "ByteLength": 2,
+      "RelativePath": "raw/gitlab-releases.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "Source": "https://gitlab.com/api/v4/projects/37047089/releases"
+    },
+    {
+      "ByteLength": 21472,
+      "RelativePath": "raw/malis-commit-history.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "50905cc1512abe0094ab1039c3fe0bff71b3fe1d5d72a98e7ebf84c8e3024ae1",
+      "Source": "https://gitlab.com/Pixelmania/malis-mission-roller-2.0.git"
+    },
+    {
+      "ByteLength": 513,
+      "RelativePath": "raw/malis-level-80-fix-e19bb1ddc25e2647688c7996c8b09d50198fc486.patch",
+      "Role": "MALIS_HISTORICAL_PATCH",
+      "Sha256": "ab6565eaeccc0a21b8fe6f8bf780f93f435ff92b486962a4460f4330359af432",
+      "Source": "https://gitlab.com/Pixelmania/malis-mission-roller-2.0.git"
+    },
+    {
+      "ByteLength": 9425,
+      "RelativePath": "raw/malis-ql200-above-200-7e5b921cebabee99051252a4883f324b38a519fc.patch",
+      "Role": "MALIS_HISTORICAL_PATCH",
+      "Sha256": "a79976b33365d4c8e1a0c5b1971e999e461caee4ed3e41dcb7bda6b5ef45eb65",
+      "Source": "https://gitlab.com/Pixelmania/malis-mission-roller-2.0.git"
+    },
+    {
+      "ByteLength": 1946911,
+      "RelativePath": "raw/malis-repository-3ac9943a4943b8cb80eda9e40359729e656686b0.bundle",
+      "Role": "MALIS_COMPLETE_GIT_HISTORY",
+      "Sha256": "286983b76670602b994be27851732962230ecf369c9511f0816f8236fcf6e75c",
+      "Source": "https://gitlab.com/Pixelmania/malis-mission-roller-2.0.git"
+    },
+    {
+      "ByteLength": 1219850,
+      "RelativePath": "raw/malis-source-3ac9943a4943b8cb80eda9e40359729e656686b0.zip",
+      "Role": "MALIS_EXACT_SOURCE_TREE",
+      "Sha256": "c1dc1bf4c919193c0ea9b5ba3cc5419075becd5b94e1041391f0d9ebbae0074d",
+      "Source": "https://gitlab.com/Pixelmania/malis-mission-roller-2.0.git"
+    },
+    {
+      "ByteLength": 299,
+      "RelativePath": "raw/mega-release-metadata.json",
+      "Role": "PUBLIC_METADATA_OR_HISTORY",
+      "Sha256": "4a1c2953425ebe27e81900666a68fd459084be597b63adce86a6fe430da111b8",
+      "Source": "https://mega.nz/folder/XThTRBKD#w0JD-dp-Cxg9syfNEcIwiA"
+    }
+  ]
+}

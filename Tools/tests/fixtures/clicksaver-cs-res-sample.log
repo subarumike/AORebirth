@@ -1,0 +1,26 @@
+# Exact documentation samples from https://arpa3.net/ao/clicksaver.shtml.
+# These are schema/behavior evidence, not an independently acquired player log corpus.
+ *** Found wanted mission, QL200 #3
+     loc 665: 647.0 1310.8 Broken Shores
+     find Super SOL Fire Executioner Type T
+ *** reward QL200 Head Implant: Treatment, Shiny (DB Id 106957/106957)
+
+ *** Found wanted mission, QL134 #1
+ *** loc 665: 535.6 1482.6 Broken Shores
+     find Waist Implant: Chemical AC, Shiny
+ *** reward QL139 Nano Crystal (Perfected Shielding Barrier) (DB Id 70590/70590)
+
+ *** Found wanted mission, QL134 #1
+ *** loc 665: 731.4 1430.5 Broken Shores
+     find Flawless Kevlar Armor Sleeves
+ *** reward QL143 Nano Crystal (Touch of the Specter) (DB Id 210741/210741)
+
+ *** Found wanted mission, QL134 #1
+ *** loc 665: 562.4 1508.2 Broken Shores
+ *** find Nano Crystal (Team Skill Wrangler (Superior))
+     reward QL134 Layered Large Rider Squibber (DB Id 125338/125339)
+
+ *** Found wanted mission, QL149 #2
+     loc 615: 1600.3 2142.4 Southern Fouls Hills
+ *** find Nano Crystal (Flawed Warbot)
+     reward QL149 Senior Aero Borealis Corona (DB Id 122629/122630)
