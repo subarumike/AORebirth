@@ -404,6 +404,8 @@ def load_mission_type_join() -> dict[int, dict[str, object]]:
     return {
         int(row["MissionIcon"]): {
             "CaptureBackedType": row["AORebirthCaptureBackedType"],
+            "CanonicalMissionType": row["CanonicalMissionType"],
+            "CanonicalDisplayName": row["CanonicalDisplayName"],
             "MalisDisplayName": row["MalisDisplayName"],
             "Confidence": row["Representation"],
         }
@@ -994,6 +996,8 @@ def self_test() -> None:
         assert normalized["Session"]["DuplicateCallbackCount"] == 1
         assert normalized["Offers"][0]["Rewards"][0]["OfflineLowIdJoin"]["Name"] == "Flamethrower Ammunition"
         assert normalized["Offers"][0]["MissionType"]["CaptureBackedType"] == "FindItemReturn"
+        assert normalized["Offers"][0]["MissionType"]["CanonicalMissionType"] == "RETURN_ITEM"
+        assert normalized["Offers"][0]["MissionType"]["CanonicalDisplayName"] == "Return Item"
         assert normalized["Offers"][0]["PlayfieldName"]["Name"]
         assert normalized["Offers"][0]["RollOrigin"]["provenance"] == "SCHEMA_VERSION_1_SESSION_ORIGIN_FALLBACK"
         assert normalized["Offers"][0]["RollOrigin"]["terminal_identity"]["instance"] == 1234

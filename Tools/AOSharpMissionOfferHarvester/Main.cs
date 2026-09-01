@@ -49,7 +49,7 @@ namespace AORebirth.MissionEvidence
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester 1.2 loaded (roll origin + mission destination + type + rewards). Select a mission terminal, then use /missionharvest start <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester 1.2.1 loaded (roll origin + mission destination + canonical type + rewards). Select a mission terminal, then use /missionharvest start <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
         }
 
         public override void Teardown()
@@ -543,32 +543,44 @@ namespace AORebirth.MissionEvidence
         private static IDictionary<string, object> MissionTypePayload(int missionIcon)
         {
             string captureBackedType = null;
+            string canonicalType = null;
+            string canonicalDisplayName = null;
             string malisDisplayName = null;
             string clickSaverWireCode = null;
             switch (missionIcon)
             {
                 case 11329:
                     captureBackedType = "FindItemReturn";
+                    canonicalType = "RETURN_ITEM";
+                    canonicalDisplayName = "Return Item";
                     malisDisplayName = "Return Item";
                     clickSaverWireCode = "0x2C41";
                     break;
                 case 11330:
                     captureBackedType = "KillPerson";
+                    canonicalType = "KILL_PERSON";
+                    canonicalDisplayName = "Kill Person";
                     malisDisplayName = "Kill Target";
                     clickSaverWireCode = "0x2C42";
                     break;
                 case 11335:
                     captureBackedType = "FindPerson";
+                    canonicalType = "FIND_PERSON";
+                    canonicalDisplayName = "Find Person";
                     malisDisplayName = "Find Target";
                     clickSaverWireCode = "0x2C47";
                     break;
                 case 11337:
                     captureBackedType = "FindItem";
+                    canonicalType = "FIND_ITEM";
+                    canonicalDisplayName = "Find Item";
                     malisDisplayName = "Find Item";
                     clickSaverWireCode = "0x2C49";
                     break;
                 case 11342:
                     captureBackedType = "RepairMachine";
+                    canonicalType = "REPAIR";
+                    canonicalDisplayName = "Repair";
                     malisDisplayName = "Use Item";
                     clickSaverWireCode = "0x2C4E";
                     break;
@@ -577,6 +589,8 @@ namespace AORebirth.MissionEvidence
             {
                 ["mission_icon"] = missionIcon,
                 ["capture_backed_type"] = captureBackedType,
+                ["canonical_type"] = canonicalType,
+                ["canonical_display_name"] = canonicalDisplayName,
                 ["malis_display_name"] = malisDisplayName,
                 ["clicksaver_wire_code"] = clickSaverWireCode,
                 ["classification_status"] = captureBackedType == null

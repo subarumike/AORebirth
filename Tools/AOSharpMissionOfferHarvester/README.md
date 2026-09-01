@@ -57,10 +57,11 @@ Every public field exposed by AOSharp 1.0.106 `MissionInfo` is retained. Each
 offer includes mission identity, title, description, terminal identity, credits,
 XP, reward descriptor version, every reward item's low/high IDs and QL, mission
 icon, structured mission destination, all six raw unknown chunks, and the
-request-time roll origin. The five proven Malis icon mappings are emitted as an
-explicit mission-type record: Return Item, Kill Target, Find Target, Find Item,
-and Use Item/Repair. An unknown icon remains `UNKNOWN_ICON_RAW_VALUE_PRESERVED`;
-the plugin never guesses its type from prose.
+request-time roll origin. The five proven icon mappings are emitted with the
+canonical Rubi-Ka mission names: Find Item, Return Item, Repair, Find Person,
+and Kill Person. The original Malis labels and AORebirth capture-backed names
+remain alongside the canonical name as provenance. An unknown icon remains
+`UNKNOWN_ICON_RAW_VALUE_PRESERVED`; the plugin never guesses its type from prose.
 
 The response envelope now preserves every public `QuestAlternativeMessage`
 header field in addition to the returned sliders and full offer cohort. Fields
