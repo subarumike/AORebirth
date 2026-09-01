@@ -120,19 +120,32 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.PlayfieldZ = Playfields.GetPlayfieldZ(character.Playfield.Identity.Instance);
 
                 // Capture 20260824-125154: ACGEntrance C7A1:C00010D6 + j222 generator payload.
-                // Must run before IsMissionInstancePlayfield (dyn id is not an RK mission lease).
-                if (NascenceDungeon1Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
+                // D4/D3/D2 before D1: all share the live ACG dyn band; wrong order stamps D1 layout.
+                if (NascenceDungeon4Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
                 {
                     x.PlayfieldX = 0;
                     x.PlayfieldZ = 0;
                     x.PlayfieldId1 = new Identity
                                      {
-                                         Type = NascenceDungeon1Rules.BuildingGeneratorType,
-                                         Instance = NascenceDungeon1Rules.BuildingInstance
+                                         Type = NascenceDungeon4Rules.BuildingGeneratorType,
+                                         Instance = NascenceDungeon4Rules.BuildingInstance
                                      };
                     x.Unknown3 = 0;
                     x.Unknown4 = 0;
-                    x.GeneratorPayload = NascenceDungeon1AcgLayout.CreateGeneratorPayload();
+                    x.GeneratorPayload = NascenceDungeon4AcgLayout.CreateGeneratorPayload();
+                }
+                else if (NascenceDungeon3Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
+                {
+                    x.PlayfieldX = 0;
+                    x.PlayfieldZ = 0;
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = NascenceDungeon3Rules.BuildingGeneratorType,
+                                         Instance = NascenceDungeon3Rules.BuildingInstance
+                                     };
+                    x.Unknown3 = 0;
+                    x.Unknown4 = 0;
+                    x.GeneratorPayload = NascenceDungeon3AcgLayout.CreateGeneratorPayload();
                 }
                 else if (NascenceDungeon2Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
                 {
@@ -146,6 +159,22 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.Unknown3 = 0;
                     x.Unknown4 = 0;
                     x.GeneratorPayload = NascenceDungeon2AcgLayout.CreateGeneratorPayload();
+                }
+                else if (NascenceDungeon1Rules.IsDungeonPlayfield(character.Playfield.Identity.Instance))
+                {
+                    // Keep Identity/PlayfieldId2 = server dyn lease. Forcing reserved 1F900B
+                    // mismatched ChangePlayfield and froze the client on character login.
+                    // PlayfieldX/Z=0 keeps ACG fog mode (non-zero → full static grey floorplan).
+                    x.PlayfieldX = 0;
+                    x.PlayfieldZ = 0;
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = NascenceDungeon1Rules.BuildingGeneratorType,
+                                         Instance = NascenceDungeon1Rules.BuildingInstance
+                                     };
+                    x.Unknown3 = 0;
+                    x.Unknown4 = 0;
+                    x.GeneratorPayload = NascenceDungeon1AcgLayout.CreateGeneratorPayload();
                 }
                 else if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
                 {

@@ -75,18 +75,31 @@ namespace AORebirth.Core.Playfields
         private const string NascenceD2IcyShadowProfileKey = "captured.nascence-d2.icy-shadow";
         private const string NascenceD2SmellyWeaverProfileKey = "captured.nascence-d2.smelly-weaver";
         private const string NascenceD2HavarisProfileKey = "captured.nascence-d2.havaris";
+        private const string NascenceD3MortiigPredatorProfileKey = "captured.nascence-d3.mortiig-predator";
+        private const string NascenceD3GuardTurretProfileKey = "captured.nascence-d3.guard-turret";
+        private const string NascenceD3HuedSewerScuttlerProfileKey = "captured.nascence-d3.hued-sewer-scuttler";
+        private const string NascenceD3HavarisProfileKey = "captured.nascence-d3.havaris";
+        private const string NascenceD3BurningShadowProfileKey = "captured.nascence-d3.burning-shadow";
+        private const string NascenceD3IcyShadowProfileKey = "captured.nascence-d3.icy-shadow";
+        private const string NascenceD4HavarisProfileKey = "captured.nascence-d4.havaris";
         private const string NascenceD1LootEvidence =
             "AOSharpLiveCapture 20260823-171238 Nascence Frontier PF4310/SL ACG corpse-loot-observations; credits=0 on all linked corpses";
         private const string NascenceD1HavarisLootEvidence =
             "AOSharpLiveCapture 20260824-175852 Havaris boss corpse FE9001 InventoryUpdate seq6241 + ContainerAddItem seq6259/6262";
         private const string NascenceD2LootEvidence =
             "AOSharpLiveCapture 20260825-094236 SL ACG(dng) PF 0x002080D9 InventoryUpdate Remains loot; Encapsulated Bullet never on Remains";
+        private const string NascenceD3LootEvidence =
+            "AOSharpLiveCapture 20260830-140240 Collapsed Temple D3 raw-packets InventoryUpdate on Remains; corpse-loot-observations.csv empty";
+        private const string NascenceD4LootEvidence =
+            "AOSharpLiveCapture 20260830-143801 A Door D4 — Havaris loot IDs TBD (stub)";
         // AO-Universe: outdoor plain mobs; drop rate not great — provisional 2.5% until capture-backed rate.
         private const int NascenceDojaChipDropChanceBasisPoints = 250;
         // Capture 20260826-052537 + Mike: Hiathlin Nascense DOJA 5%.
         private const int NascenceHiathlinDojaChipDropChanceBasisPoints = 500;
         // Mike: Predator Striker Nascense DOJA 5% (capture 20260826-054154 pocket).
         private const int NascencePredatorStrikerDojaChipDropChanceBasisPoints = 500;
+        // Mike: Crippler cave (PF4311) Nascense DOJA 5% (capture 20260827-221909).
+        private const int NascenceCripplerDojaChipDropChanceBasisPoints = 500;
         // Mike: Compact Message Datadisc ~30% on quest source mobs (Independent overlay on observed loot).
         private const int NascenceCompactMessageDatadiscDropChanceBasisPoints = 3000;
         // InventoryUpdate disc ids: Silvertail 0x3F76D, Chimera 0x3F76F, Predator 0x3F76E, Weaver 0x3F770.
@@ -102,7 +115,8 @@ namespace AORebirth.Core.Playfields
             "AOSharpLiveCapture 20260723-225021 Barking Chimera 15 corpses; 20260723-221330 Swift Silvertail; "
             + "20260822-221109 Jobe Research PF4001/4310 starter mobs (Chimera/Silvertail/Yuttos Geosurvey Dog loot+empty corpses); "
             + "20260823-103458 Spirit Hunter/Cascading Spirit/Soul Dredge corpse-loot-observations; "
-            + "20260823-112044 Disease-Ridden Rafter/Tempterus/Predator Striker/Crippler of Growth corpse-loot-observations";
+            + "20260823-112044 Disease-Ridden Rafter/Tempterus/Predator Striker/Crippler of Growth corpse-loot-observations; "
+            + "20260827-221909 Crippler cave PF4311 corpse-loot-observations";
         private const int CapturedAbmouthCredits = 587;
         private const int CapturedInfectorCredits = 150;
         private const int CapturedEumenidesCredits = 186;
@@ -151,8 +165,16 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(DebugInfoDetail.Error, "Global loot definition rejected: " + error.Message);
             }
             int seed;
-            lock (this.productionRandomSync) seed = this.productionRandom.Next();
-            context.Seed = seed;
+            lock (this.productionRandomSync)
+            {
+                seed = this.productionRandom.Next();
+            }
+
+            // Per-kill variation: mix identity + time so same mob archetype does not repeat one snapshot.
+            context.Seed = unchecked(
+                seed
+                ^ target.Identity.Instance
+                ^ (int)(DateTime.UtcNow.Ticks & 0x7FFFFFFF));
             LootGenerationResult result = this.generator.Generate(context, new SeededLootRandomSource(seed));
             this.EnsureAlexPadCreditsEvenWhenEmpty(context, result);
             if (DiagnosticsEnabled())
@@ -431,7 +453,9 @@ namespace AORebirth.Core.Playfields
                 }
 
                 if (string.Equals(target.Name, "Weaver of Malice", StringComparison.OrdinalIgnoreCase)
-                    && !NascenceDungeon2Rules.IsDungeonPlayfield(context.PlayfieldId))
+                    && !NascenceDungeon2Rules.IsDungeonPlayfield(context.PlayfieldId)
+                    && !NascenceDungeon3Rules.IsDungeonPlayfield(context.PlayfieldId)
+                    && !NascenceDungeon4Rules.IsDungeonPlayfield(context.PlayfieldId))
                 {
                     this.EnsureNascenceOutdoorWeaverOfMalice();
                     this.EnsureNascenceCompactMessageDatadiscOnTable(
@@ -453,6 +477,9 @@ namespace AORebirth.Core.Playfields
                 if (string.Equals(target.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
                 {
                     this.EnsureNascenceCripplerOfGrowth();
+                    this.EnsureNascenceDojaChipOnTable(
+                        "captured.nascence.crippler-of-growth",
+                        NascenceCripplerDojaChipDropChanceBasisPoints);
                     context.EnemyProfileKey = NascenceCripplerOfGrowthProfileKey;
                     return;
                 }
@@ -523,6 +550,22 @@ namespace AORebirth.Core.Playfields
                 {
                     this.EnsureNascenceDungeon2Loot(target.Name);
                     context.EnemyProfileKey = NascenceDungeon2ProfileKeyFor(target.Name);
+                    return;
+                }
+
+                if (NascenceDungeon3Rules.IsDungeonPlayfield(context.PlayfieldId)
+                    && NascenceDungeon3Rules.IsDungeonCorpseName(target.Name))
+                {
+                    this.EnsureNascenceDungeon3Loot(target.Name);
+                    context.EnemyProfileKey = NascenceDungeon3ProfileKeyFor(target.Name);
+                    return;
+                }
+
+                if (NascenceDungeon4Rules.IsDungeonPlayfield(context.PlayfieldId)
+                    && NascenceDungeon4Rules.IsDungeonCorpseName(target.Name))
+                {
+                    this.EnsureNascenceDungeon4Loot(target.Name);
+                    context.EnemyProfileKey = NascenceDungeon4ProfileKeyFor(target.Name);
                     return;
                 }
 
@@ -2335,6 +2378,8 @@ namespace AORebirth.Core.Playfields
             }
 
             const string e = NascenceLifeLootEvidence;
+            const string cave =
+                "AOSharpLiveCapture 20260827-221909 Nascense Wilds PF4311 Crippler cave corpse-loot-observations";
             ObservedCorpseSnapshotDefinition[] snapshots =
                 {
                     ObservedCorpseSnapshot(
@@ -2343,6 +2388,28 @@ namespace AORebirth.Core.Playfields
                         0,
                         ObservedCorpseSnapshotEntry(e, "capture.20260823-112044.crippler.FCE", 284954, 284954, 1, 1),
                         ObservedCorpseSnapshotEntry(e, "capture.20260823-112044.crippler.FCE", 223568, 223569, 10, 1)),
+                    ObservedCorpseSnapshot(
+                        cave,
+                        "capture.20260827-221909.crippler.7A372E06.214789",
+                        0,
+                        ObservedCorpseSnapshotEntry(
+                            cave,
+                            "capture.20260827-221909.crippler.7A372E06.214789",
+                            214789,
+                            214789,
+                            1,
+                            1)),
+                    ObservedCorpseSnapshot(
+                        cave,
+                        "capture.20260827-221909.crippler.7A372E07.214789",
+                        0,
+                        ObservedCorpseSnapshotEntry(
+                            cave,
+                            "capture.20260827-221909.crippler.7A372E07.214789",
+                            214789,
+                            214789,
+                            1,
+                            1)),
                 };
 
             this.RegisterNascenceObservedCorpseTable(
@@ -2723,6 +2790,434 @@ namespace AORebirth.Core.Playfields
             {
                 this.EnsureNascenceD2Havaris();
             }
+        }
+
+        private static string NascenceDungeon3ProfileKeyFor(string name)
+        {
+            if (string.Equals(name, "Mortiig Predator", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD3MortiigPredatorProfileKey;
+            }
+
+            if (string.Equals(name, "Guard Turret", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD3GuardTurretProfileKey;
+            }
+
+            if (string.Equals(name, "Hued Sewer Scuttler", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD3HuedSewerScuttlerProfileKey;
+            }
+
+            if (string.Equals(name, "Havaris", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD3HavarisProfileKey;
+            }
+
+            if (string.Equals(name, "Burning Shadow", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD3BurningShadowProfileKey;
+            }
+
+            if (string.Equals(name, "Icy Shadow", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD3IcyShadowProfileKey;
+            }
+
+            return NascenceDungeon2ProfileKeyFor(name);
+        }
+
+        private void EnsureNascenceDungeon3Loot(string name)
+        {
+            if (string.Equals(name, "Mortiig Predator", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD3MortiigPredator();
+                return;
+            }
+
+            if (string.Equals(name, "Guard Turret", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD3GuardTurret();
+                return;
+            }
+
+            if (string.Equals(name, "Hued Sewer Scuttler", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD3HuedSewerScuttler();
+                return;
+            }
+
+            if (string.Equals(name, "Havaris", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD3Havaris();
+                return;
+            }
+
+            if (string.Equals(name, "Burning Shadow", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD3BurningShadow();
+                return;
+            }
+
+            if (string.Equals(name, "Icy Shadow", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD3IcyShadow();
+                return;
+            }
+
+            // Shared leftover names (Smelly Weaver, etc.): reuse D2 captured tables.
+            this.EnsureNascenceDungeon2Loot(name);
+        }
+
+        private static string NascenceDungeon4ProfileKeyFor(string name)
+        {
+            if (string.Equals(name, "Havaris", StringComparison.OrdinalIgnoreCase))
+            {
+                return NascenceD4HavarisProfileKey;
+            }
+
+            // Parent fills remaining D4 profile keys; fall back to D3 naming until then.
+            return NascenceDungeon3ProfileKeyFor(name);
+        }
+
+        private void EnsureNascenceDungeon4Loot(string name)
+        {
+            if (string.Equals(name, "Havaris", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnsureNascenceD4Havaris();
+                return;
+            }
+
+            // Stub: reuse D3 tables until parent fills D4 loot IDs.
+            this.EnsureNascenceDungeon3Loot(name);
+        }
+
+        private void EnsureNascenceD4Havaris()
+        {
+            const string tableKey = "captured.nascence-d4.havaris";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            // Chat 20260830-143801: Half Digested Human Torso (encoded !!?q1/!!?q2 → 223566/223567).
+            const string e = NascenceD4LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-143801.havaris.torso",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-143801.havaris.torso", 223566, 223567, 93, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D4 Havaris boss captured corpse",
+                NascenceD4HavarisProfileKey,
+                snapshots,
+                NascenceD4LootEvidence);
+        }
+
+        private void EnsureNascenceD3MortiigPredator()
+        {
+            const string tableKey = "captured.nascence-d3.mortiig-predator";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string e = NascenceD3LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.ruby",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.ruby", 232816, 232817, 49, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.wristwatch",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.wristwatch", 225993, 225994, 47, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.multi.a",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.multi.a", 211236, 211237, 46, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.multi.a", 232828, 232829, 42, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.multi.a", 223421, 223422, 42, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.spirit-leech",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.spirit-leech", 225977, 225978, 48, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.jet-amber",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.jet-amber", 232839, 232840, 30, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.jet-amber", 232828, 232829, 31, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.bullet",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.bullet", 225981, 225982, 39, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260830-140240.mortiig.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.ring",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.ring", 232926, 232927, 37, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.coral",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.coral", 232834, 232835, 43, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.mortiig.bullets.x3",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.bullets.x3", 225981, 225982, 35, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.bullets.x3", 225981, 225982, 34, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.mortiig.bullets.x3", 225981, 225982, 31, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D3 Mortiig Predator captured corpse",
+                NascenceD3MortiigPredatorProfileKey,
+                snapshots,
+                NascenceD3LootEvidence);
+        }
+
+        private void EnsureNascenceD3GuardTurret()
+        {
+            const string tableKey = "captured.nascence-d3.guard-turret";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string e = NascenceD3LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(e, "capture.20260830-140240.guard.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.guard.parts",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.guard.parts", 42640, 42641, 32, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D3 Guard Turret captured corpse",
+                NascenceD3GuardTurretProfileKey,
+                snapshots,
+                NascenceD3LootEvidence);
+        }
+
+        private void EnsureNascenceD3HuedSewerScuttler()
+        {
+            const string tableKey = "captured.nascence-d3.hued-sewer-scuttler";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string e = NascenceD3LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.hued.ruby",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.hued.ruby", 232816, 232817, 44, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D3 Hued Sewer Scuttler captured corpse",
+                NascenceD3HuedSewerScuttlerProfileKey,
+                snapshots,
+                NascenceD3LootEvidence);
+        }
+
+        private void EnsureNascenceD3Havaris()
+        {
+            const string tableKey = "captured.nascence-d3.havaris";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string e = NascenceD3LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.havaris.inventory",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.havaris.inventory", 230212, 230212, 80, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.havaris.inventory", 230132, 230132, 80, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.havaris.inventory", 236660, 236660, 1, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.havaris.inventory", 225981, 225982, 51, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D3 Havaris boss captured corpse",
+                NascenceD3HavarisProfileKey,
+                snapshots,
+                NascenceD3LootEvidence);
+        }
+
+        private void EnsureNascenceD3BurningShadow()
+        {
+            const string tableKey = "captured.nascence-d3.burning-shadow";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string e = NascenceD3LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.a",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.a", 232839, 232840, 40, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.a", 223421, 223422, 44, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260830-140240.burning.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.hide",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.hide", 223421, 223422, 30, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.ruby-hard",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.ruby-hard", 232816, 232817, 39, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.ruby-hard", 223423, 223424, 44, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.spirit",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.spirit", 225977, 225978, 40, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.ruby-fungus",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.ruby-fungus", 232816, 232817, 38, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.ruby-fungus", 225979, 225980, 28, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.coral",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.coral", 232834, 232835, 47, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.pearl-fungus",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.pearl-fungus", 232822, 232823, 42, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.pearl-fungus", 225979, 225980, 43, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.doja",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.doja", 225983, 225984, 30, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.burning.doja.b",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.burning.doja.b", 225983, 225984, 44, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D3 Burning Shadow captured corpse",
+                NascenceD3BurningShadowProfileKey,
+                snapshots,
+                NascenceD3LootEvidence);
+        }
+
+        private void EnsureNascenceD3IcyShadow()
+        {
+            const string tableKey = "captured.nascence-d3.icy-shadow";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            const string e = NascenceD3LootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.doja",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.doja", 225983, 225984, 36, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.jet",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.jet", 232839, 232840, 33, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.doja-pearl",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.doja-pearl", 225983, 225984, 32, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.doja-pearl", 232822, 232823, 45, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.amber",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.amber", 232828, 232829, 37, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260830-140240.icy.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.spirit",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.spirit", 225977, 225978, 41, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.fungus-jet",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.fungus-jet", 225979, 225980, 30, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.fungus-jet", 232839, 232840, 44, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.hide-doja",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.hide-doja", 223421, 223422, 40, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.hide-doja", 225983, 225984, 40, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.doja.b",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.doja.b", 225983, 225984, 41, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.jet-fungus",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.jet-fungus", 232839, 232840, 39, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.jet-fungus", 225979, 225980, 48, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260830-140240.icy.fungus",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260830-140240.icy.fungus", 225979, 225980, 40, 1)),
+                };
+
+            this.RegisterNascenceObservedCorpseTable(
+                tableKey,
+                "Nascence D3 Icy Shadow captured corpse",
+                NascenceD3IcyShadowProfileKey,
+                snapshots,
+                NascenceD3LootEvidence);
         }
 
         private void EnsureNascenceD2BoundDryad()

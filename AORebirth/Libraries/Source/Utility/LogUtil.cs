@@ -94,10 +94,6 @@ namespace Utility
         public static void ApplyConfiguredDebugDetails()
         {
             debugInfoDetail = ParseDebugInfoDetail(ConfigReadWrite.Instance.CurrentConfig.DebugInfoDetail);
-            Console.WriteLine(
-                "Config: {0} | DebugInfoDetail: {1}",
-                Path.GetFullPath(ConfigReadWrite.ResolvedConfigPath),
-                FormatEnabledDebugDetails());
         }
 
         public static void ApplyConfiguredDebugDetails(string configuredValue)

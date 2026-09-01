@@ -98,6 +98,29 @@ namespace AORebirth.Core.Playfields
             new PatrolRoute("Predator Striker", 808.9715f, 31.9617233f, 1640.9292f, 809.9836f, 31.9135113f, 1643.2771f),
             new PatrolRoute("Predator Striker", 809.067566f, 31.96945f, 1641.1521f, 809.9836f, 31.9135113f, 1643.2771f),
             new PatrolRoute("Predator Striker", 814.6472f, 32.2130775f, 1648.0271f, 816.554565f, 32.172184f, 1650.14f),
+            // Capture 20260827-221909 Crippler cave mouth PF4311 FollowTarget NpcPath.
+            new PatrolRoute("Crippler of Growth", 535.7803f, 55.8844f, 1739.284f, 539.498535f, 55.8814468f, 1743.97485f),
+            new PatrolRoute("Crippler of Growth", 536.4755f, 53.59499f, 1730.014f, 534.471069f, 56.1467514f, 1736.71606f),
+            new PatrolRoute("Crippler of Growth", 556.2581f, 47.41654f, 1720.475f, 573.944153f, 45.4753075f, 1717.77551f),
+            new PatrolRoute("Crippler of Growth", 556.2581f, 47.41654f, 1720.475f, 547.794006f, 49.7163239f, 1721.1687f),
+            // Capture 20260830-110744 PF4311 Crippler SCFU HasWaypoints (first 2-wp per identity, 8m cells).
+            new PatrolRoute("Crippler of Growth", 519.9849f, 72.5213547f, 1793.49622f, 518.8054f, 72.3678055f, 1791.84619f),
+            new PatrolRoute("Crippler of Growth", 548.7474f, 56.9037437f, 1753.30859f, 551.437866f, 56.45418f, 1751.42444f),
+            new PatrolRoute("Crippler of Growth", 549.21f, 51.284f, 1728.885f, 546.456055f, 51.90901f, 1730.22473f),
+            new PatrolRoute("Crippler of Growth", 559.9603f, 46.3379974f, 1720.36438f, 556.2111f, 47.40425f, 1720.38391f),
+            new PatrolRoute("Crippler of Growth", 570.2458f, 12.8625736f, 1621.76489f, 568.385254f, 12.89774f, 1643.0813f),
+            new PatrolRoute("Crippler of Growth", 594.9996f, 12.1943722f, 1624.39673f, 591.7411f, 12.1732635f, 1626.7511f),
+            new PatrolRoute("Crippler of Growth", 618.841858f, 12.201931f, 1576.98572f, 615.368042f, 11.8878174f, 1576.19031f),
+            new PatrolRoute("Crippler of Growth", 640.703735f, 11.896451f, 1532.5929f, 639.4386f, 11.8696041f, 1533.97107f),
+            new PatrolRoute("Crippler of Growth", 597.2117f, 15.1940994f, 1480.39087f, 618.1115f, 15.0082884f, 1479.99231f),
+            new PatrolRoute("Crippler of Growth", 565.2699f, 12.2437754f, 1457.3717f, 562.9642f, 12.2254906f, 1459.24109f),
+            new PatrolRoute("Crippler of Growth", 669.313538f, 12.6606627f, 1440.02661f, 672.9868f, 12.7774277f, 1442.13708f),
+            new PatrolRoute("Crippler of Growth", 699.1533f, 12.01f, 1367.40857f, 700.486633f, 11.7484989f, 1369.25671f),
+            new PatrolRoute("Crippler of Growth", 649.842834f, 11.9051f, 1344.40759f, 651.6679f, 11.962431f, 1360.26147f),
+            new PatrolRoute("Crippler of Growth", 612.919556f, 12.9023609f, 1312.0636f, 605.7775f, 11.8846989f, 1311.19617f),
+            new PatrolRoute("Crippler of Growth", 643.2199f, 12.5583963f, 1283.32568f, 634.0827f, 11.90892f, 1282.4165f),
+            new PatrolRoute("Crippler of Growth", 582.2088f, 12.2401953f, 1218.15759f, 592.351f, 12.228487f, 1233.4801f),
+            new PatrolRoute("Crippler of Growth", 640.7513f, 12.5981522f, 1188.31042f, 627.340149f, 12.3152218f, 1178.52441f),
             new PatrolRoute("Slivering Chimera", 816.4902f, 31.210001f, 1657.716f, 818.321f, 30.8617535f, 1658.06677f),
             new PatrolRoute("Slivering Chimera", 816.7252f, 31.210001f, 1657.761f, 818.321f, 30.8617535f, 1658.06677f),
             new PatrolRoute("Slivering Chimera", 810.2743f, 31.2691441f, 1655.634f, 802.202637f, 30.3403969f, 1649.725f),
@@ -315,6 +338,11 @@ namespace AORebirth.Core.Playfields
 
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
         {
+            return TryGetExtendedTextureOverride(name, 0, out data);
+        }
+
+        internal static bool TryGetExtendedTextureOverride(string name, int playfieldId, out byte[] data)
+        {
             if (string.Equals(name, "Deadly Predator", StringComparison.OrdinalIgnoreCase))
             {
                 // Capture sabre self :235170 — 48-byte 0x07E2 only (92-byte tail is instance-specific like Weaver).
@@ -362,7 +390,14 @@ namespace AORebirth.Core.Playfields
 
             if (string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
             {
-                // Capture bytes exist, but outdoor ExtTex on Crippler crashes the client on Demonic exit.
+                // Capture 20260827-221909 corpse ExtTex anun self + Material #7 :209280 (0x0BD3).
+                // Outdoor PF4310 ExtTex still crashes Demonic exit — gate to Wilds cave only.
+                if (playfieldId == 4311)
+                {
+                    data = BuildDualMaterialExtTex("anun self", "Material #7", TextureCrippler);
+                    return true;
+                }
+
                 data = null;
                 return false;
             }
@@ -391,6 +426,14 @@ namespace AORebirth.Core.Playfields
             if (mob == null || string.IsNullOrEmpty(name))
             {
                 return;
+            }
+
+            // Capture SCFU Side=Monster → red PF map dots for hostiles only.
+            // Clan=yellow, Omni=blue, Neutral=white (friendly NPCs set Side in LifeSpawn).
+            if (IsOutdoorHostileMonster(name))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Monster);
+                mob.Stats[StatIds.side].Value = (int)Side.Monster;
             }
 
             // Capture 20260826-051307 SCFU npcFamily / Side=Monster (default animal side).
@@ -533,8 +576,14 @@ namespace AORebirth.Core.Playfields
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 32u);
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, 52u);
             }
-            else if (string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase)
-                     || string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260827-221909 AttackInfo Amount=24; SCFU RunSpeedBase=97.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 24u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 24u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, 97u);
+            }
+            else if (string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
             {
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.runspeed, 34u);
             }
@@ -709,6 +758,19 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
+            if (string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
+            {
+                // Capture 20260827-221909 7A372E06 SAW Unknown1-4=181; AttackInfo Amount=24.
+                contract = BuildSawContract(
+                    "20260827-221909: Crippler of Growth SAW 181",
+                    unchecked((int)0x7A372E06),
+                    181,
+                    24,
+                    24,
+                    new[] { 24, 24, 24, 24, 24 });
+                return true;
+            }
+
             return false;
         }
 
@@ -750,6 +812,38 @@ namespace AORebirth.Core.Playfields
                     new[] { best.X2, best.Y2, best.Z2 },
                 };
             return true;
+        }
+
+        /// <summary>
+        /// PF map: Side.Monster → red dots. Do not overwrite Clan/Omni/Neutral NPCs.
+        /// </summary>
+        private static bool IsOutdoorHostileMonster(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            return string.Equals(name, "Spinetooth Hatchling", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Weaver of Malice", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Malah-Aya", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Malah-Ana", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Predator Striker", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Deadly Predator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Stalking Predator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Omathon", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hiathlin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Hiathlin Prime", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Slivering Chimera", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "The Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Demonic Subjugator", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Corrupting Imp", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Nascence Spirit Hunter", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Soul Dredge", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Disease-Ridden Rafter", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void TryMatchPatrolRoute(

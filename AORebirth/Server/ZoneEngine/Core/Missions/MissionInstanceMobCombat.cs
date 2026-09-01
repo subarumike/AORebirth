@@ -569,6 +569,15 @@ namespace ZoneEngine.Core.Missions
                 return null;
             }
 
+            // Nascence D2–D4 use dedicated room-gated combat; never auto-aggro via mission path.
+            int pf = npc.Playfield.Identity.Instance;
+            if (NascenceDungeon2Rules.IsDungeonPlayfield(pf)
+                || NascenceDungeon3Rules.IsDungeonPlayfield(pf)
+                || NascenceDungeon4Rules.IsDungeonPlayfield(pf))
+            {
+                return null;
+            }
+
             lock (Gate)
             {
                 if (!AggressiveMobs.Contains(npc.Identity.Instance))

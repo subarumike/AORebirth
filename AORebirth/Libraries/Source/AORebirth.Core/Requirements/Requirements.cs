@@ -96,6 +96,11 @@ namespace AORebirth.Core.Requirements
         /// </returns>
         public bool CheckRequirement(IInstancedEntity entity)
         {
+            if (IsRequirementLinkOperator(this))
+            {
+                return true;
+            }
+
             if (this.theCheckFunc == null)
             {
                 try
@@ -144,6 +149,18 @@ namespace AORebirth.Core.Requirements
             copy.Statnumber = this.Statnumber;
             copy.Value = this.Value;
             return copy;
+        }
+
+        internal static bool IsRequirementLinkOperator(Requirement requirement)
+        {
+            if (requirement == null || requirement.Statnumber != 0)
+            {
+                return false;
+            }
+
+            return requirement.Operator == Operator.And
+                   || requirement.Operator == Operator.Or
+                   || requirement.Operator == Operator.Not;
         }
 
         public override string ToString()

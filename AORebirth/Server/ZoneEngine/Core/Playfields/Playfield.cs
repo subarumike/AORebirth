@@ -408,7 +408,9 @@ namespace AORebirth.Core.Playfields
             if (n3Message != null)
             {
                 ICharacter source = this.FindByIdentity<ICharacter>(n3Message.Identity);
-                if (source != null && IsVisibilityMovementMessage(messageBody))
+                if (source != null
+                    && IsVisibilityMovementMessage(messageBody)
+                    && !ShouldSkipNpcMovementVisibilityRefresh(source))
                 {
                     this.RefreshCharacterVisibility(source);
                 }
@@ -498,6 +500,14 @@ namespace AORebirth.Core.Playfields
 
         internal bool ForceCharacterVisibilityToRecipient(ICharacter source, ICharacter recipient)
         {
+            return this.ForceCharacterVisibilityToRecipient(source, recipient, false);
+        }
+
+        internal bool ForceCharacterVisibilityToRecipient(
+            ICharacter source,
+            ICharacter recipient,
+            bool forceResend)
+        {
             if (source == null || recipient == null || recipient.Controller == null
                 || recipient.Controller.Client == null)
             {
@@ -507,7 +517,8 @@ namespace AORebirth.Core.Playfields
             return this.runtimeSystems.ForceCharacterVisibilityToRecipient(
                 source,
                 recipient,
-                this.SendVisibilityMessage);
+                this.SendVisibilityMessage,
+                forceResend);
         }
 
         internal bool EnsureNpcCombatVisibility(ICharacter attacker, ICharacter target)
@@ -576,6 +587,26 @@ namespace AORebirth.Core.Playfields
             return messageBody is CharDCMoveMessage
                    || messageBody is FollowTargetMessage
                    || messageBody is SetPosMessage;
+        }
+
+        /// <summary>
+        /// Nascence dungeon NPCs are dungeon-wide visibility pinned. Reconcile on every
+        /// chase SetPos/DCMove re-sends SCFU and flashes the HP bar (~2s combat cadence).
+        /// </summary>
+        private static bool ShouldSkipNpcMovementVisibilityRefresh(ICharacter source)
+        {
+            if (source == null
+                || source.Playfield == null
+                || !(source.Controller is NPCController))
+            {
+                return false;
+            }
+
+            int pf = source.Playfield.Identity.Instance;
+            return NascenceDungeon1Rules.IsDungeonPlayfield(pf)
+                   || NascenceDungeon2Rules.IsDungeonPlayfield(pf)
+                   || NascenceDungeon3Rules.IsDungeonPlayfield(pf)
+                   || NascenceDungeon4Rules.IsDungeonPlayfield(pf);
         }
 
         private Coordinate DynelDropPosition(Identity identity)
@@ -1371,6 +1402,58 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            // Capture 20260830-140240: Nascence Frontier D3 Collapsed Temple → dyn ACG PF 0x00209103.
+            if (NascenceDungeon3Rules.IsSourcePlayfield(this.Identity.Instance)
+                && NascenceDungeon3Rules.IsDungeonPlayfield(playfieldInstance))
+            {
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    NascenceDungeon3Rules.EntryTriggerX,
+                    NascenceDungeon3Rules.EntryTriggerY,
+                    NascenceDungeon3Rules.EntryTriggerZ);
+                var entryHeading = new AORebirth.Core.Vector.Quaternion(
+                    NascenceDungeon3Rules.EntryHeadingX,
+                    NascenceDungeon3Rules.EntryHeadingY,
+                    NascenceDungeon3Rules.EntryHeadingZ,
+                    NascenceDungeon3Rules.EntryHeadingW);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedNascenceDungeon3Entry(
+                        character,
+                        envelope,
+                        entryHeading,
+                        playfieldInstance));
+                return;
+            }
+
+            // Capture 20260830-143801: Nascence Frontier D4 A Door → dyn ACG.
+            if (NascenceDungeon4Rules.IsSourcePlayfield(this.Identity.Instance)
+                && NascenceDungeon4Rules.IsDungeonPlayfield(playfieldInstance))
+            {
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    NascenceDungeon4Rules.EntryTriggerX,
+                    NascenceDungeon4Rules.EntryTriggerY,
+                    NascenceDungeon4Rules.EntryTriggerZ);
+                var entryHeading = new AORebirth.Core.Vector.Quaternion(
+                    NascenceDungeon4Rules.EntryHeadingX,
+                    NascenceDungeon4Rules.EntryHeadingY,
+                    NascenceDungeon4Rules.EntryHeadingZ,
+                    NascenceDungeon4Rules.EntryHeadingW);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedNascenceDungeon4Entry(
+                        character,
+                        envelope,
+                        entryHeading,
+                        playfieldInstance));
+                return;
+            }
+
             // Capture 20260824-132534: dyn ACG cave → Nascence Frontier (4310).
             if (NascenceDungeon1Rules.IsDungeonPlayfield(this.Identity.Instance)
                 && NascenceDungeon1Rules.IsSourcePlayfield(playfieldInstance))
@@ -1425,6 +1508,68 @@ namespace AORebirth.Core.Playfields
                     heading,
                     playfieldIdentity,
                     character => TeleportMessageHandler.Default.SendCapturedNascenceDungeon2Exit(
+                        character,
+                        envelope,
+                        exitHeading,
+                        playfieldInstance,
+                        outdoorDoor));
+                return;
+            }
+
+            // Capture 20260830-140240: D3 dyn ACG → Nascence Frontier (4311).
+            if (NascenceDungeon3Rules.IsDungeonPlayfield(this.Identity.Instance)
+                && NascenceDungeon3Rules.IsSourcePlayfield(playfieldInstance))
+            {
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    NascenceDungeon3Rules.ExitTriggerX,
+                    NascenceDungeon3Rules.ExitTriggerY,
+                    NascenceDungeon3Rules.ExitTriggerZ);
+                var exitHeading = new AORebirth.Core.Vector.Quaternion(
+                    NascenceDungeon3Rules.ExitHeadingX,
+                    NascenceDungeon3Rules.ExitHeadingY,
+                    NascenceDungeon3Rules.ExitHeadingZ,
+                    NascenceDungeon3Rules.ExitHeadingW);
+                var outdoorDoor = new AORebirth.Core.Vector.Vector3(
+                    NascenceDungeon3Rules.ExitOutdoorDoorX,
+                    NascenceDungeon3Rules.ExitOutdoorDoorY,
+                    NascenceDungeon3Rules.ExitOutdoorDoorZ);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedNascenceDungeon3Exit(
+                        character,
+                        envelope,
+                        exitHeading,
+                        playfieldInstance,
+                        outdoorDoor));
+                return;
+            }
+
+            // Capture 20260830-143801: D4 dyn ACG → Nascence Frontier (4311).
+            if (NascenceDungeon4Rules.IsDungeonPlayfield(this.Identity.Instance)
+                && NascenceDungeon4Rules.IsSourcePlayfield(playfieldInstance))
+            {
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    NascenceDungeon4Rules.ExitTriggerX,
+                    NascenceDungeon4Rules.ExitTriggerY,
+                    NascenceDungeon4Rules.ExitTriggerZ);
+                var exitHeading = new AORebirth.Core.Vector.Quaternion(
+                    NascenceDungeon4Rules.ExitHeadingX,
+                    NascenceDungeon4Rules.ExitHeadingY,
+                    NascenceDungeon4Rules.ExitHeadingZ,
+                    NascenceDungeon4Rules.ExitHeadingW);
+                var outdoorDoor = new AORebirth.Core.Vector.Vector3(
+                    NascenceDungeon4Rules.ExitOutdoorDoorX,
+                    NascenceDungeon4Rules.ExitOutdoorDoorY,
+                    NascenceDungeon4Rules.ExitOutdoorDoorZ);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedNascenceDungeon4Exit(
                         character,
                         envelope,
                         exitHeading,
@@ -3702,6 +3847,16 @@ namespace AORebirth.Core.Playfields
             {
                 NascenceDungeon2TreasureLootService.ProcessDue(this, utcNow);
             }
+
+            if (NascenceDungeon3Rules.IsDungeonPlayfield(this.Identity.Instance))
+            {
+                NascenceDungeon3TreasureLootService.ProcessDue(this, utcNow);
+            }
+
+            if (NascenceDungeon4Rules.IsDungeonPlayfield(this.Identity.Instance))
+            {
+                NascenceDungeon4TreasureLootService.ProcessDue(this, utcNow);
+            }
         }
 
         private void ProcessPendingCorpseSpawns()
@@ -3865,7 +4020,9 @@ namespace AORebirth.Core.Playfields
                 .ToList();
             bool nascenceDungeonLoot =
                 NascenceDungeon1Rules.IsDungeonPlayfield(this.Identity.Instance)
-                || NascenceDungeon2Rules.IsDungeonPlayfield(this.Identity.Instance);
+                || NascenceDungeon2Rules.IsDungeonPlayfield(this.Identity.Instance)
+                || NascenceDungeon3Rules.IsDungeonPlayfield(this.Identity.Instance)
+                || NascenceDungeon4Rules.IsDungeonPlayfield(this.Identity.Instance);
             bool missionInteriorLoot =
                 !nascenceDungeonLoot
                 && (operationalMissionNpc
@@ -4078,20 +4235,31 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
-            // Mike: Nascence ACG dungeon corpses despawn after 2 minutes.
+            // Mike: Nascence ACG dungeon corpses despawn after 2 minutes if unlooted
+            // (empty AND non-empty — Remains must linger until opened / timer).
+            // emptyCleanupDelay: Zero only for lootClass==Empty (opened-empty / emptied spawn).
+            // RegularLoot: brief linger after last item so UI is not yanked mid-loot.
             TimeSpan nascenceDungeonCorpseLifetime;
             if (target != null
                 && ((NascenceDungeon1Rules.IsDungeonPlayfield(this.Identity.Instance)
                      && NascenceDungeon1Rules.IsDungeonCorpseName(target.Name))
                     || (NascenceDungeon2Rules.IsDungeonPlayfield(this.Identity.Instance)
-                        && NascenceDungeon2Rules.IsDungeonCorpseName(target.Name))))
+                        && NascenceDungeon2Rules.IsDungeonCorpseName(target.Name))
+                    || (NascenceDungeon3Rules.IsDungeonPlayfield(this.Identity.Instance)
+                        && NascenceDungeon3Rules.IsDungeonCorpseName(target.Name))
+                    || (NascenceDungeon4Rules.IsDungeonPlayfield(this.Identity.Instance)
+                        && NascenceDungeon4Rules.IsDungeonCorpseName(target.Name))))
             {
-                nascenceDungeonCorpseLifetime = NascenceDungeon2Rules.CorpseLifetime;
+                nascenceDungeonCorpseLifetime = NascenceDungeon1Rules.CorpseLifetime;
                 itemLootLifetime = nascenceDungeonCorpseLifetime;
                 lifetime = nascenceDungeonCorpseLifetime;
                 if (lootClass == CombatCorpseLootClass.Empty)
                 {
-                    emptyCleanupDelay = nascenceDungeonCorpseLifetime;
+                    emptyCleanupDelay = CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay;
+                }
+                else
+                {
+                    emptyCleanupDelay = NascenceLifeSpawn.OpenableEmptyCorpseCleanupAfterOpenedDelay;
                 }
             }
             else
@@ -4399,7 +4567,11 @@ namespace AORebirth.Core.Playfields
                    || (target != null
                        && NascenceDungeon1Rules.IsDungeonCorpseName(target.Name))
                    || (target != null
-                       && NascenceDungeon2Rules.IsDungeonCorpseName(target.Name));
+                       && NascenceDungeon2Rules.IsDungeonCorpseName(target.Name))
+                   || (target != null
+                       && NascenceDungeon3Rules.IsDungeonCorpseName(target.Name))
+                   || (target != null
+                       && NascenceDungeon4Rules.IsDungeonCorpseName(target.Name));
         }
 
         private static int CorpseCatMeshFor(ICharacter target)
@@ -4484,14 +4656,18 @@ namespace AORebirth.Core.Playfields
             }
 
             // L7 gold 20260725-002423: mission trash Death Parameter2=501 (not default 0x1F7).
-            // D1/D2 Nascence dungeon trash use the same 501 key (MissionInstance register was
+            // D1/D2/D3/D4 Nascence dungeon trash use the same 501 key (MissionInstance register was
             // removed for D2 room-gated aggro — still need 501 or corpses stand at 0 HP).
             if (target != null
                 && (ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsAggressive(target.Identity)
+                    || ZoneEngine.Core.Playfields.NascenceDungeon4MobCombat.IsAggressive(target.Identity)
+                    || ZoneEngine.Core.Playfields.NascenceDungeon3MobCombat.IsAggressive(target.Identity)
                     || ZoneEngine.Core.Playfields.NascenceDungeon2MobCombat.IsAggressive(target.Identity)
                     || ZoneEngine.Core.Playfields.NascenceDungeon1MobCombat.IsAggressive(target.Identity)
                     || NascenceDungeon1Rules.IsDungeonCorpseName(target.Name)
-                    || NascenceDungeon2Rules.IsDungeonCorpseName(target.Name)))
+                    || NascenceDungeon2Rules.IsDungeonCorpseName(target.Name)
+                    || NascenceDungeon3Rules.IsDungeonCorpseName(target.Name)
+                    || NascenceDungeon4Rules.IsDungeonCorpseName(target.Name)))
             {
                 int keyed = CombatCorpseVisuals.DeathAnimationKeyFor(
                     target.Stats[StatIds.corpseanimkey].Value,
@@ -4717,11 +4893,6 @@ namespace AORebirth.Core.Playfields
             if (!this.corpseInventoryService.RemoveCredits(corpse.CorpseIdentity, DateTime.UtcNow))
             {
                 return;
-            }
-
-            if (corpse.IsEmpty)
-            {
-                this.ScheduleCorpseDespawn(corpse, corpse.EmptyCleanupDelay, "credits-empty");
             }
 
             int cashAfter = CashStatRules.Clamp((long)cashBefore + corpse.Credits);

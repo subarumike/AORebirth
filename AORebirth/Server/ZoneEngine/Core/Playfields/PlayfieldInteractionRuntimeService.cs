@@ -45,6 +45,16 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (NascenceDungeon3TreasureLootService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon4TreasureLootService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             // Mission Repair Kit used on / Use of Broken Machine inside the instance.
             if (MissionRepairService.TryHandleUse(client, message, target))
             {
@@ -194,6 +204,16 @@ namespace ZoneEngine.Core.Playfields
             }
 
             if (NascenceDungeon2InteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon3InteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (NascenceDungeon4InteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

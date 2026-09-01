@@ -551,6 +551,24 @@ namespace ZoneEngine.Core.Packets
                     | SimpleCharFullUpdateFlags.UnknownDataFlag;
                 scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
             }
+            else if (character.Controller is NPCController
+                     && NascenceDungeon3Spawn.NeedsCapturedScfuIsPet(charName))
+            {
+                // Capture 20260830-140240: D3 trash/boss SCFU Flags include IsPet.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet
+                    | SimpleCharFullUpdateFlags.UnknownDataFlag;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
+            else if (character.Controller is NPCController
+                     && NascenceDungeon4Spawn.NeedsCapturedScfuIsPet(charName))
+            {
+                // Capture 20260830-143801: D4 trash/boss SCFU Flags include IsPet.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet
+                    | SimpleCharFullUpdateFlags.UnknownDataFlag;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+            }
             else if (!hasWindcallerNpcRuntime
                      && !hasCapturedVendorRuntime
                      && !hasEncounterRuntime
@@ -627,11 +645,12 @@ namespace ZoneEngine.Core.Packets
                         scfu.Unknown1 = oasisUnknown1;
                     }
                 }
-                else if (NascenceLifeSpawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                else if (NascenceLifeSpawn.TryGetExtendedTextureOverride(charName, charPlayfield, out alexExtendedTextures))
                 {
                     // Capture 20260723-221330 Barking Chimera / Yuttos Nascence Geosurvey Dog ExtTex.
                     // Capture 20260822-082554 Papagena ExtTex + IsPet SCFU flags + Unknown1.
                     // Capture 20260822-224319 Ecclesiast Aban Fala ExtTex + Side=Clan + IsPet flags.
+                    // Capture 20260827-221909 Crippler of Growth PF4311 ExtTex anun self + Material #7.
                     scfu.ExtendedTextureOverrideData = alexExtendedTextures;
                     if (NascenceLifeSpawn.RequiresScfuVersion58(charName))
                     {
@@ -668,6 +687,14 @@ namespace ZoneEngine.Core.Packets
                     scfu.ExtendedTextureOverrideData = alexExtendedTextures;
                 }
                 else if (NascenceDungeon2Spawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                }
+                else if (NascenceDungeon3Spawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                }
+                else if (NascenceDungeon4Spawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
                 {
                     scfu.ExtendedTextureOverrideData = alexExtendedTextures;
                 }

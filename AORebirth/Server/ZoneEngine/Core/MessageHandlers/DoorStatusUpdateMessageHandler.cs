@@ -68,6 +68,42 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, message => FillDoorStatus(message, entrance, false));
         }
 
+        /// <summary>
+        /// Capture 20260830-140240 PF 4311: MissionEntrance:C00010D7 (D3 Collapsed Temple), closed.
+        /// </summary>
+        internal void SendCapturedNascenceDungeon3EntranceStatus(ICharacter character)
+        {
+            if (character == null)
+            {
+                throw new ArgumentNullException("character");
+            }
+
+            var entrance = new Identity
+                           {
+                               Type = IdentityType.MissionEntrance,
+                               Instance = NascenceDungeon3Rules.AcgEntranceInstance
+                           };
+            this.Send(character, message => FillDoorStatus(message, entrance, false));
+        }
+
+        /// <summary>
+        /// Capture 20260830-143801 PF 4311: MissionEntrance:C00110D7 (D4 A Door), closed.
+        /// </summary>
+        internal void SendCapturedNascenceDungeon4EntranceStatus(ICharacter character)
+        {
+            if (character == null)
+            {
+                throw new ArgumentNullException("character");
+            }
+
+            var entrance = new Identity
+                           {
+                               Type = IdentityType.MissionEntrance,
+                               Instance = NascenceDungeon4Rules.AcgEntranceInstance
+                           };
+            this.Send(character, message => FillDoorStatus(message, entrance, false));
+        }
+
         private static void FillDoorStatus(DoorStatusUpdateMessage message, Identity door, bool isOpen)
         {
             message.Identity = door;

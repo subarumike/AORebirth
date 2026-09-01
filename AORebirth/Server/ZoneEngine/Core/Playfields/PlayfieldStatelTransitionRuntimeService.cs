@@ -164,24 +164,29 @@ namespace AORebirth.Core.Playfields
 
         private const float CapturedHoloDeckExitLandingHeadingW = 0.5969435f;
 
-        // Capture 20260821-191836 + Mike: Nascense outdoor (4310-4313) swim -> Jobe (4001).
-        // Hard rule (Mike 20260823): ONLY swim (moveType 26 / MoveModes.Swim).
-        // Falling under terrain / "hole" near cave mobs must NOT zone to Jobe.
+        // Capture 20260821-191836 + Mike: Nascense outdoor (4310-4313) water -> Jobe (4001).
+        // Capture 20260830-110744: no MoveType=Swim packets; Y drops to ~2.59 then PF 4001.
+        // Mike: anywhere in outdoor Nascence, when falling into water / swimming → Jobe.
+        // Mike 20260823: under-terrain "hole" near Crippler cave mouth must NOT zone to Jobe.
+        // Landing pose from capture 20260830-110744 PF4311 → 4001 SCFU.
         private const int CapturedNascenseJobeDestinationPlayfieldId = 4001;
+
+        // Capture water entry Y≈2.59; land walking near rivers is ~Y11–15.
+        private const float CapturedNascenseJobeWaterYMax = 6.0f;
 
         private const float CapturedNascenseJobeEntryLandingX = 826.0f;
 
-        private const float CapturedNascenseJobeEntryLandingY = 1.0f;
+        private const float CapturedNascenseJobeEntryLandingY = 43.81f;
 
         private const float CapturedNascenseJobeEntryLandingZ = 822.0f;
 
         private const float CapturedNascenseJobeEntryLandingHeadingX = 0.0f;
 
-        private const float CapturedNascenseJobeEntryLandingHeadingY = 0.9900106f;
+        private const float CapturedNascenseJobeEntryLandingHeadingY = -0.9996747f;
 
         private const float CapturedNascenseJobeEntryLandingHeadingZ = 0.0f;
 
-        private const float CapturedNascenseJobeEntryLandingHeadingW = 0.1409931f;
+        private const float CapturedNascenseJobeEntryLandingHeadingW = 0.02550354f;
 
         private readonly HashSet<int> capturedSunriseLobbyEntryContacts = new HashSet<int>();
 
@@ -216,6 +221,14 @@ namespace AORebirth.Core.Playfields
         private readonly HashSet<int> capturedNascenceDungeon2EntryContacts = new HashSet<int>();
 
         private readonly HashSet<int> capturedNascenceDungeon2ExitContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedNascenceDungeon3EntryContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedNascenceDungeon3ExitContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedNascenceDungeon4EntryContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedNascenceDungeon4ExitContacts = new HashSet<int>();
 
         // After mission enter, player must walk away from the exit door before walk-on exit arms.
         private readonly HashSet<int> missionExitDoorArmedCharacters = new HashSet<int>();
@@ -271,6 +284,10 @@ namespace AORebirth.Core.Playfields
             this.capturedNascenceDungeon1ExitContacts.Remove(dynelId);
             this.capturedNascenceDungeon2EntryContacts.Remove(dynelId);
             this.capturedNascenceDungeon2ExitContacts.Remove(dynelId);
+            this.capturedNascenceDungeon3EntryContacts.Remove(dynelId);
+            this.capturedNascenceDungeon3ExitContacts.Remove(dynelId);
+            this.capturedNascenceDungeon4EntryContacts.Remove(dynelId);
+            this.capturedNascenceDungeon4ExitContacts.Remove(dynelId);
         }
 
         internal static bool IsNascenseOutdoorPlayfield(int playfieldInstance)
@@ -403,6 +420,24 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (this.TryHandleCapturedNascenceDungeon3Entry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedNascenceDungeon4Entry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
             if (this.TryHandleCapturedNascenceDungeon1Exit(
                 dynel,
                 playfieldIdentity,
@@ -413,6 +448,24 @@ namespace AORebirth.Core.Playfields
             }
 
             if (this.TryHandleCapturedNascenceDungeon2Exit(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedNascenceDungeon3Exit(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedNascenceDungeon4Exit(
                 dynel,
                 playfieldIdentity,
                 stopMovement,
@@ -1141,12 +1194,13 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            int dynelId = character.Identity.Instance;
-            if (character.MoveMode != MoveModes.Swim)
+            if (!IsCapturedNascenseJobeWaterEntry(character, -1))
             {
+                this.capturedNascenseJobeEntryContacts.Remove(character.Identity.Instance);
                 return false;
             }
 
+            int dynelId = character.Identity.Instance;
             if (this.capturedNascenseJobeEntryContacts.Contains(dynelId))
             {
                 return false;
@@ -1159,7 +1213,7 @@ namespace AORebirth.Core.Playfields
                 playfieldIdentity.Instance,
                 stopMovement,
                 teleportToPlayfield,
-                "MoveMode.Swim");
+                "water-entry");
             return true;
         }
 
@@ -1226,7 +1280,8 @@ namespace AORebirth.Core.Playfields
             character.Stats[StatIds.externalplayfieldinstance].BaseValue = NascenceDungeon1Rules.SourcePlayfieldId;
 
             stopMovement(character);
-            teleportToPlayfield(dynel, destination, heading, NascenceDungeon1Rules.DungeonPlayfieldId);
+            int destinationPlayfield = NascenceDungeon1Rules.AllocateDynamicPlayfieldId();
+            teleportToPlayfield(dynel, destination, heading, destinationPlayfield);
 
             LogUtil.Debug(
                 DebugInfoDetail.Zoning,
@@ -1238,7 +1293,7 @@ namespace AORebirth.Core.Playfields
                     sourceX,
                     sourceY,
                     sourceZ,
-                    NascenceDungeon1Rules.DungeonPlayfieldId,
+                    destinationPlayfield,
                     destination.x,
                     destination.y,
                     destination.z));
@@ -1309,7 +1364,8 @@ namespace AORebirth.Core.Playfields
             character.Stats[StatIds.externalplayfieldinstance].BaseValue = NascenceDungeon2Rules.SourcePlayfieldId;
 
             stopMovement(character);
-            teleportToPlayfield(dynel, destination, heading, NascenceDungeon2Rules.DungeonPlayfieldId);
+            int destinationPlayfield = NascenceDungeon2Rules.AllocateDynamicPlayfieldId();
+            teleportToPlayfield(dynel, destination, heading, destinationPlayfield);
 
             LogUtil.Debug(
                 DebugInfoDetail.Zoning,
@@ -1321,7 +1377,7 @@ namespace AORebirth.Core.Playfields
                     sourceX,
                     sourceY,
                     sourceZ,
-                    NascenceDungeon2Rules.DungeonPlayfieldId,
+                    destinationPlayfield,
                     destination.x,
                     destination.y,
                     destination.z));
@@ -1493,6 +1549,338 @@ namespace AORebirth.Core.Playfields
             return true;
         }
 
+        private bool TryHandleCapturedNascenceDungeon3Entry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !NascenceDungeon3Rules.IsSourcePlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - NascenceDungeon3Rules.EntryTriggerX;
+            double deltaZ = sourceZ - NascenceDungeon3Rules.EntryTriggerZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - NascenceDungeon3Rules.EntryTriggerY);
+            bool inEntryTrigger =
+                horizontalDistanceSquared
+                    <= NascenceDungeon3Rules.EntryTriggerRadius * NascenceDungeon3Rules.EntryTriggerRadius
+                && verticalDistance <= NascenceDungeon3Rules.EntryTriggerVerticalTolerance;
+
+            int dynelId = character.Identity.Instance;
+            if (!inEntryTrigger)
+            {
+                this.capturedNascenceDungeon3EntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            if (this.capturedNascenceDungeon3EntryContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedNascenceDungeon3EntryContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedNascenceDungeon3EntryContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                NascenceDungeon3Rules.InteriorLandingX,
+                NascenceDungeon3Rules.InteriorLandingY,
+                NascenceDungeon3Rules.InteriorLandingZ);
+            var heading = new RuntimeQuaternion(
+                NascenceDungeon3Rules.InteriorLandingHeadingX,
+                NascenceDungeon3Rules.InteriorLandingHeadingY,
+                NascenceDungeon3Rules.InteriorLandingHeadingZ,
+                NascenceDungeon3Rules.InteriorLandingHeadingW);
+
+            character.Stats[StatIds.externaldoorinstance].BaseValue = NascenceDungeon3Rules.AcgEntranceInstanceStat;
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue = NascenceDungeon3Rules.SourcePlayfieldId;
+
+            stopMovement(character);
+            int destinationPlayfield = NascenceDungeon3Rules.AllocateDynamicPlayfieldId();
+            teleportToPlayfield(dynel, destination, heading, destinationPlayfield);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    "NascenceDungeon3 entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260830-140240",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    destinationPlayfield,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedNascenceDungeon3Exit(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !NascenceDungeon3Rules.IsDungeonPlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - NascenceDungeon3Rules.ExitTriggerX;
+            double deltaZ = sourceZ - NascenceDungeon3Rules.ExitTriggerZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - NascenceDungeon3Rules.ExitTriggerY);
+            bool inExitTrigger =
+                horizontalDistanceSquared
+                    <= NascenceDungeon3Rules.ExitTriggerRadius * NascenceDungeon3Rules.ExitTriggerRadius
+                && verticalDistance <= NascenceDungeon3Rules.ExitTriggerVerticalTolerance;
+
+            int dynelId = character.Identity.Instance;
+            if (!inExitTrigger)
+            {
+                this.capturedNascenceDungeon3ExitContacts.Remove(dynelId);
+                return false;
+            }
+
+            // Landing is ~1m from exit trigger — arm only after leave/re-enter
+            // (same pattern as Sunrise apartment exit). Capture 20260830-140240: walk-out, no Use.
+            if (this.capturedNascenceDungeon3ExitContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedNascenceDungeon3ExitContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedNascenceDungeon3ExitContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                NascenceDungeon3Rules.ExitOutdoorLandingX,
+                NascenceDungeon3Rules.ExitOutdoorLandingY,
+                NascenceDungeon3Rules.ExitOutdoorLandingZ);
+            var heading = new RuntimeQuaternion(
+                NascenceDungeon3Rules.ExitOutdoorLandingHeadingX,
+                NascenceDungeon3Rules.ExitOutdoorLandingHeadingY,
+                NascenceDungeon3Rules.ExitOutdoorLandingHeadingZ,
+                NascenceDungeon3Rules.ExitOutdoorLandingHeadingW);
+
+            stopMovement(character);
+            teleportToPlayfield(dynel, destination, heading, NascenceDungeon3Rules.SourcePlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    "NascenceDungeon3 exit teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260830-140240",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    NascenceDungeon3Rules.SourcePlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedNascenceDungeon4Entry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !NascenceDungeon4Rules.IsSourcePlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - NascenceDungeon4Rules.EntryTriggerX;
+            double deltaZ = sourceZ - NascenceDungeon4Rules.EntryTriggerZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - NascenceDungeon4Rules.EntryTriggerY);
+            bool inEntryTrigger =
+                horizontalDistanceSquared
+                    <= NascenceDungeon4Rules.EntryTriggerRadius * NascenceDungeon4Rules.EntryTriggerRadius
+                && verticalDistance <= NascenceDungeon4Rules.EntryTriggerVerticalTolerance;
+
+            int dynelId = character.Identity.Instance;
+            if (!inEntryTrigger)
+            {
+                this.capturedNascenceDungeon4EntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            if (this.capturedNascenceDungeon4EntryContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedNascenceDungeon4EntryContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedNascenceDungeon4EntryContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                NascenceDungeon4Rules.InteriorLandingX,
+                NascenceDungeon4Rules.InteriorLandingY,
+                NascenceDungeon4Rules.InteriorLandingZ);
+            var heading = new RuntimeQuaternion(
+                NascenceDungeon4Rules.InteriorLandingHeadingX,
+                NascenceDungeon4Rules.InteriorLandingHeadingY,
+                NascenceDungeon4Rules.InteriorLandingHeadingZ,
+                NascenceDungeon4Rules.InteriorLandingHeadingW);
+
+            character.Stats[StatIds.externaldoorinstance].BaseValue = NascenceDungeon4Rules.AcgEntranceInstanceStat;
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue = NascenceDungeon4Rules.SourcePlayfieldId;
+
+            stopMovement(character);
+            int destinationPlayfield = NascenceDungeon4Rules.AllocateDynamicPlayfieldId();
+            teleportToPlayfield(dynel, destination, heading, destinationPlayfield);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    "NascenceDungeon4 entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260830-143801",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    destinationPlayfield,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedNascenceDungeon4Exit(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || !NascenceDungeon4Rules.IsDungeonPlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - NascenceDungeon4Rules.ExitTriggerX;
+            double deltaZ = sourceZ - NascenceDungeon4Rules.ExitTriggerZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - NascenceDungeon4Rules.ExitTriggerY);
+            bool inExitTrigger =
+                horizontalDistanceSquared
+                    <= NascenceDungeon4Rules.ExitTriggerRadius * NascenceDungeon4Rules.ExitTriggerRadius
+                && verticalDistance <= NascenceDungeon4Rules.ExitTriggerVerticalTolerance;
+
+            int dynelId = character.Identity.Instance;
+            if (!inExitTrigger)
+            {
+                this.capturedNascenceDungeon4ExitContacts.Remove(dynelId);
+                return false;
+            }
+
+            // Landing is ~1m from exit trigger — arm only after leave/re-enter
+            // (same pattern as Sunrise apartment exit). Capture 20260830-143801: walk-out, no Use.
+            if (this.capturedNascenceDungeon4ExitContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedNascenceDungeon4ExitContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedNascenceDungeon4ExitContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                NascenceDungeon4Rules.ExitOutdoorLandingX,
+                NascenceDungeon4Rules.ExitOutdoorLandingY,
+                NascenceDungeon4Rules.ExitOutdoorLandingZ);
+            var heading = new RuntimeQuaternion(
+                NascenceDungeon4Rules.ExitOutdoorLandingHeadingX,
+                NascenceDungeon4Rules.ExitOutdoorLandingHeadingY,
+                NascenceDungeon4Rules.ExitOutdoorLandingHeadingZ,
+                NascenceDungeon4Rules.ExitOutdoorLandingHeadingW);
+
+            stopMovement(character);
+            teleportToPlayfield(dynel, destination, heading, NascenceDungeon4Rules.SourcePlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    "NascenceDungeon4 exit teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260830-143801",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    NascenceDungeon4Rules.SourcePlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
         internal bool TryHandleCapturedNascenseJobeFromMove(
             ICharacter character,
             Identity playfieldIdentity,
@@ -1515,9 +1903,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            // Mike 20260823: Jobe portal is swim-only. Below-terrain / hole falls must not zone.
-            bool swimPacket = moveType == 26 || character.MoveMode == MoveModes.Swim;
-            if (!swimPacket)
+            // Capture 20260830-110744: zone on water depth (low Y), not Swim MoveType 26.
+            // Cave-mouth under-terrain holes stay excluded (see IsCapturedNascenseJobeWaterEntry).
+            if (!IsCapturedNascenseJobeWaterEntry(character, moveType))
             {
                 this.capturedNascenseJobeEntryContacts.Remove(character.Identity.Instance);
                 return false;
@@ -1536,8 +1924,42 @@ namespace AORebirth.Core.Playfields
                 playfieldIdentity.Instance,
                 stopMovement,
                 teleportToPlayfield,
-                "swim-packet");
+                "water-entry");
             return true;
+        }
+
+        /// <summary>
+        /// Capture 20260830-110744 water portal: Y≈2.59 at ~(619,1304) then PLAYFIELD-INIT 4001.
+        /// No Swim packets in that capture. Swim MoveType/MoveMode still accepted if present.
+        /// </summary>
+        private static bool IsCapturedNascenseJobeWaterEntry(ICharacter character, int moveType)
+        {
+            if (character == null)
+            {
+                return false;
+            }
+
+            float x = character.RawCoordinates.X;
+            float y = character.RawCoordinates.Y;
+            float z = character.RawCoordinates.Z;
+
+            bool swimSignal = character.MoveMode == MoveModes.Swim
+                || moveType == 26;
+            bool inWaterDepth = y <= CapturedNascenseJobeWaterYMax;
+
+            // Mike 20260823: Crippler cave mouth under-map falls are not the water portal.
+            if (IsNascenseCripplerCaveUnderTerrainHole(x, z) && !swimSignal)
+            {
+                return false;
+            }
+
+            return swimSignal || inWaterDepth;
+        }
+
+        private static bool IsNascenseCripplerCaveUnderTerrainHole(float x, float z)
+        {
+            // Cave-mouth / high-terrain Crippler cluster (~Y 45–72), not the low river basin.
+            return x >= 490f && x <= 590f && z >= 1680f && z <= 1820f;
         }
 
         private void StartNascenseSwimTeleport(
@@ -1571,7 +1993,7 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Zoning,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Nascense->Jobe swim teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) via={9} evidence=20260821-191836",
+                    "Nascense->Jobe swim teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) via={9} evidence=20260821-191836+20260830-110744",
                     character.Identity.ToString(true),
                     sourcePlayfieldId,
                     character.RawCoordinates.X,
