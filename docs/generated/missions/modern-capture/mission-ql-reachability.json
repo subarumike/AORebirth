@@ -829,12 +829,8 @@
       "MissionQl": 16
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 8,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 10,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 16,
           "DifficultySlot": 7
@@ -874,8 +870,12 @@
       "MissionQl": 17
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 14,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 10,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 12,
           "DifficultySlot": 10
@@ -1090,8 +1090,12 @@
       "MissionQl": 21
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 13,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 15,
           "DifficultySlot": 10
@@ -1143,12 +1147,8 @@
       "MissionQl": 22
     },
     {
-      "CandidateCharacterLevelCount": 10,
+      "CandidateCharacterLevelCount": 9,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 13,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 18,
           "DifficultySlot": 9
@@ -1192,8 +1192,12 @@
       "MissionQl": 23
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 13,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 14,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 16,
           "DifficultySlot": 10
@@ -1249,12 +1253,8 @@
       "MissionQl": 24
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 14,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 17,
           "DifficultySlot": 10
@@ -1779,12 +1779,8 @@
       "MissionQl": 34
     },
     {
-      "CandidateCharacterLevelCount": 10,
+      "CandidateCharacterLevelCount": 9,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 20,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 27,
           "DifficultySlot": 9
@@ -1828,8 +1824,12 @@
       "MissionQl": 35
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 14,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 20,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 24,
           "DifficultySlot": 10
@@ -1946,8 +1946,12 @@
       "MissionQl": 37
     },
     {
-      "CandidateCharacterLevelCount": 8,
+      "CandidateCharacterLevelCount": 9,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 22,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 32,
           "DifficultySlot": 8
@@ -1987,12 +1991,8 @@
       "MissionQl": 38
     },
     {
-      "CandidateCharacterLevelCount": 14,
+      "CandidateCharacterLevelCount": 13,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 22,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 26,
           "DifficultySlot": 10
@@ -2896,8 +2896,12 @@
       "MissionQl": 55
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 32,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 47,
           "DifficultySlot": 8
@@ -2949,12 +2953,8 @@
       "MissionQl": 56
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 32,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 38,
           "DifficultySlot": 10
@@ -3006,8 +3006,12 @@
       "MissionQl": 57
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 33,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 39,
           "DifficultySlot": 10
@@ -3059,12 +3063,8 @@
       "MissionQl": 58
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 8,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 33,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 46,
           "DifficultySlot": 9
@@ -3104,7 +3104,7 @@
       "MissionQl": 59
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 14,
       "CandidateEdges": [
         {
           "CharacterLevel": 34,
@@ -3143,6 +3143,10 @@
           "DifficultySlot": 3
         },
         {
+          "CharacterLevel": 77,
+          "DifficultySlot": 3
+        },
+        {
           "CharacterLevel": 80,
           "DifficultySlot": 2
         },
@@ -3165,7 +3169,7 @@
       "MissionQl": 60
     },
     {
-      "CandidateCharacterLevelCount": 10,
+      "CandidateCharacterLevelCount": 9,
       "CandidateEdges": [
         {
           "CharacterLevel": 41,
@@ -3194,10 +3198,6 @@
         {
           "CharacterLevel": 72,
           "DifficultySlot": 4
-        },
-        {
-          "CharacterLevel": 77,
-          "DifficultySlot": 3
         },
         {
           "CharacterLevel": 82,
@@ -3328,7 +3328,7 @@
       "MissionQl": 63
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
         {
           "CharacterLevel": 36,
@@ -3359,6 +3359,10 @@
           "DifficultySlot": 4
         },
         {
+          "CharacterLevel": 77,
+          "DifficultySlot": 4
+        },
+        {
           "CharacterLevel": 80,
           "DifficultySlot": 3
         },
@@ -3381,7 +3385,7 @@
       "MissionQl": 64
     },
     {
-      "CandidateCharacterLevelCount": 8,
+      "CandidateCharacterLevelCount": 7,
       "CandidateEdges": [
         {
           "CharacterLevel": 50,
@@ -3394,10 +3398,6 @@
         {
           "CharacterLevel": 73,
           "DifficultySlot": 5
-        },
-        {
-          "CharacterLevel": 77,
-          "DifficultySlot": 4
         },
         {
           "CharacterLevel": 82,
@@ -4755,7 +4755,7 @@
       "MissionQl": 90
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 13,
       "CandidateEdges": [
         {
           "CharacterLevel": 51,
@@ -4771,6 +4771,10 @@
         },
         {
           "CharacterLevel": 76,
+          "DifficultySlot": 8
+        },
+        {
+          "CharacterLevel": 77,
           "DifficultySlot": 8
         },
         {
@@ -4815,12 +4819,12 @@
       "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
         {
-          "CharacterLevel": 71,
-          "DifficultySlot": 9
+          "CharacterLevel": 52,
+          "DifficultySlot": 11
         },
         {
-          "CharacterLevel": 77,
-          "DifficultySlot": 8
+          "CharacterLevel": 71,
+          "DifficultySlot": 9
         },
         {
           "CharacterLevel": 84,
@@ -4861,12 +4865,8 @@
       "MissionQl": 92
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 52,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 62,
           "DifficultySlot": 10
@@ -4922,12 +4922,8 @@
       "MissionQl": 93
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 53,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 63,
           "DifficultySlot": 10
@@ -4975,8 +4971,12 @@
       "MissionQl": 94
     },
     {
-      "CandidateCharacterLevelCount": 8,
+      "CandidateCharacterLevelCount": 9,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 53,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 87,
           "DifficultySlot": 7
@@ -5016,12 +5016,8 @@
       "MissionQl": 95
     },
     {
-      "CandidateCharacterLevelCount": 14,
+      "CandidateCharacterLevelCount": 13,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 54,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 64,
           "DifficultySlot": 10
@@ -5081,8 +5077,12 @@
       "MissionQl": 96
     },
     {
-      "CandidateCharacterLevelCount": 10,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 54,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 65,
           "DifficultySlot": 10
@@ -5607,12 +5607,8 @@
       "MissionQl": 106
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 60,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 83,
           "DifficultySlot": 9
@@ -5660,8 +5656,12 @@
       "MissionQl": 107
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 13,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 60,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 72,
           "DifficultySlot": 10
@@ -5770,8 +5770,12 @@
       "MissionQl": 109
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 62,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 85,
           "DifficultySlot": 9
@@ -5815,12 +5819,8 @@
       "MissionQl": 110
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 62,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 74,
           "DifficultySlot": 10
@@ -6084,15 +6084,11 @@
       "MissionQl": 115
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
         {
           "CharacterLevel": 65,
           "DifficultySlot": 11
-        },
-        {
-          "CharacterLevel": 90,
-          "DifficultySlot": 9
         },
         {
           "CharacterLevel": 97,
@@ -6141,11 +6137,15 @@
       "MissionQl": 116
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
         {
           "CharacterLevel": 78,
           "DifficultySlot": 10
+        },
+        {
+          "CharacterLevel": 90,
+          "DifficultySlot": 9
         },
         {
           "CharacterLevel": 98,
@@ -6406,7 +6406,7 @@
       "MissionQl": 121
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
         {
           "CharacterLevel": 94,
@@ -6418,6 +6418,10 @@
         },
         {
           "CharacterLevel": 111,
+          "DifficultySlot": 7
+        },
+        {
+          "CharacterLevel": 112,
           "DifficultySlot": 7
         },
         {
@@ -6451,7 +6455,7 @@
       "MissionQl": 122
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
         {
           "CharacterLevel": 69,
@@ -6468,10 +6472,6 @@
         {
           "CharacterLevel": 103,
           "DifficultySlot": 8
-        },
-        {
-          "CharacterLevel": 112,
-          "DifficultySlot": 7
         },
         {
           "CharacterLevel": 123,
@@ -7087,8 +7087,12 @@
       "MissionQl": 134
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 14,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 76,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 90,
           "DifficultySlot": 10
@@ -7148,12 +7152,8 @@
       "MissionQl": 135
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 76,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 91,
           "DifficultySlot": 10
@@ -7258,8 +7258,12 @@
       "MissionQl": 137
     },
     {
-      "CandidateCharacterLevelCount": 10,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 78,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 92,
           "DifficultySlot": 10
@@ -7310,7 +7314,7 @@
       "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
         {
-          "CharacterLevel": 78,
+          "CharacterLevel": 79,
           "DifficultySlot": 11
         },
         {
@@ -7413,12 +7417,8 @@
       "MissionQl": 140
     },
     {
-      "CandidateCharacterLevelCount": 13,
+      "CandidateCharacterLevelCount": 12,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 79,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 94,
           "DifficultySlot": 10
@@ -7519,12 +7519,8 @@
       "MissionQl": 142
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 8,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 80,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 110,
           "DifficultySlot": 9
@@ -7564,8 +7560,12 @@
       "MissionQl": 143
     },
     {
-      "CandidateCharacterLevelCount": 14,
+      "CandidateCharacterLevelCount": 15,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 80,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 96,
           "DifficultySlot": 10
@@ -7845,8 +7845,12 @@
       "MissionQl": 148
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 84,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 115,
           "DifficultySlot": 9
@@ -7890,12 +7894,8 @@
       "MissionQl": 149
     },
     {
-      "CandidateCharacterLevelCount": 12,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 84,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 100,
           "DifficultySlot": 10
@@ -7947,8 +7947,12 @@
       "MissionQl": 150
     },
     {
-      "CandidateCharacterLevelCount": 10,
+      "CandidateCharacterLevelCount": 11,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 85,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 101,
           "DifficultySlot": 10
@@ -7996,12 +8000,8 @@
       "MissionQl": 151
     },
     {
-      "CandidateCharacterLevelCount": 11,
+      "CandidateCharacterLevelCount": 10,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 85,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 117,
           "DifficultySlot": 9
@@ -9240,12 +9240,8 @@
       "MissionQl": 179
     },
     {
-      "CandidateCharacterLevelCount": 9,
+      "CandidateCharacterLevelCount": 8,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 101,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 120,
           "DifficultySlot": 10
@@ -9322,12 +9318,8 @@
       "MissionQl": 181
     },
     {
-      "CandidateCharacterLevelCount": 7,
+      "CandidateCharacterLevelCount": 6,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 102,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 140,
           "DifficultySlot": 9
@@ -9399,7 +9391,7 @@
       "CandidateCharacterLevelCount": 8,
       "CandidateEdges": [
         {
-          "CharacterLevel": 103,
+          "CharacterLevel": 101,
           "DifficultySlot": 11
         },
         {
@@ -9437,8 +9429,12 @@
       "MissionQl": 184
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 6,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 103,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 143,
           "DifficultySlot": 9
@@ -9469,7 +9465,7 @@
       "CandidateCharacterLevelCount": 6,
       "CandidateEdges": [
         {
-          "CharacterLevel": 104,
+          "CharacterLevel": 102,
           "DifficultySlot": 11
         },
         {
@@ -9499,8 +9495,12 @@
       "MissionQl": 186
     },
     {
-      "CandidateCharacterLevelCount": 7,
+      "CandidateCharacterLevelCount": 8,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 104,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 125,
           "DifficultySlot": 10
@@ -10061,12 +10061,8 @@
       "MissionQl": 204
     },
     {
-      "CandidateCharacterLevelCount": 6,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 115,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 137,
           "DifficultySlot": 10
@@ -10094,8 +10090,12 @@
       "MissionQl": 205
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 115,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 159,
           "DifficultySlot": 9
@@ -10119,12 +10119,8 @@
       "MissionQl": 206
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 116,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 138,
           "DifficultySlot": 10
@@ -10148,8 +10144,12 @@
       "MissionQl": 207
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 116,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 139,
           "DifficultySlot": 10
@@ -10173,12 +10173,8 @@
       "MissionQl": 208
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 3,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 117,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 161,
           "DifficultySlot": 9
@@ -10198,8 +10194,12 @@
       "MissionQl": 209
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 6,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 117,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 140,
           "DifficultySlot": 10
@@ -10260,8 +10260,12 @@
       "MissionQl": 211
     },
     {
-      "CandidateCharacterLevelCount": 3,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 142,
+          "DifficultySlot": 10
+        },
         {
           "CharacterLevel": 177,
           "DifficultySlot": 8
@@ -10281,16 +10285,8 @@
       "MissionQl": 212
     },
     {
-      "CandidateCharacterLevelCount": 6,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 119,
-          "DifficultySlot": 11
-        },
-        {
-          "CharacterLevel": 142,
-          "DifficultySlot": 10
-        },
         {
           "CharacterLevel": 164,
           "DifficultySlot": 9
@@ -10317,7 +10313,7 @@
       "CandidateCharacterLevelCount": 6,
       "CandidateEdges": [
         {
-          "CharacterLevel": 120,
+          "CharacterLevel": 119,
           "DifficultySlot": 11
         },
         {
@@ -10347,8 +10343,12 @@
       "MissionQl": 214
     },
     {
-      "CandidateCharacterLevelCount": 3,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 120,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 166,
           "DifficultySlot": 9
@@ -10368,12 +10368,8 @@
       "MissionQl": 215
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 121,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 144,
           "DifficultySlot": 10
@@ -10397,8 +10393,12 @@
       "MissionQl": 216
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 6,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 121,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 145,
           "DifficultySlot": 10
@@ -10555,12 +10555,8 @@
       "MissionQl": 222
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 125,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 149,
           "DifficultySlot": 10
@@ -10584,8 +10580,12 @@
       "MissionQl": 223
     },
     {
-      "CandidateCharacterLevelCount": 3,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 125,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 173,
           "DifficultySlot": 9
@@ -10605,10 +10605,14 @@
       "MissionQl": 224
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
         {
           "CharacterLevel": 126,
+          "DifficultySlot": 11
+        },
+        {
+          "CharacterLevel": 127,
           "DifficultySlot": 11
         },
         {
@@ -10630,8 +10634,12 @@
       "MissionQl": 225
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 128,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 151,
           "DifficultySlot": 10
@@ -10658,7 +10666,7 @@
       "CandidateCharacterLevelCount": 3,
       "CandidateEdges": [
         {
-          "CharacterLevel": 127,
+          "CharacterLevel": 129,
           "DifficultySlot": 11
         },
         {
@@ -10701,12 +10709,8 @@
       "MissionQl": 228
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 3,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 128,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 153,
           "DifficultySlot": 10
@@ -10743,12 +10747,8 @@
       "MissionQl": 230
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 129,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 154,
           "DifficultySlot": 10
@@ -10818,12 +10818,8 @@
       "MissionQl": 233
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 3,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 131,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 156,
           "DifficultySlot": 10
@@ -10843,8 +10839,12 @@
       "MissionQl": 234
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 131,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 157,
           "DifficultySlot": 10
@@ -10893,8 +10893,12 @@
       "MissionQl": 236
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 5,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 133,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 158,
           "DifficultySlot": 10
@@ -10921,7 +10925,7 @@
       "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
         {
-          "CharacterLevel": 133,
+          "CharacterLevel": 134,
           "DifficultySlot": 11
         },
         {
@@ -10943,8 +10947,12 @@
       "MissionQl": 238
     },
     {
-      "CandidateCharacterLevelCount": 2,
+      "CandidateCharacterLevelCount": 3,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 135,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 184,
           "DifficultySlot": 9
@@ -10960,12 +10968,8 @@
       "MissionQl": 239
     },
     {
-      "CandidateCharacterLevelCount": 5,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 134,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 160,
           "DifficultySlot": 10
@@ -10989,12 +10993,8 @@
       "MissionQl": 240
     },
     {
-      "CandidateCharacterLevelCount": 4,
+      "CandidateCharacterLevelCount": 3,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 135,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 161,
           "DifficultySlot": 10
@@ -11094,8 +11094,12 @@
       "MissionQl": 245
     },
     {
-      "CandidateCharacterLevelCount": 3,
+      "CandidateCharacterLevelCount": 4,
       "CandidateEdges": [
+        {
+          "CharacterLevel": 138,
+          "DifficultySlot": 11
+        },
         {
           "CharacterLevel": 164,
           "DifficultySlot": 10
@@ -11115,12 +11119,8 @@
       "MissionQl": 246
     },
     {
-      "CandidateCharacterLevelCount": 3,
+      "CandidateCharacterLevelCount": 2,
       "CandidateEdges": [
-        {
-          "CharacterLevel": 138,
-          "DifficultySlot": 11
-        },
         {
           "CharacterLevel": 165,
           "DifficultySlot": 10

@@ -68,19 +68,14 @@
       ]
     },
     {
-      "ApproximateCohortCountIfAllComplete": 180,
-      "ApproximateOfferCountIfFivePerCohort": 900,
-      "ApproximateRequestCount": 180,
+      "ApproximateCohortCountIfAllComplete": 170,
+      "ApproximateOfferCountIfFivePerCohort": 850,
+      "ApproximateRequestCount": 170,
       "CountStatus": "OPERATIONAL_RECOMMENDATION_NOT_PROOF_THRESHOLD",
       "Name": "Wave 2 - disputed low-level cells",
       "Purpose": "Resolve the first and densest Malis versus canonical table disagreements.",
       "RequestsPerTarget": 10,
       "Targets": [
-        {
-          "CharacterLevel": 10,
-          "DifficultySlot": 11,
-          "TargetMissionQl": 17
-        },
         {
           "CharacterLevel": 12,
           "DifficultySlot": 3,
@@ -164,7 +159,7 @@
         {
           "CharacterLevel": 13,
           "DifficultySlot": 11,
-          "TargetMissionQl": 23
+          "TargetMissionQl": 22
         }
       ]
     },
@@ -180,27 +175,27 @@
         {
           "CharacterLevel": 52,
           "DifficultySlot": 11,
-          "TargetMissionQl": 93
+          "TargetMissionQl": 92
         },
         {
           "CharacterLevel": 53,
           "DifficultySlot": 11,
-          "TargetMissionQl": 94
+          "TargetMissionQl": 95
         },
         {
           "CharacterLevel": 54,
           "DifficultySlot": 11,
-          "TargetMissionQl": 96
+          "TargetMissionQl": 97
         },
         {
           "CharacterLevel": 60,
           "DifficultySlot": 11,
-          "TargetMissionQl": 107
+          "TargetMissionQl": 108
         },
         {
           "CharacterLevel": 80,
           "DifficultySlot": 11,
-          "TargetMissionQl": 143
+          "TargetMissionQl": 144
         }
       ]
     },
@@ -402,7 +397,7 @@
         {
           "CharacterLevel": 10,
           "DifficultySlot": 11,
-          "TargetMissionQl": 17
+          "TargetMissionQl": 18
         },
         {
           "CharacterLevel": 12,
@@ -432,7 +427,7 @@
         {
           "CharacterLevel": 13,
           "DifficultySlot": 11,
-          "TargetMissionQl": 23
+          "TargetMissionQl": 22
         },
         {
           "CharacterLevel": 52,
@@ -447,7 +442,7 @@
         {
           "CharacterLevel": 52,
           "DifficultySlot": 11,
-          "TargetMissionQl": 93
+          "TargetMissionQl": 92
         },
         {
           "CharacterLevel": 53,
@@ -462,7 +457,7 @@
         {
           "CharacterLevel": 53,
           "DifficultySlot": 11,
-          "TargetMissionQl": 94
+          "TargetMissionQl": 95
         },
         {
           "CharacterLevel": 54,
@@ -477,7 +472,7 @@
         {
           "CharacterLevel": 54,
           "DifficultySlot": 11,
-          "TargetMissionQl": 96
+          "TargetMissionQl": 97
         },
         {
           "CharacterLevel": 60,
@@ -492,7 +487,7 @@
         {
           "CharacterLevel": 60,
           "DifficultySlot": 11,
-          "TargetMissionQl": 107
+          "TargetMissionQl": 108
         },
         {
           "CharacterLevel": 80,
@@ -507,7 +502,7 @@
         {
           "CharacterLevel": 80,
           "DifficultySlot": 11,
-          "TargetMissionQl": 143
+          "TargetMissionQl": 144
         },
         {
           "CharacterLevel": 200,

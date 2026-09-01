@@ -1,6 +1,6 @@
 {
   "GreedyNearOptimal": {
-    "CharacterCount": 48,
+    "CharacterCount": 49,
     "CharacterLevels": [
       17,
       31,
@@ -16,55 +16,60 @@
       164,
       7,
       48,
-      113,
-      173,
-      206,
+      124,
       134,
-      203,
+      163,
+      173,
+      191,
+      206,
       208,
       38,
-      94,
-      124,
+      101,
       167,
-      163,
+      95,
       177,
-      213,
       2,
       23,
+      54,
+      58,
+      166,
+      169,
+      187,
       44,
-      63,
-      168,
-      65,
-      133,
-      137,
       161,
-      175,
-      179,
+      165,
       180,
-      183,
       184,
-      33,
+      185,
+      122,
       126,
       129,
-      139,
-      166,
+      130,
+      133,
+      137,
+      154,
+      156,
       201,
       202
     ],
     "CoveragePercentOfReachableDomain": 100.0,
     "CoveredMissionQlCount": 250,
     "LevelReasons": {
+      "101": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 101"
+      ],
       "106": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 74, 127"
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 74, 79, 127"
       ],
       "110": [
-        "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 77, 82, 110, 197"
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 77, 82, 197"
       ],
-      "113": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 101, 169"
+      "122": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 218"
       ],
       "124": [
         "adds 2 QLs not supplied by the other selected levels",
@@ -75,35 +80,44 @@
         "exclusive contribution: 225"
       ],
       "128": [
-        "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 89, 108, 115, 229"
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 89, 108, 192"
       ],
       "129": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 231"
+        "exclusive contribution: 227"
+      ],
+      "130": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 232"
       ],
       "132": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 92, 158, 236"
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 92, 236"
       ],
       "133": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 238"
+        "exclusive contribution: 237"
       ],
       "134": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 174, 240"
+        "exclusive contribution: 174, 238"
       ],
       "137": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 205, 245"
-      ],
-      "139": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 248"
+        "exclusive contribution: 245"
       ],
       "149": [
-        "adds 0 QLs not supplied by the other selected levels"
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 223"
+      ],
+      "154": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 231"
+      ],
+      "156": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 234"
       ],
       "157": [
         "adds 3 QLs not supplied by the other selected levels",
@@ -115,23 +129,27 @@
       ],
       "163": [
         "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 195, 211, 244"
+        "exclusive contribution: 179, 211, 244"
       ],
       "164": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 139, 196, 213, 246"
+      ],
+      "165": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 246"
+        "exclusive contribution: 214"
       ],
       "166": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 215"
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 182, 215"
       ],
       "167": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 200, 217"
-      ],
-      "168": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 218"
+        "exclusive contribution: 217"
+      ],
+      "169": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 219"
       ],
       "17": [
         "adds 5 QLs not supplied by the other selected levels",
@@ -139,31 +157,31 @@
       ],
       "173": [
         "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 173, 190, 207, 224"
-      ],
-      "175": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 210, 227"
+        "exclusive contribution: 155, 173, 190, 207"
       ],
       "177": [
         "adds 3 QLs not supplied by the other selected levels",
         "exclusive contribution: 194, 212, 230"
       ],
-      "179": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 214, 232"
-      ],
       "180": [
         "adds 2 QLs not supplied by the other selected levels",
         "exclusive contribution: 216, 233"
       ],
-      "183": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 219, 237"
-      ],
       "184": [
         "adds 2 QLs not supplied by the other selected levels",
         "exclusive contribution: 220, 239"
+      ],
+      "185": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 203, 240"
+      ],
+      "187": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 168, 243"
+      ],
+      "191": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 191, 210, 229, 248"
       ],
       "2": [
         "adds 3 QLs not supplied by the other selected levels",
@@ -179,73 +197,62 @@
         "adds 1 QLs not supplied by the other selected levels",
         "exclusive contribution: 242"
       ],
-      "203": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 203, 243"
-      ],
       "206": [
-        "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 185, 206, 226, 247"
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 175, 206"
       ],
       "208": [
         "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 176, 187, 228"
-      ],
-      "213": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 191, 234"
+        "exclusive contribution: 176, 208, 228"
       ],
       "23": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 16, 19"
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 16, 19, 29"
       ],
       "31": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 21, 31, 46"
-      ],
-      "33": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 59"
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 21, 24, 31, 55"
       ],
       "38": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 32"
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 28, 32"
       ],
       "44": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 35, 66"
+        "exclusive contribution: 35, 78"
       ],
       "48": [
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 36"
+      ],
+      "54": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 43, 85"
+        "exclusive contribution: 59, 81",
+        "historically corrected difficulty-11 boundary"
       ],
       "56": [
+        "adds 6 QLs not supplied by the other selected levels",
+        "exclusive contribution: 42, 47, 50, 56, 61, 67"
+      ],
+      "58": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 61, 67"
-      ],
-      "63": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 63, 69, 81"
-      ],
-      "65": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 71"
+        "exclusive contribution: 63, 69"
       ],
       "7": [
         "adds 7 QLs not supplied by the other selected levels",
         "exclusive contribution: 4, 5, 6, 7, 8, 9, 10"
       ],
       "73": [
-        "adds 5 QLs not supplied by the other selected levels",
-        "exclusive contribution: 51, 54, 73, 80, 87"
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 51, 65, 73"
       ],
       "76": [
-        "adds 6 QLs not supplied by the other selected levels",
-        "exclusive contribution: 60, 64, 76, 83, 91, 98"
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 53, 60, 83, 98"
       ],
-      "94": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 70"
+      "95": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 71, 142"
       ]
     },
     "Name": "GREEDY_NEAR_OPTIMAL",
@@ -253,170 +260,191 @@
     "UncoveredReachableMissionQls": []
   },
   "MathematicalMinimumOrBestProven": {
-    "CharacterCount": 48,
+    "CharacterCount": 47,
     "CharacterLevels": [
       2,
       7,
-      17,
-      23,
-      31,
-      33,
-      38,
-      44,
-      48,
-      56,
-      63,
-      65,
-      73,
+      12,
+      16,
+      26,
+      37,
+      43,
+      49,
+      50,
+      66,
       76,
-      94,
-      106,
+      78,
+      82,
+      84,
+      107,
+      109,
       110,
-      113,
-      124,
-      126,
+      121,
+      123,
       128,
       129,
       132,
       133,
-      134,
+      135,
       137,
+      138,
       139,
-      149,
-      157,
+      142,
+      146,
+      152,
+      153,
+      154,
+      156,
       161,
-      163,
-      164,
-      166,
-      167,
-      168,
+      162,
+      165,
       173,
-      175,
-      177,
-      179,
       180,
-      183,
-      184,
+      185,
+      186,
+      188,
+      192,
+      194,
+      196,
+      199,
       201,
-      202,
-      203,
-      206,
-      208,
-      213
+      202
     ],
     "CoveragePercentOfReachableDomain": 100.0,
     "CoveredMissionQlCount": 250,
     "LevelReasons": {
-      "106": [
+      "107": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 74, 80, 191"
+      ],
+      "109": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 74, 127"
+        "exclusive contribution: 81, 195"
       ],
       "110": [
-        "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 77, 82, 110, 197"
-      ],
-      "113": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 101, 169"
+        "exclusive contribution: 88, 143"
       ],
-      "124": [
+      "12": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 86, 186"
+        "exclusive contribution: 15, 21",
+        "dense cluster of Malis missing/disputed cells"
       ],
-      "126": [
+      "121": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 225"
+        "exclusive contribution: 217"
+      ],
+      "123": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 86, 220"
       ],
       "128": [
-        "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 89, 108, 115, 229"
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 226"
       ],
       "129": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 231"
+        "exclusive contribution: 227"
       ],
       "132": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 92, 158, 236"
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 105, 236"
       ],
       "133": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 238"
+        "exclusive contribution: 237"
       ],
-      "134": [
+      "135": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 174, 240"
+        "exclusive contribution: 94, 239"
       ],
       "137": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 205, 245"
-      ],
-      "139": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 248"
-      ],
-      "149": [
-        "adds 0 QLs not supplied by the other selected levels"
-      ],
-      "157": [
         "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 188, 204, 235"
+        "exclusive contribution: 95, 205, 245"
       ],
-      "161": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 209"
-      ],
-      "163": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 195, 211, 244"
-      ],
-      "164": [
+      "138": [
         "adds 1 QLs not supplied by the other selected levels",
         "exclusive contribution: 246"
       ],
-      "166": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 215"
-      ],
-      "167": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 200, 217"
-      ],
-      "168": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 218"
-      ],
-      "17": [
+      "139": [
         "adds 5 QLs not supplied by the other selected levels",
-        "exclusive contribution: 11, 13, 14, 15, 22"
+        "exclusive contribution: 97, 111, 125, 208, 248"
+      ],
+      "142": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 127, 142, 212"
+      ],
+      "146": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 189, 219"
+      ],
+      "152": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 182, 228"
+      ],
+      "153": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 122, 168, 183, 229"
+      ],
+      "154": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 200, 231"
+      ],
+      "156": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 187, 234"
+      ],
+      "16": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 11, 16, 17, 24"
+      ],
+      "161": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 177, 209"
+      ],
+      "162": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 210, 243"
+      ],
+      "165": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 214, 247"
       ],
       "173": [
-        "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 173, 190, 207, 224"
-      ],
-      "175": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 210, 227"
-      ],
-      "177": [
         "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 194, 212, 230"
-      ],
-      "179": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 214, 232"
+        "exclusive contribution: 173, 190, 224"
       ],
       "180": [
         "adds 2 QLs not supplied by the other selected levels",
         "exclusive contribution: 216, 233"
       ],
-      "183": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 219, 237"
+      "185": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 185, 203, 240"
       ],
-      "184": [
+      "186": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 186, 204, 223"
+      ],
+      "188": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 188, 206, 225, 244"
+      ],
+      "192": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 134, 211, 230, 249"
+      ],
+      "194": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 174, 213, 232"
+      ],
+      "196": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 176, 196, 215, 235"
+      ],
+      "199": [
         "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 220, 239"
+        "exclusive contribution: 218, 238"
       ],
       "2": [
         "adds 3 QLs not supplied by the other selected levels",
@@ -424,81 +452,57 @@
         "lowest known table level not blocked by the modern level-1 starter rule; reaches QL1"
       ],
       "201": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 221",
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 201, 221",
         "Malis QL200 filtering behavior begins above character level 200"
       ],
       "202": [
         "adds 1 QLs not supplied by the other selected levels",
         "exclusive contribution: 242"
       ],
-      "203": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 203, 243"
+      "26": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 22, 23, 26"
       ],
-      "206": [
+      "37": [
         "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 185, 206, 226, 247"
+        "exclusive contribution: 25, 27, 29, 48"
       ],
-      "208": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 176, 187, 228"
+      "43": [
+        "adds 6 QLs not supplied by the other selected levels",
+        "exclusive contribution: 30, 32, 38, 43, 47, 51"
       ],
-      "213": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 191, 234"
-      ],
-      "23": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 16, 19"
-      ],
-      "31": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 21, 31, 46"
-      ],
-      "33": [
+      "49": [
         "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 59"
+        "exclusive contribution: 41"
       ],
-      "38": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 32"
+      "50": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 35, 42, 45, 50"
       ],
-      "44": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 35, 66"
-      ],
-      "48": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 43, 85"
-      ],
-      "56": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 61, 67"
-      ],
-      "63": [
-        "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 63, 69, 81"
-      ],
-      "65": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 71"
+      "66": [
+        "adds 5 QLs not supplied by the other selected levels",
+        "exclusive contribution: 52, 56, 59, 72, 79"
       ],
       "7": [
-        "adds 7 QLs not supplied by the other selected levels",
-        "exclusive contribution: 4, 5, 6, 7, 8, 9, 10"
-      ],
-      "73": [
-        "adds 5 QLs not supplied by the other selected levels",
-        "exclusive contribution: 51, 54, 73, 80, 87"
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 4, 5, 6, 7"
       ],
       "76": [
-        "adds 6 QLs not supplied by the other selected levels",
-        "exclusive contribution: 60, 64, 76, 83, 91, 98"
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 68, 83, 91"
       ],
-      "94": [
-        "adds 1 QLs not supplied by the other selected levels",
-        "exclusive contribution: 70"
+      "78": [
+        "adds 4 QLs not supplied by the other selected levels",
+        "exclusive contribution: 54, 62, 70, 78"
+      ],
+      "82": [
+        "adds 2 QLs not supplied by the other selected levels",
+        "exclusive contribution: 61, 69"
+      ],
+      "84": [
+        "adds 3 QLs not supplied by the other selected levels",
+        "exclusive contribution: 67, 71, 100"
       ]
     },
     "Name": "BEST_DETERMINISTIC_NEAR_EXACT",
@@ -527,18 +531,18 @@
     "CoveredMissionQlCount": 91,
     "LevelReasons": {
       "10": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 7, 17",
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 7",
         "first Malis/canonical value disagreement"
       ],
       "12": [
-        "adds 2 QLs not supplied by the other selected levels",
-        "exclusive contribution: 18, 21",
+        "adds 1 QLs not supplied by the other selected levels",
+        "exclusive contribution: 21",
         "dense cluster of Malis missing/disputed cells"
       ],
       "13": [
         "adds 3 QLs not supplied by the other selected levels",
-        "exclusive contribution: 16, 19, 23",
+        "exclusive contribution: 16, 19, 22",
         "dense cluster of Malis missing/disputed cells"
       ],
       "2": [
@@ -573,27 +577,27 @@
       ],
       "52": [
         "adds 9 QLs not supplied by the other selected levels",
-        "exclusive contribution: 36, 41, 44, 46, 52, 57, 62, 67, 93",
+        "exclusive contribution: 36, 41, 44, 46, 52, 57, 62, 67, 92",
         "historically corrected difficulty-11 boundary"
       ],
       "53": [
         "adds 6 QLs not supplied by the other selected levels",
-        "exclusive contribution: 47, 53, 58, 63, 79, 94",
+        "exclusive contribution: 47, 53, 58, 63, 79, 95",
         "historically corrected difficulty-11 boundary"
       ],
       "54": [
-        "adds 5 QLs not supplied by the other selected levels",
-        "exclusive contribution: 40, 43, 59, 70, 81",
+        "adds 6 QLs not supplied by the other selected levels",
+        "exclusive contribution: 40, 43, 59, 70, 81, 97",
         "historically corrected difficulty-11 boundary"
       ],
       "60": [
         "adds 4 QLs not supplied by the other selected levels",
-        "exclusive contribution: 51, 66, 90, 107",
+        "exclusive contribution: 51, 66, 90, 108",
         "historically corrected difficulty-11 boundary"
       ],
       "80": [
-        "adds 6 QLs not supplied by the other selected levels",
-        "exclusive contribution: 56, 80, 88, 104, 120, 143",
+        "adds 7 QLs not supplied by the other selected levels",
+        "exclusive contribution: 56, 80, 88, 96, 104, 120, 144",
         "historically corrected difficulty-11 value 144 to 143"
       ]
     },
@@ -603,8 +607,9 @@
       4,
       5,
       6,
+      17,
       20,
-      22,
+      23,
       24,
       25,
       26,
@@ -638,9 +643,8 @@
       87,
       89,
       91,
-      92,
-      95,
-      97,
+      93,
+      94,
       98,
       99,
       100,
@@ -649,7 +653,7 @@
       103,
       105,
       106,
-      108,
+      107,
       109,
       110,
       111,
@@ -682,7 +686,7 @@
       139,
       141,
       142,
-      144,
+      143,
       145,
       147,
       148,

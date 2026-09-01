@@ -411,6 +411,52 @@ def load_mission_type_join() -> dict[int, dict[str, object]]:
     }
 
 
+def legacy_roll_origin(
+    session_inputs: dict[str, object] | None,
+    terminal_identity: object | None = None,
+) -> dict[str, object] | None:
+    if not session_inputs:
+        return None
+    identity = terminal_identity or session_inputs.get("terminal_identity")
+    playfield = session_inputs.get("terminal_playfield")
+    coordinates = session_inputs.get("terminal_coordinates")
+    if identity is None and playfield is None and coordinates is None:
+        return None
+    return {
+        "capture_phase": "LEGACY_SESSION_STARTED",
+        "terminal_identity": identity,
+        "terminal_playfield_identity": playfield,
+        "terminal_local_coordinates": coordinates,
+        "provenance": "SCHEMA_VERSION_1_SESSION_ORIGIN_FALLBACK",
+    }
+
+
+def enrich_roll_origin(
+    roll_origin: dict[str, object] | None,
+    playfield_join: dict[int, object],
+) -> dict[str, object] | None:
+    if roll_origin is None:
+        return None
+    result = dict(roll_origin)
+    identity = result.get("terminal_playfield_identity")
+    if isinstance(identity, dict) and identity.get("instance") is not None:
+        result["terminal_playfield_name"] = playfield_join.get(
+            int(identity["instance"])
+        )
+    return result
+
+
+def enrich_mission_destination(
+    destination: dict[str, object],
+    playfield_join: dict[int, object],
+) -> dict[str, object]:
+    result = dict(destination)
+    identity = result.get("playfield_identity")
+    if isinstance(identity, dict) and identity.get("instance") is not None:
+        result["playfield_name"] = playfield_join.get(int(identity["instance"]))
+    return result
+
+
 def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
     events = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     item_join = load_item_join()
@@ -434,6 +480,7 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                 "RawEventSource": events_path.as_posix(),
             }
         elif event_type == "request_started":
+            session_inputs = session.get("Inputs") if session is not None else None
             requests[event["request_id"]] = {
                 "SessionId": event["session_id"],
                 "RequestId": event["request_id"],
@@ -441,6 +488,8 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                 "Status": "PARTIAL_NO_COHORT",
                 "CohortOfferCount": 0,
                 "Inputs": payload,
+                "RollOrigin": payload.get("roll_origin")
+                or legacy_roll_origin(session_inputs),
             }
         elif event_type == "cohort_received":
             fingerprint = str(payload.get("callback_fingerprint") or "")
@@ -455,9 +504,30 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
             request["CohortOfferCount"] = len(payload["offers"])
             request["ResponseEnvelope"] = payload.get("message_envelope")
             request["ReturnedSliders"] = payload.get("sliders")
+            request["RollOrigin"] = payload.get("roll_origin") or request.get("RollOrigin")
             for raw_offer in payload["offers"]:
+                session_inputs = session.get("Inputs") if session is not None else None
+                roll_origin = (
+                    raw_offer.get("roll_origin")
+                    or request.get("RollOrigin")
+                    or legacy_roll_origin(
+                        session_inputs, raw_offer.get("terminal_identity")
+                    )
+                )
+                roll_origin = enrich_roll_origin(roll_origin, playfield_join)
+                mission_destination = raw_offer.get("mission_destination") or {
+                    "playfield_identity": raw_offer.get("playfield"),
+                    "coordinates": raw_offer.get("location"),
+                    "availability": "LEGACY_DIRECT_AOSHARP_MISSIONINFO_FIELDS",
+                }
+                mission_destination = enrich_mission_destination(
+                    mission_destination, playfield_join
+                )
                 rewards = []
-                for raw_reward in raw_offer.get("mission_items", []):
+                raw_rewards = raw_offer.get("reward_items")
+                if raw_rewards is None:
+                    raw_rewards = raw_offer.get("mission_items", [])
+                for raw_reward in raw_rewards:
                     identity = int(raw_reward["low_id"])
                     high_identity = int(raw_reward["high_id"])
                     rewards.append(
@@ -465,6 +535,7 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                             "RawIdentity": {"LowId": identity, "HighId": high_identity},
                             "RewardQl": int(raw_reward["ql"]),
                             "Unknown": raw_reward.get("unknown"),
+                            "IdentitySemantics": raw_reward.get("identity_semantics"),
                             "OfflineLowIdJoin": item_join.get(identity, {"AORebirthResolution": "UNRESOLVED"}),
                             "OfflineHighIdJoin": item_join.get(high_identity, {"AORebirthResolution": "UNRESOLVED"}),
                         }
@@ -487,6 +558,7 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                         "Description": raw_offer.get("description"),
                         "DescriptionIdentifiers": None,
                         "TerminalIdentity": raw_offer.get("terminal_identity"),
+                        "RollOrigin": roll_origin,
                         "RewardDescriptorVersion": raw_offer.get("reward_descriptor_version"),
                         "Rewards": rewards,
                         "ObjectiveItemIdentity": None,
@@ -498,6 +570,8 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                         "PlayfieldIdentity": raw_offer.get("playfield"),
                         "PlayfieldName": playfield_join.get(int(raw_offer["playfield"]["instance"])),
                         "Location": raw_offer.get("location"),
+                        "MissionDestination": mission_destination,
+                        "RawMissionTypeEvidence": raw_offer.get("mission_type"),
                         "DestinationEntranceIdentity": None,
                         "FactionRequirements": None,
                         "UnknownFields": raw_offer.get("unknown_fields", {}),
@@ -817,7 +891,7 @@ def harvester_schema() -> dict[str, object]:
         "required": ["event_type", "schema_version", "session_id", "timestamp_utc", "payload"],
         "properties": {
             "event_type": {"enum": ["session_started", "request_started", "cohort_received", "request_timeout", "duplicate_callback", "session_stopped", "error"]},
-            "schema_version": {"const": 1},
+            "schema_version": {"enum": [1, 2]},
             "session_id": {"type": "string"},
             "request_id": {"type": ["string", "null"]},
             "timestamp_utc": {"type": "string"},
@@ -825,7 +899,9 @@ def harvester_schema() -> dict[str, object]:
         },
         "additionalProperties": True,
         "Durability": "one JSON object per line; append and Flush(true) after every event",
-        "SemanticBoundary": "target_mission_ql is a planner input; MissionInfo 1.0.106 does not expose server mission QL",
+        "SemanticBoundary": "schema 2 target_mission_ql is resolved to an exact character-level table slot at request time; MissionInfo 1.0.106 still does not expose a response-side mission QL",
+        "CaptureContractV2": "request-time terminal origin, mission destination, capture-backed mission-icon type, reward-item descriptors, every public MissionInfo field, and every public QuestAlternativeMessage envelope field",
+        "BackwardCompatibility": "schema 1 journals normalize with session-level roll-origin fallback when terminal location fields are present",
     }
 
 
@@ -919,6 +995,9 @@ def self_test() -> None:
         assert normalized["Offers"][0]["Rewards"][0]["OfflineLowIdJoin"]["Name"] == "Flamethrower Ammunition"
         assert normalized["Offers"][0]["MissionType"]["CaptureBackedType"] == "FindItemReturn"
         assert normalized["Offers"][0]["PlayfieldName"]["Name"]
+        assert normalized["Offers"][0]["RollOrigin"]["provenance"] == "SCHEMA_VERSION_1_SESSION_ORIGIN_FALLBACK"
+        assert normalized["Offers"][0]["RollOrigin"]["terminal_identity"]["instance"] == 1234
+        assert normalized["Offers"][0]["MissionDestination"]["playfield_name"]["Name"]
         assert normalized["Offers"][4]["UnknownFields"]["FutureUnknown"] == "preserve-me"
         assert normalized["Offers"][0]["MissionQl"] is None
     first = build_outputs()
