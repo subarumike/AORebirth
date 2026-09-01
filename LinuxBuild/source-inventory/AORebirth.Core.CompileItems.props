@@ -25,6 +25,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Components/MessageSerializer.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Encryption/PasswordHash.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Character.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/CharacterWeapon.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Dynel.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Dynel.Stats.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/ICharacter.cs" />
