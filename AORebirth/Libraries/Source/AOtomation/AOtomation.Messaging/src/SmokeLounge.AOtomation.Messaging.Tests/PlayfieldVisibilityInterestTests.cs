@@ -38,7 +38,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             ExpectException<ArgumentOutOfRangeException>(
                 () => PlayfieldVisibilityInterestPolicy.Create(80.0f, 80.0f, 32.0f));
             ExpectException<ArgumentOutOfRangeException>(
-                () => PlayfieldVisibilityInterestPolicy.Create(80.0f, 385.0f, 32.0f));
+                () => PlayfieldVisibilityInterestPolicy.Create(
+                    80.0f,
+                    PlayfieldVisibilityInterestPolicy.MaximumLeaveRadius + 1.0f,
+                    32.0f));
             ExpectException<ArgumentOutOfRangeException>(
                 () => PlayfieldVisibilityInterestPolicy.Create(80.0f, 100.0f, 7.0f));
             ExpectException<ArgumentOutOfRangeException>(

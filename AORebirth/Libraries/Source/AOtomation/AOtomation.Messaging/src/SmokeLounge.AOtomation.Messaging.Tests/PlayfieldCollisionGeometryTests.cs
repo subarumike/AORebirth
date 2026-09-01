@@ -570,24 +570,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinator = ReadPlayfieldSource(root, "NpcCombatTickCoordinator.cs");
             string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
             string lineOfSight = ReadPlayfieldSource(root, "NpcDamageLineOfSightRuntimeService.cs");
-            string normal = ExtractMethodBlock(coordinator, "internal void ProcessCombatTick");
+            string capturedNormal = ExtractMethodBlock(coordinator, "internal void ProcessCombatTick");
+            string ordinaryNormal = ExtractMethodBlock(coordinator, "internal void ApplyCombatHit");
+            string normalDamageCore = ExtractMethodBlock(coordinator, "private void ApplyNpcCombatHitCore");
             string parallel = ExtractMethodBlock(
                 coordinator,
                 "private void ProcessCapturedParallelAttackTicks");
             string gate = ExtractMethodBlock(coordinator, "private bool CanApplyNpcDamage");
-            int normalDamage = normal.IndexOf(
+            int normalDamage = normalDamageCore.IndexOf(
                 "int currentHealth = target.Stats[StatIds.health].Value;",
+                StringComparison.Ordinal);
+            int normalDamageCalculation = normalDamageCore.IndexOf(
+                "int damage = this.CalculateCombatDamage(attacker, attackSource);",
+                StringComparison.Ordinal);
+            int normalHealthMutation = normalDamageCore.IndexOf(
+                "target.Stats[StatIds.health].Value = newHealth;",
                 StringComparison.Ordinal);
             int parallelDamage = parallel.IndexOf(
                 "int currentHealth = target.Stats[StatIds.health].Value;",
                 StringComparison.Ordinal);
-            int fallbackAttackSource = normal.IndexOf(
+            int fallbackAttackSource = capturedNormal.IndexOf(
                 "CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);",
                 StringComparison.Ordinal);
-            int normalDamageGate = normal.LastIndexOf(
-                "this.CanApplyNpcDamage(",
-                normalDamage,
+            int capturedCoreCall = capturedNormal.IndexOf(
+                "this.ApplyNpcCombatHitCore(",
                 StringComparison.Ordinal);
+            int ordinaryCoreCall = ordinaryNormal.IndexOf(
+                "this.ApplyNpcCombatHitCore(",
+                StringComparison.Ordinal);
+            int capturedDamageGate = capturedCoreCall < 0
+                                         ? -1
+                                         : capturedNormal.LastIndexOf(
+                                             "this.CanApplyNpcDamage(",
+                                             capturedCoreCall,
+                                             StringComparison.Ordinal);
+            int ordinaryDamageGate = ordinaryCoreCall < 0
+                                         ? -1
+                                         : ordinaryNormal.LastIndexOf(
+                                             "this.CanApplyNpcDamage(",
+                                             ordinaryCoreCall,
+                                             StringComparison.Ordinal);
+            int parallelDamageGate = parallelDamage < 0
+                                         ? -1
+                                         : parallel.LastIndexOf(
+                                             "this.CanApplyNpcDamage(",
+                                             parallelDamage,
+                                             StringComparison.Ordinal);
             int vergilStart = contracts.IndexOf("case 203748:", StringComparison.Ordinal);
             int abmouthStart = contracts.IndexOf("case 155962:", StringComparison.Ordinal);
             int infectorStart = contracts.IndexOf("case 31909:", StringComparison.Ordinal);
@@ -618,11 +646,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && lineOfSight.Contains("start.Y + probeHeight")
                 && lineOfSight.Contains("end.Y + probeHeight"));
             Assert.IsTrue(normalDamage > 0);
+            Assert.IsTrue(normalDamageCalculation > normalDamage);
+            Assert.IsTrue(normalHealthMutation > normalDamageCalculation);
             Assert.IsTrue(fallbackAttackSource >= 0);
-            Assert.IsTrue(normalDamageGate > fallbackAttackSource);
+            Assert.AreEqual(
+                2,
+                coordinator.Split(
+                    new[] { "this.ApplyNpcCombatHitCore(" },
+                    StringSplitOptions.None).Length - 1,
+                "Every shared NPC damage-core caller must remain covered by a visibility/LOS gate assertion.");
+            Assert.IsTrue(capturedCoreCall >= 0);
+            Assert.IsTrue(capturedDamageGate > fallbackAttackSource);
+            Assert.IsTrue(ordinaryCoreCall >= 0);
+            Assert.IsTrue(ordinaryDamageGate >= 0);
             Assert.IsTrue(parallelDamage > 0);
-            Assert.IsTrue(
-                parallel.LastIndexOf("this.CanApplyNpcDamage(", parallelDamage, StringComparison.Ordinal) >= 0);
+            Assert.IsTrue(parallelDamageGate >= 0);
             Assert.IsTrue(gate.Contains("NpcCombatAttackRules.OutOfRangeRetrySeconds"));
             Assert.IsFalse(gate.Contains("ClearInvalidNpcCombatTarget"));
             Assert.IsFalse(gate.Contains("ClearFightingTarget"));

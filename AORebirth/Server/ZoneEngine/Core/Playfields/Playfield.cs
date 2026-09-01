@@ -483,15 +483,15 @@ namespace AORebirth.Core.Playfields
             this.RefreshCorpseVisibilityForRecipient(character);
         }
 
-        internal void ForceCharacterVisibilityToRecipient(ICharacter source, ICharacter recipient)
+        internal bool ForceCharacterVisibilityToRecipient(ICharacter source, ICharacter recipient)
         {
             if (source == null || recipient == null || recipient.Controller == null
                 || recipient.Controller.Client == null)
             {
-                return;
+                return false;
             }
 
-            this.runtimeSystems.ForceCharacterVisibilityToRecipient(
+            return this.runtimeSystems.ForceCharacterVisibilityToRecipient(
                 source,
                 recipient,
                 this.SendVisibilityMessage);
@@ -522,8 +522,7 @@ namespace AORebirth.Core.Playfields
                 recipient => recipient.Identity == target.Identity);
             if (!visible)
             {
-                this.ForceCharacterVisibilityToRecipient(attacker, target);
-                visible = true;
+                visible = this.ForceCharacterVisibilityToRecipient(attacker, target);
             }
 
             return visible;

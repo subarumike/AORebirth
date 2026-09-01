@@ -697,8 +697,6 @@ namespace AORebirth.Core.Entities
 
         public override void Tick(double deltaTime)
         {
-            this.ProcessCharacterRegen(deltaTime);
-
             if (this.FightingTarget.Instance == 0)
             {
                 return;
@@ -734,51 +732,6 @@ namespace AORebirth.Core.Entities
                 {
                     weapon.Tick(deltaTime);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Heal/nano interval regen driven by playfield deltaTime.
-        /// </summary>
-        private void ProcessCharacterRegen(double deltaTime)
-        {
-            if (deltaTime <= 0.0)
-            {
-                return;
-            }
-
-            bool changed = false;
-
-            int healIntervalSeconds = this.Stats[StatIds.healinterval].Value;
-            int healDelta = this.Stats[StatIds.healdelta].Value;
-            if (healIntervalSeconds > 0 && healDelta != 0)
-            {
-                this.HealRegenElapsed += deltaTime;
-                if (this.HealRegenElapsed >= healIntervalSeconds)
-                {
-                    this.Stats[StatIds.health].Value =
-                        Math.Min(this.Stats[StatIds.life].Value, this.Stats[StatIds.health].Value + healDelta);
-                    this.HealRegenElapsed = 0.0;
-                    changed = true;
-                }
-            }
-
-            int nanoIntervalSeconds = this.Stats[StatIds.nanointerval].Value;
-            int nanoDelta = this.Stats[StatIds.nanodelta].Value;
-            if (nanoIntervalSeconds > 0 && nanoDelta != 0)
-            {
-                this.NanoRegenElapsed += deltaTime;
-                if (this.NanoRegenElapsed >= nanoIntervalSeconds)
-                {
-                    this.Stats[StatIds.currentnano].Value += nanoDelta;
-                    this.NanoRegenElapsed = 0.0;
-                    changed = true;
-                }
-            }
-
-            if (changed)
-            {
-                this.SendChangedStats();
             }
         }
 
