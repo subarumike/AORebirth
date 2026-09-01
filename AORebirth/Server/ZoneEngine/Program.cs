@@ -267,6 +267,7 @@ namespace ZoneEngine
             }
         }
 
+
         /// <summary>
         /// </summary>
         /// <param name="args">
@@ -376,7 +377,7 @@ namespace ZoneEngine
         /// <returns>
         /// true if ok
         /// </returns>
-        private static bool Initialize()
+        private static bool Initialize(bool databaseAlreadyValidated)
         {
             Console.WriteLine();
             Colouring.Push(ConsoleColor.Green);
@@ -426,7 +427,7 @@ namespace ZoneEngine
                 return false;
             }
 
-            if (!Misc.CheckDatabase())
+            if (!CheckRuntimeDatabase(databaseAlreadyValidated))
             {
                 Colouring.Push(ConsoleColor.Red);
                 Console.WriteLine(locales.ErrorInitializingDatabase);
@@ -486,6 +487,11 @@ namespace ZoneEngine
             Colouring.Pop();
 
             return true;
+        }
+
+        private static bool CheckRuntimeDatabase(bool databaseAlreadyValidated)
+        {
+            return Misc.CheckDatabase();
         }
 
         /// <summary>
@@ -833,6 +839,8 @@ namespace ZoneEngine
                 ConfigureHeadlessConsoleLogging(args);
             }
 
+            bool runtimeDatabaseValidated = false;
+
             Console.CancelKeyPress += ConsoleCancelKeyPress;
 
             OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
@@ -840,8 +848,16 @@ namespace ZoneEngine
             Console.WriteLine();
             Console.WriteLine(locales.ServerConsoleMainText, DateTime.Now.Year);
 
-            if (!Initialize())
+            if (!Initialize(runtimeDatabaseValidated))
             {
+                if (headless)
+                {
+                    Console.Error.WriteLine("ZONEENGINE_HEADLESS_INITIALIZATION_FAILED");
+                    Environment.ExitCode = 1;
+                    FlushHeadlessConsoleLogging();
+                    return;
+                }
+
                 Console.WriteLine(locales.ErrorInitializingEngine);
                 Console.WriteLine("Press enter to exit");
                 Console.ReadLine();
