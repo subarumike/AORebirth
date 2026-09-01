@@ -1,0 +1,68 @@
+{
+  "acquisition_manifest_sha256": "41eb73cb0bac02d542dec566d227cd5fec4a05e98df04da285e9f43441ca1850",
+  "aorebirth_item_projection": {
+    "byte_length": 11253379,
+    "relative_path": "docs/reference/missions/aorebirth-item-templates.jsonl",
+    "row_count": 120842,
+    "sha256": "565bff885c0786871b11ec39f3db308f758a2beca2c17946abc0310ab9a554e5"
+  },
+  "aorebirth_items_dat": {
+    "byte_length": 2466207,
+    "relative_path": "AORebirth/Datafiles/items.dat",
+    "sha256": "4e5355f177a42fbd05b33b4a27083a53ecfee93f5fce982880f19e5461badf3c"
+  },
+  "corpus_boundaries": {
+    "arpa3_backend_rows": "single pre-policy-discovery representative response fixture only",
+    "failed_queries_are_negative_evidence": false,
+    "robots_disallow_cgi": true,
+    "source_artifact_count": 14
+  },
+  "files": [
+    {
+      "byte_length": 2510,
+      "relative_path": "docs/generated/missions/arpa3/analysis-summary.json",
+      "sha256": "81ed6ebbcb0d97c7280603745466b14ef095b1329b9787905d3456ff2862a476"
+    },
+    {
+      "byte_length": 946,
+      "relative_path": "docs/generated/missions/arpa3/archive-member-inventory.json",
+      "sha256": "b63bfbb5903ec15189eefdce30d0424a2bf501c3728a4eab89554501b5f9bc20"
+    },
+    {
+      "byte_length": 9061321,
+      "relative_path": "docs/generated/missions/arpa3/clicksaver-item-catalog.csv",
+      "sha256": "85a1480d2e8eda7332df2a2bd43c3f28c0aa29fdfd441f963200dd7d789de23f"
+    },
+    {
+      "byte_length": 1483045,
+      "relative_path": "docs/generated/missions/arpa3/clicksaver-item-catalog.jsonl.gz",
+      "sha256": "fa19ecb5861dad267e3a1639797905cb89bfe5ba298a24493cff493321df35b6"
+    },
+    {
+      "byte_length": 224275,
+      "relative_path": "docs/generated/missions/arpa3/clicksaver-playfield-catalog.json",
+      "sha256": "095262b9eab1c2f7ee839a7cbc555796b139b6e61d813e0cd8c47fbb287b7011"
+    },
+    {
+      "byte_length": 1591,
+      "relative_path": "docs/generated/missions/arpa3/documented-ql-exceptions.json",
+      "sha256": "fa6cdfb1f0e89063e73247d4f0e9321e4a23f8fb1192133aaac5df716af9b4c4"
+    },
+    {
+      "byte_length": 2661,
+      "relative_path": "docs/generated/missions/arpa3/normalized-clicksaver-log-samples.jsonl",
+      "sha256": "f764200afff6af9ea41344fcde3b4428e75e7e4c84f7976ae8cf43d96a42b08d"
+    },
+    {
+      "byte_length": 5179,
+      "relative_path": "docs/generated/missions/arpa3/normalized-roll-observations.csv",
+      "sha256": "aa7f9658a86f119dbfddb6b291414fd0e4c0a96f2ec26a5d2fc028dbd07f94f1"
+    },
+    {
+      "byte_length": 10218,
+      "relative_path": "docs/generated/missions/arpa3/normalized-roll-observations.jsonl",
+      "sha256": "24ea1abdb9a63efb7584b012e119cc282838656b64bce7fd770aa5d2503a143b"
+    }
+  ],
+  "schema_version": 1
+}

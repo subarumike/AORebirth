@@ -1,0 +1,30 @@
+# http://www.robotstxt.org/wc/norobots.html
+
+# { Disallow these
+User-agent: MSIECrawler
+Disallow: /
+
+User-agent: IRLbot
+Disallow: /
+# }
+
+# Allow rest
+User-agent: *
+Crawl-delay: 4
+
+Disallow: /cgi-bin
+
+Disallow: /caminando/wp/wp-admin
+Disallow: /caminando/wp/wp-includes
+
+Disallow: /linedance/wp/wp-admin
+Disallow: /linedance/wp/wp-includes
+
+Disallow: /lasmatesclaras/wp/wp-admin
+Disallow: /lasmatesclaras/wp/wp-includes
+
+Disallow: /en/wp/wp-admin
+Disallow: /en/wp/wp-includes
+
+Disallow: /es/wp/wp-admin
+Disallow: /es/wp/wp-includes

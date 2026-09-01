@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>ClickSaver - Creating the Local Database</title>
+<meta name="description" content="ClickSaver - Creating the Local Database">
+<meta name="keywords" content="Anarchy Online, AO, ClickSaver, Local Database, Creation">
+<meta name="allow-search" content="yes">
+<meta name="audience" content="all">
+<meta name="robots" content="index,follow">
+<meta name="GOOGLEBOT" content="index,follow">
+<meta name="revisit-after" content="3 days">
+<meta name="Rating" content="General">
+<meta name="Language" content="en">
+<meta name="distribution" content="Global">
+<meta HTTP-EQUIV="expires" CONTENT="0">
+<meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<script src="/js/recobar-xp.js" type="text/javascript" language="javascript"></script>
+<link href="/ao/global.css" rel="stylesheet" type="text/css">
+<script type="text/javascript"><!--
+function ptExit() {}
+
+var xxx=0;
+var aobetaid='89.129.150.15';
+if (aobetaid=='129.224.201.50') xxx=1;
+var httpref='';
+//--></script>
+<script type="text/javascript" src="/ao/aoglobal.js"></script>
+<script type="text/javascript" src="/js/js_tooltips.js"></script>
+
+<!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+<script type="text/javascript">
+    window.cookieconsent_options = {"message":"This site uses cookies from Google to personalize the ads you see. If you continue using this site, you accept this","dismiss":"OK","learnMore":"use of cookies.","link":"https://www.google.com/intl/en/policies/privacy/partners/","theme":"dark-bottom"};
+</script>
+
+<script type="text/javascript" src="//s3.amazonaws.com/cc.silktide.com/cookieconsent.latest.min.js"></script>
+<!-- End Cookie Consent plugin -->
+
+</head>
+<BODY BACKGROUND="/gif/backs/blue_boxes_light_md_wht.jpg"
+>
+<table cellpadding="0" cellspacing="0" border="0" style="text-align: left; width: 100%; align: center;">
+ <tbody>
+  <tr>
+   <td style="vertical-align: top; width: 370px;">
+<img src='/ao/img/dice2_rotate_mc.gif' border=0>
+   </td>
+   <td style="vertical-align: center;">
+    <center><H2>ClickSaver - Creating the Local Database</H2></center>
+   </td>
+  </tr>
+ </tbody>
+</table>
+<center>
+<script type="text/javascript" src="/ao/i-scbar.js"></script>
+<table cellpadding="0" cellspacing="0" border="0" style="text-align: left; width: 100%; align: center;">
+ <tr>
+
+   <td style="vertical-align: top;">
+    <center>
+<div>
+<a href="/anarchy-online/">Home</a> &nbsp;&nbsp;&nbsp;
+<a href="/anarchy-online/#recentnews">News</a> &nbsp;&nbsp;&nbsp;
+<a href="/ao/nanos.html">Nanocrystal&nbsp;Knowledge&nbsp;Base</a>
+
+<br>
+
+<nobr>
+<a href="/ao/clicksaver-for-donators.html">ClickSaver 3.1.7</a>&nbsp;&nbsp;
+<a href="https://arpa3.net/ao/clicksaver.shtml">ClickSaver 3.1.0</a>&nbsp;&nbsp;
+<a href="/ao/tools.html">and&nbsp;more&nbsp;Tools</a> &nbsp;&nbsp;&nbsp;
+</nobr>
+<a href="/ao/rollability.html">Rollability&nbsp;Facts</a>&nbsp;&nbsp;&nbsp; 
+
+<!--
+<font color="red"><b>NEW</b></font>
+//-->
+</div>
+    </center>
+   </td>
+
+   <td style="vertical-align: top;">
+
+<!-- SiteSearch Google -->
+<form action="http://www.google.com/cse" id="cse-search-box">
+  <div>
+    <input type="hidden" name="cx" value="partner-pub-9417975954577388:ewmu3z-aex6" />
+    <input type="hidden" name="ie" value="ISO-8859-1" />
+    <input type="text" name="q" size="31" />
+    <input type="submit" name="sa" value="Search" />
+  </div>
+</form>
+<script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&amp;lang=en"></script>
+<!-- SiteSearch Google -->
+
+   </td>
+
+ </tr>
+</table>
+
+
+</center><br>
+
+<center>
+<table cellpadding="2" cellspacing="10" border="0" style="text-align: left; width: 98%; align: center;">
+  <tbody>
+    <tr>
+
+
+     <td style="vertical-align: top; width: 162px;">
+<!-- { i-gadst1.htm -->
+<br>
+Read this page in another language
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<style type="text/css">iframe.goog-te-banner-frame{ display: none !important;}</style>
+<style type="text/css">body {position: static !important; top:0px !important;}</style>
+
+<br>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-9417975954577388";
+google_alternate_ad_url = "http://javierarpa.com/js/a3/google_adsense_script.html";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_channel ="8747012688";
+google_color_border = "BBC3E7";
+google_color_bg = "BBC3E7";
+google_color_link = "0000FF";
+google_color_url = "FF0000";
+google_color_text = "000000";
+google_ad_type = "text_image";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+
+<br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9417975954577388";
+google_alternate_ad_url = "http://javierarpa.com/js/a3/google_adsense_script.html";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_channel ="8747012688";
+google_color_border = "BBC3E7";
+google_color_bg = "BBC3E7";
+google_color_link = "0000FF";
+google_color_url = "FF0000";
+google_color_text = "000000";
+google_ad_type = "text_image";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+
+
+<br>
+<!-- Recent headlines: -->
+<br>
+<style type="text/css">
+.rsnt { font: normal 11px/15px arial,helvetica,sans-serif; }
+</style>
+
+<table border="0" cellpadding="7" cellspacing="0" style="border-collapse: collapse" bgcolor="#BBC3E7" width="160px">
+
+  <tr>
+   <td style="vertical-align: top;">
+    <b>Recent site news:</b>
+   </td>
+  </tr>
+
+  <tr>
+   <td style="vertical-align: top;" class="rsnt">
+<b>14-Jul-2015</b><br>
+&#8226; <a href='http://javierarpa.com/go/?cs_3.1.7'>ClickSaver 3.1.7</a> released.<br><a href='/anarchy-online/sitenews-archive.html#20150714'>Read more...</a>
+   </td>
+  </tr>
+
+  <tr>
+   <td style="vertical-align: top;" class="rsnt">
+<b>14-May-2015</b><br>
+&#8226; <a href='http://javierarpa.com/go/?cs_3.1.6'>ClickSaver 3.1.6</a> released.<br><a href='/anarchy-online/sitenews-archive.html#20150514'>Read more...</a>
+   </td>
+  </tr>
+
+
+  <tr>
+   <td style="vertical-align: top;" class="rsnt">
+   <center>
+   <a href="/anarchy-online/sitenews-archive.html"><b>More Site News...</b></a><br><br>
+   <a href="/anarchy-online/sitenews-archive.html"><b>Get this site news by email</b></a><br><br>
+   </center>
+   </td>
+  </tr>
+
+</table>
+
+<br><br>
+
+<center><HR SIZE=2 WIDTH="100%"></center>
+
+
+
+
+<br>
+
+<br>
+<!-- } i-gadst1.htm -->
+
+     </td>
+
+
+      <td style="vertical-align: top; width: 730px;">
+      <div>
+    <center>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9417975954577388";
+google_alternate_ad_url = "http://javierarpa.com/js/a3/google_adsense_script.html";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel ="9029471359";
+google_color_border = "BBC3E7";
+google_color_bg = "BBC3E7";
+google_color_link = "0000FF";
+google_color_url = "FF0000";
+google_color_text = "000000";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</center>
+ 
+    <br>
+    </center>
+
+<table border="0" cellspacing="0" cellpadding="2" width="100%" style="text-align: left; width: 100%; background-color: rgb(255, 255, 255);">
+  <tbody>
+
+
+<center>
+<a href='#but'>But do you really need to create a local database?</a><br>
+<a href='#butbutbut'>Usual creation errors - Troubleshooting</a><br>
+<a href='#onceuponatime'>A little history of local database creation</a><br>
+<a href='#ctdll_seg'>Finding a ctreestd.dll that supports segmented files</a><br>
+</center>
+
+<a name='but'></a>
+<h2>But do you really need to create a local database?</h2>
+
+With the availability of the <b>Tiny database</b> bundled with ClickSaver 3.0.0 and 
+the other <a href='/ao/clicksaver-premade-local-databases.html'><b>premade downloadable databases</b></a>,
+there are few valid reasons I can think of to get an updated database:<br>
+<br>
+<ul>
+<li>If ClickSaver LDB tab is reporting "Not found items" / "Error rate" even though you're using an all-items All.cdb,
+it means Funcom has defined new items since your database was made, AND defined some of them as
+rollable-as-reward. Unlikely, but may happen.
+</li>
+<br>
+<li>Funcom may have renamed some rollable-as-reward item you want to roll.
+Happens too, but also rare and anyway hard to notice by the average user.
+</li>
+</ul>
+
+To give you an idea of how rare these cases are, that I know of:<br>
+<br>
+The last meaningful addition of rewardable items to the rollability tables happened way back,
+in the ShadowLands launch days (patch 15.0?).
+Spindles, Coils, many weapons, nanos for shades and keepers, and a few SL advie and crat nanos were added.<br>
+<br>
+In the <b>years</b> since then, I've only noticed these new <b>rewards</b>:<br>
+<br>
+Polizziotto M203 Druid<br>
+Polizziotto M204 Hierophant<br>
+Map - Coast of Peace<br>
+Map - Coast of Tranquility<br>
+Nano Crystal (Dimach Expertise)<br>
+Nano Crystal (Dimach Proficiency)<br>
+<br>
+<br>
+And only a few meaningful <b>renamings</b> of rollable items:<br>
+<br>
+Second-Hand Vektor M-31 Automatic Grenade Launche --- Second-Hand Vektor M-31 Automatic Grenade Launcher<br>
+NanoCrystal (A  sergeant&#96;s knowledge) --- NanoCrystal (A sergeant&#96;s knowledge)  (double to single-space)<br>
+Nano Crystal (Calia's Form: Dragon) --- Nano Crystal (Calia's Form: Pit Lizard)<br>
+Nano Crystal (Monofilament Cat-O --- Nano Crystal (Monofilament Cat-O'Nine-Tails)<br>
+NanoCrystal (Dodge Persuers) --- NanoCrystal (Dodge Pursuers)<br>
+NanoCrystal (Persuade for Freedom) --- NanoCrystal (Pursuade for Freedom)<br>
+Exellent Concrete Cushion --- Excellent Concrete Cushion<br>
+<br>
+<br>
+So yes, ClickSaver's 2.3.x and 2.4.x <b>"make a new database after each patch"</b> concept might have made sense
+when ClickSaver was designed. I guess new items were added to the rollability tables pretty often in those days.<br>
+<br>
+But that's not the case anymore.<br>
+<br>
+<h3>These days a local database is valid until any of the above <b>RARE</b> cases happen.</h3>
+<br>
+And even in both of them you can just download a new local database when it becomes available.<br>
+<br>
+<br>
+<a name='butbutbut'></a>
+<h2>And yet you still want to create a local database?</h2><br>
+Ah well. But you're alone from here. The information below is the last I provide
+about local database creation.<br>
+If it doesn't work for you, don't bother to ask me for further support!<br>
+<br>
+
+<a name='usualerrors'></a>
+Here are the typical errors and some troubleshooting tips in case you tried and failed.<br>
+<br>
+<h2>Usual errors reported in cs-err.log by CS 3.x.x - Troubleshooting</h2>
+
+<ul>
+<li>LDB creation: Can't link to ctreestd.dll<br>
+<b>Reason</b>: There's no ctreestd.dll in your system, or the one ClickSaver is trying to load
+is unsupported by your system, i.e. your ctreestd.dll requires Win 2000/XP/Vista/whatever,
+but you're running Win 98.<br>
+<b>Fix</b>: Find and copy to ClickSaver's directory a ctreestd.dll supported by your system.
+</li>
+<br>
+
+<li>LDB creation: Can't open the AO Resource File, OpenIFile err 12<br>
+<b>Reason</b>: Most likely you're trying to create the local database while AO is running.<br>
+<b>Fix</b>: Close AO and retry.<br>
+</li>
+<br>
+
+<li>LDB creation: Can't open the AO Resource File, OpenIFile err 43<br>
+<b>Reason</b>: Probably your AO Resource Database is segmented into three files (2 big + one index file), and your
+ctreestd.dll is old and can't read segmented files.<br>
+<b>Fix</b>: Find and copy to ClickSaver's directory <a href='#ctdll_seg'><b>a ctreestd.dll that supports segmented files</b></a>.<br>
+</li>
+<br>
+
+</ul>
+
+
+<a name='onceuponatime'></a>
+<h2>Once upon a time...</h2>
+Creation was easy:<br>
+<br>
+The AO Resource Database was stored in a single file (ResourceDatabase.dat)
+and a corresponding .idx in [YourAoDirectory]\cd_image\data\db\<br>
+<br>
+With the AO client came a ctreestd.dll perfectly capable of reading the
+ResourceDatabase.dat<br>
+<br>
+ClickSaver (and some other third-party AO applications) used that ctreestd.dll to extract items, icons, etc from the AO RDB.
+In fact, ClickSaver creation 'logic' was so confident in the success of this process,
+that the first thing it did when creating its local database was deleting the old one,
+leaving the user database-less if anything went wrong.
+<br>
+
+<h2>Then came patch 18.1.0</h2>
+With it, most AO users saw their ResourceDatabase.dat split (<b>segmented</b>) in two.
+The old ctreestd.dll wasn't capable of processing segmented files,
+and Funcom didn't provide a new dll that could,
+so ClickSaver local database creation would fail for the users with the old dll and the segmented AO database.<br>
+<br>
+Not enough reason to panic. After all, a solution for that case was already available in my
+<a href='/ao/clicksaver.html#cs-tbs'><b>ClickSaver Troubleshooting</b></a> page in the form
+of downloading a premade database compatible with 2.3.x and 2.4.x.
+
+<a name='ctdll_seg'></a>
+<h2>Finding a ctreestd.dll that supports segmented files</h2>
+But indeed, a new ctreestd.dll is needed in order to extract information from the segmented database.<br>
+Probably any such dll later than <a href='/go/?a3ao_CtreeSeg' target='_blank'><b>v7.10, April 2001</b></a> will do.<br>
+<br>
+With a bit of luck, your system may have already a ctreestd.dll that came bundled with your operating system
+or with some installed application. I suggest a file search for <b>ctreestd.dll</b> in your hard disks.<br>
+<br>
+If you can't find it there...<br>
+<br>
+<a name='ctdll_notincs'></a>
+<b>Don't</b> look for it in the ClickSaver package.
+<a href='/go/?a3ao_FairCom' target='_blank'><b>FairCom</b></a>, the maker of the dll, requires a license agreement before any of their software is distributed
+with applications, even if they're freeware. That includes ClickSaver, yes.
+I learned this only recently, while researching the issue with the split AO RDB,
+so you'll notice that since ClickSaver 3.0.0 I'm not distributing the dll in the ClickSaver package anymore,
+not even the one that came bundled with the AO installation.<br>
+<br>
+Luckily, at least as I write this (Aug-2009), there is a <b>free</b> way,
+<b>legal</b> as can be, in which you can get a working dll complying with FairCom's terms of use.
+It's about getting a licensed developer's package and finding the dll within it.
+This procedure requires installation of the developer package in a Windows 2000/XP/Vista or higher with NET 2.0<br>
+
+<ul>
+<li>Go to <a href='/go/?a3ao_FairCom' target='_blank'><b>FairCom</b></a> site</li>
+<li>Look for Downloads / Download c-treeACE and hit the link</li>
+<li>Fill the form, selecting <b>Windows x86 32bit</b> as your development platform</li>
+<li>Read, Understand and Accept the developer's license</li>
+<li>Wait for the email with the link to the package</li>
+<li>Download and install it. I suggest an install with all options. The default installation didn't install ctreestd.dll in my case.</li>
+<li>Within the installation directory, search for ctreestd.dll</b></li>
+</ul>
+
+I may have missed some step, but you get the general idea.<br>
+<br>
+In my case the dll was in <b>win32\sdk\ctree.vcl.delphi\src\</b> and it worked perfectly
+with AO's segmented database for patch 18.1.3 under Win XP.<br>
+<br>
+Hope it helps!<br>
+<br>
+<br>
+P.S.: You know there are other, non-legal ways to get a working copy of this dll.
+Please show some respect to FairCom and get yours legally. After all it is thanks to
+their c-tree database engine that AO has been running all these years.<br>
+<br>
+
+  </tbody>
+</table>
+
+<center>
+ 
+<table cellpadding="0" cellspacing="0" border="0" style="text-align: left; width: 100%; align: center;">
+ <tr>
+
+   <td style="vertical-align: top;">
+    <center>
+<div>
+<a href="/anarchy-online/">Home</a> &nbsp;&nbsp;&nbsp;
+<a href="/anarchy-online/#recentnews">News</a> &nbsp;&nbsp;&nbsp;
+<a href="/ao/nanos.html">Nanocrystal&nbsp;Knowledge&nbsp;Base</a>
+
+<br>
+
+<nobr>
+<a href="/ao/clicksaver-for-donators.html">ClickSaver 3.1.7</a>&nbsp;&nbsp;
+<a href="https://arpa3.net/ao/clicksaver.shtml">ClickSaver 3.1.0</a>&nbsp;&nbsp;
+<a href="/ao/tools.html">and&nbsp;more&nbsp;Tools</a> &nbsp;&nbsp;&nbsp;
+</nobr>
+<a href="/ao/rollability.html">Rollability&nbsp;Facts</a>&nbsp;&nbsp;&nbsp; 
+
+<!--
+<font color="red"><b>NEW</b></font>
+//-->
+</div>
+    </center>
+   </td>
+
+   <td style="vertical-align: top;">
+
+<!-- SiteSearch Google -->
+<form action="http://www.google.com/cse" id="cse-search-box">
+  <div>
+    <input type="hidden" name="cx" value="partner-pub-9417975954577388:ewmu3z-aex6" />
+    <input type="hidden" name="ie" value="ISO-8859-1" />
+    <input type="text" name="q" size="31" />
+    <input type="submit" name="sa" value="Search" />
+  </div>
+</form>
+<script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&amp;lang=en"></script>
+<!-- SiteSearch Google -->
+
+   </td>
+
+ </tr>
+</table>
+
+</center><br>
+<br>
+<center>
+
+<!--
+<table width='650' cellpadding='0' cellspacing='0' border='0'>
+ <tr>
+  <td width='8'><img src='/gif/roundedtab/tc-sol-bor1-8-ffffcc-xp-tl.gif' width='8' height='8' border='0' alt='.'></td>
+  <td width='634' style="background-image: url('/gif/roundedtab/te-sol-bor1-8-ffffcc-xp-t.gif');"><img src='/gif/roundedtab/xp1x1.gif' width='1' height='8' border='0' alt='.' /></td>
+  <td width='8'><img src='/gif/roundedtab/tc-sol-bor1-8-ffffcc-xp-tr.gif' width='8' height='8' border='0' alt='.'></td>
+ </tr>
+
+ <tr>
+  <td><img src='/gif/roundedtab/tc-sol-bor1-8-ffffcc-xp-bl.gif' width='8' height='8' border='0' alt='.'></td>
+  <td style="background-image: url('/gif/roundedtab/te-sol-bor1-8-ffffcc-xp-b.gif');"><img src='/gif/roundedtab/xp1x1.gif' width='1' height='8' border='0' alt='.' /></td>
+  <td><img src='/gif/roundedtab/tc-sol-bor1-8-ffffcc-xp-br.gif' width='8' height='8' border='0' alt='.'></td>
+ </tr>
+</table>
+//-->
+
+<br>
+<small>
+<a href="/ao/privacy.html"><b>Privacy Policy</b></a><br>
+
+Anarchy Online, Funcom, and associated logos are trademarks of <a href="http://www.funcom.com/" target="_blank"><b>Funcom</b></a>.<br>
+<br>
+&copy; 2003-2024 Javier M. Arpa.<br>
+</small>
+</center>
+ 
+      </div>
+      </td>
+
+      <td style="vertical-align: top;">
+      <div>
+
+      </div>
+      </td>
+      
+    </tr>
+  </tbody>
+</table>
+</center>
+</body>
+</html>
