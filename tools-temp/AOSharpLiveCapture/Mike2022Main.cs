@@ -60,6 +60,7 @@ namespace AOSharpLiveCapture.Mike2022
             internal uint MonsterData;
             internal string Kind;
             internal bool HasPosition;
+            internal bool HasHeading;
             internal bool HasLineOfSight;
             internal bool IsInLineOfSight;
             internal bool HasInPlay;
@@ -111,6 +112,8 @@ namespace AOSharpLiveCapture.Mike2022
             internal string SourceIdentity;
             internal string TargetIdentity;
             internal bool PlayerPreviouslyAttackedSource;
+            internal EntitySnapshot PreAttackSourceState;
+            internal EntitySnapshot PreAttackTargetState;
         }
 
         private sealed class ItemSnapshot
@@ -221,6 +224,8 @@ namespace AOSharpLiveCapture.Mike2022
         private int aggroObservationRows;
         private int npcToPlayerAggroObservationRows;
         private int unprovokedNpcAggroObservationRows;
+        private int aggroHeadingObservationRows;
+        private int preAggroHeadingObservationRows;
         private int visibilitySamples;
         private int visibilityObservationRows;
         private int visibilityTransitionRows;
@@ -462,9 +467,9 @@ namespace AOSharpLiveCapture.Mike2022
                 this.playerCombatContextLog.WriteLine(
                     "CapturedUtc,Phase,Identity,Name,Level,Profession,PositionX,PositionY,PositionZ,Health,MaxHealth,RunSpeed,EvadeClsC,DodgeRanged,DuckExp,MeleeAC,ProjectileAC,EnergyAC,ChemicalAC,RadiationAC,ColdAC,PoisonAC,FireAC,ActiveNanos,Equipment,Error");
                 this.aggroObservationLog.WriteLine(
-                    "CapturedUtc,ElapsedMilliseconds,GlobalOrdinal,Direction,Sequence,SourceIdentity,SourceName,TargetIdentity,TargetName,InitiatorRole,PlayerPreviouslyAttackedSource,SourcePositionUtc,SourcePositionMessage,SourceX,SourceY,SourceZ,TargetPositionUtc,TargetPositionMessage,TargetX,TargetY,TargetZ,PreviousTargetPositionUtc,PreviousTargetX,PreviousTargetY,PreviousTargetZ,TriggerDistance,PreviousDistance,DistanceBracketMin,DistanceBracketMax,SourcePositionDeltaMs,TargetPositionDeltaMs,CorrelationStatus");
+                    "CapturedUtc,ElapsedMilliseconds,GlobalOrdinal,Direction,Sequence,SourceIdentity,SourceName,TargetIdentity,TargetName,InitiatorRole,PlayerPreviouslyAttackedSource,SourcePositionUtc,SourcePositionMessage,SourceX,SourceY,SourceZ,TargetPositionUtc,TargetPositionMessage,TargetX,TargetY,TargetZ,PreviousTargetPositionUtc,PreviousTargetX,PreviousTargetY,PreviousTargetZ,TriggerDistance,PreviousDistance,DistanceBracketMin,DistanceBracketMax,SourcePositionDeltaMs,TargetPositionDeltaMs,CorrelationStatus,PreAggroSampleUtc,PreAggroSourceX,PreAggroSourceY,PreAggroSourceZ,PreAggroTargetX,PreAggroTargetY,PreAggroTargetZ,PreAggroDistance,PreAggroHeadingX,PreAggroHeadingY,PreAggroHeadingZ,PreAggroHeadingW,PreAggroForwardX,PreAggroForwardZ,PreAggroRelativeAngleDegrees,PreAggroSampleAgeMs,EventHeadingSampleUtc,EventHeadingX,EventHeadingY,EventHeadingZ,EventHeadingW,EventForwardX,EventForwardZ,EventRelativeAngleDegrees,EventHeadingDeltaMs,HeadingCorrelationStatus");
                 this.visibilityObservationLog.WriteLine(
-                    "CapturedUtc,ElapsedMilliseconds,SampleIndex,Phase,Observation,Identity,Name,Kind,PlayfieldId,PlayerX,PlayerY,PlayerZ,EntityX,EntityY,EntityZ,Distance,PreviousSampleUtc,PreviousPlayerX,PreviousPlayerY,PreviousPlayerZ,PreviousEntityX,PreviousEntityY,PreviousEntityZ,PreviousDistance,LineOfSight,PreviousLineOfSight,IsInPlay,PreviousIsInPlay,Direction,Sequence,GlobalOrdinal,EvidenceSource");
+                    "CapturedUtc,ElapsedMilliseconds,SampleIndex,Phase,Observation,Identity,Name,Kind,PlayfieldId,PlayerX,PlayerY,PlayerZ,EntityX,EntityY,EntityZ,Distance,PreviousSampleUtc,PreviousPlayerX,PreviousPlayerY,PreviousPlayerZ,PreviousEntityX,PreviousEntityY,PreviousEntityZ,PreviousDistance,LineOfSight,PreviousLineOfSight,IsInPlay,PreviousIsInPlay,Direction,Sequence,GlobalOrdinal,EvidenceSource,EntityHeadingX,EntityHeadingY,EntityHeadingZ,EntityHeadingW,EntityForwardX,EntityForwardZ,PreviousEntityHeadingX,PreviousEntityHeadingY,PreviousEntityHeadingZ,PreviousEntityHeadingW,PreviousEntityForwardX,PreviousEntityForwardZ");
                 this.inventorySnapshotLog.WriteLine(
                     "CapturedUtc,ElapsedMilliseconds,Phase,ContainerKind,ContainerIdentity,ContainerName,ContainerSlotIdentity,ContainerOpen,ItemSlotIdentity,ItemUniqueIdentity,LowId,HighId,QualityLevel,Name,Charges,ResolutionStatus,Error");
                 this.itemUseObservationLog.WriteLine(
@@ -516,6 +521,8 @@ namespace AOSharpLiveCapture.Mike2022
             this.aggroObservationRows = 0;
             this.npcToPlayerAggroObservationRows = 0;
             this.unprovokedNpcAggroObservationRows = 0;
+            this.aggroHeadingObservationRows = 0;
+            this.preAggroHeadingObservationRows = 0;
             this.visibilitySamples = 0;
             this.visibilityObservationRows = 0;
             this.visibilityTransitionRows = 0;
@@ -1682,6 +1689,11 @@ namespace AOSharpLiveCapture.Mike2022
                 this.playerAttackTargets.Add(targetIdentity);
             }
 
+            EntitySnapshot preAttackSourceState;
+            EntitySnapshot preAttackTargetState;
+            this.previousVisibleDynels.TryGetValue(sourceIdentity, out preAttackSourceState);
+            this.previousVisibleDynels.TryGetValue(targetIdentity, out preAttackTargetState);
+
             this.pendingAttacks.Add(
                 new PendingAttack
                 {
@@ -1692,7 +1704,9 @@ namespace AOSharpLiveCapture.Mike2022
                     Sequence = sequence,
                     SourceIdentity = sourceIdentity,
                     TargetIdentity = targetIdentity,
-                    PlayerPreviouslyAttackedSource = playerPreviouslyAttackedSource
+                    PlayerPreviouslyAttackedSource = playerPreviouslyAttackedSource,
+                    PreAttackSourceState = preAttackSourceState,
+                    PreAttackTargetState = preAttackTargetState
                 });
 
             if (this.attackStarts == 1)
@@ -2375,6 +2389,31 @@ namespace AOSharpLiveCapture.Mike2022
                                        : targetIsPlayer
                                              ? "NpcToPlayer"
                                              : "Other";
+            if (targetIsPlayer && !sourceIsPlayer)
+            {
+                this.WriteWorldSnapshot("npc-aggro");
+            }
+
+            EntitySnapshot eventSourceState;
+            EntitySnapshot eventTargetState;
+            this.previousVisibleDynels.TryGetValue(attack.SourceIdentity, out eventSourceState);
+            this.previousVisibleDynels.TryGetValue(attack.TargetIdentity, out eventTargetState);
+            EntitySnapshot preAggroSourceState = attack.PreAttackSourceState;
+            EntitySnapshot preAggroTargetState = attack.PreAttackTargetState;
+            double? preAggroDistance = Distance(preAggroSourceState, preAggroTargetState);
+            double? preAggroRelativeAngle = RelativeHorizontalAngleDegrees(
+                preAggroSourceState,
+                preAggroTargetState);
+            double? eventRelativeAngle = RelativeHorizontalAngleDegrees(
+                eventSourceState,
+                eventTargetState);
+            string headingCorrelationStatus = preAggroRelativeAngle.HasValue
+                                                  ? eventRelativeAngle.HasValue
+                                                        ? "pre-and-event-heading"
+                                                        : "pre-heading-only"
+                                                  : eventRelativeAngle.HasValue
+                                                        ? "event-heading-only"
+                                                        : "missing-heading";
             double? triggerDistance = Distance(source, target);
             double? previousDistance = Distance(source, previousTarget);
             double? bracketMin = null;
@@ -2386,6 +2425,19 @@ namespace AOSharpLiveCapture.Mike2022
             }
 
             this.aggroObservationRows++;
+            if (eventRelativeAngle.HasValue)
+            {
+                this.aggroHeadingObservationRows++;
+            }
+
+            if (preAggroRelativeAngle.HasValue
+                && targetIsPlayer
+                && !sourceIsPlayer
+                && !attack.PlayerPreviouslyAttackedSource)
+            {
+                this.preAggroHeadingObservationRows++;
+            }
+
             if (targetIsPlayer && !sourceIsPlayer)
             {
                 this.npcToPlayerAggroObservationRows++;
@@ -2433,11 +2485,36 @@ namespace AOSharpLiveCapture.Mike2022
                     Csv(target == null
                             ? string.Empty
                             : (target.CapturedUtc - attack.CapturedUtc).TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture)),
-                    Csv(correlationStatus)));
+                    Csv(correlationStatus),
+                    FormatEntityUtc(preAggroSourceState),
+                    FormatEntityCoordinate(preAggroSourceState, "X"),
+                    FormatEntityCoordinate(preAggroSourceState, "Y"),
+                    FormatEntityCoordinate(preAggroSourceState, "Z"),
+                    FormatEntityCoordinate(preAggroTargetState, "X"),
+                    FormatEntityCoordinate(preAggroTargetState, "Y"),
+                    FormatEntityCoordinate(preAggroTargetState, "Z"),
+                    FormatDistance(preAggroDistance),
+                    FormatEntityHeading(preAggroSourceState, "X"),
+                    FormatEntityHeading(preAggroSourceState, "Y"),
+                    FormatEntityHeading(preAggroSourceState, "Z"),
+                    FormatEntityHeading(preAggroSourceState, "W"),
+                    FormatEntityForward(preAggroSourceState, "X"),
+                    FormatEntityForward(preAggroSourceState, "Z"),
+                    FormatNullableDouble(preAggroRelativeAngle),
+                    FormatEntityAgeMilliseconds(attack.CapturedUtc, preAggroSourceState),
+                    FormatEntityUtc(eventSourceState),
+                    FormatEntityHeading(eventSourceState, "X"),
+                    FormatEntityHeading(eventSourceState, "Y"),
+                    FormatEntityHeading(eventSourceState, "Z"),
+                    FormatEntityHeading(eventSourceState, "W"),
+                    FormatEntityForward(eventSourceState, "X"),
+                    FormatEntityForward(eventSourceState, "Z"),
+                    FormatNullableDouble(eventRelativeAngle),
+                    FormatEntityDeltaMilliseconds(attack.CapturedUtc, eventSourceState),
+                    Csv(headingCorrelationStatus)));
 
             if (targetIsPlayer && !sourceIsPlayer)
             {
-                this.WriteWorldSnapshot("npc-aggro");
                 this.WritePlayerCombatContext("npc-aggro");
             }
         }
@@ -2643,6 +2720,8 @@ namespace AOSharpLiveCapture.Mike2022
             json.AppendLine("    \"aggroObservationRows\": " + this.aggroObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"npcToPlayerAggroObservationRows\": " + this.npcToPlayerAggroObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"unprovokedNpcAggroObservationRows\": " + this.unprovokedNpcAggroObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"aggroHeadingObservationRows\": " + this.aggroHeadingObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"preAggroHeadingObservationRows\": " + this.preAggroHeadingObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"visibilitySamples\": " + this.visibilitySamples.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"visibilityObservationRows\": " + this.visibilityObservationRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"visibilityTransitionRows\": " + this.visibilityTransitionRows.ToString(CultureInfo.InvariantCulture) + ",");
@@ -2869,6 +2948,10 @@ namespace AOSharpLiveCapture.Mike2022
                         string positionX = MemberNumber(position, "X");
                         string positionY = MemberNumber(position, "Y");
                         string positionZ = MemberNumber(position, "Z");
+                        string headingX = MemberNumber(rotation, "X");
+                        string headingY = MemberNumber(rotation, "Y");
+                        string headingZ = MemberNumber(rotation, "Z");
+                        string headingW = MemberNumber(rotation, "W");
                         string level = NamedStat(evidenceDynel, "Level");
                         string health = NamedStat(evidenceDynel, "Health");
                         string monsterData = NamedStat(evidenceDynel, "MonsterData");
@@ -2911,10 +2994,10 @@ namespace AOSharpLiveCapture.Mike2022
                                     Csv(positionX),
                                     Csv(positionY),
                                     Csv(positionZ),
-                                    Csv(MemberNumber(rotation, "X")),
-                                    Csv(MemberNumber(rotation, "Y")),
-                                    Csv(MemberNumber(rotation, "Z")),
-                                    Csv(MemberNumber(rotation, "W")),
+                                    Csv(headingX),
+                                    Csv(headingY),
+                                    Csv(headingZ),
+                                    Csv(headingW),
                                     Csv(level),
                                     Csv(health),
                                     Csv(string.Empty),
@@ -2941,6 +3024,14 @@ namespace AOSharpLiveCapture.Mike2022
                             int parsedLevel;
                             int parsedHealth;
                             uint parsedMonsterData;
+                            float parsedHeadingX = 0.0f;
+                            float parsedHeadingY = 0.0f;
+                            float parsedHeadingZ = 0.0f;
+                            float parsedHeadingW = 0.0f;
+                            bool hasHeading = float.TryParse(headingX, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedHeadingX)
+                                              && float.TryParse(headingY, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedHeadingY)
+                                              && float.TryParse(headingZ, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedHeadingZ)
+                                              && float.TryParse(headingW, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedHeadingW);
                             int.TryParse(level, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedLevel);
                             int.TryParse(health, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedHealth);
                             uint.TryParse(monsterData, NumberStyles.Integer, CultureInfo.InvariantCulture, out parsedMonsterData);
@@ -2953,11 +3044,16 @@ namespace AOSharpLiveCapture.Mike2022
                                 X = x,
                                 Y = y,
                                 Z = z,
+                                HeadingX = parsedHeadingX,
+                                HeadingY = parsedHeadingY,
+                                HeadingZ = parsedHeadingZ,
+                                HeadingW = parsedHeadingW,
                                 Level = parsedLevel,
                                 Health = parsedHealth,
                                 MonsterData = parsedMonsterData,
                                 Kind = kind,
                                 HasPosition = true,
+                                HasHeading = hasHeading,
                                 HasLineOfSight = hasLineOfSight,
                                 IsInLineOfSight = lineOfSight,
                                 HasInPlay = hasInPlay,
@@ -3326,7 +3422,19 @@ namespace AOSharpLiveCapture.Mike2022
                     Csv(direction),
                     sequence == 0 ? string.Empty : sequence.ToString(CultureInfo.InvariantCulture),
                     globalOrdinal == 0 ? string.Empty : globalOrdinal.ToString(CultureInfo.InvariantCulture),
-                    Csv(evidenceSource)));
+                    Csv(evidenceSource),
+                    FormatEntityHeading(entity, "X"),
+                    FormatEntityHeading(entity, "Y"),
+                    FormatEntityHeading(entity, "Z"),
+                    FormatEntityHeading(entity, "W"),
+                    FormatEntityForward(entity, "X"),
+                    FormatEntityForward(entity, "Z"),
+                    FormatEntityHeading(previousEntity, "X"),
+                    FormatEntityHeading(previousEntity, "Y"),
+                    FormatEntityHeading(previousEntity, "Z"),
+                    FormatEntityHeading(previousEntity, "W"),
+                    FormatEntityForward(previousEntity, "X"),
+                    FormatEntityForward(previousEntity, "Z")));
         }
 
         private void WritePlayerCombatContext(string phase)
@@ -3568,6 +3676,10 @@ namespace AOSharpLiveCapture.Mike2022
             {
                 issues.Add("NPC-to-player attacks followed player initiation; unprovoked aggro range is not proven");
             }
+            else if (this.preAggroHeadingObservationRows == 0)
+            {
+                issues.Add("unprovoked aggro observed without pre-aggro heading correlation");
+            }
 
             if (this.deathActions == 0 && this.corpseFullUpdatePackets == 0)
             {
@@ -3646,6 +3758,7 @@ namespace AOSharpLiveCapture.Mike2022
                 json.AppendLine("    \"combatStart\": " + (this.attackStarts > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"npcToPlayerAggro\": " + (this.npcToPlayerAggroObservationRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"unprovokedAggroRange\": " + (this.unprovokedNpcAggroObservationRows > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"preAggroHeading\": " + (this.preAggroHeadingObservationRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"deathOrCorpse\": " + (this.deathActions > 0 || this.corpseFullUpdatePackets > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"identityLinkedLoot\": " + (this.identityLinkedInventoryPackets > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"playerInventorySnapshot\": " + (this.inventorySnapshotRows > 0 && this.inventorySnapshotErrors == 0 ? "true" : "false") + ",");
@@ -3951,6 +4064,147 @@ namespace AOSharpLiveCapture.Mike2022
             }
 
             return FormatFloat(entity.Z);
+        }
+
+        private static string FormatEntityUtc(EntitySnapshot entity)
+        {
+            return entity == null
+                       ? string.Empty
+                       : Csv(entity.CapturedUtc.ToString("o", CultureInfo.InvariantCulture));
+        }
+
+        private static string FormatEntityHeading(EntitySnapshot entity, string coordinate)
+        {
+            if (entity == null || !entity.HasHeading)
+            {
+                return string.Empty;
+            }
+
+            if (coordinate == "X")
+            {
+                return FormatFloat(entity.HeadingX);
+            }
+
+            if (coordinate == "Y")
+            {
+                return FormatFloat(entity.HeadingY);
+            }
+
+            if (coordinate == "Z")
+            {
+                return FormatFloat(entity.HeadingZ);
+            }
+
+            return FormatFloat(entity.HeadingW);
+        }
+
+        private static string FormatEntityForward(EntitySnapshot entity, string coordinate)
+        {
+            double forwardX;
+            double forwardZ;
+            if (!TryGetHorizontalForward(entity, out forwardX, out forwardZ))
+            {
+                return string.Empty;
+            }
+
+            return (coordinate == "X" ? forwardX : forwardZ).ToString(
+                "0.######",
+                CultureInfo.InvariantCulture);
+        }
+
+        private static double? RelativeHorizontalAngleDegrees(
+            EntitySnapshot source,
+            EntitySnapshot target)
+        {
+            if (source == null
+                || target == null
+                || !source.HasPosition
+                || !target.HasPosition)
+            {
+                return null;
+            }
+
+            double forwardX;
+            double forwardZ;
+            if (!TryGetHorizontalForward(source, out forwardX, out forwardZ))
+            {
+                return null;
+            }
+
+            double targetX = target.X - source.X;
+            double targetZ = target.Z - source.Z;
+            double targetLength = Math.Sqrt(targetX * targetX + targetZ * targetZ);
+            if (targetLength <= 0.000001)
+            {
+                return null;
+            }
+
+            double cosine = (forwardX * targetX + forwardZ * targetZ) / targetLength;
+            cosine = Math.Max(-1.0, Math.Min(1.0, cosine));
+            return Math.Acos(cosine) * 180.0 / Math.PI;
+        }
+
+        private static bool TryGetHorizontalForward(
+            EntitySnapshot entity,
+            out double forwardX,
+            out double forwardZ)
+        {
+            forwardX = 0.0;
+            forwardZ = 0.0;
+            if (entity == null || !entity.HasHeading)
+            {
+                return false;
+            }
+
+            double x = entity.HeadingX;
+            double y = entity.HeadingY;
+            double z = entity.HeadingZ;
+            double w = entity.HeadingW;
+            double quaternionLength = Math.Sqrt(x * x + y * y + z * z + w * w);
+            if (quaternionLength <= 0.000001)
+            {
+                return false;
+            }
+
+            x /= quaternionLength;
+            y /= quaternionLength;
+            z /= quaternionLength;
+            w /= quaternionLength;
+            forwardX = 2.0 * (x * z + w * y);
+            forwardZ = 1.0 - 2.0 * (x * x + y * y);
+            double horizontalLength = Math.Sqrt(forwardX * forwardX + forwardZ * forwardZ);
+            if (horizontalLength <= 0.000001)
+            {
+                forwardX = 0.0;
+                forwardZ = 0.0;
+                return false;
+            }
+
+            forwardX /= horizontalLength;
+            forwardZ /= horizontalLength;
+            return true;
+        }
+
+        private static string FormatEntityAgeMilliseconds(
+            DateTime capturedUtc,
+            EntitySnapshot entity)
+        {
+            return entity == null
+                       ? string.Empty
+                       : (capturedUtc - entity.CapturedUtc).TotalMilliseconds.ToString(
+                           "0.###",
+                           CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatEntityDeltaMilliseconds(
+            DateTime capturedUtc,
+            EntitySnapshot entity)
+        {
+            return entity == null
+                       ? string.Empty
+                       : (entity.CapturedUtc - capturedUtc).TotalMilliseconds.ToString(
+                           "0.###",
+                           CultureInfo.InvariantCulture);
         }
 
         private static string FormatLineOfSight(EntitySnapshot entity)
