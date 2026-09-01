@@ -168,6 +168,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ZoneLoginSimpleCharFullUpdatePrimesJoiningClientBeforeBroadcastingOthers()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string simpleCharFullUpdateText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
+            string sendToPlayfield = ExtractMethodBlock(
+                simpleCharFullUpdateText,
+                "public static void SendToPlayfield(IZoneClient client)");
+
+            int directSend = sendToPlayfield.IndexOf("character.Send(message);", StringComparison.Ordinal);
+            int otherPlayers = sendToPlayfield.IndexOf(
+                "character.Playfield.AnnounceOthers(message, character.Identity);",
+                StringComparison.Ordinal);
+
+            Assert.IsTrue(
+                directSend >= 0 && otherPlayers > directSend,
+                "Zone login must directly prime the joining client with its own SCFU before broadcasting to other players.");
+            Assert.IsFalse(
+                sendToPlayfield.Contains("character.Playfield.Announce(message);"),
+                "Zone login must not depend on visibility registration to deliver the joining character's own SCFU.");
+        }
+
+        [TestMethod]
         public void CleaningRobotDeathOrderIncludesStopFightDeathCorpseAndDespawnScheduling()
         {
             Identity attacker = new Identity { Type = IdentityType.CanbeAffected, Instance = 1001 };
