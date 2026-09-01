@@ -1,0 +1,18 @@
+{
+  "DefaultForLevels2Through220": {
+    "Evidence": "The known modern starter restriction blocks departure only while the character remains level 1. Ordinary terminal use still requires live confirmation per character.",
+    "LiveUsabilityStatus": "LIVE_UNCONFIRMED",
+    "OrdinaryMissionTerminalAccess": "NOT_BLOCKED_BY_KNOWN_STARTER_RULE",
+    "Provenance": "USER_PROVIDED_MODERN_AO_CONSTRAINT_20260901"
+  },
+  "Overrides": [
+    {
+      "Evidence": "A newly created level-1 character cannot leave the modern starter area before level 2 and cannot be assumed to reach an ordinary Rubi-Ka mission terminal.",
+      "Level": 1,
+      "LiveUsabilityStatus": "CHARACTER_LEVEL_1_CAPTURE_BLOCKED",
+      "OrdinaryMissionTerminalAccess": "UNAVAILABLE_IN_MODERN_STARTER_FLOW",
+      "Provenance": "USER_PROVIDED_MODERN_AO_CONSTRAINT_20260901"
+    }
+  ],
+  "SchemaVersion": 1
+}

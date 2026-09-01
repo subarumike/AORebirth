@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "Durability": "one JSON object per line; append and Flush(true) after every event",
+  "SemanticBoundary": "target_mission_ql is a planner input; MissionInfo 1.0.106 does not expose server mission QL",
+  "additionalProperties": true,
+  "properties": {
+    "event_type": {
+      "enum": [
+        "session_started",
+        "request_started",
+        "cohort_received",
+        "request_timeout",
+        "duplicate_callback",
+        "session_stopped",
+        "error"
+      ]
+    },
+    "payload": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "request_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "timestamp_utc": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_type",
+    "schema_version",
+    "session_id",
+    "timestamp_utc",
+    "payload"
+  ],
+  "title": "AORebirth mission offer harvester event",
+  "type": "object"
+}

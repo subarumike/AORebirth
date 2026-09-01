@@ -27,6 +27,15 @@ completion matrices and dated evidence retain detailed provenance.
   changing runtime mission logic. Evidence:
   `docs/evidence/MALIS_MISSION_ROLLER_FORENSIC_RECONSTRUCTION_20260901.md`.
 
+- Modern mission capture planning now retains all 2,420 character-level/slider
+  edges with canonical/Malis disagreement, models the level-1 starter access
+  block separately from QL1 reachability, and provides deterministic set-cover,
+  adaptive targeting, readiness, raw/normalized session tooling, and an
+  evidence-only five-offer AOSharp harvester. Static levels 2-220 cover QL1-250;
+  no modern live edge or reward probability is claimed, and runtime mission
+  logic remains unchanged. Evidence:
+  `docs/evidence/MODERN_MISSION_CAPTURE_PLANNER_20260901.md`.
+
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted
   source SHA `b1b17e6c43e25d3ce3115ca5c60a842dfe07dd19`. LoginEngine and ZoneEngine
