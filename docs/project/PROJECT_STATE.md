@@ -27,6 +27,15 @@ completion matrices and dated evidence retain detailed provenance.
   changing runtime mission logic. Evidence:
   `docs/evidence/MALIS_MISSION_ROLLER_FORENSIC_RECONSTRUCTION_20260901.md`.
 
+- Audited Malis commit `3ac9943a4943b8cb80eda9e40359729e656686b0`
+  now has a deterministic x86/.NET Framework 4.8 live package compiled against
+  the installed AOSharp runtime at `D:\AOTools\ReadyToUse`. Static plugin-entry,
+  dependency-closure, resource, and coexistence checks pass. The evidence-only
+  MissionOfferHarvester can passively correlate Malis requests and returned
+  cohorts; Malis source and AORebirth runtime mission logic remain unchanged.
+  Evidence:
+  `docs/evidence/MALIS_LIVE_BUILD_AND_DEPLOYMENT_20260901.md`.
+
 - Modern mission capture planning now retains all 2,420 character-level/slider
   edges with canonical/Malis disagreement, models the level-1 starter access
   block separately from QL1 reachability, and provides deterministic set-cover,
