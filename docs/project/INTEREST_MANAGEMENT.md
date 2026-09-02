@@ -74,6 +74,7 @@ Global policy is loaded from `Config.xml` → `<Locality>` (`Utility.Config.Loca
 
 | Setting | Default | Meaning |
 | --- | ---: | --- |
+| `EnableCellHeatScheduling` | `false` | Enables reduced-rate and sleeping character ticks. Leave disabled until scheduler combat and lifecycle regression gates pass. Visibility locality remains active either way. |
 | `VisibilityNeighborLevel` | 2 | Chebyshev ring for AOI candidate selection |
 | `HotNeighborLevel` | 1 | Cells at or inside this distance from a connected player tick at full PF rate |
 | `WarmNeighborLevel` | 2 | Cells beyond Hot but inside this distance tick at half PF rate |
@@ -85,6 +86,7 @@ Example:
 
 ```xml
 <Locality>
+  <EnableCellHeatScheduling>false</EnableCellHeatScheduling>
   <VisibilityNeighborLevel>2</VisibilityNeighborLevel>
   <HotNeighborLevel>1</HotNeighborLevel>
   <WarmNeighborLevel>2</WarmNeighborLevel>
@@ -152,8 +154,9 @@ Indoor playfields skip heat tiers; all characters receive full-rate ticks.
 `PlayfieldLocality.Tick`:
 
 1. `PlayfieldCellLocalityMonitor` tracks player-occupied cells (surface loading placeholder hook).
-2. `PlayfieldCellHeatScheduler` resolves heat and invokes `ProcessDynelTick` per character in tickable cells.
-3. `ProcessDynelTick` runs character tick, NPC patrol, follow, and player collision via `PlayfieldLocalityTickCallbacks` wired from `Playfield`.
+2. With `EnableCellHeatScheduling=false`, every character invokes `ProcessDynelTick` once per heartbeat using the full heartbeat delta.
+3. With `EnableCellHeatScheduling=true`, `PlayfieldCellHeatScheduler` resolves heat and invokes `ProcessDynelTick` per character in tickable cells.
+4. `ProcessDynelTick` runs character tick, NPC patrol, follow, and player collision via `PlayfieldLocalityTickCallbacks` wired from `Playfield`.
 
 ## Lifecycle Semantics
 
