@@ -117,6 +117,7 @@ namespace AORebirth.MissionEvidence
                 ["resolution"] = Resolution
             };
         }
+
     }
 
     internal sealed class NativeMissionSliderValues
@@ -184,6 +185,20 @@ namespace AORebirth.MissionEvidence
                 ["physical_mystical"] = PhysicalMystical,
                 ["headon_stealth"] = HeadonStealth,
                 ["credits_xp"] = CreditsXp
+            };
+        }
+
+        internal byte[] ToRawByteArray()
+        {
+            return new[]
+            {
+                Difficulty,
+                GoodBad,
+                OrderChaos,
+                OpenHidden,
+                PhysicalMystical,
+                HeadonStealth,
+                CreditsXp
             };
         }
     }
