@@ -96,6 +96,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void HighBitIssuingTerminalInstanceRemainsConcreteInAcceptedProjection()
+        {
+            SourceOffer source =
+                FindAllMissionTypes()[MissionRollType.FindItem];
+            var terminal = new Identity
+                           {
+                               Type = source.Roll.MissionTerminalIdentity.Type,
+                               Instance = unchecked((int)0xC0020320)
+                           };
+            source.Roll.MissionTerminalIdentity = terminal;
+            source.Offer.Unknown5 = terminal;
+            source =
+                new SourceOffer(
+                    source.Roll,
+                    MissionRollService.SerializeBody(source.Roll),
+                    source.OfferIndex,
+                    source.Offer);
+
+            Assert.IsTrue(terminal.Instance < 0);
+
+            MissionAcgAcceptedProjection projection =
+                this.CreateProjection(source, 93, 4093);
+
+            Assert.AreEqual(
+                IdentityRecord(terminal),
+                projection.Binding.IssuingTerminalIdentity);
+        }
+
+        [TestMethod]
         public void FrozenTextRewardsItemsActionsAndQfuContractsSurviveRestart()
         {
             IDictionary<MissionRollType, SourceOffer> sources = FindAllMissionTypes();

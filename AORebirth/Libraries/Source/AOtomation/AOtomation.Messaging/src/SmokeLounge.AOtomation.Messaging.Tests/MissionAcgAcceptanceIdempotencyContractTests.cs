@@ -26,6 +26,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AcceptanceTreatsHighBitTerminalInstancesAsConcrete()
+        {
+            string coordinator = ReadMissionSource("MissionAcgAcceptanceCoordinator.cs");
+            string accept = ReadMember(coordinator, "internal static bool TryAccept(");
+            string validate = ReadMember(coordinator, "private static bool ValidateOffer(");
+
+            StringAssert.Contains(accept, "ToRecord(offer.Unknown5)");
+            StringAssert.Contains(validate, "offer.Unknown5.Instance == 0");
+            Assert.IsFalse(
+                validate.IndexOf("offer.Unknown5.Instance <= 0", StringComparison.Ordinal) >= 0);
+        }
+
+        [TestMethod]
         public void DurableOfferAuthorityRestoresBeforeAllocatorAndNewIdentityPublication()
         {
             string runtime = ReadMissionSource("MissionAcgBindingRuntime.cs");

@@ -832,7 +832,8 @@ namespace ZoneEngine.Core.Missions
                 || offer.QuestIdentity == null
                 || offer.QuestIdentity.Instance <= 0
                 || offer.Unknown5 == null
-                || offer.Unknown5.Instance <= 0
+                || (int)offer.Unknown5.Type == 0
+                || offer.Unknown5.Instance == 0
                 || offer.QuestActions == null
                 || offer.QuestActions.Length == 0
                 || offer.QuestActions[0] == null
