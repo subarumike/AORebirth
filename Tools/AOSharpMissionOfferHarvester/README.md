@@ -26,6 +26,7 @@ explicit custom state:
 /missionharvest start <difficulty-detent 1-11> <requests> <preset> [interval-seconds]
 /missionharvest startcustom <difficulty-detent 1-11> <requests> <good-bad> <order-chaos> <open-hidden> <physical-mystical> <headon-stealth> <money-xp> [interval-seconds]
 /missionharvest matrix <start-state 1-27> <end-state 1-27> <requests-per-state> [interval-seconds]
+/missionharvest items <difficulty-detent 1-11> <max-rounds> <quiet-rounds> [interval-seconds]
 /missionharvest status
 /missionharvest stop
 ```
@@ -90,6 +91,40 @@ command runs every remaining state with two requests each:
 The single schema-3 session retains a distinct matrix index, label, requested
 state, native values, slider-state ID, raw packets, and cohort association on
 every request.
+
+## Automated reward-item saturation
+
+The `items` mode is the one-command campaign for discovering the widest possible
+reward-item pool at one character-level/difficulty-detent range. Each complete
+round sends one request at each of 13 controlled states: centered baseline, then
+full left and full right for each of the six secondary sliders. It round-robins
+the states so every slider extreme receives equal coverage.
+
+The tracker preserves two separate dimensions:
+
+- unique reward template pairs (`low_id`, `high_id`);
+- unique exact descriptors (`low_id`, `high_id`, reward QL, unknown field).
+
+After every round, chat reports new descriptors, total unique pairs and
+descriptors, and the quiet-round count. The session automatically stops when a
+configured number of complete 13-state rounds produces no new descriptor, or
+when the explicit maximum round count is reached. `/missionharvest status` and
+the final stop message report the same progress. Every newly discovered exact
+descriptor is also written to `reward_saturation_progress` in `events.jsonl`.
+
+Recommended first QL1 run on the preserved level-2 character:
+
+```text
+/missionharvest items 1 1000 100 1.5
+```
+
+That command has a fail-safe maximum of 1,000 rounds (13,000 requests / 65,000
+offers) and may stop earlier only after 100 complete balanced rounds (1,300
+requests / 6,500 offers) find no new exact reward descriptor. The statistical
+saturation rule is intentionally strong, but it is not mathematical proof that
+a random server pool is complete. Completed sessions must still be unioned with
+earlier captures and compared offline against known item catalogs before a
+character range is declared exhausted.
 
 ## Capture contract version 3
 

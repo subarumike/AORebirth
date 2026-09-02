@@ -24,6 +24,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="..\AOSharpMissionOfferHarvester\MissionQlResolver.g.cs"><Link>MissionQlResolver.g.cs</Link></Compile>
     <Compile Include="..\AOSharpMissionOfferHarvester\MissionSliderState.cs"><Link>MissionSliderState.cs</Link></Compile>
+    <Compile Include="..\AOSharpMissionOfferHarvester\RewardSaturationTracker.cs"><Link>RewardSaturationTracker.cs</Link></Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
