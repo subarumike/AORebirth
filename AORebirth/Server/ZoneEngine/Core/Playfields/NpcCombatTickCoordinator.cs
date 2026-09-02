@@ -20,6 +20,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -117,6 +118,7 @@ namespace AORebirth.Core.Playfields
             }
 
             bool hasCapturedContract = hasRegisteredCapturedContract && capturedContract.IsCombatReady;
+            this.SendNpcWeaponDefinitionsToPlayerTarget(attacker);
             if (hasCapturedContract
                 && capturedContract.AttackModel
                    == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary)
@@ -302,6 +304,22 @@ namespace AORebirth.Core.Playfields
             }
 
             character.ResetAllWeaponAttacks();
+        }
+
+        private void SendNpcWeaponDefinitionsToPlayerTarget(ICharacter attacker)
+        {
+            ICharacter target = this.playfield.FindByIdentity<ICharacter>(attacker.FightingTarget);
+            if (target == null || !(target.Controller is PlayerController))
+            {
+                return;
+            }
+
+            foreach (WeaponItemFullUpdateMessage message in
+                WeaponItemFullUpdate.CreateWeaponDefinitionMessages(attacker))
+            {
+                target.Send(message);
+                WeaponItemFullUpdate.LogObserverWeaponDefinition(attacker, target, message);
+            }
         }
 
         internal void ClearTracking(Identity identity)

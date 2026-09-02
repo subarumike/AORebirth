@@ -750,8 +750,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayerCombatRuntimeService.cs"));
             string characterCombatText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
+            string strikeBuilderText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AORebirth.Core\Combat\CharacterCombatStrikeBuilder.cs"));
             string combatSubscriptionsText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterCombatSubscriptions.cs"));
+            string npcCombatText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string npcRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string projectText = File.ReadAllText(
@@ -935,6 +939,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && combatSubscriptionsText.Contains("c.Died += this.OnCharacterDied;")
                 && combatSubscriptionsText.Contains("this.playfield.HandleCombatKillingHit(e.Killer, e.Victim);"),
                 "Character must own strike calculation while Playfield subscriptions retain damage and death lifecycle integration.");
+            Assert.IsTrue(
+                strikeBuilderText.Contains("if (weapon == null || weapon.LowID <= 0)")
+                && strikeBuilderText.Contains("NormalizeStat(attacker.Stats[StatIds.mindamage].Value)")
+                && strikeBuilderText.Contains("NormalizeStat(attacker.Stats[StatIds.maxdamage].Value)")
+                && strikeBuilderText.Contains("unarmedDamage = PlayerUnarmedFallbackDamage;")
+                && strikeBuilderText.Contains("UsesEquippedWeapon = false")
+                && strikeBuilderText.Contains("DamageSource = CombatDamageSource.UnarmedAutoAttack")
+                && strikeBuilderText.Contains("AttackInfoAmmoCount = PlayerUnarmedAttackInfoAmmoCount")
+                && strikeBuilderText.Contains("AttackInfoWeaponSlot = PlayerUnarmedAttackInfoWeaponSlot")
+                && strikeBuilderText.Contains("AttackInfoWeaponInstance = PlayerUnarmedAttackInfoWeaponInstance")
+                && strikeBuilderText.Contains("value == MissingStatValue"),
+                "The core strike builder must preserve the proven unarmed player source and packet contract when no weapon is equipped.");
+            string resetNpcCombatTick = ExtractMethodBlock(npcCombatText, "internal void ResetCombatTick");
+            string sendNpcWeaponDefinitions = ExtractMethodBlock(
+                npcCombatText,
+                "private void SendNpcWeaponDefinitionsToPlayerTarget");
+            Assert.IsTrue(
+                resetNpcCombatTick.Contains("this.SendNpcWeaponDefinitionsToPlayerTarget(attacker);")
+                && sendNpcWeaponDefinitions.Contains("target.Controller is PlayerController")
+                && sendNpcWeaponDefinitions.Contains("WeaponItemFullUpdate.CreateWeaponDefinitionMessages(attacker)")
+                && sendNpcWeaponDefinitions.Contains("target.Send(message);"),
+                "NPC combat start must send the acquired player the existing owner-linked weapon definition before the first incoming hit.");
+            AssertTextBefore(
+                resetNpcCombatTick,
+                "this.SendNpcWeaponDefinitionsToPlayerTarget(attacker);",
+                "this.StartBasicCaptureBackedAttackClocks(");
             Assert.IsTrue(
                 playfieldText.Contains("public void StartPlayerAttack(ICharacter character, Identity target)")
                 && playfieldText.Contains("this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);")
