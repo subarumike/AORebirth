@@ -126,6 +126,16 @@ namespace ChatEngine.Channels
 
         #region Public Properties
 
+        internal IClient[] SnapshotConnectedClients()
+        {
+            lock (this.clients)
+            {
+                var snapshot = new IClient[this.clients.Count];
+                this.clients.CopyTo(snapshot);
+                return snapshot;
+            }
+        }
+
         /// <summary>
         /// </summary>
         public virtual uint ChannelId { get; private set; }

@@ -98,6 +98,7 @@
     <Compile Include="Lists\LftRegistry.cs" />
     <Compile Include="Lists\LftPlayfieldRegistry.cs" />
     <Compile Include="Lists\TeamLevelRanges.cs" />
+    <Compile Include="Lists\TeamChatBridge.cs" />
     <Compile Include="PacketHandlers\Authenticate.cs" />
     <Compile Include="PacketHandlers\AuthenticateBot.cs" />
     <Compile Include="PacketHandlers\BuddyAdd.cs" />
