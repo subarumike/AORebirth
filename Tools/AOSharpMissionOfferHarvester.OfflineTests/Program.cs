@@ -85,6 +85,11 @@ namespace AORebirth.MissionEvidence
             MissionSliderState.TryCreatePreset(1, "centered_baseline", out second, out ignored);
             Assert(first.SliderStateId == second.SliderStateId, "state id must be deterministic");
             Assert(first.RequestedSemanticPayload().ContainsKey("money_xp"), "semantic payload must retain money/xp");
+            byte[] raw = first.ToNativeValues().ToRawByteArray();
+            Assert(raw.Length == 7, "raw slider serialization must contain seven bytes");
+            Assert(raw[0] == 1 && raw[1] == 255 && raw[2] == 255 && raw[3] == 255
+                && raw[4] == 255 && raw[5] == 255 && raw[6] == 255,
+                "raw slider serialization must preserve native order and values");
             MissionSliderState invalid;
             Assert(!MissionSliderState.TryCreatePreset(1, "NOT_A_PRESET", out invalid, out ignored), "unknown preset must fail");
         }
