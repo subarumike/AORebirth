@@ -11,6 +11,8 @@
   <!-- Playfield simulation ticks per second (default 32) -->
   <PlayfieldTickRate>32</PlayfieldTickRate>
   <Locality>
+    <!-- Safety default: locality visibility remains active while character ticks stay full-rate. -->
+    <EnableCellHeatScheduling>false</EnableCellHeatScheduling>
     <VisibilityNeighborLevel>2</VisibilityNeighborLevel>
     <HotNeighborLevel>1</HotNeighborLevel>
     <WarmNeighborLevel>2</WarmNeighborLevel>
