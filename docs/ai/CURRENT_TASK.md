@@ -16,6 +16,13 @@ mission destination, exact known icon type, reward-item descriptors, and every
 AOSharp-exposed offer field; a finite roll sample is never proof of pool
 exhaustion.
 
+Before any further level-2 harvest, satisfy the slider-capture gate in
+`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
+Current harvester 1.2.1 active mode is centered-only for the six
+non-difficulty sliders and must not be used for the large low-level campaign.
+Do not let the level-2 character level, and do not infer slider effects from
+historical descriptions or centered-only offers.
+
 ## Prior active checkpoint
 
 Crash-reconnect zombie-session fix is production accepted. Windows-authoritative

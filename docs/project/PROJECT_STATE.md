@@ -60,6 +60,11 @@ completion matrices and dated evidence retain detailed provenance.
   unknown chunks. The normalizer keeps the new origin/destination structures and
   accepts earlier schema-version-1 journals. Plan:
   `docs/mission-harvest/mission-ql-1-250-plan.md`.
+  The large level-2 campaign is paused at a documented slider gate: the current
+  active roller fixes all six non-difficulty controls at Malis center encoding
+  and cannot select duplicate-QL detents. The minimum discovery matrix and
+  evidence boundaries are in
+  `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
 
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted
