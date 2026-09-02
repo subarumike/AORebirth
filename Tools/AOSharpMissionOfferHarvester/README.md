@@ -22,12 +22,15 @@ requested number of verified five-offer responses. If multiple Difficulty
 positions return the same QL, their mappings are retained but the repeated
 capture work is grouped by the observed QL.
 
-The campaign uses the `FIND_ITEM_HEAVY` preset: Good/Bad is full Bad, Money/XP
-is full Credits, and Order/Chaos, Open/Hidden, Physical/Mystical, and Head
-On/Stealth remain centered. This replaces the centered preset, which repeatedly
-returned three Repair, one Return Item, and one Kill Person offer while
-excluding Find Item and Find Person. There is one semantic state, not a
-13-state or 27-state item-capture matrix.
+The campaign is a small supplement to the completed centered captures. It uses
+the `FIND_ITEM_PERSON_SUPPLEMENT` preset: Good/Bad full Bad, Order/Chaos full
+Order, Open/Hidden full Hidden, Physical/Mystical full Physical, Head On/Stealth
+centered, and Money/XP full Money. The preserved mission-settings guide reports
+this combination as three Find Item, one Return Item, and one Find Person. The
+existing centered captures already contain Repair, Return Item, and Kill Person,
+so the combined evidence covers all five mission types without repeating the
+full 250-request baseline. There is one semantic state, not a 13-state or
+27-state item-capture matrix.
 
 ```text
 /missionharvest status
@@ -37,7 +40,7 @@ excluding Find Item and Find Person. There is one semantic state, not a
 Progress is stored per observed character identity and resumes automatically:
 
 ```text
-MissionOfferHarvester\campaigns\MISSION_QL_SPECTRUM_V3\level-NNN-character-ID\progress.jsonl
+MissionOfferHarvester\campaigns\MISSION_QL_SPECTRUM_V4\level-NNN-character-ID\progress.jsonl
 ```
 
 Only verified requests with matching request/response linkage, exactly five

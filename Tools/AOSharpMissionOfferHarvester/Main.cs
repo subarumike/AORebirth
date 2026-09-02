@@ -275,7 +275,7 @@ namespace AORebirth.MissionEvidence
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Mission spectrum capture resolved: observedLevel={0}; difficultyPositions=11; staticDistinctQLs={1}; requestsPerActualQl={2}; completedRequests={3}; knownRemaining={4}; firstDifficulty={5}; preset=FIND_ITEM_HEAVY (Good/Bad=BAD, Money/XP=CREDITS, others=CENTERED).",
+                    "Mission spectrum capture resolved: observedLevel={0}; difficultyPositions=11; staticDistinctQLs={1}; requestsPerActualQl={2}; completedRequests={3}; knownRemaining={4}; firstDifficulty={5}; preset=FIND_ITEM_PERSON_SUPPLEMENT.",
                     characterLevel,
                     definition.PlannedQlCohortCount,
                     requestsPerQl,
@@ -390,7 +390,7 @@ namespace AORebirth.MissionEvidence
                 Chat.WriteLine(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "OBSERVED CHARACTER: Level {0}; DIFFICULTY POSITION: {1}/11; ACTUAL MISSION QL: {2}; PHASE: {3}; PRESET: FIND_ITEM_HEAVY; REQUEST: {4}/{5}; OFFERS CAPTURED THIS SESSION: {6}; QL STATUS: {7}; CHARACTER SPECTRUM STATUS: {8}; output={9}; progress={10}",
+                        "OBSERVED CHARACTER: Level {0}; DIFFICULTY POSITION: {1}/11; ACTUAL MISSION QL: {2}; PHASE: {3}; PRESET: FIND_ITEM_PERSON_SUPPLEMENT; REQUEST: {4}/{5}; OFFERS CAPTURED THIS SESSION: {6}; QL STATUS: {7}; CHARACTER SPECTRUM STATUS: {8}; output={9}; progress={10}",
                         _characterLevel,
                         _currentItemQlCohort == null ? "none" : _currentItemQlCohort.DifficultyDetent.ToString(CultureInfo.InvariantCulture),
                         _currentItemQlCohort == null || _currentItemQlCohort.IsDifficultyDiscovery ? "pending live response" : "QL " + _currentItemQlCohort.MissionQl,
@@ -625,7 +625,7 @@ namespace AORebirth.MissionEvidence
                     Chat.WriteLine(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "Mission capture: observedLevel={0}; difficultyPosition={1}/11; phase={2}; missionQL={3}; completed={4}/{5}; preset=FIND_ITEM_HEAVY.",
+                            "Mission capture: observedLevel={0}; difficultyPosition={1}/11; phase={2}; missionQL={3}; completed={4}/{5}; preset=FIND_ITEM_PERSON_SUPPLEMENT.",
                             _characterLevel,
                             next.DifficultyDetent,
                             next.IsDifficultyDiscovery ? "DIFFICULTY_DISCOVERY" : "QL_CAPTURE",
