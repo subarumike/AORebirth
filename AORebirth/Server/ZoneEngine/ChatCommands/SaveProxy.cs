@@ -39,7 +39,7 @@ namespace ZoneEngine.ChatCommands
                 ChatTextMessageHandler.Default.Create(character, "Please enter a proxyfied playfield first.");
             }
 
-            Coordinate tempCoordinate = character.Coordinates();
+            Coordinate tempCoordinate = character.CalculatePredictedPosition();
             PlayfieldData pfData = PlayfieldLoader.PFData[character.Playfield.Identity.Instance];
             StatelData o = null;
             foreach (StatelData s in pfData.Statels)

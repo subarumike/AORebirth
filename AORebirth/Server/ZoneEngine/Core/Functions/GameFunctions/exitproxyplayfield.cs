@@ -102,14 +102,14 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
                 Dynel dynel = (Dynel)self;
                 var preservedHeading = new Quaternion(
-                    self.RawHeading.xf,
-                    self.RawHeading.yf,
-                    self.RawHeading.zf,
-                    self.RawHeading.wf);
+                    self.Rotation.xf,
+                    self.Rotation.yf,
+                    self.Rotation.zf,
+                    self.Rotation.wf);
                 var envelopeDestination = new Vector3(
-                    self.RawCoordinates.X,
-                    self.RawCoordinates.Y,
-                    self.RawCoordinates.Z);
+                    (float)self.Position.x,
+                    (float)self.Position.y,
+                    (float)self.Position.z);
                 sourcePlayfield.Teleport(
                     dynel,
                     officialDungeonDestination,
@@ -152,9 +152,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                             caller.Identity.ToString(true),
                             self.Identity.ToString(true),
                             self.Playfield.Identity.Instance,
-                            ((Dynel)self).RawCoordinates.X,
-                            ((Dynel)self).RawCoordinates.Y,
-                            ((Dynel)self).RawCoordinates.Z,
+                            ((Dynel)self).Position.x,
+                            ((Dynel)self).Position.y,
+                            ((Dynel)self).Position.z,
                             externalDoorInstance,
                             externalPlayfieldId,
                             overrideDestination.x,
@@ -185,9 +185,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         caller.Identity.ToString(true),
                         self.Identity.ToString(true),
                         self.Playfield.Identity.Instance,
-                        ((Dynel)self).RawCoordinates.X,
-                        ((Dynel)self).RawCoordinates.Y,
-                        ((Dynel)self).RawCoordinates.Z,
+                        ((Dynel)self).Position.x,
+                        ((Dynel)self).Position.y,
+                        ((Dynel)self).Position.z,
                         externalDoorInstance,
                         externalPlayfieldId,
                         v.x,

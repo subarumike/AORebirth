@@ -322,7 +322,7 @@ namespace ZoneEngine.Core
 
         public static Character SpawnNear(ICharacter character, Entry entry, float zOffset)
         {
-            Coordinate spawnCoordinate = new Coordinate(character.Coordinates());
+            Coordinate spawnCoordinate = new Coordinate(character.CalculatePredictedPosition());
             spawnCoordinate.z += zOffset;
 
             var npcController = new NPCController();
@@ -330,7 +330,7 @@ namespace ZoneEngine.Core
                 entry.TemplateHash,
                 character.Playfield.Identity,
                 spawnCoordinate,
-                character.Heading,
+                character.Rotation,
                 npcController,
                 entry.Level);
 

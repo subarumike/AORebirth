@@ -13,11 +13,14 @@ namespace AORebirth.Core.GameData
     {
         public const int SupportedSchemaVersion = 1;
 
-        /// <summary>Chunked ground format. Carries the chunk grid used for outdoor cell layout.</summary>
+        /// <summary>Chunked ground format from the RDB tilemap extractor.</summary>
         public const string ChunkedGroundFormat = "CHGA";
 
         /// <summary>Embedded PNG ground format. Has no chunk grid.</summary>
         public const string EmbeddedGroundFormat = "GNDA";
+
+        /// <summary>Outdoor locality cell size in world units (legacy AO CELL_SIZE).</summary>
+        public const float CellSize = 40f;
 
         public int SchemaVersion { get; set; }
 
@@ -112,9 +115,9 @@ namespace AORebirth.Core.GameData
         }
 
         /// <summary>
-        /// Derives the outdoor cell grid from the chunked ground layout.
-        /// Returns false for embedded ground, for missing chunk fields, and when the chunk
-        /// grid cannot cover the heightmap; all of those resolve to an indoor layout.
+        /// Derives the outdoor cell grid from playfield dimensions and <see cref="CellSize"/>.
+        /// Returns false for embedded ground and when width, height, or tileSize are invalid;
+        /// those cases resolve to an indoor layout.
         /// </summary>
         public bool TryGetOutdoorGrid(out int numZonesX, out int numZonesZ, out float cellWorldSize)
         {
@@ -127,24 +130,15 @@ namespace AORebirth.Core.GameData
                 return false;
             }
 
-            if (!this.ChunkSize.HasValue
-                || this.ChunkSize.Value <= 0
-                || !this.GridWidth.HasValue
-                || this.GridWidth.Value <= 0
-                || this.TileSize <= 0f)
+            if (this.Width <= 0 || this.Height <= 0 || this.TileSize <= 0f || CellSize <= 0f)
             {
                 return false;
             }
 
-            if (this.GridWidth.Value * this.ChunkSize.Value < this.Width)
-            {
-                return false;
-            }
-
-            numZonesX = this.GridWidth.Value;
-            numZonesZ = this.GridWidth.Value;
-            cellWorldSize = this.ChunkSize.Value * this.TileSize;
-            return true;
+            numZonesX = (int)((this.Width * this.TileSize) / CellSize);
+            numZonesZ = (int)((this.Height * this.TileSize) / CellSize);
+            cellWorldSize = CellSize;
+            return numZonesX > 0 && numZonesZ > 0;
         }
     }
 }

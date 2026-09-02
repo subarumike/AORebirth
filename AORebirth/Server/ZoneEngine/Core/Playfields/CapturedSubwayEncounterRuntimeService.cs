@@ -244,7 +244,7 @@ namespace AORebirth.Core.Playfields
                     candidate => candidate != null
                                  && candidate.Controller is PlayerController
                                  && candidate.Stats[StatIds.health].Value > 0)
-                .OrderBy(candidate => candidate.Coordinates().coordinate.Distance2D(npc.Coordinates().coordinate))
+                .OrderBy(candidate => candidate.CalculatePredictedPosition().coordinate.Distance2D(npc.CalculatePredictedPosition().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .FirstOrDefault();
         }
@@ -402,7 +402,7 @@ namespace AORebirth.Core.Playfields
                     candidate => candidate != null
                                  && candidate.Controller is PlayerController
                                  && candidate.Stats[StatIds.health].Value > 0)
-                .OrderBy(candidate => candidate.Coordinates().coordinate.Distance2D(boss.Coordinates().coordinate))
+                .OrderBy(candidate => candidate.CalculatePredictedPosition().coordinate.Distance2D(boss.CalculatePredictedPosition().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .FirstOrDefault();
             return player ?? combatTarget;
@@ -415,7 +415,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            AORebirth.Core.Vector.Vector3 destination = boss.RawCoordinates;
+            AORebirth.Core.Vector.Vector3 destination = boss.Position;
             SmokeLounge.AOtomation.Messaging.GameData.Vector3 teleportDestination =
                 new SmokeLounge.AOtomation.Messaging.GameData.Vector3
                 {
@@ -432,28 +432,18 @@ namespace AORebirth.Core.Playfields
                 player.Identity,
                 AbmouthWarpNanoId,
                 AbmouthWarpDurationMilliseconds);
-            TeleportMessageHandler.Default.SendLocal(player, teleportDestination, player.RawHeading);
-            player.RawCoordinates = destination;
-            player.Coordinates(
-                new Coordinate
-                {
-                    x = destination.xf,
-                    y = destination.yf,
-                    z = destination.zf
-                });
+            TeleportMessageHandler.Default.SendLocal(player, teleportDestination, player.Rotation);
+            player.Position = destination;
+            player.Position =
+                new AORebirth.Core.Vector.Vector3(destination.xf, destination.yf, destination.zf);
 
             foreach (ICharacter pet in this.dynelRegistry.Characters().Where(
                 candidate => candidate != null
                              && candidate.Stats[StatIds.petmaster].Value == player.Identity.Instance
                              && candidate.Stats[StatIds.health].Value > 0))
             {
-                pet.Coordinates(
-                    new Coordinate
-                    {
-                        x = destination.xf,
-                        y = destination.yf,
-                        z = destination.zf
-                    });
+                pet.Position =
+                    new AORebirth.Core.Vector.Vector3(destination.xf, destination.yf, destination.zf);
                 this.playfield.Announce(
                     new SetPosMessage
                     {
@@ -894,13 +884,13 @@ namespace AORebirth.Core.Playfields
             {
                 definition = CreateInfectorDefinition(
                     slot,
-                    boss.RawCoordinates.X + CapturedReplacementInfectorOffsetX,
-                    boss.RawCoordinates.Y,
-                    boss.RawCoordinates.Z,
-                    boss.RawHeading.xf,
-                    boss.RawHeading.yf,
-                    boss.RawHeading.zf,
-                    boss.RawHeading.wf,
+                    (float)boss.Position.x + CapturedReplacementInfectorOffsetX,
+                    (float)boss.Position.y,
+                    (float)boss.Position.z,
+                    boss.Rotation.xf,
+                    boss.Rotation.yf,
+                    boss.Rotation.zf,
+                    boss.Rotation.wf,
                     ReplacementInfectorUnknown1);
             }
 
@@ -921,19 +911,13 @@ namespace AORebirth.Core.Playfields
             character.Name = definition.DisplayName;
             character.FirstName = string.Empty;
             character.LastName = string.Empty;
-            character.Coordinates(
-                new Coordinate
-                {
-                    x = definition.X,
-                    y = definition.Y,
-                    z = definition.Z
-                });
-            character.RawHeading =
+            character.SetPose(
+                new Coordinate(definition.X, definition.Y, definition.Z),
                 new AORebirth.Core.Vector.Quaternion(
                     definition.HeadingX,
                     definition.HeadingY,
                     definition.HeadingZ,
-                    definition.HeadingW);
+                    definition.HeadingW));
 
             SetStat(character, StatIds.side, definition.Side);
             SetStat(character, StatIds.fatness, definition.Fatness);

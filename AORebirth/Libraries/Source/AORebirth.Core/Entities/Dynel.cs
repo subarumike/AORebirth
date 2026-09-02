@@ -51,7 +51,7 @@ namespace AORebirth.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
-    using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     #endregion
 
@@ -145,30 +145,42 @@ namespace AORebirth.Core.Entities
         public bool Starting { get; set; }
 
         /// <summary>
+        /// World pose storage.
         /// </summary>
-        public virtual Coordinate Coordinates()
+        public Transform Transform { get; private set; }
+
+        /// <summary>
+        /// Stored world position.
+        /// </summary>
+        public virtual Vector3 Position
         {
-            if (this.RawCoordinates == null)
+            get
             {
-                return new Coordinate(0f, 0f, 0f);
+                return this.Transform.Position;
             }
 
-            return new Coordinate(this.RawCoordinates);
+            set
+            {
+                this.Transform.Position = value;
+            }
         }
 
-        public virtual void Coordinates(Vector3 position)
+        /// <summary>
+        /// Stored world rotation (facing). Character overrides for turn prediction.
+        /// </summary>
+        public virtual Quaternion Rotation
         {
-            this.RawCoordinates = position;
-        }
+            get
+            {
+                return this.Transform.Rotation;
+            }
 
-        public virtual void Coordinates(Vector.Vector3 position)
-        {
-            this.RawCoordinates = position;
-        }
-
-        public virtual void Coordinates(Coordinate position)
-        {
-            this.RawCoordinates = position.coordinate;
+            set
+            {
+                this.Transform.Rotation = value == null
+                    ? new Quaternion()
+                    : new Quaternion(value.xf, value.yf, value.zf, value.wf);
+            }
         }
 
         /// <summary>
@@ -178,47 +190,6 @@ namespace AORebirth.Core.Entities
             get
             {
                 return DateTime.UtcNow - this.PredictionTime;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public virtual Vector3 RawCoordinates { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Quaternion RawHeading { get; set; }
-
-        /// <summary>
-        /// Heading as Quaternion
-        /// </summary>
-        public Quaternion Heading
-        {
-            get
-            {
-                if (this.spinDirection == SpinOrStrafeDirections.None)
-                {
-                    return this.RawHeading;
-                }
-                else
-                {
-                    double turnArcAngle;
-                    Quaternion turnQuaterion;
-                    Quaternion newHeading;
-
-                    turnArcAngle = this.calculateTurnArcAngle();
-                    turnQuaterion = new Quaternion(Vector.Vector3.AxisY, turnArcAngle);
-
-                    newHeading = Quaternion.Hamilton(turnQuaterion, this.RawHeading);
-                    newHeading.Normalize();
-
-                    return newHeading;
-                }
-            }
-
-            set
-            {
-                this.RawHeading = new Quaternion(value.xf, value.yf, value.zf, value.wf);
             }
         }
 
@@ -275,6 +246,7 @@ namespace AORebirth.Core.Entities
         {
             this.Starting = true;
             this.DoNotDoTimers = true;
+            this.Transform = new Transform();
 
             this.Stats = new Stats(this.Identity);
             this.InitializeStats();

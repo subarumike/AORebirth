@@ -96,15 +96,15 @@ namespace ZoneEngine.Core.MessageHandlers
             float auxB = message.AuxB;
 
             // High-frequency move packets — do not Info-spam the ZoneEngine console.
-            client.Server.Debug(
-                client,
-                "CharDCMove moveTypeRaw={0} moveTypeNormalized={1} coords={2} tick={3} auxA={4} auxB={5}",
-                rawMoveType,
-                moveType,
-                coordinates,
-                tmpInt1,
-                auxA,
-                auxB);
+            // client.Server.Debug(
+            //     client,
+            //     "CharDCMove moveTypeRaw={0} moveTypeNormalized={1} coords={2} tick={3} auxA={4} auxB={5}",
+            //     rawMoveType,
+            //     moveType,
+            //     coordinates,
+            //     tmpInt1,
+            //     auxA,
+            //     auxB);
 
             /*
             if (!client.Character.DoNotDoTimers)
@@ -140,7 +140,7 @@ namespace ZoneEngine.Core.MessageHandlers
                         aoc.x += correspondingDoor.hX * 3;
                         aoc.y += correspondingDoor.hY * 3;
                         aoc.z += correspondingDoor.hZ * 3;
-                        client.Teleport(aoc, client.Character.Heading, correspondingDoor.playfield);
+                        client.Teleport(aoc, client.Character.Rotation, correspondingDoor.playfield);
                         Program.zoneServer.Clients.Remove(client);
                         return;
                     }

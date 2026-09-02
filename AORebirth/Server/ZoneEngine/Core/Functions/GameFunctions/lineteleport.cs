@@ -139,7 +139,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             character.Teleport(
                 destCoordinate,
-                character.Heading,
+                character.Rotation,
                 new Identity() { Type = IdentityType.Playfield, Instance = toPlayfield });
             return true;
         }

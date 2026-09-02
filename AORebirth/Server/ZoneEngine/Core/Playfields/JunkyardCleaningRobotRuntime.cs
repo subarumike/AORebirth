@@ -227,7 +227,7 @@ namespace ZoneEngine.Core.Playfields
                     "Junkyard Cleaning Robot intentionally quarantined reason=" + combatFailure);
             }
 
-            robot.Coordinates(new Coordinate { x = pos[0], y = pos[1], z = pos[2] });
+            robot.Position = (new Coordinate { x = pos[0], y = pos[1], z = pos[2] }).coordinate;
             robot.DoNotDoTimers = false;
             activateNpc(robot);
             playfield.AnnounceSpawnedCharacterVisibility(robot, Identity.None);
@@ -291,8 +291,8 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - pos[0];
-                float dz = candidate.Coordinates().z - pos[2];
+                float dx = candidate.CalculatePredictedPosition().x - pos[0];
+                float dz = candidate.CalculatePredictedPosition().z - pos[2];
                 if (dx * dx + dz * dz <= 6.25f)
                 {
                     return true;

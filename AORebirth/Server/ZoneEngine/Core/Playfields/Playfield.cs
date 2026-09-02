@@ -152,6 +152,11 @@ namespace AORebirth.Core.Playfields
 
         private readonly object corpseVisibilitySync = new object();
 
+        private readonly object staticDynelVisibilitySync = new object();
+
+        private readonly Dictionary<ulong, HashSet<ulong>> visibleStaticDynelsByRecipient =
+            new Dictionary<ulong, HashSet<ulong>>();
+
         private readonly Dictionary<int, CorpseState> pendingCorpseSpawns = new Dictionary<int, CorpseState>();
 
         private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards =
@@ -287,15 +292,15 @@ namespace AORebirth.Core.Playfields
                 this.MetaData,
                 this.runtimeSystems.VisibilityFanout,
                 this.runtimeSystems.PacketSequences,
+                this.dynelRegistry,
                 new PlayfieldLocalityTickCallbacks
                 {
-                    GetAllCharacters = () => this.runtimeSystems.Characters(),
-                    GetConnectedPlayers = () => this.runtimeSystems.Players(),
                     HasPendingDeadNpcDespawn = this.runtimeSystems.HasPendingDeadNpcDespawn,
                     ProcessDeadNpcDespawn = this.runtimeSystems.ProcessDeadNpcDespawn,
                     ProcessCharacterTick = this.ProcessCharacterTick,
                     ProcessNpcPatrolTick = this.runtimeSystems.ProcessNpcPatrolTick,
                     ProcessFollow = this.runtimeSystems.ProcessCharacterFollow,
+                    ProcessPlayerCellChanged = this.RefreshNonCharacterVisibilityForRecipient,
                     ProcessPlayerCollision =
                         dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
                             dynel,
@@ -532,7 +537,13 @@ namespace AORebirth.Core.Playfields
                 character,
                 this.SendVisibilityMessage,
                 this.SendVisibilityLeave);
-            this.RefreshCorpseVisibilityForRecipient(character);
+            this.RefreshNonCharacterVisibilityForRecipient(character);
+        }
+
+        private void RefreshNonCharacterVisibilityForRecipient(ICharacter recipient)
+        {
+            this.RefreshCorpseVisibilityForRecipient(recipient);
+            this.RefreshStaticDynelVisibilityForRecipient(recipient);
         }
 
         internal bool ForceCharacterVisibilityToRecipient(ICharacter source, ICharacter recipient)
@@ -594,6 +605,11 @@ namespace AORebirth.Core.Playfields
         public void ForgetVisibilityRecipient(Identity recipientIdentity)
         {
             this.locality.ForgetRecipient(recipientIdentity);
+            lock (this.staticDynelVisibilitySync)
+            {
+                this.visibleStaticDynelsByRecipient.Remove(recipientIdentity.Long());
+            }
+
             lock (this.corpseVisibilitySync)
             {
                 foreach (CorpseState corpse in this.corpses.Values)
@@ -700,7 +716,7 @@ namespace AORebirth.Core.Playfields
         private Coordinate DynelDropPosition(Identity identity)
         {
             IDynel dynel = this.runtimeSystems.FindByIdentity<IDynel>(identity);
-            return dynel != null ? dynel.Coordinates() : new Coordinate();
+            return dynel != null ? new AORebirth.Core.Vector.Coordinate(dynel.Position) : new Coordinate();
         }
 
         public void DespawnNpcImmediately(ICharacter target)
@@ -742,10 +758,21 @@ namespace AORebirth.Core.Playfields
         public void RegisterDynel(IEntity entity)
         {
             this.runtimeSystems.RegisterDynel(entity);
-            ICharacter character = entity as ICharacter;
+            IDynel dynel = entity as IDynel;
+            if (dynel != null)
+            {
+                this.locality.RegisterDynel(dynel);
+            }
+
+            StaticDynel staticDynel = entity as StaticDynel;
+            if (staticDynel != null)
+            {
+                this.locality.RegisterStaticDynel(staticDynel);
+            }
+
+            ICharacter character = dynel as ICharacter;
             if (character != null)
             {
-                this.locality.RegisterCharacter(character);
                 this.RegisterCharacterCombatEvents(character);
             }
         }
@@ -1072,8 +1099,9 @@ namespace AORebirth.Core.Playfields
                 ActiveNanoRuntimeService.Default.HandlePlayfieldLeave(character);
             }
 
-            dynel.RawCoordinates = new Vector3() { X = destination.x, Y = destination.y, Z = destination.z };
-            dynel.RawHeading = new Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+            dynel.Position = new AORebirth.Core.Vector.Vector3(destination.x, destination.y, destination.z);
+            dynel.Transform.Rotation =
+                new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
         }
 
         private static ZoneClient CapturePlayfieldTransferClient(Dynel dynel)
@@ -1157,22 +1185,18 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float fromX = dynel.RawCoordinates.X;
-            float fromY = dynel.RawCoordinates.Y;
-            float fromZ = dynel.RawCoordinates.Z;
+            float fromX = (float)dynel.Position.x;
+            float fromY = (float)dynel.Position.y;
+            float fromZ = (float)dynel.Position.z;
 
             TeleportMessageHandler.Default.SendLocal(
                 character,
                 destination.coordinate,
                 new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf));
 
-            dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3
-                                   {
-                                       x = destination.x,
-                                       y = destination.y,
-                                       z = destination.z
-                                   };
-            dynel.RawHeading = new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+            dynel.Position = new AORebirth.Core.Vector.Vector3(destination.x, destination.y, destination.z);
+            dynel.Transform.Rotation =
+                new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
             this.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
             this.RefreshCharacterVisibility(character, forceRefresh: true);
             this.PrimeStatelCollisionContacts(character);
@@ -1299,7 +1323,13 @@ namespace AORebirth.Core.Playfields
                 "SendStaticDynelsToClient pf=" + this.Identity.Instance + " count=" + list.Count);
             foreach (StaticDynel staticDynel in list)
             {
+                if (!this.locality.SharesVisibilityNeighborhood(character, staticDynel.Identity))
+                {
+                    continue;
+                }
+
                 SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
+                this.MarkStaticDynelVisible(character.Identity, staticDynel.Identity);
             }
 
             int doorStatuses = this.runtimeSystems.SendInitialDoorStatuses(
@@ -1386,9 +1416,9 @@ namespace AORebirth.Core.Playfields
             if (playfieldInstance == 7001 || this.Identity.Instance == 7001)
             {
                 var envelope = new AORebirth.Core.Vector.Vector3(
-                    dynel.RawCoordinates.X,
-                    dynel.RawCoordinates.Y,
-                    dynel.RawCoordinates.Z);
+                    (float)dynel.Position.x,
+                    (float)dynel.Position.y,
+                    (float)dynel.Position.z);
                 var landing = new AORebirth.Core.Vector.Vector3(
                     (float)destination.x,
                     (float)destination.y,
@@ -1417,11 +1447,11 @@ namespace AORebirth.Core.Playfields
                 float envelopeY = PlayfieldStatelTransitionRuntimeService.IsNascenseOutdoorPlayfield(
                                      this.Identity.Instance)
                                      ? 7.09f
-                                     : dynel.RawCoordinates.Y;
+                                     : (float)dynel.Position.y;
                 var envelope = new AORebirth.Core.Vector.Vector3(
-                    dynel.RawCoordinates.X,
+                    (float)dynel.Position.x,
                     envelopeY,
-                    dynel.RawCoordinates.Z);
+                    (float)dynel.Position.z);
                 var landing = new AORebirth.Core.Vector.Vector3(
                     (float)destination.x,
                     (float)destination.y,
@@ -1674,9 +1704,9 @@ namespace AORebirth.Core.Playfields
                 && playfieldInstance == LuxuryApartmentSunriseRules.SunriseStationPlayfieldId)
             {
                 var envelope = new AORebirth.Core.Vector.Vector3(
-                    dynel.RawCoordinates.X,
-                    dynel.RawCoordinates.Y,
-                    dynel.RawCoordinates.Z);
+                    (float)dynel.Position.x,
+                    (float)dynel.Position.y,
+                    (float)dynel.Position.z);
                 this.Teleport(
                     dynel,
                     destination,
@@ -1807,7 +1837,7 @@ namespace AORebirth.Core.Playfields
                         this.ProcessPendingCorpseSpawns,
                         this.ProcessCorpseDespawns,
                         this.ProcessPendingCorpseCreditAwards);
-                    this.locality.Tick(deltaTime);
+                    this.locality.Tick(deltaTime, this.SendVisibilityMessage, this.SendVisibilityLeave);
                 }
                 catch (Exception e)
                 {
@@ -1909,7 +1939,8 @@ namespace AORebirth.Core.Playfields
             double attackRange = attackSource != null && attackSource.Range > 0.0
                                      ? attackSource.Range
                                      : MaxMeleeCombatDistance;
-            double distance = attacker.Coordinates().Distance3D(target.Coordinates());
+            double distance = attacker.CalculatePredictedPosition().Distance3D(
+                target.CalculatePredictedPosition());
             return distance <= attackRange + 1.5;
         }
 
@@ -2172,13 +2203,9 @@ namespace AORebirth.Core.Playfields
                 new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf),
                 destinationPlayfield);
 
-            dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3
-                                   {
-                                       x = destination.x,
-                                       y = destination.y,
-                                       z = destination.z
-                                   };
-            dynel.RawHeading = new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
+            dynel.Position = new AORebirth.Core.Vector.Vector3(destination.x, destination.y, destination.z);
+            dynel.Transform.Rotation =
+                new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
 
             PlayfieldAnarchyFMessageHandler.Default.Send(character);
             SimpleCharFullUpdate.SendToPlayfield(client);
@@ -2735,7 +2762,8 @@ namespace AORebirth.Core.Playfields
 
         private void MoveNpcToCombatPosition(ICharacter attacker, AORebirth.Core.Vector.Vector3 nextPosition)
         {
-            attacker.Coordinates(nextPosition);
+            attacker.Position =
+                new AORebirth.Core.Vector.Vector3(nextPosition.x, nextPosition.y, nextPosition.z);
             this.Announce(
                 new SetPosMessage
                 {
@@ -3425,7 +3453,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            destination = new Coordinate(savedX, character.RawCoordinates.Y, savedY);
+            destination = new Coordinate(savedX, (float)character.Position.y, savedY);
             destinationPlayfield = new Identity
                                    {
                                        Type = IdentityType.Playfield,
@@ -3677,6 +3705,7 @@ namespace AORebirth.Core.Playfields
             }
 
             corpse.VisualSource = target;
+            corpse.Coordinate = new Coordinate(target.Position);
             var recipients = this.locality.VisibleRecipientsForSource(target.Identity).ToList();
             if (target.Controller != null
                 && target.Controller.Client != null
@@ -3714,9 +3743,9 @@ namespace AORebirth.Core.Playfields
                     target.Stats[StatIds.breed].Value,
                     target.Stats[StatIds.race].Value,
                     recipientCount,
-                    target.RawCoordinates.X,
-                    target.RawCoordinates.Y,
-                    target.RawCoordinates.Z));
+                    (float)target.Position.x,
+                    (float)target.Position.y,
+                    (float)target.Position.z));
         }
 
         private bool SendCorpseFullUpdateToRecipient(
@@ -3779,7 +3808,9 @@ namespace AORebirth.Core.Playfields
             foreach (CorpseState corpse in this.corpses.Values.OrderBy(x => x.CorpseIdentity.Instance))
             {
                 if (corpse.VisualSource == null
-                    || !this.locality.SharesVisibilityNeighborhood(recipient, corpse.VisualSource))
+                    || !this.locality.SharesVisibilityNeighborhood(
+                        recipient,
+                        corpse.Coordinate ?? new Coordinate(corpse.VisualSource.Position)))
                 {
                     continue;
                 }
@@ -3789,6 +3820,70 @@ namespace AORebirth.Core.Playfields
                     recipient,
                     CorpseCatMeshFor(corpse.VisualSource),
                     CorpseMonsterDataFor(corpse.VisualSource));
+            }
+        }
+
+        private void MarkStaticDynelVisible(Identity recipientIdentity, Identity staticDynelIdentity)
+        {
+            lock (this.staticDynelVisibilitySync)
+            {
+                HashSet<ulong> visible;
+                ulong recipientKey = recipientIdentity.Long();
+                if (!this.visibleStaticDynelsByRecipient.TryGetValue(recipientKey, out visible))
+                {
+                    visible = new HashSet<ulong>();
+                    this.visibleStaticDynelsByRecipient.Add(recipientKey, visible);
+                }
+
+                visible.Add(staticDynelIdentity.Long());
+            }
+        }
+
+        private void RefreshStaticDynelVisibilityForRecipient(ICharacter recipient)
+        {
+            if (recipient == null
+                || recipient.Controller == null
+                || recipient.Controller.Client == null)
+            {
+                return;
+            }
+
+            HashSet<ulong> visible;
+            lock (this.staticDynelVisibilitySync)
+            {
+                HashSet<ulong> stored;
+                visible = this.visibleStaticDynelsByRecipient.TryGetValue(recipient.Identity.Long(), out stored)
+                    ? new HashSet<ulong>(stored)
+                    : new HashSet<ulong>();
+            }
+
+            foreach (StaticDynel staticDynel in this.runtimeSystems.StaticDynels()
+                .OrderBy(x => (int)x.Identity.Type)
+                .ThenBy(x => x.Identity.Instance))
+            {
+                ulong sourceKey = staticDynel.Identity.Long();
+                bool inNeighborhood = this.locality.SharesVisibilityNeighborhood(
+                    recipient,
+                    staticDynel.Identity);
+                if (!visible.Contains(sourceKey) && inNeighborhood)
+                {
+                    SimpleItemFullUpdateMessageHandler.Default.Send(recipient, staticDynel);
+                    this.MarkStaticDynelVisible(recipient.Identity, staticDynel.Identity);
+                }
+                else if (visible.Contains(sourceKey) && !inNeighborhood)
+                {
+                    this.SendVisibilityLeave(recipient, staticDynel.Identity);
+                    lock (this.staticDynelVisibilitySync)
+                    {
+                        HashSet<ulong> stored;
+                        if (this.visibleStaticDynelsByRecipient.TryGetValue(
+                                recipient.Identity.Long(),
+                                out stored))
+                        {
+                            stored.Remove(sourceKey);
+                        }
+                    }
+                }
             }
         }
 
@@ -3808,7 +3903,9 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                bool inNeighborhood = this.locality.SharesVisibilityNeighborhood(recipient, corpse.VisualSource);
+                bool inNeighborhood = this.locality.SharesVisibilityNeighborhood(
+                    recipient,
+                    corpse.Coordinate ?? new Coordinate(corpse.VisualSource.Position));
                 bool visible;
                 lock (this.corpseVisibilitySync)
                 {
@@ -4376,6 +4473,7 @@ namespace AORebirth.Core.Playfields
                 OwnerIdentity = ownerIdentity,
                 PlayfieldId = this.Identity.Instance,
                 VisualSource = target,
+                Coordinate = new Coordinate(target.Position),
                 VisibleRecipients = new HashSet<Identity>(),
                 Name = "Remains of " + target.Name,
                 LootClass = lootClass,

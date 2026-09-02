@@ -342,7 +342,7 @@ namespace AORebirth.Core.Playfields
                                  && candidate.Stats[StatIds.health].Value > 0
                                  && (!definition.Profile.Aggression.RequiresLineOfSight
                                      || this.HasClearAggroLineOfSight(npc, candidate)))
-                .OrderBy(candidate => candidate.Coordinates().coordinate.Distance2D(npc.Coordinates().coordinate))
+                .OrderBy(candidate => candidate.CalculatePredictedPosition().coordinate.Distance2D(npc.CalculatePredictedPosition().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .FirstOrDefault();
         }
@@ -371,8 +371,8 @@ namespace AORebirth.Core.Playfields
                         npc,
                         target))
                 .OrderBy(
-                    candidate => candidate.Coordinates().coordinate.Distance2D(
-                        npc.Coordinates().coordinate))
+                    candidate => candidate.CalculatePredictedPosition().coordinate.Distance2D(
+                        npc.CalculatePredictedPosition().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .ToArray();
         }
@@ -400,13 +400,13 @@ namespace AORebirth.Core.Playfields
         private bool HasClearAggroLineOfSight(ICharacter observer, ICharacter target)
         {
             var start = new CollisionPoint3(
-                observer.RawCoordinates.X,
-                observer.RawCoordinates.Y,
-                observer.RawCoordinates.Z);
+                (float)observer.Position.x,
+                (float)observer.Position.y,
+                (float)observer.Position.z);
             var end = new CollisionPoint3(
-                target.RawCoordinates.X,
-                target.RawCoordinates.Y,
-                target.RawCoordinates.Z);
+                (float)target.Position.x,
+                (float)target.Position.y,
+                (float)target.Position.z);
             SegmentTriangleHit hit;
             return this.aggroLineOfSight.EvaluateAttackLine(true, start, end, out hit)
                    == NpcDamageLineOfSightDecision.AllowedClear;
@@ -430,7 +430,7 @@ namespace AORebirth.Core.Playfields
                 definition.Spawn.X,
                 definition.Spawn.Y,
                 definition.Spawn.Z);
-            if (npc.Coordinates().coordinate.Distance2D(home) <= 0.5)
+            if (npc.CalculatePredictedPosition().coordinate.Distance2D(home) <= 0.5)
             {
                 return;
             }
@@ -595,8 +595,8 @@ namespace AORebirth.Core.Playfields
                                  && candidate.Stats[StatIds.health].Value > 0
                                  && IsOrdinaryEnemy(candidate))
                 .OrderBy(
-                    candidate => candidate.Coordinates().coordinate.Distance2D(
-                        caster.Coordinates().coordinate))
+                    candidate => candidate.CalculatePredictedPosition().coordinate.Distance2D(
+                        caster.CalculatePredictedPosition().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .FirstOrDefault();
             return target ?? (profile.FallbackToSelf ? caster : null);
@@ -1147,8 +1147,8 @@ namespace AORebirth.Core.Playfields
             character.Name = profile.DisplayName;
             character.FirstName = string.Empty;
             character.LastName = string.Empty;
-            character.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
-            character.RawHeading =
+            character.Position = (new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z }).coordinate;
+            character.Transform.Rotation =
                 new AORebirth.Core.Vector.Quaternion(
                     spawn.HeadingX,
                     spawn.HeadingY,
@@ -1199,7 +1199,7 @@ namespace AORebirth.Core.Playfields
                         segments[0].EndX,
                         segments[0].EndY,
                         segments[0].EndZ);
-                    character.Coordinates(start);
+                    character.Position = start;
                     character.Waypoints.Clear();
                     character.AddWaypoint(start, false);
                     character.AddWaypoint(end, false);

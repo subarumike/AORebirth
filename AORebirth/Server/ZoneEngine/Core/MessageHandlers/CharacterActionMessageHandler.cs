@@ -1269,17 +1269,17 @@ namespace ZoneEngine.Core.MessageHandlers
                        Heading =
                            new Quaternion
                            {
-                               X = character.Heading.xf,
-                               Y = character.Heading.yf,
-                               Z = character.Heading.zf,
-                               W = character.Heading.wf
+                               X = character.Rotation.xf,
+                               Y = character.Rotation.yf,
+                               Z = character.Rotation.zf,
+                               W = character.Rotation.wf
                            },
                        Coordinates =
                            new Vector3
                            {
-                               X = character.RawCoordinates.X,
-                               Y = character.RawCoordinates.Y,
-                               Z = character.RawCoordinates.Z
+                               X = (float)character.Position.x,
+                               Y = (float)character.Position.y,
+                               Z = (float)character.Position.z
                            },
                        Unknown1 = 0,
                        Unknown2 = 0,

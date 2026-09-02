@@ -98,7 +98,7 @@ namespace ZoneEngine.Core.Playfields
                 return null;
             }
 
-            Coordinate npcPos = npc.Coordinates();
+            Coordinate npcPos = npc.CalculatePredictedPosition();
             ICharacter nearest = null;
             double nearestDist = AggroRadiusMeters;
             List<ICharacter> inRange = playfield.FindCharacterInRange(npc, AggroRadiusMeters);
@@ -113,7 +113,7 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                double dist = candidate.Coordinates().coordinate.Distance2D(npcPos.coordinate);
+                double dist = candidate.CalculatePredictedPosition().coordinate.Distance2D(npcPos.coordinate);
                 if (dist < nearestDist)
                 {
                     nearestDist = dist;

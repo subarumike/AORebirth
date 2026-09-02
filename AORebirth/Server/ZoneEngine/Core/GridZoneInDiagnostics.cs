@@ -124,7 +124,7 @@ namespace ZoneEngine.Core
                 CleanupExpiredContexts();
                 if (!PendingContexts.TryGetValue(character.Identity.Instance, out context))
                 {
-                    Coordinate current = character.Coordinates();
+                    Coordinate current = character.CalculatePredictedPosition();
                     context = new GridZoneInContext
                               {
                                   CharacterId = character.Identity.Instance,
@@ -273,20 +273,20 @@ namespace ZoneEngine.Core
             if (message is FullCharacterMessage)
             {
                 var full = (FullCharacterMessage)message;
-                Coordinate coordinates = client.Controller.Character.Coordinates();
+                Coordinate coordinates = client.Controller.Character.CalculatePredictedPosition();
                 details.PlayfieldId = client.Controller.Character.Playfield.Identity.Instance;
                 details.Coordinates = FormatCoordinate(coordinates);
-                details.Heading = FormatCoreQuaternion(client.Controller.Character.Heading);
+                details.Heading = FormatCoreQuaternion(client.Controller.Character.Rotation);
                 details.ModelResourceMesh = BuildFullCharacterMeshSummary(full);
                 return details;
             }
 
             if (client.Controller.Character.Identity == message.Identity)
             {
-                Coordinate coordinates = client.Controller.Character.Coordinates();
+                Coordinate coordinates = client.Controller.Character.CalculatePredictedPosition();
                 details.PlayfieldId = client.Controller.Character.Playfield.Identity.Instance;
                 details.Coordinates = FormatCoordinate(coordinates);
-                details.Heading = FormatCoreQuaternion(client.Controller.Character.Heading);
+                details.Heading = FormatCoreQuaternion(client.Controller.Character.Rotation);
             }
 
             return details;

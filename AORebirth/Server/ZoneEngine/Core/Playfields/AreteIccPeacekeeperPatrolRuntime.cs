@@ -163,7 +163,7 @@ namespace ZoneEngine.Core.Playfields
         {
             if (peacekeeper == null
                 || peacekeeper.Playfield == null
-                || peacekeeper.RawCoordinates == null
+                || peacekeeper.Position == null
                 || peacekeeper.Stats[StatIds.health].Value <= 0
                 || peacekeeper.FightingTarget.Instance != 0
                 || !(peacekeeper.Controller is NPCController)
@@ -202,7 +202,7 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                double distance = peacekeeper.Coordinates().Distance2D(candidate.Coordinates());
+                double distance = new AORebirth.Core.Vector.Coordinate(peacekeeper.Position).Distance2D(candidate.CalculatePredictedPosition());
                 if (distance <= bestDistance)
                 {
                     bestDistance = distance;
@@ -229,13 +229,13 @@ namespace ZoneEngine.Core.Playfields
             }
 
             Playfield playfield = player.Playfield as Playfield;
-            if (playfield == null || player.RawCoordinates == null || hostile.RawCoordinates == null)
+            if (playfield == null || player.Position == null || hostile.Position == null)
             {
                 return new ICharacter[0];
             }
 
-            Coordinate playerCoord = player.Coordinates();
-            Coordinate hostileCoord = hostile.Coordinates();
+            Coordinate playerCoord = player.CalculatePredictedPosition();
+            Coordinate hostileCoord = new AORebirth.Core.Vector.Coordinate(hostile.Position);
             var allies = new List<ICharacter>();
             var seen = new HashSet<int>();
 
@@ -269,14 +269,14 @@ namespace ZoneEngine.Core.Playfields
                     || !(candidate.Controller is NPCController)
                     || candidate.Stats[StatIds.health].Value <= 0
                     || candidate.FightingTarget.Instance != 0
-                    || candidate.RawCoordinates == null
+                    || candidate.Position == null
                     || !IsRegisteredOrNamedPeacekeeper(candidate))
                 {
                     continue;
                 }
 
-                double toPlayer = candidate.Coordinates().Distance2D(playerCoord);
-                double toHostile = candidate.Coordinates().Distance2D(hostileCoord);
+                double toPlayer = candidate.CalculatePredictedPosition().Distance2D(playerCoord);
+                double toHostile = candidate.CalculatePredictedPosition().Distance2D(hostileCoord);
                 if (toPlayer > PlayerDefenseRadiusMeters && toHostile > PlayerDefenseRadiusMeters)
                 {
                     continue;

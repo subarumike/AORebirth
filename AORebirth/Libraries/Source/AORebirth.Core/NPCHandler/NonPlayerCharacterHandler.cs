@@ -177,9 +177,8 @@ namespace AORebirth.Core.NPCHandler
 
                 Character mobCharacter = new NpcCharacter(playfield.Identity, newIdentity, controller);
                 mobCharacter.Read();
-                mobCharacter.Coordinates(coord);
+                mobCharacter.SetPose(coord, new Quaternion(heading.xf, heading.yf, heading.zf, heading.wf));
                 mobCharacter.Playfield = Pool.Instance.GetObject<IPlayfield>(Identity.None, playfieldIdentity);
-                mobCharacter.RawHeading = new Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
                 mobCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.life, (uint)mob.Health);
                 mobCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)level);
                 mobCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)mob.NPCFamily);
@@ -248,8 +247,9 @@ namespace AORebirth.Core.NPCHandler
                 Character cmob = new NpcCharacter(playfield.Identity, mobId, npccontroller);
                 cmob.Read();
                 cmob.Playfield = playfield;
-                cmob.Coordinates(new Coordinate() { x = mob.X, y = mob.Y, z = mob.Z });
-                cmob.RawHeading = new Quaternion(mob.HeadingX, mob.HeadingY, mob.HeadingZ, mob.HeadingW);
+                cmob.SetPose(
+                    new Coordinate() { x = mob.X, y = mob.Y, z = mob.Z },
+                    new Quaternion(mob.HeadingX, mob.HeadingY, mob.HeadingZ, mob.HeadingW));
                 cmob.Name = mob.Name;
                 cmob.FirstName = "";
                 cmob.LastName = "";

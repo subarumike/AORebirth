@@ -924,7 +924,7 @@ namespace ZoneEngine.Core.Missions
             if (!IsFinite(current)
                 || !entry.Envelope.Contains(current.x, current.y, current.z))
             {
-                npc.Coordinates(ToCoordinate(runtimeObject.Position));
+                npc.Position = (ToCoordinate(runtimeObject.Position)).coordinate;
             }
         }
 
@@ -1081,7 +1081,7 @@ namespace ZoneEngine.Core.Missions
                 return new Coordinate();
             }
 
-            Coordinate current = character.Coordinates();
+            Coordinate current = character.CalculatePredictedPosition();
             return CopyCoordinate(current);
         }
 

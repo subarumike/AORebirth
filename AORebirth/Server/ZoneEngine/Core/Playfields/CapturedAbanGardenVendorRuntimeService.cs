@@ -152,13 +152,13 @@ namespace ZoneEngine.Core.Playfields
         private static double DistanceSquaredXz(ICharacter character, float expectedX, float expectedZ)
         {
             Character concrete = character as Character;
-            if (concrete == null || concrete.RawCoordinates == null)
+            if (concrete == null || concrete.Position == null)
             {
                 return double.MaxValue;
             }
 
-            double dx = concrete.RawCoordinates.X - expectedX;
-            double dz = concrete.RawCoordinates.Z - expectedZ;
+            double dx = (float)concrete.Position.x - expectedX;
+            double dz = (float)concrete.Position.z - expectedZ;
             return (dx * dx) + (dz * dz);
         }
 
@@ -211,8 +211,8 @@ namespace ZoneEngine.Core.Playfields
                 Character concreteNpc = character as Character;
                 if (concreteNpc != null)
                 {
-                    vendor.RawCoordinates = concreteNpc.RawCoordinates;
-                    vendor.Heading = concreteNpc.RawHeading;
+                    vendor.Position = concreteNpc.Position;
+                    vendor.Rotation = concreteNpc.Rotation;
                 }
 
                 vendor.Playfield = playfield;

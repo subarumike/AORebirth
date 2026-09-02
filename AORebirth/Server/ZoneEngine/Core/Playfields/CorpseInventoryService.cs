@@ -28,6 +28,7 @@ namespace AORebirth.Core.Playfields
         internal MissionAcgIdentityRecord OwnerIdentity { get; set; }
         internal int PlayfieldId { get; set; }
         internal ICharacter VisualSource { get; set; }
+        internal AORebirth.Core.Vector.Coordinate Coordinate { get; set; }
         internal HashSet<Identity> VisibleRecipients { get; set; }
         internal string Name { get; set; }
         internal CombatCorpseLootClass LootClass { get; set; }

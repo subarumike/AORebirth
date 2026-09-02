@@ -107,7 +107,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("SecondInfectorDelaySeconds = 2.326367")
                 && encounter.Contains("CapturedRefillDelays = { 0.830, 0.380, 3.322, 3.490 }")
                 && encounter.Contains("CapturedReplacementInfectorOffsetX = 3.0f")
-                && encounter.Contains("boss.RawCoordinates.X + CapturedReplacementInfectorOffsetX")
+                && encounter.Contains("(float)boss.Position.x + CapturedReplacementInfectorOffsetX")
                 && encounter.Contains("slot.ActiveIdentity.Instance != 0")
                 && encounter.Contains("if (!this.abmouthDead && this.combatActive && this.abmouthIdentity.Instance != 0)"),
                 "Initial summon timing and captured live-fight refill gating must remain explicit.");

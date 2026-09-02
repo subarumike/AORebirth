@@ -387,8 +387,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(rules, "CapturedEntryX = 172.989990234375f");
             StringAssert.Contains(rules, "CapturedEntryY = 24.011247634887695f");
             StringAssert.Contains(rules, "CapturedEntryZ = 7.81494140625f");
-            StringAssert.Contains(teleportProxy, "character.RawHeading");
-            StringAssert.Contains(teleportProxy, "character.RawCoordinates");
+            StringAssert.Contains(teleportProxy, "character.Rotation");
+            StringAssert.Contains(teleportProxy, "character.Position");
             StringAssert.Contains(teleportHandler, "SendOfficialDungeonProxyTransfer");
             StringAssert.Contains(teleportHandler, "sourceDoor.Instance,");
             StringAssert.Contains(teleportHandler, "x.SgId = sgId");

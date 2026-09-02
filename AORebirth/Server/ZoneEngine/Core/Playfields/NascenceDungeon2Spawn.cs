@@ -346,8 +346,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - def.X;
-                float dz = candidate.Coordinates().z - def.Z;
+                float dx = candidate.CalculatePredictedPosition().x - def.X;
+                float dz = candidate.CalculatePredictedPosition().z - def.Z;
                 if ((dx * dx) + (dz * dz) <= SlotAliveProximityMetersSq)
                 {
                     living[slotIndex] = candidate.Identity;

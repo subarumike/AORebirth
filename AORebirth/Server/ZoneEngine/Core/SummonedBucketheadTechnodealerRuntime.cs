@@ -312,12 +312,12 @@ namespace ZoneEngine.Core
                 character.LastName = string.Empty;
 
                 Coordinate spawn = SpawnInFrontOf(owner, 1.0f);
-                character.Coordinates(spawn);
-                character.RawHeading = new Quaternion(
-                    owner.RawHeading.xf,
-                    owner.RawHeading.yf,
-                    owner.RawHeading.zf,
-                    owner.RawHeading.wf);
+                character.Position = (spawn).coordinate;
+                character.Transform.Rotation = new Quaternion(
+                    owner.Rotation.xf,
+                    owner.Rotation.yf,
+                    owner.Rotation.zf,
+                    owner.Rotation.wf);
 
                 SetStat(character, StatIds.side, (int)Side.Neutral);
                 SetStat(character, StatIds.fatness, (int)Fatness.Normal);
@@ -428,13 +428,13 @@ namespace ZoneEngine.Core
             {
                 vendor.Name = CapturedBucketheadTechnodealerContentProvider.DisplayName;
                 vendor.NpcIdentity = character.Identity;
-                Coordinate coords = character.Coordinates();
-                vendor.RawCoordinates = new AORebirth.Core.Vector.Vector3(coords.x, coords.y, coords.z);
-                vendor.Heading = new Quaternion(
-                    character.RawHeading.xf,
-                    character.RawHeading.yf,
-                    character.RawHeading.zf,
-                    character.RawHeading.wf);
+                Coordinate coords = character.CalculatePredictedPosition();
+                vendor.Position = new AORebirth.Core.Vector.Vector3(coords.x, coords.y, coords.z);
+                vendor.Rotation = new Quaternion(
+                    character.Rotation.xf,
+                    character.Rotation.yf,
+                    character.Rotation.zf,
+                    character.Rotation.wf);
                 vendor.Playfield = playfield;
 
                 // Prefer capture template stats when present (VMFU still uses capture filler).
@@ -466,10 +466,10 @@ namespace ZoneEngine.Core
 
         private static Coordinate SpawnInFrontOf(ICharacter owner, float distance)
         {
-            Coordinate coords = owner.Coordinates();
+            Coordinate coords = owner.CalculatePredictedPosition();
             // AO heading: yaw from quaternion Y/W — forward on XZ.
-            float y = owner.RawHeading.yf;
-            float w = owner.RawHeading.wf;
+            float y = owner.Rotation.yf;
+            float w = owner.Rotation.wf;
             float sin = 2f * y * w;
             float cos = 1f - (2f * y * y);
             // Capture 20260723-061619: caster→vendor ΔX≈+1 with heading Y=-0.411 W=0.912.

@@ -54,8 +54,8 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float px = (float)character.RawCoordinates.X;
-            float pz = (float)character.RawCoordinates.Z;
+            float px = (float)character.Position.x;
+            float pz = (float)character.Position.z;
             int playfieldInstance = character.Playfield.Identity.Instance;
             int characterInstance = character.Identity.Instance;
 

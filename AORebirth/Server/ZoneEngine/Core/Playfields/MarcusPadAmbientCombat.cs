@@ -481,7 +481,7 @@ namespace ZoneEngine.Core.Playfields
             robot.Stats[StatIds.flags].BaseValue = (uint)RobotCharacterFlags;
             robot.Stats[StatIds.visualflags].Value = 31;
             robot.Stats[StatIds.visualflags].BaseValue = 31u;
-            robot.Coordinates(new Coordinate { x = RobotX, y = RobotY, z = RobotZ });
+            robot.Position = (new Coordinate { x = RobotX, y = RobotY, z = RobotZ }).coordinate;
             robot.DoNotDoTimers = false;
             activateNpc(robot);
             playfield.AnnounceSpawnedCharacterVisibility(robot, Identity.None);

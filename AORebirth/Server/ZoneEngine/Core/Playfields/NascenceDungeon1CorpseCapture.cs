@@ -190,9 +190,9 @@ namespace AORebirth.Core.Playfields
             WriteInt32(buffer, ServerIdOffset, serverId);
             WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
             WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
-            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
-            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
-            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteSingle(buffer, PositionXOffset, (float)deadNpc.Position.x);
+            WriteSingle(buffer, PositionYOffset, (float)deadNpc.Position.y);
+            WriteSingle(buffer, PositionZOffset, (float)deadNpc.Position.z);
             WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
             WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);
             WriteInt32(buffer, SexOffset, deadNpc.Stats[StatIds.sex].Value);

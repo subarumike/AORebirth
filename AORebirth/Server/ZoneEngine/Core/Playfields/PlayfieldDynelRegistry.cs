@@ -191,22 +191,22 @@ namespace ZoneEngine.Core.Playfields
                 return result.AsReadOnly();
             }
 
-            if (dynel.RawCoordinates == null)
+            if (dynel.Position == null)
             {
                 return result.AsReadOnly();
             }
 
-            Coordinate coord = dynel.Coordinates();
+            Coordinate coord = new AORebirth.Core.Vector.Coordinate(dynel.Position);
             foreach (IDynel entity in this.DynelsSnapshot())
             {
                 if (entity == dynel
                     || entity.Identity.Type != IdentityType.CanbeAffected
-                    || entity.RawCoordinates == null)
+                    || entity.Position == null)
                 {
                     continue;
                 }
 
-                if (entity.Coordinates().Distance2D(coord) <= range)
+                if (new AORebirth.Core.Vector.Coordinate(entity.Position).Distance2D(coord) <= range)
                 {
                     result.Add(entity);
                 }
@@ -221,12 +221,12 @@ namespace ZoneEngine.Core.Playfields
             // Characters() already refreshed; re-entering RefreshFromPool mid-tick clears
             // the registry under sync and has frozen PF 4310 outdoor packs.
             var result = new List<ICharacter>();
-            if (dynel == null || dynel.RawCoordinates == null)
+            if (dynel == null || dynel.Position == null)
             {
                 return result.AsReadOnly();
             }
 
-            Coordinate coord = dynel.Coordinates();
+            Coordinate coord = new AORebirth.Core.Vector.Coordinate(dynel.Position);
             List<ICharacter> snapshot;
             lock (this.sync)
             {
@@ -237,12 +237,12 @@ namespace ZoneEngine.Core.Playfields
             {
                 if (entity == dynel
                     || entity.Identity.Type != IdentityType.CanbeAffected
-                    || entity.RawCoordinates == null)
+                    || entity.Position == null)
                 {
                     continue;
                 }
 
-                if (entity.Coordinates().Distance2D(coord) <= range)
+                if (entity.CalculatePredictedPosition().Distance2D(coord) <= range)
                 {
                     result.Add(entity);
                 }
@@ -257,6 +257,15 @@ namespace ZoneEngine.Core.Playfields
             lock (this.sync)
             {
                 return this.characters.Values.ToList().AsReadOnly();
+            }
+        }
+
+        internal ReadOnlyCollection<IDynel> Dynels()
+        {
+            this.RefreshFromPool();
+            lock (this.sync)
+            {
+                return this.dynels.Values.ToList().AsReadOnly();
             }
         }
 

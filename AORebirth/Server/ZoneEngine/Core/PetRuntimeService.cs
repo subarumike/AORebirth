@@ -197,7 +197,7 @@ namespace ZoneEngine.Core
                 mobHash,
                 owner.Playfield.Identity,
                 spawnCoord,
-                owner.RawHeading,
+                owner.Rotation,
                 controller,
                 spawnLevel);
 
@@ -357,7 +357,7 @@ namespace ZoneEngine.Core
 
                 this.SendPetCombatStatSyncToOwner(ownerClient, petCharacter, petSlotStrain);
 
-                Coordinate petCoord = petCharacter.Coordinates();
+                Coordinate petCoord = petCharacter.CalculatePredictedPosition();
                 ownerClient.SendCompressed(
                     new SetPosMessage
                     {
@@ -973,7 +973,7 @@ namespace ZoneEngine.Core
 
         private Coordinate ResolvePetSpawnCoordinate(ICharacter owner, int petSlotStrain)
         {
-            Coordinate ownerCoord = owner.Coordinates();
+            Coordinate ownerCoord = owner.CalculatePredictedPosition();
             if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain))
             {
                 return new Coordinate(

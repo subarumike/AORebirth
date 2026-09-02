@@ -103,9 +103,9 @@ namespace ZoneEngine.Core.Playfields
                 activeRecipients.Add(recipientId);
                 TempleDoorTransition[] transitions = this.proximityRuntime.Evaluate(
                     recipientId,
-                    character.RawCoordinates.X,
-                    character.RawCoordinates.Y,
-                    character.RawCoordinates.Z,
+                    (float)character.Position.x,
+                    (float)character.Position.y,
+                    (float)character.Position.z,
                     nowUtc,
                     this.doors);
                 foreach (TempleDoorTransition transition in transitions)

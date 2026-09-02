@@ -158,7 +158,7 @@ Filter will be applied to mob name"));
 
         public void SpawnRandomMob(ICharacter character)
         {
-            Coordinate coord = character.Coordinates();
+            Coordinate coord = character.CalculatePredictedPosition();
 
             DBMobTemplate[] templates = MobTemplateDao.Instance.GetAll().ToArray();
             Random rnd = new Random(Environment.TickCount);
@@ -170,8 +170,8 @@ Filter will be applied to mob name"));
             Character mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                 template.Hash,
                 character.Playfield.Identity,
-                character.Coordinates(),
-                character.RawHeading,
+                character.CalculatePredictedPosition(),
+                character.Rotation,
                 npcController);
             mobCharacter.Playfield = character.Playfield;
             Playfield spawnPlayfield = mobCharacter.Playfield as Playfield;
@@ -289,8 +289,8 @@ Filter will be applied to mob name"));
                     mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                         args[1],
                         character.Playfield.Identity,
-                        character.Coordinates(),
-                        character.RawHeading,
+                        character.CalculatePredictedPosition(),
+                        character.Rotation,
                         npcController,
                         int.Parse(args[2]));
                 }
@@ -300,8 +300,8 @@ Filter will be applied to mob name"));
                     mobCharacter = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                         templateHash,
                         character.Playfield.Identity,
-                        character.Coordinates(),
-                        character.RawHeading,
+                        character.CalculatePredictedPosition(),
+                        character.Rotation,
                         npcController);
                 }
                 if (mobCharacter != null)
@@ -398,7 +398,7 @@ Filter will be applied to mob name"));
             //character.Playfield.Teleport(
             //    (Character)character,
             //    coord,
-            //    character.Heading,
+            //    character.Rotation,
             //    new Identity() { Type = IdentityType.Playfield, Instance = pf });
         }
 
@@ -653,7 +653,7 @@ Filter will be applied to mob name"));
             float xOffset,
             float zOffset)
         {
-            Coordinate spawnCoordinate = new Coordinate(character.Coordinates());
+            Coordinate spawnCoordinate = new Coordinate(character.CalculatePredictedPosition());
             spawnCoordinate.x += xOffset;
             spawnCoordinate.z += zOffset;
 
@@ -662,7 +662,7 @@ Filter will be applied to mob name"));
                 entry.TemplateHash,
                 character.Playfield.Identity,
                 spawnCoordinate,
-                character.RawHeading,
+                character.Rotation,
                 npcController,
                 entry.Level);
 
@@ -693,9 +693,9 @@ Filter will be applied to mob name"));
                     mobCharacter.Name,
                     mobCharacter.Identity.ToString(true),
                     character.Playfield.Identity.ToString(true),
-                    mobCharacter.RawCoordinates.X,
-                    mobCharacter.RawCoordinates.Y,
-                    mobCharacter.RawCoordinates.Z,
+                    (float)mobCharacter.Position.x,
+                    (float)mobCharacter.Position.y,
+                    (float)mobCharacter.Position.z,
                     mobCharacter.Stats[StatIds.health].Value,
                     mobCharacter.Stats[StatIds.life].Value,
                     mobCharacter.Stats[StatIds.monsterdata].Value,

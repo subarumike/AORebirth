@@ -389,7 +389,7 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            Coordinate pos = character.Coordinates();
+            Coordinate pos = character.CalculatePredictedPosition();
             return pos.coordinate.x >= FrontierSpinetoothDeferredMinX
                    && pos.coordinate.z >= FrontierSpinetoothDeferredMinZ
                    && pos.coordinate.z <= FrontierSpinetoothDeferredMaxZ;
@@ -548,7 +548,8 @@ namespace AORebirth.Core.Playfields
                     LogUtil.Debug(
                         DebugInfoDetail.Error,
                         "NascenceLifeSpawn deferred SpawnOne threw npc=" + def.Name
-                        + " ex=" + ex.GetType().Name + ": " + ex.Message);
+                        + " ex=" + ex.GetType().Name + ": " + ex.Message
+                        + " stack=" + ex.StackTrace);
                 }
             }
 
@@ -1292,8 +1293,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - def.X;
-                float dz = candidate.Coordinates().z - def.Z;
+                float dx = candidate.CalculatePredictedPosition().x - def.X;
+                float dz = candidate.CalculatePredictedPosition().z - def.Z;
                 if ((dx * dx) + (dz * dz) <= SoftRespawnAliveProximityMetersSq)
                 {
                     return true;
@@ -1376,8 +1377,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - def.X;
-                float dz = candidate.Coordinates().z - def.Z;
+                float dx = candidate.CalculatePredictedPosition().x - def.X;
+                float dz = candidate.CalculatePredictedPosition().z - def.Z;
                 if ((dx * dx) + (dz * dz) <= SoftRespawnAliveProximityMetersSq)
                 {
                     return true;
@@ -1681,8 +1682,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - def.X;
-                float dz = candidate.Coordinates().z - def.Z;
+                float dx = candidate.CalculatePredictedPosition().x - def.X;
+                float dz = candidate.CalculatePredictedPosition().z - def.Z;
                 if ((dx * dx) + (dz * dz) <= proximitySq)
                 {
                     return true;
@@ -1886,8 +1887,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - def.X;
-                float dz = candidate.Coordinates().z - def.Z;
+                float dx = candidate.CalculatePredictedPosition().x - def.X;
+                float dz = candidate.CalculatePredictedPosition().z - def.Z;
                 if ((dx * dx) + (dz * dz) <= SoftRespawnAliveProximityMetersSq)
                 {
                     return true;
@@ -11939,7 +11940,8 @@ namespace AORebirth.Core.Playfields
                     LogUtil.Debug(
                         DebugInfoDetail.Error,
                         "NascenceLifeSpawn SpawnOne threw npc=" + def.Name
-                        + " ex=" + ex.GetType().Name + ": " + ex.Message);
+                        + " ex=" + ex.GetType().Name + ": " + ex.Message
+                        + " stack=" + ex.StackTrace);
                 }
             }
 

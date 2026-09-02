@@ -616,9 +616,9 @@ namespace AORebirth.Core.Playfields
                             "Statel collision firing character={0} playfield={1} coords={2:F1},{3:F1},{4:F1} statel={5} event={6}",
                             dynel.Identity.ToString(true),
                             dynel.Playfield.Identity.Instance,
-                            dynel.RawCoordinates.X,
-                            dynel.RawCoordinates.Y,
-                            dynel.RawCoordinates.Z,
+                            (float)dynel.Position.x,
+                            (float)dynel.Position.y,
+                            (float)dynel.Position.z,
                             sd.Identity.ToString(true),
                             ev.EventType));
                     ev.Perform(dynel, sd);
@@ -658,10 +658,10 @@ namespace AORebirth.Core.Playfields
 
         private static bool IsInStatelCollisionRange(StatelData sd, ICharacter dynel)
         {
-            float dx = sd.X - dynel.RawCoordinates.X;
-            float dz = sd.Z - dynel.RawCoordinates.Z;
+            float dx = (float)(sd.X - (float)dynel.Position.x);
+            float dz = (float)(sd.Z - (float)dynel.Position.z);
             float horizontalDistance = (float)Math.Sqrt((dx * dx) + (dz * dz));
-            float verticalDistance = Math.Abs(sd.Y - dynel.RawCoordinates.Y);
+            float verticalDistance = Math.Abs(sd.Y - (float)dynel.Position.y);
 
             return horizontalDistance < 2.0f && verticalDistance <= 6.0f;
         }
@@ -716,9 +716,9 @@ namespace AORebirth.Core.Playfields
                 MissionAcgBindingRuntime.HasOwnedExteriorMarker(
                     character.Identity.Instance,
                     playfieldIdentity.Instance,
-                    character.RawCoordinates.X,
-                    character.RawCoordinates.Y,
-                    character.RawCoordinates.Z,
+                    (float)character.Position.x,
+                    (float)character.Position.y,
+                    (float)character.Position.z,
                     8.0,
                     12.0)
                 || MissionInstanceService.HasGeneratedAcceptedExteriorClaim(
@@ -731,9 +731,9 @@ namespace AORebirth.Core.Playfields
                 return generatedExteriorClaim;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             int currentPf = playfieldIdentity.Instance;
 
             bool near = false;
@@ -882,9 +882,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double dx = sourceX - doorX;
             double dz = sourceZ - doorZ;
             double horizontalSq = (dx * dx) + (dz * dz);
@@ -946,9 +946,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - CapturedSubwayEntrySourceX;
             double deltaZ = sourceZ - CapturedSubwayEntrySourceZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1031,9 +1031,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - CapturedHoloDeckEntrySourceX;
             double deltaZ = sourceZ - CapturedHoloDeckEntrySourceZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1113,9 +1113,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - CapturedHoloDeckExitSourceX;
             double deltaZ = sourceZ - CapturedHoloDeckExitSourceZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1238,9 +1238,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon1Rules.EntryTriggerX;
             double deltaZ = sourceZ - NascenceDungeon1Rules.EntryTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1322,9 +1322,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon2Rules.EntryTriggerX;
             double deltaZ = sourceZ - NascenceDungeon2Rules.EntryTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1406,9 +1406,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon1Rules.ExitTriggerX;
             double deltaZ = sourceZ - NascenceDungeon1Rules.ExitTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1488,9 +1488,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon2Rules.ExitTriggerX;
             double deltaZ = sourceZ - NascenceDungeon2Rules.ExitTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1570,9 +1570,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon3Rules.EntryTriggerX;
             double deltaZ = sourceZ - NascenceDungeon3Rules.EntryTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1654,9 +1654,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon3Rules.ExitTriggerX;
             double deltaZ = sourceZ - NascenceDungeon3Rules.ExitTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1736,9 +1736,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon4Rules.EntryTriggerX;
             double deltaZ = sourceZ - NascenceDungeon4Rules.EntryTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1820,9 +1820,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - NascenceDungeon4Rules.ExitTriggerX;
             double deltaZ = sourceZ - NascenceDungeon4Rules.ExitTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -1939,9 +1939,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float x = character.RawCoordinates.X;
-            float y = character.RawCoordinates.Y;
-            float z = character.RawCoordinates.Z;
+            float x = (float)character.Position.x;
+            float y = (float)character.Position.y;
+            float z = (float)character.Position.z;
 
             bool swimSignal = character.MoveMode == MoveModes.Swim
                 || moveType == 26;
@@ -1996,9 +1996,9 @@ namespace AORebirth.Core.Playfields
                     "Nascense->Jobe swim teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) via={9} evidence=20260821-191836+20260830-110744",
                     character.Identity.ToString(true),
                     sourcePlayfieldId,
-                    character.RawCoordinates.X,
-                    character.RawCoordinates.Y,
-                    character.RawCoordinates.Z,
+                    (float)character.Position.x,
+                    (float)character.Position.y,
+                    (float)character.Position.z,
                     CapturedNascenseJobeDestinationPlayfieldId,
                     destination.x,
                     destination.y,
@@ -2027,9 +2027,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             bool inDoorTrigger = false;
             foreach (float[] spot in LuxuryApartmentSunriseRules.OrbitalApartmentDoorProximitySpots)
             {
@@ -2103,9 +2103,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - LuxuryApartmentSunriseRules.ApartmentExitTriggerX;
             double deltaZ = sourceZ - LuxuryApartmentSunriseRules.ApartmentExitTriggerZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -2192,9 +2192,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - LuxuryApartmentSunriseRules.LobbyEntrySourceX;
             double deltaZ = sourceZ - LuxuryApartmentSunriseRules.LobbyEntrySourceZ;
             double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -2282,9 +2282,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - CapturedMontroyalEntrySourceX;
             double deltaZ = sourceZ - CapturedMontroyalEntrySourceZ;
             double horizontalDistanceSquared = deltaX * deltaX + deltaZ * deltaZ;
@@ -2348,9 +2348,9 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            float sourceX = character.RawCoordinates.X;
-            float sourceY = character.RawCoordinates.Y;
-            float sourceZ = character.RawCoordinates.Z;
+            float sourceX = (float)character.Position.x;
+            float sourceY = (float)character.Position.y;
+            float sourceZ = (float)character.Position.z;
             double deltaX = sourceX - UserConfirmedMontroyalExitSourceX;
             double deltaZ = sourceZ - UserConfirmedMontroyalExitSourceZ;
             double horizontalDistanceSquared = deltaX * deltaX + deltaZ * deltaZ;

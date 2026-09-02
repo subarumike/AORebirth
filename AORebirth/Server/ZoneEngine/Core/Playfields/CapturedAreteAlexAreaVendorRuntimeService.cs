@@ -141,8 +141,8 @@ namespace ZoneEngine.Core.Playfields
                 vendor = new Vendor(playfieldIdentity, identity, templateId);
                 vendor.Name = definition.DisplayName;
                 vendor.NpcIdentity = Identity.None;
-                vendor.RawCoordinates = new Vector3(definition.X, definition.Y, definition.Z);
-                vendor.Heading = new Quaternion(
+                vendor.Position = new Vector3(definition.X, definition.Y, definition.Z);
+                vendor.Rotation = new Quaternion(
                     definition.HeadingX,
                     definition.HeadingY,
                     definition.HeadingZ,

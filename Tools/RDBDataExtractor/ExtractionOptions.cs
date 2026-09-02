@@ -5,7 +5,7 @@ namespace AORebirth.Tools.RDBDataExtractor
 
     using CommandLine;
 
-    [Verb("extract", isDefault: true, HelpText = "Export RDB tilemaps to GameData/Playfields.")]
+    [Verb("extract", isDefault: true, HelpText = "Export RDB playfield tilemaps and districts to GameData/Playfields.")]
     internal sealed class ExtractionOptions
     {
         [Option(
@@ -18,13 +18,13 @@ namespace AORebirth.Tools.RDBDataExtractor
             HelpText = "Output root. Defaults to AORebirth/GameData/Playfields under the repo root.")]
         public string OutputDirectory { get; set; }
 
-        [Option("tilemap-id", HelpText = "Export one tilemap resource id.")]
+        [Option("tilemap-id", HelpText = "Export one playfield resource id (tilemap and/or district).")]
         public int? TilemapId { get; set; }
 
         [Option(
-            "skip-existing",
-            HelpText = "Skip tilemaps that already have metadata and a height image.")]
-        public bool SkipExisting { get; set; }
+            "overwrite",
+            HelpText = "Replace existing output files. By default each existing file is skipped.")]
+        public bool Overwrite { get; set; }
 
         [Option("self-test", HelpText = "Run built-in exporter self tests.")]
         public bool SelfTest { get; set; }
@@ -68,7 +68,7 @@ namespace AORebirth.Tools.RDBDataExtractor
                 AoClientPath = Path.GetFullPath(aoClientPath.Trim()),
                 OutputDirectory = Path.GetFullPath(outputDirectory.Trim()),
                 TilemapId = options.TilemapId,
-                SkipExisting = options.SkipExisting,
+                Overwrite = options.Overwrite,
                 SelfTest = false,
             };
         }

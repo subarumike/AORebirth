@@ -257,7 +257,7 @@ namespace ZoneEngine.Core
             int ownerInstance = owner.Identity.Instance;
             int petInstance = petCharacter.Identity.Instance;
             int playfieldId = owner.Playfield.Identity.Instance;
-            Coordinate petCoord = petCharacter.Coordinates();
+            Coordinate petCoord = petCharacter.CalculatePredictedPosition();
 
             EnqueueScfuForRebirth(
                 ownerClient,
@@ -285,7 +285,7 @@ namespace ZoneEngine.Core
             int ownerInstance = owner.Identity.Instance;
             int petInstance = petCharacter.Identity.Instance;
             int playfieldId = owner.Playfield.Identity.Instance;
-            Coordinate petCoord = petCharacter.Coordinates();
+            Coordinate petCoord = petCharacter.CalculatePredictedPosition();
 
             EnqueueScfuForRebirth(
                 ownerClient,
@@ -338,7 +338,7 @@ namespace ZoneEngine.Core
 
             int ownerInstance = owner.Identity.Instance;
             int petInstance = petCharacter.Identity.Instance;
-            Coordinate petCoord = petCharacter.Coordinates();
+            Coordinate petCoord = petCharacter.CalculatePredictedPosition();
 
             EnqueueScfuMinimal(ownerClient, ownerInstance, petInstance);
             EnqueueStatPetmaster(ownerClient, ownerInstance, petInstance);
@@ -411,7 +411,7 @@ namespace ZoneEngine.Core
 
             int playfieldId = owner.Playfield.Identity.Instance;
 
-            Coordinate petCoord = petCharacter.Coordinates();
+            Coordinate petCoord = petCharacter.CalculatePredictedPosition();
 
 
 
