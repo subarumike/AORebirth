@@ -1,0 +1,265 @@
+{
+  "baseline": "LEVEL_7_MISSION_QL_SPECTRUM_V2",
+  "by_mission_ql": [
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 4,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 755,
+      "unique_item_pairs": 755,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 5,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 763,
+      "unique_item_pairs": 763,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 6,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 758,
+      "unique_item_pairs": 758,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 7,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 788,
+      "unique_item_pairs": 788,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 8,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 801,
+      "unique_item_pairs": 801,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 9,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 785,
+      "unique_item_pairs": 785,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 10,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 802,
+      "unique_item_pairs": 802,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 2,
+      "maximum_observed_item_ql": 30,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 12,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 807,
+      "unique_item_pairs": 807,
+      "verified_requests": 250
+    }
+  ],
+  "character_identity_instance": 37165191,
+  "character_level": 7,
+  "difficulty_position_to_actual_mission_ql": [
+    {
+      "actual_mission_ql": 4,
+      "difficulty_position": 1
+    },
+    {
+      "actual_mission_ql": 5,
+      "difficulty_position": 2
+    },
+    {
+      "actual_mission_ql": 5,
+      "difficulty_position": 3
+    },
+    {
+      "actual_mission_ql": 5,
+      "difficulty_position": 4
+    },
+    {
+      "actual_mission_ql": 6,
+      "difficulty_position": 5
+    },
+    {
+      "actual_mission_ql": 7,
+      "difficulty_position": 6
+    },
+    {
+      "actual_mission_ql": 7,
+      "difficulty_position": 7
+    },
+    {
+      "actual_mission_ql": 8,
+      "difficulty_position": 8
+    },
+    {
+      "actual_mission_ql": 9,
+      "difficulty_position": 9
+    },
+    {
+      "actual_mission_ql": 10,
+      "difficulty_position": 10
+    },
+    {
+      "actual_mission_ql": 12,
+      "difficulty_position": 11
+    }
+  ],
+  "field_coverage": {
+    "credits": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "description": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "mission_destination": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "mission_icon": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "mission_items": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "mission_type": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "title": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "unknown_fields": {
+      "offers": 10000,
+      "present": 10000
+    },
+    "xp_reward": {
+      "offers": 10000,
+      "present": 10000
+    }
+  },
+  "input_files": [
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\campaigns\\MISSION_QL_SPECTRUM_V2\\level-007-character-37165191\\progress.jsonl",
+      "sha256": "a3f3c36c5d0d16d663e65eefa297f5802066f593a09848154cf217fec7debf10"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T082908255Z-37165191-c3e4f4b4\\events.jsonl",
+      "sha256": "28d81c6c67e2ce04bd0d1f79e31d2f830498c8f02445f395556e71e6ba48bb51"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T083013056Z-37165191-19266cac\\events.jsonl",
+      "sha256": "67327b9446f0085ee0c6f5199fbc5713455c29e685b4cc5e5195b9a03674c31d"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\analysis\\level7-spectrum-baseline\\mission-20260902T082908255Z-37165191-c3e4f4b4\\mission_offer.jsonl",
+      "sha256": "8b5f90607d46291292169caae89f0f20eab3ab576ea930248e6e93199f1b2a1b"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\analysis\\level7-spectrum-baseline\\mission-20260902T083013056Z-37165191-19266cac\\mission_offer.jsonl",
+      "sha256": "03424f31065e3e83234011a7985b662a1b4726db11edf8da01016d236c954d60"
+    }
+  ],
+  "not_proven_by_this_baseline": [
+    "complete item-pool membership or exclusions",
+    "server probability weights",
+    "item-family interpolation or every valid item QL",
+    "separately typed objective-item identity because AOSharp does not expose one here",
+    "mission interior layout, enemies, or semantic-slider effects"
+  ],
+  "schema_version": 1,
+  "sessions": [
+    {
+      "harvester_version": "1.6.1.0",
+      "session_id": "mission-20260902T082908255Z-37165191-c3e4f4b4",
+      "started_at_utc": "2026-09-02T08:29:08.2608420Z",
+      "stop_reason": "plugin_teardown",
+      "stopped_at_utc": "2026-09-02T08:29:21.9148710Z",
+      "verified_completions_used": 7
+    },
+    {
+      "harvester_version": "1.6.1.0",
+      "session_id": "mission-20260902T083013056Z-37165191-19266cac",
+      "started_at_utc": "2026-09-02T08:30:13.0636763Z",
+      "stop_reason": "character_campaign_completed",
+      "stopped_at_utc": "2026-09-02T09:37:10.1455621Z",
+      "verified_completions_used": 1993
+    }
+  ],
+  "totals": {
+    "five_offer_cohorts": 2000,
+    "observed_item_references": 10000,
+    "offers": 10000,
+    "unique_descriptions": 8211,
+    "unique_exact_item_descriptors": 5269,
+    "unique_inbound_packet_hashes": 2000,
+    "unique_item_pairs": 2704,
+    "unique_mission_identities": 10000,
+    "unique_outbound_packet_hashes": 11,
+    "unique_titles": 163,
+    "verified_completed_requests": 2000
+  },
+  "useful_for": [
+    "candidate mission-item observations by roller level and actual mission QL",
+    "observed item QL values without requiring every database-supported interpolation",
+    "mission-type, credits, XP, text, and destination distributions",
+    "comparison with overlapping mission QLs captured by other roller levels",
+    "replay and parser validation through exact request/response packet provenance"
+  ],
+  "validation": {
+    "all_cohorts_have_five_offers": true,
+    "all_completion_markers_verified": true,
+    "all_raw_hash_links_match": true,
+    "all_requests_have_exact_inbound_raw_evidence": true,
+    "all_requests_have_exact_outbound_raw_evidence": true,
+    "all_response_ql_candidates_match_completion_records": true,
+    "all_secondary_sliders_centered": true,
+    "completion_markers_unique": true
+  }
+}

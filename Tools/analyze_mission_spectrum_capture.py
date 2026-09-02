@@ -56,6 +56,9 @@ def main() -> int:
     completions: dict[str, dict[str, object]] = {}
     mappings: dict[int, int] = {}
     completion_ids: set[str] = set()
+    character_level: int | None = None
+    character_identity_instance: int | None = None
+    campaign_name: str | None = None
     for line_number, event in read_jsonl(progress_path):
         event_type = event.get("event_type")
         payload = event.get("payload", {})
@@ -75,6 +78,19 @@ def main() -> int:
             raise SystemExit(f"unverified completion at progress line {line_number}")
         if int(payload["offer_count"]) != 5:
             raise SystemExit(f"non-five-offer completion at progress line {line_number}")
+        completed_level = int(payload["character_level"])
+        completed_identity = int(payload["character_identity_instance"])
+        completed_campaign = str(payload["campaign_name"])
+        if character_level is None:
+            character_level = completed_level
+            character_identity_instance = completed_identity
+            campaign_name = completed_campaign
+        elif (
+            completed_level != character_level
+            or completed_identity != character_identity_instance
+            or completed_campaign != campaign_name
+        ):
+            raise SystemExit(f"mixed character or campaign completion at progress line {line_number}")
         completions[request_id] = {"session_id": str(event["session_id"]), **payload}
         completion_ids.add(completion_id)
 
@@ -263,9 +279,9 @@ def main() -> int:
     total_offers = sum(by_ql_offers.values())
     summary = {
         "schema_version": 1,
-        "baseline": "LEVEL_2_MISSION_QL_SPECTRUM_V2",
-        "character_level": 2,
-        "character_identity_instance": 36962762,
+        "baseline": f"LEVEL_{character_level}_{campaign_name}",
+        "character_level": character_level,
+        "character_identity_instance": character_identity_instance,
         "input_files": input_files,
         "sessions": session_summaries,
         "difficulty_position_to_actual_mission_ql": [
