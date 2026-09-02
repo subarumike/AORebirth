@@ -106,6 +106,8 @@
       <Link>Properties\SolutionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Connector.cs" />
+    <Compile Include="DatabaseDaoFactory.cs" />
+    <Compile Include="Domain\Missions\MySqlMissionDao.cs" />
     <Compile Include="Dao\CharacterOnlineOwnershipGuard.cs" />
     <Compile Include="Dao\CharacterDao.cs" />
     <Compile Include="Dao\NewCharacterStartAreaSelectionDao.cs" />

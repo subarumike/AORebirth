@@ -39,6 +39,7 @@ namespace LoginEngine.Packets
 
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
+    using AORebirth.Interfaces.Persistence.Missions;
 
     using LoginEngine.CharacterCreation;
 
@@ -63,6 +64,8 @@ namespace LoginEngine.Packets
         /// <summary>
         /// </summary>
         private static string optionalOrdEnd = "nmrlstyzx"; /* 9 chars */
+
+        private static IMissionDao missionDao;
 
         #endregion
 
@@ -115,6 +118,16 @@ namespace LoginEngine.Packets
         #endregion
 
         #region Public Methods and Operators
+
+        public static void InitializeMissionPersistence(IMissionDao dao)
+        {
+            if (dao == null)
+            {
+                throw new ArgumentNullException("dao");
+            }
+
+            missionDao = dao;
+        }
 
         /// <summary>
         /// </summary>
@@ -256,7 +269,13 @@ namespace LoginEngine.Packets
 
                 if (!startInSL)
                 {
-                    NewCharacterStartAreaSelectionDao.MarkPending(charid);
+                    if (missionDao == null)
+                    {
+                        throw new InvalidOperationException(
+                            "New-character mission persistence has not been initialized.");
+                    }
+
+                    missionDao.MarkStartAreaSelectionPending(charid);
                 }
             }
         }

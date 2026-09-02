@@ -6,8 +6,7 @@ namespace ZoneEngine.Core.Missions
     using System.Collections.Generic;
     using System.Linq;
 
-    using AORebirth.Database.Dao;
-    using AORebirth.Database.Entities;
+    using AORebirth.Interfaces.Persistence.Missions;
 
     using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Arete.Quests;
@@ -46,6 +45,7 @@ namespace ZoneEngine.Core.Missions
         private static readonly object SyncRoot = new object();
 
         private static IMissionRepository repository;
+        private static IMissionDao missionDao;
         private static PersistentMissionService service;
         private static MissionRewardCoordinator rewards;
 
@@ -92,12 +92,25 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        public static void Initialize(AreteFrameworkRegistries registries)
+        public static void Initialize(AreteFrameworkRegistries registries, IMissionDao dao)
         {
-            Initialize(registries, new MySqlMissionRepository());
+            if (dao == null)
+            {
+                throw new ArgumentNullException("dao");
+            }
+
+            Initialize(registries, new MissionDaoRepositoryAdapter(dao), dao);
         }
 
         public static void Initialize(AreteFrameworkRegistries registries, IMissionRepository missionRepository)
+        {
+            Initialize(registries, missionRepository, null);
+        }
+
+        private static void Initialize(
+            AreteFrameworkRegistries registries,
+            IMissionRepository missionRepository,
+            IMissionDao dao)
         {
             if (registries == null || !registries.IsValid)
             {
@@ -116,6 +129,7 @@ namespace ZoneEngine.Core.Missions
             lock (SyncRoot)
             {
                 repository = missionRepository;
+                missionDao = dao;
                 service = initializedService;
                 rewards = initializedRewards;
             }
@@ -128,10 +142,13 @@ namespace ZoneEngine.Core.Missions
                 return null;
             }
 
-            DBCharacter character = CharacterDao.Instance.Get(characterId);
-            return character == null || string.IsNullOrWhiteSpace(character.Username)
-                       ? null
-                       : character.Username.Trim();
+            IMissionDao dao;
+            lock (SyncRoot)
+            {
+                dao = missionDao;
+            }
+
+            return dao == null ? null : dao.ResolveCharacterAccountKey(characterId);
         }
 
         public static MissionReloadResult ReloadForLogin(int characterId)

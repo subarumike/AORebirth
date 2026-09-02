@@ -389,3 +389,28 @@ USEFUL_CURRENT_DATABASE_TEST_PROJECTS=0
 IMPLEMENTATION_STARTED=NO
 ```
 
+## 13. Post-audit implementation checkpoint (2026-09-01)
+
+The completed audit above remains the historical pre-implementation snapshot.
+Phase 1 infrastructure and the Phase 2 mission-persistence slice now implement
+the recommended dependency direction:
+
+```text
+Mission runtime and services
+        -> IMissionDao
+        -> MySqlMissionDao
+        -> existing Connector
+```
+
+The production mission repository SQL, generated roll-fee SQL, start-area flag
+operations, and MissionRuntime account-key lookup now cross the DAO contract.
+The existing domain service contract is preserved by an explicit Zone adapter.
+The deterministic architecture guard retains five reviewed legacy runtime SQL
+sites outside the mission slice and reports zero direct mission runtime SQL
+sites. Character deletion retains its existing cross-owner mission-table cleanup
+inside the character aggregate transaction pending the later character phase.
+
+No schema, packet, mission definition, reward, or gameplay changes are part of
+this slice. The provider remains the existing MySQL-specific Connector; provider
+parity is an unchanged limitation. Disposable MySQL and governed exact-SHA
+acceptance remain validation gates, not permission to use production data.

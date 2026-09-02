@@ -179,7 +179,8 @@
     <Compile Include="Core\Missions\MissionDefinitionCatalog.cs" />
     <Compile Include="Core\Missions\DailyMissionRewardRules.cs" />
     <Compile Include="Core\Missions\MissionRewardCoordinator.cs" />
-    <Compile Include="Core\Missions\MySqlMissionRepository.cs" />
+    <Compile Include="Core\Missions\MissionDaoRepositoryAdapter.cs" />
+    <Compile Include="Core\Missions\MissionDataMapper.cs" />
     <Compile Include="Core\Missions\PersistentMissionService.cs" />
     <Compile Include="Core\Missions\MissionRuntime.cs" />
     <Compile Include="Core\Subway\Quests\TotwGatewayInteractionHandler.cs" />

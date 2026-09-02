@@ -131,6 +131,10 @@
       <Project>{63d6c409-58eb-4033-87e0-e0dda6594075}</Project>
       <Name>AORebirth.Database</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Interfaces\AORebirth.Interfaces.csproj">
+      <Project>{d53f0612-fefe-4eaf-80aa-480f25c8dd76}</Project>
+      <Name>AORebirth.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\Source\Translations\Translations.csproj">
       <Project>{4bbd60c6-aed0-4347-b4ca-a262d3474826}</Project>
       <Name>Translations</Name>

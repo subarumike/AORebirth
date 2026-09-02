@@ -440,7 +440,10 @@ namespace ZoneEngine
             {
                 AreteFrameworkRegistries contentRegistries =
                     AreteFrameworkBootstrap.InitializeCheckedInContent();
-                MissionRuntime.Initialize(contentRegistries);
+                var missionDao = DatabaseDaoFactory.CreateMissionDao();
+                MissionRuntime.Initialize(contentRegistries, missionDao);
+                MissionRollFeeService.Initialize(missionDao);
+                NewCharacterStartAreaSelectionRuntime.Initialize(missionDao);
                 MissionAcgBindingRuntime.Initialize();
             }
             catch (Exception exception)

@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
     <Compile Include="NewCharacterStartAreaSelectionContractTests.cs" />
+    <Compile Include="MissionDaoArchitectureTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="LoginSessionHydrationSafetyContractTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
@@ -510,6 +511,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDefinitionCatalog.cs"><Link>MissionDefinitionCatalog.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\IMissionRepository.cs"><Link>IMissionRepository.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\InMemoryMissionRepository.cs"><Link>InMemoryMissionRepository.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDataMapper.cs"><Link>MissionDataMapper.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDaoRepositoryAdapter.cs"><Link>MissionDaoRepositoryAdapter.cs</Link></Compile>
+    <Compile Include="..\..\..\..\AORebirth.Interfaces\Persistence\Missions\IMissionDao.cs"><Link>IMissionDao.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\PersistentMissionService.cs"><Link>PersistentMissionService.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\RexB18CFeedbackPolicy.cs"><Link>RexB18CFeedbackPolicy.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcContent.cs"><Link>WindcallerKarrecNpcContent.cs</Link></Compile>
