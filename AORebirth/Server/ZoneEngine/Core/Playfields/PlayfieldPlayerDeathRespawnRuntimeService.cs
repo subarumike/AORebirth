@@ -54,12 +54,12 @@ namespace ZoneEngine.Core.Playfields
             logRespawnRequested(character, corpseIdentity, destinationPlayfield, destination);
             enableTimers(character);
 
-            if (tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.RawHeading, destinationPlayfield))
+            if (tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.Rotation, destinationPlayfield))
             {
                 return;
             }
 
-            transferToRespawnPlayfield(dynel, destination, character.RawHeading, destinationPlayfield);
+            transferToRespawnPlayfield(dynel, destination, character.Rotation, destinationPlayfield);
         }
 
         private static void Require(Delegate callback, string name)

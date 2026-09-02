@@ -182,7 +182,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             }
 
             Coordinate landing = ComputeLandingCoordinate(caster, slotIndex);
-            IQuaternion heading = caster.Heading ?? member.Heading ?? new Quaternion(0, 0, 0, 1);
+            IQuaternion heading = caster.Rotation ?? member.Rotation ?? new Quaternion(0, 0, 0, 1);
             var headingConcrete = new Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
 
             try
@@ -305,8 +305,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
         internal static Coordinate ComputeLandingCoordinate(ICharacter caster, int slotIndex)
         {
-            Coordinate casterPos = caster.Coordinates();
-            IQuaternion heading = caster.Heading;
+            Coordinate casterPos = caster.CalculatePredictedPosition();
+            IQuaternion heading = caster.Rotation;
             float angle = slotIndex * 0.7f;
             float localX = CapturedLandingOffsetMeters * (float)Math.Sin(angle);
             float localZ = CapturedLandingOffsetMeters * (float)Math.Cos(angle);
@@ -447,8 +447,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             Character memberConcrete = member as Character;
             if (memberConcrete != null)
             {
-                memberConcrete.RawCoordinates = new Vector3(landing.x, landing.y, landing.z);
-                memberConcrete.RawHeading = headingConcrete;
+                memberConcrete.Position = new Vector3(landing.x, landing.y, landing.z);
+                memberConcrete.Transform.Rotation = headingConcrete;
             }
 
             playfield.Announce(

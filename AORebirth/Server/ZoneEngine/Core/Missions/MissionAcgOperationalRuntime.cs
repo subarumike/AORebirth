@@ -1566,19 +1566,13 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
-            mob.Coordinates(
-                new Coordinate
-                {
-                    x = state.Position.X,
-                    y = state.Position.Y,
-                    z = state.Position.Z
-                });
-            mob.RawHeading =
+            mob.SetPose(
+                new Coordinate(state.Position.X, state.Position.Y, state.Position.Z),
                 new Quaternion(
                     state.Heading.X,
                     state.Heading.Y,
                     state.Heading.Z,
-                    state.Heading.W);
+                    state.Heading.W));
         }
 
         private static ICharacter TryGetExistingNpc(Playfield playfield, Identity runtimeIdentity)

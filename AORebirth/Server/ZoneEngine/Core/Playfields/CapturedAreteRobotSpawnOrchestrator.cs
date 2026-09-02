@@ -172,7 +172,7 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.health, spawn.Health);
             SetCapturedMobStat(mobCharacter, StatIds.level, spawn.Level);
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
-            mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
+            mobCharacter.Position = (new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z }).coordinate;
             AssignCapturedPatrolWaypoints(mobCharacter, spawn);
             CapturedEnemyCombatContract contract = AreteRegularMobCombatProfileSelector.Create(
                 "arete-malfunctioning-cleaning-robot-20260721-Rox-robots",
@@ -291,8 +291,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - spawn.X;
-                float dz = candidate.Coordinates().z - spawn.Z;
+                float dx = candidate.CalculatePredictedPosition().x - spawn.X;
+                float dz = candidate.CalculatePredictedPosition().z - spawn.Z;
                 if ((dx * dx) + (dz * dz) <= LivingNearRadiusSquared)
                 {
                     return true;

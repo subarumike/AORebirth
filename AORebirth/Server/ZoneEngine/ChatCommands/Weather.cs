@@ -84,9 +84,9 @@ namespace ZoneEngine.ChatCommands
         public override void ExecuteCommand(ICharacter character, Identity target, string[] args)
         {
             Vector3 position = new Vector3();
-            position.X = character.Coordinates().x;
-            position.Y = character.Coordinates().y;
-            position.Z = character.Coordinates().z;
+            position.X = character.CalculatePredictedPosition().x;
+            position.Y = character.CalculatePredictedPosition().y;
+            position.Z = character.CalculatePredictedPosition().z;
             byte type = byte.Parse(args[1]);
             /*if (type == 2)
             {

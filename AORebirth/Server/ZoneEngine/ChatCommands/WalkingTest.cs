@@ -64,9 +64,9 @@ namespace ZoneEngine.ChatCommands
                 if (npc != null)
                 {
                     Vector3 newcoords = new Vector3();
-                    newcoords.X = npc.RawCoordinates.X;
-                    newcoords.Y = npc.RawCoordinates.Y;
-                    newcoords.Z = npc.RawCoordinates.Z;
+                    newcoords.X = (float)npc.Position.x;
+                    newcoords.Y = (float)npc.Position.y;
+                    newcoords.Z = (float)npc.Position.z;
                     newcoords.X += 20;
                     npc.Controller.MoveTo(newcoords);
                 }
@@ -77,9 +77,9 @@ namespace ZoneEngine.ChatCommands
                 if (npc != null)
                 {
                     Vector3 newcoords = new Vector3();
-                    newcoords.X = npc.RawCoordinates.X;
-                    newcoords.Y = npc.RawCoordinates.Y;
-                    newcoords.Z = npc.RawCoordinates.Z;
+                    newcoords.X = (float)npc.Position.x;
+                    newcoords.Y = (float)npc.Position.y;
+                    newcoords.Z = (float)npc.Position.z;
                     newcoords.X -= 20;
                     npc.Controller.MoveTo(newcoords);
                 }
@@ -101,16 +101,16 @@ namespace ZoneEngine.ChatCommands
                         ChatTextMessageHandler.Default.CreateIM(
                             character,
                             "Coordinates of " + character.SelectedTarget.ToString(true) + ": "
-                            + npc.Coordinates().ToString()));
+                            + npc.CalculatePredictedPosition().ToString()));
                     character.Playfield.Publish(
                         ChatTextMessageHandler.Default.CreateIM(
                             character,
-                            "Heading of " + character.SelectedTarget.ToString(true) + ": " + npc.Heading.ToString()));
+                            "Heading of " + character.SelectedTarget.ToString(true) + ": " + npc.Rotation.ToString()));
                 }
             }
             if (args[0].ToLower() == "addwp")
             {
-                AORebirth.Core.Vector.Vector3 v = character.Coordinates().coordinate;
+                AORebirth.Core.Vector.Vector3 v = character.CalculatePredictedPosition().coordinate;
                 bool running = character.MoveMode == MoveModes.Run;
                 ICharacter npc = Pool.Instance.GetObject<ICharacter>(character.Playfield.Identity, character.SelectedTarget);
                 if (npc != null)
@@ -120,7 +120,7 @@ namespace ZoneEngine.ChatCommands
                         ChatTextMessageHandler.Default.CreateIM(
                             character,
                             "Waypoint added: " + character.SelectedTarget.ToString(true) + ": "
-                            + character.Coordinates().ToString()));
+                            + character.CalculatePredictedPosition().ToString()));
                 }
             }
         }

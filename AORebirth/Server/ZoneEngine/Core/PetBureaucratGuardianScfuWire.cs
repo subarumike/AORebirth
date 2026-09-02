@@ -148,7 +148,7 @@ namespace ZoneEngine.Core
             byte[] packet = (byte[])template.Clone();
             int petInstance = petCharacter.Identity.Instance;
             int playfieldId = owner.Playfield.Identity.Instance;
-            Coordinate petCoord = petCharacter.Coordinates();
+            Coordinate petCoord = petCharacter.CalculatePredictedPosition();
 
             PatchHeader(packet, recipientInstance);
             WriteInt32BigEndian(packet, N3IdentityInstanceOffset, petInstance);

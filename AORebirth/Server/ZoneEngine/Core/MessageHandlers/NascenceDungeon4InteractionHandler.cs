@@ -99,8 +99,8 @@ namespace ZoneEngine.Core.MessageHandlers
             var dynel = character as Dynel;
             if (dynel != null)
             {
-                dynel.RawCoordinates = landing;
-                dynel.RawHeading = heading;
+                dynel.Position = landing;
+                dynel.Transform.Rotation = heading;
             }
 
             var zoneClient = client as ZoneClient;

@@ -560,7 +560,7 @@ namespace ZoneEngine.Core.MessageHandlers
             character.Playfield.Teleport(
                 dynel,
                 destination,
-                character.Heading,
+                character.Rotation,
                 new Identity { Type = IdentityType.Playfield, Instance = destinationPlayfieldId });
 
             GenericCmdMessageHandler.Default.Acknowledge(character, message);

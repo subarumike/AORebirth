@@ -134,12 +134,12 @@ namespace ZoneEngine.Core.Playfields
                 }
 
                 vendor.NpcIdentity = Identity.None;
-                vendor.RawCoordinates =
+                vendor.Position =
                     new AORebirth.Core.Vector.Vector3(
                         CapturedHoloDeckVendorContentProvider.X,
                         CapturedHoloDeckVendorContentProvider.Y,
                         CapturedHoloDeckVendorContentProvider.Z);
-                vendor.Heading =
+                vendor.Rotation =
                     new AORebirth.Core.Vector.Quaternion(
                         CapturedHoloDeckVendorContentProvider.HeadingX,
                         CapturedHoloDeckVendorContentProvider.HeadingY,

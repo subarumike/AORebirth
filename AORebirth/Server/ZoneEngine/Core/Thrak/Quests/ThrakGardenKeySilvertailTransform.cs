@@ -58,8 +58,8 @@ namespace ZoneEngine.Core.Thrak.Quests
                 return false;
             }
 
-            Coordinate position = dreaming.Coordinates();
-            Quaternion heading = dreaming.Heading ?? new Quaternion(0f, 0f, 0f, 1f);
+            Coordinate position = dreaming.CalculatePredictedPosition();
+            Quaternion heading = dreaming.Rotation ?? new Quaternion(0f, 0f, 0f, 1f);
 
             // Capture order: spawn Cursed first, then Despawn Dreaming.
             Character cursed = SpawnCursed(playfield, source.Playfield.Identity, position, heading);
@@ -161,7 +161,7 @@ namespace ZoneEngine.Core.Thrak.Quests
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)CursedLevel);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)CursedVisualFlags);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterscale, (uint)CursedScale);
-            mob.Coordinates(position);
+            mob.Position = (position).coordinate;
             string combatFailure;
             CapturedEnemyCombatRuntime.Prepare(
                 mob,

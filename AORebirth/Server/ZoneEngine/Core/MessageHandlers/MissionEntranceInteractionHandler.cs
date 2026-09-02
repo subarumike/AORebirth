@@ -74,9 +74,9 @@ namespace ZoneEngine.Core.MessageHandlers
                 MissionAcgBindingRuntime.HasOwnedExteriorMarker(
                     character.Identity.Instance,
                     character.Playfield.Identity.Instance,
-                    character.RawCoordinates.X,
-                    character.RawCoordinates.Y,
-                    character.RawCoordinates.Z,
+                    (float)character.Position.x,
+                    (float)character.Position.y,
+                    (float)character.Position.z,
                     10.0,
                     14.0)
                 || MissionInstanceService.HasGeneratedAcceptedExteriorClaim(

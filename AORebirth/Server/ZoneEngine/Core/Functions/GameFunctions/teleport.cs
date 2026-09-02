@@ -117,7 +117,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             MessagePackObject[] Arguments)
         {
             Coordinate destination = new Coordinate(Arguments[0].AsInt32(), Arguments[1].AsInt32(), Arguments[2].AsInt32());
-            IQuaternion heading = ((Character)Self).Heading;
+            IQuaternion heading = ((Character)Self).Rotation;
             if (heading == null)
             {
                 heading = new Quaternion(0.0, 0.0, 0.0, 1.0);

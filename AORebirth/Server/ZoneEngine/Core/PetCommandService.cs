@@ -163,7 +163,7 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            Coordinate ownerCoord = owner.Coordinates();
+            Coordinate ownerCoord = owner.CalculatePredictedPosition();
             foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
             {
                 ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
@@ -217,7 +217,7 @@ namespace ZoneEngine.Core
             // Capture order: Follow chat, then SetPos to owner, then DesiredTargetDistance=0.
             AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Follow(pet));
 
-            pet.Coordinates(ownerCoord);
+            pet.Position = (ownerCoord).coordinate;
             playfield.Announce(
                 new SetPosMessage
                 {
@@ -615,7 +615,7 @@ namespace ZoneEngine.Core
             ActiveHealCommands.Remove(pet.Identity.Instance);
             PetsHoldingWaitStance.Add(pet.Identity.Instance);
             ClearPetCombatState(pet, petController, playfield);
-            FollowTargetMessageHandler.Default.Send(pet, pet.RawCoordinates);
+            FollowTargetMessageHandler.Default.Send(pet, pet.Position);
             AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Wait(pet));
         }
 
@@ -756,7 +756,7 @@ namespace ZoneEngine.Core
 
             int ncuUsed = Math.Max(0, pet.Stats[StatIds.currentncu].Value);
             int ncuMax = Math.Max(0, pet.Stats[StatIds.maxncu].Value);
-            Coordinate coord = pet.Coordinates();
+            Coordinate coord = new AORebirth.Core.Vector.Coordinate(pet.Position);
             int posX = (int)Math.Round(coord.x);
             int posZ = (int)Math.Round(coord.z);
 

@@ -106,7 +106,7 @@ namespace AORebirth.Core.Playfields
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, (uint)CapturedHealth);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)CapturedLevel);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)CapturedVisualFlags);
-            mob.Coordinates(new Coordinate { x = CapturedX, y = CapturedY, z = CapturedZ });
+            mob.Position = (new Coordinate { x = CapturedX, y = CapturedY, z = CapturedZ }).coordinate;
             ApplyTemplateTextures(mob, TemplateHash);
 
             BaseKnuBot knu = ScriptCompiler.Instance.CreateKnuBot("PerkResetServiceKnu", mob.Identity);

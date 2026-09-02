@@ -988,8 +988,8 @@ namespace ZoneEngine.Core.Arete.Quests
                             continue;
                         }
 
-                        float dx = npc.RawCoordinates.X - entry.Value.HomeX;
-                        float dz = npc.RawCoordinates.Z - entry.Value.HomeZ;
+                        float dx = (float)npc.Position.x - entry.Value.HomeX;
+                        float dz = (float)npc.Position.z - entry.Value.HomeZ;
                         if ((dx * dx) + (dz * dz) < 0.25f)
                         {
                             entry.Value.WalkedHome = true;
@@ -1052,9 +1052,9 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            float homeX = dockworker.RawCoordinates.X;
-            float homeY = dockworker.RawCoordinates.Y;
-            float homeZ = dockworker.RawCoordinates.Z;
+            float homeX = (float)dockworker.Position.x;
+            float homeY = (float)dockworker.Position.y;
+            float homeZ = (float)dockworker.Position.z;
 
             AnnounceEmptySpellList(dockworker);
             AnnounceEmptySpellList(dockworker);
@@ -1093,17 +1093,17 @@ namespace ZoneEngine.Core.Arete.Quests
                     Heading =
                         new Quaternion
                         {
-                            X = dockworker.Heading.xf,
-                            Y = dockworker.Heading.yf,
-                            Z = dockworker.Heading.zf,
-                            W = dockworker.Heading.wf
+                            X = dockworker.Rotation.xf,
+                            Y = dockworker.Rotation.yf,
+                            Z = dockworker.Rotation.zf,
+                            W = dockworker.Rotation.wf
                         },
                     Coordinates =
                         new Vector3
                         {
-                            X = dockworker.RawCoordinates.X,
-                            Y = dockworker.RawCoordinates.Y,
-                            Z = dockworker.RawCoordinates.Z
+                            X = (float)dockworker.Position.x,
+                            Y = (float)dockworker.Position.y,
+                            Z = (float)dockworker.Position.z
                         },
                     Unknown1 = 0,
                     Unknown2 = 0,
@@ -1191,7 +1191,7 @@ namespace ZoneEngine.Core.Arete.Quests
                     new Vector3 { X = state.HomeX, Y = state.HomeY, Z = state.HomeZ });
             }
 
-            dockworker.RawCoordinates = new AORebirth.Core.Vector.Vector3(
+            dockworker.Position = new AORebirth.Core.Vector.Vector3(
                 state.HomeX,
                 state.HomeY,
                 state.HomeZ);
@@ -1232,10 +1232,10 @@ namespace ZoneEngine.Core.Arete.Quests
                     Heading =
                         new Quaternion
                         {
-                            X = dockworker.Heading.xf,
-                            Y = dockworker.Heading.yf,
-                            Z = dockworker.Heading.zf,
-                            W = dockworker.Heading.wf
+                            X = dockworker.Rotation.xf,
+                            Y = dockworker.Rotation.yf,
+                            Z = dockworker.Rotation.zf,
+                            W = dockworker.Rotation.wf
                         },
                     Coordinates =
                         new Vector3 { X = state.HomeX, Y = state.HomeY, Z = state.HomeZ },

@@ -92,7 +92,7 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                Coordinate pos = existing.Coordinates();
+                Coordinate pos = new AORebirth.Core.Vector.Coordinate(existing.Position);
                 float dx = pos.x - x;
                 float dz = pos.z - z;
                 if ((dx * dx) + (dz * dz) <= 4f)
@@ -149,7 +149,7 @@ namespace ZoneEngine.Core.Playfields
                 mob.MeshLayer.Clear();
             }
 
-            mob.Coordinates(new Coordinate { x = x, y = y, z = z });
+            mob.Position = (new Coordinate { x = x, y = y, z = z }).coordinate;
             string combatFailure;
             bool combatReady = CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
                 mob,

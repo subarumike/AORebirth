@@ -248,7 +248,7 @@ namespace ZoneEngine.Core
             sourcePlayfield.Teleport(
                 dynel,
                 new Coordinate(IccShuttleportX, IccShuttleportY, IccShuttleportZ),
-                character.Heading,
+                character.Rotation,
                 new Identity { Type = IdentityType.Playfield, Instance = IccShuttleportPlayfieldId });
         }
     }

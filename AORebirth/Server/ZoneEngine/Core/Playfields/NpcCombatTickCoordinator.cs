@@ -541,11 +541,11 @@ namespace AORebirth.Core.Playfields
                             DateTime.UtcNow,
                             out movementDestination))
                     {
-                        movementDestination = attacker.Coordinates().coordinate;
+                        movementDestination = attacker.CalculatePredictedPosition().coordinate;
                     }
 
                     npcController.StopFollowForCapturedCombatRange(
-                        target.Coordinates().coordinate,
+                        target.CalculatePredictedPosition().coordinate,
                         movementDestination);
                 }
 
@@ -1003,13 +1003,13 @@ namespace AORebirth.Core.Playfields
             if (requiresDamageLineOfSight)
             {
                 var start = new CollisionPoint3(
-                    attacker.RawCoordinates.X,
-                    attacker.RawCoordinates.Y,
-                    attacker.RawCoordinates.Z);
+                    (float)attacker.Position.x,
+                    (float)attacker.Position.y,
+                    (float)attacker.Position.z);
                 var end = new CollisionPoint3(
-                    target.RawCoordinates.X,
-                    target.RawCoordinates.Y,
-                    target.RawCoordinates.Z);
+                    (float)target.Position.x,
+                    (float)target.Position.y,
+                    (float)target.Position.z);
                 SegmentTriangleHit hit;
                 NpcDamageLineOfSightDecision decision = this.damageLineOfSight.EvaluateAttackLine(
                     true,

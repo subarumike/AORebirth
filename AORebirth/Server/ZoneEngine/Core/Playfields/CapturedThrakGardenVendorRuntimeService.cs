@@ -162,8 +162,8 @@ namespace ZoneEngine.Core.Playfields
                 Character concreteNpc = character as Character;
                 if (concreteNpc != null)
                 {
-                    vendor.RawCoordinates = concreteNpc.RawCoordinates;
-                    vendor.Heading = concreteNpc.RawHeading;
+                    vendor.Position = concreteNpc.Position;
+                    vendor.Rotation = concreteNpc.Rotation;
                 }
 
                 vendor.Playfield = playfield;

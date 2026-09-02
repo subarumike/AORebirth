@@ -229,7 +229,7 @@ namespace ZoneEngine.Core.Playfields
             SetStat(mob, StatIds.visualflags, NascenceCoreHecklerContentProvider.VisualFlags);
             SetStat(mob, StatIds.mindamage, NascenceCoreHecklerContentProvider.MinDamage);
             SetStat(mob, StatIds.maxdamage, NascenceCoreHecklerContentProvider.MaxDamage);
-            mob.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
+            mob.Position = (new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z }).coordinate;
 
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttack(
                 NascenceCoreHecklerContentProvider.CaptureId + ": Heckler of Earth fight 796C7244",

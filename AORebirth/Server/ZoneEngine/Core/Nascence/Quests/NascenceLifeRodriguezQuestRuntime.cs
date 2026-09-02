@@ -269,8 +269,8 @@ namespace ZoneEngine.Core.Nascence.Quests
 
         private static bool IsWithinRodriguezProximity(ICharacter player, ICharacter rodriguez)
         {
-            AORebirth.Core.Vector.Vector3 playerCoord = player.Coordinates().coordinate;
-            AORebirth.Core.Vector.Vector3 npcCoord = rodriguez.Coordinates().coordinate;
+            AORebirth.Core.Vector.Vector3 playerCoord = player.CalculatePredictedPosition().coordinate;
+            AORebirth.Core.Vector.Vector3 npcCoord = rodriguez.CalculatePredictedPosition().coordinate;
             float radius = NascenceLifeRodriguezInteractionRules.RodriguezProximityRadiusMeters;
             float radiusSq = radius * radius;
             double dx = npcCoord.x - playerCoord.x;

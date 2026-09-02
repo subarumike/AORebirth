@@ -2,14 +2,17 @@ namespace ZoneEngine.Core.Playfields.Locality
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.GameData;
+    using AORebirth.Core.Vector;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
+    using Utility;
     using Utility.Config;
 
     using ZoneEngine.Core.Controllers;
@@ -98,6 +101,8 @@ namespace ZoneEngine.Core.Playfields.Locality
         }
     }
 
+
+    //TODO: Remove this and have the dynel own it's own mechanics.
     internal sealed class PlayfieldLocalityTickCallbacks
     {
         internal Func<Identity, bool> HasPendingDeadNpcDespawn { get; set; }
@@ -112,9 +117,7 @@ namespace ZoneEngine.Core.Playfields.Locality
 
         internal Action<ICharacter> ProcessPlayerCollision { get; set; }
 
-        internal Func<IEnumerable<ICharacter>> GetAllCharacters { get; set; }
-
-        internal Func<IEnumerable<ICharacter>> GetConnectedPlayers { get; set; }
+        internal Action<ICharacter> ProcessPlayerCellChanged { get; set; }
     }
 
     internal sealed class PlayfieldLocality
@@ -129,12 +132,14 @@ namespace ZoneEngine.Core.Playfields.Locality
         private readonly PlayfieldCellLocalityMonitor cellMonitor;
         private readonly PlayfieldCellHeatScheduler heatScheduler;
         private readonly PlayfieldLocalityTickCallbacks tickCallbacks;
+        private readonly PlayfieldDynelRegistry dynelRegistry;
 
         internal PlayfieldLocality(
             Identity playfieldIdentity,
             PlayfieldMetaData metaData,
             PlayfieldVisibilityFanoutRuntimeService visibilityFanout,
             PlayfieldPacketSequencingRuntimeService packetSequences,
+            PlayfieldDynelRegistry dynelRegistry,
             PlayfieldLocalityTickCallbacks tickCallbacks)
         {
             if (playfieldIdentity.Instance <= 0)
@@ -143,6 +148,7 @@ namespace ZoneEngine.Core.Playfields.Locality
             }
 
             this.playfieldIdentity = playfieldIdentity;
+            this.dynelRegistry = dynelRegistry ?? throw new ArgumentNullException("dynelRegistry");
             this.tickCallbacks = tickCallbacks ?? throw new ArgumentNullException("tickCallbacks");
             this.layout = PlayfieldCellLayoutFactory.Create(playfieldIdentity.Instance, metaData);
             this.policy = PlayfieldLocalityPolicy.FromConfig(
@@ -166,9 +172,32 @@ namespace ZoneEngine.Core.Playfields.Locality
             this.cells.Register(character);
         }
 
+        internal void RegisterDynel(IDynel dynel)
+        {
+            this.cells.Register(dynel);
+        }
+
+        internal void RegisterStaticDynel(StaticDynel staticDynel)
+        {
+            this.cells.Register(staticDynel);
+        }
+
         internal bool MoveCharacter(ICharacter character)
         {
-            return this.cells.Move(character);
+            if (character == null)
+            {
+                return false;
+            }
+
+            int oldCellId;
+            int newCellId;
+            bool cellChanged = this.cells.Move(character, out oldCellId, out newCellId);
+            if (cellChanged && character.Controller is PlayerController)
+            {
+                this.LogPlayerCellChange(character, oldCellId, newCellId);
+            }
+
+            return cellChanged;
         }
 
         internal void UnregisterCharacter(Identity identity)
@@ -284,18 +313,106 @@ namespace ZoneEngine.Core.Playfields.Locality
             return neighbors.Contains(sourceCellId);
         }
 
-        internal void Tick(double deltaTime)
+        internal bool SharesVisibilityNeighborhood(ICharacter recipient, Identity sourceIdentity)
         {
-            IEnumerable<ICharacter> players = this.tickCallbacks.GetConnectedPlayers != null
-                ? this.tickCallbacks.GetConnectedPlayers()
-                : Enumerable.Empty<ICharacter>();
+            if (recipient == null)
+            {
+                return false;
+            }
+
+            if (this.layout.IsIndoor)
+            {
+                return recipient.Identity != sourceIdentity;
+            }
+
+            int recipientCellId;
+            int sourceCellId;
+            if (!this.cells.TryGetCellId(recipient, out recipientCellId)
+                || !this.cells.TryGetCellId(sourceIdentity, out sourceCellId)
+                || recipientCellId < 0
+                || sourceCellId < 0)
+            {
+                return false;
+            }
+
+            var neighbors = new List<int>();
+            this.cells.CollectNeighborCells(recipientCellId, this.policy.VisibilityNeighborLevel, neighbors);
+            return neighbors.Contains(sourceCellId);
+        }
+
+        internal bool SharesVisibilityNeighborhood(ICharacter recipient, Coordinate sourceCoordinate)
+        {
+            if (recipient == null || sourceCoordinate == null)
+            {
+                return false;
+            }
+
+            if (this.layout.IsIndoor)
+            {
+                return true;
+            }
+
+            int recipientCellId;
+            int sourceCellId;
+            if (!this.cells.TryGetCellId(recipient, out recipientCellId)
+                || !this.layout.TryGetCellId(sourceCoordinate, out sourceCellId)
+                || recipientCellId < 0
+                || sourceCellId < 0)
+            {
+                return false;
+            }
+
+            var neighbors = new List<int>();
+            this.cells.CollectNeighborCells(recipientCellId, this.policy.VisibilityNeighborLevel, neighbors);
+            return neighbors.Contains(sourceCellId);
+        }
+
+        internal void Tick(
+            double deltaTime,
+            Action<ICharacter, MessageBody> sendVisibilityMessage,
+            Action<ICharacter, Identity> sendLeaveVisibility)
+        {
+            foreach (IDynel dynel in this.dynelRegistry.Dynels())
+            {
+                if (dynel == null || !dynel.Transform.PositionChangedSinceLastTick)
+                {
+                    continue;
+                }
+
+                int oldCellId;
+                int newCellId;
+                bool cellChanged;
+                ICharacter character = dynel as ICharacter;
+                if (character != null)
+                {
+                    cellChanged = this.MoveCharacter(character);
+                }
+                else
+                {
+                    cellChanged = this.cells.Move(dynel, out oldCellId, out newCellId);
+                }
+
+                dynel.Transform.AcknowledgePositionChange();
+                if (cellChanged && character != null)
+                {
+                    this.packets.AnnounceJoiningCharacterVisibility(
+                        character,
+                        sendVisibilityMessage,
+                        sendLeaveVisibility);
+                    if (character.Controller is PlayerController
+                        && this.tickCallbacks.ProcessPlayerCellChanged != null)
+                    {
+                        this.tickCallbacks.ProcessPlayerCellChanged(character);
+                    }
+                }
+            }
+
+            IEnumerable<ICharacter> players = this.dynelRegistry.Players();
             this.cellMonitor.UpdatePlayers(players);
 
             if (!this.policy.EnableCellHeatScheduling)
             {
-                IEnumerable<ICharacter> characters = this.tickCallbacks.GetAllCharacters != null
-                    ? this.tickCallbacks.GetAllCharacters()
-                    : this.cells.AllRegisteredCharacters();
+                IEnumerable<ICharacter> characters = this.dynelRegistry.Characters();
                 foreach (ICharacter character in characters.ToList())
                 {
                     this.ProcessDynelTick(character, deltaTime);
@@ -357,12 +474,7 @@ namespace ZoneEngine.Core.Playfields.Locality
 
         private IEnumerable<ICharacter> CollectCombatHotCharacters()
         {
-            if (this.tickCallbacks.GetAllCharacters == null)
-            {
-                return Enumerable.Empty<ICharacter>();
-            }
-
-            return this.tickCallbacks.GetAllCharacters()
+            return this.dynelRegistry.Characters()
                 .Where(
                     c =>
                         c != null
@@ -373,12 +485,58 @@ namespace ZoneEngine.Core.Playfields.Locality
 
         private ICharacter ResolveCharacter(Identity identity)
         {
-            if (this.tickCallbacks.GetAllCharacters == null)
+            return this.dynelRegistry.Characters().FirstOrDefault(c => c.Identity == identity);
+        }
+
+        private void LogPlayerCellChange(ICharacter player, int oldCellId, int newCellId)
+        {
+            if (!LogUtil.HasDetail(DebugInfoDetail.Locality) || player == null)
             {
-                return null;
+                return;
             }
 
-            return this.tickCallbacks.GetAllCharacters().FirstOrDefault(c => c.Identity == identity);
+            AORebirth.Core.Vector.Vector3 position = player.Position;
+            LogUtil.Debug(
+                DebugInfoDetail.Locality,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield {0} player {1}/{2} cell {3} -> {4} pos=({5:F1},{6:F1},{7:F1})",
+                    this.layout.PlayfieldId,
+                    player.Identity,
+                    player.Name ?? string.Empty,
+                    this.FormatCellLabel(oldCellId),
+                    this.FormatCellLabel(newCellId),
+                    position == null ? 0f : position.xf,
+                    position == null ? 0f : position.yf,
+                    position == null ? 0f : position.zf));
+
+            if (!this.policy.EnableCellHeatScheduling && !this.layout.IsIndoor)
+            {
+                this.heatScheduler.RefreshHeatDiagnostics(
+                    this.dynelRegistry.Players(),
+                    this.CollectCombatHotCharacters());
+            }
+        }
+
+        private string FormatCellLabel(int cellId)
+        {
+            if (cellId < 0)
+            {
+                return "non-local";
+            }
+
+            if (this.layout.IsIndoor)
+            {
+                return cellId.ToString(CultureInfo.InvariantCulture);
+            }
+
+            this.layout.GetCellCoords(cellId, out int ix, out int iz);
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} ({1},{2})",
+                cellId,
+                ix,
+                iz);
         }
     }
 }

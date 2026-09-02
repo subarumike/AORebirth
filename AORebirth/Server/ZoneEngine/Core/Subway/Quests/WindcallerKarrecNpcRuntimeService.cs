@@ -120,14 +120,13 @@ namespace ZoneEngine.Core.Subway.Quests
             character.Name = definition.DisplayName;
             character.FirstName = string.Empty;
             character.LastName = string.Empty;
-            character.Coordinates(
-                new Coordinate { x = definition.X, y = definition.Y, z = definition.Z });
-            character.RawHeading =
+            character.SetPose(
+                new Coordinate(definition.X, definition.Y, definition.Z),
                 new AORebirth.Core.Vector.Quaternion(
                     definition.HeadingX,
                     definition.HeadingY,
                     definition.HeadingZ,
-                    definition.HeadingW);
+                    definition.HeadingW));
 
             SetStat(character, StatIds.side, definition.Side);
             SetStat(character, StatIds.fatness, definition.Fatness);

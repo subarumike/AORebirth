@@ -282,7 +282,7 @@ namespace ZoneEngine.Core.Playfields
             SetStat(droid, StatIds.expansion, 0);
             SetStat(droid, StatIds.profession, 0);
             SetStat(droid, StatIds.visualprofession, 0);
-            droid.Coordinates(new Coordinate { x = SpawnX, y = SpawnY, z = SpawnZ });
+            droid.Position = (new Coordinate { x = SpawnX, y = SpawnY, z = SpawnZ }).coordinate;
             droid.DoNotDoTimers = false;
             activateNpc(droid);
             playfield.AnnounceSpawnedCharacterVisibility(droid, Identity.None);

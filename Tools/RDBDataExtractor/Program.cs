@@ -5,6 +5,7 @@ namespace AORebirth.Tools.RDBDataExtractor
     using System.IO;
     using System.Linq;
 
+    using AODB;
     using CommandLine;
 
     internal static class Program
@@ -37,54 +38,133 @@ namespace AORebirth.Tools.RDBDataExtractor
 
                 Directory.CreateDirectory(resolved.OutputDirectory);
 
-                int exported = 0;
-                int skipped = 0;
+                int tilemapWritten = 0;
+                int tilemapSkipped = 0;
+                int districtWritten = 0;
+                int districtSkipped = 0;
                 int failed = 0;
-                using (var exporter = new TilemapExporter(
-                    resolved.AoClientPath,
-                    resolved.OutputDirectory))
+
+                using (var controller = new RdbController(resolved.AoClientPath))
                 {
-                    IEnumerable<int> tilemapIds = resolved.TilemapId.HasValue
-                        ? new[] { resolved.TilemapId.Value }
-                        : exporter.EnumerateTilemapIds();
+                    var tilemaps = new TilemapExporter(controller, resolved.OutputDirectory);
+                    var districts = new DistrictExporter(controller, resolved.OutputDirectory);
 
-                    foreach (int tilemapId in tilemapIds)
+                    IEnumerable<int> playfieldIds;
+                    if (resolved.TilemapId.HasValue)
                     {
-                        if (resolved.SkipExisting && exporter.HasCompleteExport(tilemapId))
-                        {
-                            skipped++;
-                            continue;
-                        }
+                        playfieldIds = new[] { resolved.TilemapId.Value };
+                    }
+                    else
+                    {
+                        playfieldIds = tilemaps.EnumerateTilemapIds()
+                            .Union(districts.EnumerateDistrictIds())
+                            .OrderBy(id => id);
+                    }
 
-                        try
-                        {
-                            exporter.Export(tilemapId);
-                            exported++;
-                            Console.WriteLine("exported tilemap " + tilemapId);
-                        }
-                        catch (Exception exception)
+                    foreach (int playfieldId in playfieldIds)
+                    {
+                        bool hasTilemap = tilemaps.TryHasTilemapRecord(playfieldId);
+                        bool hasDistrict = districts.TryHasDistrictRecord(playfieldId);
+                        if (!hasTilemap && !hasDistrict)
                         {
                             failed++;
                             Console.Error.WriteLine(
-                                "FAIL tilemap "
-                                + tilemapId
-                                + " "
-                                + exception.GetType().Name
-                                + ": "
-                                + exception.Message);
+                                "FAIL playfield "
+                                + playfieldId
+                                + " has neither tilemap nor district records.");
                             if (resolved.TilemapId.HasValue)
                             {
                                 return 1;
+                            }
+
+                            continue;
+                        }
+
+                        if (hasTilemap)
+                        {
+                            try
+                            {
+                                ExportFileCounts counts = tilemaps.Export(
+                                    playfieldId,
+                                    resolved.Overwrite);
+                                tilemapWritten += counts.Written;
+                                tilemapSkipped += counts.Skipped;
+                                if (counts.Written > 0)
+                                {
+                                    Console.WriteLine(
+                                        "exported tilemap "
+                                        + playfieldId
+                                        + " written="
+                                        + counts.Written
+                                        + " skipped="
+                                        + counts.Skipped);
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                failed++;
+                                Console.Error.WriteLine(
+                                    "FAIL tilemap "
+                                    + playfieldId
+                                    + " "
+                                    + exception.GetType().Name
+                                    + ": "
+                                    + exception.Message);
+                                if (resolved.TilemapId.HasValue)
+                                {
+                                    return 1;
+                                }
+                            }
+                        }
+
+                        if (hasDistrict)
+                        {
+                            try
+                            {
+                                ExportFileCounts counts = districts.Export(
+                                    playfieldId,
+                                    resolved.Overwrite);
+                                districtWritten += counts.Written;
+                                districtSkipped += counts.Skipped;
+                                if (counts.Written > 0)
+                                {
+                                    Console.WriteLine(
+                                        "exported district "
+                                        + playfieldId
+                                        + " written="
+                                        + counts.Written
+                                        + " skipped="
+                                        + counts.Skipped);
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                failed++;
+                                Console.Error.WriteLine(
+                                    "FAIL district "
+                                    + playfieldId
+                                    + " "
+                                    + exception.GetType().Name
+                                    + ": "
+                                    + exception.Message);
+                                if (resolved.TilemapId.HasValue)
+                                {
+                                    return 1;
+                                }
                             }
                         }
                     }
                 }
 
                 Console.WriteLine(
-                    "RDBDataExtractor complete exported="
-                    + exported
-                    + " skipped="
-                    + skipped
+                    "RDBDataExtractor complete tilemapWritten="
+                    + tilemapWritten
+                    + " tilemapSkipped="
+                    + tilemapSkipped
+                    + " districtWritten="
+                    + districtWritten
+                    + " districtSkipped="
+                    + districtSkipped
                     + " failed="
                     + failed);
                 return failed > 0 ? 1 : 0;

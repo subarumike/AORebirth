@@ -75,7 +75,7 @@ namespace ZoneEngine.ChatCommands
             character.Playfield.Teleport(
                 (Dynel)character,
                 new Coordinate(sd.X, sd.Y, sd.Z),
-                character.Heading,
+                character.Rotation,
                 new Identity() { Type = IdentityType.Playfield, Instance = pfId });
         }
 
