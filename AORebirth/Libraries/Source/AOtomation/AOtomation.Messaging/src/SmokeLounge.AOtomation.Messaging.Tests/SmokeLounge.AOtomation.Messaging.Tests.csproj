@@ -190,6 +190,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon2Rules.cs">
       <Link>NascenceDungeon2Rules.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon3Rules.cs">
+      <Link>NascenceDungeon3Rules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon4Rules.cs">
+      <Link>NascenceDungeon4Rules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingResolver.cs">
       <Link>MissionAcgBindingResolver.cs</Link>
     </Compile>
