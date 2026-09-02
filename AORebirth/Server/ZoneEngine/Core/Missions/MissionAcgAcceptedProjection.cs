@@ -114,6 +114,11 @@ namespace ZoneEngine.Core.Missions
                 throw new ArgumentOutOfRangeException("selectedOfferIndex");
             }
 
+            if (rawLevelSlider > 100)
+            {
+                throw new ArgumentOutOfRangeException("rawLevelSlider");
+            }
+
             RequireSignedSlider(goodBadSlider, "goodBadSlider");
             RequireSignedSlider(orderChaosSlider, "orderChaosSlider");
             RequireSignedSlider(openHiddenSlider, "openHiddenSlider");
@@ -517,18 +522,6 @@ namespace ZoneEngine.Core.Missions
             }
 
             QuestInfo offer = roll.QuestInfos[this.SelectedOfferIndex];
-            if (roll.LevelSlider != this.RawLevelSlider
-                || DecodeSigned(roll.GoodBadSlider) != this.GoodBadSlider
-                || DecodeSigned(roll.OrderChaosSlider) != this.OrderChaosSlider
-                || DecodeSigned(roll.OpenHiddenSlider) != this.OpenHiddenSlider
-                || DecodeSigned(roll.PhysicalMysticalSlider) != this.PhysicalMysticalSlider
-                || DecodeSigned(roll.HeadOnStealthSlider) != this.HeadOnStealthSlider
-                || DecodeSigned(roll.MoneyExperienceSlider) != this.MoneyExperienceSlider)
-            {
-                throw new ArgumentException(
-                    "Persisted slider semantics do not match the selected mission-roll body.");
-            }
-
             if (!IdentityEquals(offer.QuestIdentity, this.Binding.OriginalOfferIdentity)
                 || MissionTypeCatalog.TypeFromIcon(offer.MissionIconId)
                     != this.Binding.MissionType
@@ -645,19 +638,6 @@ namespace ZoneEngine.Core.Missions
                    && record != null
                    && (int)identity.Type == record.Type
                    && identity.Instance == record.Instance;
-        }
-
-        private static int DecodeSigned(byte value)
-        {
-            int decoded;
-            if (!MissionSliderProfile.TryDecodeSignedPercent(value, out decoded))
-            {
-                throw new ArgumentOutOfRangeException(
-                    "value",
-                    "Mission slider is outside the captured protocol range.");
-            }
-
-            return decoded;
         }
 
         private static void RequireSignedSlider(int value, string parameterName)
