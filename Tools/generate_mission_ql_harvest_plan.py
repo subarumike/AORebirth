@@ -308,7 +308,7 @@ def build_assignments(
             ),
             "request_count": REQUEST_COUNT,
             "expected_offers_per_complete_cohort": EXPECTED_OFFERS_PER_COMPLETE_COHORT,
-            "harvest_command": f"/missionharvest start {ql} {REQUEST_COUNT}",
+            "harvest_command": f"/missionharvest start {slot} {REQUEST_COUNT} CENTERED_BASELINE",
             "status_command": "/missionharvest status",
             "stop_command": "/missionharvest stop",
         }

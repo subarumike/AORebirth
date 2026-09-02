@@ -331,7 +331,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 1 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -345,7 +345,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 2 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -359,7 +359,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 3 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -378,7 +378,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 4 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -392,7 +392,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 5 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -406,7 +406,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 6 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -420,7 +420,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 7 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -434,7 +434,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 8 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -448,7 +448,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 9 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -462,7 +462,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 10 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -476,7 +476,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 12 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -495,7 +495,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 11 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -509,7 +509,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 13 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -523,7 +523,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 15 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -537,7 +537,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 17 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -551,7 +551,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 20 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -565,7 +565,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 22 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -579,7 +579,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 25 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -593,7 +593,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 30 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -612,7 +612,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 14 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -626,7 +626,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 16 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -640,7 +640,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 18 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -654,7 +654,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 19 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -668,7 +668,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 21 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -682,7 +682,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 23 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -696,7 +696,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 27 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -710,7 +710,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 32 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -729,7 +729,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 24 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -743,7 +743,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 26 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -757,7 +757,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 28 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -771,7 +771,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 29 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -785,7 +785,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 42 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -799,7 +799,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 52 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -813,7 +813,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 62 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -832,7 +832,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 31 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -846,7 +846,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 33 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -860,7 +860,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 35 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -874,7 +874,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 37 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -888,7 +888,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 46 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -902,7 +902,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 50 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -916,7 +916,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 75 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -935,7 +935,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 34 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -949,7 +949,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 36 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -963,7 +963,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 39 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -977,7 +977,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 41 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -991,7 +991,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 49 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1005,7 +1005,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 53 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1019,7 +1019,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 58 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1038,7 +1038,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 38 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1052,7 +1052,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 40 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1066,7 +1066,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 43 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1080,7 +1080,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 45 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1094,7 +1094,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 51 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1108,7 +1108,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 56 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1122,7 +1122,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 66 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1141,7 +1141,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 44 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1155,7 +1155,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 48 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1169,7 +1169,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 54 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1183,7 +1183,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 64 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1197,7 +1197,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 70 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1211,7 +1211,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 76 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1225,7 +1225,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 83 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1244,7 +1244,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 47 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1258,7 +1258,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 57 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1272,7 +1272,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 61 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1286,7 +1286,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 68 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1300,7 +1300,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 74 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1314,7 +1314,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 81 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1333,7 +1333,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 55 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1347,7 +1347,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 59 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1361,7 +1361,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 63 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1375,7 +1375,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 71 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1389,7 +1389,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 79 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1408,7 +1408,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 60 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1422,7 +1422,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 65 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1436,7 +1436,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 69 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1450,7 +1450,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 95 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1464,7 +1464,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 155 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1483,7 +1483,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 67 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1497,7 +1497,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 72 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1511,7 +1511,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 87 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1525,7 +1525,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 97 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1539,7 +1539,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 173 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1558,7 +1558,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 73 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1572,7 +1572,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 78 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1586,7 +1586,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 84 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1600,7 +1600,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 94 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1614,7 +1614,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 115 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1628,7 +1628,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 188 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1647,7 +1647,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 77 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1661,7 +1661,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 88 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1675,7 +1675,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 143 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1689,7 +1689,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 165 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1703,7 +1703,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 197 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1722,7 +1722,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 89 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1736,7 +1736,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 112 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1750,7 +1750,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 122 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1764,7 +1764,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 168 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1778,7 +1778,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 200 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1797,7 +1797,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 80 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1811,7 +1811,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 103 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1825,7 +1825,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 138 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1839,7 +1839,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 149 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1853,7 +1853,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 206 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1872,7 +1872,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 82 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1886,7 +1886,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 118 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1900,7 +1900,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 153 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1914,7 +1914,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 177 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1928,7 +1928,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 211 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1947,7 +1947,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 90 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1961,7 +1961,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 120 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1975,7 +1975,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 144 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -1989,7 +1989,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 156 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2003,7 +2003,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 180 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2017,7 +2017,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 215 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2036,7 +2036,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 121 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2050,7 +2050,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 133 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2064,7 +2064,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 145 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2078,7 +2078,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 181 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2092,7 +2092,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 217 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2111,7 +2111,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 85 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2125,7 +2125,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 91 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2139,7 +2139,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 109 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2153,7 +2153,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 183 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2167,7 +2167,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 218 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2186,7 +2186,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 86 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2200,7 +2200,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 136 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2214,7 +2214,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 148 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2228,7 +2228,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 186 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2242,7 +2242,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 222 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2261,7 +2261,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 125 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2275,7 +2275,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 137 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2289,7 +2289,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 150 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2303,7 +2303,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 162 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2317,7 +2317,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 224 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2336,7 +2336,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 107 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2350,7 +2350,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 114 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2364,7 +2364,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 139 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2378,7 +2378,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 190 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2392,7 +2392,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 225 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2411,7 +2411,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 96 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2425,7 +2425,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 140 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2439,7 +2439,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 166 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2453,7 +2453,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 192 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2467,7 +2467,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 226 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2486,7 +2486,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 116 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2500,7 +2500,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 141 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2514,7 +2514,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 154 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2528,7 +2528,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 167 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2542,7 +2542,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 227 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2561,7 +2561,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 104 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2575,7 +2575,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 130 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2589,7 +2589,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 169 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2603,7 +2603,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 195 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2617,7 +2617,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 232 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2636,7 +2636,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 98 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2650,7 +2650,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 117 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2664,7 +2664,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 170 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2678,7 +2678,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 196 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2692,7 +2692,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 235 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2711,7 +2711,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 92 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2725,7 +2725,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 99 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2739,7 +2739,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 105 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2753,7 +2753,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 198 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2767,7 +2767,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 236 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2786,7 +2786,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 93 1
+/missionharvest start 1 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2800,7 +2800,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 113 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2814,7 +2814,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 159 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2828,7 +2828,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 199 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2842,7 +2842,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 237 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2861,7 +2861,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 100 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2875,7 +2875,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 147 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2889,7 +2889,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 174 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2903,7 +2903,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 201 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2917,7 +2917,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 238 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2936,7 +2936,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 101 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2950,7 +2950,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 135 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2964,7 +2964,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 175 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2978,7 +2978,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 202 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -2992,7 +2992,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 239 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3011,7 +3011,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 108 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3025,7 +3025,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 163 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3039,7 +3039,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 176 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3053,7 +3053,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 204 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3067,7 +3067,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 243 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3086,7 +3086,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 102 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3100,7 +3100,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 123 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3114,7 +3114,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 164 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3128,7 +3128,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 205 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3142,7 +3142,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 245 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3161,7 +3161,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 124 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3175,7 +3175,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 151 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3189,7 +3189,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 179 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3203,7 +3203,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 207 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3217,7 +3217,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 246 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3236,7 +3236,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 111 1
+/missionharvest start 3 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3250,7 +3250,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 152 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3264,7 +3264,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 208 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3278,7 +3278,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 248 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3297,7 +3297,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 119 1
+/missionharvest start 4 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3311,7 +3311,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 126 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3325,7 +3325,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 182 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3339,7 +3339,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 210 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3353,7 +3353,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 250 1
+/missionharvest start 11 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3372,7 +3372,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 106 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3386,7 +3386,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 127 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3400,7 +3400,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 142 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3414,7 +3414,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 184 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3428,7 +3428,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 212 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3447,7 +3447,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 128 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3461,7 +3461,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 157 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3475,7 +3475,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 171 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3489,7 +3489,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 185 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3503,7 +3503,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 214 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3522,7 +3522,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 129 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3536,7 +3536,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 158 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3550,7 +3550,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 172 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3564,7 +3564,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 187 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3578,7 +3578,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 216 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3597,7 +3597,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 131 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3611,7 +3611,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 146 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3625,7 +3625,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 160 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3639,7 +3639,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 189 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3653,7 +3653,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 219 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3672,7 +3672,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 110 1
+/missionharvest start 2 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3686,7 +3686,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 132 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3700,7 +3700,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 161 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3714,7 +3714,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 191 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3728,7 +3728,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 220 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3747,7 +3747,7 @@ below separately.
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 134 1
+/missionharvest start 5 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3761,7 +3761,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 178 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3775,7 +3775,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 193 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3789,7 +3789,7 @@ Wait for completion feedback, then:
 Evidence status: `PROVEN_HELPBOT`.
 
 ```text
-/missionharvest start 223 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3808,7 +3808,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 234 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3827,7 +3827,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 244 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3846,7 +3846,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 247 1
+/missionharvest start 10 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3865,7 +3865,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 194 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3879,7 +3879,7 @@ Wait for completion feedback, then:
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 230 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3898,7 +3898,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 213 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3912,7 +3912,7 @@ Wait for completion feedback, then:
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 231 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3931,7 +3931,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 233 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3950,7 +3950,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 203 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3964,7 +3964,7 @@ Wait for completion feedback, then:
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 240 1
+/missionharvest start 9 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3983,7 +3983,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 221 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -3997,7 +3997,7 @@ Wait for completion feedback, then:
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 241 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -4016,7 +4016,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 242 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -4035,7 +4035,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 228 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -4049,7 +4049,7 @@ Wait for completion feedback, then:
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 249 1
+/missionharvest start 8 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -4068,7 +4068,7 @@ below separately.
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 209 1
+/missionharvest start 6 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:
@@ -4082,7 +4082,7 @@ Wait for completion feedback, then:
 Evidence status: `INFERRED_LOCAL_TABLE`.
 
 ```text
-/missionharvest start 229 1
+/missionharvest start 7 1 CENTERED_BASELINE
 ```
 
 Wait for completion feedback, then:

@@ -53,17 +53,17 @@ completion matrices and dated evidence retain detailed provenance.
   not claimed optimal. The recommended 54-character roster is proven minimal
   when all 233 Helpbot-backed QLs must use a pinned Helpbot level/QL edge; only
   the 17 absent QLs use inferred high-level rows. Runtime mission generation
-  is unchanged. MissionHarvest capture-contract version 2 now correlates every
+  is unchanged. MissionHarvest capture-contract version 3 now correlates every
   offer with its request-time terminal origin, preserves destination coordinates,
   emits the five exact capture-backed mission-icon types, records reward-item
   descriptors, and retains every public AOSharp `MissionInfo` field plus raw
-  unknown chunks. The normalizer keeps the new origin/destination structures and
-  accepts earlier schema-version-1 journals. Plan:
+  unknown chunks. Capture-contract version 3 adds explicit seven-slider state,
+  exact raw outbound/inbound packets, stable state/cohort association, and
+  fail-closed verification. The normalizer accepts schema versions 1-3. Plan:
   `docs/mission-harvest/mission-ql-1-250-plan.md`.
-  The large level-2 campaign is paused at a documented slider gate: the current
-  active roller fixes all six non-difficulty controls at its center encoding
-  and cannot select duplicate-QL detents. The minimum discovery matrix and
-  evidence boundaries are in
+  The explicit-slider implementation gate is satisfied by Harvester 1.3.0. The
+  large level-2 campaign remains paused only for the documented one-request live
+  acceptance. The minimum discovery matrix and evidence boundaries are in
   `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
   Malis is not an operational dependency for automation or capture.
 

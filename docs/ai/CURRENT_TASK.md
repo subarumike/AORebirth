@@ -5,23 +5,23 @@
 Harvest one complete live Rubi-Ka mission-terminal offer cohort for every
 target QL 1-250. The generated plan assigns every target exactly once to an
 exact character-level/difficulty-slot pair and the AOSharp harvester now
-resolves target QL to the exact slot, fails closed when a target is unavailable,
+accepts that exact detent, reports its static expected QL, and fails closed when
+the state cannot be represented or verified,
 and reports completion plus output location. Mike owns AO client, plugin, and
 terminal interaction; Codex analyzes only completed session folders. Use
 `docs/mission-harvest/mission-ql-1-250-plan.md` as the literal runbook. Do not
 substitute a nearby QL, infer response-side mission QL from request metadata, or
 change AORebirth mission generation from static planning evidence. Harvester
-capture-contract version 2 must preserve the request-time terminal origin,
+capture-contract version 3 must preserve the request-time terminal origin,
 mission destination, exact known icon type, reward-item descriptors, and every
 AOSharp-exposed offer field; a finite roll sample is never proof of pool
 exhaustion.
 
-Before any further level-2 harvest, satisfy the slider-capture gate in
-`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
-Current harvester 1.2.1 active mode is centered-only for the six
-non-difficulty sliders and must not be used for the large low-level campaign.
-Do not let the level-2 character level, and do not infer slider effects from
-historical descriptions or centered-only offers.
+Before any further level-2 harvest, run the one-request live acceptance in
+`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`. Harvester 1.3.0 now
+owns all seven explicit controls and raw request/response evidence; Malis is not
+an operational dependency. Do not let the level-2 character level, and do not
+infer slider effects from historical descriptions or the discovery sample.
 
 ## Prior active checkpoint
 

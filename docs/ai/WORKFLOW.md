@@ -411,38 +411,39 @@ cmd /d /c Tools\generate_mission_ql_harvest_plan.cmd
 cmd /d /c Tools\generate_mission_ql_harvest_plan.cmd --check
 ```
 
-The in-game command accepts a target QL directly:
+The in-game command accepts an exact difficulty detent and mandatory complete
+slider preset (or all six explicit custom values):
 
 ```text
-/missionharvest start <targetQL> <requestCount> [intervalSeconds]
+/missionharvest start <difficultyDetent 1-11> <requestCount> <preset> [intervalSeconds]
+/missionharvest startcustom <difficultyDetent 1-11> <requestCount> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds]
 /missionharvest status
 /missionharvest stop
 ```
 
-MissionHarvest resolves the first exact matching slot for the current character
-level. It must send no request when the target is absent; nearest-QL substitution
-is forbidden.
+MissionHarvest 1.3 accepts an explicit one-based difficulty detent. It records
+the static mission QL resolved from current character level plus that detent;
+nearest-QL substitution and silent first-detent selection are forbidden.
 
-Harvester capture-contract version 2 records a request-time roll-origin snapshot
+Harvester capture-contract version 3 records a request-time roll-origin snapshot
 on every request, cohort, and offer: terminal identity/name, terminal playfield,
 local/global coordinates, rotation, and player coordinates. Each offer separately
 records the destination playfield/coordinates, all AOSharp `MissionInfo` fields,
 reward item low/high IDs and QL, all raw unknown chunks, and the exact
 capture-backed mission type for known icons. Known types also carry the five
 canonical Rubi-Ka labels: Find Item, Return Item, Repair, Find Person, and Kill
-Person; the original Malis label remains as provenance. Unknown icons remain
+Person; any retained Malis label is historical provenance only. Unknown icons remain
 unclassified with their numeric value preserved. The normalizer retains both
 the origin and destination and remains backward-compatible with schema-version-1
-journals.
+and schema-version-2 journals. Version 3 also retains the requested semantic
+slider state, native values, stable state ID, exact serialized/transmitted raw
+request, exact raw response, returned sliders, and fail-closed verification.
 
-Do not start the large level-2 campaign until the slider gate in
-`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md` is
-satisfied. Harvester 1.2.1 active mode sends byte `255` (the capture tool's
-canonical center encoding)
-for Good/Bad, Order/Chaos, Open/Hidden, Physical/Mystical, Head On/Stealth, and
-Money/XP and resolves a target QL to the first matching difficulty detent. It
-cannot execute the required one-variable-at-a-time low-level matrix as-is.
-Malis is not part of this capture workflow.
+The explicit-slider implementation gate in
+`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md` is satisfied by
+Harvester 1.3. Before the larger level-2 campaign, Mike must run the documented
+single-request `CENTERED_BASELINE` live acceptance. Malis is not part of this
+capture workflow.
 
 ## Database-Wide Official Playfield Placement Import
 

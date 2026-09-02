@@ -31,6 +31,7 @@ ACCESS = ROOT / "docs/reference/missions/modern-capture/character-level-capture-
 SESSION_INDEX = ROOT / "docs/reference/missions/modern-capture/capture-session-index.json"
 GENERATED = ROOT / "docs/generated/missions/modern-capture"
 FIXTURE = ROOT / "Tools/tests/fixtures/modern-mission-capture/events.jsonl"
+SCHEMA3_FIXTURE = ROOT / "Tools/tests/fixtures/modern-mission-capture/schema3-events.jsonl"
 
 ARPA_BASELINE = "de61fa4cacb3626cb19155b9548c5325df6d8fd6"
 MALIS_BASELINE = "1cb8b18c2b3683114e947b0ff42b43cf035d0f23"
@@ -492,7 +493,22 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                 "Inputs": payload,
                 "RollOrigin": payload.get("roll_origin")
                 or legacy_roll_origin(session_inputs),
+                "SliderStateId": payload.get("slider_state_id"),
+                "SliderPreset": payload.get("slider_preset"),
+                "RequestedSemanticState": payload.get("requested_semantic_state"),
+                "OutboundRawPackets": [],
+                "InboundRawPackets": [],
+                "Errors": [],
             }
+        elif event_type == "request_transmitted":
+            request = requests[event["request_id"]]
+            request["OutboundRawPackets"].append(payload.get("raw_packet"))
+            request["TransmittedNativeValues"] = payload.get("transmitted_native_values")
+            request["TransmissionVerificationStatus"] = payload.get("verification_status")
+        elif event_type == "raw_response_received":
+            request = requests[event["request_id"]]
+            request["InboundRawPackets"].append(payload.get("raw_packet"))
+            request["RawResponseAssociationStatus"] = payload.get("association_status")
         elif event_type == "cohort_received":
             fingerprint = str(payload.get("callback_fingerprint") or "")
             if fingerprint and fingerprint in fingerprints:
@@ -504,8 +520,13 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
             request["CompletedAtUtc"] = event["timestamp_utc"]
             request["Status"] = "COMPLETE_FIVE_OFFER_COHORT" if len(payload["offers"]) == 5 else "COMPLETE_NONSTANDARD_COHORT"
             request["CohortOfferCount"] = len(payload["offers"])
+            request["CohortId"] = payload.get("cohort_id")
+            request["SliderStateId"] = payload.get("slider_state_id") or request.get("SliderStateId")
+            request["RequestedSemanticState"] = payload.get("requested_semantic_state") or request.get("RequestedSemanticState")
             request["ResponseEnvelope"] = payload.get("message_envelope")
-            request["ReturnedSliders"] = payload.get("sliders")
+            request["ReturnedSliders"] = payload.get("returned_sliders") or payload.get("sliders")
+            request["SliderVerification"] = payload.get("slider_verification")
+            request["RawResponsePacket"] = payload.get("raw_response_packet")
             request["RollOrigin"] = payload.get("roll_origin") or request.get("RollOrigin")
             for raw_offer in payload["offers"]:
                 session_inputs = session.get("Inputs") if session is not None else None
@@ -546,13 +567,15 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                     {
                         "SessionId": event["session_id"],
                         "RequestId": event["request_id"],
+                        "CohortId": raw_offer.get("cohort_id") or payload.get("cohort_id"),
+                        "SliderStateId": raw_offer.get("slider_state_id") or payload.get("slider_state_id"),
                         "OfferId": f'{event["request_id"]}/offer/{int(raw_offer["offer_index"]):02d}',
                         "OfferIndex": int(raw_offer["offer_index"]),
                         "ObservedAtUtc": event["timestamp_utc"],
                         "MissionIdentity": raw_offer.get("mission_identity"),
                         "MissionQl": None,
                         "MissionQlAvailability": "NOT_EXPOSED_BY_AOSHARP_MISSIONINFO_1_0_106",
-                        "PlannedTargetMissionQl": request["Inputs"].get("target_mission_ql"),
+                        "PlannedTargetMissionQl": request["Inputs"].get("static_expected_mission_ql", request["Inputs"].get("target_mission_ql")),
                         "MissionType": mission_type_join.get(int(raw_offer["mission_icon"])),
                         "MissionTemplateOrTypeId": None,
                         "MissionIcon": raw_offer.get("mission_icon"),
@@ -582,6 +605,13 @@ def normalize_events(events_path: Path, output_dir: Path) -> dict[str, object]:
                 )
         elif event_type == "duplicate_callback":
             duplicate_count += 1
+        elif event_type == "request_timeout" and event.get("request_id") in requests:
+            requests[event["request_id"]]["Status"] = "FAILED_CLOSED_REQUEST_TIMEOUT"
+            requests[event["request_id"]]["Errors"].append(payload)
+        elif event_type == "error" and event.get("request_id") in requests:
+            requests[event["request_id"]]["Errors"].append(payload)
+            if payload.get("disposition") == "FAILED_CLOSED_NO_FURTHER_REQUESTS":
+                requests[event["request_id"]]["Status"] = "FAILED_CLOSED"
         elif event_type == "session_stopped" and session is not None:
             session["StoppedAtUtc"] = event["timestamp_utc"]
             session["Status"] = "STOPPED"
@@ -619,10 +649,12 @@ def load_observation_counts() -> tuple[Counter[int], Counter[int], Counter[tuple
             for line in stream:
                 request = json.loads(line)
                 inputs = request.get("Inputs", {})
-                if inputs.get("target_mission_ql") is not None and inputs.get("difficulty_slot") is not None:
+                mission_ql = inputs.get("static_expected_mission_ql", inputs.get("target_mission_ql"))
+                difficulty = inputs.get("difficulty_detent", inputs.get("difficulty_slot"))
+                if mission_ql is not None and difficulty is not None:
                     requests[request["RequestId"]] = (
-                        int(inputs["difficulty_slot"]),
-                        int(inputs["target_mission_ql"]),
+                        int(difficulty),
+                        int(mission_ql),
                     )
         offer_path = ROOT / entry["NormalizedOfferJsonl"]
         session_level = int(entry["CharacterLevel"])
@@ -674,7 +706,8 @@ def build_statistical_readiness() -> dict[str, object]:
         with request_path.open("r", encoding="utf-8") as stream:
             for line in stream:
                 request = json.loads(line)
-                ql = request.get("Inputs", {}).get("target_mission_ql")
+                inputs = request.get("Inputs", {})
+                ql = inputs.get("static_expected_mission_ql", inputs.get("target_mission_ql"))
                 if ql is None:
                     continue
                 ql = int(ql)
@@ -892,8 +925,8 @@ def harvester_schema() -> dict[str, object]:
         "type": "object",
         "required": ["event_type", "schema_version", "session_id", "timestamp_utc", "payload"],
         "properties": {
-            "event_type": {"enum": ["session_started", "request_started", "cohort_received", "request_timeout", "duplicate_callback", "session_stopped", "error"]},
-            "schema_version": {"enum": [1, 2]},
+            "event_type": {"enum": ["session_started", "request_started", "request_transmitted", "raw_response_received", "cohort_received", "request_timeout", "duplicate_callback", "session_stopped", "error"]},
+            "schema_version": {"enum": [1, 2, 3]},
             "session_id": {"type": "string"},
             "request_id": {"type": ["string", "null"]},
             "timestamp_utc": {"type": "string"},
@@ -901,9 +934,10 @@ def harvester_schema() -> dict[str, object]:
         },
         "additionalProperties": True,
         "Durability": "one JSON object per line; append and Flush(true) after every event",
-        "SemanticBoundary": "schema 2 target_mission_ql is resolved to an exact character-level table slot at request time; MissionInfo 1.0.106 still does not expose a response-side mission QL",
+        "SemanticBoundary": "schema 3 static_expected_mission_ql is resolved from character level plus explicit difficulty detent; it is not a response-side mission QL",
         "CaptureContractV2": "request-time terminal origin, mission destination, capture-backed mission-icon type, reward-item descriptors, every public MissionInfo field, and every public QuestAlternativeMessage envelope field",
-        "BackwardCompatibility": "schema 1 journals normalize with session-level roll-origin fallback when terminal location fields are present",
+        "CaptureContractV3": "explicit seven-slider state, stable slider-state id, native request readback, exact serialized and transmitted request packets, exact received response packet, returned sliders, and verified request/cohort association",
+        "BackwardCompatibility": "schema 1 and 2 journals remain accepted; schema 1 uses session-level roll-origin fallback when terminal location fields are present",
     }
 
 
@@ -1004,6 +1038,17 @@ def self_test() -> None:
         assert normalized["Offers"][0]["MissionDestination"]["playfield_name"]["Name"]
         assert normalized["Offers"][4]["UnknownFields"]["FutureUnknown"] == "preserve-me"
         assert normalized["Offers"][0]["MissionQl"] is None
+    with tempfile.TemporaryDirectory(prefix="aorebirth-mission-normalizer-v3-") as temp:
+        normalized = normalize_events(SCHEMA3_FIXTURE, Path(temp))
+        request = normalized["Requests"][0]
+        assert request["Status"] == "COMPLETE_NONSTANDARD_COHORT"
+        assert request["SliderStateId"] == "slider-state-test"
+        assert request["TransmissionVerificationStatus"] == "MATCH"
+        assert request["OutboundRawPackets"][0]["sha256"] == "request-sha"
+        assert request["InboundRawPackets"][0]["sha256"] == "response-sha"
+        assert request["SliderVerification"]["status"] == "MATCH"
+        assert normalized["Offers"][0]["CohortId"] == "request-1/cohort/0001"
+        assert normalized["Offers"][0]["SliderStateId"] == "slider-state-test"
     first = build_outputs()
     second = build_outputs()
     assert first == second

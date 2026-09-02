@@ -1,251 +1,251 @@
 mission_ql,character_level,slider_position,rollable,evidence_status,request_count,expected_offers_per_complete_cohort,harvest_command
-1,2,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1
-2,2,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1
-3,2,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1
-4,7,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1
-5,7,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1
-6,7,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1
-7,7,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1
-8,7,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1
-9,7,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1
-10,7,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1
-11,17,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1
-12,7,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 12 1
-13,17,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 13 1
-14,18,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 14 1
-15,17,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 15 1
-16,18,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 16 1
-17,17,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 17 1
-18,18,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 18 1
-19,18,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 19 1
-20,17,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 20 1
-21,18,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 21 1
-22,17,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 22 1
-23,18,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 23 1
-24,35,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 24 1
-25,17,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 25 1
-26,35,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 26 1
-27,18,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 27 1
-28,35,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 28 1
-29,35,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 29 1
-30,17,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 30 1
-31,42,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 31 1
-32,18,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 32 1
-33,42,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 33 1
-34,49,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 34 1
-35,42,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 35 1
-36,49,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 36 1
-37,42,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 37 1
-38,51,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 38 1
-39,49,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 39 1
-40,51,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 40 1
-41,49,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 41 1
-42,35,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 42 1
-43,51,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 43 1
-44,64,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 44 1
-45,51,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 45 1
-46,42,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 46 1
-47,68,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 47 1
-48,64,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 48 1
-49,49,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 49 1
-50,42,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 50 1
-51,51,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 51 1
-52,35,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 52 1
-53,49,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 53 1
-54,64,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 54 1
-55,79,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 55 1
-56,51,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 56 1
-57,68,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 57 1
-58,49,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 58 1
-59,79,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 59 1
-60,87,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 60 1
-61,68,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 61 1
-62,35,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 62 1
-63,79,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 63 1
-64,64,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 64 1
-65,87,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 65 1
-66,51,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 66 1
-67,97,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 67 1
-68,68,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 68 1
-69,87,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 69 1
-70,64,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 70 1
-71,79,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 71 1
-72,97,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 72 1
-73,105,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 73 1
-74,68,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 74 1
-75,42,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 75 1
-76,64,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 76 1
-77,110,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 77 1
-78,105,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 78 1
-79,79,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 79 1
-80,115,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 80 1
-81,68,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 81 1
-82,118,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 82 1
-83,64,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 83 1
-84,105,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 84 1
-85,122,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 85 1
-86,124,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 86 1
-87,97,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 87 1
-88,110,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 88 1
-89,112,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 89 1
-90,120,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 90 1
-91,122,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 91 1
-92,132,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 92 1
-93,133,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 93 1
-94,105,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 94 1
-95,87,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 95 1
-96,128,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 96 1
-97,97,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 97 1
-98,131,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 98 1
-99,132,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 99 1
-100,134,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 100 1
-101,135,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 101 1
-102,137,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 102 1
-103,115,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 103 1
-104,130,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 104 1
-105,132,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 105 1
-106,142,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 106 1
-107,127,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 107 1
-108,136,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 108 1
-109,122,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 109 1
-110,147,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 110 1
-111,139,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 111 1
-112,112,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 112 1
-113,133,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 113 1
-114,127,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 114 1
-115,105,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 115 1
-116,129,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 116 1
-117,131,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 117 1
-118,118,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 118 1
-119,140,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 119 1
-120,120,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 120 1
-121,121,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 121 1
-122,112,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 122 1
-123,137,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 123 1
-124,138,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 124 1
-125,125,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 125 1
-126,140,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 126 1
-127,142,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 127 1
-128,143,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 128 1
-129,144,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 129 1
-130,130,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 130 1
-131,146,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 131 1
-132,147,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 132 1
-133,121,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 133 1
-134,149,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 134 1
-135,135,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 135 1
-136,124,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 136 1
-137,125,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 137 1
-138,115,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 138 1
-139,127,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 139 1
-140,128,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 140 1
-141,129,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 141 1
-142,142,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 142 1
-143,110,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 143 1
-144,120,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 144 1
-145,121,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 145 1
-146,146,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 146 1
-147,134,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 147 1
-148,124,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 148 1
-149,115,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 149 1
-150,125,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 150 1
-151,138,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 151 1
-152,139,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 152 1
-153,118,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 153 1
-154,129,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 154 1
-155,87,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 155 1
-156,120,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 156 1
-157,143,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 157 1
-158,144,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 158 1
-159,133,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 159 1
-160,146,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 160 1
-161,147,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 161 1
-162,125,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 162 1
-163,136,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 163 1
-164,137,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 164 1
-165,110,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 165 1
-166,128,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 166 1
-167,129,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 167 1
-168,112,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 168 1
-169,130,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 169 1
-170,131,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 170 1
-171,143,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 171 1
-172,144,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 172 1
-173,97,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 173 1
-174,134,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 174 1
-175,135,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 175 1
-176,136,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 176 1
-177,118,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 177 1
-178,149,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 178 1
-179,138,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 179 1
-180,120,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 180 1
-181,121,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 181 1
-182,140,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 182 1
-183,122,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 183 1
-184,142,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 184 1
-185,143,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 185 1
-186,124,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 186 1
-187,144,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 187 1
-188,105,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 188 1
-189,146,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 189 1
-190,127,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 190 1
-191,147,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 191 1
-192,128,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 192 1
-193,149,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 193 1
-194,177,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 194 1
-195,130,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 195 1
-196,131,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 196 1
-197,110,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 197 1
-198,132,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 198 1
-199,133,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 199 1
-200,112,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 200 1
-201,134,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 201 1
-202,135,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 202 1
-203,185,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 203 1
-204,136,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 204 1
-205,137,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 205 1
-206,115,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 206 1
-207,138,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 207 1
-208,139,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 208 1
-209,209,6,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 209 1
-210,140,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 210 1
-211,118,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 211 1
-212,142,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 212 1
-213,178,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 213 1
-214,143,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 214 1
-215,120,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 215 1
-216,144,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 216 1
-217,121,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 217 1
-218,122,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 218 1
-219,146,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 219 1
-220,147,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 220 1
-221,201,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 221 1
-222,124,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 222 1
-223,149,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 223 1
-224,125,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 224 1
-225,127,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 225 1
-226,128,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 226 1
-227,129,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 227 1
-228,208,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 228 1
-229,209,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 229 1
-230,177,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 230 1
-231,178,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 231 1
-232,130,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 232 1
-233,180,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 233 1
-234,156,10,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 234 1
-235,131,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 235 1
-236,132,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 236 1
-237,133,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 237 1
-238,134,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 238 1
-239,135,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 239 1
-240,185,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 240 1
-241,201,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 241 1
-242,202,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 242 1
-243,136,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 243 1
-244,163,10,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 244 1
-245,137,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 245 1
-246,138,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 246 1
-247,165,10,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 247 1
-248,139,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 248 1
-249,208,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 249 1
-250,140,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 250 1
+1,2,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+2,2,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+3,2,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+4,7,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+5,7,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+6,7,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+7,7,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+8,7,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+9,7,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+10,7,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+11,17,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+12,7,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+13,17,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+14,18,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+15,17,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+16,18,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+17,17,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+18,18,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+19,18,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+20,17,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+21,18,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+22,17,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+23,18,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+24,35,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+25,17,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+26,35,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+27,18,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+28,35,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+29,35,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+30,17,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+31,42,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+32,18,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+33,42,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+34,49,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+35,42,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+36,49,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+37,42,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+38,51,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+39,49,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+40,51,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+41,49,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+42,35,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+43,51,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+44,64,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+45,51,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+46,42,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+47,68,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+48,64,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+49,49,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+50,42,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+51,51,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+52,35,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+53,49,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+54,64,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+55,79,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+56,51,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+57,68,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+58,49,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+59,79,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+60,87,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+61,68,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+62,35,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+63,79,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+64,64,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+65,87,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+66,51,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+67,97,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+68,68,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+69,87,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+70,64,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+71,79,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+72,97,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+73,105,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+74,68,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+75,42,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+76,64,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+77,110,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+78,105,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+79,79,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+80,115,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+81,68,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+82,118,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+83,64,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+84,105,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+85,122,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+86,124,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+87,97,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+88,110,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+89,112,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+90,120,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+91,122,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+92,132,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+93,133,1,true,PROVEN_HELPBOT,1,5,/missionharvest start 1 1 CENTERED_BASELINE
+94,105,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+95,87,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+96,128,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+97,97,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+98,131,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+99,132,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+100,134,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+101,135,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+102,137,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+103,115,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+104,130,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+105,132,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+106,142,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+107,127,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+108,136,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+109,122,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+110,147,2,true,PROVEN_HELPBOT,1,5,/missionharvest start 2 1 CENTERED_BASELINE
+111,139,3,true,PROVEN_HELPBOT,1,5,/missionharvest start 3 1 CENTERED_BASELINE
+112,112,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+113,133,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+114,127,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+115,105,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+116,129,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+117,131,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+118,118,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+119,140,4,true,PROVEN_HELPBOT,1,5,/missionharvest start 4 1 CENTERED_BASELINE
+120,120,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+121,121,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+122,112,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+123,137,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+124,138,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+125,125,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+126,140,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+127,142,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+128,143,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+129,144,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+130,130,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+131,146,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+132,147,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+133,121,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+134,149,5,true,PROVEN_HELPBOT,1,5,/missionharvest start 5 1 CENTERED_BASELINE
+135,135,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+136,124,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+137,125,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+138,115,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+139,127,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+140,128,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+141,129,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+142,142,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+143,110,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+144,120,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+145,121,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+146,146,6,true,PROVEN_HELPBOT,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+147,134,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+148,124,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+149,115,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+150,125,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+151,138,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+152,139,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+153,118,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+154,129,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+155,87,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+156,120,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+157,143,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+158,144,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+159,133,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+160,146,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+161,147,7,true,PROVEN_HELPBOT,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+162,125,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+163,136,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+164,137,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+165,110,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+166,128,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+167,129,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+168,112,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+169,130,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+170,131,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+171,143,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+172,144,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+173,97,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+174,134,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+175,135,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+176,136,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+177,118,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+178,149,8,true,PROVEN_HELPBOT,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+179,138,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+180,120,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+181,121,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+182,140,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+183,122,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+184,142,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+185,143,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+186,124,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+187,144,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+188,105,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+189,146,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+190,127,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+191,147,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+192,128,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+193,149,9,true,PROVEN_HELPBOT,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+194,177,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+195,130,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+196,131,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+197,110,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+198,132,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+199,133,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+200,112,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+201,134,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+202,135,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+203,185,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+204,136,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+205,137,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+206,115,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+207,138,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+208,139,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+209,209,6,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 6 1 CENTERED_BASELINE
+210,140,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+211,118,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+212,142,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+213,178,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+214,143,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+215,120,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+216,144,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+217,121,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+218,122,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+219,146,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+220,147,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+221,201,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+222,124,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+223,149,10,true,PROVEN_HELPBOT,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+224,125,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+225,127,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+226,128,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+227,129,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+228,208,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+229,209,7,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 7 1 CENTERED_BASELINE
+230,177,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+231,178,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+232,130,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+233,180,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+234,156,10,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+235,131,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+236,132,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+237,133,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+238,134,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+239,135,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+240,185,9,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 9 1 CENTERED_BASELINE
+241,201,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+242,202,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+243,136,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+244,163,10,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+245,137,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+246,138,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+247,165,10,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 10 1 CENTERED_BASELINE
+248,139,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
+249,208,8,true,INFERRED_LOCAL_TABLE,1,5,/missionharvest start 8 1 CENTERED_BASELINE
+250,140,11,true,PROVEN_HELPBOT,1,5,/missionharvest start 11 1 CENTERED_BASELINE
