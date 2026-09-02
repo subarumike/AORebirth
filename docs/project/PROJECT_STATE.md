@@ -66,6 +66,8 @@ completion matrices and dated evidence retain detailed provenance.
   large level-2 campaign remains paused only for the documented one-request live
   acceptance. The minimum discovery matrix and evidence boundaries are in
   `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
+  Live discovery states 1-11 are accepted; the remaining resumable range is
+  states 12-27 with two requests per state.
   Malis is not an operational dependency for automation or capture.
 
 - Temple documented boss loot, together with the preceding Inner Sanctum and

@@ -23,6 +23,8 @@ owns all seven explicit controls and raw request/response evidence; Malis is not
 an operational dependency. Its resumable matrix command replaces manual
 per-state commands. Do not let the level-2 character level, and do not
 infer slider effects from historical descriptions or the discovery sample.
+Live states 1-11 have passed raw-packet, slider, cohort, five-offer, and
+normalization validation. Resume once with `/missionharvest matrix 12 27 2 2.0`.
 
 ## Prior active checkpoint
 
