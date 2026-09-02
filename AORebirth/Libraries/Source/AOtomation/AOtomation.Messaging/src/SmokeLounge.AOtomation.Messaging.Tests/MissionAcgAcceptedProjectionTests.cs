@@ -125,6 +125,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void RequestSlidersRemainIndependentFromCapturedResponseEnvelope()
+        {
+            SourceOffer source =
+                FindAllMissionTypes()[MissionRollType.KillPerson];
+            const byte rawLevel = 6;
+            const int goodBad = -80;
+            const int orderChaos = 60;
+            const int openHidden = -40;
+            const int physicalMystical = 20;
+            const int headOnStealth = -20;
+            const int moneyExperience = 80;
+
+            Assert.IsTrue(
+                source.Roll.LevelSlider != rawLevel
+                || DecodeSlider(source.Roll.GoodBadSlider) != goodBad
+                || DecodeSlider(source.Roll.OrderChaosSlider) != orderChaos
+                || DecodeSlider(source.Roll.OpenHiddenSlider) != openHidden
+                || DecodeSlider(source.Roll.PhysicalMysticalSlider) != physicalMystical
+                || DecodeSlider(source.Roll.HeadOnStealthSlider) != headOnStealth
+                || DecodeSlider(source.Roll.MoneyExperienceSlider) != moneyExperience,
+                "The regression fixture must retain different request and response slider semantics.");
+
+            MissionAcgAcceptedProjection projection =
+                this.CreateProjection(
+                    source,
+                    94,
+                    4094,
+                    MissionAcgAcceptancePhase.QfuSent,
+                    rawLevel,
+                    goodBad,
+                    orderChaos,
+                    openHidden,
+                    physicalMystical,
+                    headOnStealth,
+                    moneyExperience);
+
+            Assert.AreEqual(rawLevel, projection.RawLevelSlider);
+            Assert.AreEqual(goodBad, projection.GoodBadSlider);
+            Assert.AreEqual(orderChaos, projection.OrderChaosSlider);
+            Assert.AreEqual(openHidden, projection.OpenHiddenSlider);
+            Assert.AreEqual(physicalMystical, projection.PhysicalMysticalSlider);
+            Assert.AreEqual(headOnStealth, projection.HeadOnStealthSlider);
+            Assert.AreEqual(moneyExperience, projection.MoneyExperienceSlider);
+        }
+
+        [TestMethod]
         public void FrozenTextRewardsItemsActionsAndQfuContractsSurviveRestart()
         {
             IDictionary<MissionRollType, SourceOffer> sources = FindAllMissionTypes();
@@ -548,6 +594,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int ownerInstance,
             MissionAcgAcceptancePhase phase)
         {
+            return this.CreateProjection(
+                source,
+                salt,
+                ownerInstance,
+                phase,
+                source.Roll.LevelSlider,
+                DecodeSlider(source.Roll.GoodBadSlider),
+                DecodeSlider(source.Roll.OrderChaosSlider),
+                DecodeSlider(source.Roll.OpenHiddenSlider),
+                DecodeSlider(source.Roll.PhysicalMysticalSlider),
+                DecodeSlider(source.Roll.HeadOnStealthSlider),
+                DecodeSlider(source.Roll.MoneyExperienceSlider));
+        }
+
+        private MissionAcgAcceptedProjection CreateProjection(
+            SourceOffer source,
+            int salt,
+            int ownerInstance,
+            MissionAcgAcceptancePhase phase,
+            byte rawLevelSlider,
+            int goodBadSlider,
+            int orderChaosSlider,
+            int openHiddenSlider,
+            int physicalMysticalSlider,
+            int headOnStealthSlider,
+            int moneyExperienceSlider)
+        {
             MissionRollType missionType =
                 MissionTypeCatalog.TypeFromIcon(source.Offer.MissionIconId);
             var owner = new MissionAcgIdentityRecord(0xC350, ownerInstance);
@@ -616,13 +689,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 binding,
                 source.Body,
                 source.OfferIndex,
-                source.Roll.LevelSlider,
-                DecodeSlider(source.Roll.GoodBadSlider),
-                DecodeSlider(source.Roll.OrderChaosSlider),
-                DecodeSlider(source.Roll.OpenHiddenSlider),
-                DecodeSlider(source.Roll.PhysicalMysticalSlider),
-                DecodeSlider(source.Roll.HeadOnStealthSlider),
-                DecodeSlider(source.Roll.MoneyExperienceSlider),
+                rawLevelSlider,
+                goodBadSlider,
+                orderChaosSlider,
+                openHiddenSlider,
+                physicalMysticalSlider,
+                headOnStealthSlider,
+                moneyExperienceSlider,
                 offeredUtc,
                 expiryUtc,
                 qfuVersion,
