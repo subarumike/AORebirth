@@ -88,6 +88,13 @@ namespace AORebirth.Core.Playfields
                 sendCorpseCloseAction(looter, corpse);
                 sendUseActionFinished(looter);
 
+                // Despawn only after close when fully empty — not on open, so corpses with
+                // unlooted items stay visible if the player opens and closes without looting.
+                if (isEmpty(corpse))
+                {
+                    scheduleCorpseDespawn(corpse, emptyCleanupDelay, "closed-empty");
+                }
+
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     string.Format(
@@ -119,11 +126,6 @@ namespace AORebirth.Core.Playfields
                     corpse,
                     sendCorpseInventoryUpdate,
                     scheduleCorpseCreditAward);
-            }
-
-            if (isEmpty(corpse))
-            {
-                scheduleCorpseDespawn(corpse, emptyCleanupDelay, "opened-empty");
             }
 
             LogUtil.Debug(

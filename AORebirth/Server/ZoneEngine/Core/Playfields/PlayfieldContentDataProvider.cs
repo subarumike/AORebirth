@@ -123,6 +123,28 @@ namespace ZoneEngine.Core.Playfields
                 return new List<StatelData>();
             }
 
+            if (NascenceDungeon3Rules.IsDungeonPlayfield(playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nascence Dungeon 3 instance created without PFData statels instance={0} evidence=20260830-140240",
+                        playfieldIdentity.Instance));
+                return new List<StatelData>();
+            }
+
+            if (NascenceDungeon4Rules.IsDungeonPlayfield(playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nascence Dungeon 4 instance created without PFData statels instance={0} evidence=20260830-143801",
+                        playfieldIdentity.Instance));
+                return new List<StatelData>();
+            }
+
             return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
         }
 

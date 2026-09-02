@@ -586,6 +586,7 @@ namespace LoginEngine
             {
                 // Setup and enable NLog logging to file
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/LoginEngineLog.txt", LogLevel.Trace);
 
                 // NBug initialization

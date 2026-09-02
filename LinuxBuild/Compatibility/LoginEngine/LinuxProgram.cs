@@ -271,6 +271,7 @@ namespace LoginEngine
         private static void InitializeLogging()
         {
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
+            LogUtil.ApplyConfiguredDebugDetails();
             AppDomain.CurrentDomain.UnhandledException += LinuxUnhandledException;
             TaskScheduler.UnobservedTaskException += LinuxUnobservedTaskException;
         }

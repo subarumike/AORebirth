@@ -61,7 +61,7 @@ namespace AORebirth.Core.Entities
 
     /// <summary>
     /// </summary>
-    public class Character : Dynel, ICharacter, IDynel
+    public partial class Character : Dynel, ICharacter, IDynel
     {
         #region Fields
 
@@ -234,11 +234,6 @@ namespace AORebirth.Core.Entities
         /// Per-slot auto-attack clocks (Lost Eden multi-weapon model).
         /// </summary>
         public Dictionary<WeaponSlot, CharacterWeapon> Weapons { get; private set; }
-
-        /// <summary>
-        /// Playfield-registered combat apply. Invoked when a CharacterWeapon fires Attacked.
-        /// </summary>
-        public Action<WeaponSlot> CombatSwingHandler { get; set; }
 
         /// <summary>
         /// Accumulated healinterval elapsed seconds (deltaTime regen).
@@ -649,14 +644,7 @@ namespace AORebirth.Core.Entities
             }
 
             weapon.Wielder = this;
-            Action handler = () =>
-                {
-                    Action<WeaponSlot> swingHandler = this.CombatSwingHandler;
-                    if (swingHandler != null)
-                    {
-                        swingHandler(slot);
-                    }
-                };
+            Action handler = () => this.ProcessWeaponSwing(slot);
             this.weaponAttackHandlers[slot] = handler;
             this.Weapons[slot] = weapon;
             weapon.Attacked += handler;

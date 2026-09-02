@@ -174,6 +174,12 @@ namespace ZoneEngine.Core.MessageHandlers
             AORebirth.Core.Playfields.NascenceDungeon2DoorReplay.TrySendNearbyOnMove(
                 client,
                 client.Controller.Character);
+            AORebirth.Core.Playfields.NascenceDungeon3DoorReplay.TrySendNearbyOnMove(
+                client,
+                client.Controller.Character);
+            AORebirth.Core.Playfields.NascenceDungeon4DoorReplay.TrySendNearbyOnMove(
+                client,
+                client.Controller.Character);
 
             // Garden save: only when standing on the save pad (once per visit).
             ZoneEngine.Core.ShadowlandsGardenSaveRuntimeService.TryApplyWhenOnSavePad(

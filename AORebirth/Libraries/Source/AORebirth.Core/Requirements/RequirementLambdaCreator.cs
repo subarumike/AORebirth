@@ -106,6 +106,30 @@ namespace AORebirth.Core.Requirements
                     return k => ((Character)GetTarget(t).Compile().Invoke(k)).HasPerk(statValue);
                 case Operator.HasNotPerk:
                     return k => !((Character)GetTarget(t).Compile().Invoke(k)).HasPerk(statValue);
+                case Operator.HasWornItem:
+                    return k =>
+                        EquipmentRequirementChecks.HasWornItemTemplate(
+                            (Character)GetTarget(t).Compile().Invoke(k),
+                            statValue);
+                case Operator.HasNotWornItem:
+                    return k =>
+                        !EquipmentRequirementChecks.HasWornItemTemplate(
+                            (Character)GetTarget(t).Compile().Invoke(k),
+                            statValue);
+                case Operator.HasWieldedItem:
+                    return k =>
+                        EquipmentRequirementChecks.HasWieldedItemTemplate(
+                            (Character)GetTarget(t).Compile().Invoke(k),
+                            statValue);
+                case Operator.HasNotWieldedItem:
+                    return k =>
+                        !EquipmentRequirementChecks.HasWieldedItemTemplate(
+                            (Character)GetTarget(t).Compile().Invoke(k),
+                            statValue);
+                case Operator.True:
+                    return k => true;
+                case Operator.False:
+                    return k => false;
                 case Operator.FlyingAllowed:
                     return k => true;
                 default:

@@ -809,6 +809,12 @@ namespace ZoneEngine.Core.Controllers
             StatMessageHandler.Default.SendBulk(this.Character, toPlayer, toPlayfield);
         }
 
+        public void SendCombatHealthStatWire(uint wireHealth)
+        {
+            StatMessageHandler.Default.AnnounceSingle(this.Character, (int)StatIds.health, wireHealth);
+            this.Character.Stats[(int)StatIds.health].Changed = false;
+        }
+
         public void CallFunction(Function function, IEntity caller)
         {
             FunctionCollection.Instance.CallFunction(

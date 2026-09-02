@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using System;
     using System.Threading;
 
+    using AORebirth.Core.Combat;
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
@@ -18,14 +19,11 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core;
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
-    /// <summary>
-    /// Handles CharSecSpecAttack (FlingShot / Burst / Brawl / Dimach).
-    /// Capture 20260719-fling-burst + 20260724-001643 sequence:
-    /// echo CharSecSpecAttack → CharacterAction SpecialUsed → SpecialAttackInfo (damage) → later SpecialAvailable.
-    /// </summary>
     [MessageHandler(MessageHandlerDirection.InboundOnly)]
     public class CharSecSpecAttackMessageHandler :
         BaseMessageHandler<CharSecSpecAttackMessage, CharSecSpecAttackMessageHandler>
@@ -39,7 +37,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            ICharacter character = client.Controller.Character;
+            Character character = client.Controller.Character as Character;
+            if (character == null)
+            {
+                return;
+            }
+
+            ClientActionBusyRuntime.Clear(character);
+
             int specialStatId = message.Stat;
             Identity targetId = message.Target;
 
@@ -49,7 +54,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 specialStatId,
                 targetId);
 
-            if (!PlayerSpecialAttackRules.IsSupportedSpecial(specialStatId))
+            if (!CharacterSpecialAttackRules.IsSupportedSpecial(specialStatId))
             {
                 client.Server.Info(client, "CharSecSpecAttack ignored: unsupported special={0}", specialStatId);
                 return;
@@ -65,30 +70,32 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            string missionSpatialFailure;
+            if (!MissionAcgSpatialRuntime.TryValidateCombatPair(
+                    character,
+                    target,
+                    out missionSpatialFailure))
+            {
+                client.Server.Info(client, "CharSecSpecAttack ignored: mission spatial validation failed.");
+                return;
+            }
+
+            CharacterSpecialAttackResult specialResult =
+                character.ProcessSpecialAttack(target, (StatIds)specialStatId);
+            if (specialResult.Outcome != StrikeOutcome.Applied)
+            {
+                client.Server.Info(client, "CharSecSpecAttack failed: outcome={0}", specialResult.Outcome);
+                return;
+            }
+
             Playfield playfield = character.Playfield as Playfield;
             if (playfield == null)
             {
                 return;
             }
 
-            int damage;
-            int ammoCount;
-            int equipSlot;
-            if (!playfield.TryApplyPlayerSpecialAttack(
-                    character,
-                    target,
-                    specialStatId,
-                    out damage,
-                    out ammoCount,
-                    out equipSlot))
-            {
-                client.Server.Info(client, "CharSecSpecAttack failed: no weapon damage source.");
-                return;
-            }
+            int lockSeconds = CharacterSpecialAttackRules.ResolveLockSeconds(specialStatId);
 
-            int lockSeconds = PlayerSpecialAttackRules.ResolveLockSeconds(specialStatId);
-
-            // Capture order: echo CharSecSpecAttack → SpecialUsed → SpecialAttackInfo.
             playfield.Announce(
                 new CharSecSpecAttackMessage
                 {
@@ -116,9 +123,9 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                     Identity = character.Identity,
                     Unknown = 0,
-                    Unknown1 = equipSlot,
-                    Unknown2 = damage,
-                    Unknown3 = ammoCount,
+                    Unknown1 = specialResult.EquipSlot,
+                    Unknown2 = specialResult.Damage,
+                    Unknown3 = specialResult.AmmoCount,
                     Target = targetId,
                     Unknown4 = specialStatId,
                     Unknown5 = 0

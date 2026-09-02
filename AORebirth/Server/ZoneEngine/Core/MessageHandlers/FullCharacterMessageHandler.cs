@@ -65,6 +65,9 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character)
         {
+            // Capture 20260830-110744 / 124309: PF Map "Map Not Available" requires MapsC=0 in
+            // FullCharacter when Overview of Nascence and Jobe is not in NCU.
+            NanoEventRuntimeService.Default.SyncOverviewMapFlags(character, pushWire: false);
             CombatXpRuntimeService.LogXpWireSnapshot(
                 character,
                 "FullCharacterMessageHandler",
@@ -1082,9 +1085,21 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             uint value;
+            // Capture 20260830-110744 / 124309: PF Map is gated by Overview nano in NCU.
+            // Always emit ActiveNanos-derived MapsC here so a stuck DB/BaseValue cannot unlock
+            // Ctrl+5 without uploading/casting Overview of Nascence and Jobe (223767).
+            if (statId == (int)StatIds.mapareapart3)
+            {
+                const uint overviewMapsC = 403669119u;
+                const int overviewNanoId = 223767;
+                bool hasOverview = client.Controller.Character.ActiveNanos != null
+                    && client.Controller.Character.ActiveNanos.Values.Any(
+                        x => x != null && x.ID == overviewNanoId);
+                value = hasOverview ? overviewMapsC : 0u;
+            }
             // NextXP / NextSK are computed (StatNextXP / StatNextSK). Always force recalculate
             // so a stale Value cache cannot send 0 after level was loaded from DB.
-            if (statId == (int)StatIds.nextxp || statId == (int)StatIds.nextsk)
+            else if (statId == (int)StatIds.nextxp || statId == (int)StatIds.nextsk)
             {
                 client.Controller.Character.Stats[statId].ReCalculate = true;
                 int computed = client.Controller.Character.Stats[statId].Value;

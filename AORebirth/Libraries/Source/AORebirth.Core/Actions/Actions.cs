@@ -83,12 +83,20 @@ namespace AORebirth.Core.Actions
         /// </returns>
         public bool CheckRequirements(IInstancedEntity entity)
         {
-            bool result = true;
-            foreach (Requirement requirements in this.Requirements)
+            if (this.Requirements == null || this.Requirements.Count == 0)
             {
-                if (requirements.ChildOperator == Operator.And)
+                return true;
+            }
+
+            // Legacy AOAction evaluation: only ChildOperator.And links are enforced here.
+            // Or-linked profession alternatives and single-req templates stay lenient until
+            // full requirement runtime matches live AO event evaluation.
+            bool result = true;
+            foreach (Requirement requirement in this.Requirements)
+            {
+                if (requirement.ChildOperator == Operator.And)
                 {
-                    result &= requirements.CheckRequirement(entity);
+                    result &= requirement.CheckRequirement(entity);
                 }
 
                 if (!result)
@@ -98,6 +106,58 @@ namespace AORebirth.Core.Actions
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Evaluates requirements and returns a diagnostic summary when they fail.
+        /// </summary>
+        public bool TryCheckRequirements(IInstancedEntity entity, out string failureDetail)
+        {
+            failureDetail = null;
+            if (this.CheckRequirements(entity))
+            {
+                return true;
+            }
+
+            failureDetail = this.DescribeRequirementResults(entity);
+            return false;
+        }
+
+        private string DescribeRequirementResults(IInstancedEntity entity)
+        {
+            List<string> parts = new List<string>(this.Requirements.Count);
+            foreach (Requirement requirement in this.Requirements)
+            {
+                if (Requirement.IsRequirementLinkOperator(requirement)
+                    || requirement.ChildOperator != Operator.And)
+                {
+                    continue;
+                }
+
+                bool passed = requirement.CheckRequirement(entity);
+                int actual = 0;
+                try
+                {
+                    actual = entity.Stats[requirement.Statnumber].Value;
+                }
+                catch
+                {
+                }
+
+                parts.Add(
+                    string.Format(
+                        "{0}=>{1} actual={2}",
+                        requirement,
+                        passed ? "pass" : "FAIL",
+                        actual));
+            }
+
+            if (parts.Count == 0)
+            {
+                return "requirement chain failed";
+            }
+
+            return string.Join("; ", parts.ToArray());
         }
 
         #endregion

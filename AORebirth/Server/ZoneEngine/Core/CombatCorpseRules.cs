@@ -497,6 +497,8 @@ namespace ZoneEngine.Core
                 { 208922, 208937 },
                 // Capture 20260822-070136: Hiathlin / Hiathlin Prime corpse CATMesh.
                 { 209196, 208982 },
+                // Capture 20260830-143801: Hoathlan / Brisk Hoathlan Remains MD→CatMesh.
+                { 209203, 208982 },
                 // Capture 20260822-082554: Papagena corpse CATMesh (CorpseFullUpdate FCE016).
                 { 236640, 236637 },
                 // Capture 20260823-112044: Papageno Omni corpse CATMesh (CorpseFullUpdate FCE011).

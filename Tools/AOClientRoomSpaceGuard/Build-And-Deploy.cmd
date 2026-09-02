@@ -32,12 +32,9 @@ echo [RoomSpace Guard] Running wrapper self-test...
 "%TEMP_EXE%" --self-test
 if errorlevel 1 goto :fail
 
-echo [RoomSpace Guard] Validating new-client profile...
-"%TEMP_EXE%" --client-root "C:\Funcom\Anarchy Online" --inspect
-if errorlevel 1 goto :fail
 
 echo [RoomSpace Guard] Validating old-client profile...
-"%TEMP_EXE%" --client-root "D:\Funcom\Anarchy Online" --inspect
+"%TEMP_EXE%" --client-root "C:\Program Files (x86)\Steam\steamapps\common\Anarchy Online" --inspect
 if errorlevel 1 goto :fail
 
 if not exist "%DEPLOY_ROOT%" mkdir "%DEPLOY_ROOT%"

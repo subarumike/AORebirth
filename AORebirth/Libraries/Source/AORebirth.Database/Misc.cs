@@ -39,6 +39,7 @@ namespace AORebirth.Database
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     using Dapper;
 
@@ -103,15 +104,17 @@ namespace AORebirth.Database
                         if (sqlFile != null)
                         {
                             fName = Path.GetFileNameWithoutExtension(sqlFile).ToLower();
-                            if (fName.EndsWith("_alter", StringComparison.OrdinalIgnoreCase))
-                            {
-                                continue;
-                            }
-
-                            if (!Exists(conn, fName))
-                            {
-                                tablesNotFound.Add(sqlFile);
-                            }
+                    if (IsAlterScript(fName))
+                    {
+                        if (!IsAlterMigrationApplied(conn, fName, sqlFile))
+                        {
+                            tablesNotFound.Add(sqlFile);
+                                }
+                    }
+                    else if (!Exists(conn, fName))
+                    {
+                        tablesNotFound.Add(sqlFile);
+                    }
                         }
                     }
                 }
@@ -559,7 +562,86 @@ namespace AORebirth.Database
                 case "MsSql":
                     return conn.Query<string>("SELECT table_name FROM INFORMATION_SCHEMA.TABLES").Contains(fName);
                 case "PostgreSQL":
-                    return conn.Query<string>("SELECT table_name FROM information_schema.tables").Contains(fName);
+                    return conn.Query<string>("SELECT table_name FROM INFORMATION_SCHEMA.tables").Contains(fName);
+                default:
+                    throw new Exception("Unknown database type encountered. Check your Config.xml or tell the coders");
+            }
+        }
+
+        private static bool IsAlterScript(string scriptName)
+        {
+            return scriptName.EndsWith("_alter", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// *_alter.sql scripts add columns to an existing table. Skip when the base table is
+        /// missing (CREATE will include the columns) or every ADD COLUMN is already present.
+        /// </summary>
+        private static bool IsAlterMigrationApplied(IDbConnection conn, string alterScriptName, string sqlFilePath)
+        {
+            const string alterSuffix = "_alter";
+            string baseTableName = alterScriptName.Substring(
+                0,
+                alterScriptName.Length - alterSuffix.Length);
+
+            if (!Exists(conn, baseTableName))
+            {
+                return true;
+            }
+
+            string[] columnsToAdd = ParseAlterAddColumnNames(File.ReadAllText(sqlFilePath));
+            if (columnsToAdd.Length == 0)
+            {
+                return true;
+            }
+
+            HashSet<string> existingColumns = new HashSet<string>(
+                GetTableColumnNames(conn, baseTableName),
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (string columnName in columnsToAdd)
+            {
+                if (!existingColumns.Contains(columnName))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static string[] ParseAlterAddColumnNames(string alterSql)
+        {
+            MatchCollection matches = Regex.Matches(
+                alterSql,
+                @"ADD\s+COLUMN\s+`?([A-Za-z0-9_]+)`?",
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+            string[] columnNames = new string[matches.Count];
+            for (int i = 0; i < matches.Count; i++)
+            {
+                columnNames[i] = matches[i].Groups[1].Value;
+            }
+
+            return columnNames;
+        }
+
+        private static IEnumerable<string> GetTableColumnNames(IDbConnection conn, string tableName)
+        {
+            switch (Config.Instance.CurrentConfig.SQLType)
+            {
+                case "MySql":
+                    return conn.Query<string>(
+                        "SELECT column_name FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = @tableName",
+                        new { tableName });
+                case "MsSql":
+                    return conn.Query<string>(
+                        "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = @tableName",
+                        new { tableName });
+                case "PostgreSQL":
+                    return conn.Query<string>(
+                        "SELECT column_name FROM information_schema.columns WHERE table_name = @tableName",
+                        new { tableName });
                 default:
                     throw new Exception("Unknown database type encountered. Check your Config.xml or tell the coders");
             }

@@ -178,6 +178,8 @@ namespace AORebirth.Core.Playfields
         private const float CascadingSpiritSocialAggroRadiusMeters = 10f;
         // Mike: Predator Striker social aggro radius 10m (capture 20260826-054154 pocket).
         private const float PredatorStrikerSocialAggroRadiusMeters = 10f;
+        // Capture 20260827-221909: second cave Crippler Attack ~3s after first.
+        private const float CripplerOfGrowthSocialAggroRadiusMeters = 10f;
 
         // Capture 20260826-192602: login crash when char loads at ~900/1640 fork visibility.
         // Tight bubble only — Demonic Subjugator @ 733/1565 stays outside (~183m).
@@ -230,6 +232,11 @@ namespace AORebirth.Core.Playfields
 
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
         {
+            return TryGetExtendedTextureOverride(name, 0, out data);
+        }
+
+        internal static bool TryGetExtendedTextureOverride(string name, int playfieldId, out byte[] data)
+        {
             if (string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "Slivering Chimera", StringComparison.OrdinalIgnoreCase))
             {
@@ -273,7 +280,8 @@ namespace AORebirth.Core.Playfields
             }
 
             // NascenceFrontierOutdoorMobRuntime ExtTex: Deadly sabre (SCFU v58); Striker/Stalking off (crash).
-            if (NascenceFrontierOutdoorMobRuntime.TryGetExtendedTextureOverride(name, out data))
+            // Crippler PF4311 cave ExtTex gated by playfieldId (Demonic-exit crash on outdoor).
+            if (NascenceFrontierOutdoorMobRuntime.TryGetExtendedTextureOverride(name, playfieldId, out data))
             {
                 return true;
             }
@@ -690,7 +698,9 @@ namespace AORebirth.Core.Playfields
                 || string.Equals(name, "Papagena", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "Papageno", StringComparison.OrdinalIgnoreCase)
                 || NascenceDungeon1Rules.IsDungeonCorpseName(name)
-                || NascenceDungeon2Rules.IsDungeonCorpseName(name);
+                || NascenceDungeon2Rules.IsDungeonCorpseName(name)
+                || NascenceDungeon3Rules.IsDungeonCorpseName(name)
+                || NascenceDungeon4Rules.IsDungeonCorpseName(name);
         }
 
         // Mike: empty loot closes too fast — keep opened empty corpse ~2s before cleanup.
@@ -1750,6 +1760,46 @@ namespace AORebirth.Core.Playfields
                     || candidate.Identity.Instance == npc.Identity.Instance
                     || !(candidate.Controller is NPCController)
                     || !string.Equals(candidate.Name, "Predator Striker", StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0
+                    || candidate.FightingTarget.Instance != 0)
+                {
+                    continue;
+                }
+
+                allies.Add(candidate);
+            }
+
+            return allies.ToArray();
+        }
+
+        /// <summary>
+        /// Capture 20260827-221909: Crippler of Growth social aggro within 10m (7A372E07 joined 7A372E06).
+        /// </summary>
+        public static ICharacter[] FindCripplerOfGrowthSocialAggroAllies(ICharacter npc, ICharacter target)
+        {
+            if (npc == null
+                || target == null
+                || npc.Playfield == null
+                || !string.Equals(npc.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ICharacter[0];
+            }
+
+            Playfield playfield = npc.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return new ICharacter[0];
+            }
+
+            var allies = new List<ICharacter>();
+            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, CripplerOfGrowthSocialAggroRadiusMeters);
+            for (int i = 0; i < inRange.Count; i++)
+            {
+                ICharacter candidate = inRange[i];
+                if (candidate == null
+                    || candidate.Identity.Instance == npc.Identity.Instance
+                    || !(candidate.Controller is NPCController)
+                    || !string.Equals(candidate.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase)
                     || candidate.Stats[StatIds.health].Value <= 0
                     || candidate.FightingTarget.Instance != 0)
                 {
@@ -6966,6 +7016,7 @@ namespace AORebirth.Core.Playfields
                 Meshes = null,
                 CaptureFolder = "20260718-173204",
             },
+            // Capture 20260718-173204 cave mouth cluster (patrol filled by 20260827-221909 routes).
             new LifeNpc
             {
                 PlayfieldId = 4311,
@@ -6998,6 +7049,55 @@ namespace AORebirth.Core.Playfields
                 Textures = null,
                 Meshes = null,
                 CaptureFolder = "20260718-173204",
+            },
+            // Capture 20260827-221909 SCFU 7A372E06 / 7A372E07 / 7A372E0C cave-mouth pair + ledge.
+            new LifeNpc
+            {
+                PlayfieldId = 4311,
+                Name = "Crippler of Growth",
+                Level = 28, Health = 1504, MonsterData = 209333, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                X = 535.7803f, Y = 55.8844f, Z = 1739.284f,
+                Hx = 0f, Hy = 0.2810554f, Hz = 0f, Hw = 0.9596915f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 535.7803f, 55.8844f, 1739.284f },
+                    new[] { 539.498535f, 55.8814468f, 1743.97485f },
+                },
+                CaptureFolder = "20260827-221909",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4311,
+                Name = "Crippler of Growth",
+                Level = 28, Health = 1504, MonsterData = 209333, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                X = 536.4755f, Y = 53.59499f, Z = 1730.014f,
+                Hx = 0f, Hy = -0.4962857f, Hz = 0f, Hw = 0.8681592f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 536.4755f, 53.59499f, 1730.014f },
+                    new[] { 534.471069f, 56.1467514f, 1736.71606f },
+                },
+                CaptureFolder = "20260827-221909",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = 4311,
+                Name = "Crippler of Growth",
+                Level = 28, Health = 1504, MonsterData = 209333, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                X = 556.2581f, Y = 47.41654f, Z = 1720.475f,
+                Hx = 0f, Hy = 0.7058362f, Hz = 0f, Hw = 0.708375f,
+                Textures = null,
+                Meshes = null,
+                Waypoints = new[]
+                {
+                    new[] { 556.2581f, 47.41654f, 1720.475f },
+                    new[] { 573.944153f, 45.4753075f, 1717.77551f },
+                },
+                CaptureFolder = "20260827-221909",
             },
             new LifeNpc
             {
@@ -11997,7 +12097,10 @@ namespace AORebirth.Core.Playfields
             }
             else if (string.Equals(def.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
             {
+                // Capture 20260830-110744 SCFU Side=Monster (red PF map dots).
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)CripplerOfGrowthNpcFamily);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.side, (uint)Side.Monster);
+                mob.Stats[StatIds.side].Value = (int)Side.Monster;
             }
 
             NascenceSwampClanMobRuntime.ApplySpawnStats(mob, def.Name);
@@ -12079,8 +12182,11 @@ namespace AORebirth.Core.Playfields
             }
             else if (string.Equals(def.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
             {
-                // Capture 20260823-112044: SAW + Attack engaged, but no mob AttackInfo before death.
-                combatContract = BuildCripplerOfGrowthCombatContractSawOnly();
+                // Capture 20260827-221909 SAW 181 + AttackInfo Amount=24 (supersedes SAW-only 112044).
+                if (!NascenceFrontierOutdoorMobRuntime.TryGetCombatContract(def.Name, out combatContract))
+                {
+                    combatContract = BuildCripplerOfGrowthCombatContractSawOnly();
+                }
             }
             else if (NascenceFrontierOutdoorMobRuntime.TryGetCombatContract(def.Name, out combatContract))
             {
@@ -12179,8 +12285,10 @@ namespace AORebirth.Core.Playfields
             }
             else if (string.Equals(def.Name, "Crippler of Growth", StringComparison.OrdinalIgnoreCase))
             {
-                // Capture 20260823-112044 SCFU RunSpeedBase=34; no landed AttackInfo Amount.
-                ApplyRunSpeed(mob, 34);
+                // Capture 20260827-221909 AttackInfo Amount=24; SCFU RunSpeedBase=97.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 24u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 24u);
+                ApplyRunSpeed(mob, 97);
             }
 
             if (!CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady(
