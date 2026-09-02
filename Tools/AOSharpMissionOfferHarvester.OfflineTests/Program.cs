@@ -61,6 +61,7 @@ namespace AORebirth.MissionEvidence
             string[] names =
             {
                 "CENTERED_BASELINE",
+                "FIND_ITEM_HEAVY",
                 "GOOD_BAD_FULL_LEFT", "GOOD_BAD_FULL_RIGHT",
                 "ORDER_CHAOS_FULL_LEFT", "ORDER_CHAOS_FULL_RIGHT",
                 "OPEN_HIDDEN_FULL_LEFT", "OPEN_HIDDEN_FULL_RIGHT",
@@ -82,7 +83,8 @@ namespace AORebirth.MissionEvidence
                     + (native.PhysicalMystical == 255 ? 0 : 1)
                     + (native.HeadonStealth == 255 ? 0 : 1)
                     + (native.CreditsXp == 255 ? 0 : 1);
-                Assert(nonCenter == (name == "CENTERED_BASELINE" ? 0 : 1), "preset must vary exactly one secondary slider: " + name);
+                int expectedNonCenter = name == "CENTERED_BASELINE" ? 0 : name == "FIND_ITEM_HEAVY" ? 2 : 1;
+                Assert(nonCenter == expectedNonCenter, "preset must set the expected number of secondary sliders: " + name);
             }
             MissionSliderState first;
             MissionSliderState second;
@@ -96,6 +98,14 @@ namespace AORebirth.MissionEvidence
             Assert(raw[0] == 1 && raw[1] == 255 && raw[2] == 255 && raw[3] == 255
                 && raw[4] == 255 && raw[5] == 255 && raw[6] == 255,
                 "raw slider serialization must preserve native order and values");
+            MissionSliderState findItemHeavy;
+            Assert(MissionSliderState.TryCreatePreset(1, "FIND_ITEM_HEAVY", out findItemHeavy, out ignored), "find-item-heavy preset must resolve");
+            NativeMissionSliderValues findItemHeavyNative = findItemHeavy.ToNativeValues();
+            Assert(findItemHeavyNative.GoodBad == 100 && findItemHeavyNative.CreditsXp == 156,
+                "find-item-heavy preset must use full Bad and full Credits");
+            Assert(findItemHeavyNative.OrderChaos == 255 && findItemHeavyNative.OpenHidden == 255
+                && findItemHeavyNative.PhysicalMystical == 255 && findItemHeavyNative.HeadonStealth == 255,
+                "find-item-heavy preset must center the other secondary sliders");
             MissionSliderState invalid;
             Assert(!MissionSliderState.TryCreatePreset(1, "NOT_A_PRESET", out invalid, out ignored), "unknown preset must fail");
         }
@@ -184,9 +194,9 @@ namespace AORebirth.MissionEvidence
                     Assert(cohort.DifficultyDetent == index + 1, "difficulty detents must remain ordered");
                     NativeMissionSliderValues native = cohort.SliderState.ToNativeValues();
                     Assert(native.Difficulty == cohort.DifficultyDetent, "difficulty detent must be explicit");
-                    Assert(native.GoodBad == 255 && native.OrderChaos == 255 && native.OpenHidden == 255
-                        && native.PhysicalMystical == 255 && native.HeadonStealth == 255 && native.CreditsXp == 255,
-                        "all six secondary sliders must remain centered");
+                    Assert(native.GoodBad == 100 && native.OrderChaos == 255 && native.OpenHidden == 255
+                        && native.PhysicalMystical == 255 && native.HeadonStealth == 255 && native.CreditsXp == 156,
+                        "campaign must use full Bad and full Credits with the other sliders centered");
                 }
             }
 

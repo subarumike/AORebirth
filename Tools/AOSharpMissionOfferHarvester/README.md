@@ -15,16 +15,19 @@ Example:
 /missionharvest campaign 250 1.5
 ```
 
-The plugin first sends one centered-slider request at each of the 11 Easy/Hard
+The plugin first sends one request at each of the 11 Easy/Hard
 positions and records the mission QL actually returned by each position. It
 then continues rolling each distinct observed mission QL until that QL has the
 requested number of verified five-offer responses. If multiple Difficulty
 positions return the same QL, their mappings are retained but the repeated
 capture work is grouped by the observed QL.
 
-Good/Bad, Order/Chaos, Open/Hidden, Physical/Mystical, Head On/Stealth, and
-Money/XP remain centered. There is one semantic state, not a 13-state or
-27-state item-capture matrix.
+The campaign uses the `FIND_ITEM_HEAVY` preset: Good/Bad is full Bad, Money/XP
+is full Credits, and Order/Chaos, Open/Hidden, Physical/Mystical, and Head
+On/Stealth remain centered. This replaces the centered preset, which repeatedly
+returned three Repair, one Return Item, and one Kill Person offer while
+excluding Find Item and Find Person. There is one semantic state, not a
+13-state or 27-state item-capture matrix.
 
 ```text
 /missionharvest status
@@ -34,7 +37,7 @@ Money/XP remain centered. There is one semantic state, not a 13-state or
 Progress is stored per observed character identity and resumes automatically:
 
 ```text
-MissionOfferHarvester\campaigns\MISSION_QL_SPECTRUM_V2\level-NNN-character-ID\progress.jsonl
+MissionOfferHarvester\campaigns\MISSION_QL_SPECTRUM_V3\level-NNN-character-ID\progress.jsonl
 ```
 
 Only verified requests with matching request/response linkage, exactly five

@@ -40,7 +40,9 @@ namespace AORebirth.MissionEvidence
     internal sealed class MissionItemCampaignDefinition
     {
         internal const int SchemaVersion = 2;
-        internal const string CampaignName = "MISSION_QL_SPECTRUM_V2";
+        internal const string CampaignName = "MISSION_QL_SPECTRUM_V3";
+        internal const string CapturePresetName = "FIND_ITEM_HEAVY";
+        internal const string CaptureSemanticState = "FULL_BAD_FULL_CREDITS_FIND_ITEM_HEAVY";
 
         internal int CharacterLevel { get; private set; }
         internal int RequiredRequestsPerQl { get; private set; }
@@ -80,14 +82,14 @@ namespace AORebirth.MissionEvidence
                     error = "CHARACTER_LEVEL_NOT_SUPPORTED_BY_MISSION_QL_TABLE";
                     return false;
                 }
-                MissionSliderState centered;
+                MissionSliderState captureState;
                 string sliderError;
-                if (!MissionSliderState.TryCreatePreset(detent, "CENTERED_BASELINE", out centered, out sliderError))
+                if (!MissionSliderState.TryCreatePreset(detent, CapturePresetName, out captureState, out sliderError))
                 {
                     error = sliderError;
                     return false;
                 }
-                states.Add(new MissionItemQlCohort(detent, characterLevel, staticQl, staticQl, detent, true, centered));
+                states.Add(new MissionItemQlCohort(detent, characterLevel, staticQl, staticQl, detent, true, captureState));
             }
             definition = new MissionItemCampaignDefinition(characterLevel, requiredRequestsPerQl, states);
             return true;
@@ -127,7 +129,7 @@ namespace AORebirth.MissionEvidence
                 ["static_distinct_ql_count"] = PlannedQlCohortCount,
                 ["required_requests_per_actual_ql"] = RequiredRequestsPerQl,
                 ["semantic_state_count"] = 1,
-                ["semantic_state"] = "CENTERED_ONLY",
+                ["semantic_state"] = CaptureSemanticState,
                 ["difficulty_states"] = states
             };
         }
@@ -137,7 +139,7 @@ namespace AORebirth.MissionEvidence
             var canonical = new StringBuilder(CampaignName).Append('|').Append(characterLevel);
             foreach (MissionItemQlCohort state in states)
                 canonical.Append('|').Append(state.DifficultyDetent).Append(':').Append(state.StaticExpectedMissionQl);
-            canonical.Append("|semantic=CENTERED_ONLY");
+            canonical.Append("|semantic=").Append(CaptureSemanticState);
             using (SHA256 hash = SHA256.Create())
             {
                 return BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(canonical.ToString())))
@@ -241,9 +243,9 @@ namespace AORebirth.MissionEvidence
                 cohortIndex++;
                 if (CompletedRequestCount(actualQl) >= _definition.RequiredRequestsPerQl)
                     continue;
-                MissionSliderState centered;
+                MissionSliderState captureState;
                 string error;
-                if (!MissionSliderState.TryCreatePreset(state.DifficultyDetent, "CENTERED_BASELINE", out centered, out error))
+                if (!MissionSliderState.TryCreatePreset(state.DifficultyDetent, MissionItemCampaignDefinition.CapturePresetName, out captureState, out error))
                     throw new InvalidOperationException(error);
                 return new MissionItemQlCohort(
                     cohortIndex,
@@ -252,7 +254,7 @@ namespace AORebirth.MissionEvidence
                     state.StaticExpectedMissionQl,
                     state.DifficultyDetent,
                     false,
-                    centered);
+                    captureState);
             }
             return null;
         }
@@ -374,7 +376,7 @@ namespace AORebirth.MissionEvidence
                 {
                     ["actual_mission_ql"] = actualQl,
                     ["representative_difficulty_position"] = state.DifficultyDetent,
-                    ["semantic_state"] = "CENTERED_ONLY",
+                    ["semantic_state"] = MissionItemCampaignDefinition.CaptureSemanticState,
                     ["completed_verified_requests"] = completed,
                     ["required_verified_requests"] = _definition.RequiredRequestsPerQl,
                     ["offers_captured"] = completed * 5,
