@@ -15,10 +15,13 @@ completion matrices and dated evidence retain detailed provenance.
   lookup now depend on `IMissionDao`; `MySqlMissionDao` owns their SQL through
   the existing Connector. The audit-mode architecture guard reports five
   reviewed later-phase runtime SQL sites and zero direct mission runtime SQL.
-  Windows and Linux builds plus the 1,140-test AOtomation suite pass. Disposable
+  Windows and Linux builds plus the 1,144-test AOtomation suite pass. Disposable
   MySQL validation passes 30 lifecycle, rollback, concurrency, reward, roll-fee,
-  and start-area checks with zero labelled Docker residue. Governed exact-SHA
-  acceptance remains open until its acceptance environment is available.
+  and start-area checks with zero labelled Docker residue. The combined DAO,
+  Nascence Dungeon 3/4, and combat-refactor source passed governed Windows and
+  Linux exact-SHA acceptance and was transactionally deployed to production at
+  `cd5232f4be63a3cb839816460a3ff311ccf38efe`; both engines passed post-start
+  stability with zero restarts and rollback was not required.
 
 - ARPA3/ClickSaver Rubi-Ka mission evidence is archived and normalized offline
   with source/member SHA-256 provenance, deterministic regeneration, and no
