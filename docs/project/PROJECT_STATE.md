@@ -61,7 +61,8 @@ completion matrices and dated evidence retain detailed provenance.
   exact raw outbound/inbound packets, stable state/cohort association, and
   fail-closed verification. The normalizer accepts schema versions 1-3. Plan:
   `docs/mission-harvest/mission-ql-1-250-plan.md`.
-  The explicit-slider implementation gate is satisfied by Harvester 1.3.0. The
+  The explicit-slider implementation gate is satisfied by Harvester 1.4.0,
+  including a resumable 27-state level-2 matrix command. The
   large level-2 campaign remains paused only for the documented one-request live
   acceptance. The minimum discovery matrix and evidence boundaries are in
   `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.

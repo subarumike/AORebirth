@@ -14,6 +14,7 @@ namespace AORebirth.MissionEvidence
                 TestLevelTwoDetents();
                 TestSecondaryParsing();
                 TestPresetsAndStateIds();
+                TestLowLevelMatrix();
                 TestFailClosedGate();
                 Console.WriteLine("MISSION_OFFER_HARVESTER_OFFLINE_TESTS=PASS assertions=" + _assertions);
                 return 0;
@@ -140,6 +141,28 @@ namespace AORebirth.MissionEvidence
             Assert(wrongCohort.TryMarkTransmitted("r9", expected, "abc", "abc", out error), "prepare cohort mismatch transmit");
             Assert(wrongCohort.TryVerifyResponse(expected, out error), "prepare cohort mismatch response");
             Assert(!wrongCohort.TryAssociateCohort("r9", "wrong-state", out error) && error == "COHORT_ASSOCIATION_MISMATCH", "cohort slider state must match");
+        }
+
+        private static void TestLowLevelMatrix()
+        {
+            IList<MissionSliderPlanEntry> plan;
+            string error;
+            Assert(LowLevelSliderMatrix.TryBuild(1, 27, out plan, out error), "complete matrix must build");
+            Assert(plan.Count == 27, "complete matrix must contain 27 states");
+            Assert(plan[0].MatrixIndex == 1 && plan[0].Label == "CENTERED_BASELINE_D1", "matrix first state");
+            Assert(plan[7].MatrixIndex == 8 && plan[7].Label == "ORDER_CHAOS_MINUS_50", "resumable state 8");
+            Assert(plan[7].SliderState.ToNativeValues().OrderChaos == 206, "state 8 order/chaos raw -50");
+            Assert(plan[8].SliderState.ToNativeValues().OrderChaos == 50, "state 9 order/chaos raw +50");
+            Assert(plan[25].SliderState.DifficultyDetent == 6, "QL2 bridge detent");
+            Assert(plan[26].SliderState.DifficultyDetent == 10, "QL3 bridge detent");
+            var stateIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (MissionSliderPlanEntry entry in plan)
+                Assert(stateIds.Add(entry.SliderState.SliderStateId), "matrix state IDs must be unique: " + entry.Label);
+            Assert(LowLevelSliderMatrix.TryBuild(8, 27, out plan, out error) && plan.Count == 20, "matrix resume range 8-27");
+            Assert(plan[0].MatrixIndex == 8 && plan[19].MatrixIndex == 27, "matrix resume boundaries");
+            Assert(!LowLevelSliderMatrix.TryBuild(0, 27, out plan, out error), "matrix start below range must fail");
+            Assert(!LowLevelSliderMatrix.TryBuild(8, 28, out plan, out error), "matrix end above range must fail");
+            Assert(!LowLevelSliderMatrix.TryBuild(10, 9, out plan, out error), "matrix reversed range must fail");
         }
 
         private static SliderRequestGate PreparedGate(string requestId, MissionSliderState state, NativeMissionSliderValues expected)

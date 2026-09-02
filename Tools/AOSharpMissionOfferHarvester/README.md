@@ -25,6 +25,7 @@ explicit custom state:
 ```text
 /missionharvest start <difficulty-detent 1-11> <requests> <preset> [interval-seconds]
 /missionharvest startcustom <difficulty-detent 1-11> <requests> <good-bad> <order-chaos> <open-hidden> <physical-mystical> <headon-stealth> <money-xp> [interval-seconds]
+/missionharvest matrix <start-state 1-27> <end-state 1-27> <requests-per-state> [interval-seconds]
 /missionharvest status
 /missionharvest stop
 ```
@@ -59,6 +60,36 @@ Named presets:
 Every non-baseline preset changes exactly one secondary slider and centers the
 other five. The default interval is 2.0 seconds, the minimum is 1.5 seconds,
 and only one request may be outstanding.
+
+## Resumable level-2 matrix
+
+Harvester 1.4 can run the complete 27-state discovery matrix without manually
+pasting one command per state. The command is restricted to a level-2 character,
+applies and verifies the complete state before every request, reports each state
+transition in chat, and fails closed for the entire run on any evidence failure.
+
+| Indices | States |
+| --- | --- |
+| 1 | Detent-1 centered baseline |
+| 2-5 | Good/Bad full left, full right, -50, +50 |
+| 6-9 | Order/Chaos full left, full right, -50, +50 |
+| 10-13 | Open/Hidden full left, full right, -50, +50 |
+| 14-17 | Physical/Mystical full left, full right, -50, +50 |
+| 18-21 | Head On/Stealth full left, full right, -50, +50 |
+| 22-25 | Money/XP full left, full right, -50, +50 |
+| 26 | Detent-6 centered QL2 bridge |
+| 27 | Detent-10 centered QL3 bridge |
+
+Ranges make the campaign resumable. After states 1-7 are accepted, this one
+command runs every remaining state with two requests each:
+
+```text
+/missionharvest matrix 8 27 2 2.0
+```
+
+The single schema-3 session retains a distinct matrix index, label, requested
+state, native values, slider-state ID, raw packets, and cohort association on
+every request.
 
 ## Capture contract version 3
 

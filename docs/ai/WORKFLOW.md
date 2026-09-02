@@ -417,11 +417,13 @@ slider preset (or all six explicit custom values):
 ```text
 /missionharvest start <difficultyDetent 1-11> <requestCount> <preset> [intervalSeconds]
 /missionharvest startcustom <difficultyDetent 1-11> <requestCount> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds]
+/missionharvest matrix <startState 1-27> <endState 1-27> <requestsPerState> [intervalSeconds]
 /missionharvest status
 /missionharvest stop
 ```
 
-MissionHarvest 1.3 accepts an explicit one-based difficulty detent. It records
+MissionHarvest 1.4 accepts an explicit one-based difficulty detent and can run
+resumable ranges of the governed level-2 27-state slider matrix. It records
 the static mission QL resolved from current character level plus that detent;
 nearest-QL substitution and silent first-detent selection are forbidden.
 
@@ -441,7 +443,7 @@ request, exact raw response, returned sliders, and fail-closed verification.
 
 The explicit-slider implementation gate in
 `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md` is satisfied by
-Harvester 1.3. Before the larger level-2 campaign, Mike must run the documented
+Harvester 1.4. Before the larger level-2 campaign, Mike must run the documented
 single-request `CENTERED_BASELINE` live acceptance. Malis is not part of this
 capture workflow.
 

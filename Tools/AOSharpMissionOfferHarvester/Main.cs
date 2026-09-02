@@ -47,6 +47,9 @@ namespace AORebirth.MissionEvidence
         private string _pendingSerializedRequestSha256;
         private string _lastRawResponseSha256;
         private Identity _sessionTerminalIdentity;
+        private IList<MissionSliderPlanEntry> _matrixPlan;
+        private int _matrixRequestsPerState;
+        private MissionSliderPlanEntry _currentMatrixEntry;
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
 
         [Obsolete]
@@ -57,7 +60,7 @@ namespace AORebirth.MissionEvidence
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester 1.3.0 loaded (explicit sliders + verified raw request/response evidence). Select a mission terminal, then specify a difficulty detent and named preset.", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester 1.4.0 loaded (explicit sliders + resumable matrix automation + verified raw evidence).", ChatColor.Gold);
         }
 
         public override void Teardown()
@@ -79,6 +82,13 @@ namespace AORebirth.MissionEvidence
             if (parameters.Length == 1 && string.Equals(parameters[0], "status", StringComparison.OrdinalIgnoreCase))
             {
                 WriteStatus();
+                return;
+            }
+            if (parameters.Length >= 4
+                && parameters.Length <= 5
+                && string.Equals(parameters[0], "matrix", StringComparison.OrdinalIgnoreCase))
+            {
+                StartMatrix(parameters);
                 return;
             }
             bool presetStart = parameters.Length >= 4
@@ -164,13 +174,86 @@ namespace AORebirth.MissionEvidence
                 return;
             }
             Chat.WriteLine("Resolved slider state: " + sliderState.Describe(), ChatColor.Gold);
-            Start(characterLevel, sliderState, expectedMissionQl, requestCount, interval);
+            Start(characterLevel, sliderState, expectedMissionQl, requestCount, interval, null, 0);
         }
 
         private static void WriteUsage()
         {
             Chat.WriteLine(
-                "Usage: /missionharvest start <difficultyDetent 1-11> <requests> <preset> [intervalSeconds] | /missionharvest startcustom <difficultyDetent> <requests> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds] | stop | status");
+                "Usage: /missionharvest matrix <startState 1-27> <endState 1-27> <requestsPerState> [intervalSeconds] | start <difficultyDetent> <requests> <preset> [intervalSeconds] | startcustom <difficultyDetent> <requests> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds] | stop | status");
+        }
+
+        private void StartMatrix(string[] parameters)
+        {
+            int startIndex;
+            int endIndex;
+            int requestsPerState;
+            double interval = DefaultIntervalSeconds;
+            if (!int.TryParse(parameters[1], out startIndex)
+                || !int.TryParse(parameters[2], out endIndex)
+                || !int.TryParse(parameters[3], out requestsPerState)
+                || requestsPerState < 1
+                || requestsPerState > 1000
+                || (parameters.Length == 5
+                    && !double.TryParse(parameters[4], NumberStyles.Float, CultureInfo.InvariantCulture, out interval))
+                || interval < MinimumIntervalSeconds)
+            {
+                Chat.WriteLine("Invalid matrix arguments. No request was sent.", ChatColor.Red);
+                WriteUsage();
+                return;
+            }
+            if (_active)
+            {
+                Chat.WriteLine("A mission evidence session is already active.", ChatColor.Red);
+                return;
+            }
+            if (_terminal == null || !_terminal.IsValid)
+            {
+                Chat.WriteLine("Select/use an ordinary mission terminal before starting.", ChatColor.Red);
+                return;
+            }
+            int characterLevel = DynelManager.LocalPlayer.GetStat(Stat.Level);
+            if (characterLevel != 2)
+            {
+                Chat.WriteLine("The low-level discovery matrix requires character level 2; no request was sent.", ChatColor.Red);
+                return;
+            }
+            IList<MissionSliderPlanEntry> plan;
+            string matrixError;
+            if (!LowLevelSliderMatrix.TryBuild(startIndex, endIndex, out plan, out matrixError))
+            {
+                Chat.WriteLine("Invalid matrix range: " + matrixError + ". No request was sent.", ChatColor.Red);
+                return;
+            }
+            MissionSliderPlanEntry first = plan[0];
+            int expectedMissionQl;
+            if (!MissionQlResolver.TryGetMissionQl(
+                    characterLevel,
+                    first.SliderState.DifficultyDetent,
+                    out expectedMissionQl))
+            {
+                Chat.WriteLine("Matrix first detent cannot be resolved for this character; no request was sent.", ChatColor.Red);
+                return;
+            }
+            int totalRequests = plan.Count * requestsPerState;
+            Chat.WriteLine(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Resolved matrix states {0}-{1}/27; states={2}; requestsPerState={3}; totalRequests={4}.",
+                    startIndex,
+                    endIndex,
+                    plan.Count,
+                    requestsPerState,
+                    totalRequests),
+                ChatColor.Gold);
+            Start(
+                characterLevel,
+                first.SliderState,
+                expectedMissionQl,
+                totalRequests,
+                interval,
+                plan,
+                requestsPerState);
         }
 
         private void WriteStatus()
@@ -181,10 +264,18 @@ namespace AORebirth.MissionEvidence
                 return;
             }
 
+            string matrixStatus = _matrixPlan == null
+                ? "single-state"
+                : string.Format(
+                    CultureInfo.InvariantCulture,
+                    "matrix={0}-{1}/27; current={2}",
+                    _matrixPlan[0].MatrixIndex,
+                    _matrixPlan[_matrixPlan.Count - 1].MatrixIndex,
+                    _currentMatrixEntry == null ? "not-started" : _currentMatrixEntry.Label);
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Harvester active={0}; captureContract=3; session={1}; level={2}; expectedQL={3}; detent={4}; sliderState={5}; preset={6}; requests={7}/{8}; completeCohorts={9}; harvestedOffers={10}; pending={11}; stopReason={12}; output={13}",
+                    "Harvester active={0}; captureContract=3; session={1}; level={2}; expectedQL={3}; detent={4}; sliderState={5}; preset={6}; requests={7}/{8}; completeCohorts={9}; harvestedOffers={10}; pending={11}; stopReason={12}; mode={13}; output={14}",
                     _active,
                     _sessionId,
                     _characterLevel,
@@ -198,6 +289,7 @@ namespace AORebirth.MissionEvidence
                     _harvestedOfferCount,
                     _pendingRequestId ?? "none",
                     _lastStopReason ?? "none",
+                    matrixStatus,
                     _sessionOutputPath ?? "unknown"));
         }
 
@@ -206,7 +298,9 @@ namespace AORebirth.MissionEvidence
             MissionSliderState sliderState,
             int expectedMissionQl,
             int requestCount,
-            double interval)
+            double interval,
+            IList<MissionSliderPlanEntry> matrixPlan,
+            int matrixRequestsPerState)
         {
             if (_active || _journal != null)
                 Stop("replaced_by_new_session", true);
@@ -219,6 +313,9 @@ namespace AORebirth.MissionEvidence
             _sliderState = sliderState;
             _difficultySlot = sliderState.DifficultyDetent;
             _targetMissionQl = expectedMissionQl;
+            _matrixPlan = matrixPlan;
+            _matrixRequestsPerState = matrixRequestsPerState;
+            _currentMatrixEntry = matrixPlan == null ? null : matrixPlan[0];
             _sessionTerminalIdentity = _terminal.Identity;
             _requestedRequestCount = requestCount;
             _intervalSeconds = interval;
@@ -240,7 +337,7 @@ namespace AORebirth.MissionEvidence
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Mission evidence session started: {0}; captureContract=3; level={1}; staticExpectedQL={2}; detent={3}; sliderState={4}; preset={5}; requests={6}; output={7}",
+                    "Mission evidence session started: {0}; captureContract=3; level={1}; staticExpectedQL={2}; detent={3}; sliderState={4}; preset={5}; requests={6}; mode={7}; output={8}",
                     _sessionId,
                     _characterLevel,
                     _targetMissionQl,
@@ -248,6 +345,7 @@ namespace AORebirth.MissionEvidence
                     _sliderState.SliderStateId,
                     _sliderState.PresetName,
                     _requestedRequestCount,
+                    _matrixPlan == null ? "single-state" : "low-level-matrix",
                     _sessionOutputPath),
                 ChatColor.Gold);
         }
@@ -263,7 +361,9 @@ namespace AORebirth.MissionEvidence
                     ["issued_request_count"] = _issuedRequestCount,
                     ["completed_cohort_count"] = _completedCohortCount,
                     ["harvested_offer_count"] = _harvestedOfferCount,
-                    ["pending_request_id"] = _pendingRequestId
+                    ["pending_request_id"] = _pendingRequestId,
+                    ["capture_mode"] = _matrixPlan == null ? "SINGLE_STATE" : "LOW_LEVEL_DISCOVERY_MATRIX",
+                    ["current_matrix_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex
                 });
                 _journal.Dispose();
                 _journal = null;
@@ -338,7 +438,56 @@ namespace AORebirth.MissionEvidence
                 });
                 return;
             }
+            if (!PrepareNextSliderState())
+                return;
             IssueRequest(now);
+        }
+
+        private bool PrepareNextSliderState()
+        {
+            if (_matrixPlan == null)
+                return true;
+            if (_matrixRequestsPerState < 1)
+            {
+                FailClosed("MATRIX_REQUESTS_PER_STATE_INVALID", null);
+                return false;
+            }
+            int planOffset = _issuedRequestCount / _matrixRequestsPerState;
+            if (planOffset < 0 || planOffset >= _matrixPlan.Count)
+            {
+                FailClosed("MATRIX_PLAN_OFFSET_OUT_OF_RANGE", new Dictionary<string, object>
+                {
+                    ["plan_offset"] = planOffset,
+                    ["plan_count"] = _matrixPlan.Count
+                });
+                return false;
+            }
+            _currentMatrixEntry = _matrixPlan[planOffset];
+            _sliderState = _currentMatrixEntry.SliderState;
+            _difficultySlot = _sliderState.DifficultyDetent;
+            if (!MissionQlResolver.TryGetMissionQl(_characterLevel, _difficultySlot, out _targetMissionQl))
+            {
+                FailClosed("MATRIX_DETENT_NOT_RESOLVABLE", new Dictionary<string, object>
+                {
+                    ["matrix_index"] = _currentMatrixEntry.MatrixIndex,
+                    ["difficulty_detent"] = _difficultySlot,
+                    ["character_level"] = _characterLevel
+                });
+                return false;
+            }
+            if (_issuedRequestCount % _matrixRequestsPerState == 0)
+            {
+                Chat.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Matrix state {0}/27: {1}; expectedQL={2}; {3}",
+                        _currentMatrixEntry.MatrixIndex,
+                        _currentMatrixEntry.Label,
+                        _targetMissionQl,
+                        _sliderState.Describe()),
+                    ChatColor.Gold);
+            }
+            return true;
         }
 
         private void IssueRequest(DateTime now)
@@ -412,6 +561,12 @@ namespace AORebirth.MissionEvidence
             _journal.Append("request_started", _sessionId, requestId, new Dictionary<string, object>
             {
                 ["request_sequence"] = sequence,
+                ["capture_mode"] = _matrixPlan == null ? "SINGLE_STATE" : "LOW_LEVEL_DISCOVERY_MATRIX",
+                ["matrix_state_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex,
+                ["matrix_state_label"] = _currentMatrixEntry == null ? null : _currentMatrixEntry.Label,
+                ["matrix_request_within_state"] = _currentMatrixEntry == null
+                    ? (object)null
+                    : ((_issuedRequestCount - 1) % _matrixRequestsPerState) + 1,
                 ["character_level"] = _characterLevel,
                 ["difficulty_detent"] = _difficultySlot,
                 ["static_expected_mission_ql"] = _targetMissionQl,
@@ -649,6 +804,8 @@ namespace AORebirth.MissionEvidence
             var payload = new Dictionary<string, object>
             {
                 ["cohort_id"] = cohortId,
+                ["matrix_state_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex,
+                ["matrix_state_label"] = _currentMatrixEntry == null ? null : _currentMatrixEntry.Label,
                 ["slider_state_id"] = _sliderState == null ? null : _sliderState.SliderStateId,
                 ["slider_preset"] = _sliderState == null ? null : _sliderState.PresetName,
                 ["requested_semantic_state"] = _sliderState == null ? null : _sliderState.RequestedSemanticPayload(),
@@ -707,6 +864,11 @@ namespace AORebirth.MissionEvidence
                 ["requested_semantic_state"] = _sliderState.RequestedSemanticPayload(),
                 ["resolved_native_slider_values"] = _sliderState.ToNativeValues().ToPayload(),
                 ["requested_request_count"] = _requestedRequestCount,
+                ["capture_mode"] = _matrixPlan == null ? "SINGLE_STATE" : "LOW_LEVEL_DISCOVERY_MATRIX",
+                ["matrix_requests_per_state"] = _matrixPlan == null ? (object)null : _matrixRequestsPerState,
+                ["matrix_start_index"] = _matrixPlan == null ? (object)null : _matrixPlan[0].MatrixIndex,
+                ["matrix_end_index"] = _matrixPlan == null ? (object)null : _matrixPlan[_matrixPlan.Count - 1].MatrixIndex,
+                ["matrix_plan"] = BuildMatrixPlanPayload(),
                 ["minimum_request_interval_seconds"] = MinimumIntervalSeconds,
                 ["configured_request_interval_seconds"] = _intervalSeconds,
                 ["one_outstanding_request_only"] = true,
@@ -729,6 +891,26 @@ namespace AORebirth.MissionEvidence
                 },
                 ["raw_event_format"] = "incremental_jsonl_flush_true"
             };
+        }
+
+        private object BuildMatrixPlanPayload()
+        {
+            if (_matrixPlan == null)
+                return null;
+            var result = new List<object>();
+            foreach (MissionSliderPlanEntry entry in _matrixPlan)
+            {
+                IDictionary<string, object> payload = entry.ToPayload();
+                int expectedQl;
+                payload["static_expected_mission_ql"] = MissionQlResolver.TryGetMissionQl(
+                    _characterLevel,
+                    entry.SliderState.DifficultyDetent,
+                    out expectedQl)
+                    ? (object)expectedQl
+                    : null;
+                result.Add(payload);
+            }
+            return result;
         }
 
         private static IDictionary<string, object> OfferPayload(

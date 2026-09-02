@@ -18,9 +18,10 @@ AOSharp-exposed offer field; a finite roll sample is never proof of pool
 exhaustion.
 
 Before any further level-2 harvest, run the one-request live acceptance in
-`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`. Harvester 1.3.0 now
+`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`. Harvester 1.4.0 now
 owns all seven explicit controls and raw request/response evidence; Malis is not
-an operational dependency. Do not let the level-2 character level, and do not
+an operational dependency. Its resumable matrix command replaces manual
+per-state commands. Do not let the level-2 character level, and do not
 infer slider effects from historical descriptions or the discovery sample.
 
 ## Prior active checkpoint
