@@ -40,7 +40,7 @@ Source root: `AORebirth/Server/ZoneEngine/Core/Playfields/Locality/`.
 
 `PlayfieldCellLayoutFactory` chooses a layout per playfield instance from `Playfield.MetaData`, the parsed `GameData/Playfields/{id}/metadata.json` produced by the RDB tilemap extractor. `Playfields.xml` is no longer consulted for grid geometry.
 
-Metadata is loaded once per playfield id by `ZoneEngine.Core.GameData.GameDataLoader` from `{BaseDirectory}\GameData`. A missing GameData root fails at engine startup; a missing per-playfield folder is a normal "no ground tilemap" signal and yields `null` metadata; a corrupt or schema-invalid document throws.
+Metadata is loaded once per playfield id by `ZoneEngine.Core.GameData.GameDataLoader` from `{BaseDirectory}\GameData`. A missing external GameData root safely leaves all playfields on the indoor fallback; a missing per-playfield folder is a normal "no ground tilemap" signal and yields `null` metadata; a corrupt or schema-invalid document throws.
 
 ### Outdoor grid
 
@@ -211,7 +211,7 @@ Radius-based enter/leave policy and `AO_REBIRTH_VISIBILITY_*` environment variab
 
 ## Rollout Notes
 
-1. **Extract playfield GameData** with `extract-rdb-gamedata.bat` so `GameData/Playfields/{id}/metadata.json` exists. Playfields without chunked ground metadata run indoor fallback (full visibility + full tick).
+1. **Extract playfield GameData** with `extract-rdb-gamedata.bat` so `GameData/Playfields/{id}/metadata.json` exists when outdoor cell locality is wanted. A missing external dataset and playfields without chunked ground metadata run the safe indoor fallback (full visibility + full tick).
 2. **Tune `<Locality>`** globally before adding per-playfield overrides (not implemented in v1).
 3. **Validate with live capture** at cell boundaries — pop-in/out behavior differs from the old 80 m / 100 m hysteresis model.
 4. **Tests** — lifecycle trace tests under `SmokeLounge.AOtomation.Messaging.Tests` still reference removed interest symbols and need updating to locality assertions.

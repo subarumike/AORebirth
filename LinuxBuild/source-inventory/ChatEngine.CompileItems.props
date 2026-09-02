@@ -27,6 +27,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/LftRegistry.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/LftPlayfieldRegistry.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/TeamLevelRanges.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/TeamChatBridge.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/Authenticate.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/AuthenticateBot.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/PacketHandlers/BuddyAdd.cs" />
