@@ -65,7 +65,7 @@ namespace AORebirth.MissionEvidence
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester 1.6.0 loaded (Easy/Hard QL-spectrum campaign + verified raw evidence + deterministic resume).", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester 1.6.1 loaded (Easy/Hard QL-spectrum capture + verified raw evidence + deterministic resume).", ChatColor.Gold);
         }
 
         public override void Teardown()
@@ -1080,6 +1080,19 @@ namespace AORebirth.MissionEvidence
                             observedMissionQl,
                             _itemCampaignDefinition.RequiredRequestsPerQl,
                             _itemCampaignDefinition.RequiredRequestsPerQl * 5),
+                        ChatColor.Gold);
+                }
+                if (_completedCohortCount % 10 == 0)
+                {
+                    Chat.WriteLine(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Mission capture running: rolls={0}; actualQL={1}; QL progress={2}/{3}; offers captured={4}.",
+                            _completedCohortCount,
+                            observedMissionQl,
+                            _itemCampaignProgress.CompletedRequestCount(observedMissionQl),
+                            _itemCampaignDefinition.RequiredRequestsPerQl,
+                            _harvestedOfferCount),
                         ChatColor.Gold);
                 }
             }
