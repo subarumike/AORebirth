@@ -461,6 +461,8 @@
     <Compile Include="Core\MessageHandlers\QuestAlternativeMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\CreateQuestMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\QuestMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\RaidCmdMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\RaidMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\MissionEntranceInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\BuffMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AddPetMessageHandler.cs" />
