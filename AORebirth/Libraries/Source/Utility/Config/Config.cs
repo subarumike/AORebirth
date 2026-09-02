@@ -234,7 +234,7 @@ namespace Utility.Config
         public LocalitySettings Locality { get; set; }
 
         /// <summary>
-        /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Combat). Defaults to Engine,Error when omitted.
+        /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Combat,Locality). Defaults to Engine,Error when omitted.
         /// </summary>
         public string DebugInfoDetail { get; set; }
 

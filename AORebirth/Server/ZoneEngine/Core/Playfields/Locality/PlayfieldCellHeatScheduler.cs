@@ -2,12 +2,23 @@ namespace ZoneEngine.Core.Playfields.Locality
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     using AORebirth.Core.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using Utility;
+
     using ZoneEngine.Core.Controllers;
+
+    internal enum CellHeat
+    {
+        Asleep = 0,
+        Cold = 1,
+        Warm = 2,
+        Hot = 3
+    }
 
     internal sealed class PlayfieldCellHeatScheduler
     {
@@ -88,6 +99,13 @@ namespace ZoneEngine.Core.Playfields.Locality
             {
                 seenCells.Add(cellId);
                 CellHeat heat = this.ResolveHeat(cellId, combatHotCells);
+                CellHeat previousHeat;
+                bool isNewCell = !this.heatByCell.TryGetValue(cellId, out previousHeat);
+                if (isNewCell || previousHeat != heat)
+                {
+                    this.LogHeatChange(cellId, previousHeat, heat, isNewCell);
+                }
+
                 this.heatByCell[cellId] = heat;
                 this.UpdateColdTimer(cellId, heat, now);
 
@@ -212,6 +230,23 @@ namespace ZoneEngine.Core.Playfields.Locality
             this.layout.GetCellCoords(cellA, out int ax, out int az);
             this.layout.GetCellCoords(cellB, out int bx, out int bz);
             return Math.Max(Math.Abs(ax - bx), Math.Abs(az - bz));
+        }
+
+        private void LogHeatChange(int cellId, CellHeat previousHeat, CellHeat newHeat, bool isNewCell)
+        {
+            this.layout.GetCellCoords(cellId, out int ix, out int iz);
+            string previousLabel = isNewCell ? "new" : previousHeat.ToString();
+            LogUtil.Debug(
+                DebugInfoDetail.Locality,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield {0} cell {1} ({2},{3}) heat {4} -> {5}",
+                    this.layout.PlayfieldId,
+                    cellId,
+                    ix,
+                    iz,
+                    previousLabel,
+                    newHeat));
         }
     }
 }
