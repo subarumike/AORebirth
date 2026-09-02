@@ -267,8 +267,11 @@ namespace AORebirth.MissionEvidence
             {
                 case "CENTERED_BASELINE":
                     break;
-                case "FIND_ITEM_HEAVY":
+                case "FIND_ITEM_PERSON_SUPPLEMENT":
                     goodBad = SecondarySliderSetting.FromSemantic("FULL_RIGHT", 100);
+                    orderChaos = SecondarySliderSetting.FromSemantic("FULL_LEFT", -100);
+                    openHidden = SecondarySliderSetting.FromSemantic("FULL_RIGHT", 100);
+                    physicalMystical = SecondarySliderSetting.FromSemantic("FULL_LEFT", -100);
                     creditsXp = SecondarySliderSetting.FromSemantic("FULL_LEFT", -100);
                     break;
                 case "GOOD_BAD_FULL_LEFT":

@@ -40,9 +40,9 @@ namespace AORebirth.MissionEvidence
     internal sealed class MissionItemCampaignDefinition
     {
         internal const int SchemaVersion = 2;
-        internal const string CampaignName = "MISSION_QL_SPECTRUM_V3";
-        internal const string CapturePresetName = "FIND_ITEM_HEAVY";
-        internal const string CaptureSemanticState = "FULL_BAD_FULL_CREDITS_FIND_ITEM_HEAVY";
+        internal const string CampaignName = "MISSION_QL_SPECTRUM_V4";
+        internal const string CapturePresetName = "FIND_ITEM_PERSON_SUPPLEMENT";
+        internal const string CaptureSemanticState = "FIND_ITEM_AND_FIND_PERSON_SUPPLEMENT";
 
         internal int CharacterLevel { get; private set; }
         internal int RequiredRequestsPerQl { get; private set; }
