@@ -111,6 +111,7 @@ Backup*/
 UpgradeLog*.XML
 /*/AO.Core.XML
 /AORebirth/Built
+AORebirth/GameData/Playfields/
 AORebirth/_dotMemory.AORebirth/
 AORebirth/AORebirth.sln.DotSettings
 

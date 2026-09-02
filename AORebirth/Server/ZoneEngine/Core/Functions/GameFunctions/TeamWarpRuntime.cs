@@ -459,7 +459,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                     Unknown1 = 1
                 });
 
-            playfield.RefreshCharacterVisibility(member);
+            playfield.RefreshCharacterVisibility(member, forceRefresh: true);
             AppearanceUpdateMessageHandler.Default.Send(member);
 
             if (memberClient != null)

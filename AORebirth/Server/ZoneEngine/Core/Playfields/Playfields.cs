@@ -194,6 +194,18 @@ namespace ZoneEngine.Core.Playfields
         [XmlAttribute("zscale")]
         public float zscale = 1.0f;
 
+        [XmlAttribute("indoor")]
+        public bool indoor;
+
+        [XmlAttribute("numZonesX")]
+        public int numZonesX;
+
+        [XmlAttribute("numZonesZ")]
+        public int numZonesZ;
+
+        [XmlAttribute("cellWorldSize")]
+        public float cellWorldSize;
+
         /// <summary>
         /// </summary>
         private int _id;

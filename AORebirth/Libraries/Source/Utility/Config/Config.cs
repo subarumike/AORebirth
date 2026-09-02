@@ -231,6 +231,8 @@ namespace Utility.Config
         /// </summary>
         public int PlayfieldTickRate { get; set; }
 
+        public LocalitySettings Locality { get; set; }
+
         /// <summary>
         /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Combat). Defaults to Engine,Error when omitted.
         /// </summary>
