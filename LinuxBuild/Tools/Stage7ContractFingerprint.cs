@@ -422,6 +422,7 @@ namespace AORebirth.LinuxBuild.Contracts
 
             string[] expectedReferences =
             {
+                "AORebirth.Interfaces.Linux.csproj",
                 "AORebirth.Database.Linux.csproj",
                 "AORebirth.Core.Login.Linux.csproj",
                 "Cell.Core.Linux.csproj",
