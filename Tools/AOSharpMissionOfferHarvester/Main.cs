@@ -41,20 +41,30 @@ namespace AORebirth.MissionEvidence
         private string _lastStopReason;
         private string _lastCohortFingerprint;
         private string _lastCohortRequestId;
+        private MissionSliderState _sliderState;
+        private SliderRequestGate _pendingSliderGate;
+        private IDictionary<string, object> _pendingRawResponsePacket;
+        private string _pendingSerializedRequestSha256;
+        private string _lastRawResponseSha256;
+        private Identity _sessionTerminalIdentity;
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
 
         [Obsolete]
         public override void Run(string pluginDir)
         {
+            Network.PacketSent += OnPacketSent;
+            Network.PacketReceived += OnPacketReceived;
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester 1.2.1 loaded (roll origin + mission destination + canonical type + rewards). Select a mission terminal, then use /missionharvest start <targetQL> <requests> [intervalSeconds].", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester 1.3.0 loaded (explicit sliders + verified raw request/response evidence). Select a mission terminal, then specify a difficulty detent and named preset.", ChatColor.Gold);
         }
 
         public override void Teardown()
         {
             Stop("plugin_teardown", false);
+            Network.PacketSent -= OnPacketSent;
+            Network.PacketReceived -= OnPacketReceived;
             Network.N3MessageReceived -= OnN3MessageReceived;
             Game.OnUpdate -= OnUpdate;
         }
@@ -71,24 +81,30 @@ namespace AORebirth.MissionEvidence
                 WriteStatus();
                 return;
             }
-            if ((parameters.Length < 3 || parameters.Length > 4)
-                || !string.Equals(parameters[0], "start", StringComparison.OrdinalIgnoreCase))
+            bool presetStart = parameters.Length >= 4
+                && parameters.Length <= 5
+                && string.Equals(parameters[0], "start", StringComparison.OrdinalIgnoreCase);
+            bool customStart = parameters.Length >= 9
+                && parameters.Length <= 10
+                && string.Equals(parameters[0], "startcustom", StringComparison.OrdinalIgnoreCase);
+            if (!presetStart && !customStart)
             {
                 WriteUsage();
                 return;
             }
-            int targetQl;
+            int difficultyDetent;
             int requestCount;
             double interval = DefaultIntervalSeconds;
-            if (!int.TryParse(parameters[1], out targetQl)
-                || targetQl < 1
-                || targetQl > 250
+            int intervalIndex = presetStart ? 4 : 9;
+            if (!int.TryParse(parameters[1], out difficultyDetent)
+                || difficultyDetent < 1
+                || difficultyDetent > MissionQlResolver.DifficultyCount
                 || !int.TryParse(parameters[2], out requestCount)
                 || requestCount < 1
                 || requestCount > 100000
-                || (parameters.Length == 4
+                || (parameters.Length == intervalIndex + 1
                     && !double.TryParse(
-                        parameters[3],
+                        parameters[intervalIndex],
                         NumberStyles.Float,
                         CultureInfo.InvariantCulture,
                         out interval)))
@@ -115,28 +131,46 @@ namespace AORebirth.MissionEvidence
                 return;
             }
             int characterLevel = DynelManager.LocalPlayer.GetStat(Stat.Level);
-            int slot;
-            if (!MissionQlResolver.TryResolveFirstSlot(
-                    characterLevel,
-                    targetQl,
-                    out slot))
+            int expectedMissionQl;
+            if (!MissionQlResolver.TryGetMissionQl(characterLevel, difficultyDetent, out expectedMissionQl))
             {
                 Chat.WriteLine(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Target QL {0} is not exactly rollable by character level {1}; no request was sent.",
-                        targetQl,
+                        "Difficulty detent {0} is not valid for character level {1}; no request was sent.",
+                        difficultyDetent,
                         characterLevel),
                     ChatColor.Red);
                 return;
             }
-            Start(characterLevel, slot, targetQl, requestCount, interval);
+            MissionSliderState sliderState;
+            string sliderError;
+            bool validState = presetStart
+                ? MissionSliderState.TryCreatePreset(difficultyDetent, parameters[3], out sliderState, out sliderError)
+                : MissionSliderState.TryCreateCustom(
+                    difficultyDetent,
+                    parameters[3],
+                    parameters[4],
+                    parameters[5],
+                    parameters[6],
+                    parameters[7],
+                    parameters[8],
+                    out sliderState,
+                    out sliderError);
+            if (!validState)
+            {
+                Chat.WriteLine("Invalid slider state: " + sliderError + ". No request was sent.", ChatColor.Red);
+                WriteUsage();
+                return;
+            }
+            Chat.WriteLine("Resolved slider state: " + sliderState.Describe(), ChatColor.Gold);
+            Start(characterLevel, sliderState, expectedMissionQl, requestCount, interval);
         }
 
         private static void WriteUsage()
         {
             Chat.WriteLine(
-                "Usage: /missionharvest start <targetQL 1-250> <requests 1-100000> [intervalSeconds] | stop | status");
+                "Usage: /missionharvest start <difficultyDetent 1-11> <requests> <preset> [intervalSeconds] | /missionharvest startcustom <difficultyDetent> <requests> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds] | stop | status");
         }
 
         private void WriteStatus()
@@ -150,12 +184,14 @@ namespace AORebirth.MissionEvidence
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Harvester active={0}; captureContract=2; session={1}; level={2}; targetQL={3}; slot={4}; requests={5}/{6}; completeCohorts={7}; harvestedOffers={8}; pending={9}; stopReason={10}; output={11}",
+                    "Harvester active={0}; captureContract=3; session={1}; level={2}; expectedQL={3}; detent={4}; sliderState={5}; preset={6}; requests={7}/{8}; completeCohorts={9}; harvestedOffers={10}; pending={11}; stopReason={12}; output={13}",
                     _active,
                     _sessionId,
                     _characterLevel,
                     _targetMissionQl,
                     _difficultySlot,
+                    _sliderState == null ? "none" : _sliderState.SliderStateId,
+                    _sliderState == null ? "none" : _sliderState.PresetName,
                     _issuedRequestCount,
                     _requestedRequestCount,
                     _completedCohortCount,
@@ -167,8 +203,8 @@ namespace AORebirth.MissionEvidence
 
         private void Start(
             int characterLevel,
-            int slot,
-            int targetQl,
+            MissionSliderState sliderState,
+            int expectedMissionQl,
             int requestCount,
             double interval)
         {
@@ -180,8 +216,10 @@ namespace AORebirth.MissionEvidence
             _sessionOutputPath = System.IO.Path.Combine(_sessionDirectory, "events.jsonl");
             _journal = new JsonLineJournal(_sessionOutputPath);
             _characterLevel = characterLevel;
-            _difficultySlot = slot;
-            _targetMissionQl = targetQl;
+            _sliderState = sliderState;
+            _difficultySlot = sliderState.DifficultyDetent;
+            _targetMissionQl = expectedMissionQl;
+            _sessionTerminalIdentity = _terminal.Identity;
             _requestedRequestCount = requestCount;
             _intervalSeconds = interval;
             _issuedRequestCount = 0;
@@ -189,6 +227,10 @@ namespace AORebirth.MissionEvidence
             _harvestedOfferCount = 0;
             _pendingRequestId = null;
             _pendingRollOrigin = null;
+            _pendingSliderGate = null;
+            _pendingRawResponsePacket = null;
+            _pendingSerializedRequestSha256 = null;
+            _lastRawResponseSha256 = null;
             _lastCohortFingerprint = null;
             _lastCohortRequestId = null;
             _lastStopReason = null;
@@ -198,11 +240,13 @@ namespace AORebirth.MissionEvidence
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Mission evidence session started: {0}; captureContract=2; level={1}; targetQL={2}; slot={3}; requests={4}; output={5}",
+                    "Mission evidence session started: {0}; captureContract=3; level={1}; staticExpectedQL={2}; detent={3}; sliderState={4}; preset={5}; requests={6}; output={7}",
                     _sessionId,
                     _characterLevel,
                     _targetMissionQl,
                     _difficultySlot,
+                    _sliderState.SliderStateId,
+                    _sliderState.PresetName,
                     _requestedRequestCount,
                     _sessionOutputPath),
                 ChatColor.Gold);
@@ -227,6 +271,9 @@ namespace AORebirth.MissionEvidence
             _active = false;
             _pendingRequestId = null;
             _pendingRollOrigin = null;
+            _pendingSliderGate = null;
+            _pendingRawResponsePacket = null;
+            _pendingSerializedRequestSha256 = null;
             _lastStopReason = reason;
             if (announce && hadActiveSession)
             {
@@ -261,10 +308,11 @@ namespace AORebirth.MissionEvidence
                     _journal.Append("request_timeout", _sessionId, _pendingRequestId, new Dictionary<string, object>
                     {
                         ["timeout_seconds"] = RequestTimeoutSeconds,
+                        ["slider_state_id"] = _sliderState.SliderStateId,
+                        ["verification_phase"] = _pendingSliderGate == null ? null : _pendingSliderGate.Phase,
                         ["possible_causes"] = new[] { "terminal_rejection", "insufficient_credits", "network_interruption", "disconnect", "unknown" }
                     });
-                    _pendingRequestId = null;
-                    _nextRequestUtc = now.AddSeconds(_intervalSeconds);
+                    Stop("request_timeout_fail_closed", true);
                 }
                 return;
             }
@@ -281,28 +329,193 @@ namespace AORebirth.MissionEvidence
                 Stop("terminal_invalid", true);
                 return;
             }
+            if (_terminal.Identity != _sessionTerminalIdentity)
+            {
+                FailClosed("TERMINAL_IDENTITY_CHANGED", new Dictionary<string, object>
+                {
+                    ["session_terminal"] = IdentityPayload(_sessionTerminalIdentity),
+                    ["current_terminal"] = IdentityPayload(_terminal.Identity)
+                });
+                return;
+            }
             IssueRequest(now);
         }
 
         private void IssueRequest(DateTime now)
         {
-            _issuedRequestCount++;
-            _pendingRequestId = string.Format("{0}/request/{1:D8}", _sessionId, _issuedRequestCount);
+            int sequence = _issuedRequestCount + 1;
+            string requestId = string.Format("{0}/request/{1:D8}", _sessionId, sequence);
+            SliderRequestGate gate = new SliderRequestGate(requestId, _sliderState);
+            NativeMissionSliderValues requestedNative = _sliderState.ToNativeValues();
+            MissionSliders nativeSliders = new MissionSliders
+            {
+                Difficulty = requestedNative.Difficulty,
+                GoodBad = requestedNative.GoodBad,
+                OrderChaos = requestedNative.OrderChaos,
+                OpenHidden = requestedNative.OpenHidden,
+                PhysicalMystical = requestedNative.PhysicalMystical,
+                HeadonStealth = requestedNative.HeadonStealth,
+                CreditsXp = requestedNative.CreditsXp
+            };
+            QuestAlternativeMessage request = new QuestAlternativeMessage
+            {
+                Unknown1 = 4,
+                MissionSliders = nativeSliders,
+                Scope = _terminal.Name.Contains("Team") ? MissionScope.Team : MissionScope.Solo,
+                Terminal = _terminal.Identity,
+                MissionDetails = new MissionInfo[0]
+            };
+            NativeMissionSliderValues appliedNative = NativeValues(request.MissionSliders);
+            string verificationError;
+            if (!gate.TryApplyNative(appliedNative, request.MissionSliders != null, out verificationError))
+            {
+                FailClosed(verificationError, GateFailurePayload(gate, requestedNative, appliedNative, null));
+                return;
+            }
+
+            byte[] serializedPacket;
+            QuestAlternativeMessage serializedRequest;
+            string decodeError = null;
+            try
+            {
+                serializedPacket = PacketFactory.Create(request);
+            }
+            catch (Exception exception)
+            {
+                FailClosed("REQUEST_SERIALIZATION_FAILED", new Dictionary<string, object> { ["exception"] = exception.GetType().FullName, ["message"] = exception.Message });
+                return;
+            }
+            if (serializedPacket == null
+                || !TryDecodeQuestAlternative(serializedPacket, out serializedRequest, out decodeError))
+            {
+                FailClosed("SERIALIZED_REQUEST_NOT_DECODABLE", new Dictionary<string, object> { ["decode_error"] = decodeError });
+                return;
+            }
+            NativeMissionSliderValues serializedNative = NativeValues(serializedRequest.MissionSliders);
+            if (serializedRequest.Terminal != _sessionTerminalIdentity
+                || !gate.TryVerifySerialized(serializedNative, out verificationError))
+            {
+                string code = serializedRequest.Terminal != _sessionTerminalIdentity
+                    ? "SERIALIZED_REQUEST_TERMINAL_MISMATCH"
+                    : verificationError;
+                FailClosed(code, GateFailurePayload(gate, requestedNative, serializedNative, RawPacketPayload(serializedPacket, "PACKETFACTORY_CREATE_PRE_SEND")));
+                return;
+            }
+
+            _issuedRequestCount = sequence;
+            _pendingRequestId = requestId;
+            _pendingSliderGate = gate;
             _pendingSinceUtc = now;
             _pendingRollOrigin = BuildRollOriginPayload("REQUEST_STARTED");
-            _journal.Append("request_started", _sessionId, _pendingRequestId, new Dictionary<string, object>
+            _pendingRawResponsePacket = null;
+            _pendingSerializedRequestSha256 = Sha256(serializedPacket);
+            _journal.Append("request_started", _sessionId, requestId, new Dictionary<string, object>
             {
-                ["request_sequence"] = _issuedRequestCount,
+                ["request_sequence"] = sequence,
                 ["character_level"] = _characterLevel,
-                ["difficulty_slot"] = _difficultySlot,
-                ["target_mission_ql"] = _targetMissionQl,
-                ["target_mission_ql_semantics"] = "exact_character_level_table_lookup_resolved_to_first_matching_difficulty_slot",
+                ["difficulty_detent"] = _difficultySlot,
+                ["static_expected_mission_ql"] = _targetMissionQl,
+                ["static_expected_mission_ql_semantics"] = "character_level_and_explicit_difficulty_detent_table_lookup_not_server_response_ql",
                 ["mission_ql_table_source"] = MissionQlResolver.SourceRepositoryPath,
                 ["mission_ql_table_sha256"] = MissionQlResolver.SourceSha256,
+                ["slider_state_id"] = _sliderState.SliderStateId,
+                ["slider_preset"] = _sliderState.PresetName,
+                ["requested_semantic_state"] = _sliderState.RequestedSemanticPayload(),
+                ["native_client_before"] = new Dictionary<string, object>
+                {
+                    ["availability"] = "NOT_APPLICABLE_DIRECT_REQUEST_CONSTRUCTION",
+                    ["verification_status"] = "UNVERIFIABLE_NOT_REQUIRED_FOR_DIRECT_PACKET",
+                    ["values"] = null
+                },
+                ["native_client_after"] = new Dictionary<string, object>
+                {
+                    ["availability"] = "DIRECT_REQUEST_OBJECT",
+                    ["verification_status"] = "READ_BACK_MATCH",
+                    ["values"] = appliedNative.ToPayload()
+                },
+                ["serialized_pre_send"] = new Dictionary<string, object>
+                {
+                    ["verification_status"] = "MATCH",
+                    ["values"] = serializedNative.ToPayload(),
+                    ["raw_packet"] = RawPacketPayload(serializedPacket, "PACKETFACTORY_CREATE_PRE_SEND")
+                },
+                ["application_verification_phase"] = gate.Phase,
                 ["roll_origin"] = _pendingRollOrigin,
-                ["sliders"] = SliderPayload((byte)_difficultySlot, 255, 255, 255, 255, 255, 255)
+                ["sliders"] = requestedNative.ToPayload()
             });
-            _terminal.RequestMissions((byte)_difficultySlot, 255, 255, 255, 255, 255, 255);
+            Network.Send(serializedPacket);
+        }
+
+        private void OnPacketSent(object sender, byte[] packet)
+        {
+            if (!_active || packet == null)
+                return;
+            QuestAlternativeMessage request;
+            string decodeError;
+            if (!TryDecodeQuestAlternative(packet, out request, out decodeError)
+                || request.Terminal != _sessionTerminalIdentity)
+                return;
+            if (_pendingRequestId == null || _pendingSliderGate == null)
+            {
+                FailClosed("UNMATCHED_RAW_REQUEST", new Dictionary<string, object> { ["raw_packet"] = RawPacketPayload(packet, "NETWORK_PACKET_SENT") });
+                return;
+            }
+            NativeMissionSliderValues transmittedNative = NativeValues(request.MissionSliders);
+            string observedSha256 = Sha256(packet);
+            string verificationError;
+            if (!_pendingSliderGate.TryMarkTransmitted(
+                    _pendingRequestId,
+                    transmittedNative,
+                    _pendingSerializedRequestSha256,
+                    observedSha256,
+                    out verificationError))
+            {
+                FailClosed(verificationError, GateFailurePayload(_pendingSliderGate, _sliderState.ToNativeValues(), transmittedNative, RawPacketPayload(packet, "NETWORK_PACKET_SENT")));
+                return;
+            }
+            _journal.Append("request_transmitted", _sessionId, _pendingRequestId, new Dictionary<string, object>
+            {
+                ["slider_state_id"] = _sliderState.SliderStateId,
+                ["verification_status"] = "MATCH",
+                ["verification_phase"] = _pendingSliderGate.Phase,
+                ["transmitted_native_values"] = transmittedNative.ToPayload(),
+                ["raw_packet"] = RawPacketPayload(packet, "NETWORK_PACKET_SENT")
+            });
+        }
+
+        private void OnPacketReceived(object sender, byte[] packet)
+        {
+            if (!_active || packet == null)
+                return;
+            QuestAlternativeMessage response;
+            string decodeError;
+            if (!TryDecodeQuestAlternative(packet, out response, out decodeError)
+                || response.Terminal != _sessionTerminalIdentity)
+                return;
+            IDictionary<string, object> rawPacket = RawPacketPayload(packet, "NETWORK_PACKET_RECEIVED");
+            if (_pendingRequestId == null)
+            {
+                if (string.Equals(
+                        Convert.ToString(rawPacket["sha256"], CultureInfo.InvariantCulture),
+                        _lastRawResponseSha256,
+                        StringComparison.OrdinalIgnoreCase))
+                    return;
+                _journal.Append("error", _sessionId, null, new Dictionary<string, object>
+                {
+                    ["code"] = "UNMATCHED_RAW_RESPONSE_PRESERVED",
+                    ["raw_packet"] = rawPacket,
+                    ["returned_sliders"] = response.MissionSliders == null ? null : NativeValues(response.MissionSliders).ToPayload()
+                });
+                return;
+            }
+            _pendingRawResponsePacket = rawPacket;
+            _journal.Append("raw_response_received", _sessionId, _pendingRequestId, new Dictionary<string, object>
+            {
+                ["slider_state_id"] = _sliderState.SliderStateId,
+                ["association_status"] = "PENDING_REQUEST_MATCHED_BY_SINGLE_OUTSTANDING_REQUEST_AND_TERMINAL_IDENTITY",
+                ["returned_sliders"] = NativeValues(response.MissionSliders).ToPayload(),
+                ["raw_packet"] = rawPacket
+            });
         }
 
         private void OnN3MessageReceived(object sender, N3Message message)
@@ -311,6 +524,15 @@ namespace AORebirth.MissionEvidence
             if (generic != null && generic.Identity == DynelManager.LocalPlayer.Identity &&
                 generic.Action == GenericCmdAction.Use && generic.Target.Type == IdentityType.MissionTerminal)
             {
+                if (_active && generic.Target != _sessionTerminalIdentity)
+                {
+                    FailClosed("TERMINAL_SELECTION_CHANGED_DURING_SESSION", new Dictionary<string, object>
+                    {
+                        ["session_terminal"] = IdentityPayload(_sessionTerminalIdentity),
+                        ["new_terminal"] = IdentityPayload(generic.Target)
+                    });
+                    return;
+                }
                 Dynel dynel = DynelManager.GetDynel(generic.Target);
                 if (dynel != null)
                     _terminal = new MissionTerminal(dynel);
@@ -321,9 +543,8 @@ namespace AORebirth.MissionEvidence
                 return;
             if (_terminal == null || response.Terminal != _terminal.Identity)
             {
-                _journal.Append("error", _sessionId, _pendingRequestId, new Dictionary<string, object>
+                FailClosed("RESPONSE_TERMINAL_MISMATCH", new Dictionary<string, object>
                 {
-                    ["code"] = "RESPONSE_TERMINAL_MISMATCH",
                     ["response_terminal"] = IdentityPayload(response.Terminal),
                     ["selected_terminal"] = _terminal == null ? null : IdentityPayload(_terminal.Identity)
                 });
@@ -332,7 +553,12 @@ namespace AORebirth.MissionEvidence
             if (_pendingRequestId == null)
             {
                 string unmatchedFingerprint;
-                IDictionary<string, object> unmatchedPayload = BuildCohortPayload(response, out unmatchedFingerprint);
+                IDictionary<string, object> unmatchedPayload = BuildCohortPayload(
+                    response,
+                    "UNMATCHED",
+                    false,
+                    "UNMATCHED_COHORT",
+                    out unmatchedFingerprint);
                 if (unmatchedFingerprint == _lastCohortFingerprint)
                 {
                     _journal.Append("duplicate_callback", _sessionId, _lastCohortRequestId, new Dictionary<string, object>
@@ -348,6 +574,7 @@ namespace AORebirth.MissionEvidence
                         ["code"] = "UNMATCHED_COHORT_RAW_PRESERVED",
                         ["cohort"] = unmatchedPayload
                     });
+                    Stop("unmatched_cohort_fail_closed", true);
                 }
                 return;
             }
@@ -356,28 +583,58 @@ namespace AORebirth.MissionEvidence
 
         private void HandleCohort(QuestAlternativeMessage response)
         {
+            NativeMissionSliderValues returnedNative = NativeValues(response.MissionSliders);
+            string verificationError = null;
+            bool verified = _pendingRawResponsePacket != null
+                && _pendingSliderGate != null
+                && _pendingSliderGate.TryVerifyResponse(returnedNative, out verificationError)
+                && _pendingSliderGate.TryAssociateCohort(_pendingRequestId, _sliderState.SliderStateId, out verificationError);
+            if (_pendingRawResponsePacket == null)
+                verificationError = "RAW_RESPONSE_PACKET_MISSING";
+            else if (_pendingSliderGate == null)
+                verificationError = "SLIDER_REQUEST_GATE_MISSING";
             string fingerprint;
-            IDictionary<string, object> payload = BuildCohortPayload(response, out fingerprint);
+            string cohortId = _pendingRequestId + "/cohort/0001";
+            IDictionary<string, object> payload = BuildCohortPayload(response, cohortId, verified, verificationError, out fingerprint);
             string completedRequestId = _pendingRequestId;
             _journal.Append("cohort_received", _sessionId, completedRequestId, payload);
+            if (!verified)
+            {
+                FailClosed(verificationError ?? "COHORT_VERIFICATION_FAILED", new Dictionary<string, object>
+                {
+                    ["slider_state_id"] = _sliderState.SliderStateId,
+                    ["cohort_id"] = cohortId,
+                    ["returned_sliders"] = returnedNative == null ? null : returnedNative.ToPayload()
+                });
+                return;
+            }
             _lastCohortFingerprint = fingerprint;
             _lastCohortRequestId = completedRequestId;
+            _lastRawResponseSha256 = Convert.ToString(_pendingRawResponsePacket["sha256"], CultureInfo.InvariantCulture);
             _completedCohortCount++;
             _harvestedOfferCount +=
                 response.MissionDetails == null ? 0 : response.MissionDetails.Length;
             _pendingRequestId = null;
             _pendingRollOrigin = null;
+            _pendingSliderGate = null;
+            _pendingRawResponsePacket = null;
+            _pendingSerializedRequestSha256 = null;
             _nextRequestUtc = DateTime.UtcNow.AddSeconds(_intervalSeconds);
         }
 
-        private IDictionary<string, object> BuildCohortPayload(QuestAlternativeMessage response, out string fingerprint)
+        private IDictionary<string, object> BuildCohortPayload(
+            QuestAlternativeMessage response,
+            string cohortId,
+            bool verified,
+            string verificationError,
+            out string fingerprint)
         {
             MissionInfo[] details = response.MissionDetails ?? new MissionInfo[0];
             IDictionary<string, object> rollOrigin =
                 _pendingRollOrigin ?? BuildRollOriginPayload("UNMATCHED_RESPONSE_CURRENT_SNAPSHOT");
             var offers = new List<object>();
             for (int index = 0; index < details.Length; index++)
-                offers.Add(OfferPayload(details[index], index + 1, rollOrigin));
+                offers.Add(OfferPayload(details[index], index + 1, rollOrigin, cohortId, _sliderState == null ? null : _sliderState.SliderStateId));
             var envelope = new Dictionary<string, object>
             {
                 ["identity"] = IdentityPayload(response.Identity),
@@ -391,12 +648,31 @@ namespace AORebirth.MissionEvidence
             };
             var payload = new Dictionary<string, object>
             {
+                ["cohort_id"] = cohortId,
+                ["slider_state_id"] = _sliderState == null ? null : _sliderState.SliderStateId,
+                ["slider_preset"] = _sliderState == null ? null : _sliderState.PresetName,
+                ["requested_semantic_state"] = _sliderState == null ? null : _sliderState.RequestedSemanticPayload(),
                 ["message_envelope"] = envelope,
                 ["roll_origin"] = rollOrigin,
-                ["sliders"] = SliderPayload(response.MissionSliders.Difficulty, response.MissionSliders.GoodBad, response.MissionSliders.OrderChaos, response.MissionSliders.OpenHidden, response.MissionSliders.PhysicalMystical, response.MissionSliders.HeadonStealth, response.MissionSliders.CreditsXp),
+                ["returned_sliders"] = response.MissionSliders == null ? null : NativeValues(response.MissionSliders).ToPayload(),
+                ["slider_verification"] = new Dictionary<string, object>
+                {
+                    ["status"] = verified ? "MATCH" : "FAILED_CLOSED",
+                    ["failure_code"] = verificationError,
+                    ["phase"] = _pendingSliderGate == null ? null : _pendingSliderGate.Phase
+                },
+                ["raw_response_packet"] = _pendingRawResponsePacket,
                 ["offers"] = offers
             };
-            fingerprint = Sha256(_serializer.Serialize(payload));
+            var fingerprintOffers = new List<object>();
+            for (int index = 0; index < details.Length; index++)
+                fingerprintOffers.Add(OfferPayload(details[index], index + 1, null, null, null));
+            fingerprint = Sha256(_serializer.Serialize(new Dictionary<string, object>
+            {
+                ["message_envelope"] = envelope,
+                ["returned_sliders"] = response.MissionSliders == null ? null : NativeValues(response.MissionSliders).ToPayload(),
+                ["offers"] = fingerprintOffers
+            }));
             payload["callback_fingerprint"] = fingerprint;
             return payload;
         }
@@ -422,10 +698,14 @@ namespace AORebirth.MissionEvidence
                 ["terminal_coordinates"] = VectorPayload(terminalPosition),
                 ["roll_origin"] = BuildRollOriginPayload("SESSION_STARTED"),
                 ["difficulty_slot"] = _difficultySlot,
-                ["target_mission_ql"] = _targetMissionQl,
-                ["target_resolution"] = "EXACT_FIRST_MATCHING_SLOT",
+                ["static_expected_mission_ql"] = _targetMissionQl,
+                ["target_resolution"] = "STATIC_CHARACTER_LEVEL_AND_EXPLICIT_DIFFICULTY_DETENT_LOOKUP",
                 ["mission_ql_table_source"] = MissionQlResolver.SourceRepositoryPath,
                 ["mission_ql_table_sha256"] = MissionQlResolver.SourceSha256,
+                ["slider_state_id"] = _sliderState.SliderStateId,
+                ["slider_preset"] = _sliderState.PresetName,
+                ["requested_semantic_state"] = _sliderState.RequestedSemanticPayload(),
+                ["resolved_native_slider_values"] = _sliderState.ToNativeValues().ToPayload(),
                 ["requested_request_count"] = _requestedRequestCount,
                 ["minimum_request_interval_seconds"] = MinimumIntervalSeconds,
                 ["configured_request_interval_seconds"] = _intervalSeconds,
@@ -437,8 +717,8 @@ namespace AORebirth.MissionEvidence
                 ["aosharp_expected_package_version"] = "1.0.106",
                 ["aosharp_observed_assembly_version"] = typeof(AOPluginEntry).Assembly.GetName().Version.ToString(),
                 ["harvester_version"] = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                ["capture_contract_version"] = 2,
-                ["mission_type_catalog_source"] = "docs/generated/missions/malis/mission-type-catalog.json",
+                ["capture_contract_version"] = 3,
+                ["mission_type_catalog_source"] = "HARVESTER_EMBEDDED_CAPTURE_BACKED_ICON_MAP",
                 ["aosharp_mission_info_public_fields_captured"] = new[]
                 {
                     "Credits", "Description", "Location", "MissionIcon",
@@ -454,7 +734,9 @@ namespace AORebirth.MissionEvidence
         private static IDictionary<string, object> OfferPayload(
             MissionInfo offer,
             int offerIndex,
-            IDictionary<string, object> rollOrigin)
+            IDictionary<string, object> rollOrigin,
+            string cohortId,
+            string sliderStateId)
         {
             var rewards = new List<object>();
             foreach (MissionItemReward reward in offer.MissionItemData ?? new MissionItemReward[0])
@@ -479,6 +761,8 @@ namespace AORebirth.MissionEvidence
             return new Dictionary<string, object>
             {
                 ["offer_index"] = offerIndex,
+                ["cohort_id"] = cohortId,
+                ["slider_state_id"] = sliderStateId,
                 ["mission_identity"] = IdentityPayload(offer.MissionIdentity),
                 ["title"] = offer.Title,
                 ["description"] = offer.Description,
@@ -545,7 +829,6 @@ namespace AORebirth.MissionEvidence
             string captureBackedType = null;
             string canonicalType = null;
             string canonicalDisplayName = null;
-            string malisDisplayName = null;
             string clickSaverWireCode = null;
             switch (missionIcon)
             {
@@ -553,35 +836,30 @@ namespace AORebirth.MissionEvidence
                     captureBackedType = "FindItemReturn";
                     canonicalType = "RETURN_ITEM";
                     canonicalDisplayName = "Return Item";
-                    malisDisplayName = "Return Item";
                     clickSaverWireCode = "0x2C41";
                     break;
                 case 11330:
                     captureBackedType = "KillPerson";
                     canonicalType = "KILL_PERSON";
                     canonicalDisplayName = "Kill Person";
-                    malisDisplayName = "Kill Target";
                     clickSaverWireCode = "0x2C42";
                     break;
                 case 11335:
                     captureBackedType = "FindPerson";
                     canonicalType = "FIND_PERSON";
                     canonicalDisplayName = "Find Person";
-                    malisDisplayName = "Find Target";
                     clickSaverWireCode = "0x2C47";
                     break;
                 case 11337:
                     captureBackedType = "FindItem";
                     canonicalType = "FIND_ITEM";
                     canonicalDisplayName = "Find Item";
-                    malisDisplayName = "Find Item";
                     clickSaverWireCode = "0x2C49";
                     break;
                 case 11342:
                     captureBackedType = "RepairMachine";
                     canonicalType = "REPAIR";
                     canonicalDisplayName = "Repair";
-                    malisDisplayName = "Use Item";
                     clickSaverWireCode = "0x2C4E";
                     break;
             }
@@ -591,12 +869,11 @@ namespace AORebirth.MissionEvidence
                 ["capture_backed_type"] = captureBackedType,
                 ["canonical_type"] = canonicalType,
                 ["canonical_display_name"] = canonicalDisplayName,
-                ["malis_display_name"] = malisDisplayName,
                 ["clicksaver_wire_code"] = clickSaverWireCode,
                 ["classification_status"] = captureBackedType == null
                     ? "UNKNOWN_ICON_RAW_VALUE_PRESERVED"
                     : "CAPTURE_BACKED_EXACT_ICON_MAPPING",
-                ["catalog_source"] = "docs/generated/missions/malis/mission-type-catalog.json"
+                ["catalog_source"] = "HARVESTER_EMBEDDED_CAPTURE_BACKED_ICON_MAP"
             };
         }
 
@@ -612,6 +889,94 @@ namespace AORebirth.MissionEvidence
                 ["headon_stealth"] = headonStealth,
                 ["credits_xp"] = creditsXp
             };
+        }
+
+        private static NativeMissionSliderValues NativeValues(MissionSliders sliders)
+        {
+            return sliders == null
+                ? null
+                : new NativeMissionSliderValues(
+                    sliders.Difficulty,
+                    sliders.GoodBad,
+                    sliders.OrderChaos,
+                    sliders.OpenHidden,
+                    sliders.PhysicalMystical,
+                    sliders.HeadonStealth,
+                    sliders.CreditsXp);
+        }
+
+        private static bool TryDecodeQuestAlternative(
+            byte[] packet,
+            out QuestAlternativeMessage message,
+            out string error)
+        {
+            message = null;
+            error = null;
+            if (packet == null || packet.Length == 0)
+            {
+                error = "PACKET_EMPTY";
+                return false;
+            }
+            try
+            {
+                Message decoded = PacketFactory.Disassemble(packet);
+                message = decoded == null ? null : decoded.Body as QuestAlternativeMessage;
+                if (message == null)
+                {
+                    error = "PACKET_IS_NOT_QUEST_ALTERNATIVE";
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                error = exception.GetType().FullName + ": " + exception.Message;
+                return false;
+            }
+        }
+
+        private static IDictionary<string, object> RawPacketPayload(byte[] packet, string captureSource)
+        {
+            return new Dictionary<string, object>
+            {
+                ["capture_source"] = captureSource,
+                ["byte_length"] = packet == null ? 0 : packet.Length,
+                ["sha256"] = packet == null ? null : Sha256(packet),
+                ["base64"] = Base64(packet)
+            };
+        }
+
+        private static IDictionary<string, object> GateFailurePayload(
+            SliderRequestGate gate,
+            NativeMissionSliderValues requested,
+            NativeMissionSliderValues observed,
+            IDictionary<string, object> rawPacket)
+        {
+            return new Dictionary<string, object>
+            {
+                ["slider_state_id"] = gate == null || gate.RequestedState == null ? null : gate.RequestedState.SliderStateId,
+                ["verification_phase"] = gate == null ? null : gate.Phase,
+                ["requested_native_values"] = requested == null ? null : requested.ToPayload(),
+                ["observed_native_values"] = observed == null ? null : observed.ToPayload(),
+                ["raw_packet"] = rawPacket
+            };
+        }
+
+        private void FailClosed(string code, IDictionary<string, object> details)
+        {
+            if (_journal != null)
+            {
+                var payload = new Dictionary<string, object>
+                {
+                    ["code"] = code,
+                    ["disposition"] = "FAILED_CLOSED_NO_FURTHER_REQUESTS",
+                    ["slider_state_id"] = _sliderState == null ? null : _sliderState.SliderStateId,
+                    ["verification_phase"] = _pendingSliderGate == null ? null : _pendingSliderGate.Phase,
+                    ["details"] = details
+                };
+                _journal.Append("error", _sessionId, _pendingRequestId, payload);
+            }
+            Stop((code ?? "unknown_error").ToLowerInvariant(), true);
         }
 
         private static IDictionary<string, object> IdentityPayload(Identity identity)
@@ -650,6 +1015,12 @@ namespace AORebirth.MissionEvidence
         {
             using (SHA256 hash = SHA256.Create())
                 return BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-", "").ToLowerInvariant();
+        }
+
+        private static string Sha256(byte[] bytes)
+        {
+            using (SHA256 hash = SHA256.Create())
+                return BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
         }
     }
 }

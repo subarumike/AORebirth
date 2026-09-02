@@ -2,12 +2,12 @@
 
 ## Decision
 
-Do not begin the large level-2 mission harvest with the current active-roller
-command. `MissionOfferHarvester` capture-contract version 2 records the seven
-returned slider bytes, but version 1.2.1 actively sends the selected difficulty
-and hard-codes all six other fields to byte `255`. It also resolves a target QL
-to the first matching difficulty detent. That is sufficient for a centered
-baseline, but it cannot execute the controlled slider matrix below.
+`MissionOfferHarvester` 1.3.0 capture-contract version 3 now provides the
+explicit-slider gate required before the level-2 campaign. It accepts an exact
+Easy/Hard detent and either a named complete state or all six explicit secondary
+values. It verifies the constructed, serialized, transmitted, and returned
+state and fails closed on any mismatch. Run the documented one-request live
+acceptance before beginning the matrix below.
 
 This is an evidence-planning gate only. It does not authorize or implement any
 AORebirth runtime mission behavior.
@@ -61,11 +61,9 @@ assumed equivalent without controlled evidence.
   requests directly.
 - AOSharp deserializes the seven bytes on `QuestAlternativeMessage`; the
   harvester can preserve the returned `MissionSliders` bytes.
-- Harvester 1.2.1 owns automation and capture. It currently controls Easy/Hard
-  indirectly from target QL, resolves the first matching detent, and sends raw
-  byte `255` for every other slider.
-- The next capture-tool contract must directly control the exact detent and all
-  six canonical semantic values. It must not read, observe, or depend on Malis.
+- Harvester 1.3.0 owns automation and capture. It directly controls the exact
+  detent and all six secondary values and records semantic and native forms.
+- It does not read, observe, invoke, or depend on Malis.
 - Existing level-2 journals contain centered (`255`) samples for all eleven
   difficulty detents. No existing non-centered state is a controlled
   one-variable-at-a-time comparison.
@@ -74,13 +72,13 @@ assumed equivalent without controlled evidence.
 
 | Slider | Known effect | Proven? | AOSharp-readable? | Capture-tool controlled? | Must test at level 2? | Recommended states |
 | --- | --- | --- | --- | --- | --- | --- |
-| Easy ↔ Hard | Selects one of 11 difficulty request bytes; retained level table maps it to intended mission QL. Historical guides also associate it with mob, chest, and reward level. | Request encoding and table mapping are proven from source. AOSharp offers do not expose authoritative response-side mission QL, so every downstream effect is not yet live-proven. | Request/response byte yes. | Yes, but 1.2.1 selects the first detent for a target QL; explicit detent control is required. | Yes. Existing centered level-2 data already covers detents 1..11. | Preserve all detents. For the new matrix fix detent 1/QL1, then add centered bridges at detent 6/QL2 and detent 10/QL3. |
-| Good ↔ Bad | Historical sources consistently associate it with mission type and degree of violence. This can change objective type and the five-icon mix. | Historical/player evidence only; controlled local causality is not proven. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes.** Omitting it invalidates a claim that the observed five-type mix is complete or representative. | Semantic `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
-| Order ↔ Chaos | Historical sources associate it with human versus monster enemy families; full Chaos has a claimed special paired-mob selection behavior. | Historical/player evidence only. The offer harvester cannot observe interior enemy populations. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes for discovery.** QL1 enemy pools could otherwise remain unobserved. | Semantic `-100,-50,0,+50,+100`; accept/inspect one QL1 mission at center and each endpoint only after interior capture is ready. |
-| Open ↔ Hidden | Historical sources associate it with locked doors/chests and hidden/secret spaces. | Historical/player evidence only. Not visible in mission offers. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes for discovery.** | Semantic `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
-| Physical ↔ Mystical | Historical sources associate it with weapon-oriented versus nano-using enemy populations/professions. | Historical/player evidence only. Not visible in mission offers. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes for discovery.** | Semantic `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
-| Head On ↔ Stealth | Historical sources conflict: one associates Stealth with traps/cameras/turrets; another associates the slider with aggression and assist/sneak behavior. | Conflicting historical/player evidence; controlled local proof is required. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes.** The disagreement makes omission unsafe. | Semantic `-100,-50,0,+50,+100`; inspect traps, security devices, aggression, and assists at center and endpoints. |
-| Money ↔ XP | Historical sources consistently associate it with the credits/XP reward split. Both returned numeric fields are exposed by AOSharp. | Transport and returned fields are proven; causal magnitude and possible effects on item rewards are not yet controlled live evidence. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes.** It is the most direct non-difficulty numeric-output test. | Semantic `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
+| Easy ↔ Hard | Selects one of 11 difficulty request bytes; retained level table maps it to intended mission QL. Historical guides also associate it with mob, chest, and reward level. | Request encoding and table mapping are proven from source. AOSharp offers do not expose authoritative response-side mission QL, so every downstream effect is not yet live-proven. | Request/response byte yes. | Yes, explicitly in 1.3.0. | Yes. Existing centered level-2 data already covers detents 1..11. | Preserve all detents. For the new matrix fix detent 1/QL1, then add centered bridges at detent 6/QL2 and detent 10/QL3. |
+| Good ↔ Bad | Historical sources consistently associate it with mission type and degree of violence. This can change objective type and the five-icon mix. | Historical/player evidence only; controlled local causality is not proven. | Request/response byte yes. | Yes in 1.3.0. | **Yes.** Omitting it invalidates a claim that the observed five-type mix is complete or representative. | Semantic `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
+| Order ↔ Chaos | Historical sources associate it with human versus monster enemy families; full Chaos has a claimed special paired-mob selection behavior. | Historical/player evidence only. The offer harvester cannot observe interior enemy populations. | Request/response byte yes. | Yes in 1.3.0. | **Yes for discovery.** QL1 enemy pools could otherwise remain unobserved. | Semantic `-100,-50,0,+50,+100`; accept/inspect one QL1 mission at center and each endpoint only after interior capture is ready. |
+| Open ↔ Hidden | Historical sources associate it with locked doors/chests and hidden/secret spaces. | Historical/player evidence only. Not visible in mission offers. | Request/response byte yes. | Yes in 1.3.0. | **Yes for discovery.** | Semantic `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
+| Physical ↔ Mystical | Historical sources associate it with weapon-oriented versus nano-using enemy populations/professions. | Historical/player evidence only. Not visible in mission offers. | Request/response byte yes. | Yes in 1.3.0. | **Yes for discovery.** | Semantic `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
+| Head On ↔ Stealth | Historical sources conflict: one associates Stealth with traps/cameras/turrets; another associates the slider with aggression and assist/sneak behavior. | Conflicting historical/player evidence; controlled local proof is required. | Request/response byte yes. | Yes in 1.3.0. | **Yes.** The disagreement makes omission unsafe. | Semantic `-100,-50,0,+50,+100`; inspect traps, security devices, aggression, and assists at center and endpoints. |
+| Money ↔ XP | Historical sources consistently associate it with the credits/XP reward split. Both returned numeric fields are exposed by AOSharp. | Transport and returned fields are proven; causal magnitude and possible effects on item rewards are not yet controlled live evidence. | Request/response byte yes. | Yes in 1.3.0. | **Yes.** It is the most direct non-difficulty numeric-output test. | Semantic `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
 
 No historical source reviewed ties a non-difficulty slider directly to mission
 destination or reward-item selection. That is absence of proof, not proof of no
@@ -172,14 +170,22 @@ four interior/environment sliders.
 
 ## Capture-tool gate
 
-Before running this matrix, the dedicated harvester must accept explicit
-arguments for difficulty detent and all six canonical signed slider values,
-recording signed and raw representations. No Malis mode or dependency is part of
-this workflow.
+The dedicated harvester now accepts explicit arguments for difficulty detent
+and all six canonical signed or raw slider values and records both semantic and
+native representations. No Malis mode or dependency is part of this workflow.
 
-The tool must not silently resolve duplicate QLs to the first detent during a
-detent-equivalence test. It must preserve the response slider bytes and reject a
-request if the configured state cannot be represented exactly.
+It does not silently resolve duplicate QLs to the first detent. It preserves the
+exact serialized/transmitted request and received response bytes and rejects a
+request or stops further sends if the configured state cannot be verified.
+
+Before the matrix, perform only this one-request acceptance:
+
+```text
+/missionharvest start 1 1 CENTERED_BASELINE 2.0
+```
+
+Require one transmitted raw request, one received raw response, one verified
+cohort, and automatic completion in the schema-3 journal.
 
 ## Sources
 
