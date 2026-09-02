@@ -23,8 +23,14 @@ owns all seven explicit controls and raw request/response evidence; Malis is not
 an operational dependency. Its resumable matrix command replaces manual
 per-state commands. Do not let the level-2 character level, and do not
 infer slider effects from historical descriptions or the discovery sample.
-Live states 1-11 have passed raw-packet, slider, cohort, five-offer, and
-normalization validation. Resume once with `/missionharvest matrix 12 27 2 2.0`.
+The level-2 slider-discovery campaign is complete and accepted: 27 states,
+54 primary requests, 270 offers, two deterministic requests per state, and one
+explicitly retained surplus state-8 session excluded from the primary matrix.
+Offline analysis proves seven distinct transmitted request bytes, a definite
+Money/XP compensation effect, and a strong mission-QL candidate at decoded
+`UnkChunk3` offset 16. No additional level-2 slider capture is required; the
+character may advance and the next assigned capture character level is 7.
+Evidence: `docs/evidence/LEVEL2_MISSION_SLIDER_DISCOVERY_ANALYSIS.md`.
 
 ## Prior active checkpoint
 

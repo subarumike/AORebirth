@@ -1,0 +1,454 @@
+{
+  "all_seven_transmitted": true,
+  "baseline_packet_base64": "//8ACgABADMCNAHKAAAAAlxDZgkAAMNQAjQBygEEAf///////wAAAAABAADawcAAAo8AAA==",
+  "baseline_packet_sha256": "2e40ca9fc05c743d46b6132edf18409f13189ee88c8da0454711ccd3e33efe02",
+  "packet_byte_length": 52,
+  "packing_result": "SEVEN_DISTINCT_SINGLE_BYTE_OFFSETS_NO_SHARED_PACKING_OBSERVED",
+  "repeat_determinism": {
+    "states_exactly_identical_across_two_requests": 27,
+    "states_with_unexplained_difference": 0
+  },
+  "sliders": [
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        30
+      ],
+      "changed_offsets_hex": [
+        "0x1E"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 1,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            30
+          ],
+          "label": "CENTERED_BASELINE_D6",
+          "native_value": 6,
+          "state_index": 26,
+          "values_at_changed_offsets": {
+            "0x1E": 6
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            30
+          ],
+          "label": "CENTERED_BASELINE_D10",
+          "native_value": 10,
+          "state_index": 27,
+          "values_at_changed_offsets": {
+            "0x1E": 10
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "ONE_BASED_DETENT_BYTE",
+      "slider": "easy_hard"
+    },
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        31
+      ],
+      "changed_offsets_hex": [
+        "0x1F"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 255,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            31
+          ],
+          "label": "GOOD_BAD_FULL_LEFT",
+          "native_value": 156,
+          "state_index": 2,
+          "values_at_changed_offsets": {
+            "0x1F": 156
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            31
+          ],
+          "label": "GOOD_BAD_FULL_RIGHT",
+          "native_value": 100,
+          "state_index": 3,
+          "values_at_changed_offsets": {
+            "0x1F": 100
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            31
+          ],
+          "label": "GOOD_BAD_MINUS_50",
+          "native_value": 206,
+          "state_index": 4,
+          "values_at_changed_offsets": {
+            "0x1F": 206
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            31
+          ],
+          "label": "GOOD_BAD_PLUS_50",
+          "native_value": 50,
+          "state_index": 5,
+          "values_at_changed_offsets": {
+            "0x1F": 50
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "SIGNED_BYTE_ENCODING_MONOTONIC_AFTER_SIGNED_DECODE",
+      "slider": "good_bad"
+    },
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        32
+      ],
+      "changed_offsets_hex": [
+        "0x20"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 255,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            32
+          ],
+          "label": "ORDER_CHAOS_FULL_LEFT",
+          "native_value": 156,
+          "state_index": 6,
+          "values_at_changed_offsets": {
+            "0x20": 156
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            32
+          ],
+          "label": "ORDER_CHAOS_FULL_RIGHT",
+          "native_value": 100,
+          "state_index": 7,
+          "values_at_changed_offsets": {
+            "0x20": 100
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            32
+          ],
+          "label": "ORDER_CHAOS_MINUS_50",
+          "native_value": 206,
+          "state_index": 8,
+          "values_at_changed_offsets": {
+            "0x20": 206
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            32
+          ],
+          "label": "ORDER_CHAOS_PLUS_50",
+          "native_value": 50,
+          "state_index": 9,
+          "values_at_changed_offsets": {
+            "0x20": 50
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "SIGNED_BYTE_ENCODING_MONOTONIC_AFTER_SIGNED_DECODE",
+      "slider": "order_chaos"
+    },
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        33
+      ],
+      "changed_offsets_hex": [
+        "0x21"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 255,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            33
+          ],
+          "label": "OPEN_HIDDEN_FULL_LEFT",
+          "native_value": 156,
+          "state_index": 10,
+          "values_at_changed_offsets": {
+            "0x21": 156
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            33
+          ],
+          "label": "OPEN_HIDDEN_FULL_RIGHT",
+          "native_value": 100,
+          "state_index": 11,
+          "values_at_changed_offsets": {
+            "0x21": 100
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            33
+          ],
+          "label": "OPEN_HIDDEN_MINUS_50",
+          "native_value": 206,
+          "state_index": 12,
+          "values_at_changed_offsets": {
+            "0x21": 206
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            33
+          ],
+          "label": "OPEN_HIDDEN_PLUS_50",
+          "native_value": 50,
+          "state_index": 13,
+          "values_at_changed_offsets": {
+            "0x21": 50
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "SIGNED_BYTE_ENCODING_MONOTONIC_AFTER_SIGNED_DECODE",
+      "slider": "open_hidden"
+    },
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        34
+      ],
+      "changed_offsets_hex": [
+        "0x22"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 255,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            34
+          ],
+          "label": "PHYSICAL_MYSTICAL_FULL_LEFT",
+          "native_value": 156,
+          "state_index": 14,
+          "values_at_changed_offsets": {
+            "0x22": 156
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            34
+          ],
+          "label": "PHYSICAL_MYSTICAL_FULL_RIGHT",
+          "native_value": 100,
+          "state_index": 15,
+          "values_at_changed_offsets": {
+            "0x22": 100
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            34
+          ],
+          "label": "PHYSICAL_MYSTICAL_MINUS_50",
+          "native_value": 206,
+          "state_index": 16,
+          "values_at_changed_offsets": {
+            "0x22": 206
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            34
+          ],
+          "label": "PHYSICAL_MYSTICAL_PLUS_50",
+          "native_value": 50,
+          "state_index": 17,
+          "values_at_changed_offsets": {
+            "0x22": 50
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "SIGNED_BYTE_ENCODING_MONOTONIC_AFTER_SIGNED_DECODE",
+      "slider": "physical_mystical"
+    },
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        35
+      ],
+      "changed_offsets_hex": [
+        "0x23"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 255,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            35
+          ],
+          "label": "HEADON_STEALTH_FULL_LEFT",
+          "native_value": 156,
+          "state_index": 18,
+          "values_at_changed_offsets": {
+            "0x23": 156
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            35
+          ],
+          "label": "HEADON_STEALTH_FULL_RIGHT",
+          "native_value": 100,
+          "state_index": 19,
+          "values_at_changed_offsets": {
+            "0x23": 100
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            35
+          ],
+          "label": "HEADON_STEALTH_MINUS_50",
+          "native_value": 206,
+          "state_index": 20,
+          "values_at_changed_offsets": {
+            "0x23": 206
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            35
+          ],
+          "label": "HEADON_STEALTH_PLUS_50",
+          "native_value": 50,
+          "state_index": 21,
+          "values_at_changed_offsets": {
+            "0x23": 50
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "SIGNED_BYTE_ENCODING_MONOTONIC_AFTER_SIGNED_DECODE",
+      "slider": "headon_stealth"
+    },
+    {
+      "changed_byte_count": 1,
+      "changed_offsets": [
+        36
+      ],
+      "changed_offsets_hex": [
+        "0x24"
+      ],
+      "classification": "TRANSMITTED_PROVEN",
+      "native_values_by_state": [
+        {
+          "changed_offsets_from_center": [],
+          "label": "CENTERED_BASELINE_D1",
+          "native_value": 255,
+          "state_index": 1,
+          "values_at_changed_offsets": {}
+        },
+        {
+          "changed_offsets_from_center": [
+            36
+          ],
+          "label": "MONEY_XP_FULL_LEFT",
+          "native_value": 156,
+          "state_index": 22,
+          "values_at_changed_offsets": {
+            "0x24": 156
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            36
+          ],
+          "label": "MONEY_XP_FULL_RIGHT",
+          "native_value": 100,
+          "state_index": 23,
+          "values_at_changed_offsets": {
+            "0x24": 100
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            36
+          ],
+          "label": "MONEY_XP_MINUS_50",
+          "native_value": 206,
+          "state_index": 24,
+          "values_at_changed_offsets": {
+            "0x24": 206
+          }
+        },
+        {
+          "changed_offsets_from_center": [
+            36
+          ],
+          "label": "MONEY_XP_PLUS_50",
+          "native_value": 50,
+          "state_index": 25,
+          "values_at_changed_offsets": {
+            "0x24": 50
+          }
+        }
+      ],
+      "same_offset_for_every_noncenter_state": true,
+      "semantic_monotonicity": "SIGNED_BYTE_ENCODING_MONOTONIC_AFTER_SIGNED_DECODE",
+      "slider": "money_xp"
+    }
+  ],
+  "volatile_field_mask": []
+}

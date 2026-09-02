@@ -1,5 +1,13 @@
 # Low-Level Rubi-Ka Mission Slider Capture Matrix
 
+## Completed result
+
+The governed matrix is complete: 27 states, 54 primary requests, and 270 offers.
+Offline packet analysis proves all seven controls are distinct transmitted
+bytes. No additional level-2 slider capture is required, and the level-2
+character may advance. Full evidence and boundaries are in
+`docs/evidence/LEVEL2_MISSION_SLIDER_DISCOVERY_ANALYSIS.md`.
+
 ## Decision
 
 `MissionOfferHarvester` 1.4.0 capture-contract version 3 now provides the

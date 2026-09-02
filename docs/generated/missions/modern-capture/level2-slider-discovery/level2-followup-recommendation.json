@@ -1,0 +1,14 @@
+{
+  "level2_character_may_advance": true,
+  "minimal_followup_matrix": [],
+  "more_level2_capture_required": false,
+  "next_character_level": 7,
+  "reasoning": [
+    "All seven controls are proven as distinct transmitted bytes and repeat deterministically.",
+    "The only definite secondary offer-level effect, Money/XP compensation, is not unique to QL1 and can be studied at higher level.",
+    "Good/Bad mission-icon differences remain discovery-only; larger distribution work can use a higher-level character without losing the protocol dimension.",
+    "Order/Chaos, Open/Hidden, Physical/Mystical, and Head On/Stealth historical claims concern mission interiors and are not resolved by more offer-only QL1 rolling.",
+    "No mission-QL candidate was promoted; broader multi-QL captures provide better correlation than repeating only QL1."
+  ],
+  "separate_scope_warning": "The 270-offer discovery campaign does not exhaust the QL1 reward pool and does not establish probabilities. That separate statistical-content objective was not required to resolve slider control or preserve a uniquely level-2 protocol dimension."
+}

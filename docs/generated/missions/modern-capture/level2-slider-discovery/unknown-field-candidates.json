@@ -1,0 +1,211 @@
+{
+  "entrance_identity": {
+    "classification": "UNKNOWN_NOT_EXPOSED"
+  },
+  "faction_requirement": {
+    "classification": "UNKNOWN_NOT_EXPOSED"
+  },
+  "mission_ql": {
+    "classification": "STRONG_MISSION_QL_CANDIDATE",
+    "exact_candidates": [
+      {
+        "byte_order": "big",
+        "offset": 16,
+        "property": "UnkChunk3Base64",
+        "relationship": "EQUALS_STATIC_EXPECTED_MISSION_QL_ALL_30_OFFERS",
+        "width": 4
+      }
+    ],
+    "overlapping_alias_views": [
+      {
+        "byte_order": "big",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "relationship": "EQUALS_STATIC_EXPECTED_MISSION_QL_ALL_30_OFFERS",
+        "width": 1
+      },
+      {
+        "byte_order": "big",
+        "offset": 18,
+        "property": "UnkChunk3Base64",
+        "relationship": "EQUALS_STATIC_EXPECTED_MISSION_QL_ALL_30_OFFERS",
+        "width": 2
+      },
+      {
+        "byte_order": "little",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "relationship": "EQUALS_STATIC_EXPECTED_MISSION_QL_ALL_30_OFFERS",
+        "width": 2
+      },
+      {
+        "byte_order": "little",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "relationship": "EQUALS_STATIC_EXPECTED_MISSION_QL_ALL_30_OFFERS",
+        "width": 4
+      }
+    ],
+    "promotion_status": "CANDIDATE_ONLY_REQUIRES_BROADER_MULTI_QL_CONFIRMATION",
+    "sample_offer_count": 30,
+    "weak_candidates": [
+      {
+        "byte_order": "big",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 1,
+          "2": 2,
+          "3": 3
+        },
+        "width": 1
+      },
+      {
+        "byte_order": "little",
+        "offset": 18,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 256,
+          "2": 512,
+          "3": 768
+        },
+        "width": 2
+      },
+      {
+        "byte_order": "big",
+        "offset": 18,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 1,
+          "2": 2,
+          "3": 3
+        },
+        "width": 2
+      },
+      {
+        "byte_order": "little",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 1,
+          "2": 2,
+          "3": 3
+        },
+        "width": 2
+      },
+      {
+        "byte_order": "big",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 256,
+          "2": 512,
+          "3": 768
+        },
+        "width": 2
+      },
+      {
+        "byte_order": "little",
+        "offset": 16,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 16777216,
+          "2": 33554432,
+          "3": 50331648
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "big",
+        "offset": 16,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 1,
+          "2": 2,
+          "3": 3
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "little",
+        "offset": 17,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 65536,
+          "2": 131072,
+          "3": 196608
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "big",
+        "offset": 17,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 256,
+          "2": 512,
+          "3": 768
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "little",
+        "offset": 18,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 256,
+          "2": 512,
+          "3": 768
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "big",
+        "offset": 18,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 65536,
+          "2": 131072,
+          "3": 196608
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "little",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 1,
+          "2": 2,
+          "3": 3
+        },
+        "width": 4
+      },
+      {
+        "byte_order": "big",
+        "offset": 19,
+        "property": "UnkChunk3Base64",
+        "values_by_expected_ql": {
+          "1": 16777216,
+          "2": 33554432,
+          "3": 50331648
+        },
+        "width": 4
+      }
+    ]
+  },
+  "mission_type": {
+    "candidates": [],
+    "known_decoded_anchor": "MissionIcon"
+  },
+  "objective_identity": {
+    "classification": "UNKNOWN_NO_DECODED_GROUND_TRUTH"
+  },
+  "objective_ql": {
+    "classification": "UNKNOWN_NO_DECODED_GROUND_TRUTH"
+  },
+  "semantic_promotion_performed": false,
+  "token_reward": {
+    "classification": "UNKNOWN_NOT_EXPOSED"
+  }
+}

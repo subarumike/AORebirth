@@ -66,8 +66,13 @@ completion matrices and dated evidence retain detailed provenance.
   large level-2 campaign remains paused only for the documented one-request live
   acceptance. The minimum discovery matrix and evidence boundaries are in
   `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
-  Live discovery states 1-11 are accepted; the remaining resumable range is
-  states 12-27 with two requests per state.
+  The complete level-2 discovery campaign is accepted at 27 states, 54 primary
+  requests, and 270 offers. All seven controls occupy distinct deterministic
+  outbound bytes; Money/XP has a definite decoded compensation effect; decoded
+  `UnkChunk3` big-endian offset 16 is a strong mission-QL candidate across
+  expected QL1/2/3 but remains unpromoted pending broader multi-QL confirmation.
+  No further level-2 slider capture is required, the character may advance, and
+  level 7 is the next assigned capture level. No probabilities were inferred.
   Malis is not an operational dependency for automation or capture.
 
 - Temple documented boss loot, together with the preceding Inner Sanctum and
