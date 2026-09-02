@@ -67,6 +67,7 @@ namespace ZoneEngine
     using ZoneEngine.Core;
     using ZoneEngine.Core.Arete;
     using ZoneEngine.Core.Functions;
+    using ZoneEngine.Core.GameData;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Script;
@@ -490,6 +491,19 @@ namespace ZoneEngine
 
             try
             {
+                GameDataLoader.EnsureRootExists();
+            }
+            catch (Exception exception)
+            {
+                Colouring.Push(ConsoleColor.Red);
+                Console.WriteLine("GameData initialization failed: " + exception.Message);
+                Colouring.Pop();
+                Colouring.Pop();
+                return false;
+            }
+
+            try
+            {
                 AreteFrameworkRegistries contentRegistries =
                     AreteFrameworkBootstrap.InitializeCheckedInContent();
                 var missionDao = DatabaseDaoFactory.CreateMissionDao();
@@ -627,6 +641,17 @@ namespace ZoneEngine
         /// </summary>
         /// <returns>
         /// </returns>
+        private static void LogActiveConfiguration()
+        {
+            string configPath = Path.GetFullPath(ConfigReadWrite.ResolvedConfigPath);
+            string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
+            string source = string.IsNullOrWhiteSpace(configuredPath)
+                ? "default"
+                : "AO_REBIRTH_CONFIG_PATH";
+
+            Console.WriteLine("ZoneEngine configuration: " + configPath + " (source=" + source + ")");
+        }
+
         private static bool InitializeLogAndBug()
         {
             try
@@ -635,6 +660,7 @@ namespace ZoneEngine
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
                 LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
+                LogActiveConfiguration();
 
 #if !AOREBIRTH_LINUX
                 // NBug initialization
@@ -1073,6 +1099,8 @@ namespace ZoneEngine
                     throw new FileNotFoundException("Required ZoneEngine runtime asset is missing: " + relativePath);
                 }
             }
+
+            GameDataLoader.EnsureRootExists();
         }
 
         private static int ValidateStartup()

@@ -279,7 +279,7 @@ namespace AORebirth.Core.Playfields
             var playfield = character.Playfield as Playfield;
             if (playfield != null)
             {
-                playfield.RefreshCharacterVisibility(character);
+                playfield.RefreshCharacterVisibility(character, forceRefresh: true);
             }
         }
 

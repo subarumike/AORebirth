@@ -124,7 +124,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 var playfield = character.Playfield as Playfield;
                 if (playfield != null)
                 {
-                    playfield.RefreshCharacterVisibility(character);
+                    playfield.RefreshCharacterVisibility(character, forceRefresh: true);
                 }
             }
 

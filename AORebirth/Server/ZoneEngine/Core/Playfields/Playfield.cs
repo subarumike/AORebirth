@@ -45,6 +45,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Core.Entities;
     using AORebirth.Core.Events;
     using AORebirth.Core.Functions;
+    using AORebirth.Core.GameData;
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
@@ -72,11 +73,13 @@ namespace AORebirth.Core.Playfields
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Functions;
+    using ZoneEngine.Core.GameData;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Playfields.Locality;
     using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Script;
 
@@ -124,6 +127,8 @@ namespace AORebirth.Core.Playfields
         private readonly PlayfieldDynelRegistry dynelRegistry;
 
         private readonly PlayfieldRuntimeSystems runtimeSystems;
+
+        private readonly PlayfieldLocality locality;
 
         private readonly PlayfieldCharacterCombatSubscriptions characterCombatSubscriptions;
 
@@ -261,6 +266,7 @@ namespace AORebirth.Core.Playfields
             : base(Identity.None, playfieldIdentity)
         {
             this.server = zoneServer;
+            this.MetaData = GameDataLoader.LoadPlayfieldMetaData(playfieldIdentity.Instance);
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
             this.dynelRegistry = new PlayfieldDynelRegistry(this.Identity);
             this.runtimeSystems =
@@ -275,6 +281,27 @@ namespace AORebirth.Core.Playfields
                     ResolveCharacterStatWireValue);
 
             this.characterCombatSubscriptions = new PlayfieldCharacterCombatSubscriptions(this);
+
+            this.locality = new PlayfieldLocality(
+                this.Identity,
+                this.MetaData,
+                this.runtimeSystems.VisibilityFanout,
+                this.runtimeSystems.PacketSequences,
+                new PlayfieldLocalityTickCallbacks
+                {
+                    GetAllCharacters = () => this.runtimeSystems.Characters(),
+                    GetConnectedPlayers = () => this.runtimeSystems.Players(),
+                    HasPendingDeadNpcDespawn = this.runtimeSystems.HasPendingDeadNpcDespawn,
+                    ProcessDeadNpcDespawn = this.runtimeSystems.ProcessDeadNpcDespawn,
+                    ProcessCharacterTick = this.ProcessCharacterTick,
+                    ProcessNpcPatrolTick = this.runtimeSystems.ProcessNpcPatrolTick,
+                    ProcessFollow = this.runtimeSystems.ProcessCharacterFollow,
+                    ProcessPlayerCollision =
+                        dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
+                            dynel,
+                            this.CheckWallCollision,
+                            this.CheckStatelCollision)
+                });
 
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtomationMessageToClient>(
@@ -351,6 +378,12 @@ namespace AORebirth.Core.Playfields
         public Expansions Expansion { get; set; }
 
         /// <summary>
+        /// GameData\Playfields\{id}\metadata.json for this playfield, or null when the
+        /// playfield has no extracted ground tilemap.
+        /// </summary>
+        public PlayfieldMetaData MetaData { get; private set; }
+
+        /// <summary>
         /// </summary>
         public IBus PlayfieldBus { get; set; }
 
@@ -415,11 +448,10 @@ namespace AORebirth.Core.Playfields
                     this.RefreshCharacterVisibility(source);
                 }
 
-                if (this.runtimeSystems.TryAnnounceCharacterScopedMessage(
+                if (this.TryAnnounceCharacterScopedMessage(
                     n3Message.Identity,
                     Identity.None,
-                    messageBody,
-                    this.Send))
+                    messageBody))
                 {
                     return;
                 }
@@ -452,11 +484,10 @@ namespace AORebirth.Core.Playfields
         {
             N3Message n3Message = messageBody as N3Message;
             if (n3Message != null
-                && this.runtimeSystems.TryAnnounceCharacterScopedMessage(
+                && this.TryAnnounceCharacterScopedMessage(
                     n3Message.Identity,
                     dontSend,
-                    messageBody,
-                    this.Send))
+                    messageBody))
             {
                 return;
             }
@@ -470,7 +501,7 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void Despawn(Identity identity)
         {
-            if (this.runtimeSystems.TryDespawnVisibleCharacter(identity, this.SendVisibilityMessage))
+            if (this.TryDespawnVisibleCharacter(identity))
             {
                 return;
             }
@@ -482,16 +513,22 @@ namespace AORebirth.Core.Playfields
             ICharacter character,
             Identity alreadyVisibleRecipient)
         {
-            this.runtimeSystems.AnnounceSpawnedCharacterVisibility(
+            this.locality.AnnounceSpawnedCharacterVisibility(
                 character,
                 alreadyVisibleRecipient,
                 this.SendVisibilityMessage,
                 this.SendVisibilityLeave);
         }
 
-        public void RefreshCharacterVisibility(ICharacter character)
+        public void RefreshCharacterVisibility(ICharacter character, bool forceRefresh = false)
         {
-            this.runtimeSystems.RefreshCharacterVisibility(
+            bool cellChanged = this.locality.MoveCharacter(character);
+            if (!forceRefresh && !cellChanged)
+            {
+                return;
+            }
+
+            this.locality.RefreshCharacterVisibility(
                 character,
                 this.SendVisibilityMessage,
                 this.SendVisibilityLeave);
@@ -514,11 +551,18 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            return this.runtimeSystems.ForceCharacterVisibilityToRecipient(
+            if (!forceResend
+                && this.locality.VisibleRecipientsForSource(source.Identity).Any(
+                    visibleRecipient => visibleRecipient.Identity == recipient.Identity))
+            {
+                return true;
+            }
+
+            this.locality.RegisterCharacter(source);
+            return this.locality.SendCharacterVisibilityEntry(
                 source,
                 recipient,
-                this.SendVisibilityMessage,
-                forceResend);
+                messageBody => this.SendVisibilityMessage(recipient, messageBody));
         }
 
         internal bool EnsureNpcCombatVisibility(ICharacter attacker, ICharacter target)
@@ -528,21 +572,16 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            // Already visible: do not Refresh (SetPos→Refresh was re-SCFUing pinned D2 mobs
-            // every chase step → disappear/reappear flicker during fights).
-            bool visible = this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity).Any(
+            bool visible = this.locality.VisibleRecipientsForSource(attacker.Identity).Any(
                 recipient => recipient.Identity == target.Identity);
             if (visible)
             {
                 return true;
             }
 
-            this.runtimeSystems.RefreshCharacterVisibility(
-                attacker,
-                this.SendVisibilityMessage,
-                this.SendVisibilityLeave);
+            this.RefreshCharacterVisibility(attacker, forceRefresh: true);
 
-            visible = this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity).Any(
+            visible = this.locality.VisibleRecipientsForSource(attacker.Identity).Any(
                 recipient => recipient.Identity == target.Identity);
             if (!visible)
             {
@@ -554,7 +593,7 @@ namespace AORebirth.Core.Playfields
 
         public void ForgetVisibilityRecipient(Identity recipientIdentity)
         {
-            this.runtimeSystems.ForgetVisibilityRecipient(recipientIdentity);
+            this.locality.ForgetRecipient(recipientIdentity);
             lock (this.corpseVisibilitySync)
             {
                 foreach (CorpseState corpse in this.corpses.Values)
@@ -565,6 +604,55 @@ namespace AORebirth.Core.Playfields
                     }
                 }
             }
+        }
+
+        private bool TryAnnounceCharacterScopedMessage(
+            Identity sourceIdentity,
+            Identity excludedRecipient,
+            MessageBody messageBody)
+        {
+            ICharacter source = this.FindByIdentity<ICharacter>(sourceIdentity);
+            if (source == null)
+            {
+                return false;
+            }
+
+            foreach (ICharacter recipient in this.locality.VisibleRecipientsForSource(sourceIdentity))
+            {
+                if (recipient.Identity != excludedRecipient
+                    && recipient.Controller != null
+                    && recipient.Controller.Client != null)
+                {
+                    this.Send(recipient.Controller.Client, messageBody);
+                }
+            }
+
+            if (source.Identity != excludedRecipient
+                && source.Controller != null
+                && source.Controller.Client != null)
+            {
+                this.Send(source.Controller.Client, messageBody);
+            }
+
+            return true;
+        }
+
+        private bool TryDespawnVisibleCharacter(Identity sourceIdentity)
+        {
+            ICharacter source = this.FindByIdentity<ICharacter>(sourceIdentity);
+            if (source == null)
+            {
+                return false;
+            }
+
+            DespawnMessage despawn = DespawnMessageHandler.Default.Create(sourceIdentity);
+            foreach (ICharacter recipient in this.locality.VisibleRecipientsForSource(sourceIdentity))
+            {
+                this.SendVisibilityMessage(recipient, despawn);
+            }
+
+            this.locality.UnregisterCharacter(sourceIdentity);
+            return true;
         }
 
         private void SendVisibilityMessage(ICharacter recipient, MessageBody messageBody)
@@ -628,9 +716,7 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         internal void HideDeadNpcFromVisibility(Identity deadNpcIdentity)
         {
-            this.runtimeSystems.TryDespawnVisibleCharacter(
-                deadNpcIdentity,
-                this.SendVisibilityMessage);
+            this.TryDespawnVisibleCharacter(deadNpcIdentity);
         }
 
         private void CancelPendingNpcCorpseSpawn(Identity deadNpcIdentity)
@@ -649,6 +735,7 @@ namespace AORebirth.Core.Playfields
         public void ActivateNpc(ICharacter character)
         {
             this.runtimeSystems.ActivateNpc(character);
+            this.locality.RegisterCharacter(character);
             this.RegisterCharacterCombatEvents(character);
         }
 
@@ -658,6 +745,7 @@ namespace AORebirth.Core.Playfields
             ICharacter character = entity as ICharacter;
             if (character != null)
             {
+                this.locality.RegisterCharacter(character);
                 this.RegisterCharacterCombatEvents(character);
             }
         }
@@ -670,6 +758,7 @@ namespace AORebirth.Core.Playfields
                 this.UnregisterCharacterCombatEvents(character);
             }
 
+            this.locality.UnregisterCharacter(identity);
             this.runtimeSystems.UnregisterDynel(identity);
         }
 
@@ -1085,7 +1174,7 @@ namespace AORebirth.Core.Playfields
                                    };
             dynel.RawHeading = new AORebirth.Core.Vector.Quaternion(heading.xf, heading.yf, heading.zf, heading.wf);
             this.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
-            this.RefreshCharacterVisibility(character);
+            this.RefreshCharacterVisibility(character, forceRefresh: true);
             this.PrimeStatelCollisionContacts(character);
 
             LogUtil.Debug(
@@ -1174,8 +1263,9 @@ namespace AORebirth.Core.Playfields
         /// </param>
         public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)
         {
-            this.runtimeSystems.SendExistingCharacterVisibilityToClient(
+            this.locality.SendExistingCharacterVisibilityToClient(
                 sendSCFUs.toClient.Controller.Character,
+                this.runtimeSystems.Characters(),
                 body => sendSCFUs.toClient.SendCompressed(body));
             this.SendExistingCorpseVisibilityToClient(sendSCFUs.toClient.Controller.Character);
         }
@@ -1227,7 +1317,7 @@ namespace AORebirth.Core.Playfields
 
         public void AnnouncePlayerVisibility(ICharacter character)
         {
-            this.runtimeSystems.AnnounceJoiningCharacterVisibility(
+            this.locality.AnnounceJoiningCharacterVisibility(
                 character,
                 this.SendVisibilityMessage,
                 this.SendVisibilityLeave);
@@ -1712,18 +1802,12 @@ namespace AORebirth.Core.Playfields
 
                     this.lastHeartbeatUtc = now;
 
-                    this.runtimeSystems.ProcessHeartbeatTimedLifecycle(
+                    this.runtimeSystems.ProcessHeartbeatAuxiliary(
                         this.Identity,
-                        deltaTime,
                         this.ProcessPendingCorpseSpawns,
                         this.ProcessCorpseDespawns,
-                        this.ProcessPendingCorpseCreditAwards,
-                        this.ProcessCharacterTick,
-                        this.runtimeSystems.ProcessCharacterFollow,
-                        dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
-                            dynel,
-                            this.CheckWallCollision,
-                            this.CheckStatelCollision));
+                        this.ProcessPendingCorpseCreditAwards);
+                    this.locality.Tick(deltaTime);
                 }
                 catch (Exception e)
                 {
@@ -2103,7 +2187,7 @@ namespace AORebirth.Core.Playfields
 
             var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
             this.SendSCFUsToClient(sendSCFUs);
-            this.RefreshCharacterVisibility(character);
+            this.RefreshCharacterVisibility(character, forceRefresh: true);
 
             this.SendStaticDynelsToClient(character);
 
@@ -3593,7 +3677,7 @@ namespace AORebirth.Core.Playfields
             }
 
             corpse.VisualSource = target;
-            var recipients = this.runtimeSystems.VisibleRecipientsForSource(target.Identity).ToList();
+            var recipients = this.locality.VisibleRecipientsForSource(target.Identity).ToList();
             if (target.Controller != null
                 && target.Controller.Client != null
                 && recipients.All(x => x.Identity != target.Identity))
@@ -3695,8 +3779,7 @@ namespace AORebirth.Core.Playfields
             foreach (CorpseState corpse in this.corpses.Values.OrderBy(x => x.CorpseIdentity.Instance))
             {
                 if (corpse.VisualSource == null
-                    || corpse.VisualSource.Coordinates().Distance2D(recipient.Coordinates())
-                       > this.runtimeSystems.VisibilityEnterRadius)
+                    || !this.locality.SharesVisibilityNeighborhood(recipient, corpse.VisualSource))
                 {
                     continue;
                 }
@@ -3725,13 +3808,14 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                double distance = corpse.VisualSource.Coordinates().Distance2D(recipient.Coordinates());
+                bool inNeighborhood = this.locality.SharesVisibilityNeighborhood(recipient, corpse.VisualSource);
                 bool visible;
                 lock (this.corpseVisibilitySync)
                 {
                     visible = corpse.VisibleRecipients.Contains(recipient.Identity);
                 }
-                if (!visible && distance <= this.runtimeSystems.VisibilityEnterRadius)
+
+                if (!visible && inNeighborhood)
                 {
                     this.SendCorpseFullUpdateToRecipient(
                         corpse,
@@ -3739,7 +3823,7 @@ namespace AORebirth.Core.Playfields
                         CorpseCatMeshFor(corpse.VisualSource),
                         CorpseMonsterDataFor(corpse.VisualSource));
                 }
-                else if (visible && distance > this.runtimeSystems.VisibilityLeaveRadius)
+                else if (visible && !inNeighborhood)
                 {
                     this.SendVisibilityLeave(recipient, corpse.CorpseIdentity);
                     lock (this.corpseVisibilitySync)
@@ -5058,6 +5142,7 @@ namespace AORebirth.Core.Playfields
                 {
                     // We wont save any NPCs to character table/character's stats table.
                     this.runtimeSystems.ClearNpcRuntimeState();
+                    this.locality.Clear();
                 }
                 finally
                 {

@@ -97,10 +97,6 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
 
-        private readonly PlayfieldVisibilityInterestRuntimeService visibilityInterest;
-
-        private readonly PlayfieldVisibilityPacketRuntimeService visibilityPackets;
-
         private readonly PlayfieldWallCollisionRuntimeService wallCollision;
 
         private readonly PacketSequencingCoordinator packetSequencing;
@@ -187,17 +183,6 @@ namespace ZoneEngine.Core.Playfields
             this.transfers = new PlayfieldTransferRuntimeService(this.lifecycle, this.packetSequences);
             this.vendors = new PlayfieldVendorRuntimeService();
             this.visibilityFanout = new PlayfieldVisibilityFanoutRuntimeService();
-            PlayfieldVisibilityInterestPolicy visibilityPolicy =
-                PlayfieldVisibilityInterestPolicy.FromEnvironment();
-            this.visibilityInterest =
-                new PlayfieldVisibilityInterestRuntimeService(
-                    visibilityPolicy,
-                    new PlayfieldSpatialCharacterIndex(visibilityPolicy));
-            this.visibilityPackets =
-                new PlayfieldVisibilityPacketRuntimeService(
-                    this.visibilityFanout,
-                    this.packetSequences,
-                    this.visibilityInterest);
             this.wallCollision = new PlayfieldWallCollisionRuntimeService();
             this.privateCityReadyInit =
                 new PrivateCityReadyInitCoordinator(
@@ -278,8 +263,17 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ClearRuntimeState();
             this.npcChaseNavigation.Dispose();
             this.doorStatuses.Clear();
-            this.visibilityInterest.Clear();
             this.dynelRegistry.Clear();
+        }
+
+        internal PlayfieldVisibilityFanoutRuntimeService VisibilityFanout
+        {
+            get { return this.visibilityFanout; }
+        }
+
+        internal PlayfieldPacketSequencingRuntimeService PacketSequences
+        {
+            get { return this.packetSequences; }
         }
 
         internal List<StatelData> ResolveStatels(Identity playfieldIdentity)
@@ -325,16 +319,10 @@ namespace ZoneEngine.Core.Playfields
             // StaticDynel already enters Pool via PooledObject ctor (CellAO LoadStaticDynels pattern).
             // Do not AddObject again — that throws duplicate-key and floods the log.
             this.dynelRegistry.Register(entity);
-            ICharacter character = entity as ICharacter;
-            if (character != null)
-            {
-                this.visibilityInterest.Register(character);
-            }
         }
 
         internal void UnregisterDynel(Identity identity)
         {
-            this.visibilityInterest.Unregister(identity);
             this.dynelRegistry.Unregister(identity);
         }
 
@@ -406,7 +394,6 @@ namespace ZoneEngine.Core.Playfields
         internal void ActivateNpc(ICharacter character)
         {
             this.npcRuntime.ActivateNpc(character);
-            this.visibilityInterest.Register(character);
         }
 
         private void DeactivateNpc(Identity identity)
@@ -471,6 +458,11 @@ namespace ZoneEngine.Core.Playfields
             return this.dynelRegistry.Characters();
         }
 
+        internal ReadOnlyCollection<ICharacter> Players()
+        {
+            return this.dynelRegistry.Players();
+        }
+
         internal ReadOnlyCollection<Character> CharacterEntities()
         {
             return this.dynelRegistry.CharacterEntities();
@@ -509,178 +501,6 @@ namespace ZoneEngine.Core.Playfields
                 excludedIdentity,
                 messageBody,
                 sendMessageBodyToClient);
-        }
-
-        internal void SendExistingCharacterVisibilityToClient(
-            ICharacter recipient,
-            Action<MessageBody> sendVisibilityMessage)
-        {
-            this.visibilityPackets.SendExistingCharacterVisibilityToClient(
-                recipient,
-                this.Characters(),
-                sendVisibilityMessage);
-        }
-
-        internal void AnnounceJoiningCharacterVisibility(
-            ICharacter character,
-            Action<ICharacter, MessageBody> sendVisibilityMessage,
-            Action<ICharacter, Identity> sendLeaveVisibility)
-        {
-            this.visibilityPackets.AnnounceJoiningCharacterVisibility(
-                character,
-                sendVisibilityMessage,
-                sendLeaveVisibility);
-        }
-
-        internal void AnnounceSpawnedCharacterVisibility(
-            ICharacter character,
-            Identity alreadyVisibleRecipient,
-            Action<ICharacter, MessageBody> sendVisibilityMessage,
-            Action<ICharacter, Identity> sendLeaveVisibility)
-        {
-            if (character == null)
-            {
-                return;
-            }
-
-            this.visibilityInterest.Register(character);
-            if (alreadyVisibleRecipient != Identity.None)
-            {
-                ICharacter recipient = this.dynelRegistry.FindByIdentity<ICharacter>(alreadyVisibleRecipient);
-                if (recipient != null)
-                {
-                    this.visibilityInterest.MarkVisibleEntry(recipient, character);
-                }
-            }
-
-            this.visibilityPackets.AnnounceJoiningCharacterVisibility(
-                character,
-                sendVisibilityMessage,
-                sendLeaveVisibility);
-        }
-
-        internal void RefreshCharacterVisibility(
-            ICharacter character,
-            Action<ICharacter, MessageBody> sendVisibilityMessage,
-            Action<ICharacter, Identity> sendLeaveVisibility)
-        {
-            this.visibilityPackets.AnnounceJoiningCharacterVisibility(
-                character,
-                sendVisibilityMessage,
-                sendLeaveVisibility);
-        }
-
-        internal bool TryAnnounceCharacterScopedMessage(
-            Identity sourceIdentity,
-            Identity excludedRecipient,
-            MessageBody messageBody,
-            Action<IZoneClient, MessageBody> sendMessageBodyToClient)
-        {
-            ICharacter source = this.dynelRegistry.FindByIdentity<ICharacter>(sourceIdentity);
-            if (source == null)
-            {
-                return false;
-            }
-
-            foreach (ICharacter recipient in this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity))
-            {
-                if (recipient.Identity != excludedRecipient
-                    && recipient.Controller != null
-                    && recipient.Controller.Client != null)
-                {
-                    sendMessageBodyToClient(recipient.Controller.Client, messageBody);
-                }
-            }
-
-            if (source.Identity != excludedRecipient
-                && source.Controller != null
-                && source.Controller.Client != null)
-            {
-                sendMessageBodyToClient(source.Controller.Client, messageBody);
-            }
-
-            return true;
-        }
-
-        internal bool TryDespawnVisibleCharacter(
-            Identity sourceIdentity,
-            Action<ICharacter, MessageBody> sendVisibilityMessage)
-        {
-            ICharacter source = this.dynelRegistry.FindByIdentity<ICharacter>(sourceIdentity);
-            if (source == null)
-            {
-                return false;
-            }
-
-            DespawnMessage despawn = DespawnMessageHandler.Default.Create(sourceIdentity);
-            foreach (ICharacter recipient in this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity))
-            {
-                sendVisibilityMessage(recipient, despawn);
-            }
-
-            this.visibilityInterest.Unregister(sourceIdentity);
-            return true;
-        }
-
-        internal void ForgetVisibilityRecipient(Identity recipientIdentity)
-        {
-            this.visibilityInterest.ForgetRecipient(recipientIdentity);
-        }
-
-        internal ReadOnlyCollection<ICharacter> VisibleRecipientsForSource(Identity sourceIdentity)
-        {
-            return this.visibilityInterest.VisibleRecipientsForSource(sourceIdentity);
-        }
-
-        internal bool ForceCharacterVisibilityToRecipient(
-            ICharacter source,
-            ICharacter recipient,
-            Action<ICharacter, MessageBody> sendVisibilityMessage)
-        {
-            return this.ForceCharacterVisibilityToRecipient(
-                source,
-                recipient,
-                sendVisibilityMessage,
-                false);
-        }
-
-        /// <param name="forceResend">
-        /// When false, skip if already visible (avoids mid-fight SCFU HP flash).
-        /// When true, always send SCFU+CharInPlay (Havaris boss button / first spawn).
-        /// </param>
-        internal bool ForceCharacterVisibilityToRecipient(
-            ICharacter source,
-            ICharacter recipient,
-            Action<ICharacter, MessageBody> sendVisibilityMessage,
-            bool forceResend)
-        {
-            if (source == null || recipient == null)
-            {
-                return false;
-            }
-
-            if (!forceResend
-                && this.visibilityInterest.VisibleRecipientsForSource(source.Identity).Any(
-                    visibleRecipient => visibleRecipient.Identity == recipient.Identity))
-            {
-                return true;
-            }
-
-            this.visibilityInterest.Register(source);
-            return this.visibilityPackets.SendCharacterVisibilityEntry(
-                source,
-                recipient,
-                messageBody => sendVisibilityMessage(recipient, messageBody));
-        }
-
-        internal float VisibilityEnterRadius
-        {
-            get { return this.visibilityInterest.Policy.EnterRadius; }
-        }
-
-        internal float VisibilityLeaveRadius
-        {
-            get { return this.visibilityInterest.Policy.LeaveRadius; }
         }
 
         internal void PublishMessageBodyToClient(IZoneClient client, MessageBody body, Action<object> publish)
@@ -859,15 +679,11 @@ namespace ZoneEngine.Core.Playfields
             this.privateCityReadyInit.SendPreFullCharacterReadyBlock(client, character);
         }
 
-        internal void ProcessHeartbeatTimedLifecycle(
+        internal void ProcessHeartbeatAuxiliary(
             Identity playfieldIdentity,
-            double deltaTime,
             Action processPendingCorpseSpawns,
             Action processCorpseDespawns,
-            Action processPendingCorpseCreditAwards,
-            Action<ICharacter, double> processCharacterTick,
-            Action<ICharacter> processFollow,
-            Action<ICharacter> processPlayerCollision)
+            Action processPendingCorpseCreditAwards)
         {
             if (playfieldIdentity.Instance == 6553)
             {
@@ -882,19 +698,18 @@ namespace ZoneEngine.Core.Playfields
                     this.dynelRegistry);
             }
 
-            this.timedLifecycle.ProcessHeartbeatLifecycle(
-                playfieldIdentity,
-                deltaTime,
-                this.Characters,
-                this.HasPendingDeadNpcDespawn,
-                processPendingCorpseSpawns,
-                processCorpseDespawns,
-                processPendingCorpseCreditAwards,
-                this.ProcessDeadNpcDespawn,
-                processCharacterTick,
-                this.ProcessNpcPatrolTick,
-                processFollow,
-                processPlayerCollision);
+            processPendingCorpseSpawns?.Invoke();
+            processCorpseDespawns?.Invoke();
+            processPendingCorpseCreditAwards?.Invoke();
+
+            foreach (ICharacter character in this.Characters())
+            {
+                if (this.HasPendingDeadNpcDespawn(character.Identity))
+                {
+                    this.ProcessDeadNpcDespawn(character);
+                }
+            }
+
             ZoneEngine.Core.Nascence.Quests.NascenceLifeRodriguezQuestRuntime.TickProximityBracerGrant(
                 this.playfield,
                 this.Characters());
