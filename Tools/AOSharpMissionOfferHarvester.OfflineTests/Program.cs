@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Web.Script.Serialization;
 
 namespace AORebirth.MissionEvidence
 {
@@ -15,8 +18,8 @@ namespace AORebirth.MissionEvidence
                 TestSecondaryParsing();
                 TestPresetsAndStateIds();
                 TestLowLevelMatrix();
-                TestRewardSaturationPlan();
-                TestRewardSaturationTracker();
+                TestMissionItemCampaignRoster();
+                TestMissionItemCampaignResume();
                 TestFailClosedGate();
                 Console.WriteLine("MISSION_OFFER_HARVESTER_OFFLINE_TESTS=PASS assertions=" + _assertions);
                 return 0;
@@ -167,63 +170,80 @@ namespace AORebirth.MissionEvidence
             Assert(!LowLevelSliderMatrix.TryBuild(10, 9, out plan, out error), "matrix reversed range must fail");
         }
 
-        private static void TestRewardSaturationPlan()
+        private static void TestMissionItemCampaignRoster()
         {
-            IList<MissionSliderPlanEntry> plan;
-            string error;
-            Assert(RewardSaturationPlan.TryBuild(1, out plan, out error), "reward saturation plan must build");
-            Assert(plan.Count == 13, "reward saturation plan must contain 13 states");
-            Assert(plan[0].Label == "CENTERED_BASELINE", "reward saturation plan begins centered");
-            Assert(plan[11].Label == "MONEY_XP_FULL_LEFT", "reward saturation plan includes money left");
-            Assert(plan[12].Label == "MONEY_XP_FULL_RIGHT", "reward saturation plan includes money right");
-            var stateIds = new HashSet<string>(StringComparer.Ordinal);
-            foreach (MissionSliderPlanEntry entry in plan)
+            foreach (int level in new[] { 2, 7, 46, 199 })
             {
-                Assert(entry.SliderState.DifficultyDetent == 1, "reward plan preserves requested detent");
-                Assert(stateIds.Add(entry.SliderState.SliderStateId), "reward plan states must be unique");
+                MissionItemCampaignDefinition definition;
+                string error;
+                Assert(MissionItemCampaignDefinition.TryBuild(level, 10, out definition, out error), "spectrum capture must accept observed level: " + level);
+                Assert(definition.DifficultyStates.Count == 11, "all eleven difficulty positions must be scheduled");
+                for (int index = 0; index < definition.DifficultyStates.Count; index++)
+                {
+                    MissionItemQlCohort cohort = definition.DifficultyStates[index];
+                    Assert(cohort.DifficultyDetent == index + 1, "difficulty detents must remain ordered");
+                    NativeMissionSliderValues native = cohort.SliderState.ToNativeValues();
+                    Assert(native.Difficulty == cohort.DifficultyDetent, "difficulty detent must be explicit");
+                    Assert(native.GoodBad == 255 && native.OrderChaos == 255 && native.OpenHidden == 255
+                        && native.PhysicalMystical == 255 && native.HeadonStealth == 255 && native.CreditsXp == 255,
+                        "all six secondary sliders must remain centered");
+                }
             }
-            Assert(!RewardSaturationPlan.TryBuild(0, out plan, out error), "invalid reward plan detent must fail");
+
+            MissionItemCampaignDefinition ten;
+            MissionItemCampaignDefinition twenty;
+            string manifestError;
+            Assert(MissionItemCampaignDefinition.TryBuild(2, 10, out ten, out manifestError), "first deterministic manifest");
+            Assert(MissionItemCampaignDefinition.TryBuild(2, 20, out twenty, out manifestError), "second deterministic manifest");
+            Assert(ten.ManifestSha256 == twenty.ManifestSha256, "manifest identity must not change when extending request target");
+            Assert(!MissionItemCampaignDefinition.TryBuild(2, 0, out ten, out manifestError), "zero request target must fail");
         }
 
-        private static void TestRewardSaturationTracker()
+        private static void TestMissionItemCampaignResume()
         {
-            var tracker = new RewardSaturationTracker(2, 2);
-            RewardSaturationUpdate update;
+            MissionItemCampaignDefinition definition;
             string error;
-            Assert(tracker.TryObserve(1, "CENTER", new[]
+            Assert(MissionItemCampaignDefinition.TryBuild(2, 5, out definition, out error), "resume definition");
+            string path = Path.Combine(Path.GetTempPath(), "aorebirth-mission-campaign-" + Guid.NewGuid().ToString("N") + ".jsonl");
+            try
             {
-                new RewardDescriptorObservation(10, 20, 1, 0),
-                new RewardDescriptorObservation(10, 20, 1, 0)
-            }, out update, out error), "first saturation state must be accepted");
-            Assert(update.NewPairCount == 1 && update.NewDescriptorCount == 1, "duplicates in one cohort count once");
-            Assert(!update.RoundCompleted, "first state does not complete two-state round");
-            Assert(tracker.TryObserve(2, "RIGHT", new[]
-            {
-                new RewardDescriptorObservation(10, 20, 2, 0),
-                new RewardDescriptorObservation(30, 30, 1, 7)
-            }, out update, out error), "second saturation state must be accepted");
-            Assert(update.RoundCompleted && update.NewDescriptorsInCompletedRound == 3, "first round retains all new descriptors");
-            Assert(tracker.UniquePairCount == 2 && tracker.UniqueDescriptorCount == 3, "tracker retains pair and descriptor dimensions");
-            Assert(tracker.ConsecutiveQuietRounds == 0 && !tracker.IsSaturated, "new descriptor resets quiet rounds");
+                MissionItemCampaignProgress progress;
+                Assert(MissionItemCampaignProgress.TryLoad(path, definition, 12345, out progress, out error), "missing progress file starts empty");
+                Assert(progress.NextIncompleteCohort().DifficultyDetent == 1, "capture starts at first difficulty position");
+                int[] actualQls = { 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3 };
+                for (int detent = 1; detent <= 11; detent++)
+                {
+                    Assert(progress.TryRecordMapping(detent, actualQls[detent - 1], out error), "difficulty mapping accepted");
+                    Assert(progress.TryRecordCompletion(actualQls[detent - 1], "completion-" + detent, out error), "discovery request counts as captured evidence");
+                }
+                MissionItemQlCohort next = progress.NextIncompleteCohort();
+                Assert(!next.IsDifficultyDiscovery && next.MissionQl == 2, "duplicate QLs are deduplicated after all positions are observed");
 
-            for (int quietRound = 1; quietRound <= 2; quietRound++)
-            {
-                Assert(tracker.TryObserve(1, "CENTER", new[]
+                var serializer = new JavaScriptSerializer();
+                var payload = new Dictionary<string, object>
                 {
-                    new RewardDescriptorObservation(10, 20, 1, 0)
-                }, out update, out error), "quiet round first state");
-                Assert(tracker.TryObserve(2, "RIGHT", new[]
-                {
-                    new RewardDescriptorObservation(30, 30, 1, 7)
-                }, out update, out error), "quiet round final state");
-                Assert(update.ConsecutiveQuietRounds == quietRound, "quiet round counter increments only at round boundary");
+                    ["campaign_manifest_sha256"] = definition.ManifestSha256,
+                    ["character_level"] = 2,
+                    ["character_identity_instance"] = 12345,
+                    ["difficulty_detent"] = 1,
+                    ["actual_mission_ql"] = 1,
+                    ["required_requests_per_ql"] = 5,
+                    ["offer_count"] = 5,
+                    ["verification_status"] = "VERIFIED_COMPLETE_FIVE_OFFER_COHORT",
+                    ["completion_id"] = "persisted-a"
+                };
+                string mappingLine = serializer.Serialize(new Dictionary<string, object> { ["event_type"] = "difficulty_mapping_verified", ["payload"] = payload });
+                string completionLine = serializer.Serialize(new Dictionary<string, object> { ["event_type"] = "campaign_request_completed", ["payload"] = payload });
+                File.WriteAllText(path, mappingLine + Environment.NewLine + completionLine + Environment.NewLine);
+                Assert(MissionItemCampaignProgress.TryLoad(path, definition, 12345, out progress, out error), "persisted progress must load");
+                Assert(progress.CompletedRequestCount(1) == 1, "persisted completion must count once");
+                Assert(progress.CompletedDifficultyCount == 1, "persisted difficulty mapping must resume");
             }
-            Assert(tracker.IsSaturated && update.Saturated, "quiet target reaches saturation");
-            Assert(!tracker.TryObserve(2, "OUT_OF_ORDER", new RewardDescriptorObservation[0], out update, out error)
-                && error == "REWARD_SATURATION_STATE_ORDER_MISMATCH", "state order mismatch must fail closed");
-            IDictionary<string, object> payload = tracker.ToPayload();
-            Assert((int)payload["unique_reward_pair_count"] == 2, "summary retains unique pair count");
-            Assert((bool)payload["saturation_reached"], "summary retains saturation disposition");
+            finally
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
         }
 
         private static SliderRequestGate PreparedGate(string requestId, MissionSliderState state, NativeMissionSliderValues expected)

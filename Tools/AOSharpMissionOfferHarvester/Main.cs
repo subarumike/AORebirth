@@ -50,8 +50,11 @@ namespace AORebirth.MissionEvidence
         private IList<MissionSliderPlanEntry> _matrixPlan;
         private int _matrixRequestsPerState;
         private MissionSliderPlanEntry _currentMatrixEntry;
-        private RewardSaturationTracker _rewardSaturation;
-        private int _rewardSaturationMaxRounds;
+        private MissionItemCampaignDefinition _itemCampaignDefinition;
+        private MissionItemCampaignProgress _itemCampaignProgress;
+        private MissionItemQlCohort _currentItemQlCohort;
+        private JsonLineJournal _campaignProgressJournal;
+        private string _campaignProgressPath;
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
 
         [Obsolete]
@@ -62,7 +65,7 @@ namespace AORebirth.MissionEvidence
             Network.N3MessageReceived += OnN3MessageReceived;
             Game.OnUpdate += OnUpdate;
             Chat.RegisterCommand("missionharvest", OnCommand);
-            Chat.WriteLine("Mission evidence harvester 1.5.0 loaded (explicit sliders + automated reward saturation + verified raw evidence).", ChatColor.Gold);
+            Chat.WriteLine("Mission evidence harvester 1.6.0 loaded (Easy/Hard QL-spectrum campaign + verified raw evidence + deterministic resume).", ChatColor.Gold);
         }
 
         public override void Teardown()
@@ -86,11 +89,17 @@ namespace AORebirth.MissionEvidence
                 WriteStatus();
                 return;
             }
-            if (parameters.Length >= 4
-                && parameters.Length <= 5
+            if (parameters.Length >= 2
+                && parameters.Length <= 3
+                && string.Equals(parameters[0], "campaign", StringComparison.OrdinalIgnoreCase))
+            {
+                StartCampaign(parameters);
+                return;
+            }
+            if (parameters.Length >= 1
                 && string.Equals(parameters[0], "items", StringComparison.OrdinalIgnoreCase))
             {
-                StartRewardSaturation(parameters);
+                Chat.WriteLine("The obsolete fixed-QL secondary-slider item mode is disabled. Use /missionharvest campaign <requestsPerQl> [intervalSeconds].", ChatColor.Red);
                 return;
             }
             if (parameters.Length >= 4
@@ -183,35 +192,27 @@ namespace AORebirth.MissionEvidence
                 return;
             }
             Chat.WriteLine("Resolved slider state: " + sliderState.Describe(), ChatColor.Gold);
-            Start(characterLevel, sliderState, expectedMissionQl, requestCount, interval, null, 0, null, 0);
+            Start(characterLevel, sliderState, expectedMissionQl, requestCount, interval, null, 0, null, null, null, null);
         }
 
         private static void WriteUsage()
         {
             Chat.WriteLine(
-                "Usage: /missionharvest items <difficultyDetent> <maxRounds> <quietRounds> [intervalSeconds] | matrix <startState 1-27> <endState 1-27> <requestsPerState> [intervalSeconds] | start <difficultyDetent> <requests> <preset> [intervalSeconds] | startcustom <difficultyDetent> <requests> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds] | stop | status");
+                "Usage: /missionharvest campaign <requestsPerQl> [intervalSeconds] | matrix <startState 1-27> <endState 1-27> <requestsPerState> [intervalSeconds] | start <difficultyDetent> <requests> <preset> [intervalSeconds] | startcustom <difficultyDetent> <requests> <goodBad> <orderChaos> <openHidden> <physicalMystical> <headonStealth> <moneyXp> [intervalSeconds] | stop | status");
         }
 
-        private void StartRewardSaturation(string[] parameters)
+        private void StartCampaign(string[] parameters)
         {
-            int difficultyDetent;
-            int maxRounds;
-            int quietRounds;
+            int requestsPerQl;
             double interval = DefaultIntervalSeconds;
-            if (!int.TryParse(parameters[1], out difficultyDetent)
-                || difficultyDetent < 1
-                || difficultyDetent > MissionQlResolver.DifficultyCount
-                || !int.TryParse(parameters[2], out maxRounds)
-                || maxRounds < 1
-                || maxRounds > 10000
-                || !int.TryParse(parameters[3], out quietRounds)
-                || quietRounds < 1
-                || quietRounds > maxRounds
-                || (parameters.Length == 5
-                    && !double.TryParse(parameters[4], NumberStyles.Float, CultureInfo.InvariantCulture, out interval))
+            if (!int.TryParse(parameters[1], out requestsPerQl)
+                || requestsPerQl < 1
+                || requestsPerQl > 100000
+                || (parameters.Length == 3
+                    && !double.TryParse(parameters[2], NumberStyles.Float, CultureInfo.InvariantCulture, out interval))
                 || interval < MinimumIntervalSeconds)
             {
-                Chat.WriteLine("Invalid item-saturation arguments. No request was sent.", ChatColor.Red);
+                Chat.WriteLine("Invalid campaign arguments. No request was sent.", ChatColor.Red);
                 WriteUsage();
                 return;
             }
@@ -226,51 +227,74 @@ namespace AORebirth.MissionEvidence
                 return;
             }
             int characterLevel = DynelManager.LocalPlayer.GetStat(Stat.Level);
-            int expectedMissionQl;
-            if (!MissionQlResolver.TryGetMissionQl(characterLevel, difficultyDetent, out expectedMissionQl))
+            MissionItemCampaignDefinition definition;
+            string campaignError;
+            if (!MissionItemCampaignDefinition.TryBuild(
+                    characterLevel,
+                    requestsPerQl,
+                    out definition,
+                    out campaignError))
             {
-                Chat.WriteLine("That difficulty detent is not valid for this character; no request was sent.", ChatColor.Red);
+                Chat.WriteLine("Unable to build mission-item campaign: " + campaignError + ". No request was sent.", ChatColor.Red);
                 return;
             }
-            IList<MissionSliderPlanEntry> plan;
-            string planError;
-            if (!RewardSaturationPlan.TryBuild(difficultyDetent, out plan, out planError))
+            int characterIdentity = DynelManager.LocalPlayer.Identity.Instance;
+            string progressDirectory = System.IO.Path.Combine(
+                PluginDataDirectory.FullName,
+                "campaigns",
+                MissionItemCampaignDefinition.CampaignName,
+                string.Format(CultureInfo.InvariantCulture, "level-{0:D3}-character-{1}", characterLevel, characterIdentity));
+            string progressPath = System.IO.Path.Combine(progressDirectory, "progress.jsonl");
+            MissionItemCampaignProgress progress;
+            if (!MissionItemCampaignProgress.TryLoad(
+                    progressPath,
+                    definition,
+                    characterIdentity,
+                    out progress,
+                    out campaignError))
             {
-                Chat.WriteLine("Unable to build reward-saturation slider plan: " + planError + ". No request was sent.", ChatColor.Red);
+                Chat.WriteLine("Campaign progress rejected: " + campaignError + ". No request was sent.", ChatColor.Red);
                 return;
             }
-            int totalRequests;
+            if (progress.IsComplete)
+            {
+                Chat.WriteLine("This character campaign is already complete: " + progressPath, ChatColor.Gold);
+                return;
+            }
+            JsonLineJournal progressJournal;
             try
             {
-                totalRequests = checked(maxRounds * RewardSaturationPlan.StateCount);
+                progressJournal = new JsonLineJournal(progressPath);
             }
-            catch (OverflowException)
+            catch (Exception exception)
             {
-                Chat.WriteLine("Item-saturation request limit is too large. No request was sent.", ChatColor.Red);
+                Chat.WriteLine("Campaign progress journal could not be opened: " + exception.Message, ChatColor.Red);
                 return;
             }
-            var tracker = new RewardSaturationTracker(RewardSaturationPlan.StateCount, quietRounds);
+            MissionItemQlCohort first = progress.NextIncompleteCohort();
             Chat.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Reward saturation resolved: level={0}; detent={1}; expectedQL={2}; states=13; maxRounds={3}; maxRequests={4}; quietRounds={5}. Each round covers center and both extremes of every secondary slider.",
+                    "Mission spectrum capture resolved: observedLevel={0}; difficultyPositions=11; staticDistinctQLs={1}; requestsPerActualQl={2}; completedRequests={3}; knownRemaining={4}; firstDifficulty={5}; all secondary sliders=CENTERED.",
                     characterLevel,
-                    difficultyDetent,
-                    expectedMissionQl,
-                    maxRounds,
-                    totalRequests,
-                    quietRounds),
+                    definition.PlannedQlCohortCount,
+                    requestsPerQl,
+                    progress.TotalCompletedRequestCount,
+                    progress.RemainingRequestCount,
+                    first.DifficultyDetent),
                 ChatColor.Gold);
             Start(
                 characterLevel,
-                plan[0].SliderState,
-                expectedMissionQl,
-                totalRequests,
+                first.SliderState,
+                first.MissionQl,
+                progress.MaximumRemainingRequestCount,
                 interval,
-                plan,
-                1,
-                tracker,
-                maxRounds);
+                null,
+                0,
+                definition,
+                progress,
+                progressJournal,
+                progressPath);
         }
 
         private void StartMatrix(string[] parameters)
@@ -345,7 +369,9 @@ namespace AORebirth.MissionEvidence
                 plan,
                 requestsPerState,
                 null,
-                0);
+                null,
+                null,
+                null);
         }
 
         private void WriteStatus()
@@ -356,19 +382,32 @@ namespace AORebirth.MissionEvidence
                 return;
             }
 
+            if (_itemCampaignProgress != null)
+            {
+                int completedForQl = _currentItemQlCohort == null
+                    ? 0
+                    : _itemCampaignProgress.CompletedRequestCount(_currentItemQlCohort.MissionQl);
+                Chat.WriteLine(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "OBSERVED CHARACTER: Level {0}; DIFFICULTY POSITION: {1}/11; ACTUAL MISSION QL: {2}; PHASE: {3}; SEMANTIC STATE: 1/1 CENTERED; REQUEST: {4}/{5}; OFFERS CAPTURED THIS SESSION: {6}; QL STATUS: {7}; CHARACTER SPECTRUM STATUS: {8}; output={9}; progress={10}",
+                        _characterLevel,
+                        _currentItemQlCohort == null ? "none" : _currentItemQlCohort.DifficultyDetent.ToString(CultureInfo.InvariantCulture),
+                        _currentItemQlCohort == null || _currentItemQlCohort.IsDifficultyDiscovery ? "pending live response" : "QL " + _currentItemQlCohort.MissionQl,
+                        _currentItemQlCohort == null ? "none" : (_currentItemQlCohort.IsDifficultyDiscovery ? "DIFFICULTY_DISCOVERY" : "QL_CAPTURE"),
+                        completedForQl,
+                        _itemCampaignDefinition.RequiredRequestsPerQl,
+                        _harvestedOfferCount,
+                        completedForQl >= _itemCampaignDefinition.RequiredRequestsPerQl ? "COMPLETE" : "INCOMPLETE",
+                        _itemCampaignProgress.IsComplete ? "COMPLETE" : "INCOMPLETE",
+                        _sessionOutputPath ?? "unknown",
+                        _campaignProgressPath ?? "unknown"),
+                    ChatColor.Gold);
+                return;
+            }
+
             string matrixStatus = _matrixPlan == null
                 ? "single-state"
-                : _rewardSaturation != null
-                    ? string.Format(
-                        CultureInfo.InvariantCulture,
-                        "reward-saturation round={0}/{1}; quiet={2}/{3}; uniquePairs={4}; uniqueDescriptors={5}; current={6}",
-                        _rewardSaturation.CompletedRounds,
-                        _rewardSaturationMaxRounds,
-                        _rewardSaturation.ConsecutiveQuietRounds,
-                        _rewardSaturation.QuietRoundTarget,
-                        _rewardSaturation.UniquePairCount,
-                        _rewardSaturation.UniqueDescriptorCount,
-                        _currentMatrixEntry == null ? "not-started" : _currentMatrixEntry.Label)
                 : string.Format(
                     CultureInfo.InvariantCulture,
                     "matrix={0}-{1}/27; current={2}",
@@ -404,8 +443,10 @@ namespace AORebirth.MissionEvidence
             double interval,
             IList<MissionSliderPlanEntry> matrixPlan,
             int matrixRequestsPerState,
-            RewardSaturationTracker rewardSaturation,
-            int rewardSaturationMaxRounds)
+            MissionItemCampaignDefinition itemCampaignDefinition,
+            MissionItemCampaignProgress itemCampaignProgress,
+            JsonLineJournal campaignProgressJournal,
+            string campaignProgressPath)
         {
             if (_active || _journal != null)
                 Stop("replaced_by_new_session", true);
@@ -421,8 +462,11 @@ namespace AORebirth.MissionEvidence
             _matrixPlan = matrixPlan;
             _matrixRequestsPerState = matrixRequestsPerState;
             _currentMatrixEntry = matrixPlan == null ? null : matrixPlan[0];
-            _rewardSaturation = rewardSaturation;
-            _rewardSaturationMaxRounds = rewardSaturationMaxRounds;
+            _itemCampaignDefinition = itemCampaignDefinition;
+            _itemCampaignProgress = itemCampaignProgress;
+            _currentItemQlCohort = itemCampaignProgress == null ? null : itemCampaignProgress.NextIncompleteCohort();
+            _campaignProgressJournal = campaignProgressJournal;
+            _campaignProgressPath = campaignProgressPath;
             _sessionTerminalIdentity = _terminal.Identity;
             _requestedRequestCount = requestCount;
             _intervalSeconds = interval;
@@ -471,10 +515,15 @@ namespace AORebirth.MissionEvidence
                     ["pending_request_id"] = _pendingRequestId,
                     ["capture_mode"] = CaptureModeLabel(),
                     ["current_matrix_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex,
-                    ["reward_saturation"] = _rewardSaturation == null ? null : _rewardSaturation.ToPayload()
+                    ["campaign_progress"] = _itemCampaignProgress == null ? null : _itemCampaignProgress.ToPayload()
                 });
                 _journal.Dispose();
                 _journal = null;
+            }
+            if (_campaignProgressJournal != null)
+            {
+                _campaignProgressJournal.Dispose();
+                _campaignProgressJournal = null;
             }
             _active = false;
             _pendingRequestId = null;
@@ -488,16 +537,15 @@ namespace AORebirth.MissionEvidence
                 Chat.WriteLine(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Mission evidence session stopped: {0}; reason={1}; requests={2}/{3}; completeCohorts={4}; harvestedOffers={5}; uniqueRewardPairs={6}; uniqueRewardDescriptors={7}; quietRounds={8}; output={9}",
+                        "Mission evidence session stopped: {0}; reason={1}; requests={2}/{3}; completeCohorts={4}; harvestedOffers={5}; characterCampaign={6}; progress={7}; output={8}",
                         _sessionId,
                         reason,
                         _issuedRequestCount,
                         _requestedRequestCount,
                         _completedCohortCount,
                         _harvestedOfferCount,
-                        _rewardSaturation == null ? 0 : _rewardSaturation.UniquePairCount,
-                        _rewardSaturation == null ? 0 : _rewardSaturation.UniqueDescriptorCount,
-                        _rewardSaturation == null ? "n/a" : string.Format(CultureInfo.InvariantCulture, "{0}/{1}", _rewardSaturation.ConsecutiveQuietRounds, _rewardSaturation.QuietRoundTarget),
+                        _itemCampaignProgress == null ? "n/a" : (_itemCampaignProgress.IsComplete ? "COMPLETE" : "INCOMPLETE"),
+                        _campaignProgressPath ?? "n/a",
                         _sessionOutputPath ?? "unknown"),
                     ChatColor.Gold);
             }
@@ -556,6 +604,38 @@ namespace AORebirth.MissionEvidence
 
         private bool PrepareNextSliderState()
         {
+            if (_itemCampaignProgress != null)
+            {
+                MissionItemQlCohort next = _itemCampaignProgress.NextIncompleteCohort();
+                if (next == null)
+                {
+                    Stop("character_campaign_completed", true);
+                    return false;
+                }
+                bool changed = _currentItemQlCohort == null
+                    || _currentItemQlCohort.MissionQl != next.MissionQl
+                    || _currentItemQlCohort.DifficultyDetent != next.DifficultyDetent
+                    || _currentItemQlCohort.IsDifficultyDiscovery != next.IsDifficultyDiscovery;
+                _currentItemQlCohort = next;
+                _sliderState = next.SliderState;
+                _difficultySlot = next.DifficultyDetent;
+                _targetMissionQl = next.MissionQl;
+                if (changed)
+                {
+                    Chat.WriteLine(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Mission capture: observedLevel={0}; difficultyPosition={1}/11; phase={2}; missionQL={3}; completed={4}/{5}; all secondary sliders=CENTERED.",
+                            _characterLevel,
+                            next.DifficultyDetent,
+                            next.IsDifficultyDiscovery ? "DIFFICULTY_DISCOVERY" : "QL_CAPTURE",
+                            next.IsDifficultyDiscovery ? "pending live response" : next.MissionQl.ToString(CultureInfo.InvariantCulture),
+                            _itemCampaignProgress.CompletedRequestCount(next.MissionQl),
+                            _itemCampaignDefinition.RequiredRequestsPerQl),
+                        ChatColor.Gold);
+                }
+                return true;
+            }
             if (_matrixPlan == null)
                 return true;
             if (_matrixRequestsPerState < 1)
@@ -563,9 +643,7 @@ namespace AORebirth.MissionEvidence
                 FailClosed("MATRIX_REQUESTS_PER_STATE_INVALID", null);
                 return false;
             }
-            int planOffset = _rewardSaturation == null
-                ? _issuedRequestCount / _matrixRequestsPerState
-                : _issuedRequestCount % _matrixPlan.Count;
+            int planOffset = _issuedRequestCount / _matrixRequestsPerState;
             if (planOffset < 0 || planOffset >= _matrixPlan.Count)
             {
                 FailClosed("MATRIX_PLAN_OFFSET_OUT_OF_RANGE", new Dictionary<string, object>
@@ -588,7 +666,7 @@ namespace AORebirth.MissionEvidence
                 });
                 return false;
             }
-            if (_rewardSaturation == null && _issuedRequestCount % _matrixRequestsPerState == 0)
+            if (_issuedRequestCount % _matrixRequestsPerState == 0)
             {
                 Chat.WriteLine(
                     string.Format(
@@ -679,9 +757,22 @@ namespace AORebirth.MissionEvidence
                 ["matrix_state_label"] = _currentMatrixEntry == null ? null : _currentMatrixEntry.Label,
                 ["matrix_request_within_state"] = _currentMatrixEntry == null
                     ? (object)null
-                    : _rewardSaturation == null
-                        ? (object)(((_issuedRequestCount - 1) % _matrixRequestsPerState) + 1)
-                        : ((_issuedRequestCount - 1) / _matrixPlan.Count) + 1,
+                    : (object)(((_issuedRequestCount - 1) % _matrixRequestsPerState) + 1),
+                ["campaign_manifest_sha256"] = _itemCampaignDefinition == null ? null : _itemCampaignDefinition.ManifestSha256,
+                ["campaign_ql_cohort_index"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.CohortIndex,
+                ["campaign_static_expected_mission_ql"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.StaticExpectedMissionQl,
+                ["campaign_actual_mission_ql_target"] = _currentItemQlCohort == null || _currentItemQlCohort.IsDifficultyDiscovery ? (object)null : _currentItemQlCohort.MissionQl,
+                ["campaign_phase"] = _currentItemQlCohort == null ? null : (_currentItemQlCohort.IsDifficultyDiscovery ? "DIFFICULTY_DISCOVERY" : "QL_CAPTURE"),
+                ["campaign_difficulty_detent"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.DifficultyDetent,
+                ["campaign_semantic_state_index"] = _currentItemQlCohort == null ? (object)null : 1,
+                ["campaign_semantic_state_count"] = _currentItemQlCohort == null ? (object)null : 1,
+                ["campaign_completed_request_within_ql_before_request"] = _currentItemQlCohort == null
+                    ? (object)null
+                    : _itemCampaignProgress.CompletedRequestCount(_currentItemQlCohort.MissionQl),
+                ["campaign_required_requests_per_ql"] = _itemCampaignDefinition == null
+                    ? (object)null
+                    : _itemCampaignDefinition.RequiredRequestsPerQl,
+                ["campaign_progress_path"] = _campaignProgressPath,
                 ["character_level"] = _characterLevel,
                 ["difficulty_detent"] = _difficultySlot,
                 ["static_expected_mission_ql"] = _targetMissionQl,
@@ -884,66 +975,111 @@ namespace AORebirth.MissionEvidence
             _completedCohortCount++;
             _harvestedOfferCount +=
                 response.MissionDetails == null ? 0 : response.MissionDetails.Length;
-            RewardSaturationUpdate saturationUpdate = null;
-            if (_rewardSaturation != null)
+            if (_itemCampaignProgress != null)
             {
                 int offerCount = response.MissionDetails == null ? 0 : response.MissionDetails.Length;
                 if (offerCount != 5)
                 {
-                    FailClosed("REWARD_SATURATION_COHORT_SIZE_MISMATCH", new Dictionary<string, object>
+                    FailClosed("CAMPAIGN_COHORT_SIZE_MISMATCH", new Dictionary<string, object>
                     {
                         ["expected_offer_count"] = 5,
                         ["actual_offer_count"] = offerCount,
-                        ["current_state_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex
+                        ["mission_ql"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.MissionQl
                     });
                     return;
                 }
-                var observations = new List<RewardDescriptorObservation>();
-                foreach (MissionInfo offer in response.MissionDetails ?? new MissionInfo[0])
+
+                int observedMissionQl = 0;
+                string candidateError = "CAMPAIGN_QL_COHORT_NOT_SELECTED";
+                if (_currentItemQlCohort == null
+                    || !TryGetMissionQlCandidate(response, out observedMissionQl, out candidateError))
                 {
-                    foreach (MissionItemReward reward in offer.MissionItemData ?? new MissionItemReward[0])
+                    FailClosed("CAMPAIGN_MISSION_QL_CANDIDATE_UNAVAILABLE", new Dictionary<string, object>
                     {
-                        observations.Add(new RewardDescriptorObservation(
-                            reward.LowId,
-                            reward.HighId,
-                            reward.Ql,
-                            reward.Unk));
-                    }
-                }
-                string saturationError = null;
-                if (_currentMatrixEntry == null
-                    || !_rewardSaturation.TryObserve(
-                        _currentMatrixEntry.MatrixIndex,
-                        _currentMatrixEntry.Label,
-                        observations,
-                        out saturationUpdate,
-                        out saturationError))
-                {
-                    FailClosed(saturationError ?? "REWARD_SATURATION_STATE_MISSING", new Dictionary<string, object>
-                    {
-                        ["current_state_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex,
-                        ["tracker"] = _rewardSaturation.ToPayload()
+                        ["candidate_error"] = candidateError,
+                        ["static_expected_mission_ql"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.StaticExpectedMissionQl,
+                        ["observed_mission_ql_candidate"] = observedMissionQl,
+                        ["candidate_semantics"] = "STRONG_CANDIDATE_NOT_RUNTIME_PROMOTION",
+                        ["source_field"] = "MissionInfo.UnkChunk3",
+                        ["byte_offset"] = 16,
+                        ["byte_width"] = 4,
+                        ["byte_order"] = "BIG_ENDIAN"
                     });
                     return;
                 }
-                _journal.Append(
-                    "reward_saturation_progress",
-                    _sessionId,
-                    completedRequestId,
-                    RewardSaturationUpdatePayload(saturationUpdate));
-                if (saturationUpdate.RoundCompleted)
+                if (!_currentItemQlCohort.IsDifficultyDiscovery
+                    && observedMissionQl != _currentItemQlCohort.MissionQl)
+                {
+                    FailClosed("CAMPAIGN_DIFFICULTY_MAPPING_CHANGED", new Dictionary<string, object>
+                    {
+                        ["difficulty_detent"] = _currentItemQlCohort.DifficultyDetent,
+                        ["previously_observed_actual_mission_ql"] = _currentItemQlCohort.MissionQl,
+                        ["current_observed_actual_mission_ql"] = observedMissionQl
+                    });
+                    return;
+                }
+
+                string rawResponseSha = Convert.ToString(_pendingRawResponsePacket["sha256"], CultureInfo.InvariantCulture);
+                string completionId = Sha256(_sessionId + "|" + completedRequestId + "|" + rawResponseSha);
+                var mappingPayload = new Dictionary<string, object>
+                {
+                    ["campaign_name"] = MissionItemCampaignDefinition.CampaignName,
+                    ["campaign_manifest_sha256"] = _itemCampaignDefinition.ManifestSha256,
+                    ["character_level"] = _characterLevel,
+                    ["character_identity_instance"] = DynelManager.LocalPlayer.Identity.Instance,
+                    ["difficulty_detent"] = _currentItemQlCohort.DifficultyDetent,
+                    ["static_expected_mission_ql"] = _currentItemQlCohort.StaticExpectedMissionQl,
+                    ["actual_mission_ql"] = observedMissionQl,
+                    ["validation_status"] = observedMissionQl == _currentItemQlCohort.StaticExpectedMissionQl
+                        ? "MATCH"
+                        : "LIVE_CONTRADICTION_RECORDED",
+                    ["verification_status"] = "VERIFIED_COMPLETE_FIVE_OFFER_COHORT"
+                };
+                if (_currentItemQlCohort.IsDifficultyDiscovery)
+                    _campaignProgressJournal.Append("difficulty_mapping_verified", _sessionId, completedRequestId, mappingPayload);
+                string progressError;
+                if (!_itemCampaignProgress.TryRecordMapping(_currentItemQlCohort.DifficultyDetent, observedMissionQl, out progressError))
+                {
+                    FailClosed(progressError ?? "CAMPAIGN_DIFFICULTY_MAPPING_UPDATE_FAILED", mappingPayload);
+                    return;
+                }
+                var completionPayload = new Dictionary<string, object>
+                {
+                    ["campaign_name"] = MissionItemCampaignDefinition.CampaignName,
+                    ["campaign_manifest_sha256"] = _itemCampaignDefinition.ManifestSha256,
+                    ["character_level"] = _characterLevel,
+                    ["character_identity_instance"] = DynelManager.LocalPlayer.Identity.Instance,
+                    ["actual_mission_ql"] = observedMissionQl,
+                    ["static_expected_mission_ql"] = _currentItemQlCohort.StaticExpectedMissionQl,
+                    ["difficulty_detent"] = _currentItemQlCohort.DifficultyDetent,
+                    ["campaign_phase"] = _currentItemQlCohort.IsDifficultyDiscovery ? "DIFFICULTY_DISCOVERY" : "QL_CAPTURE",
+                    ["semantic_state_index"] = 1,
+                    ["semantic_state_count"] = 1,
+                    ["required_requests_per_ql"] = _itemCampaignDefinition.RequiredRequestsPerQl,
+                    ["offer_count"] = offerCount,
+                    ["observed_mission_ql_candidate"] = observedMissionQl,
+                    ["mission_ql_candidate_semantics"] = "STRONG_CANDIDATE_NOT_RUNTIME_PROMOTION",
+                    ["raw_response_sha256"] = rawResponseSha,
+                    ["completion_id"] = completionId,
+                    ["verification_status"] = "VERIFIED_COMPLETE_FIVE_OFFER_COHORT"
+                };
+                _campaignProgressJournal.Append("campaign_request_completed", _sessionId, completedRequestId, completionPayload);
+                if (!_itemCampaignProgress.TryRecordCompletion(observedMissionQl, completionId, out progressError))
+                {
+                    FailClosed(progressError ?? "CAMPAIGN_PROGRESS_UPDATE_FAILED", completionPayload);
+                    return;
+                }
+                if (_itemCampaignProgress.CompletedRequestCount(observedMissionQl)
+                    == _itemCampaignDefinition.RequiredRequestsPerQl)
                 {
                     Chat.WriteLine(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "Reward round {0}/{1} complete: newDescriptors={2}; uniquePairs={3}; uniqueDescriptors={4}; quietRounds={5}/{6}.",
-                            saturationUpdate.CompletedRounds,
-                            _rewardSaturationMaxRounds,
-                            saturationUpdate.NewDescriptorsInCompletedRound,
-                            _rewardSaturation.UniquePairCount,
-                            _rewardSaturation.UniqueDescriptorCount,
-                            saturationUpdate.ConsecutiveQuietRounds,
-                            _rewardSaturation.QuietRoundTarget),
+                            "QL cohort complete: characterLevel={0}; missionQL={1}; verifiedRequests={2}; offers={3}; next cohort will start automatically.",
+                            _characterLevel,
+                            observedMissionQl,
+                            _itemCampaignDefinition.RequiredRequestsPerQl,
+                            _itemCampaignDefinition.RequiredRequestsPerQl * 5),
                         ChatColor.Gold);
                 }
             }
@@ -953,29 +1089,8 @@ namespace AORebirth.MissionEvidence
             _pendingRawResponsePacket = null;
             _pendingSerializedRequestSha256 = null;
             _nextRequestUtc = DateTime.UtcNow.AddSeconds(_intervalSeconds);
-            if (saturationUpdate != null && saturationUpdate.Saturated)
-                Stop("reward_descriptor_saturation_reached", true);
-        }
-
-        private IDictionary<string, object> RewardSaturationUpdatePayload(RewardSaturationUpdate update)
-        {
-            var newDescriptors = new List<object>();
-            foreach (RewardDescriptorObservation descriptor in update.NewDescriptors)
-                newDescriptors.Add(descriptor.ToPayload());
-            return new Dictionary<string, object>
-            {
-                ["state_index"] = update.StateIndex,
-                ["state_label"] = update.StateLabel,
-                ["new_pair_count"] = update.NewPairCount,
-                ["new_descriptor_count"] = update.NewDescriptorCount,
-                ["new_descriptors"] = newDescriptors,
-                ["round_completed"] = update.RoundCompleted,
-                ["completed_rounds"] = update.CompletedRounds,
-                ["new_descriptors_in_completed_round"] = update.NewDescriptorsInCompletedRound,
-                ["consecutive_quiet_rounds"] = update.ConsecutiveQuietRounds,
-                ["saturation_reached"] = update.Saturated,
-                ["tracker"] = _rewardSaturation.ToPayload()
-            };
+            if (_itemCampaignProgress != null && _itemCampaignProgress.IsComplete)
+                Stop("character_campaign_completed", true);
         }
 
         private IDictionary<string, object> BuildCohortPayload(
@@ -1007,12 +1122,15 @@ namespace AORebirth.MissionEvidence
                 ["cohort_id"] = cohortId,
                 ["matrix_state_index"] = _currentMatrixEntry == null ? (object)null : _currentMatrixEntry.MatrixIndex,
                 ["matrix_state_label"] = _currentMatrixEntry == null ? null : _currentMatrixEntry.Label,
-                ["reward_saturation_state_index"] = _rewardSaturation == null || _currentMatrixEntry == null
-                    ? (object)null
-                    : _currentMatrixEntry.MatrixIndex,
-                ["reward_saturation_state_label"] = _rewardSaturation == null || _currentMatrixEntry == null
-                    ? null
-                    : _currentMatrixEntry.Label,
+                ["campaign_manifest_sha256"] = _itemCampaignDefinition == null ? null : _itemCampaignDefinition.ManifestSha256,
+                ["campaign_ql_cohort_index"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.CohortIndex,
+                ["campaign_static_expected_mission_ql"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.StaticExpectedMissionQl,
+                ["campaign_actual_mission_ql_target"] = _currentItemQlCohort == null || _currentItemQlCohort.IsDifficultyDiscovery ? (object)null : _currentItemQlCohort.MissionQl,
+                ["campaign_phase"] = _currentItemQlCohort == null ? null : (_currentItemQlCohort.IsDifficultyDiscovery ? "DIFFICULTY_DISCOVERY" : "QL_CAPTURE"),
+                ["campaign_difficulty_detent"] = _currentItemQlCohort == null ? (object)null : _currentItemQlCohort.DifficultyDetent,
+                ["campaign_semantic_state_index"] = _currentItemQlCohort == null ? (object)null : 1,
+                ["campaign_semantic_state_count"] = _currentItemQlCohort == null ? (object)null : 1,
+                ["mission_ql_candidate"] = MissionQlCandidatePayload(response, _currentItemQlCohort == null ? (int?)null : _currentItemQlCohort.MissionQl),
                 ["slider_state_id"] = _sliderState == null ? null : _sliderState.SliderStateId,
                 ["slider_preset"] = _sliderState == null ? null : _sliderState.PresetName,
                 ["requested_semantic_state"] = _sliderState == null ? null : _sliderState.RequestedSemanticPayload(),
@@ -1076,17 +1194,9 @@ namespace AORebirth.MissionEvidence
                 ["matrix_start_index"] = _matrixPlan == null ? (object)null : _matrixPlan[0].MatrixIndex,
                 ["matrix_end_index"] = _matrixPlan == null ? (object)null : _matrixPlan[_matrixPlan.Count - 1].MatrixIndex,
                 ["matrix_plan"] = BuildMatrixPlanPayload(),
-                ["reward_saturation_configuration"] = _rewardSaturation == null
-                    ? null
-                    : new Dictionary<string, object>
-                    {
-                        ["max_rounds"] = _rewardSaturationMaxRounds,
-                        ["max_requests"] = _requestedRequestCount,
-                        ["quiet_round_target"] = _rewardSaturation.QuietRoundTarget,
-                        ["states_per_round"] = RewardSaturationPlan.StateCount,
-                        ["stopping_descriptor"] = "LOW_ID_HIGH_ID_QL_UNKNOWN",
-                        ["claim_boundary"] = "STATISTICAL_SATURATION_HEURISTIC_NOT_MATHEMATICAL_PROOF_OF_COMPLETE_POOL"
-                    },
+                ["campaign_definition"] = _itemCampaignDefinition == null ? null : _itemCampaignDefinition.ToPayload(),
+                ["campaign_progress"] = _itemCampaignProgress == null ? null : _itemCampaignProgress.ToPayload(),
+                ["campaign_progress_path"] = _campaignProgressPath,
                 ["minimum_request_interval_seconds"] = MinimumIntervalSeconds,
                 ["configured_request_interval_seconds"] = _intervalSeconds,
                 ["one_outstanding_request_only"] = true,
@@ -1133,9 +1243,76 @@ namespace AORebirth.MissionEvidence
 
         private string CaptureModeLabel()
         {
-            if (_rewardSaturation != null)
-                return "REWARD_SATURATION";
+            if (_itemCampaignProgress != null)
+                return "MISSION_ITEM_QL_SPECTRUM_CAMPAIGN";
             return _matrixPlan == null ? "SINGLE_STATE" : "LOW_LEVEL_DISCOVERY_MATRIX";
+        }
+
+        private static IDictionary<string, object> MissionQlCandidatePayload(
+            QuestAlternativeMessage response,
+            int? expectedMissionQl)
+        {
+            int observedMissionQl;
+            string error;
+            bool available = TryGetMissionQlCandidate(response, out observedMissionQl, out error);
+            string status = !available
+                ? "UNAVAILABLE"
+                : expectedMissionQl.HasValue && observedMissionQl != expectedMissionQl.Value
+                    ? "MISMATCH"
+                    : expectedMissionQl.HasValue ? "MATCH" : "OBSERVED_NOT_COMPARED";
+            return new Dictionary<string, object>
+            {
+                ["source_field"] = "MissionInfo.UnkChunk3",
+                ["byte_offset"] = 16,
+                ["byte_width"] = 4,
+                ["byte_order"] = "BIG_ENDIAN",
+                ["semantics"] = "STRONG_CANDIDATE_NOT_RUNTIME_PROMOTION",
+                ["expected_mission_ql"] = expectedMissionQl.HasValue ? (object)expectedMissionQl.Value : null,
+                ["observed_mission_ql_candidate"] = available ? (object)observedMissionQl : null,
+                ["status"] = status,
+                ["error"] = error
+            };
+        }
+
+        private static bool TryGetMissionQlCandidate(
+            QuestAlternativeMessage response,
+            out int missionQl,
+            out string error)
+        {
+            missionQl = 0;
+            error = null;
+            MissionInfo[] offers = response == null ? null : response.MissionDetails;
+            if (offers == null || offers.Length == 0)
+            {
+                error = "MISSION_QL_CANDIDATE_NO_OFFERS";
+                return false;
+            }
+            for (int index = 0; index < offers.Length; index++)
+            {
+                byte[] chunk = offers[index].UnkChunk3;
+                if (chunk == null || chunk.Length < 20)
+                {
+                    error = "MISSION_QL_CANDIDATE_CHUNK_TOO_SHORT_AT_OFFER_" + (index + 1).ToString(CultureInfo.InvariantCulture);
+                    return false;
+                }
+                int candidate = (chunk[16] << 24)
+                    | (chunk[17] << 16)
+                    | (chunk[18] << 8)
+                    | chunk[19];
+                if (candidate < 1 || candidate > 250)
+                {
+                    error = "MISSION_QL_CANDIDATE_OUT_OF_RANGE_AT_OFFER_" + (index + 1).ToString(CultureInfo.InvariantCulture);
+                    return false;
+                }
+                if (index == 0)
+                    missionQl = candidate;
+                else if (candidate != missionQl)
+                {
+                    error = "MISSION_QL_CANDIDATE_NOT_UNIFORM_ACROSS_COHORT";
+                    return false;
+                }
+            }
+            return true;
         }
 
         private static IDictionary<string, object> OfferPayload(

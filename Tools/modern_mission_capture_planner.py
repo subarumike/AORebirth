@@ -925,7 +925,7 @@ def harvester_schema() -> dict[str, object]:
         "type": "object",
         "required": ["event_type", "schema_version", "session_id", "timestamp_utc", "payload"],
         "properties": {
-            "event_type": {"enum": ["session_started", "request_started", "request_transmitted", "raw_response_received", "cohort_received", "request_timeout", "duplicate_callback", "session_stopped", "error"]},
+            "event_type": {"enum": ["session_started", "request_started", "request_transmitted", "raw_response_received", "cohort_received", "difficulty_mapping_verified", "campaign_request_completed", "request_timeout", "duplicate_callback", "session_stopped", "error"]},
             "schema_version": {"enum": [1, 2, 3]},
             "session_id": {"type": "string"},
             "request_id": {"type": ["string", "null"]},
@@ -937,6 +937,7 @@ def harvester_schema() -> dict[str, object]:
         "SemanticBoundary": "schema 3 static_expected_mission_ql is resolved from character level plus explicit difficulty detent; it is not a response-side mission QL",
         "CaptureContractV2": "request-time terminal origin, mission destination, capture-backed mission-icon type, reward-item descriptors, every public MissionInfo field, and every public QuestAlternativeMessage envelope field",
         "CaptureContractV3": "explicit seven-slider state, stable slider-state id, native request readback, exact serialized and transmitted request packets, exact received response packet, returned sliders, and verified request/cohort association",
+        "SpectrumCaptureContractV2": "observe current level -> discover all 11 difficulty positions -> group repeated centered-slider capture by distinct actual returned mission QL -> verified five-offer cohorts",
         "BackwardCompatibility": "schema 1 and 2 journals remain accepted; schema 1 uses session-level roll-origin fallback when terminal location fields are present",
     }
 

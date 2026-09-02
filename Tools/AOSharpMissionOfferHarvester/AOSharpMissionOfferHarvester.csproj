@@ -31,9 +31,9 @@
   <ItemGroup>
     <Compile Include="JsonLineJournal.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MissionItemCampaign.cs" />
     <Compile Include="MissionQlResolver.g.cs" />
     <Compile Include="MissionSliderState.cs" />
-    <Compile Include="RewardSaturationTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
