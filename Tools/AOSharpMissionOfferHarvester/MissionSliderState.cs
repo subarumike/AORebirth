@@ -522,4 +522,129 @@ namespace AORebirth.MissionEvidence
             return false;
         }
     }
+
+    internal sealed class MissionSliderPlanEntry
+    {
+        internal int MatrixIndex { get; private set; }
+        internal string Label { get; private set; }
+        internal MissionSliderState SliderState { get; private set; }
+
+        internal MissionSliderPlanEntry(int matrixIndex, string label, MissionSliderState sliderState)
+        {
+            MatrixIndex = matrixIndex;
+            Label = label;
+            SliderState = sliderState;
+        }
+
+        internal IDictionary<string, object> ToPayload()
+        {
+            return new Dictionary<string, object>
+            {
+                ["matrix_index"] = MatrixIndex,
+                ["label"] = Label,
+                ["difficulty_detent"] = SliderState.DifficultyDetent,
+                ["slider_state_id"] = SliderState.SliderStateId,
+                ["slider_preset"] = SliderState.PresetName,
+                ["requested_semantic_state"] = SliderState.RequestedSemanticPayload(),
+                ["native_values"] = SliderState.ToNativeValues().ToPayload()
+            };
+        }
+    }
+
+    internal static class LowLevelSliderMatrix
+    {
+        internal const int StateCount = 27;
+
+        internal static bool TryBuild(
+            int startIndex,
+            int endIndex,
+            out IList<MissionSliderPlanEntry> selected,
+            out string error)
+        {
+            selected = null;
+            error = null;
+            if (startIndex < 1 || endIndex > StateCount || startIndex > endIndex)
+            {
+                error = "MATRIX_RANGE_MUST_BE_WITHIN_1_TO_27_AND_START_NOT_AFTER_END";
+                return false;
+            }
+
+            var all = new List<MissionSliderPlanEntry>();
+            if (!AddPreset(all, 1, "CENTERED_BASELINE_D1", 1, "CENTERED_BASELINE", out error)
+                || !AddPreset(all, 2, "GOOD_BAD_FULL_LEFT", 1, "GOOD_BAD_FULL_LEFT", out error)
+                || !AddPreset(all, 3, "GOOD_BAD_FULL_RIGHT", 1, "GOOD_BAD_FULL_RIGHT", out error)
+                || !AddCustom(all, 4, "GOOD_BAD_MINUS_50", 1, "-50", "CENTER", "CENTER", "CENTER", "CENTER", "CENTER", out error)
+                || !AddCustom(all, 5, "GOOD_BAD_PLUS_50", 1, "50", "CENTER", "CENTER", "CENTER", "CENTER", "CENTER", out error)
+                || !AddPreset(all, 6, "ORDER_CHAOS_FULL_LEFT", 1, "ORDER_CHAOS_FULL_LEFT", out error)
+                || !AddPreset(all, 7, "ORDER_CHAOS_FULL_RIGHT", 1, "ORDER_CHAOS_FULL_RIGHT", out error)
+                || !AddCustom(all, 8, "ORDER_CHAOS_MINUS_50", 1, "CENTER", "-50", "CENTER", "CENTER", "CENTER", "CENTER", out error)
+                || !AddCustom(all, 9, "ORDER_CHAOS_PLUS_50", 1, "CENTER", "50", "CENTER", "CENTER", "CENTER", "CENTER", out error)
+                || !AddPreset(all, 10, "OPEN_HIDDEN_FULL_LEFT", 1, "OPEN_HIDDEN_FULL_LEFT", out error)
+                || !AddPreset(all, 11, "OPEN_HIDDEN_FULL_RIGHT", 1, "OPEN_HIDDEN_FULL_RIGHT", out error)
+                || !AddCustom(all, 12, "OPEN_HIDDEN_MINUS_50", 1, "CENTER", "CENTER", "-50", "CENTER", "CENTER", "CENTER", out error)
+                || !AddCustom(all, 13, "OPEN_HIDDEN_PLUS_50", 1, "CENTER", "CENTER", "50", "CENTER", "CENTER", "CENTER", out error)
+                || !AddPreset(all, 14, "PHYSICAL_MYSTICAL_FULL_LEFT", 1, "PHYSICAL_MYSTICAL_FULL_LEFT", out error)
+                || !AddPreset(all, 15, "PHYSICAL_MYSTICAL_FULL_RIGHT", 1, "PHYSICAL_MYSTICAL_FULL_RIGHT", out error)
+                || !AddCustom(all, 16, "PHYSICAL_MYSTICAL_MINUS_50", 1, "CENTER", "CENTER", "CENTER", "-50", "CENTER", "CENTER", out error)
+                || !AddCustom(all, 17, "PHYSICAL_MYSTICAL_PLUS_50", 1, "CENTER", "CENTER", "CENTER", "50", "CENTER", "CENTER", out error)
+                || !AddPreset(all, 18, "HEADON_STEALTH_FULL_LEFT", 1, "HEADON_STEALTH_FULL_LEFT", out error)
+                || !AddPreset(all, 19, "HEADON_STEALTH_FULL_RIGHT", 1, "HEADON_STEALTH_FULL_RIGHT", out error)
+                || !AddCustom(all, 20, "HEADON_STEALTH_MINUS_50", 1, "CENTER", "CENTER", "CENTER", "CENTER", "-50", "CENTER", out error)
+                || !AddCustom(all, 21, "HEADON_STEALTH_PLUS_50", 1, "CENTER", "CENTER", "CENTER", "CENTER", "50", "CENTER", out error)
+                || !AddPreset(all, 22, "MONEY_XP_FULL_LEFT", 1, "MONEY_XP_FULL_LEFT", out error)
+                || !AddPreset(all, 23, "MONEY_XP_FULL_RIGHT", 1, "MONEY_XP_FULL_RIGHT", out error)
+                || !AddCustom(all, 24, "MONEY_XP_MINUS_50", 1, "CENTER", "CENTER", "CENTER", "CENTER", "CENTER", "-50", out error)
+                || !AddCustom(all, 25, "MONEY_XP_PLUS_50", 1, "CENTER", "CENTER", "CENTER", "CENTER", "CENTER", "50", out error)
+                || !AddPreset(all, 26, "CENTERED_BASELINE_D6", 6, "CENTERED_BASELINE", out error)
+                || !AddPreset(all, 27, "CENTERED_BASELINE_D10", 10, "CENTERED_BASELINE", out error))
+                return false;
+
+            selected = all.GetRange(startIndex - 1, endIndex - startIndex + 1);
+            return true;
+        }
+
+        private static bool AddPreset(
+            IList<MissionSliderPlanEntry> entries,
+            int index,
+            string label,
+            int detent,
+            string preset,
+            out string error)
+        {
+            MissionSliderState state;
+            if (!MissionSliderState.TryCreatePreset(detent, preset, out state, out error))
+                return false;
+            entries.Add(new MissionSliderPlanEntry(index, label, state));
+            return true;
+        }
+
+        private static bool AddCustom(
+            IList<MissionSliderPlanEntry> entries,
+            int index,
+            string label,
+            int detent,
+            string goodBad,
+            string orderChaos,
+            string openHidden,
+            string physicalMystical,
+            string headonStealth,
+            string moneyXp,
+            out string error)
+        {
+            MissionSliderState state;
+            if (!MissionSliderState.TryCreateCustom(
+                    detent,
+                    goodBad,
+                    orderChaos,
+                    openHidden,
+                    physicalMystical,
+                    headonStealth,
+                    moneyXp,
+                    out state,
+                    out error))
+                return false;
+            entries.Add(new MissionSliderPlanEntry(index, label, state));
+            return true;
+        }
+    }
 }
