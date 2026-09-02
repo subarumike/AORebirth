@@ -1,5 +1,7 @@
 namespace AORebirth.Core.Combat
 {
+    using System;
+
     using AORebirth.Core.Entities;
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
@@ -9,9 +11,19 @@ namespace AORebirth.Core.Combat
 
     public static class CharacterCombatStrikeBuilder
     {
+        private const int MissingStatValue = 1234567890;
+
         private const int NormalAttackInfoAmmoCount = 40;
 
         private const int NormalAttackInfoHitType = (int)HitType.Normal;
+
+        private const int PlayerUnarmedAttackInfoAmmoCount = -1;
+
+        private const int PlayerUnarmedAttackInfoWeaponSlot = 0;
+
+        private const int PlayerUnarmedAttackInfoWeaponInstance = 100;
+
+        private const int PlayerUnarmedFallbackDamage = 15;
 
         public static CombatStrikeContext Build(Character attacker, WeaponSlot preferredSlot)
         {
@@ -33,7 +45,28 @@ namespace AORebirth.Core.Combat
             IItem weapon = ResolveWeaponForSlot(preferredSlot, rightHand, leftHand);
             if (weapon == null || weapon.LowID <= 0)
             {
-                return null;
+                int unarmedDamage = Math.Max(
+                    NormalizeStat(attacker.Stats[StatIds.mindamage].Value),
+                    NormalizeStat(attacker.Stats[StatIds.maxdamage].Value));
+                if (unarmedDamage <= 0)
+                {
+                    unarmedDamage = PlayerUnarmedFallbackDamage;
+                }
+
+                return new CombatStrikeContext
+                       {
+                           MinDamage = unarmedDamage,
+                           MaxDamage = unarmedDamage,
+                           DamageBonus = NormalizeStat(attacker.Stats[StatIds.damagebonus].Value),
+                           Range = CharacterCombatRangeRules.MaxMeleeCombatDistance,
+                           UsesEquippedWeapon = false,
+                           AttackInfoAmmoCount = PlayerUnarmedAttackInfoAmmoCount,
+                           AttackInfoWeaponSlot = PlayerUnarmedAttackInfoWeaponSlot,
+                           AttackInfoHitType = NormalAttackInfoHitType,
+                           AttackInfoWeaponInstance = PlayerUnarmedAttackInfoWeaponInstance,
+                           DamageSource = CombatDamageSource.UnarmedAutoAttack,
+                           WeaponSlot = preferredSlot
+                       };
             }
 
             int weaponMin = NormalizeStat(weapon.GetAttribute((int)StatIds.mindamage));
@@ -94,7 +127,7 @@ namespace AORebirth.Core.Combat
 
         private static int NormalizeStat(int value)
         {
-            return value < 0 ? 0 : value;
+            return value < 0 || value == MissingStatValue ? 0 : value;
         }
     }
 }
