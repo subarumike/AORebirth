@@ -103,6 +103,11 @@ namespace AORebirth.Database
                         if (sqlFile != null)
                         {
                             fName = Path.GetFileNameWithoutExtension(sqlFile).ToLower();
+                            if (fName.EndsWith("_alter", StringComparison.OrdinalIgnoreCase))
+                            {
+                                continue;
+                            }
+
                             if (!Exists(conn, fName))
                             {
                                 tablesNotFound.Add(sqlFile);
