@@ -31,11 +31,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinator = ReadMissionSource("MissionAcgAcceptanceCoordinator.cs");
             string accept = ReadMember(coordinator, "internal static bool TryAccept(");
             string validate = ReadMember(coordinator, "private static bool ValidateOffer(");
+            string toRecord = ReadMember(
+                coordinator,
+                "private static MissionAcgIdentityRecord ToRecord(");
 
             StringAssert.Contains(accept, "ToRecord(offer.Unknown5)");
             StringAssert.Contains(validate, "offer.Unknown5.Instance == 0");
+            StringAssert.Contains(toRecord, "identity.Instance == 0");
             Assert.IsFalse(
                 validate.IndexOf("offer.Unknown5.Instance <= 0", StringComparison.Ordinal) >= 0);
+            Assert.IsFalse(
+                toRecord.IndexOf("identity.Instance <= 0", StringComparison.Ordinal) >= 0);
         }
 
         [TestMethod]
