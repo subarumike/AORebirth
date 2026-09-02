@@ -154,6 +154,8 @@ def main() -> int:
     mission_identities: set[tuple[int, int]] = set()
     outbound_hashes: set[str] = set()
     inbound_hashes: set[str] = set()
+    secondary_slider_values: dict[str, int] | None = None
+    slider_presets: set[str] = set()
 
     required_events = {"request_started", "request_transmitted", "raw_response_received", "cohort_received"}
     for request_id, completion in sorted(completions.items()):
@@ -174,9 +176,15 @@ def main() -> int:
         if int(cohort["mission_ql_candidate"]["observed_mission_ql_candidate"]) != actual_ql:
             raise SystemExit(f"mission QL candidate mismatch: {request_id}")
         request_sliders = started["sliders"]
-        for name in ("good_bad", "order_chaos", "open_hidden", "physical_mystical", "headon_stealth", "credits_xp"):
-            if int(request_sliders[name]) != 255:
-                raise SystemExit(f"secondary slider not centered for {request_id}: {name}")
+        current_secondary_sliders = {
+            name: int(request_sliders[name])
+            for name in ("good_bad", "order_chaos", "open_hidden", "physical_mystical", "headon_stealth", "credits_xp")
+        }
+        if secondary_slider_values is None:
+            secondary_slider_values = current_secondary_sliders
+        elif current_secondary_sliders != secondary_slider_values:
+            raise SystemExit(f"secondary slider state changed for {request_id}")
+        slider_presets.add(str(started["slider_preset"]))
         if int(request_sliders["difficulty"]) != detent:
             raise SystemExit(f"difficulty mismatch for {request_id}")
         outbound_hash = str(transmitted["raw_packet"]["sha256"])
@@ -282,6 +290,8 @@ def main() -> int:
         "baseline": f"LEVEL_{character_level}_{campaign_name}",
         "character_level": character_level,
         "character_identity_instance": character_identity_instance,
+        "slider_presets": sorted(slider_presets),
+        "secondary_slider_values": secondary_slider_values,
         "input_files": input_files,
         "sessions": session_summaries,
         "difficulty_position_to_actual_mission_ql": [
@@ -310,7 +320,7 @@ def main() -> int:
             "all_requests_have_exact_inbound_raw_evidence": True,
             "all_raw_hash_links_match": True,
             "all_cohorts_have_five_offers": True,
-            "all_secondary_sliders_centered": True,
+            "all_requests_use_one_consistent_secondary_slider_state": True,
             "all_response_ql_candidates_match_completion_records": True,
         },
         "useful_for": [
