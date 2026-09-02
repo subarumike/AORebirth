@@ -6,9 +6,9 @@ Complete DAO Phase 1 infrastructure and the Phase 2 mission-persistence slice.
 Mission runtime must depend on `IMissionDao`, with SQL and provider APIs owned by
 `AORebirth.Database`, while preserving existing schema, transaction order,
 packets, and gameplay. Character aggregate persistence and every later DAO phase
-remain out of scope. Acceptance requires the architecture guard, focused and
-full mission regressions, Windows/Linux compile inventories, and disposable
-MySQL DAO validation when an isolated Docker engine is available.
+remain out of scope. The architecture guard, mission regressions,
+Windows/Linux compatibility, and 30-check disposable MySQL DAO validation pass.
+Governed exact-SHA acceptance remains before any live promotion.
 
 ## Prior active checkpoint
 

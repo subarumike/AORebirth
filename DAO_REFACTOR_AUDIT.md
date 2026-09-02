@@ -412,5 +412,6 @@ inside the character aggregate transaction pending the later character phase.
 
 No schema, packet, mission definition, reward, or gameplay changes are part of
 this slice. The provider remains the existing MySQL-specific Connector; provider
-parity is an unchanged limitation. Disposable MySQL and governed exact-SHA
-acceptance remain validation gates, not permission to use production data.
+parity is an unchanged limitation. Disposable MySQL validation passes 30
+isolated checks with rollback/concurrency coverage and zero labelled Docker
+residue. Governed exact-SHA acceptance remains a separate validation gate.

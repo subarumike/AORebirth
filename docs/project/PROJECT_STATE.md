@@ -16,8 +16,9 @@ completion matrices and dated evidence retain detailed provenance.
   the existing Connector. The audit-mode architecture guard reports five
   reviewed later-phase runtime SQL sites and zero direct mission runtime SQL.
   Windows and Linux builds plus the 1,140-test AOtomation suite pass. Disposable
-  MySQL runtime validation and governed exact-SHA acceptance remain open until
-  an isolated Docker engine and acceptance environment are available.
+  MySQL validation passes 30 lifecycle, rollback, concurrency, reward, roll-fee,
+  and start-area checks with zero labelled Docker residue. Governed exact-SHA
+  acceptance remains open until its acceptance environment is available.
 
 - ARPA3/ClickSaver Rubi-Ka mission evidence is archived and normalized offline
   with source/member SHA-256 provenance, deterministic regeneration, and no

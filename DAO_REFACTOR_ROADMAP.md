@@ -9,9 +9,10 @@ mission roll-fee persistence, and new-character start-area selection now consume
 `AORebirth.Database`; the Zone adapter retains the existing
 `IMissionRepository` service boundary. The architecture guard reports five
 reviewed non-mission legacy runtime SQL sites and zero mission runtime SQL sites.
-Disposable MySQL validation is implemented but still requires an available
-isolated Docker engine; exact-SHA acceptance is recorded only when its governed
-environment is available.
+Disposable MySQL validation passes 30 isolated lifecycle, rollback,
+concurrency, reward, roll-fee, and start-area checks with labelled resource
+cleanup; exact-SHA acceptance is recorded only when its governed environment is
+available.
 
 ## 1. Target architecture
 
@@ -561,8 +562,8 @@ Phase 1 implementation checklist:
 
 ### Phase 2 — First vertical slice: missions
 
-Implementation status (2026-09-01): code-complete; disposable MySQL and governed
-exact-SHA acceptance remain environment-dependent gates.
+Implementation status (2026-09-01): code-complete with disposable MySQL
+validation passing; governed exact-SHA acceptance remains environment-dependent.
 
 - Goal: move mission SQL below DAO interfaces while preserving all behavior and transaction semantics.
 - Exact scope: files, tables, adapters, tests, construction, and rollback listed in section 6.
@@ -585,7 +586,7 @@ Phase 2 implementation checklist:
 [x] Preserve character-deletion mission cleanup for the later character slice
 [x] Add adapter, architecture, guard, provider, rollback, idempotency, and concurrency tests
 [x] Update authoritative Windows and guarded Linux compile inventories
-[ ] Run disposable MySQL validation on an available isolated Docker engine
+[x] Run disposable MySQL validation: 30 checks, rollback/concurrency PASS, zero residue
 [ ] Record governed exact-SHA Windows and Linux acceptance
 ```
 
