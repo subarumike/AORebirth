@@ -11,9 +11,9 @@ namespace ZoneEngine.Core.GameData
     using Utility;
 
     /// <summary>
-    /// Reads the checked-in GameData tree from the fixed runtime location
-    /// {BaseDirectory}\GameData. There is no path search: a missing root is a
-    /// deployment error and fails at startup.
+    /// Reads the extracted GameData tree from the fixed runtime location
+    /// {BaseDirectory}\GameData. There is no path search. A missing root keeps
+    /// locality on its safe indoor fallback until data is provisioned.
     /// </summary>
     internal static class GameDataLoader
     {
@@ -45,20 +45,16 @@ namespace ZoneEngine.Core.GameData
         }
 
         /// <summary>
-        /// Fails immediately when the GameData tree is not deployed beside the engine.
+        /// Records a safe fallback when the optional GameData tree is not deployed.
         /// </summary>
         internal static void EnsureRootExists()
         {
-            if (!Directory.Exists(GameDataRootPath))
+            if (!Directory.Exists(GameDataRootPath) || !Directory.Exists(PlayfieldsRootPath))
             {
-                throw new DirectoryNotFoundException(
-                    "GameData root directory was not found: " + GameDataRootPath);
-            }
-
-            if (!Directory.Exists(PlayfieldsRootPath))
-            {
-                throw new DirectoryNotFoundException(
-                    "GameData playfield directory was not found: " + PlayfieldsRootPath);
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "GameData playfield metadata is unavailable; locality will use the safe indoor fallback. Root="
+                    + GameDataRootPath);
             }
         }
 

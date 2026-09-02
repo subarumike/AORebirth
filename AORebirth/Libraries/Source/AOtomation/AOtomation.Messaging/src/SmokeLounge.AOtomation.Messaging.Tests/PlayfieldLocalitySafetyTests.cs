@@ -72,6 +72,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(process, "this.tickCallbacks.ProcessPlayerCollision(dynel);");
         }
 
+        [TestMethod]
+        public void MissingExternalGameDataKeepsTheSafeFallbackAndDoesNotEnterSourceInventory()
+        {
+            string loader = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\GameData\GameDataLoader.cs");
+            string project = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
+
+            string ensureRoot = ExtractBlock(loader, "internal static void EnsureRootExists()");
+            StringAssert.Contains(ensureRoot, "!Directory.Exists(GameDataRootPath)");
+            StringAssert.Contains(ensureRoot, "!Directory.Exists(PlayfieldsRootPath)");
+            StringAssert.Contains(ensureRoot, "locality will use the safe indoor fallback");
+            Assert.IsFalse(
+                ensureRoot.Contains("throw new DirectoryNotFoundException"),
+                "An externally provisioned GameData tree must not block startup when absent.");
+
+            StringAssert.Contains(project, "<Target Name=\"CopyExtractedGameData\"");
+            StringAssert.Contains(project, "<ExtractedGameDataFiles Include=\"..\\..\\GameData\\**\\*\"");
+            Assert.IsFalse(
+                project.Contains("<Content Include=\"..\\..\\GameData\\**\\*\"")
+                || project.Contains("<Compile Include=\"..\\..\\GameData\\**\\*\""),
+                "External generated data must not be represented as governed source inventory.");
+        }
+
         private static string ReadRepositoryFile(string relativePath)
         {
             return File.ReadAllText(
