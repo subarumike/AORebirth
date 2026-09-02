@@ -82,8 +82,8 @@ namespace ZoneEngine.Core
             byte[] packet = (byte[])ScfuCapturePacket.Clone();
             int droidInstance = droid.Identity.Instance;
             int playfieldId = droid.Playfield.Identity.Instance;
-            Coordinate coord = droid.Coordinates();
-            Quaternion heading = droid.Heading;
+            Coordinate coord = droid.CalculatePredictedPosition();
+            Quaternion heading = droid.Rotation;
 
             PatchHeader(packet, recipientInstance);
             WriteInt32BigEndian(packet, N3IdentityInstanceOffset, droidInstance);

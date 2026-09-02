@@ -187,12 +187,12 @@ namespace ZoneEngine.Core.Playfields
                 return null;
             }
 
-            if (npc.RawCoordinates == null)
+            if (npc.Position == null)
             {
                 return null;
             }
 
-            Coordinate npcCoord = npc.Coordinates();
+            Coordinate npcCoord = npc.CalculatePredictedPosition();
             ICharacter best = null;
             double bestDistance = AggroRadiusMeters;
             List<ICharacter> inRange;
@@ -210,7 +210,7 @@ namespace ZoneEngine.Core.Playfields
             {
                 ICharacter candidate = inRange[i];
                 if (candidate == null
-                    || candidate.RawCoordinates == null
+                    || candidate.Position == null
                     || candidate.Identity.Instance == npc.Identity.Instance
                     || !(candidate.Controller is PlayerController)
                     || candidate.Stats[StatIds.health].Value <= 0)
@@ -223,7 +223,7 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                double distance = candidate.Coordinates().Distance3D(npcCoord);
+                double distance = candidate.CalculatePredictedPosition().Distance3D(npcCoord);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;

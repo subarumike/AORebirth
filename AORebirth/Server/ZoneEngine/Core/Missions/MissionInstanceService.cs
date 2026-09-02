@@ -312,9 +312,9 @@ namespace ZoneEngine.Core.Missions
             }
 
             int pf = character.Playfield.Identity.Instance;
-            float x = character.RawCoordinates.X;
-            float y = character.RawCoordinates.Y;
-            float z = character.RawCoordinates.Z;
+            float x = (float)character.Position.x;
+            float y = (float)character.Position.y;
+            float z = (float)character.Position.z;
             double radiusSq = horizontalRadius * horizontalRadius;
 
             List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(character.Identity.Instance);
@@ -387,10 +387,10 @@ namespace ZoneEngine.Core.Missions
                     continue;
                 }
 
-                double dx = character.RawCoordinates.X - entry.MarkerX;
-                double dz = character.RawCoordinates.Z - entry.MarkerZ;
+                double dx = (float)character.Position.x - entry.MarkerX;
+                double dz = (float)character.Position.z - entry.MarkerZ;
                 if (((dx * dx) + (dz * dz)) <= radiusSquared
-                    && Math.Abs(character.RawCoordinates.Y - entry.MarkerY)
+                    && Math.Abs((float)character.Position.y - entry.MarkerY)
                        <= verticalRadius)
                 {
                     return true;
@@ -591,9 +591,9 @@ namespace ZoneEngine.Core.Missions
             if (MissionAcgBindingRuntime.HasOwnedExteriorMarker(
                 character.Identity.Instance,
                 character.Playfield.Identity.Instance,
-                character.RawCoordinates.X,
-                character.RawCoordinates.Y,
-                character.RawCoordinates.Z,
+                (float)character.Position.x,
+                (float)character.Position.y,
+                (float)character.Position.z,
                 10.0,
                 14.0))
             {
@@ -602,9 +602,9 @@ namespace ZoneEngine.Core.Missions
                     MissionAcgBindingRuntime.TryResolveByExteriorMarker(
                         character.Identity.Instance,
                         character.Playfield.Identity.Instance,
-                        character.RawCoordinates.X,
-                        character.RawCoordinates.Y,
-                        character.RawCoordinates.Z,
+                        (float)character.Position.x,
+                        (float)character.Position.y,
+                        (float)character.Position.z,
                         10.0,
                         14.0,
                         DateTime.UtcNow,
@@ -768,7 +768,7 @@ namespace ZoneEngine.Core.Missions
                         y = entryPosition.Y,
                         z = entryPosition.Z
                     },
-                    character.Heading,
+                    character.Rotation,
                     exactPlayfield);
                 AORebirth.Core.Playfields.Playfield.ArmPostZoneCollisionGrace(character);
 
@@ -874,7 +874,7 @@ namespace ZoneEngine.Core.Missions
             }
             else
             {
-                Coordinate outdoor = character.Coordinates();
+                Coordinate outdoor = character.CalculatePredictedPosition();
                 StampOutdoorReturn(
                     character.Identity.Instance,
                     fromPf,
@@ -886,7 +886,7 @@ namespace ZoneEngine.Core.Missions
             character.DoNotDoTimers = false;
             character.Teleport(
                 new Coordinate { x = sx, y = sy, z = sz },
-                character.Heading,
+                character.Rotation,
                 pfIdentity);
             AORebirth.Core.Playfields.Playfield.ArmPostZoneCollisionGrace(character);
 
@@ -1000,7 +1000,7 @@ namespace ZoneEngine.Core.Missions
             character.DoNotDoTimers = false;
             character.Teleport(
                 new Coordinate { x = destX, y = destY, z = destZ },
-                character.Heading,
+                character.Rotation,
                 pfIdentity);
             AORebirth.Core.Playfields.Playfield.ArmPostZoneCollisionGrace(character);
 
@@ -1110,7 +1110,7 @@ namespace ZoneEngine.Core.Missions
                     y = destinationY,
                     z = destinationZ
                 },
-                character.Heading,
+                character.Rotation,
                 new Identity
                 {
                     Type = IdentityType.Playfield,
@@ -1271,9 +1271,9 @@ namespace ZoneEngine.Core.Missions
             {
                 return false;
             }
-            double dx = character.RawCoordinates.X - doorX;
-            double dz = character.RawCoordinates.Z - doorZ;
-            double dy = Math.Abs(character.RawCoordinates.Y - doorY);
+            double dx = (float)character.Position.x - doorX;
+            double dz = (float)character.Position.z - doorZ;
+            double dy = Math.Abs((float)character.Position.y - doorY);
             return ((dx * dx) + (dz * dz)) <= (horizontalRadius * horizontalRadius) && dy <= verticalRadius;
         }
 

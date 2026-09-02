@@ -32,7 +32,7 @@ namespace ZoneEngine.ChatCommands
         {
             Coordinate inGrid = new Coordinate(217, 4, 199);
 
-            character.Playfield.Teleport((Dynel)character, inGrid, character.Heading, new Identity() { Type = IdentityType.Playfield, Instance = 152 });
+            character.Playfield.Teleport((Dynel)character, inGrid, character.Rotation, new Identity() { Type = IdentityType.Playfield, Instance = 152 });
         }
 
         public override int GMLevelNeeded()

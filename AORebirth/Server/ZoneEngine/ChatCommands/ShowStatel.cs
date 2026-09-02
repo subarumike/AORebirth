@@ -104,7 +104,7 @@ namespace ZoneEngine.ChatCommands
             StatelData o = null;
             StaticDynel o2 = null;
             Vendor o3 = null;
-            Coordinate tempCoordinate = character.Coordinates();
+            Coordinate tempCoordinate = character.CalculatePredictedPosition();
             if (!PlayfieldLoader.PFData.ContainsKey(character.Playfield.Identity.Instance))
             {
                 reply = "Could not find data for playfield " + character.Playfield.Identity.Instance;

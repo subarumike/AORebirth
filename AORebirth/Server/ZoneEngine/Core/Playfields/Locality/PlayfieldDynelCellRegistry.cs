@@ -29,31 +29,67 @@ namespace ZoneEngine.Core.Playfields.Locality
             get { return !this.layout.IsIndoor; }
         }
 
-        internal void Register(ICharacter character)
+        internal void Register(IDynel dynel)
         {
-            if (character == null)
+            if (dynel == null)
             {
                 return;
             }
 
             lock (this.sync)
             {
-                this.charactersByIdentity[character.Identity.Long()] = character;
-                this.AssignCellUnlocked(character);
+                ICharacter character = dynel as ICharacter;
+                if (character != null)
+                {
+                    this.charactersByIdentity[character.Identity.Long()] = character;
+                }
+
+                this.AssignCellUnlocked(dynel.Identity, new AORebirth.Core.Vector.Coordinate(dynel.Position));
             }
         }
 
-        internal bool Move(ICharacter character)
+        internal void Register(StaticDynel staticDynel)
         {
-            if (character == null)
+            if (staticDynel == null)
+            {
+                return;
+            }
+
+            lock (this.sync)
+            {
+                this.AssignCellUnlocked(staticDynel.Identity, staticDynel.Coordinate);
+            }
+        }
+
+        internal bool Move(IDynel dynel)
+        {
+            int oldCellId;
+            int newCellId;
+            return this.Move(dynel, out oldCellId, out newCellId);
+        }
+
+        internal bool Move(IDynel dynel, out int oldCellId, out int newCellId)
+        {
+            oldCellId = NonLocalCellId;
+            newCellId = NonLocalCellId;
+            if (dynel == null)
             {
                 return false;
             }
 
             lock (this.sync)
             {
-                this.charactersByIdentity[character.Identity.Long()] = character;
-                return this.AssignCellUnlocked(character);
+                ICharacter character = dynel as ICharacter;
+                if (character != null)
+                {
+                    this.charactersByIdentity[character.Identity.Long()] = character;
+                }
+
+                return this.AssignCellUnlocked(
+                    dynel.Identity,
+                    new AORebirth.Core.Vector.Coordinate(dynel.Position),
+                    out oldCellId,
+                    out newCellId);
             }
         }
 
@@ -116,7 +152,7 @@ namespace ZoneEngine.Core.Playfields.Locality
                     }
 
                     this.charactersByIdentity[character.Identity.Long()] = character;
-                    this.AssignCellUnlocked(character);
+                    this.AssignCellUnlocked(character.Identity, character.CalculatePredictedPosition());
                 }
             }
         }
@@ -161,17 +197,23 @@ namespace ZoneEngine.Core.Playfields.Locality
             }
         }
 
-        internal bool TryGetCellId(ICharacter character, out int cellId)
+        internal bool TryGetCellId(IDynel dynel, out int cellId)
         {
             cellId = NonLocalCellId;
-            if (character == null)
+            if (dynel == null)
             {
                 return false;
             }
 
+            return this.TryGetCellId(dynel.Identity, out cellId);
+        }
+
+        internal bool TryGetCellId(Identity identity, out int cellId)
+        {
+            cellId = NonLocalCellId;
             lock (this.sync)
             {
-                return this.cellByIdentity.TryGetValue(character.Identity.Long(), out cellId);
+                return this.cellByIdentity.TryGetValue(identity.Long(), out cellId);
             }
         }
 
@@ -199,20 +241,30 @@ namespace ZoneEngine.Core.Playfields.Locality
             return this.GetCharactersInCells(new[] { cellId });
         }
 
-        private bool AssignCellUnlocked(ICharacter character)
+        private bool AssignCellUnlocked(Identity identity, Coordinate coordinate)
         {
-            int newCellId = NonLocalCellId;
-            if (!this.layout.IsIndoor && character.RawCoordinates != null)
+            int oldCellId;
+            int newCellId;
+            return this.AssignCellUnlocked(identity, coordinate, out oldCellId, out newCellId);
+        }
+
+        private bool AssignCellUnlocked(
+            Identity identity,
+            Coordinate coordinate,
+            out int oldCellId,
+            out int newCellId)
+        {
+            oldCellId = NonLocalCellId;
+            newCellId = NonLocalCellId;
+            if (!this.layout.IsIndoor && coordinate != null)
             {
-                Coordinate coordinate = character.Coordinates();
                 if (!this.layout.TryGetCellId(coordinate, out newCellId))
                 {
                     newCellId = NonLocalCellId;
                 }
             }
 
-            ulong key = character.Identity.Long();
-            int oldCellId;
+            ulong key = identity.Long();
             if (this.cellByIdentity.TryGetValue(key, out oldCellId) && oldCellId == newCellId)
             {
                 return false;

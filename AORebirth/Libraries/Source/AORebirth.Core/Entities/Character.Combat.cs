@@ -165,7 +165,8 @@ namespace AORebirth.Core.Entities
                     new CombatStrikeResult { Outcome = StrikeOutcome.RejectedInvalidTarget });
             }
 
-            double distance = this.Coordinates().Distance3D(target.Coordinates());
+            double distance = this.CalculatePredictedPosition().Distance3D(
+                new AORebirth.Core.Vector.Coordinate(target.Position));
             switch (CharacterCombatRangeRules.EvaluatePlayerRange(distance, context.Range))
             {
                 case PlayerCombatRangeDecision.HardCancel:

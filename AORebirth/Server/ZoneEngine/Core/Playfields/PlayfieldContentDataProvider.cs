@@ -388,10 +388,10 @@ namespace ZoneEngine.Core.Playfields
                 return false;
             }
 
-            float dx = statel.X - character.RawCoordinates.X;
-            float dz = statel.Z - character.RawCoordinates.Z;
+            float dx = (float)(statel.X - (float)character.Position.x);
+            float dz = (float)(statel.Z - (float)character.Position.z);
             float horizontalDistance = (float)Math.Sqrt((dx * dx) + (dz * dz));
-            float verticalDistance = Math.Abs(statel.Y - character.RawCoordinates.Y);
+            float verticalDistance = Math.Abs(statel.Y - (float)character.Position.y);
             return horizontalDistance <= TempleDoorProximityRuntime.TriggerRadius
                    && verticalDistance <= 6.0f;
         }

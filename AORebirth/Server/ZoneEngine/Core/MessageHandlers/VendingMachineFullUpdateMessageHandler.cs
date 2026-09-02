@@ -116,17 +116,17 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                     x.Coordinates = new Vector3()
                                     {
-                                        X = vendor.Coordinates().x,
-                                        Y = vendor.Coordinates().y,
-                                        Z = vendor.Coordinates().z
+                                        X = new AORebirth.Core.Vector.Coordinate(vendor.Position).x,
+                                        Y = new AORebirth.Core.Vector.Coordinate(vendor.Position).y,
+                                        Z = new AORebirth.Core.Vector.Coordinate(vendor.Position).z
                                     };
 
                     x.Heading = new Quaternion()
                                 {
-                                    X = vendor.Heading.xf,
-                                    Y = vendor.Heading.yf,
-                                    Z = vendor.Heading.zf,
-                                    W = vendor.Heading.wf
+                                    X = vendor.Rotation.xf,
+                                    Y = vendor.Rotation.yf,
+                                    Z = vendor.Rotation.zf,
+                                    W = vendor.Rotation.wf
                                 };
 
                     x.NpcIdentity = Identity.None;

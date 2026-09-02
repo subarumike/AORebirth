@@ -104,7 +104,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                  Type = IdentityType.Playfield2,
                                  Instance = character.Playfield.Identity.Instance
                              };
-                Coordinate temp = character.Coordinates();
+                Coordinate temp = character.CalculatePredictedPosition();
                 x.CharacterCoordinates = new Vector3 { X = temp.x, Y = temp.y, Z = temp.z, };
                 x.PlayfieldId1 = new Identity
                                  {

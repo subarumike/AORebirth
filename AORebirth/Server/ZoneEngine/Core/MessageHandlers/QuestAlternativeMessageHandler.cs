@@ -149,7 +149,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 float terminalZ = 0f;
                 try
                 {
-                    Coordinate coords = character.Coordinates();
+                    Coordinate coords = character.CalculatePredictedPosition();
                     terminalX = coords.x;
                     terminalZ = coords.z;
                 }

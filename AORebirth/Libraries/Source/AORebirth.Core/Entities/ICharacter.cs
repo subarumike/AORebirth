@@ -127,7 +127,11 @@ namespace AORebirth.Core.Entities
 
         void StopLogoutTimer();
 
+        void SetPose(Coordinate newCoordinates, Quaternion heading);
+
         void SetCoordinates(Coordinate newCoordinates, Quaternion heading);
+
+        Coordinate CalculatePredictedPosition();
 
         void StartLogoutTimer(int time = 30000);
 

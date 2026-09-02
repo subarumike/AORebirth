@@ -868,7 +868,7 @@ namespace AORebirth.Core.Playfields
 
             ApplyAppearance(mob, def);
             ApplyWaypoints(mob, npcController, def);
-            mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
+            mob.Position = (new Coordinate { x = def.X, y = def.Y, z = def.Z }).coordinate;
 
             mob.DoNotDoTimers = false;
             activateNpc(mob);

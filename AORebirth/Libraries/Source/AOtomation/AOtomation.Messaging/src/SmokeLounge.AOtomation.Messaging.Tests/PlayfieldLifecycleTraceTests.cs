@@ -5784,8 +5784,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playerDeathRespawnText.Contains("sendChangedStats(character);")
                 && playerDeathRespawnText.Contains("logRespawnRequested(character, corpseIdentity, destinationPlayfield, destination);")
                 && playerDeathRespawnText.Contains("enableTimers(character);")
-                && playerDeathRespawnText.Contains("tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.RawHeading, destinationPlayfield)")
-                && playerDeathRespawnText.Contains("transferToRespawnPlayfield(dynel, destination, character.RawHeading, destinationPlayfield);"),
+                && playerDeathRespawnText.Contains("tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.Rotation, destinationPlayfield)")
+                && playerDeathRespawnText.Contains("transferToRespawnPlayfield(dynel, destination, character.Rotation, destinationPlayfield);"),
                 "PlayfieldPlayerDeathRespawnRuntimeService must own player death/respawn packet-state sequencing.");
             AssertTextBefore(
                 playerDeathRespawnText,
@@ -5822,7 +5822,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 playerDeathRespawnText,
                 "enableTimers(character);",
-                "if (tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.RawHeading, destinationPlayfield))");
+                "if (tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.Rotation, destinationPlayfield))");
             Assert.IsFalse(
                 playerDeathRespawnText.Contains("SendCompressed")
                 || playerDeathRespawnText.Contains("TeleportMessageHandler")
@@ -6119,7 +6119,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("this.StartCombatWithAcquiredTarget(attacker, target, capturedContract);")
                 && npcRuntimeText.Contains("private void StartCombatWithAcquiredTarget(")
                 && npcRuntimeText.Contains("target.SetFightingTarget(attacker.Identity);")
-                && npcRuntimeText.Contains("npcController.StopFollowForCombatRange(attacker.Coordinates().coordinate);")
+                && npcRuntimeText.Contains("npcController.StopFollowForCombatRange(attacker.CalculatePredictedPosition().coordinate);")
                 && npcRuntimeText.Contains("this.ResetCombatTick(target);"),
                 "NPCRuntimeService must own NPC aggro acquisition, patrol cancellation, and combat-start orchestration.");
             Assert.IsTrue(
@@ -7692,8 +7692,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
                 && playfieldText.Contains("this.Despawn(dynel.Identity);")
                 && playfieldText.Contains("private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)")
-                && playfieldText.Contains("dynel.RawCoordinates = new Vector3()")
-                && playfieldText.Contains("dynel.RawHeading = new Vector.Quaternion")
+                && playfieldText.Contains("dynel.Position = new AORebirth.Core.Vector.Vector3")
+                && playfieldText.Contains("dynel.Transform.Rotation =")
                 && playfieldText.Contains("private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)")
                 && playfieldText.Contains("return this.server.PlayfieldById(playfield);")
                 && playfieldText.Contains("private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)")
@@ -7831,8 +7831,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new Playfield(",
                     "DespawnMessageHandler",
                     "AnnounceOthers",
-                    "RawCoordinates",
-                    "RawHeading",
+                    "dynel.Position",
+                    "Transform.Rotation",
                     "Controller.Client = null",
                     "IsTeleporting",
                     "dynel.Dispose",
@@ -7947,10 +7947,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 localTeleportMethod,
                 "TeleportMessageHandler.Default.SendLocal(",
-                "dynel.RawCoordinates = new AORebirth.Core.Vector.Vector3");
+                "dynel.Position = new AORebirth.Core.Vector.Vector3");
             AssertTextBefore(
                 localTeleportMethod,
-                "dynel.RawHeading = new AORebirth.Core.Vector.Quaternion",
+                "dynel.Transform.Rotation =",
                 "this.PrimeStatelCollisionContacts(character);");
 
             string[] forbiddenStatelRuntimeOwnership =

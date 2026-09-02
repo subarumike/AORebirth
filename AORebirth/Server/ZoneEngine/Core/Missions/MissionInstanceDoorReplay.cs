@@ -153,8 +153,8 @@ namespace ZoneEngine.Core.Missions
                 null);
             if (shape != null)
             {
-                float dx = (float)character.RawCoordinates.X - shape.SpawnX;
-                float dz = (float)character.RawCoordinates.Z - shape.SpawnZ;
+                float dx = (float)character.Position.x - shape.SpawnX;
+                float dz = (float)character.Position.z - shape.SpawnZ;
                 if (((dx * dx) + (dz * dz)) < (ZoneInWalkMinLeaveSpawn * ZoneInWalkMinLeaveSpawn))
                 {
                     return;
@@ -191,7 +191,7 @@ namespace ZoneEngine.Core.Missions
             bool findItemReturn = (hasObjective && objective == MissionRollType.FindItemReturn)
                                   || MissionFindItemService.CharacterHasActiveReturnMission(character);
 
-            // Zone-in (force): anchor to shape entrance — RawCoordinates can still be outdoor.
+            // Zone-in (force): anchor to shape entrance — stored position can still be outdoor.
             float px;
             float pz;
             if (force && shape != null)
@@ -201,8 +201,8 @@ namespace ZoneEngine.Core.Missions
             }
             else
             {
-                px = (float)character.RawCoordinates.X;
-                pz = (float)character.RawCoordinates.Z;
+                px = (float)character.Position.x;
+                pz = (float)character.Position.z;
             }
 
             HashSet<string> sent;

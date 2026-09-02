@@ -19,7 +19,8 @@
     <CellSleepTime>30</CellSleepTime>
   </Locality>
   <!-- Debug console categories: comma-separated DebugInfoDetail names (default Engine,Error) -->
-  <!-- <DebugInfoDetail>Engine,Error,Combat</DebugInfoDetail> -->
+  <!-- Locality: player cell changes + cell heat (Hot/Warm/Cold/Asleep) in ZoneEngineLog -->
+  <!-- <DebugInfoDetail>Engine,Error,Locality</DebugInfoDetail> -->
   <!-- Log Area -->
   <SqlLog>true</SqlLog>
   <LogChat>false</LogChat>

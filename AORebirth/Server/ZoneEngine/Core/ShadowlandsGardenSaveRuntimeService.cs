@@ -102,8 +102,8 @@ namespace ZoneEngine.Core
                 }
 
                 // Distance to the trigger rune (X/Z only).
-                float dx = character.RawCoordinates.X - TriggerX;
-                float dz = character.RawCoordinates.Z - TriggerZ;
+                float dx = (float)character.Position.x - TriggerX;
+                float dz = (float)character.Position.z - TriggerZ;
                 bool onPad = (dx * dx) + (dz * dz) <= (PadRadius * PadRadius);
 
                 bool wasOnPad;

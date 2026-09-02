@@ -262,17 +262,17 @@ namespace ZoneEngine.Core.Playfields
         {
             if (character.Controller is PlayerController)
             {
-                Vector3 raw = character.RawCoordinates;
+                Vector3 raw = character.Position;
                 AORebirth.Core.Vector.Vector3 rawPosition =
                     new AORebirth.Core.Vector.Vector3(raw.X, raw.Y, raw.Z);
-                AORebirth.Core.Vector.Vector3 predictedPosition = character.Coordinates().coordinate;
+                AORebirth.Core.Vector.Vector3 predictedPosition = character.CalculatePredictedPosition().coordinate;
                 return MoveCombatPositionToward(
                     rawPosition,
                     predictedPosition,
                     EnemyBehaviorContract.MaxPlayerChaseProjectionDistance);
             }
 
-            return character.Coordinates().coordinate;
+            return character.CalculatePredictedPosition().coordinate;
         }
 
         private static AORebirth.Core.Vector.Vector3 MoveCombatPositionToward(

@@ -1456,9 +1456,9 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                double dx = npc.Coordinates().x - def.X;
-                double dy = npc.Coordinates().y - def.Y;
-                double dz = npc.Coordinates().z - def.Z;
+                double dx = npc.CalculatePredictedPosition().x - def.X;
+                double dy = npc.CalculatePredictedPosition().y - def.Y;
+                double dz = npc.CalculatePredictedPosition().z - def.Z;
                 if ((dx * dx) + (dy * dy) + (dz * dz) <= radiusSq)
                 {
                     return true;
@@ -1572,7 +1572,7 @@ namespace AORebirth.Core.Playfields
             }
 
             ApplyAppearance(mob, def);
-            mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
+            mob.Position = (new Coordinate { x = def.X, y = def.Y, z = def.Z }).coordinate;
             if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.DogName, StringComparison.OrdinalIgnoreCase))
             {
                 ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.PrepareSpawnedDog(

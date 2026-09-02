@@ -113,14 +113,14 @@ namespace ZoneEngine.ChatCommands
                 mobdbo.Textures3 = 0;
                 mobdbo.Textures4 = 0;
                 mobdbo.Playfield = mob.Playfield.Identity.Instance;
-                Coordinate tempCoordinate = mob.Coordinates();
+                Coordinate tempCoordinate = mob.CalculatePredictedPosition();
                 mobdbo.X = tempCoordinate.x;
                 mobdbo.Y = tempCoordinate.y;
                 mobdbo.Z = tempCoordinate.z;
-                mobdbo.HeadingW = mob.Heading.wf;
-                mobdbo.HeadingX = mob.Heading.xf;
-                mobdbo.HeadingY = mob.Heading.yf;
-                mobdbo.HeadingZ = mob.Heading.zf;
+                mobdbo.HeadingW = mob.Rotation.wf;
+                mobdbo.HeadingX = mob.Rotation.xf;
+                mobdbo.HeadingY = mob.Rotation.yf;
+                mobdbo.HeadingZ = mob.Rotation.zf;
                 if (mob.Waypoints.Count > 0)
                 {
                     List<MobSpawnWaypoint> temp = this.GetMobWaypoints(mob);
@@ -263,9 +263,9 @@ namespace ZoneEngine.ChatCommands
                 waypoint.Identity = mob.Identity.Instance;
                 waypoint.Playfield = mob.Playfield.Identity.Instance;
                 waypoint.WalkMode = wp.Running ? 1 : 0;
-                waypoint.X = wp.Position.xf;
-                waypoint.Y = wp.Position.yf;
-                waypoint.Z = wp.Position.zf;
+                waypoint.X = (float)wp.Position.xf;
+                waypoint.Y = (float)wp.Position.yf;
+                waypoint.Z = (float)wp.Position.zf;
                 temp.Add(waypoint);
             }
             return temp;

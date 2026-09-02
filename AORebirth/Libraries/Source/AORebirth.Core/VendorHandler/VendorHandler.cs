@@ -70,8 +70,8 @@ namespace AORebirth.Core.VendorHandler
             if (statelData != null)
             {
                 v.OriginalIdentity = statelData.Identity;
-                v.RawCoordinates = new Vector3(statelData.X, statelData.Y, statelData.Z);
-                v.Heading = new Quaternion(
+                v.Position = new Vector3(statelData.X, statelData.Y, statelData.Z);
+                v.Rotation = new Quaternion(
                     statelData.HeadingX,
                     statelData.HeadingY,
                     statelData.HeadingZ,
@@ -79,8 +79,8 @@ namespace AORebirth.Core.VendorHandler
             }
             else
             {
-                v.RawCoordinates = new Vector3(vendor.X, vendor.Y, vendor.Z);
-                v.Heading = new Quaternion(vendor.HeadingX, vendor.HeadingY, vendor.HeadingZ, vendor.HeadingW);
+                v.Position = new Vector3(vendor.X, vendor.Y, vendor.Z);
+                v.Rotation = new Quaternion(vendor.HeadingX, vendor.HeadingY, vendor.HeadingZ, vendor.HeadingW);
             }
 
             v.Playfield = playfield;
@@ -99,8 +99,8 @@ namespace AORebirth.Core.VendorHandler
                                     };
             Vendor v = new Vendor(pfIdentity, freeIdentity, statelData.TemplateId);
             v.OriginalIdentity = statelData.Identity;
-            v.RawCoordinates = new Vector3(statelData.X, statelData.Y, statelData.Z);
-            v.Heading = new Quaternion(
+            v.Position = new Vector3(statelData.X, statelData.Y, statelData.Z);
+            v.Rotation = new Quaternion(
                 statelData.HeadingX,
                 statelData.HeadingY,
                 statelData.HeadingZ,

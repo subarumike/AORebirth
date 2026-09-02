@@ -379,8 +379,8 @@ namespace AORebirth.Core.Playfields
                                  && candidate.Controller is PlayerController
                                  && candidate.Stats[StatIds.health].Value > 0)
                 .OrderBy(
-                    candidate => candidate.Coordinates().coordinate.Distance2D(
-                        npc.Coordinates().coordinate))
+                    candidate => candidate.CalculatePredictedPosition().coordinate.Distance2D(
+                        npc.CalculatePredictedPosition().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .FirstOrDefault();
         }
@@ -1691,18 +1691,13 @@ namespace AORebirth.Core.Playfields
             character.Name = definition.DisplayName;
             character.FirstName = string.Empty;
             character.LastName = string.Empty;
-            character.Coordinates(
-                new Coordinate
-                {
-                    x = definition.X,
-                    y = definition.Y,
-                    z = definition.Z
-                });
-            character.RawHeading = new AORebirth.Core.Vector.Quaternion(
-                definition.HeadingX,
-                definition.HeadingY,
-                definition.HeadingZ,
-                definition.HeadingW);
+            character.SetPose(
+                new Coordinate(definition.X, definition.Y, definition.Z),
+                new AORebirth.Core.Vector.Quaternion(
+                    definition.HeadingX,
+                    definition.HeadingY,
+                    definition.HeadingZ,
+                    definition.HeadingW));
 
             SetStat(character, StatIds.side, definition.Side);
             SetStat(character, StatIds.fatness, definition.Fatness);
