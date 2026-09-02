@@ -613,5 +613,7 @@ namespace Utility
         Shopping = 32768,
 
         Combat = 65536,
+
+        Locality = 131072,
     }
 }
