@@ -290,6 +290,26 @@ namespace ZoneEngine.Core.MessageHandlers
                     client,
                     client.Controller.Character);
             }
+            else if (client.Controller.Character.Playfield != null
+                     && AORebirth.Core.Playfields.NascenceDungeon3Rules.IsDungeonPlayfield(
+                         client.Controller.Character.Playfield.Identity.Instance))
+            {
+                AORebirth.Core.Playfields.NascenceDungeon3SearchRuntime.ClearForCharacter(
+                    client.Controller.Character);
+                AORebirth.Core.Playfields.NascenceDungeon3DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else if (client.Controller.Character.Playfield != null
+                     && AORebirth.Core.Playfields.NascenceDungeon4Rules.IsDungeonPlayfield(
+                         client.Controller.Character.Playfield.Identity.Instance))
+            {
+                AORebirth.Core.Playfields.NascenceDungeon4SearchRuntime.ClearForCharacter(
+                    client.Controller.Character);
+                AORebirth.Core.Playfields.NascenceDungeon4DoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
             else
             {
                 ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(

@@ -66,6 +66,10 @@ namespace ZoneEngine.Core.Missions
                 AORebirth.Core.Playfields.NascenceDungeon1Rules.DungeonPlayfieldId);
             this.unavailablePlayfields.Add(
                 AORebirth.Core.Playfields.NascenceDungeon2Rules.DungeonPlayfieldId);
+            this.unavailablePlayfields.Add(
+                AORebirth.Core.Playfields.NascenceDungeon3Rules.DungeonPlayfieldId);
+            this.unavailablePlayfields.Add(
+                AORebirth.Core.Playfields.NascenceDungeon4Rules.DungeonPlayfieldId);
             for (int i = 0; i < catalog.Layouts.Count; i++)
             {
                 this.unavailablePlayfields.Add(catalog.Layouts[i].SourcePlayfield2);

@@ -320,11 +320,11 @@ namespace ZoneEngine.Core
                 throw new Exception("Character " + charId + " not found.");
             }
 
-            // Remap earlier rebirth dungeon attempts (live dyn 0x1F804E / stub 362) onto the
-            // reserved ACG-band id the client will generate.
+            // Remap earlier rebirth dungeon attempts onto a fresh ACG-band lease so PF Map fog
+            // starts black (fixed id reuse preserves client explored map cells).
             if (NascenceDungeon1Rules.IsLegacyDungeonPlayfield(character.Playfield))
             {
-                character.Playfield = NascenceDungeon1Rules.DungeonPlayfieldId;
+                character.Playfield = NascenceDungeon1Rules.AllocateDynamicPlayfieldId();
                 CharacterDao.Instance.Save(character);
                 CharacterDao.Instance.SetPlayfield(
                     charId,
@@ -339,6 +339,14 @@ namespace ZoneEngine.Core
                         charId));
             }
 
+            // After ZoneEngine restart, dyn ACG leases are gone from memory. Re-adopt the
+            // saved PF into D1/D2/D3 using externaldoor / exterior / interior X so login
+            // does not stamp the wrong cave (D3 logoff → D2/D1 logon).
+            NascenceDungeonLeaseRehydrate.RehydrateBeforePlayfieldCreate(character);
+
+            // Capture zone hops dispose the old Dynel and often allocate a new Character on the
+            // destination PF. That must still count as playfield transfer — otherwise
+            // SyncXpBarStatsOnLogin replays NewLevel + LastXp as "You received N xp / New Level".
             bool isZoningReload = this.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning;
             this.IsPlayfieldTransferLogin = false;
             this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();
@@ -394,7 +402,7 @@ namespace ZoneEngine.Core
 
             if (pooledCharacter == null)
             {
-                this.Controller.Character = new Character(
+                this.Controller.Character = new PlayerCharacter(
                     pf.Identity,
                     characterIdentity,
                     this.Controller);
@@ -440,9 +448,14 @@ namespace ZoneEngine.Core
                     {
                         DiscardUntrustedPooledCharacter(pooledCharacter, "inventory hydration was incomplete");
                         pooledCharacter = null;
-                        this.IsPlayfieldTransferLogin = false;
+                        // Keep transfer flag if this was a zoning hop; only true reconnect resets it.
+                        if (!isZoningReload)
+                        {
+                            this.IsPlayfieldTransferLogin = false;
+                        }
+
                         preserveLogoutSitOnConnect = false;
-                        this.Controller.Character = new Character(
+                        this.Controller.Character = new PlayerCharacter(
                             pf.Identity,
                             characterIdentity,
                             this.Controller);
@@ -456,6 +469,13 @@ namespace ZoneEngine.Core
                 }
             }
 
+            // Zone hop always allocates or rematerializes into a destination PF — mark transfer
+            // even when Pool had no reusable Character (ACG D3 entry / PF change dispose path).
+            if (isZoningReload)
+            {
+                this.IsPlayfieldTransferLogin = true;
+            }
+
             this.PreserveLogoutSitOnConnect = preserveLogoutSitOnConnect;
 
             this.Controller.Character.Playfield = pf;
@@ -464,7 +484,15 @@ namespace ZoneEngine.Core
             CombatXpRuntimeService.NormalizeLevelStatBaseValue(this.Controller.Character);
             if (pooledCharacter == null)
             {
-                MissionRuntime.ReloadForLogin(charId);
+                // Fresh Character on zone hop is still a transfer — do not run cold-login XP reconcile.
+                if (isZoningReload)
+                {
+                    MissionRuntime.ReloadForZoning(charId);
+                }
+                else
+                {
+                    MissionRuntime.ReloadForLogin(charId);
+                }
             }
             else if (isZoningReload)
             {

@@ -1648,6 +1648,20 @@ namespace ZoneEngine.Core
                     {
                         ICharacter usedCharacter = client.Controller.Character;
                         GenericCmdMessageHandler.Default.Acknowledge(usedCharacter, message);
+                        // Capture/combat: Use ACK alone can leave Attack blocked with
+                        // "Please wait until previous action has finished".
+                        usedCharacter.Controller.Client.SendCompressed(
+                            new CharacterActionMessage
+                            {
+                                Identity = usedCharacter.Identity,
+                                Unknown = 0,
+                                Action = CharacterActionType.UseActionFinished,
+                                Unknown1 = 0,
+                                Target = Identity.None,
+                                Parameter1 = 0,
+                                Parameter2 = 0,
+                                Unknown2 = 0
+                            });
 
                         // Capture 20260723-123341: AppearanceUpdate after Use ACK when Shouldermesh ran.
                         Character concrete = usedCharacter as Character;
@@ -1662,6 +1676,24 @@ namespace ZoneEngine.Core
                         // Prefer Denied so client does not consume Stack/Empty charges on failed uses
                         // (e.g. Treatment skill locked).
                         GenericCmdMessageHandler.Default.AcknowledgeDenied(client.Controller.Character, message);
+                        ICharacter deniedCharacter = client.Controller.Character;
+                        if (deniedCharacter != null
+                            && deniedCharacter.Controller != null
+                            && deniedCharacter.Controller.Client != null)
+                        {
+                            deniedCharacter.Controller.Client.SendCompressed(
+                                new CharacterActionMessage
+                                {
+                                    Identity = deniedCharacter.Identity,
+                                    Unknown = 0,
+                                    Action = CharacterActionType.UseActionFinished,
+                                    Unknown1 = 0,
+                                    Target = Identity.None,
+                                    Parameter1 = 0,
+                                    Parameter2 = 0,
+                                    Unknown2 = 0
+                                });
+                        }
                     }
 
                     return true;
@@ -1681,8 +1713,12 @@ namespace ZoneEngine.Core
                         && target.Type == IdentityType.Container
                         && (NascenceDungeon1TreasureLootService.IsTreasureChest(target)
                             || NascenceDungeon2TreasureLootService.IsTreasureChest(target)
+                            || NascenceDungeon3TreasureLootService.IsTreasureChest(target)
+                            || NascenceDungeon4TreasureLootService.IsTreasureChest(target)
                             || NascenceDungeon1RevealZones.IsKnownChestInstance(target.Instance)
-                            || NascenceDungeon2RevealZones.IsKnownChestInstance(target.Instance)))
+                            || NascenceDungeon2RevealZones.IsKnownChestInstance(target.Instance)
+                            || NascenceDungeon3RevealZones.IsKnownChestInstance(target.Instance)
+                            || NascenceDungeon4RevealZones.IsKnownChestInstance(target.Instance)))
                     {
                         return false;
                     }
@@ -1984,22 +2020,34 @@ namespace ZoneEngine.Core
                         toPlacement,
                         itemTo != null ? 1 : 0));
 
+                string equipFailureDetail;
                 if (receivingPage.NeedsItemCheck
-                    && !this.CanEquipToPage(character, receivingPage, itemFrom, toPlacement, itemTo))
+                    && !this.CanEquipToPage(
+                        character,
+                        receivingPage,
+                        itemFrom,
+                        toPlacement,
+                        itemTo,
+                        out equipFailureDetail))
                 {
                     LogUtil.Debug(
                         DebugInfoDetail.Error,
                         string.Format(
-                            "ClientMoveItemToInventory equip requirements failed item={0}/{1}:{2} source={3} targetPlacement={4} character={5}",
+                            "ClientMoveItemToInventory equip requirements failed item={0}/{1}:{2} source={3} targetPlacement={4} character={5} detail={6}",
                             itemFrom.LowID,
                             itemFrom.HighID,
                             itemFrom.Quality,
                             message.SourceContainer,
                             toPlacement,
-                            character.Identity));
-                    ChatTextMessageHandler.Default.Send(
-                        character,
-                        "You do not meet the requirements to equip that item.");
+                            character.Identity,
+                            equipFailureDetail ?? string.Empty));
+                    string chatMessage = "You do not meet the requirements to equip that item.";
+                    if (!string.IsNullOrEmpty(equipFailureDetail))
+                    {
+                        chatMessage += " [" + equipFailureDetail + "]";
+                    }
+
+                    ChatTextMessageHandler.Default.Send(character, chatMessage);
                     return true;
                 }
 
@@ -2405,8 +2453,10 @@ namespace ZoneEngine.Core
             IInventoryPage page,
             IItem item,
             int targetSlot,
-            IItem currentlyEquipped)
+            IItem currentlyEquipped,
+            out string failureDetail)
         {
+            failureDetail = null;
             // Capture 20260721-Mason: after surgery clinic, gift leg 295706 equips to ImplantPage:002B.
             // Clinic nano Treatment can still be short if OnUse missed; allow the quest gift while
             // implant access is active so Install tip can complete.
@@ -2440,7 +2490,36 @@ namespace ZoneEngine.Core
                 }
             }
 
-            return action == null || action.CheckRequirements(character);
+            return action == null || this.CheckEquipRequirements(character, item, action, out failureDetail);
+        }
+
+        private bool CheckEquipRequirements(
+            ICharacter character,
+            IItem item,
+            AOAction action,
+            out string failureDetail)
+        {
+            failureDetail = null;
+            if (action == null)
+            {
+                return true;
+            }
+
+            if (action.TryCheckRequirements(character, out failureDetail))
+            {
+                return true;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                string.Format(
+                    "CanEquipToPage requirements failed item={0}/{1}:{2} character={3} detail={4}",
+                    item.LowID,
+                    item.HighID,
+                    item.Quality,
+                    character.Identity,
+                    failureDetail));
+            return false;
         }
 
         private bool RequiresImplantAccess(IInventoryPage page)

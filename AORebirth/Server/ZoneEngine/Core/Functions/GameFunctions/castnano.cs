@@ -117,6 +117,11 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 {
                     character.SetTarget(previousSelected);
                 }
+
+                if (character.Controller != null)
+                {
+                    character.Controller.SendChangedStats();
+                }
             }
 
             int duration = nano.getItemAttribute(8);
@@ -128,6 +133,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                     nanoId,
                     duration);
             }
+
+            // Sole MapsC writer: unlock only while Overview is in ActiveNanos.
+            NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,

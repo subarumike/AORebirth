@@ -294,8 +294,34 @@ namespace ZoneEngine.Core.Packets
                     corpseCredits);
             }
 
-            // Prefer D2 capture templates on the D2 playfield (shared names/MDs with D1).
-            byte[] nascenceDungeonCorpse = NascenceDungeon2CorpseCapture.TryBuild(
+            // Prefer D4/D3/D2 capture templates on their own playfields (shared names/MDs across dungeons).
+            byte[] nascenceDungeonCorpse = NascenceDungeon4CorpseCapture.TryBuild(
+                deadNpc,
+                corpseIdentity,
+                receiver,
+                serverId,
+                corpseCatMesh,
+                corpseMonsterData,
+                corpseCredits);
+            if (nascenceDungeonCorpse != null)
+            {
+                return nascenceDungeonCorpse;
+            }
+
+            nascenceDungeonCorpse = NascenceDungeon3CorpseCapture.TryBuild(
+                deadNpc,
+                corpseIdentity,
+                receiver,
+                serverId,
+                corpseCatMesh,
+                corpseMonsterData,
+                corpseCredits);
+            if (nascenceDungeonCorpse != null)
+            {
+                return nascenceDungeonCorpse;
+            }
+
+            nascenceDungeonCorpse = NascenceDungeon2CorpseCapture.TryBuild(
                 deadNpc,
                 corpseIdentity,
                 receiver,

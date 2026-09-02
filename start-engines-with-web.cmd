@@ -1,2 +1,2 @@
 @echo off
-powershell -NoProfile -File "%~dp0start-engines.ps1" -WithWeb
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -WithWeb

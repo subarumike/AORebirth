@@ -117,11 +117,17 @@ namespace ZoneEngine.Core.MessageHandlers
                     break;
                 case GenericCmdAction.Use:
                     var playfield = client.Controller.Character.Playfield as AORebirth.Core.Playfields.Playfield;
+                    ICharacter useCharacter = client.Controller.Character;
                     if (playfield != null && playfield.TryHandleGenericCmdUse(client, message, target))
                     {
+                        ClientActionBusyRuntime.Clear(useCharacter);
                         break;
                     }
 
+                    // Unhandled Use leaves the client busy ("Please wait until previous action…")
+                    // until sit/stand. Deny + clear so Attack is not stuck.
+                    AcknowledgeDenied(useCharacter, message);
+                    ClientActionBusyRuntime.Clear(useCharacter);
                     break;
                 case GenericCmdAction.UseItemOnItem:
                     UseItemOnItemInteractionHandler.Default.TryHandle(client, message);
@@ -224,6 +230,29 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.User = message.User;
                 x.Unknown = 0;
             };
+        }
+
+        private static void SendUseActionFinished(ICharacter character)
+        {
+            if (character == null
+                || character.Controller == null
+                || character.Controller.Client == null)
+            {
+                return;
+            }
+
+            character.Controller.Client.SendCompressed(
+                new CharacterActionMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.UseActionFinished,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = 0,
+                    Unknown2 = 0
+                });
         }
 
         #endregion

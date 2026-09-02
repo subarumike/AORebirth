@@ -483,6 +483,7 @@ namespace WebEngine
             {
                 // Setup and enable NLog logging to file
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
+                LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/WebEngineLog.txt", LogLevel.Trace);
 
                 // NBug initialization

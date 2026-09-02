@@ -298,7 +298,6 @@ namespace AORebirth.Core.Playfields
                 character,
                 sourceContainer,
                 transfer.TargetSlot);
-            AddTemplateMessageHandler.Default.Send(character, item);
 
             SendInventoryUpdate(character, chest);
 

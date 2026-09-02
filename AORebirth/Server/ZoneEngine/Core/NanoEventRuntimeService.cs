@@ -18,14 +18,21 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Events;
     using AORebirth.Core.Functions;
     using AORebirth.Core.Nanos;
+    using AORebirth.Core.Network;
+    using AORebirth.Database.Dao;
+    using AORebirth.Database.Entities;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
 
     using MsgPack;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.Functions;
+    using ZoneEngine.Core.MessageHandlers;
+
+    using Utility;
 
     #endregion
 
@@ -72,6 +79,194 @@ namespace ZoneEngine.Core
             {
                 currentExecution = previous;
             }
+        }
+
+        /// <summary>
+        /// Reverse OnUse SetFlag bits when a nano leaves NCU (e.g. Overview of Nascence and
+        /// Jobe 223767). Without this, MapsC stays set and Ctrl+5 PF map / red dots remain.
+        /// </summary>
+        public void ReverseOnUseSetFlags(ICharacter character, int nanoId)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            NanoFormula nano;
+            if (!NanoLoader.NanoList.TryGetValue(nanoId, out nano)
+                || nano == null
+                || nano.Events == null)
+            {
+                return;
+            }
+
+            foreach (Event nanoEvent in nano.Events.Where(x => x.EventType == EventType.OnUse))
+            {
+                if (nanoEvent.Functions == null)
+                {
+                    continue;
+                }
+
+                foreach (Function function in nanoEvent.Functions)
+                {
+                    if (function == null
+                        || function.FunctionType != (int)FunctionType.SetFlag
+                        || function.Arguments == null
+                        || function.Arguments.Values == null
+                        || function.Arguments.Values.Count < 2)
+                    {
+                        continue;
+                    }
+
+                    FunctionCollection.Instance.CallFunction(
+                        (int)FunctionType.ClearFlag,
+                        character,
+                        character,
+                        character,
+                        function.Arguments.Values.ToArray());
+                }
+            }
+
+            FlushChangedStats(character);
+        }
+
+        private static void FlushChangedStats(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            if (character.Controller != null)
+            {
+                character.Controller.SendChangedStats();
+                return;
+            }
+
+            StatMessageHandler.Default.SendChanged(character);
+        }
+
+        /// <summary>
+        /// Capture 20260830-110744: Overview of Nascence and Jobe (223767) gates Nascence/Jobe
+        /// PF map (MapsC / mapareapart3). Client shows "Map Not Available" when MapsC==0;
+        /// capture end profile MapsC=403669119 while the nano is in NCU.
+        /// Live cast does not rely on MapsC Stat alone (client SetFlag on NCU add); stuck unlock
+        /// is cleared by FullCharacter MapsC=0 + immediate SendCompressed + SQL persist.
+        /// </summary>
+        public void SyncOverviewMapFlags(ICharacter character, bool pushWire = true)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            const int overviewOfNascenceAndJobeNanoId = 223767;
+            const uint overviewMapsC = 403669119u;
+
+            bool hasOverview = character.ActiveNanos != null
+                && character.ActiveNanos.Values.Any(
+                    x => x != null && x.ID == overviewOfNascenceAndJobeNanoId);
+
+            uint desired = hasOverview ? overviewMapsC : 0u;
+            int mapsCStatId = (int)StatIds.mapareapart3;
+
+            // Capture 20260830-124309: client ClearFlag MapsC needs Buff remove when Overview
+            // truly leaves NCU. That path is CompleteFriendlyNanoRemoval / SendRemoveNanoBuff
+            // from RemoveActiveNanoByStrain (user cancel / expiry).
+            // Do NOT Buff-remove from this sync: PrepareCharacterForLogin + ClientConnected call
+            // SyncOverviewMapFlags while ActiveNanos are empty mid-zone, before delayed restore.
+            // That spammed "Nanoprogram Overview of Nascence and Jobe terminated..." and bogus
+            // XP/level chat on every playfield hop. MapsC StatMessage below is enough for the
+            // interim "Map Not Available" until Overview is restored into NCU.
+
+            // .Set updates BaseValue the same way ClearFlag/SetFlag do; SetBaseValue alone left
+            // stale Values that later Write() persisted as unlocked MapsC.
+            character.Stats[mapsCStatId].Set(desired);
+            character.Stats[mapsCStatId].Changed = true;
+            try
+            {
+                PersistMapsC(character, desired);
+            }
+            catch (Exception)
+            {
+                // SQL persist must not abort FullCharacter MapsC=0.
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    "MAPSC_SYNC char={0} hasOverview={1} mapsC={2} pushWire={3} activeCount={4}",
+                    character.Identity.Instance,
+                    hasOverview,
+                    desired,
+                    pushWire,
+                    character.ActiveNanos != null ? character.ActiveNanos.Count : 0));
+            Console.WriteLine(
+                "MAPSC_SYNC char={0} hasOverview={1} mapsC={2} pushWire={3} buffClear=0",
+                character.Identity.Instance,
+                hasOverview,
+                desired,
+                pushWire);
+
+            if (!pushWire)
+            {
+                return;
+            }
+
+            IZoneClient client = character.Controller != null ? character.Controller.Client : null;
+            if (client != null)
+            {
+                // Same immediate SendCompressed pattern as XP-bar LastSaveXP (not buffered Send).
+                client.SendCompressed(
+                    new StatMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        Stats =
+                            new[]
+                            {
+                                new GameTuple<CharacterStat, uint>
+                                {
+                                    Value1 = CharacterStat.MapsC,
+                                    Value2 = desired
+                                }
+                            }
+                    });
+            }
+        }
+
+        private static void PersistMapsC(ICharacter character, uint mapsC)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            int characterId = character.Identity.Instance;
+            DBStats stat = StatDao.Instance
+                .GetAll(new { Type = 50000, Instance = characterId, StatId = (int)StatIds.mapareapart3 })
+                .FirstOrDefault();
+
+            if (stat == null)
+            {
+                StatDao.Instance.Add(
+                    new DBStats
+                    {
+                        Type = 50000,
+                        Instance = characterId,
+                        StatId = (int)StatIds.mapareapart3,
+                        StatValue = (int)mapsC
+                    });
+                return;
+            }
+
+            if (stat.StatValue == (int)mapsC)
+            {
+                return;
+            }
+
+            stat.StatValue = (int)mapsC;
+            StatDao.Instance.Save(stat);
         }
 
         public bool ExecuteCapturedOnUseEvents(

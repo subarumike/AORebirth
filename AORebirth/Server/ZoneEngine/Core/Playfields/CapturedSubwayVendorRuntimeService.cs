@@ -110,7 +110,7 @@ namespace ZoneEngine.Core.Playfields
                 int instance = Pool.Instance.GetFreeInstance<Character>(1000000, IdentityType.CanbeAffected);
                 var identity = new Identity { Type = IdentityType.CanbeAffected, Instance = instance };
                 var controller = new NPCController();
-                character = new Character(playfieldIdentity, identity, controller);
+                character = new NpcCharacter(playfieldIdentity, identity, controller);
                 character.Read();
                 controller.Character = character;
                 character.Playfield = playfield;

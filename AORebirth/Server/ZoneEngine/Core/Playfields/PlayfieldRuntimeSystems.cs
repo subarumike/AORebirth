@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.Playfields
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Items;
@@ -109,6 +110,7 @@ namespace ZoneEngine.Core.Playfields
         internal PlayfieldRuntimeSystems(
             Playfield playfield,
             Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry,
             Func<Identity, bool> isPrivateCityPlayfieldCandidate,
             Func<int, bool> isCapturedMontroyalPrivateCityInstance,
             Func<ICharacter, int> resolveCharacterOrganizationInstance,
@@ -118,6 +120,11 @@ namespace ZoneEngine.Core.Playfields
             if (playfield == null)
             {
                 throw new ArgumentNullException("playfield");
+            }
+
+            if (dynelRegistry == null)
+            {
+                throw new ArgumentNullException("dynelRegistry");
             }
 
             this.playfield = playfield;
@@ -132,6 +139,8 @@ namespace ZoneEngine.Core.Playfields
                 new NascenceLifeContentModule(),
                 new NascenceDungeon1ContentModule(),
                 new NascenceDungeon2ContentModule(),
+                new NascenceDungeon3ContentModule(),
+                new NascenceDungeon4ContentModule(),
                 new ThrakOmniGardenContentModule(),
                 new DojaResearchContentModule(),
                 new RomeBlueCityContentModule(),
@@ -145,7 +154,7 @@ namespace ZoneEngine.Core.Playfields
             this.aotomationDelivery = new PlayfieldAOtomationDeliveryRuntimeService();
             this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();
             this.characterHeartbeat = new PlayfieldCharacterHeartbeatRuntimeService();
-            this.dynelRegistry = new PlayfieldDynelRegistry(playfieldIdentity);
+            this.dynelRegistry = dynelRegistry;
             this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();
             this.objectLifecycle = new PlayfieldObjectLifecycleRuntimeService();
             this.objectMaterialization = new PlayfieldObjectMaterializationRuntimeService();
@@ -628,9 +637,33 @@ namespace ZoneEngine.Core.Playfields
             ICharacter recipient,
             Action<ICharacter, MessageBody> sendVisibilityMessage)
         {
+            return this.ForceCharacterVisibilityToRecipient(
+                source,
+                recipient,
+                sendVisibilityMessage,
+                false);
+        }
+
+        /// <param name="forceResend">
+        /// When false, skip if already visible (avoids mid-fight SCFU HP flash).
+        /// When true, always send SCFU+CharInPlay (Havaris boss button / first spawn).
+        /// </param>
+        internal bool ForceCharacterVisibilityToRecipient(
+            ICharacter source,
+            ICharacter recipient,
+            Action<ICharacter, MessageBody> sendVisibilityMessage,
+            bool forceResend)
+        {
             if (source == null || recipient == null)
             {
                 return false;
+            }
+
+            if (!forceResend
+                && this.visibilityInterest.VisibleRecipientsForSource(source.Identity).Any(
+                    visibleRecipient => visibleRecipient.Identity == recipient.Identity))
+            {
+                return true;
             }
 
             this.visibilityInterest.Register(source);

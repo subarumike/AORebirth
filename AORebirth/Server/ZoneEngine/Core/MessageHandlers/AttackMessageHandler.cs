@@ -50,6 +50,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core;
     using ZoneEngine.Core.Arete.Dialogue;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -80,6 +82,10 @@ namespace ZoneEngine.Core.MessageHandlers
             ICharacter character = client.Controller.Character;
             ICharacter target = Pool.Instance.GetObject<ICharacter>(character.Playfield.Identity, message.Target);
 
+            // Client blocks Attack/specials until UseActionFinished (Mike: Wait for finish).
+            ClientActionBusyRuntime.Clear(character);
+            RefreshWeaponVisuals(character);
+
             client.Server.Debug(
                 client,
                 "Attack action={0} target={1} targetFound={2} targetHealth={3}",
@@ -93,6 +99,7 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                ClientActionBusyRuntime.Clear(character);
                 return;
             }
 
@@ -104,6 +111,7 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                ClientActionBusyRuntime.Clear(character);
                 client.Server.Info(client, "Attack ignored: mission instance ownership mismatch.");
                 return;
             }
@@ -115,6 +123,7 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                ClientActionBusyRuntime.Clear(character);
                 client.Server.Info(client, "Attack ignored: mission spatial ownership mismatch.");
                 return;
             }
@@ -123,6 +132,7 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                ClientActionBusyRuntime.Clear(character);
                 client.Server.Info(client, "Attack ignored for non-attackable target.");
                 return;
             }
@@ -131,6 +141,7 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                ClientActionBusyRuntime.Clear(character);
                 client.Server.Info(client, "Attack ignored: suppression gas / PvP flag rules.");
                 return;
             }
@@ -140,19 +151,8 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 this.CancelPlayerAttack(character);
                 this.SendAttackState(character, Identity.None, 0);
+                ClientActionBusyRuntime.Clear(character);
                 client.Server.Info(client, "Attack ignored: morph RestrictAction (no fighting).");
-                return;
-            }
-
-
-            // HACK
-            // TODO: Remove once pathing is implemented.
-            Playfield attackPlayfield = character.Playfield as Playfield;
-            if (attackPlayfield != null && !attackPlayfield.IsPlayerAttackInRange(character, target))
-            {
-                this.CancelPlayerAttack(character);
-                this.SendAttackState(character, Identity.None, 0);
-                client.Server.Info(client, "Attack ignored: out of weapon range.");
                 return;
             }
 
@@ -160,7 +160,6 @@ namespace ZoneEngine.Core.MessageHandlers
             this.EngageNpcTarget(character, target);
             this.SendCombatStartSpecialAttackWeapon(character);
             this.SendAttackState(character, message.Target, message.Action);
-
             PetCommandService.OnOwnerEngagedCombat(character, message.Target);
         }
 
@@ -178,13 +177,15 @@ namespace ZoneEngine.Core.MessageHandlers
             this.ResetCombatTick(character);
         }
 
-        private void TryPlayerFirstCombatTick(ICharacter character)
+        private static void RefreshWeaponVisuals(ICharacter character)
         {
-            Playfield playfield = character.Playfield as Playfield;
-            if (playfield != null)
+            if (character == null)
             {
-                playfield.TryPlayerFirstCombatTick(character);
+                return;
             }
+
+            InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, true);
+            WeaponItemFullUpdate.SendWeaponDefinitions(character);
         }
 
         private void CancelPlayerAttack(ICharacter character)

@@ -8,6 +8,8 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
+    using AORebirth.Database.Dao;
+    using AORebirth.Database.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -307,13 +309,12 @@ namespace AORebirth.Core.Playfields
                 character,
                 sourceContainer,
                 transfer.TargetSlot);
-            AddTemplateMessageHandler.Default.Send(character, item);
             ChatTextMessageHandler.Default.Send(
                 character,
                 string.Format(
                     System.Globalization.CultureInfo.InvariantCulture,
                     "You looted {0}.",
-                    item.LowID));
+                    ResolveLootItemDisplayName(item)));
 
             LogUtil.Debug(
                 DebugInfoDetail.Error,
@@ -352,6 +353,36 @@ namespace AORebirth.Core.Playfields
 
             SendUseActionFinished(character);
             return true;
+        }
+
+        private static string ResolveLootItemDisplayName(Item item)
+        {
+            if (item == null)
+            {
+                return "an item";
+            }
+
+            DBItemName itemName = ItemNamesDao.Instance.Get(item.LowID);
+            if (itemName != null && !string.IsNullOrWhiteSpace(itemName.Name))
+            {
+                return itemName.Name;
+            }
+
+            itemName = ItemNamesDao.Instance.Get(item.HighID);
+            if (itemName != null && !string.IsNullOrWhiteSpace(itemName.Name))
+            {
+                return itemName.Name;
+            }
+
+            if (item.LowID == 220519 || item.HighID == 220519)
+            {
+                return "Cracked Crystal (Shock Absorber)";
+            }
+
+            return string.Format(
+                System.Globalization.CultureInfo.InvariantCulture,
+                "item {0}",
+                item.LowID);
         }
 
         private static bool TryCreateLootItem(TreasureLootSlot slot, out Item item)

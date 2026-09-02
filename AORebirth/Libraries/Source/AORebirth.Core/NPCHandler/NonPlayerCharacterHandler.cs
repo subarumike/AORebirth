@@ -175,7 +175,7 @@ namespace AORebirth.Core.NPCHandler
                         };
                 }
 
-                Character mobCharacter = new Character(playfield.Identity, newIdentity, controller);
+                Character mobCharacter = new NpcCharacter(playfield.Identity, newIdentity, controller);
                 mobCharacter.Read();
                 mobCharacter.Coordinates(coord);
                 mobCharacter.Playfield = Pool.Instance.GetObject<IPlayfield>(Identity.None, playfieldIdentity);
@@ -245,7 +245,7 @@ namespace AORebirth.Core.NPCHandler
                 }
 
                 Pool.Instance.PurgeResidualChildren(mobId);
-                Character cmob = new Character(playfield.Identity, mobId, npccontroller);
+                Character cmob = new NpcCharacter(playfield.Identity, mobId, npccontroller);
                 cmob.Read();
                 cmob.Playfield = playfield;
                 cmob.Coordinates(new Coordinate() { x = mob.X, y = mob.Y, z = mob.Z });

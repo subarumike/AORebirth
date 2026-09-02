@@ -106,6 +106,11 @@ namespace ZoneEngine.Core
 
                     this.SyncPersistedStore(character);
                     this.SyncCurrentNcuStat(character);
+                    if (nanoId == 223767)
+                    {
+                        NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
+                    }
+
                     return true;
                 }
             }
@@ -129,6 +134,12 @@ namespace ZoneEngine.Core
             character.ActiveNanos[strain] = state;
             this.SyncPersistedStore(character);
             this.SyncCurrentNcuStat(character);
+
+            // Overview of Nascence and Jobe: MapsC only while this nano is in ActiveNanos.
+            if (nanoId == 223767)
+            {
+                NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
+            }
 
             if (durationCentiseconds > 0)
             {
@@ -276,6 +287,9 @@ namespace ZoneEngine.Core
 
                 this.SyncPersistedStore(character);
                 AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
+                // Capture 20260830-124309: MapsC can stay 403669119 after Overview expired /
+                // ActiveNanos miss. Cancel still must force MapsC=0 for "Map Not Available".
+                NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
                 return;
             }
 
@@ -320,6 +334,9 @@ namespace ZoneEngine.Core
             AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
 
             this.SyncPersistedStore(character);
+            // Capture 20260830-124309: after Overview leave NCU, force MapsC Stat wire
+            // (SendCompressed) so PF Map returns to "Map Not Available".
+            NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
         }
 
         private List<ActiveNanoRemovalTarget> BuildRemovalTargets(ICharacter character, CharacterActionMessage message)
@@ -450,14 +467,21 @@ namespace ZoneEngine.Core
 
         public void PrepareCharacterForLogin(ICharacter character)
         {
-            if (character == null || character.ActiveNanos.Count == 0)
+            if (character == null)
             {
                 return;
             }
 
-            this.CancelAllExpiryTimersForCharacter(character.Identity.Instance);
-            character.ActiveNanos.Clear();
-            this.SyncCurrentNcuStat(character);
+            if (character.ActiveNanos.Count > 0)
+            {
+                this.CancelAllExpiryTimersForCharacter(character.Identity.Instance);
+                character.ActiveNanos.Clear();
+                this.SyncCurrentNcuStat(character);
+            }
+
+            // Capture 20260830-110744: clear MapsC before FullCharacter so PF Map shows
+            // "Map Not Available" until Overview of Nascence and Jobe is restored/cast into NCU.
+            NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
         }
 
         public void PersistCharacterActiveNanos(ICharacter character)
@@ -551,6 +575,7 @@ namespace ZoneEngine.Core
             if (persistedNanos == null || persistedNanos.Count == 0)
             {
                 AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
+                NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
                 return;
             }
 
@@ -621,6 +646,8 @@ namespace ZoneEngine.Core
 
             AdventurerMorphFlightRuntime.EnsureMorphStateMatchesActiveNanos(character);
             AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
+            // Capture 20260830-110744: MapsC (PF map) only while Overview nano is in NCU.
+            NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
         }
 
         public void CleanupOrphanSummonPetNanosAfterPetRestore(ICharacter character)
@@ -714,6 +741,8 @@ namespace ZoneEngine.Core
 
                 // No NCU restore — still clear orphan hoverboard/Phasefront mesh after
                 // FullCharacter (HealOrphaned may have run before client applied SCFU).
+                // Also re-sync MapsC after FullCharacter so "Map Not Available" sticks
+                // if DB still had leftover Overview map bits.
                 ThreadPool.QueueUserWorkItem(
                     _ =>
                     {
@@ -727,6 +756,7 @@ namespace ZoneEngine.Core
                         }
 
                         AdventurerMorphFlightRuntime.TryClearOrphanVehicleMorph(character);
+                        NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
                     });
                 return;
             }
@@ -846,7 +876,11 @@ namespace ZoneEngine.Core
             int nanoId = activeNano.ID;
             int nanoInstance = activeNano.Instance;
             NanoEventRuntimeService.Default.RemoveModifiers(character, nanoId);
+            // Capture 20260830-110744: Overview map nanos SetFlag MapsC on cast; clear on NCU remove
+            // so PF map shows "Map Not Available" without Overview of Nascence and Jobe in NCU.
             character.ActiveNanos.Remove(strain);
+            NanoEventRuntimeService.Default.ReverseOnUseSetFlags(character, nanoId);
+            NanoEventRuntimeService.Default.SyncOverviewMapFlags(character);
             this.CancelExpiryTimer(character.Identity.Instance, strain);
 
             if (NanoEventRuntimeService.Default.HasSummonPetOnUse(nanoId))

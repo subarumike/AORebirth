@@ -2,6 +2,7 @@
 
 namespace SmokeLounge.AOtomation.Messaging.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -12,12 +13,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class DamageCalculationTests
     {
+        private const int PlayerFallbackDamage = 15;
+
+        private const int NpcFallbackDamage = 1;
+
         [TestMethod]
         public void RepositoryLegacyNormalHitPreservesExistingDamageRules()
         {
             QueuedDamageRandomSource randomSource = new QueuedDamageRandomSource(2, 3);
 
-            DamageCalculationResult minimumRoll = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult minimumRoll = CalculateLegacyNormalHitDetailed(
                 1,
                 3,
                 0,
@@ -25,7 +30,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 false,
                 randomSource);
 
-            DamageCalculationResult maximumRoll = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult maximumRoll = CalculateLegacyNormalHitDetailed(
                 1,
                 3,
                 2,
@@ -33,7 +38,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 false,
                 randomSource);
 
-            DamageCalculationResult playerFallback = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult playerFallback = CalculateLegacyNormalHitDetailed(
                 0,
                 0,
                 -8,
@@ -41,7 +46,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 true,
                 randomSource);
 
-            DamageCalculationResult playerWeaponMinimumRoll = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult playerWeaponMinimumRoll = CalculateLegacyNormalHitDetailed(
                 2,
                 18,
                 0,
@@ -49,7 +54,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 true,
                 new QueuedDamageRandomSource(2));
 
-            DamageCalculationResult npcFallback = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult npcFallback = CalculateLegacyNormalHitDetailed(
                 -5,
                 -2,
                 0,
@@ -59,9 +64,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.AreEqual(2, minimumRoll.FinalTargetDamage);
             Assert.AreEqual(5, maximumRoll.FinalTargetDamage);
-            Assert.AreEqual(CombatDamageRules.PlayerFallbackDamage, playerFallback.FinalTargetDamage);
+            Assert.AreEqual(PlayerFallbackDamage, playerFallback.FinalTargetDamage);
             Assert.AreEqual(2, playerWeaponMinimumRoll.FinalTargetDamage);
-            Assert.AreEqual(CombatDamageRules.NpcFallbackDamage, npcFallback.FinalTargetDamage);
+            Assert.AreEqual(NpcFallbackDamage, npcFallback.FinalTargetDamage);
             Assert.AreEqual(DamageCalculationStrategyKind.LegacyFallback, maximumRoll.Strategy);
             Assert.AreEqual(2, maximumRoll.LegacyDamageBonusContribution);
             Assert.AreEqual(DamageEvidenceClassification.ProvenRepositoryBehavior, maximumRoll.EvidenceClassification);
@@ -298,7 +303,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void DeterministicRandomSourceReplaysBaseDamageRolls()
         {
-            DamageCalculationResult first = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult first = CalculateLegacyNormalHitDetailed(
                 1,
                 10,
                 0,
@@ -306,7 +311,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 false,
                 new QueuedDamageRandomSource(4));
 
-            DamageCalculationResult second = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult second = CalculateLegacyNormalHitDetailed(
                 1,
                 10,
                 0,
@@ -333,7 +338,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(25, result.Request.Source.AddAllOff);
             Assert.AreEqual(125, result.Request.Source.AttackSkillContributions[0].Value);
             Assert.AreEqual(100, result.Request.Source.AttackSkillContributions[0].Percentage);
-            Assert.AreEqual(1, CombatDamageRules.Calculate(1, 1, 0, 1, false));
+            Assert.AreEqual(1, CalculateLegacyNormalHit(1, 1, 0, 1, false));
         }
 
         [TestMethod]
@@ -583,7 +588,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void WeaponDamageDiagnosticSnapshotIsOptInAndDoesNotChangeProductionDamageOrRandomness()
         {
             QueuedDamageRandomSource randomSource = new QueuedDamageRandomSource(4, 5);
-            DamageCalculationResult production = CombatDamageRules.CalculateDetailed(1, 6, 0, 1, false, randomSource);
+            DamageCalculationResult production = CalculateLegacyNormalHitDetailed(1, 6, 0, 1, false, randomSource);
             int remainingAfterProduction = randomSource.RemainingCount;
             WeaponDamageObservation observation = WeaponDamageObservationValidator.Validate(BuildCompleteObservationDraft("diagnostic", 23));
 
@@ -813,7 +818,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void Level48NpcDamageComesFromProductionWeaponInputsNotCapturedDeathlessHits()
         {
-            DamageCalculationResult result = CombatDamageRules.CalculateDetailed(
+            DamageCalculationResult result = CalculateLegacyNormalHitDetailed(
                 30,
                 40,
                 0,
@@ -825,6 +830,66 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreNotEqual(41, result.FinalTargetDamage);
             Assert.AreNotEqual(42, result.FinalTargetDamage);
         }
+
+        private static int CalculateLegacyNormalHit(
+            int minDamage,
+            int maxDamage,
+            int damageBonus,
+            int level,
+            bool isPlayer)
+        {
+            return CalculateLegacyNormalHitDetailed(minDamage, maxDamage, damageBonus, level, isPlayer, null)
+                .FinalTargetDamage;
+        }
+
+        private static DamageCalculationResult CalculateLegacyNormalHitDetailed(
+            int minDamage,
+            int maxDamage,
+            int damageBonus,
+            int level,
+            bool isPlayer,
+            IDamageRandomSource randomSource)
+        {
+            int normalizedMinDamage = Math.Max(0, minDamage);
+            int normalizedMaxDamage = Math.Max(normalizedMinDamage, maxDamage);
+
+            return DamageCalculator.Calculate(
+                new DamageCalculationRequest
+                {
+                    Context = new DamageCalculationContext
+                    {
+                        Mode = DamageCalculationMode.PvM,
+                        AttackCategory = DamageAttackCategory.RegularAttack,
+                        SpecialAttackCategory = SpecialAttackCategory.None,
+                        CompatibilityPolicy = isPlayer
+                                                  ? "repository-player-legacy-normal-hit"
+                                                  : "repository-npc-legacy-normal-hit",
+                        EvidenceSource = "DamageCalculationTests legacy normal hit helper"
+                    },
+                    Source = new DamageSourceSnapshot
+                    {
+                        Category = isPlayer ? DamageSourceCategory.Player : DamageSourceCategory.Npc,
+                        Level = level
+                    },
+                    Definition = new DamageDefinition
+                    {
+                        BaseMinimum = normalizedMinDamage,
+                        BaseMaximum = normalizedMaxDamage,
+                        DamageType = DamageType.Unknown,
+                        EvidenceClassification = DamageEvidenceClassification.ProvenRepositoryBehavior
+                    },
+                    Modifiers = new DamageModifierSet
+                    {
+                        LegacyDamageBonus = damageBonus
+                    },
+                    Policy = DamageCalculationPolicy.RepositoryLegacyNormalHit(isPlayer),
+                    EvidenceClassification = DamageEvidenceClassification.ProvenRepositoryBehavior,
+                    HitOutcome = DamageHitOutcome.Hit
+                },
+                randomSource ?? LegacyNormalHitRandom);
+        }
+
+        private static readonly IDamageRandomSource LegacyNormalHitRandom = new QueuedDamageRandomSource();
 
         private static void AssertStage(
             DamageCalculationResult result,
