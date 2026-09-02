@@ -861,6 +861,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Serialize(attackInfo));
         }
 
+        [TestMethod]
+        public void RaidConvertAckMatchesCapture20260902()
+        {
+            var message = new RaidMessage
+                          {
+                              Identity = new Identity
+                                         {
+                                             Type = IdentityType.CanbeAffected,
+                                             Instance = unchecked((int)0x765A6F8A)
+                                         },
+                              Unknown = 0,
+                              Unknown1 = 0
+                          };
+
+            byte[] expected = HexToBytes("3B3B28780000C350765A6F8A000000");
+            CollectionAssert.AreEqual(expected, Serialize(message));
+
+            var decoded = (RaidMessage)Deserialize<RaidMessage>(expected);
+            Assert.AreEqual(IdentityType.CanbeAffected, decoded.Identity.Type);
+            Assert.AreEqual(unchecked((int)0x765A6F8A), decoded.Identity.Instance);
+            Assert.AreEqual(0, decoded.Unknown);
+            Assert.AreEqual(0, decoded.Unknown1);
+        }
+
         private static void AssertSerializedSize(MessageBody body, int expectedSize)
         {
             byte[] bytes = Serialize(body);

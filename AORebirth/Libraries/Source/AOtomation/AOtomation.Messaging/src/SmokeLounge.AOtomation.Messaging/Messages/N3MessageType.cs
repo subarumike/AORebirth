@@ -157,7 +157,10 @@ namespace SmokeLounge.AOtomation.Messaging.Messages
 
         SocialActionCmd = 0x3b290771, 
 
-        Raid = 0x3b3b2878, 
+        Raid = 0x3b3b2878,
+
+        /// <summary>Client→server raid UI command. Capture 20260902-073932 Convert to Raid.</summary>
+        RaidCmd = 0x4e525e58,
 
         ShadowLevel = 0x3c1e2803, 
 
