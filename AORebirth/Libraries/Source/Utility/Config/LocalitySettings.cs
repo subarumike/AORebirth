@@ -2,6 +2,8 @@ namespace Utility.Config
 {
     public class LocalitySettings
     {
+        public bool EnableCellHeatScheduling { get; set; }
+
         public int VisibilityNeighborLevel { get; set; }
 
         public int HotNeighborLevel { get; set; }

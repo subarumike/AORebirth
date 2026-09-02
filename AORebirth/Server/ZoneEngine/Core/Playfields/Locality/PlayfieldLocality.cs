@@ -24,16 +24,20 @@ namespace ZoneEngine.Core.Playfields.Locality
         private const int DefaultCellSleepTimeSeconds = 30;
 
         private PlayfieldLocalityPolicy(
+            bool enableCellHeatScheduling,
             int visibilityNeighborLevel,
             int hotNeighborLevel,
             int warmNeighborLevel,
             int cellSleepTimeSeconds)
         {
+            EnableCellHeatScheduling = enableCellHeatScheduling;
             VisibilityNeighborLevel = visibilityNeighborLevel;
             HotNeighborLevel = hotNeighborLevel;
             WarmNeighborLevel = warmNeighborLevel;
             CellSleepTimeSeconds = cellSleepTimeSeconds;
         }
+
+        internal bool EnableCellHeatScheduling { get; private set; }
 
         internal int VisibilityNeighborLevel { get; private set; }
 
@@ -45,6 +49,7 @@ namespace ZoneEngine.Core.Playfields.Locality
 
         internal static PlayfieldLocalityPolicy FromConfig(LocalitySettings settings)
         {
+            bool enableCellHeatScheduling = settings != null && settings.EnableCellHeatScheduling;
             int visibility = DefaultVisibilityNeighborLevel;
             int hot = DefaultHotNeighborLevel;
             int warm = DefaultWarmNeighborLevel;
@@ -89,7 +94,7 @@ namespace ZoneEngine.Core.Playfields.Locality
                 }
             }
 
-            return new PlayfieldLocalityPolicy(visibility, hot, warm, sleep);
+            return new PlayfieldLocalityPolicy(enableCellHeatScheduling, visibility, hot, warm, sleep);
         }
     }
 
@@ -285,6 +290,19 @@ namespace ZoneEngine.Core.Playfields.Locality
                 ? this.tickCallbacks.GetConnectedPlayers()
                 : Enumerable.Empty<ICharacter>();
             this.cellMonitor.UpdatePlayers(players);
+
+            if (!this.policy.EnableCellHeatScheduling)
+            {
+                IEnumerable<ICharacter> characters = this.tickCallbacks.GetAllCharacters != null
+                    ? this.tickCallbacks.GetAllCharacters()
+                    : this.cells.AllRegisteredCharacters();
+                foreach (ICharacter character in characters.ToList())
+                {
+                    this.ProcessDynelTick(character, deltaTime);
+                }
+
+                return;
+            }
 
             IEnumerable<ICharacter> combatHot = this.CollectCombatHotCharacters();
             this.heatScheduler.Tick(
