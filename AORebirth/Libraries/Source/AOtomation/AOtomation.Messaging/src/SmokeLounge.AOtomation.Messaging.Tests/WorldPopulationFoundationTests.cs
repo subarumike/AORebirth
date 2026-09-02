@@ -2282,7 +2282,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = FindRepositoryRoot();
             string[] owners =
                 {
-                    "PlayfieldVisibilityInterestRuntimeService.cs",
+                    @"Locality\PlayfieldLocalityVisibility.cs",
                     "NpcCombatTickCoordinator.cs",
                     "NpcCorpseLifecycleCoordinator.cs",
                     "PlayfieldNpcCombatMovementRuntimeService.cs"
