@@ -1,4 +1,4 @@
-namespace ZoneEngine.Core.Playfields
+namespace ZoneEngine.Core.Playfields.Locality
 {
     #region Usings
 
@@ -23,37 +23,20 @@ namespace ZoneEngine.Core.Playfields
 
     #endregion
 
-    internal sealed class PlayfieldVisibilityPacketRuntimeService
+    internal sealed class PlayfieldLocalityPackets
     {
         private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout;
-
         private readonly PlayfieldPacketSequencingRuntimeService packetSequences;
+        private readonly PlayfieldLocalityVisibility visibility;
 
-        private readonly PlayfieldVisibilityInterestRuntimeService visibilityInterest;
-
-        internal PlayfieldVisibilityPacketRuntimeService(
+        internal PlayfieldLocalityPackets(
             PlayfieldVisibilityFanoutRuntimeService visibilityFanout,
             PlayfieldPacketSequencingRuntimeService packetSequences,
-            PlayfieldVisibilityInterestRuntimeService visibilityInterest)
+            PlayfieldLocalityVisibility visibility)
         {
-            if (visibilityFanout == null)
-            {
-                throw new ArgumentNullException("visibilityFanout");
-            }
-
-            if (packetSequences == null)
-            {
-                throw new ArgumentNullException("packetSequences");
-            }
-
-            if (visibilityInterest == null)
-            {
-                throw new ArgumentNullException("visibilityInterest");
-            }
-
-            this.visibilityFanout = visibilityFanout;
-            this.packetSequences = packetSequences;
-            this.visibilityInterest = visibilityInterest;
+            this.visibilityFanout = visibilityFanout ?? throw new ArgumentNullException("visibilityFanout");
+            this.packetSequences = packetSequences ?? throw new ArgumentNullException("packetSequences");
+            this.visibility = visibility ?? throw new ArgumentNullException("visibility");
         }
 
         internal void SendExistingCharacterVisibilityToClient(
@@ -61,12 +44,10 @@ namespace ZoneEngine.Core.Playfields
             IEnumerable<ICharacter> characters,
             Action<MessageBody> sendVisibilityMessage)
         {
-            Require(sendVisibilityMessage, "sendVisibilityMessage");
-
             List<ICharacter> characterSnapshot = characters.Where(x => x != null).ToList();
-            this.visibilityInterest.Synchronize(characterSnapshot);
-            this.visibilityInterest.ForgetRecipient(recipient.Identity);
-            IList<ICharacter> selectedCharacters = this.visibilityInterest.SelectInitialCharacters(recipient);
+            this.visibility.Synchronize(characterSnapshot);
+            this.visibility.ForgetRecipient(recipient.Identity);
+            IList<ICharacter> selectedCharacters = this.visibility.SelectInitialCharacters(recipient);
             Identity playfieldIdentity = recipient.Playfield.Identity;
             SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot =
                 SubwayVisibilitySnapshotDiagnostics.TryBeginSnapshot(recipient, 0);
@@ -101,7 +82,7 @@ namespace ZoneEngine.Core.Playfields
                         totalPlayfieldCharacters,
                         totalPlayfieldNpcs,
                         visibilityEligibleCharacters,
-                        this.visibilityInterest.LastCandidateInspectionCount,
+                        this.visibility.LastCandidateCount,
                         selectedCharacters.Count));
             }
 
@@ -111,17 +92,13 @@ namespace ZoneEngine.Core.Playfields
                 entity =>
                     {
                         Character temp = entity as Character;
-                        if (temp == null)
-                        {
-                            return false;
-                        }
-
-                        return this.SendCharacterVisibilityEntry(
-                            temp,
-                            recipient,
-                            sendVisibilityMessage,
-                            diagnosticSnapshot,
-                            false);
+                        return temp != null
+                               && this.SendCharacterVisibilityEntry(
+                                   temp,
+                                   recipient,
+                                   sendVisibilityMessage,
+                                   diagnosticSnapshot,
+                                   false);
                     },
                 (entity, senderEqualsRecipient, senderInRecipientPlayfield, sent) =>
                     {
@@ -146,7 +123,7 @@ namespace ZoneEngine.Core.Playfields
                 diagnosticSnapshot.MarkSnapshotEnqueueCompleted();
             }
 
-            this.visibilityInterest.CompleteInitialRecipient(recipient);
+            this.visibility.CompleteInitialRecipient(recipient);
         }
 
         internal void AnnounceJoiningCharacterVisibility(
@@ -154,10 +131,7 @@ namespace ZoneEngine.Core.Playfields
             Action<ICharacter, MessageBody> sendVisibilityMessage,
             Action<ICharacter, Identity> sendLeaveVisibility)
         {
-            Require(sendVisibilityMessage, "sendVisibilityMessage");
-            Require(sendLeaveVisibility, "sendLeaveVisibility");
-
-            this.visibilityInterest.ReconcileInitializedRecipients(
+            this.visibility.Reconcile(
                 character,
                 (recipient, source) => this.SendCharacterVisibilityEntry(
                     source,
@@ -183,16 +157,12 @@ namespace ZoneEngine.Core.Playfields
             SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
             bool joiningCharacter)
         {
-            Require(sendVisibilityMessage, "sendVisibilityMessage");
-
             Character temp = source as Character;
             if (temp == null)
             {
                 return false;
             }
 
-            // Dead NPCs must not get a fresh SCFU — that resets the Death anim to a standing
-            // 0-HP model (Mike D2: killed mobs keep standing). Despawn + corpse handle removal.
             if (temp.Stats[StatIds.health].Value <= 0
                 && temp.Controller is NPCController)
             {
@@ -292,7 +262,7 @@ namespace ZoneEngine.Core.Playfields
                         }
                     });
 
-                this.visibilityInterest.MarkVisibleEntry(recipient, source);
+                this.visibility.MarkVisibleEntry(recipient, source);
                 if (diagnosticSnapshot != null)
                 {
                     diagnosticSnapshot.MarkEnemyQueued(diagnosticEnemy);
@@ -399,7 +369,7 @@ namespace ZoneEngine.Core.Playfields
                         }
                     });
 
-                this.visibilityInterest.MarkVisibleEntry(recipient, pet);
+                this.visibility.MarkVisibleEntry(recipient, pet);
                 if (diagnosticSnapshot != null)
                 {
                     diagnosticSnapshot.MarkEnemyQueued(diagnosticEnemy);
@@ -425,8 +395,6 @@ namespace ZoneEngine.Core.Playfields
             SubwayVisibilityDiagnosticSnapshot diagnosticSnapshot,
             bool joiningCharacter)
         {
-            // D1/D2/D3/D4 Havaris use capture wire (ExtTex + Monster side). ConstructMessage alone
-            // hides the boss mesh on D3 (same class of bug as prior dungeon).
             if (!NascenceDungeon1HavarisScfuWire.IsHavaris(npc)
                 && !NascenceDungeon2HavarisScfuWire.IsHavaris(npc)
                 && !NascenceDungeon3HavarisScfuWire.IsHavaris(npc)
@@ -511,7 +479,7 @@ namespace ZoneEngine.Core.Playfields
                         }
                     });
 
-                this.visibilityInterest.MarkVisibleEntry(recipient, npc);
+                this.visibility.MarkVisibleEntry(recipient, npc);
                 if (diagnosticSnapshot != null)
                 {
                     diagnosticSnapshot.MarkEnemyQueued(diagnosticEnemy);
@@ -561,14 +529,6 @@ namespace ZoneEngine.Core.Playfields
             if (diagnosticSnapshot != null)
             {
                 diagnosticSnapshot.MarkWeaponPhaseCompleted(diagnosticEnemy);
-            }
-        }
-
-        private static void Require(Delegate callback, string name)
-        {
-            if (callback == null)
-            {
-                throw new ArgumentNullException(name);
             }
         }
     }

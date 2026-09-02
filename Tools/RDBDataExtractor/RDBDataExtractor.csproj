@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AORebirth.Tools.RDBDataExtractor</RootNamespace>
+    <AssemblyName>RDBDataExtractor</AssemblyName>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AODB" Version="1.0.4" />
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
+  </ItemGroup>
+
+  <!--
+    AORebirth.Core targets net48 and cannot be referenced from this net10.0 project,
+    so the GameData contracts are compiled from their single source location instead.
+  -->
+  <ItemGroup>
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\GameDataPaths.cs"
+             Link="GameData\GameDataPaths.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldMetaData.cs"
+             Link="GameData\PlayfieldMetaData.cs" />
+  </ItemGroup>
+</Project>

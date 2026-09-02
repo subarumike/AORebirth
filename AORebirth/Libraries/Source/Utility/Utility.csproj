@@ -55,6 +55,7 @@
     <Compile Include="Colouring.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigReadWrite.cs" />
+    <Compile Include="Config\LocalitySettings.cs" />
     <Compile Include="ConsoleText.cs" />
     <Compile Include="CpuRamUtilization.cs" />
     <Compile Include="DebugStrings.cs" />

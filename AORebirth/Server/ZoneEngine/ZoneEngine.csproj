@@ -173,6 +173,7 @@
     <Compile Include="Core\Arete\Quests\RexMarcusChainCoordinator.cs" />
     <Compile Include="Core\Arete\Quests\RexQuestPreviewEmitter.cs" />
     <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.cs" />
+    <Compile Include="Core\GameData\GameDataLoader.cs" />
     <Compile Include="Core\Missions\IMissionRepository.cs" />
     <Compile Include="Core\Missions\InMemoryMissionRepository.cs" />
     <Compile Include="Core\Missions\MissionModels.cs" />
@@ -818,12 +819,22 @@
     <Compile Include="Core\MessageHandlers\CapturedAreteLoreleiVendorInteractionHandler.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVisibilityInterestState.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVisibilityInterestRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs" />
-    <Compile Include="Core\Playfields\PlayfieldSpatialCharacterIndex.cs" />
-    <Compile Include="Core\Playfields\UniformSpatialIndex.cs" />
+    <Compile Include="Core\Playfields\Locality\CellHeat.cs" />
+    <Compile Include="Core\Playfields\Locality\ICellSurfaceLoader.cs" />
+    <Compile Include="Core\Playfields\Locality\IPlayfieldCellLayout.cs" />
+    <Compile Include="Core\Playfields\Locality\IndoorCellLayout.cs" />
+    <Compile Include="Core\Playfields\Locality\OutdoorCellLayout.cs" />
+    <Compile Include="Core\Playfields\Locality\PlaceholderCellSurfaceLoader.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldCellHeatScheduler.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldCellLayoutFactory.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldCellLocalityMonitor.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldCellResourceHub.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldDynelCellRegistry.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldLocality.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldLocalityPackets.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldLocalityPolicy.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldLocalityTickCallbacks.cs" />
+    <Compile Include="Core\Playfields\Locality\PlayfieldLocalityVisibility.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilityDiagnosticSelection.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilityPacketMeasurement.cs" />
     <Compile Include="Core\Playfields\SubwayVisibilitySpatialInterestMetrics.cs" />
@@ -3715,6 +3726,16 @@
   <ItemGroup>
     <Folder Include="Component\" />
     <Folder Include="Core\InternalMessageHandler\" />
+  </ItemGroup>
+  <!--
+    GameData is deployed verbatim beside the engine and is read from
+    {BaseDirectory}\GameData at runtime.
+  -->
+  <ItemGroup>
+    <Content Include="..\..\GameData\**\*">
+      <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

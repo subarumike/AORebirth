@@ -10,6 +10,12 @@
   <CommPort>6996</CommPort>
   <!-- Playfield simulation ticks per second (default 32) -->
   <PlayfieldTickRate>32</PlayfieldTickRate>
+  <Locality>
+    <VisibilityNeighborLevel>2</VisibilityNeighborLevel>
+    <HotNeighborLevel>1</HotNeighborLevel>
+    <WarmNeighborLevel>2</WarmNeighborLevel>
+    <CellSleepTime>30</CellSleepTime>
+  </Locality>
   <!-- Debug console categories: comma-separated DebugInfoDetail names (default Engine,Error) -->
   <!-- <DebugInfoDetail>Engine,Error,Combat</DebugInfoDetail> -->
   <!-- Log Area -->
