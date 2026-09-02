@@ -370,8 +370,8 @@
     <Compile Include="CamelotLootEvidenceTests.cs" />
     <Compile Include="MercenaryCampLootEvidenceTests.cs" />
     <Compile Include="SubwayVendorContentTests.cs" />
-    <Compile Include="PlayfieldVisibilityInterestTests.cs" />
-    <Compile Include="PlayfieldVisibilityInterestStateTests.cs" />
+    <Compile Include="PlayfieldLocalitySafetyTests.cs" />
+    <Compile Include="PlayfieldLocalityVisibilityTests.cs" />
     <Compile Include="QuestNpcOutboundTransportDiagnosticsTests.cs" />
     <Compile Include="PlayfieldVisibilityLifecycleIntegrationTests.cs" />
     <Compile Include="SubwayVisibilityPacketMeasurementTests.cs" />
@@ -603,15 +603,6 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Pf127CollisionGeometryLoader.cs">
       <Link>Pf127CollisionGeometryLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestPolicy.cs">
-      <Link>PlayfieldVisibilityInterestPolicy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityInterestState.cs">
-      <Link>PlayfieldVisibilityInterestState.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\UniformSpatialIndex.cs">
-      <Link>UniformSpatialIndex.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayVisibilityPacketMeasurement.cs">
       <Link>SubwayVisibilityPacketMeasurement.cs</Link>

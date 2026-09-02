@@ -106,7 +106,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string packetText = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
 
             Assert.IsTrue(
                 snapshotText.Contains("if (!configuration.Enabled")

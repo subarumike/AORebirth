@@ -154,6 +154,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"Core\Playfields\NpcCorpseLifecycleCoordinator.cs");
             string combatTickText = Read(repositoryRoot, @"Core\Playfields\NpcCombatTickCoordinator.cs");
             string dynelRegistryText = Read(repositoryRoot, @"Core\Playfields\PlayfieldDynelRegistry.cs");
+            string localityText = Read(repositoryRoot, @"Core\Playfields\Locality\PlayfieldLocality.cs");
 
             Assert.IsTrue(zoneServerText.Contains("RuntimeOwnershipRegistry<int, IPlayfield> playfields"));
             Assert.IsTrue(zoneServerText.Contains("this.playfields.GetOrCreate(id.Instance)"));
@@ -180,7 +181,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(combatTickText.Contains("this.pendingCapturedAttackStarts.Clear();"));
             Assert.IsTrue(combatTickText.Contains("this.pendingCapturedMovementTransitions.Clear();"));
             Assert.IsTrue(corpseLifecycleText.Contains("this.deadNpcDespawnTicks.Clear();"));
-            Assert.IsTrue(runtimeSystemsText.Contains("this.visibilityInterest.Clear();"));
+            Assert.IsTrue(playfieldText.Contains("this.locality.Clear();"));
+            Assert.IsTrue(localityText.Contains("this.visibility.Clear();"));
+            Assert.IsTrue(localityText.Contains("this.cells.Clear();"));
             Assert.IsTrue(runtimeSystemsText.Contains("this.dynelRegistry.Clear();"));
             Assert.IsTrue(dynelRegistryText.Contains("internal void Clear()"));
         }
