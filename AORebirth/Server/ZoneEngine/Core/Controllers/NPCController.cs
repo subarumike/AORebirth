@@ -142,12 +142,12 @@ namespace ZoneEngine.Core.Controllers
         {
             if (target.Controller is PlayerController)
             {
-                Vector3 rawPosition = target.RawCoordinates;
-                Vector3 predictedPosition = target.Coordinates().coordinate;
+                Vector3 rawPosition = target.Position;
+                Vector3 predictedPosition = target.CalculatePredictedPosition().coordinate;
                 return MoveToward(rawPosition, predictedPosition, MaxPlayerChaseProjectionDistance);
             }
 
-            return target.Coordinates().coordinate;
+            return target.CalculatePredictedPosition().coordinate;
         }
 
         private void LogChase(string phase, Vector3 start, Vector3 destination)
@@ -189,7 +189,7 @@ namespace ZoneEngine.Core.Controllers
         {
             if (!this.followMotionSegment.Active)
             {
-                return this.Character.Coordinates().coordinate;
+                return this.Character.CalculatePredictedPosition().coordinate;
             }
 
             double elapsedSeconds = Math.Max(0.0, (now - this.followMotionSegment.StartedUtc).TotalSeconds);
@@ -212,7 +212,7 @@ namespace ZoneEngine.Core.Controllers
         private Vector3 UpdateMotionSegmentPosition(DateTime now)
         {
             Vector3 position = this.CurrentMotionSegmentPosition(now);
-            this.Character.Coordinates(position);
+            this.Character.Position = position;
             return position;
         }
 
@@ -233,7 +233,7 @@ namespace ZoneEngine.Core.Controllers
             Vector3 direction = destination - start;
             direction.y = 0;
             normalizedDirection = direction.Normalize();
-            this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(normalizedDirection);
+            this.Character.Rotation = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(normalizedDirection);
             return true;
         }
 
@@ -374,7 +374,7 @@ namespace ZoneEngine.Core.Controllers
                                     : capturedStart;
                 var end = new Vector3(segment.EndX, segment.EndY, segment.EndZ);
                 this.followCoordinates = end;
-                this.Character.Coordinates(start);
+                this.Character.Position = start;
                 this.FaceToward(start, end);
             //    this.LogChase("captured-patrol-replay", start, end);
                 FollowTargetMessageHandler.Default.Send(this.Character, start, end);
@@ -408,7 +408,7 @@ namespace ZoneEngine.Core.Controllers
                 return;
             }
 
-            this.Character.Coordinates(this.UpdateMotionSegmentPosition(DateTime.UtcNow));
+            this.Character.Position = this.UpdateMotionSegmentPosition(DateTime.UtcNow);
         }
 
         private void SetMotionSegment(Vector3 start, Vector3 destination, DateTime now)
@@ -453,7 +453,7 @@ namespace ZoneEngine.Core.Controllers
                 this.Run();
             }
 
-            this.Character.Coordinates(start);
+            this.Character.Position = start;
             this.FaceToward(start, destination);
             this.LogChase(phase, start, destination);
             FollowTargetMessageHandler.Default.Send(this.Character, start, destination);
@@ -472,7 +472,7 @@ namespace ZoneEngine.Core.Controllers
             }
 
             this.StopMovement();
-            this.Character.Coordinates(targetPosition);
+            this.Character.Position = targetPosition;
             this.StopFollow();
             return true;
         }
@@ -607,7 +607,7 @@ namespace ZoneEngine.Core.Controllers
             this.followCoordinates = targetPosition;
             if (this.followStopDistance > 0.0 && start.Distance2D(targetPosition) <= this.followStopDistance)
             {
-                this.Character.Coordinates(start);
+                this.Character.Position = start;
                 this.FaceToward(start, targetPosition);
                 return true;
             }
@@ -672,7 +672,7 @@ namespace ZoneEngine.Core.Controllers
             }
 
             Vector3 normalizedDirection;
-            if (!this.TryFaceToward(this.Character.RawCoordinates, source.RawCoordinates, out normalizedDirection))
+            if (!this.TryFaceToward(this.Character.Position, source.Position, out normalizedDirection))
             {
                 return false;
             }
@@ -828,21 +828,21 @@ namespace ZoneEngine.Core.Controllers
         public void MoveTo(SmokeLounge.AOtomation.Messaging.GameData.Vector3 destination)
         {
             Vector3 dest = destination;
-            Vector3 start = this.Character.Coordinates().coordinate;
+            Vector3 start = this.Character.CalculatePredictedPosition().coordinate;
             DateTime now = DateTime.UtcNow;
             this.followIdentity = Identity.None;
             if (start.Distance2D(dest) < 0.3f)
             {
                 this.StopMovement();
                 this.StopFollow();
-                this.Character.RawCoordinates = destination;
+                this.Character.Position = destination;
                 FollowTargetMessageHandler.Default.Send(this.Character, destination);
                 return;
             }
 
             dest = dest - start;
             dest.y = 0;
-            this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(dest.Normalize());
+            this.Character.Rotation = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(dest.Normalize());
             this.SendMotionSegmentFollow("moveto", start, destination, now);
 
             Coordinate c = new Coordinate(destination);
@@ -892,7 +892,7 @@ namespace ZoneEngine.Core.Controllers
 
             if (this.followStopDistance > 0.0 && current.Distance2D(targetPosition) <= this.followStopDistance)
             {
-                this.Character.Coordinates(current);
+                this.Character.Position = current;
                 this.FaceToward(current, targetPosition);
                 return;
             }
@@ -931,11 +931,11 @@ namespace ZoneEngine.Core.Controllers
                 }
                 this.followCoordinates = next.Position;
                 DateTime now = DateTime.UtcNow;
-                Vector3 start = this.Character.Coordinates().coordinate;
+                Vector3 start = this.Character.CalculatePredictedPosition().coordinate;
                 Vector3 temp = start - next.Position;
                 temp.y = 0;
-                this.Character.Heading = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(temp).Normalize();
-                LogUtil.Debug(DebugInfoDetail.Movement, "Direction: " + this.Character.Heading.ToString());
+                this.Character.Rotation = (Quaternion)Quaternion.GenerateRotationFromDirectionVector(temp).Normalize();
+                LogUtil.Debug(DebugInfoDetail.Movement, "Direction: " + this.Character.Rotation.ToString());
                 this.SendMotionSegmentFollow("patrol-start", start, next.Position, now);
                 LogUtil.Debug(DebugInfoDetail.Movement, "Walking to: " + this.followCoordinates);
             }
@@ -956,7 +956,7 @@ namespace ZoneEngine.Core.Controllers
         {
             Vector3 current = this.UpdateMotionSegmentPosition(DateTime.UtcNow);
 
-            this.Character.Coordinates(current);
+            this.Character.Position = current;
             this.FaceToward(current, targetPosition);
             this.LogChase("combat-stop", current, targetPosition);
             FollowTargetMessageHandler.Default.Send(this.Character, current);
@@ -975,7 +975,7 @@ namespace ZoneEngine.Core.Controllers
         {
             Vector3 current = this.UpdateMotionSegmentPosition(DateTime.UtcNow);
 
-            this.Character.Coordinates(current);
+            this.Character.Position = current;
             this.FaceToward(current, targetPosition);
             this.LogChase("captured-combat-stop", current, targetPosition);
 
@@ -1131,7 +1131,7 @@ namespace ZoneEngine.Core.Controllers
                 this.activeWaypoint = (this.activeWaypoint + 1) % len;
                 result = this.Character.Waypoints[this.activeWaypoint];
             }
-            while (result.Position.Distance2D(this.Character.Coordinates().coordinate) < 0.2f);
+            while (result.Position.Distance2D(this.Character.CalculatePredictedPosition().coordinate) < 0.2f);
             return result;
         }
 

@@ -34,7 +34,7 @@ namespace ZoneEngine.Core.Playfields
             }
 
             WallCollisionResult wcr = WallCollision.CheckCollision(
-                dynel.Coordinates(),
+                new AORebirth.Core.Vector.Coordinate(dynel.Position),
                 dynel.Playfield.Identity.Instance);
             if (wcr != null)
             {
@@ -72,9 +72,9 @@ namespace ZoneEngine.Core.Playfields
                                 "Wall collision ignored character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} missingDestinationIndex={6} destinationCount={7}",
                                 dynel.Identity.ToString(true),
                                 dynel.Playfield.Identity.Instance,
-                                dynel.RawCoordinates.X,
-                                dynel.RawCoordinates.Y,
-                                dynel.RawCoordinates.Z,
+                                (float)dynel.Position.x,
+                                (float)dynel.Position.y,
+                                (float)dynel.Position.z,
                                 destPlayfield,
                                 destinationIndex,
                                 destinationPlayfieldData.Destinations.Count));
@@ -91,7 +91,7 @@ namespace ZoneEngine.Core.Playfields
                     newX -= headDistZ * 8;
                     newZ += headDistX * 8;
 
-                    Coordinate destinationCoordinate = new Coordinate(newX, dynel.RawCoordinates.Y, newZ);
+                    Coordinate destinationCoordinate = new Coordinate(newX, (float)dynel.Position.y, newZ);
                     LogUtil.Debug(
                         DebugInfoDetail.Engine,
                         string.Format(
@@ -99,9 +99,9 @@ namespace ZoneEngine.Core.Playfields
                             "Wall collision zoning character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} toCoords={6:F1},{7:F1},{8:F1}",
                             dynel.Identity.ToString(true),
                             dynel.Playfield.Identity.Instance,
-                            dynel.RawCoordinates.X,
-                            dynel.RawCoordinates.Y,
-                            dynel.RawCoordinates.Z,
+                            (float)dynel.Position.x,
+                            (float)dynel.Position.y,
+                            (float)dynel.Position.z,
                             destPlayfield,
                             destinationCoordinate.x,
                             destinationCoordinate.y,
@@ -110,7 +110,7 @@ namespace ZoneEngine.Core.Playfields
                     teleportToPlayfield(
                         (Dynel)dynel,
                         destinationCoordinate,
-                        dynel.RawHeading,
+                        dynel.Rotation,
                         destPlayfield);
                     return;
                 }

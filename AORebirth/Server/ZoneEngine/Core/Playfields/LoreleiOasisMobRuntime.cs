@@ -254,12 +254,12 @@ namespace ZoneEngine.Core.Playfields
             }
 
             Playfield playfield = npc.Playfield as Playfield;
-            if (playfield == null || npc.RawCoordinates == null)
+            if (playfield == null || npc.Position == null)
             {
                 return null;
             }
 
-            Coordinate npcCoord = npc.Coordinates();
+            Coordinate npcCoord = npc.CalculatePredictedPosition();
             ICharacter best = null;
             float automaticAggroRadius = npc.Stats[StatIds.level].Value <= 5
                                              ? RollerratLevel5AutomaticAggroRadiusMeters
@@ -273,12 +273,12 @@ namespace ZoneEngine.Core.Playfields
                     || candidate.Identity.Instance == npc.Identity.Instance
                     || !(candidate.Controller is PlayerController)
                     || candidate.Stats[StatIds.health].Value <= 0
-                    || candidate.RawCoordinates == null)
+                    || candidate.Position == null)
                 {
                     continue;
                 }
 
-                double distance = candidate.Coordinates().Distance3D(npcCoord);
+                double distance = candidate.CalculatePredictedPosition().Distance3D(npcCoord);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;
@@ -631,7 +631,7 @@ namespace ZoneEngine.Core.Playfields
                 controller,
                 contract,
                 out combatFailure);
-            mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
+            mob.Position = (new Coordinate { x = slot.X, y = slot.Y, z = slot.Z }).coordinate;
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             if (combatReady)
@@ -684,7 +684,7 @@ namespace ZoneEngine.Core.Playfields
                 controller,
                 contract,
                 out combatFailure);
-            mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
+            mob.Position = (new Coordinate { x = slot.X, y = slot.Y, z = slot.Z }).coordinate;
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             if (combatReady)
@@ -762,7 +762,7 @@ namespace ZoneEngine.Core.Playfields
                 true,
                 true);
             controller.State = CharacterState.Patrolling;
-            mob.Coordinates(new Coordinate { x = LollySpawnX, y = LollySpawnY, z = LollySpawnZ });
+            mob.Position = (new Coordinate { x = LollySpawnX, y = LollySpawnY, z = LollySpawnZ }).coordinate;
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
@@ -931,8 +931,8 @@ namespace ZoneEngine.Core.Playfields
                         && candidate.Name.IndexOf("Lolly", StringComparison.OrdinalIgnoreCase) >= 0
                         && candidate.Name.IndexOf("Reet", StringComparison.OrdinalIgnoreCase) >= 0))
                 {
-                    float dx = candidate.Coordinates().x - LollySpawnX;
-                    float dz = candidate.Coordinates().z - LollySpawnZ;
+                    float dx = candidate.CalculatePredictedPosition().x - LollySpawnX;
+                    float dz = candidate.CalculatePredictedPosition().z - LollySpawnZ;
                     if ((dx * dx) + (dz * dz) <= 400f)
                     {
                         return candidate;
@@ -993,8 +993,8 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - slot.X;
-                float dz = candidate.Coordinates().z - slot.Z;
+                float dx = candidate.CalculatePredictedPosition().x - slot.X;
+                float dz = candidate.CalculatePredictedPosition().z - slot.Z;
                 if ((dx * dx) + (dz * dz) <= 6.25f)
                 {
                     return true;

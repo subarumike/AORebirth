@@ -641,8 +641,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(abmouthContract.Contains("requiresDamageLineOfSight: true"));
             Assert.IsFalse(coordinator.Contains("DamageLineOfSightHeightOffset"));
             Assert.IsTrue(
-                gate.Contains("attacker.RawCoordinates.Y,")
-                && gate.Contains("target.RawCoordinates.Y,"));
+                gate.Contains("attacker.Position.y,")
+                && gate.Contains("target.Position.y,"));
             Assert.IsTrue(gate.Contains("IsDamageLineOfSightRequired"));
             Assert.IsTrue(gate.Contains("Pf127DamageLineOfSightActivated"));
             Assert.IsTrue(gate.Contains("attacker.Stats[StatIds.monsterdata].Value"));

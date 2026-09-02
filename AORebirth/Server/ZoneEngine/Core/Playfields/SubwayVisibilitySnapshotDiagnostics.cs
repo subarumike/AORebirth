@@ -308,7 +308,7 @@ namespace ZoneEngine.Core.Playfields
 
             SubwayVisibilityDiagnosticManifestEntry entry;
             SubwayVisibilityDiagnosticSelection.TryGetRuntimeEntry(character.Identity.Instance, out entry);
-            Coordinate position = character.Coordinates();
+            Coordinate position = character.CalculatePredictedPosition();
             int ordinal;
             lock (this.sync)
             {

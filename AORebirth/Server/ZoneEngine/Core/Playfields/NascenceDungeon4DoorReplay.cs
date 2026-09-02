@@ -80,8 +80,8 @@ namespace AORebirth.Core.Playfields
                         NascenceDungeon4Rules.InteriorLandingX,
                         NascenceDungeon4Rules.InteriorLandingZ));
 
-                float px = (float)character.RawCoordinates.X;
-                float pz = (float)character.RawCoordinates.Z;
+                float px = (float)character.Position.x;
+                float pz = (float)character.Position.z;
                 if (!(px == 0f && pz == 0f)
                     && (Math.Abs(px - NascenceDungeon4Rules.InteriorLandingX) > 0.5f
                         || Math.Abs(pz - NascenceDungeon4Rules.InteriorLandingZ) > 0.5f))
@@ -269,8 +269,8 @@ namespace AORebirth.Core.Playfields
             }
 
             int id = character.Identity.Instance;
-            float px = (float)character.RawCoordinates.X;
-            float pz = (float)character.RawCoordinates.Z;
+            float px = (float)character.Position.x;
+            float pz = (float)character.Position.z;
             long zoneKey = NascenceDungeon4RevealZones.ResolveZoneKey(px, pz);
             bool zoneChanged;
             lock (Gate)
@@ -353,8 +353,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float px = (float)character.RawCoordinates.X;
-                float pz = (float)character.RawCoordinates.Z;
+                float px = (float)character.Position.x;
+                float pz = (float)character.Position.z;
                 if (NascenceDungeon4RevealZones.ResolveZoneKey(px, pz) != zoneKey)
                 {
                     continue;
@@ -388,10 +388,10 @@ namespace AORebirth.Core.Playfields
 
             float px = force
                 ? NascenceDungeon4Rules.InteriorLandingX
-                : (float)character.RawCoordinates.X;
+                : (float)character.Position.x;
             float pz = force
                 ? NascenceDungeon4Rules.InteriorLandingZ
-                : (float)character.RawCoordinates.Z;
+                : (float)character.Position.z;
 
             int characterInstance = character.Identity.Instance;
             int playfieldInstance = character.Playfield.Identity.Instance;

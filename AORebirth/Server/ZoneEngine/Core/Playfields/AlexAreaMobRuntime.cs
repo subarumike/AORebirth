@@ -358,7 +358,7 @@ namespace ZoneEngine.Core.Playfields
                 return null;
             }
 
-            Coordinate npcCoord = npc.Coordinates();
+            Coordinate npcCoord = npc.CalculatePredictedPosition();
             ICharacter best = null;
             double bestDistance = radius;
             List<ICharacter> inRange = playfield.FindCharacterInRange(npc, radius);
@@ -373,7 +373,7 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                double distance = candidate.Coordinates().Distance3D(npcCoord);
+                double distance = candidate.CalculatePredictedPosition().Distance3D(npcCoord);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;
@@ -522,7 +522,7 @@ namespace ZoneEngine.Core.Playfields
                 controller,
                 contract,
                 out combatFailure);
-            mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
+            mob.Position = (new Coordinate { x = slot.X, y = slot.Y, z = slot.Z }).coordinate;
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             if (combatReady && slot.AggroRadiusMeters > 0f)
@@ -638,8 +638,8 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                float dx = candidate.Coordinates().x - slot.X;
-                float dz = candidate.Coordinates().z - slot.Z;
+                float dx = candidate.CalculatePredictedPosition().x - slot.X;
+                float dz = candidate.CalculatePredictedPosition().z - slot.Z;
                 if (dx * dx + dz * dz <= 6.25f)
                 {
                     return true;

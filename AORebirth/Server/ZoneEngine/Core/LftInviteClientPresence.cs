@@ -136,8 +136,8 @@ namespace ZoneEngine.Core
 
             try
             {
-                Coordinate viewerPos = viewerDynel.Coordinates();
-                Coordinate subjectPos = subjectDynel.Coordinates();
+                Coordinate viewerPos = new AORebirth.Core.Vector.Coordinate(viewerDynel.Position);
+                Coordinate subjectPos = new AORebirth.Core.Vector.Coordinate(subjectDynel.Position);
                 if (viewerPos == null || subjectPos == null)
                 {
                     return false;

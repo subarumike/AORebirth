@@ -202,6 +202,7 @@
     <Compile Include="Textures\MeshLayers.cs" />
     <Compile Include="Vector\Coordinate.cs" />
     <Compile Include="Vector\Quaternion.cs" />
+    <Compile Include="Vector\Transform.cs" />
     <Compile Include="Vector\Vector3.cs" />
     <Compile Include="VendorHandler\VendorHandler.cs" />
   </ItemGroup>

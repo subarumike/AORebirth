@@ -76,6 +76,8 @@ namespace ZoneEngine.Core.Controllers
     {
         // All functions return true if reply should be sent, false if no reply needed
 
+        // TODO: Remove all movement functionality - Delmus
+
         /// <summary>
         /// </summary>
         private Utility.WeakReference<ICharacter> character;
@@ -228,7 +230,7 @@ namespace ZoneEngine.Core.Controllers
 
         public void MoveTo(Vector3 destination)
         {
-            FollowTargetMessageHandler.Default.Send(this.Character, this.Character.RawCoordinates, destination);
+            FollowTargetMessageHandler.Default.Send(this.Character, this.Character.Position, destination);
         }
 
         public void Run()
@@ -629,7 +631,7 @@ namespace ZoneEngine.Core.Controllers
             // give it a bit uncertainty (2.0f)
             LogUtil.Debug(
                 DebugInfoDetail.Movement,
-                newCoordinates.ToString() + "<->" + this.Character.Coordinates().ToString());
+                newCoordinates.ToString() + "<->" + this.Character.CalculatePredictedPosition().ToString());
             // if (newCoordinates.Distance2D(this.Character.Coordinates) < 2.0f)
             {
                 this.Character.SetCoordinates(newCoordinates, heading);

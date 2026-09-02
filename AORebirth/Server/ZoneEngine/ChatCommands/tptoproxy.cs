@@ -124,7 +124,7 @@ namespace ZoneEngine.ChatCommands
                                  character.Playfield.Teleport(
                                      (Dynel)character,
                                      new Coordinate(door1.X, door1.Y+1.0f, door1.Z),
-                                     character.Heading,
+                                     character.Rotation,
                                      new Identity() { Type = (IdentityType)lastFound.Arguments.Values[0].AsInt32() , Instance = door1.PlayfieldId });
                                 return;
                             }
@@ -134,7 +134,7 @@ namespace ZoneEngine.ChatCommands
                             character.Playfield.Teleport(
                                 (Dynel)character,
                                 new Coordinate(sd.X, sd.Y, sd.Z),
-                                character.Heading,
+                                character.Rotation,
                                 new Identity() { Type = IdentityType.Playfield, Instance = sd.PlayfieldId });
                             return;
                         }

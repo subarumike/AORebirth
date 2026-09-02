@@ -166,9 +166,9 @@ namespace ZoneEngine.Core.Packets
                 showsocial = (character.Stats[StatIds.visualflags].Value & 0x20) > 0;
 
                 charPlayfield = character.Playfield.Identity.Instance;
-                charCoord = character.Coordinates();
+                charCoord = character.CalculatePredictedPosition();
                 charId = character.Identity;
-                charHeading = character.Heading;
+                charHeading = character.Rotation;
 
                 sideValue = character.Stats[StatIds.side].BaseValue;
                 fatValue = character.Stats[StatIds.fatness].BaseValue;

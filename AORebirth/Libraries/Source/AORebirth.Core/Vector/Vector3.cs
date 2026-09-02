@@ -356,6 +356,16 @@ namespace AORebirth.Core.Vector
         /// <param name="v2">Vector 2</param>
         public static bool operator ==(Vector3 v1, Vector3 v2)
         {
+            if (object.ReferenceEquals(v1, v2))
+            {
+                return true;
+            }
+
+            if (object.ReferenceEquals(v1, null) || object.ReferenceEquals(v2, null))
+            {
+                return false;
+            }
+
             return v1.Equals(v2);
         }
 
@@ -530,7 +540,7 @@ namespace AORebirth.Core.Vector
         /// </returns>
         public override bool Equals(object o)
         {
-            if (o.GetType() != typeof(Vector3))
+            if (object.ReferenceEquals(o, null) || o.GetType() != typeof(Vector3))
             {
                 return false;
             }

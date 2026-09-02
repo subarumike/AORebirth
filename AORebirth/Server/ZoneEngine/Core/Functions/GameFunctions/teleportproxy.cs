@@ -101,14 +101,14 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                     }
 
                     var preservedHeading = new Quaternion(
-                        character.RawHeading.xf,
-                        character.RawHeading.yf,
-                        character.RawHeading.zf,
-                        character.RawHeading.wf);
+                        character.Rotation.xf,
+                        character.Rotation.yf,
+                        character.Rotation.zf,
+                        character.Rotation.wf);
                     var envelopeDestination = new Vector3(
-                        character.RawCoordinates.X,
-                        character.RawCoordinates.Y,
-                        character.RawCoordinates.Z);
+                        (float)character.Position.x,
+                        (float)character.Position.y,
+                        (float)character.Position.z);
                     sourcePlayfield.Teleport(
                         (Dynel)character,
                         officialDungeonDestination,
@@ -143,9 +143,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                             "TeleportProxy caller={0} fromPf={1} from=({2:F2},{3:F2},{4:F2}) destDoor=SubwayEntranceOverride destPf={5} dest=({6:F2},{7:F2},{8:F2})",
                             caller.Identity.ToString(true),
                             character.Playfield.Identity.Instance,
-                            character.RawCoordinates.X,
-                            character.RawCoordinates.Y,
-                            character.RawCoordinates.Z,
+                            (float)character.Position.x,
+                            (float)character.Position.y,
+                            (float)character.Position.z,
                             arguments[1].AsInt32(),
                             overrideDestination.x,
                             overrideDestination.y,
@@ -180,9 +180,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         "TeleportProxy caller={0} fromPf={1} from=({2:F2},{3:F2},{4:F2}) destDoor={5} destPf={6} dest=({7:F2},{8:F2},{9:F2})",
                         caller.Identity.ToString(true),
                         character.Playfield.Identity.Instance,
-                        character.RawCoordinates.X,
-                        character.RawCoordinates.Y,
-                        character.RawCoordinates.Z,
+                        (float)character.Position.x,
+                        (float)character.Position.y,
+                        (float)character.Position.z,
                         sd.Identity.ToString(true),
                         arguments[1].AsInt32(),
                         v.x,

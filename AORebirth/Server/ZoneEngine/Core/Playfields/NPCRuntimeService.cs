@@ -121,7 +121,7 @@ namespace AORebirth.Core.Playfields
                 && this.playfield.Identity.Instance
                 == Pf1931OfficialDungeonGeometryLoader.TemplePlayfieldResource)
             {
-                var coordinate = character.Coordinates().coordinate;
+                var coordinate = character.CalculatePredictedPosition().coordinate;
                 var reference = new ChaseNavigationPoint(
                     coordinate.x,
                     coordinate.y,
@@ -134,11 +134,11 @@ namespace AORebirth.Core.Playfields
                         + character.Identity.ToString(true));
                 }
 
-                character.Coordinates(
-                    new Coordinate(
-                        (float)grounded.X,
-                        (float)grounded.Y + 0.01f,
-                        (float)grounded.Z));
+                character.Position =
+                    new AORebirth.Core.Vector.Vector3(
+                        grounded.X,
+                        grounded.Y + 0.01,
+                        grounded.Z);
             }
 
             this.dynelRegistry.Register(character);
@@ -245,7 +245,7 @@ namespace AORebirth.Core.Playfields
             this.npcHomeStates[character.Identity.Instance] =
                 new NpcHomeState
                 {
-                    Coordinates = new Coordinate(character.Coordinates()),
+                    Coordinates = new Coordinate(character.CalculatePredictedPosition()),
                     MaximumNpcDistanceFromHome = maximumNpcDistanceFromHome
                 };
         }
@@ -805,8 +805,8 @@ namespace AORebirth.Core.Playfields
 
                 bool playerControlledPet = this.IsPlayerControlledPet(target);
                 ChaseNavigationPoint homePoint = ToNavigationPoint(home.Coordinates.coordinate);
-                ChaseNavigationPoint npcPoint = ToNavigationPoint(target.Coordinates().coordinate);
-                ChaseNavigationPoint attackerPoint = ToNavigationPoint(attacker.Coordinates().coordinate);
+                ChaseNavigationPoint npcPoint = ToNavigationPoint(target.CalculatePredictedPosition().coordinate);
+                ChaseNavigationPoint attackerPoint = ToNavigationPoint(attacker.CalculatePredictedPosition().coordinate);
                 if (NpcCombatLeashPolicy.ShouldResetCombat(
                     this.playfield.Identity.Instance,
                     playerControlledPet,
@@ -1193,7 +1193,7 @@ namespace AORebirth.Core.Playfields
             {
                 if (npcController != null)
                 {
-                    npcController.StopFollowForCombatRange(attacker.Coordinates().coordinate);
+                    npcController.StopFollowForCombatRange(attacker.CalculatePredictedPosition().coordinate);
                 }
 
                 this.ResetCombatTick(target);
@@ -1235,8 +1235,8 @@ namespace AORebirth.Core.Playfields
                     this.playfield.Identity.Instance,
                     false,
                     ToNavigationPoint(home.Coordinates.coordinate),
-                    ToNavigationPoint(npc.Coordinates().coordinate),
-                    ToNavigationPoint(target.Coordinates().coordinate),
+                    ToNavigationPoint(npc.CalculatePredictedPosition().coordinate),
+                    ToNavigationPoint(target.CalculatePredictedPosition().coordinate),
                     home.MaximumNpcDistanceFromHome))
             {
                 return false;
@@ -1290,7 +1290,7 @@ namespace AORebirth.Core.Playfields
                     "NPC leash reset npc={0} home={1} position={2} maxDistance={3}",
                     npc.Identity,
                     home.Coordinates.coordinate,
-                    npc.Coordinates().coordinate,
+                    npc.CalculatePredictedPosition().coordinate,
                     home.MaximumNpcDistanceFromHome));
         }
 
@@ -1316,7 +1316,7 @@ namespace AORebirth.Core.Playfields
             }
 
             ChaseNavigationPoint homePoint = ToNavigationPoint(home.Coordinates.coordinate);
-            ChaseNavigationPoint currentPoint = ToNavigationPoint(npc.Coordinates().coordinate);
+            ChaseNavigationPoint currentPoint = ToNavigationPoint(npc.CalculatePredictedPosition().coordinate);
             if (NpcCombatLeashPolicy.HasReturnedHome(homePoint, currentPoint))
             {
                 home.ReturningHome = false;

@@ -17,6 +17,10 @@ namespace AORebirth.Core.GameData
 
         public const string MetadataFileName = "metadata.json";
 
+        public const string DistrictsFileName = "Districts.json";
+
+        public const string SpawnsFileName = "Spawns.json";
+
         public static string PlayfieldRelativeDirectory(int playfieldId)
         {
             if (playfieldId <= 0)
@@ -35,6 +39,16 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldMetadataRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), MetadataFileName);
+        }
+
+        public static string PlayfieldDistrictsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DistrictsFileName);
+        }
+
+        public static string PlayfieldSpawnsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SpawnsFileName);
         }
     }
 }

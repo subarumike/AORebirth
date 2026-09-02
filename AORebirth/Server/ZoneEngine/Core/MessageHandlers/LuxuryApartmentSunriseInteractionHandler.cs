@@ -258,14 +258,14 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             var envelope = new Vector3(
-                character.RawCoordinates.X,
-                character.RawCoordinates.Y,
-                character.RawCoordinates.Z);
+                (float)character.Position.x,
+                (float)character.Position.y,
+                (float)character.Position.z);
             var envelopeHeading = new Quaternion(
-                character.RawHeading.xf,
-                character.RawHeading.yf,
-                character.RawHeading.zf,
-                character.RawHeading.wf);
+                character.Rotation.xf,
+                character.Rotation.yf,
+                character.Rotation.zf,
+                character.Rotation.wf);
 
             character.Stats[StatIds.externaldoorinstance].BaseValue = 0;
             character.Stats[StatIds.externalplayfieldinstance].BaseValue =
@@ -475,14 +475,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 0f,
                 LuxuryApartmentSunriseRules.ApartmentLandingHeadingW);
             var envelope = new Vector3(
-                character.RawCoordinates.X,
-                character.RawCoordinates.Y,
-                character.RawCoordinates.Z);
+                (float)character.Position.x,
+                (float)character.Position.y,
+                (float)character.Position.z);
             var envelopeHeading = new Quaternion(
-                character.RawHeading.xf,
-                character.RawHeading.yf,
-                character.RawHeading.zf,
-                character.RawHeading.wf);
+                character.Rotation.xf,
+                character.Rotation.yf,
+                character.Rotation.zf,
+                character.Rotation.wf);
 
             sourcePlayfield.Teleport(
                 dynel,
@@ -950,14 +950,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 0f,
                 LuxuryApartmentSunriseRules.ApartmentExitLobbyHeadingW);
             var envelope = new Vector3(
-                character.RawCoordinates.X,
-                character.RawCoordinates.Y,
-                character.RawCoordinates.Z);
+                (float)character.Position.x,
+                (float)character.Position.y,
+                (float)character.Position.z);
             var envelopeHeading = new Quaternion(
-                character.RawHeading.xf,
-                character.RawHeading.yf,
-                character.RawHeading.zf,
-                character.RawHeading.wf);
+                character.Rotation.xf,
+                character.Rotation.yf,
+                character.Rotation.zf,
+                character.Rotation.wf);
 
             sourcePlayfield.Teleport(
                 dynel,

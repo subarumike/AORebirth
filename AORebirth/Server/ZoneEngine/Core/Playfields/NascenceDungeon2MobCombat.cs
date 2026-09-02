@@ -97,12 +97,12 @@ namespace ZoneEngine.Core.Playfields
                 return false;
             }
 
-            float nx = (float)npc.RawCoordinates.X;
-            float ny = (float)npc.RawCoordinates.Y;
-            float nz = (float)npc.RawCoordinates.Z;
-            float px = (float)player.RawCoordinates.X;
-            float py = (float)player.RawCoordinates.Y;
-            float pz = (float)player.RawCoordinates.Z;
+            float nx = (float)npc.Position.x;
+            float ny = (float)npc.Position.y;
+            float nz = (float)npc.Position.z;
+            float px = (float)player.Position.x;
+            float py = (float)player.Position.y;
+            float pz = (float)player.Position.z;
             if (System.Math.Abs(ny - py) > SameFloorMaxYDelta)
             {
                 return false;
@@ -287,7 +287,7 @@ namespace ZoneEngine.Core.Playfields
                 return null;
             }
 
-            Coordinate npcPos = npc.Coordinates();
+            Coordinate npcPos = npc.CalculatePredictedPosition();
             ICharacter nearest = null;
             double nearestDist = AggroRadiusMeters;
             List<ICharacter> inRange = playfield.FindCharacterInRange(npc, AggroRadiusMeters);
@@ -303,7 +303,7 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                double dist = candidate.Coordinates().coordinate.Distance2D(npcPos.coordinate);
+                double dist = candidate.CalculatePredictedPosition().coordinate.Distance2D(npcPos.coordinate);
                 if (dist < nearestDist)
                 {
                     nearestDist = dist;

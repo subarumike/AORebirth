@@ -12,6 +12,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestChgaPngWriter();
             TestHashHelper();
             TestPlayfieldMetaDataContract();
+            TestDistrictAndSpawnContracts();
             Console.WriteLine("RDBDataExtractor self-test PASS");
             return true;
         }
@@ -85,9 +86,9 @@ namespace AORebirth.Tools.RDBDataExtractor
             int numZonesZ;
             float cellWorldSize;
             if (!chunked.TryGetOutdoorGrid(out numZonesX, out numZonesZ, out cellWorldSize)
-                || numZonesX != 7
-                || numZonesZ != 7
-                || cellWorldSize != 36f)
+                || numZonesX != 5
+                || numZonesZ != 5
+                || cellWorldSize != PlayfieldMetaData.CellSize)
             {
                 throw new InvalidOperationException("Chunked outdoor grid derivation was invalid.");
             }
@@ -113,6 +114,66 @@ namespace AORebirth.Tools.RDBDataExtractor
             if (embedded.TryGetOutdoorGrid(out numZonesX, out numZonesZ, out cellWorldSize))
             {
                 throw new InvalidOperationException("Embedded metadata must not yield an outdoor grid.");
+            }
+        }
+
+        private static void TestDistrictAndSpawnContracts()
+        {
+            if (GameDataPaths.DistrictsFileName != "Districts.json"
+                || GameDataPaths.SpawnsFileName != "Spawns.json")
+            {
+                throw new InvalidOperationException("District/spawn file names were unexpected.");
+            }
+
+            PlayfieldDistrictsData districts = new PlayfieldDistrictsData
+            {
+                SchemaVersion = PlayfieldDistrictsData.SupportedSchemaVersion,
+                RecordType = 1000014,
+                RecordId = 4582,
+                FormatVersion = 7,
+                ZoneCount = 1,
+                ZoneToDistrictMap = new byte[] { 0 },
+                Districts = new[]
+                {
+                    new PlayfieldDistrictEntry
+                    {
+                        DistrictIndex = 0,
+                        Name = "Test",
+                        Centre = new float[] { 1f, 2f, 3f },
+                        Stats = new ushort[0],
+                        SpawnInfos = new PlayfieldDistrictSpawnInfo[0],
+                        MusicPairs = new PlayfieldDistrictMusicPair[0],
+                        SpawnPoints = new PlayfieldDistrictSpawnPoint[0],
+                    },
+                },
+            };
+
+            if (districts.Districts.Length != 1 || districts.Districts[0].Name != "Test")
+            {
+                throw new InvalidOperationException("Districts contract smoke check failed.");
+            }
+
+            PlayfieldSpawnsData spawns = new PlayfieldSpawnsData
+            {
+                SchemaVersion = PlayfieldSpawnsData.SupportedSchemaVersion,
+                RecordType = 1000014,
+                PlayfieldId = 4582,
+                Spawns = new[]
+                {
+                    new PlayfieldSpawnEntry
+                    {
+                        DistrictIndex = 0,
+                        Hash = 1,
+                        HashText = "ABCD",
+                        Position = new float[] { 10f, 20f, 30f },
+                        AdditionalPoints = new PlayfieldRotationSpawnPoint[0],
+                    },
+                },
+            };
+
+            if (spawns.Spawns.Length != 1 || spawns.Spawns[0].HashText != "ABCD")
+            {
+                throw new InvalidOperationException("Spawns contract smoke check failed.");
             }
         }
     }

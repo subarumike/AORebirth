@@ -117,14 +117,13 @@ namespace ZoneEngine.Core.Playfields
                 character.Name = definition.DisplayName;
                 character.FirstName = string.Empty;
                 character.LastName = string.Empty;
-                character.Coordinates(
-                    new Coordinate { x = definition.X, y = definition.Y, z = definition.Z });
-                character.RawHeading =
+                character.SetPose(
+                    new Coordinate(definition.X, definition.Y, definition.Z),
                     new AORebirth.Core.Vector.Quaternion(
                         definition.HeadingX,
                         definition.HeadingY,
                         definition.HeadingZ,
-                        definition.HeadingW);
+                        definition.HeadingW));
 
                 SetStat(character, StatIds.side, definition.Side);
                 SetStat(character, StatIds.fatness, definition.Fatness);
@@ -245,8 +244,8 @@ namespace ZoneEngine.Core.Playfields
                     };
                 vendor = new Vendor(playfieldIdentity, identity, definition.VendorTemplateId);
                 vendor.NpcIdentity = character.Identity;
-                vendor.RawCoordinates = new AORebirth.Core.Vector.Vector3(definition.X, definition.Y, definition.Z);
-                vendor.Heading =
+                vendor.Position = new AORebirth.Core.Vector.Vector3(definition.X, definition.Y, definition.Z);
+                vendor.Rotation =
                     new AORebirth.Core.Vector.Quaternion(
                         definition.HeadingX,
                         definition.HeadingY,

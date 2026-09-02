@@ -388,44 +388,65 @@ namespace AORebirth.Core.Entities
             }
         }
 
-        public override Coordinate Coordinates()
+        /// <summary>
+        /// Facing with turn prediction while spinning.
+        /// </summary>
+        public override Quaternion Rotation
         {
-            Coordinate result = this.CalculatePredictedPosition();
-            return result;
+            get
+            {
+                if (this.spinDirection == SpinOrStrafeDirections.None)
+                {
+                    return this.Transform.Rotation;
+                }
+
+                double turnArcAngle = this.calculateTurnArcAngle();
+                Quaternion turnQuaterion = new Quaternion(Vector3.AxisY, turnArcAngle);
+                Quaternion newHeading = Quaternion.Hamilton(turnQuaterion, this.Transform.Rotation);
+                newHeading.Normalize();
+                return newHeading;
+            }
+
+            set
+            {
+                this.Transform.Rotation = value == null
+                    ? new Quaternion()
+                    : new Quaternion(value.xf, value.yf, value.zf, value.wf);
+            }
         }
 
-        public override void Coordinates(Vector3 position)
+        /// <summary>
+        /// Commit a world pose and reset movement prediction time.
+        /// </summary>
+        public void SetPose(Vector3 position, Quaternion rotation)
         {
-            this.RawCoordinates = position;
-            LogUtil.Debug(DebugInfoDetail.Movement, "Coord Set at: " + position.ToString());
+            this.Position = position;
+            this.Rotation = rotation;
+            LogUtil.Debug(DebugInfoDetail.Movement, "Pose Set at: " + this.Position);
             this.PredictionTime = DateTime.UtcNow;
         }
 
-        public override void Coordinates(SmokeLounge.AOtomation.Messaging.GameData.Vector3 position)
+        public void SetPose(Coordinate position, Quaternion rotation)
         {
-            this.RawCoordinates = position;
-            LogUtil.Debug(DebugInfoDetail.Movement, "Coord Set at: " + position.ToString());
-            this.PredictionTime = DateTime.UtcNow;
+            this.SetPose(position == null ? new Vector3(0, 0, 0) : position.coordinate, rotation);
         }
 
-        public override void Coordinates(Coordinate position)
+        public void SetPose(SmokeLounge.AOtomation.Messaging.GameData.Vector3 position, Quaternion rotation)
         {
-            this.RawCoordinates = position.coordinate;
-            LogUtil.Debug(DebugInfoDetail.Movement, "Coord Set at: " + position.coordinate.ToString());
-            this.PredictionTime = DateTime.UtcNow;
+            this.SetPose((Vector3)position, rotation);
         }
 
-        internal Coordinate CalculatePredictedPosition()
+        public Coordinate CalculatePredictedPosition()
         {
-            // Incomplete / mid-despawn dynels can have null RawCoordinates; never NRE the PF heartbeat.
-            if (this.RawCoordinates == null)
+            Vector3 stored = this.Position;
+            if (stored == null)
             {
                 return new Coordinate(0f, 0f, 0f);
             }
 
             if ((this.moveDirection == MoveDirections.None) && (this.strafeDirection == SpinOrStrafeDirections.None))
             {
-                return new Coordinate(this.RawCoordinates);
+                return new Coordinate(stored);
             }
             else if (this.spinDirection == SpinOrStrafeDirections.None)
             {
@@ -433,20 +454,12 @@ namespace AORebirth.Core.Entities
 
                 moveVector = moveVector * this.PredictionDuration.TotalSeconds;
 
-                /*this.RawCoordinates = new Vector3()
-                                      {
-                                          x = this.RawCoordinates.X + moveVector.x,
-                                          y = this.RawCoordinates.Y + moveVector.y,
-                                          z = this.RawCoordinates.Z + moveVector.z
-                                      };
-
-                this.PredictionTime = DateTime.UtcNow;*/
                 Coordinate result =
                     new Coordinate(
                         new Vector3(
-                            this.RawCoordinates.X + moveVector.x,
-                            this.RawCoordinates.Y + moveVector.y,
-                            this.RawCoordinates.Z + moveVector.z));
+                            stored.x + moveVector.x,
+                            stored.y + moveVector.y,
+                            stored.z + moveVector.z));
                 LogUtil.Debug(
                     DebugInfoDetail.Movement,
                     moveVector.ToString().PadRight(40) + "/" + result.ToString() + "/");
@@ -466,7 +479,7 @@ namespace AORebirth.Core.Entities
                 turnArcAngle = this.calculateTurnArcAngle();
 
                 // This is calculated seperately as height is unaffected by turning
-                y = this.RawCoordinates.Y + (moveVector.y * duration);
+                y = stored.y + (moveVector.y * duration);
 
                 if (this.spinDirection == SpinOrStrafeDirections.Left)
                 {
@@ -479,7 +492,7 @@ namespace AORebirth.Core.Entities
 
                 return
                     new Coordinate(
-                        new Vector3(this.RawCoordinates.X, this.RawCoordinates.Y, this.RawCoordinates.Z)
+                        new Vector3(stored.x, stored.y, stored.z)
                         + (Vector3)
                             Quaternion.RotateVector3(
                                 new Quaternion(Vector3.AxisY, turnArcAngle),
@@ -507,13 +520,9 @@ namespace AORebirth.Core.Entities
                 this.Name = daochar.Name;
                 this.LastName = daochar.LastName;
                 this.FirstName = daochar.FirstName;
-                this.RawCoordinates = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
-                                      {
-                                          X = daochar.X,
-                                          Y = daochar.Y,
-                                          Z = daochar.Z
-                                      };
-                this.RawHeading = new Quaternion(daochar.HeadingX, daochar.HeadingY, daochar.HeadingZ, daochar.HeadingW);
+                this.Position = new Vector3(daochar.X, daochar.Y, daochar.Z);
+                this.Transform.AcknowledgePositionChange();
+                this.Rotation = new Quaternion(daochar.HeadingX, daochar.HeadingY, daochar.HeadingZ, daochar.HeadingW);
             }
 
             foreach (int nano in UploadedNanosDao.Instance.ReadNanos(this.Identity.Instance))
@@ -916,13 +925,13 @@ namespace AORebirth.Core.Entities
             temp.FirstName = this.FirstName;
             temp.LastName = this.LastName;
 
-            temp.HeadingW = this.RawHeading.wf;
-            temp.HeadingX = this.RawHeading.xf;
-            temp.HeadingY = this.RawHeading.yf;
-            temp.HeadingZ = this.RawHeading.zf;
-            temp.X = this.RawCoordinates.X;
-            temp.Y = this.RawCoordinates.Y;
-            temp.Z = this.RawCoordinates.Z;
+            temp.HeadingW = this.Transform.Rotation.wf;
+            temp.HeadingX = this.Transform.Rotation.xf;
+            temp.HeadingY = this.Transform.Rotation.yf;
+            temp.HeadingZ = this.Transform.Rotation.zf;
+            temp.X = (float)this.Position.x;
+            temp.Y = (float)this.Position.y;
+            temp.Z = (float)this.Position.z;
 
             temp.Id = this.Identity.Instance;
             temp.Name = this.Name;
@@ -979,7 +988,7 @@ namespace AORebirth.Core.Entities
                 case 2: // Forward Stop
                     // Stop the predicition
                     Coordinate temp = this.CalculatePredictedPosition();
-                    this.Coordinates(temp);
+                    this.Position = temp.coordinate;
                     LogUtil.Debug(DebugInfoDetail.Movement, "Stopped at " + temp);
                     this.PredictionTime = DateTime.UtcNow;
                     this.moveDirection = MoveDirections.None;
@@ -990,7 +999,7 @@ namespace AORebirth.Core.Entities
                     break;
                 case 4: // Reverse Stop
                     // Stop the predicition
-                    this.Coordinates(this.CalculatePredictedPosition());
+                    this.Position = this.CalculatePredictedPosition().coordinate;
                     this.PredictionTime = DateTime.UtcNow;
                     this.moveDirection = MoveDirections.None;
                     break;
@@ -1135,10 +1144,9 @@ namespace AORebirth.Core.Entities
         public void StopMovement()
         {
             // This should be used to stop the interpolating and save last interpolated value of movement before teleporting
-            this.RawCoordinates.X = this.Coordinates().x;
-            this.RawCoordinates.Y = this.Coordinates().y;
-            this.RawCoordinates.Z = this.Coordinates().z;
-            this.RawHeading = this.Heading;
+            Coordinate predicted = this.CalculatePredictedPosition();
+            this.Position = predicted.coordinate;
+            this.Transform.Rotation = this.Rotation;
 
             this.spinDirection = SpinOrStrafeDirections.None;
             this.strafeDirection = SpinOrStrafeDirections.None;
@@ -1288,7 +1296,7 @@ namespace AORebirth.Core.Entities
 
             if (forwardSpeed != 0)
             {
-                forwardMove = (Vector3)Quaternion.RotateVector3(this.RawHeading, Vector3.AxisZ);
+                forwardMove = (Vector3)Quaternion.RotateVector3(this.Transform.Rotation, Vector3.AxisZ);
                 forwardMove.Magnitude = Math.Abs(forwardSpeed);
                 if (forwardSpeed < 0)
                 {
@@ -1302,7 +1310,7 @@ namespace AORebirth.Core.Entities
 
             if (strafeSpeed != 0)
             {
-                strafeMove = (Vector3)Quaternion.RotateVector3(this.RawHeading, Vector3.AxisX);
+                strafeMove = (Vector3)Quaternion.RotateVector3(this.Transform.Rotation, Vector3.AxisX);
                 strafeMove.Magnitude = Math.Abs(strafeSpeed);
                 if (strafeSpeed < 0)
                 {
@@ -1501,11 +1509,12 @@ namespace AORebirth.Core.Entities
         /// </param>
         /// <param name="heading">
         /// </param>
+        /// <summary>
+        /// Legacy name — prefer <see cref="SetPose(Coordinate, Quaternion)"/>.
+        /// </summary>
         public void SetCoordinates(Coordinate newCoordinates, Quaternion heading)
         {
-            this.Coordinates(newCoordinates);
-            this.Heading = heading;
-            this.PredictionTime = DateTime.UtcNow;
+            this.SetPose(newCoordinates, heading);
         }
 
         /// <summary>

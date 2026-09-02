@@ -30,6 +30,7 @@ namespace ZoneEngine.Core.Playfields.Locality
         private readonly Dictionary<int, CellHeat> heatByCell = new Dictionary<int, CellHeat>();
         private readonly List<int> neighborBuffer = new List<int>();
         private readonly List<int> playerCells = new List<int>();
+        private readonly HashSet<int> combatHotCells = new HashSet<int>();
         private int heartbeatCounter;
 
         internal PlayfieldCellHeatScheduler(
@@ -40,6 +41,19 @@ namespace ZoneEngine.Core.Playfields.Locality
             this.layout = layout;
             this.policy = policy;
             this.cells = cells;
+        }
+
+        internal void RefreshHeatDiagnostics(
+            IEnumerable<ICharacter> connectedPlayers,
+            IEnumerable<ICharacter> combatHotCharacters)
+        {
+            if (this.layout.IsIndoor || !LogUtil.HasDetail(DebugInfoDetail.Locality))
+            {
+                return;
+            }
+
+            this.CollectHeatContext(connectedPlayers, combatHotCharacters);
+            this.TrackHeatTransitions(DateTime.UtcNow, null, null);
         }
 
         internal void Tick(
@@ -62,6 +76,15 @@ namespace ZoneEngine.Core.Playfields.Locality
                 return;
             }
 
+            DateTime now = DateTime.UtcNow;
+            this.CollectHeatContext(connectedPlayers, combatHotCharacters);
+            this.TrackHeatTransitions(now, processDynel, deltaTime);
+        }
+
+        private void CollectHeatContext(
+            IEnumerable<ICharacter> connectedPlayers,
+            IEnumerable<ICharacter> combatHotCharacters)
+        {
             this.playerCells.Clear();
             if (connectedPlayers != null)
             {
@@ -80,7 +103,7 @@ namespace ZoneEngine.Core.Playfields.Locality
                 }
             }
 
-            HashSet<int> combatHotCells = new HashSet<int>();
+            this.combatHotCells.Clear();
             if (combatHotCharacters != null)
             {
                 foreach (ICharacter character in combatHotCharacters)
@@ -88,26 +111,36 @@ namespace ZoneEngine.Core.Playfields.Locality
                     int cellId;
                     if (character != null && this.cells.TryGetCellId(character, out cellId) && cellId >= 0)
                     {
-                        combatHotCells.Add(cellId);
+                        this.combatHotCells.Add(cellId);
                     }
                 }
             }
+        }
 
-            DateTime now = DateTime.UtcNow;
+        private void TrackHeatTransitions(
+            DateTime now,
+            Action<ICharacter, double> processDynel,
+            double? deltaTime)
+        {
             HashSet<int> seenCells = new HashSet<int>();
             foreach (int cellId in this.cells.EnumeratePopulatedCells())
             {
                 seenCells.Add(cellId);
-                CellHeat heat = this.ResolveHeat(cellId, combatHotCells);
+                CellHeat heat = this.ResolveHeat(cellId, this.combatHotCells);
                 CellHeat previousHeat;
                 bool isNewCell = !this.heatByCell.TryGetValue(cellId, out previousHeat);
-                if (isNewCell || previousHeat != heat)
+                if (!isNewCell && previousHeat != heat)
                 {
-                    this.LogHeatChange(cellId, previousHeat, heat, isNewCell);
+                    this.LogHeatChange(cellId, previousHeat, heat);
                 }
 
                 this.heatByCell[cellId] = heat;
                 this.UpdateColdTimer(cellId, heat, now);
+
+                if (processDynel == null || !deltaTime.HasValue)
+                {
+                    continue;
+                }
 
                 if (!this.ShouldTickCell(cellId, heat, now))
                 {
@@ -119,7 +152,7 @@ namespace ZoneEngine.Core.Playfields.Locality
                 {
                     if (dynel != null)
                     {
-                        processDynel(dynel, deltaTime);
+                        processDynel(dynel, deltaTime.Value);
                     }
                 }
             }
@@ -143,7 +176,7 @@ namespace ZoneEngine.Core.Playfields.Locality
 
         private CellHeat ResolveHeat(int cellId, HashSet<int> combatHotCells)
         {
-            if (combatHotCells.Contains(cellId))
+            if (combatHotCells != null && combatHotCells.Contains(cellId))
             {
                 return CellHeat.Hot;
             }
@@ -232,10 +265,9 @@ namespace ZoneEngine.Core.Playfields.Locality
             return Math.Max(Math.Abs(ax - bx), Math.Abs(az - bz));
         }
 
-        private void LogHeatChange(int cellId, CellHeat previousHeat, CellHeat newHeat, bool isNewCell)
+        private void LogHeatChange(int cellId, CellHeat previousHeat, CellHeat newHeat)
         {
             this.layout.GetCellCoords(cellId, out int ix, out int iz);
-            string previousLabel = isNewCell ? "new" : previousHeat.ToString();
             LogUtil.Debug(
                 DebugInfoDetail.Locality,
                 string.Format(
@@ -245,7 +277,7 @@ namespace ZoneEngine.Core.Playfields.Locality
                     cellId,
                     ix,
                     iz,
-                    previousLabel,
+                    previousHeat,
                     newHeat));
         }
     }

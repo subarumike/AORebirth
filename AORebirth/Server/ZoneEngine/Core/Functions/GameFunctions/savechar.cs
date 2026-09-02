@@ -105,8 +105,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             // ResolvePlayerRespawnLocation reads TempSaveX as X and TempSaveY as world Z.
             int playfieldId = character.Playfield.Identity.Instance;
-            int saveX = (int)Math.Round(character.RawCoordinates.X);
-            int saveZ = (int)Math.Round(character.RawCoordinates.Z);
+            int saveX = (int)Math.Round((float)character.Position.x);
+            int saveZ = (int)Math.Round((float)character.Position.z);
 
             character.Stats[StatIds.tempsaveplayfield].Set((uint)Math.Max(0, playfieldId));
             character.Stats[StatIds.tempsavex].Set((uint)Math.Max(0, saveX));

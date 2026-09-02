@@ -67,7 +67,7 @@ namespace ZoneEngine.Core.Playfields
             }
 
             byte[] packet = (byte[])ScfuTemplate.Clone();
-            Coordinate coord = havaris.Coordinates();
+            Coordinate coord = havaris.CalculatePredictedPosition();
             int maxHealth = havaris.Stats[StatIds.life].Value;
             int currentHealth = havaris.Stats[StatIds.health].Value;
             if (maxHealth < 0)

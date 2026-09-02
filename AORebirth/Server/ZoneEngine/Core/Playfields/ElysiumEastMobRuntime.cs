@@ -3218,13 +3218,13 @@ namespace ZoneEngine.Core.Playfields
             }
 
             Playfield playfield = npc.Playfield as Playfield;
-            if (playfield == null || npc.RawCoordinates == null)
+            if (playfield == null || npc.Position == null)
             {
                 return null;
             }
 
             int npcSide = npc.Stats[StatIds.side].Value;
-            Coordinate npcCoord = npc.Coordinates();
+            Coordinate npcCoord = npc.CalculatePredictedPosition();
             ICharacter best = null;
             double bestDistance = radius;
             List<ICharacter> inRange = playfield.FindCharacterInRange(npc, radius);
@@ -3235,7 +3235,7 @@ namespace ZoneEngine.Core.Playfields
                     || candidate.Identity.Instance == npc.Identity.Instance
                     || !(candidate.Controller is PlayerController)
                     || candidate.Stats[StatIds.health].Value <= 0
-                    || candidate.RawCoordinates == null)
+                    || candidate.Position == null)
                 {
                     continue;
                 }
@@ -3250,7 +3250,7 @@ namespace ZoneEngine.Core.Playfields
                     }
                 }
 
-                double distance = candidate.Coordinates().coordinate.Distance2D(npcCoord.coordinate);
+                double distance = candidate.CalculatePredictedPosition().coordinate.Distance2D(npcCoord.coordinate);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;
@@ -3380,8 +3380,8 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                float dx = mob.Coordinates().x - slot.X;
-                float dz = mob.Coordinates().z - slot.Z;
+                float dx = mob.CalculatePredictedPosition().x - slot.X;
+                float dz = mob.CalculatePredictedPosition().z - slot.Z;
                 if ((dx * dx) + (dz * dz) <= 25.0f)
                 {
                     return mob;
@@ -3420,7 +3420,7 @@ namespace ZoneEngine.Core.Playfields
             mob.Playfield = playfield;
             ApplyCaptureStats(mob, slot);
             PrepareCombat(mob, controller, slot);
-            mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
+            mob.Position = (new Coordinate { x = slot.X, y = slot.Y, z = slot.Z }).coordinate;
             mob.DoNotDoTimers = false;
             RegisterAggro(mob.Identity.Instance);
             activateNpc(mob);

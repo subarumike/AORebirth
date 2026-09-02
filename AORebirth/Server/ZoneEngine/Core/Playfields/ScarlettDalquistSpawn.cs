@@ -140,7 +140,7 @@ namespace AORebirth.Core.Playfields
             mob.MeshLayer.AddMesh(1, 258990, 0, 2);
             mob.SocialMeshLayer.AddMesh(1, 258990, 0, 2);
 
-            mob.Coordinates(new Coordinate { x = 104.180695f, y = 2.185f, z = 76.13117f });
+            mob.Position = (new Coordinate { x = 104.180695f, y = 2.185f, z = 76.13117f }).coordinate;
 
             string combatFailure;
             CapturedEnemyCombatRuntime.Prepare(

@@ -128,8 +128,8 @@ namespace AORebirth.Core.Playfields
             }
 
             int id = character.Identity.Instance;
-            float px = (float)character.RawCoordinates.X;
-            float pz = (float)character.RawCoordinates.Z;
+            float px = (float)character.Position.x;
+            float pz = (float)character.Position.z;
             long zoneKey = NascenceDungeon2RevealZones.ResolveZoneKey(px, pz);
             bool zoneChanged;
             lock (Gate)
@@ -189,8 +189,8 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                float px = (float)character.RawCoordinates.X;
-                float pz = (float)character.RawCoordinates.Z;
+                float px = (float)character.Position.x;
+                float pz = (float)character.Position.z;
                 if (NascenceDungeon2RevealZones.ResolveZoneKey(px, pz) != zoneKey)
                 {
                     continue;
@@ -224,10 +224,10 @@ namespace AORebirth.Core.Playfields
 
             float px = force
                 ? NascenceDungeon2Rules.InteriorLandingX
-                : (float)character.RawCoordinates.X;
+                : (float)character.Position.x;
             float pz = force
                 ? NascenceDungeon2Rules.InteriorLandingZ
-                : (float)character.RawCoordinates.Z;
+                : (float)character.Position.z;
 
             int characterInstance = character.Identity.Instance;
             int playfieldInstance = character.Playfield.Identity.Instance;

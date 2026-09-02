@@ -61,8 +61,19 @@ namespace AORebirth.Core.Entities
         bool ChangedAppearance { get; set; }
 
         /// <summary>
+        /// World pose (position + rotation).
         /// </summary>
-        Quaternion Heading { get; set; }
+        Transform Transform { get; }
+
+        /// <summary>
+        /// Stored world position.
+        /// </summary>
+        Vector3 Position { get; set; }
+
+        /// <summary>
+        /// Stored / predicted world rotation (facing).
+        /// </summary>
+        Quaternion Rotation { get; set; }
 
         /// <summary>
         /// Caching Mesh layer structure
@@ -75,23 +86,7 @@ namespace AORebirth.Core.Entities
 
         /// <summary>
         /// </summary>
-        SmokeLounge.AOtomation.Messaging.GameData.Vector3 RawCoordinates { get; set; }
-
-        /// <summary>
-        /// </summary>
-        Quaternion RawHeading { get; set; }
-
-        /// <summary>
-        /// </summary>
         string OrganizationName { get; }
-
-        Coordinate Coordinates();
-
-        void Coordinates(Vector3 position);
-
-        void Coordinates(SmokeLounge.AOtomation.Messaging.GameData.Vector3 position);
-
-        void Coordinates(Coordinate position);
 
         /// <summary>
         /// </summary>

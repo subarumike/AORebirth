@@ -742,13 +742,11 @@ namespace AORebirth.Core.Playfields
                 ApplyAppearance(mob, def);
                 ApplyWaypoints(mob, npcController, def);
             }
-            mob.Coordinates(
-                new Coordinate
-                {
-                    x = sourcePlacement.PositionX,
-                    y = sourcePlacement.PositionY,
-                    z = sourcePlacement.PositionZ
-                });
+            mob.Position =
+                new AORebirth.Core.Vector.Vector3(
+                    sourcePlacement.PositionX,
+                    sourcePlacement.PositionY,
+                    sourcePlacement.PositionZ);
 
             if (def.CombatContractFactory != null)
             {
