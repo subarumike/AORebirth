@@ -74,6 +74,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CleanupTreatsAlreadyUnloadedPlayfieldAndNpcsAsAbsent()
+        {
+            string operational =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
+
+            StringAssert.Contains(
+                operational,
+                "TryGetExistingPlayfield(state.AllocatedLivePlayfield2)");
+            StringAssert.Contains(
+                operational,
+                "TryGetExistingNpc(");
+            StringAssert.Contains(
+                operational,
+                "ToIdentity(npc.RuntimeIdentity)");
+            StringAssert.Contains(
+                operational,
+                "private static IPlayfield TryGetExistingPlayfield");
+        }
+
+        [TestMethod]
         public void LegacyCapturedDifficultyMigratesWithoutLosingMutableState()
         {
             MissionAcgBindingRecord record = this.CreateBinding(20, this.FirstPf());

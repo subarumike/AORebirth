@@ -638,13 +638,7 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 IPlayfield playfield =
-                    Pool.Instance.GetObject<IPlayfield>(
-                        Identity.None,
-                        new Identity
-                        {
-                            Type = IdentityType.Playfield2,
-                            Instance = state.AllocatedLivePlayfield2
-                        });
+                    TryGetExistingPlayfield(state.AllocatedLivePlayfield2);
                 Playfield concrete = playfield as Playfield;
                 bool hasExactLiveCorpseLease =
                     concrete != null
@@ -1026,13 +1020,7 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 IPlayfield playfield =
-                    Pool.Instance.GetObject<IPlayfield>(
-                        Identity.None,
-                        new Identity
-                        {
-                            Type = IdentityType.Playfield2,
-                            Instance = state.AllocatedLivePlayfield2
-                        });
+                    TryGetExistingPlayfield(state.AllocatedLivePlayfield2);
                 Playfield concrete = playfield as Playfield;
                 var missionNpcInstances = new HashSet<int>();
                 for (int i = 0; i < state.Npcs.Count; i++)
@@ -1044,8 +1032,8 @@ namespace ZoneEngine.Core.Missions
                     if (concrete != null)
                     {
                         ICharacter character =
-                            Pool.Instance.GetObject<ICharacter>(
-                                concrete.Identity,
+                            TryGetExistingNpc(
+                                concrete,
                                 ToIdentity(npc.RuntimeIdentity));
                         if (character != null)
                         {
@@ -1579,6 +1567,28 @@ namespace ZoneEngine.Core.Missions
                     state.Heading.Y,
                     state.Heading.Z,
                     state.Heading.W);
+        }
+
+        private static IPlayfield TryGetExistingPlayfield(int playfieldInstance)
+        {
+            if (playfieldInstance == 0)
+            {
+                return null;
+            }
+
+            try
+            {
+                return Pool.Instance.GetObject<IPlayfield>(
+                    new Identity
+                    {
+                        Type = IdentityType.Playfield2,
+                        Instance = playfieldInstance
+                    });
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private static ICharacter TryGetExistingNpc(Playfield playfield, Identity runtimeIdentity)
