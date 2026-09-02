@@ -2,13 +2,81 @@ namespace ZoneEngine.Core.Playfields.Locality
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using AORebirth.Core.Entities;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
     using ZoneEngine.Core.Controllers;
+
+    internal interface ICellSurfaceLoader
+    {
+        void OnCellsFound(IReadOnlyList<int> cellIds);
+
+        void OnCellsLost(IReadOnlyList<int> cellIds);
+
+        void Clear();
+    }
+
+    internal sealed class PlaceholderCellSurfaceLoader : ICellSurfaceLoader
+    {
+        public void OnCellsFound(IReadOnlyList<int> cellIds)
+        {
+        }
+
+        public void OnCellsLost(IReadOnlyList<int> cellIds)
+        {
+        }
+
+        public void Clear()
+        {
+        }
+    }
+
+    internal sealed class PlayfieldCellResourceHub
+    {
+        private readonly List<ICellSurfaceLoader> loaders = new List<ICellSurfaceLoader>();
+
+        internal void AddLoader(ICellSurfaceLoader loader)
+        {
+            if (loader != null)
+            {
+                this.loaders.Add(loader);
+            }
+        }
+
+        internal void NotifyCellsFound(IReadOnlyList<int> cellIds)
+        {
+            if (cellIds == null || cellIds.Count == 0)
+            {
+                return;
+            }
+
+            foreach (ICellSurfaceLoader loader in this.loaders)
+            {
+                loader.OnCellsFound(cellIds);
+            }
+        }
+
+        internal void NotifyCellsLost(IReadOnlyList<int> cellIds)
+        {
+            if (cellIds == null || cellIds.Count == 0)
+            {
+                return;
+            }
+
+            foreach (ICellSurfaceLoader loader in this.loaders)
+            {
+                loader.OnCellsLost(cellIds);
+            }
+        }
+
+        internal void Clear()
+        {
+            foreach (ICellSurfaceLoader loader in this.loaders)
+            {
+                loader.Clear();
+            }
+        }
+    }
 
     internal sealed class PlayfieldCellLocalityMonitor
     {
