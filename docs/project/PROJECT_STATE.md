@@ -61,10 +61,11 @@ completion matrices and dated evidence retain detailed provenance.
   accepts earlier schema-version-1 journals. Plan:
   `docs/mission-harvest/mission-ql-1-250-plan.md`.
   The large level-2 campaign is paused at a documented slider gate: the current
-  active roller fixes all six non-difficulty controls at Malis center encoding
+  active roller fixes all six non-difficulty controls at its center encoding
   and cannot select duplicate-QL detents. The minimum discovery matrix and
   evidence boundaries are in
   `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`.
+  Malis is not an operational dependency for automation or capture.
 
 - Temple documented boss loot, together with the preceding Inner Sanctum and
   Foreman's documented-loot additions, is live on Linux from exact accepted

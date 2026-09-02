@@ -16,10 +16,9 @@ AORebirth runtime mission behavior.
 
 Three different claims must remain separate:
 
-1. **Structurally proven:** exact Malis/AOSharp source, serialized request
-   fields, value conversion, and fields returned by AOSharp.
-2. **Observed locally:** completed level-2 harvester journals and the installed
-   Malis settings file.
+1. **Structurally proven:** the dedicated harvester/AOSharp request path,
+   serialized fields, and fields returned by AOSharp.
+2. **Observed locally:** completed level-2 harvester journals.
 3. **Historical player documentation:** descriptions of server effects. These
    are useful hypotheses, not server-code proof and not probability evidence.
 
@@ -28,14 +27,15 @@ to the server does not by itself prove which returned fields it changes.
 
 ## Exact control and wire representation
 
-Malis commit `3ac9943a4943b8cb80eda9e40359729e656686b0` defines Easy/Hard as an
-integer UI range `1..11`. The other six controls use UI range `-100..100`.
-Immediately before calling `MissionTerminal.RequestMissions`, Malis changes an
-exact UI value of `0` to signed `-1` and casts each signed value to `byte`.
-AOSharp serializes all seven fields as ordered bytes in
-`QuestAlternativeMessage.MissionSliders`.
+The dedicated capture tool must expose Easy/Hard as an exact detent `1..11` and
+the other six controls as canonical semantic values `-100..100`. The retained
+AO wire convention encodes negative signed values by unchecked byte conversion
+and encodes semantic center `0` as signed `-1`/raw byte `255`. AOSharp serializes
+all seven fields as ordered bytes in `QuestAlternativeMessage.MissionSliders`.
+Malis source corroborates this historical encoding but is not used to automate,
+configure, observe, or capture the campaign.
 
-| Semantic position | Malis UI value | AOSharp/wire byte |
+| Semantic position | Capture-tool semantic value | AOSharp/wire byte |
 | --- | ---: | ---: |
 | Full left | -100 | 156 |
 | Left interior representative | -50 | 206 |
@@ -43,48 +43,44 @@ AOSharp serializes all seven fields as ordered bytes in
 | Right interior representative | +50 | 50 |
 | Full right | +100 | 100 |
 
-The raw byte order is not semantic slider order. Byte `255` means Malis center
-because Malis deliberately encodes center as signed `-1`; it is not the
-right-hand endpoint. UI values `0` and `-1` collide at wire byte `255`, so a
-capture that stores only the byte cannot distinguish those two Malis control
-positions. Record both the signed Malis UI value and the transmitted byte.
+The raw byte order is not semantic slider order. Byte `255` is the capture
+tool's canonical center encoding; it is not the right-hand endpoint. Semantic
+values `0` and `-1` collide at wire byte `255`, so record both the capture
+tool's canonical semantic value and the transmitted byte.
 
-Easy/Hard does not use this signed conversion. Its Malis UI value `1..11` is
-passed unchanged as the request byte. For a level-2 character, the current
+Easy/Hard does not use this signed conversion. Its detent `1..11` is passed
+unchanged as the request byte. For a level-2 character, the current
 retained table maps detents `1..5` to QL 1, `6..9` to QL 2, and `10..11` to QL
 3. The duplicate-QL detents are still different request bytes and must not be
 assumed equivalent without controlled evidence.
 
-## AOSharp and Malis behavior
+## AOSharp and dedicated capture-tool behavior
 
-- AOSharp's inspected `MissionTerminal` API has no property that exposes the
-  current native AO mission-window control positions. It accepts seven request
-  bytes.
+- AOSharp's inspected `MissionTerminal` API accepts seven request bytes. Native
+  AO UI slider state is irrelevant because the dedicated harvester generates
+  requests directly.
 - AOSharp deserializes the seven bytes on `QuestAlternativeMessage`; the
   harvester can preserve the returned `MissionSliders` bytes.
-- Malis can read its own seven UI controls. It passes every control on every
-  request.
-- Malis changes only Easy/Hard automatically, and only when `AutoAdjustQl` is
-  enabled while rolling a configured item. The other six controls remain the
-  saved/user-selected values.
-- The currently installed Malis settings have `AutoAdjustQl=false`, Easy/Hard
-  `6`, and all six other controls at UI `0`.
+- Harvester 1.2.1 owns automation and capture. It currently controls Easy/Hard
+  indirectly from target QL, resolves the first matching detent, and sends raw
+  byte `255` for every other slider.
+- The next capture-tool contract must directly control the exact detent and all
+  six canonical semantic values. It must not read, observe, or depend on Malis.
 - Existing level-2 journals contain centered (`255`) samples for all eleven
-  difficulty detents. One earlier Malis-observe journal contains a non-centered
-  returned state (`156,47,187,187,230,44`), but it was not a controlled
-  one-variable-at-a-time test and cannot establish an effect.
+  difficulty detents. No existing non-centered state is a controlled
+  one-variable-at-a-time comparison.
 
 ## Slider assessment
 
-| Slider | Known effect | Proven? | AOSharp-readable? | Malis-controlled? | Must test at level 2? | Recommended states |
+| Slider | Known effect | Proven? | AOSharp-readable? | Capture-tool controlled? | Must test at level 2? | Recommended states |
 | --- | --- | --- | --- | --- | --- | --- |
-| Easy ↔ Hard | Selects one of 11 difficulty request bytes; retained level table maps it to intended mission QL. Historical guides also associate it with mob, chest, and reward level. | Request encoding and table mapping are proven from source. AOSharp offers do not expose authoritative response-side mission QL, so every downstream effect is not yet live-proven. | Request/response byte yes; native AO UI position no. | Yes; Malis may auto-change it when `AutoAdjustQl=true`. | Yes. Existing centered level-2 data already covers detents 1..11. | Preserve all detents. For the new matrix fix detent 1/QL1, then add centered bridges at detent 6/QL2 and detent 10/QL3. |
-| Good ↔ Bad | Historical sources consistently associate it with mission type and degree of violence. This can change objective type and the five-icon mix. | Historical/player evidence only; controlled local causality is not proven. | Returned byte yes; native AO UI position no. | Manual/saved value; not auto-changed. | **Yes.** Omitting it invalidates a claim that the observed five-type mix is complete or representative. | UI `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
-| Order ↔ Chaos | Historical sources associate it with human versus monster enemy families; full Chaos has a claimed special paired-mob selection behavior. | Historical/player evidence only. The offer harvester cannot observe interior enemy populations. | Returned byte yes; native AO UI position no. | Manual/saved value; not auto-changed. | **Yes for discovery.** QL1 enemy pools could otherwise remain unobserved. | UI `-100,-50,0,+50,+100`; accept/inspect one QL1 mission at center and each endpoint only after interior capture is ready. |
-| Open ↔ Hidden | Historical sources associate it with locked doors/chests and hidden/secret spaces. | Historical/player evidence only. Not visible in mission offers. | Returned byte yes; native AO UI position no. | Manual/saved value; not auto-changed. | **Yes for discovery.** | UI `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
-| Physical ↔ Mystical | Historical sources associate it with weapon-oriented versus nano-using enemy populations/professions. | Historical/player evidence only. Not visible in mission offers. | Returned byte yes; native AO UI position no. | Manual/saved value; not auto-changed. | **Yes for discovery.** | UI `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
-| Head On ↔ Stealth | Historical sources conflict: one associates Stealth with traps/cameras/turrets; another associates the slider with aggression and assist/sneak behavior. | Conflicting historical/player evidence; controlled local proof is required. | Returned byte yes; native AO UI position no. | Manual/saved value; not auto-changed. | **Yes.** The disagreement makes omission unsafe. | UI `-100,-50,0,+50,+100`; inspect traps, security devices, aggression, and assists at center and endpoints. |
-| Money ↔ XP | Historical sources consistently associate it with the credits/XP reward split. Both returned numeric fields are exposed by AOSharp. | Transport and returned fields are proven; causal magnitude and possible effects on item rewards are not yet controlled live evidence. | Returned byte yes; native AO UI position no. | Manual/saved value; not auto-changed. | **Yes.** It is the most direct non-difficulty numeric-output test. | UI `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
+| Easy ↔ Hard | Selects one of 11 difficulty request bytes; retained level table maps it to intended mission QL. Historical guides also associate it with mob, chest, and reward level. | Request encoding and table mapping are proven from source. AOSharp offers do not expose authoritative response-side mission QL, so every downstream effect is not yet live-proven. | Request/response byte yes. | Yes, but 1.2.1 selects the first detent for a target QL; explicit detent control is required. | Yes. Existing centered level-2 data already covers detents 1..11. | Preserve all detents. For the new matrix fix detent 1/QL1, then add centered bridges at detent 6/QL2 and detent 10/QL3. |
+| Good ↔ Bad | Historical sources consistently associate it with mission type and degree of violence. This can change objective type and the five-icon mix. | Historical/player evidence only; controlled local causality is not proven. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes.** Omitting it invalidates a claim that the observed five-type mix is complete or representative. | Semantic `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
+| Order ↔ Chaos | Historical sources associate it with human versus monster enemy families; full Chaos has a claimed special paired-mob selection behavior. | Historical/player evidence only. The offer harvester cannot observe interior enemy populations. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes for discovery.** QL1 enemy pools could otherwise remain unobserved. | Semantic `-100,-50,0,+50,+100`; accept/inspect one QL1 mission at center and each endpoint only after interior capture is ready. |
+| Open ↔ Hidden | Historical sources associate it with locked doors/chests and hidden/secret spaces. | Historical/player evidence only. Not visible in mission offers. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes for discovery.** | Semantic `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
+| Physical ↔ Mystical | Historical sources associate it with weapon-oriented versus nano-using enemy populations/professions. | Historical/player evidence only. Not visible in mission offers. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes for discovery.** | Semantic `-100,-50,0,+50,+100`; inspect center and endpoint interiors later. |
+| Head On ↔ Stealth | Historical sources conflict: one associates Stealth with traps/cameras/turrets; another associates the slider with aggression and assist/sneak behavior. | Conflicting historical/player evidence; controlled local proof is required. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes.** The disagreement makes omission unsafe. | Semantic `-100,-50,0,+50,+100`; inspect traps, security devices, aggression, and assists at center and endpoints. |
+| Money ↔ XP | Historical sources consistently associate it with the credits/XP reward split. Both returned numeric fields are exposed by AOSharp. | Transport and returned fields are proven; causal magnitude and possible effects on item rewards are not yet controlled live evidence. | Returned byte yes. | Not in 1.2.1; explicit control required. | **Yes.** It is the most direct non-difficulty numeric-output test. | Semantic `-100,-50,0,+50,+100` / raw `156,206,255,50,100`. |
 
 No historical source reviewed ties a non-difficulty slider directly to mission
 destination or reward-item selection. That is absence of proof, not proof of no
@@ -109,8 +105,9 @@ means the available evidence does not justify either an effect or no effect.
 
 Use one ordinary solo terminal, one level-2 character, unchanged faction and
 inventory conditions, and no accepted/completed missions during the offer-only
-matrix. Disable Malis `AutoAdjustQl`. Hold difficulty at detent `1` (QL1) and
-hold all six signed sliders at UI `0` except the single slider named by the test.
+matrix. Do not load or use Malis. Hold difficulty at detent `1` (QL1) and hold
+all six capture-tool semantic values at `0` except the single slider named by
+the test.
 
 Run these exact states:
 
@@ -154,9 +151,9 @@ repeat sampling can be deferred until a controlled endpoint effect is observed.
 - character identity, level, side, profession, and relevant organization fields;
 - solo/team scope;
 - terminal identity, name, playfield, local/global coordinates, and rotation;
-- Easy/Hard detent byte, intended QL, QL-table revision/hash, and whether Malis
-  auto-adjusted it;
-- for every other slider: semantic name, signed Malis UI value, transmitted raw
+- Easy/Hard detent byte, intended QL, QL-table revision/hash, and whether the
+  capture tool resolved or explicitly selected the detent;
+- for every other slider: semantic name, signed capture-tool value, transmitted raw
   byte, and returned/echoed raw byte;
 - cash before/after and request cost when available;
 - the complete ordered five-offer cohort, including mission identity, icon/type,
@@ -167,21 +164,18 @@ repeat sampling can be deferred until a controlled endpoint effect is observed.
   secret areas, traps, cameras/turrets, and enemy identity/family/profession,
   level, position, aggression, and assist behavior.
 
-Omitting slider bytes invalidates causal comparison. Omitting signed Malis UI
-values loses the `0` versus `-1` distinction. Center-only Good/Bad data cannot
+Omitting slider bytes invalidates causal comparison. Omitting the canonical
+signed value loses the `0` versus `-1` distinction. Center-only Good/Bad data cannot
 support mission-type coverage claims. Center-only Money/XP data cannot support
 the credits/XP rule. Offer-only data cannot support any conclusion about the
 four interior/environment sliders.
 
 ## Capture-tool gate
 
-Before running this matrix, the tooling must provide one of these evidence-safe
-paths:
-
-- explicit arguments for difficulty detent and all six signed slider values,
-  recording signed and raw representations; or
-- a restored Malis-observe mode that correlates each response with an exact
-  snapshot of Malis's seven UI controls.
+Before running this matrix, the dedicated harvester must accept explicit
+arguments for difficulty detent and all six canonical signed slider values,
+recording signed and raw representations. No Malis mode or dependency is part of
+this workflow.
 
 The tool must not silently resolve duplicate QLs to the first detent during a
 detent-equivalence test. It must preserve the response slider bytes and reject a
@@ -189,15 +183,14 @@ request if the configured state cannot be represented exactly.
 
 ## Sources
 
-- Governed Malis source archive at commit `3ac9943a...`, members
-  `UI/Views/SliderView.xml`, `Views/SliderView.cs`, and `MainWindow.cs`, retained
-  under `docs/reference/missions/malis/raw/`.
 - Governed AOSharp source archive at commit `b45b7a05...`, members
   `AOSharp.Core/Dynel/MissionTerminal.cs`,
   `MissionSliders.cs`, and `QuestAlternativeMessage.cs`, retained under
   `docs/reference/missions/malis/raw/`.
 - `Tools/AOSharpMissionOfferHarvester/Main.cs` and completed local
   `%LOCALAPPDATA%/AOSharp/MissionOfferHarvester/sessions` journals.
+- Governed Malis source at commit `3ac9943a...` is retained only as historical
+  corroboration of the signed-byte convention; it is not an operational input.
 - [Rubi-Ka Mission Settings 101](https://forums.funcom.com/t/rubi-ka-mission-settings-101/6664), explicitly phrased by its author as what they "think" the sliders do.
 - [AO-Universe: How to pull a mission](https://www.ao-universe.com/guides/classic-ao/gameplay-guides-6/how-to-pull-a-mission), independent historical player documentation.
 - [Anarchy Online Wiki: Mission Options](https://wiki.aodb.us/wiki/Quests), independent historical player documentation.

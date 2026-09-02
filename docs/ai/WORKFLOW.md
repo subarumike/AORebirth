@@ -437,10 +437,12 @@ journals.
 
 Do not start the large level-2 campaign until the slider gate in
 `docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md` is
-satisfied. Harvester 1.2.1 active mode sends byte `255` (Malis center encoding)
+satisfied. Harvester 1.2.1 active mode sends byte `255` (the capture tool's
+canonical center encoding)
 for Good/Bad, Order/Chaos, Open/Hidden, Physical/Mystical, Head On/Stealth, and
 Money/XP and resolves a target QL to the first matching difficulty detent. It
 cannot execute the required one-variable-at-a-time low-level matrix as-is.
+Malis is not part of this capture workflow.
 
 ## Database-Wide Official Playfield Placement Import
 
