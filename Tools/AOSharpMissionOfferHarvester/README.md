@@ -80,11 +80,11 @@ transition in chat, and fails closed for the entire run on any evidence failure.
 | 26 | Detent-6 centered QL2 bridge |
 | 27 | Detent-10 centered QL3 bridge |
 
-Ranges make the campaign resumable. After states 1-7 are accepted, this one
+Ranges make the campaign resumable. After states 1-11 are accepted, this one
 command runs every remaining state with two requests each:
 
 ```text
-/missionharvest matrix 8 27 2 2.0
+/missionharvest matrix 12 27 2 2.0
 ```
 
 The single schema-3 session retains a distinct matrix index, label, requested

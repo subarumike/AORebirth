@@ -10,10 +10,10 @@ state and fails closed on any mismatch. Run the documented one-request live
 acceptance before beginning the matrix below.
 
 Harvester 1.4.0 additionally automates the resumable 27-state matrix. After the
-accepted states 1-7, run all remaining states with one command:
+accepted states 1-11, run all remaining states with one command:
 
 ```text
-/missionharvest matrix 8 27 2 2.0
+/missionharvest matrix 12 27 2 2.0
 ```
 
 The plugin changes state internally, reapplies and verifies all seven controls
