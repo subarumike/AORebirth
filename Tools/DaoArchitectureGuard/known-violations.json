@@ -1,0 +1,34 @@
+{
+  "directRuntimeSqlSites": [
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.AccountBroker/AccountBrokerService.cs",
+      "category": "account-service",
+      "owner": "IAccountIdentityDao",
+      "targetPhase": 6
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.BotService/BotPersistence.cs",
+      "category": "bot-service",
+      "owner": "IBotDao",
+      "targetPhase": 6
+    },
+    {
+      "path": "AORebirth/Server/ChatEngine/Program.cs",
+      "category": "database-readiness",
+      "owner": "readiness-tooling",
+      "targetPhase": 8
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine/Program.cs",
+      "category": "database-readiness",
+      "owner": "readiness-tooling",
+      "targetPhase": 8
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs",
+      "category": "character-online-state",
+      "owner": "ICharacterDao",
+      "targetPhase": 3
+    }
+  ]
+}

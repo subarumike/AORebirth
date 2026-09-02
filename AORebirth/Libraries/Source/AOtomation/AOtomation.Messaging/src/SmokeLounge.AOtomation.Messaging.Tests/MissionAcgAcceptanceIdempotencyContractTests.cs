@@ -105,9 +105,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void RollFeeDebitAndBatchClaimShareOneExistingDatabaseTransaction()
         {
             string feeService = ReadMissionSource("MissionRollFeeService.cs");
-            string apply = ReadMember(
+            string charge = ReadMember(
                 feeService,
-                "internal static MissionRollFeeApplyResult TryApply(");
+                "public static bool TryChargeRollFee(");
+            StringAssert.Contains(charge, "dao.TryChargeRollFee(");
+            Assert.IsFalse(
+                charge.IndexOf("BeginTransaction", StringComparison.OrdinalIgnoreCase) >= 0);
+            Assert.IsFalse(
+                charge.IndexOf("SELECT ", StringComparison.OrdinalIgnoreCase) >= 0);
+
+            string missionDao = ReadRepositoryFile(
+                "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs");
+            string apply = ReadMember(
+                missionDao,
+                "public MissionRollFeeResult TryChargeRollFee(");
             AssertOrdered(
                 apply,
                 "connection.BeginTransaction()",
@@ -117,7 +128,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "INSERT INTO missionrewardledger",
                 "transaction.Commit();");
             string readCash = ReadMember(
-                feeService,
+                missionDao,
                 "private static int ReadCash(");
             StringAssert.Contains(readCash, "SELECT StatValue FROM stats");
             StringAssert.Contains(readCash, "FOR UPDATE");

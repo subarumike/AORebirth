@@ -30,10 +30,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string characterName = Read(root, @"AORebirth\Server\LoginEngine\Packets\CharacterName.cs");
             string dao = Read(
                 root,
-                @"AORebirth\Libraries\Source\AORebirth.Database\Dao\NewCharacterStartAreaSelectionDao.cs");
+                @"AORebirth\Libraries\Source\AORebirth.Database\Domain\Missions\MySqlMissionDao.cs");
 
             StringAssert.Contains(characterName, "if (!startInSL)");
-            StringAssert.Contains(characterName, "NewCharacterStartAreaSelectionDao.MarkPending(charid)");
+            StringAssert.Contains(characterName, "missionDao.MarkStartAreaSelectionPending(charid)");
             StringAssert.Contains(dao, "INSERT INTO missionflags");
             StringAssert.Contains(dao, "AND `Value`=@PendingState");
         }
@@ -63,7 +63,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "sourcePlayfield.Teleport(");
             AssertTextBefore(
                 runtime,
-                "NewCharacterStartAreaSelectionDao.TryComplete",
+                "TryCompleteStartAreaSelection",
                 "TeleportToIccShuttleport(character)");
         }
 

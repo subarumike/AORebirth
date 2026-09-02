@@ -1,15 +1,34 @@
-namespace ZoneEngine.Core.Missions
+namespace AORebirth.Database.Domain.Missions
 {
     #region Usings ...
 
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Globalization;
     using System.Linq;
 
-    using AORebirth.Database;
+    using AORebirth.Enums;
+    using AORebirth.Interfaces.Persistence.Missions;
 
     using Dapper;
+
+    using Utility;
+
+    using MissionAccountFlagRecord = AORebirth.Interfaces.Persistence.Missions.MissionAccountFlagData;
+    using MissionAtomicStatRewardResult = AORebirth.Interfaces.Persistence.Missions.MissionAtomicStatRewardResultData;
+    using MissionCharacterSnapshot = AORebirth.Interfaces.Persistence.Missions.MissionCharacterSnapshotData;
+    using MissionCharacterStatMutation = AORebirth.Interfaces.Persistence.Missions.MissionStatMutationData;
+    using MissionCharacterStatValue = AORebirth.Interfaces.Persistence.Missions.MissionStatValueData;
+    using MissionFlagRecord = AORebirth.Interfaces.Persistence.Missions.MissionFlagData;
+    using MissionKey = AORebirth.Interfaces.Persistence.Missions.MissionKeyData;
+    using MissionObjectiveKey = AORebirth.Interfaces.Persistence.Missions.MissionObjectiveKeyData;
+    using MissionObjectiveObservationRecord = AORebirth.Interfaces.Persistence.Missions.MissionObjectiveObservationData;
+    using MissionObjectiveProgressRecord = AORebirth.Interfaces.Persistence.Missions.MissionObjectiveProgressData;
+    using MissionRewardClaimResult = AORebirth.Interfaces.Persistence.Missions.MissionRewardClaimResultData;
+    using MissionRewardKey = AORebirth.Interfaces.Persistence.Missions.MissionRewardKeyData;
+    using MissionRewardStageRecord = AORebirth.Interfaces.Persistence.Missions.MissionRewardStageData;
+    using MissionStateRecord = AORebirth.Interfaces.Persistence.Missions.MissionStateData;
 
     #endregion
 
@@ -17,12 +36,34 @@ namespace ZoneEngine.Core.Missions
     /// MySQL-backed authoritative mission repository. Every write operation is
     /// executed through a caller-scoped transaction and uses optimistic versions.
     /// </summary>
-    public sealed class MySqlMissionRepository : IMissionRepository
+    public sealed class MySqlMissionDao : IMissionDao
     {
+        private const string StartAreaQuestId = "system.new_character_start_area";
+        private const string StartAreaFlagKey = "selection";
+        private const string RollFeeRewardKey = "roll-fee";
+        private const string RollFeeRewardType = "GeneratedMissionRollFee";
+
+        private readonly Func<IDbConnection> connectionFactory;
+
+        public MySqlMissionDao()
+            : this(Connector.GetConnection)
+        {
+        }
+
+        public MySqlMissionDao(Func<IDbConnection> connectionFactory)
+        {
+            if (connectionFactory == null)
+            {
+                throw new ArgumentNullException("connectionFactory");
+            }
+
+            this.connectionFactory = connectionFactory;
+        }
+
         public MissionStateRecord GetMission(MissionKey key)
         {
             ValidateMissionKey(key);
-            using (IDbConnection connection = Connector.GetConnection())
+            using (IDbConnection connection = this.connectionFactory())
             {
                 return QueryMission(connection, null, key, false);
             }
@@ -31,7 +72,7 @@ namespace ZoneEngine.Core.Missions
         public IList<MissionStateRecord> GetMissions(int characterId)
         {
             ValidateCharacterId(characterId);
-            using (IDbConnection connection = Connector.GetConnection())
+            using (IDbConnection connection = this.connectionFactory())
             {
                 return QueryMissions(connection, null, characterId);
             }
@@ -41,7 +82,22 @@ namespace ZoneEngine.Core.Missions
         {
             return this.Execute(
                 characterId,
-                transaction => ((MySqlMissionRepositoryTransaction)transaction).ReadCharacter());
+                transaction => ((MySqlMissionDaoTransaction)transaction).ReadCharacter());
+        }
+
+        public string ResolveCharacterAccountKey(int characterId)
+        {
+            if (characterId <= 0)
+            {
+                return null;
+            }
+
+            const string Sql = "SELECT Username FROM characters WHERE Id=@CharacterId";
+            using (IDbConnection connection = this.connectionFactory())
+            {
+                string accountKey = connection.Query<string>(Sql, new { CharacterId = characterId }).SingleOrDefault();
+                return string.IsNullOrWhiteSpace(accountKey) ? null : accountKey.Trim();
+            }
         }
 
         public MissionAccountFlagRecord GetAccountFlag(string accountKey, string flagKey)
@@ -49,7 +105,7 @@ namespace ZoneEngine.Core.Missions
             accountKey = NormalizeAccountKey(accountKey);
             ValidateText(flagKey, "flagKey", 128, false);
             flagKey = flagKey.Trim();
-            using (IDbConnection connection = Connector.GetConnection())
+            using (IDbConnection connection = this.connectionFactory())
             {
                 return QueryAccountFlag(connection, null, accountKey, flagKey, false);
             }
@@ -58,13 +114,13 @@ namespace ZoneEngine.Core.Missions
         public IList<MissionAccountFlagRecord> GetAccountFlags(string accountKey)
         {
             accountKey = NormalizeAccountKey(accountKey);
-            using (IDbConnection connection = Connector.GetConnection())
+            using (IDbConnection connection = this.connectionFactory())
             {
                 return QueryAccountFlags(connection, null, accountKey);
             }
         }
 
-        public T Execute<T>(int characterId, Func<IMissionRepositoryTransaction, T> operation)
+        public T Execute<T>(int characterId, Func<IMissionDaoTransaction, T> operation)
         {
             return this.Execute(characterId, null, operation);
         }
@@ -72,7 +128,7 @@ namespace ZoneEngine.Core.Missions
         public T Execute<T>(
             int characterId,
             string accountKey,
-            Func<IMissionRepositoryTransaction, T> operation)
+            Func<IMissionDaoTransaction, T> operation)
         {
             ValidateCharacterId(characterId);
             if (accountKey != null)
@@ -85,13 +141,13 @@ namespace ZoneEngine.Core.Missions
                 throw new ArgumentNullException("operation");
             }
 
-            using (IDbConnection connection = Connector.GetConnection())
+            using (IDbConnection connection = this.connectionFactory())
             using (IDbTransaction transaction = connection.BeginTransaction())
             {
                 try
                 {
                     T result = operation(
-                        new MySqlMissionRepositoryTransaction(
+                        new MySqlMissionDaoTransaction(
                             characterId,
                             accountKey,
                             connection,
@@ -105,6 +161,358 @@ namespace ZoneEngine.Core.Missions
                     throw;
                 }
             }
+        }
+
+        public MissionRollFeeResult TryChargeRollFee(MissionRollFeeRequest request)
+        {
+            if (request == null
+                || request.CharacterType <= 0
+                || request.CharacterId <= 0
+                || string.IsNullOrEmpty(request.BatchIdentity)
+                || request.BatchIdentity.Length > 96
+                || request.Fee <= 0
+                || request.AppliedAtUtcTicks <= 0)
+            {
+                return RollFeeConflict("Roll-fee claim identity or amount is invalid.");
+            }
+
+            string questId = "generated-offer:" + request.BatchIdentity;
+            using (IDbConnection connection = this.connectionFactory())
+            using (IDbTransaction transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    int cashBefore = ReadCash(
+                        connection,
+                        transaction,
+                        request.CharacterType,
+                        request.CharacterId);
+                    MissionRollFeeLedgerRow existing =
+                        connection.Query<MissionRollFeeLedgerRow>(
+                            "SELECT RewardType, Status, EffectReference FROM missionrewardledger "
+                            + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId "
+                            + "AND RewardKey=@RewardKey FOR UPDATE",
+                            new
+                            {
+                                CharacterId = request.CharacterId,
+                                QuestId = questId,
+                                RewardKey = RollFeeRewardKey
+                            },
+                            transaction).FirstOrDefault();
+                    if (existing != null)
+                    {
+                        int recordedFee;
+                        int recordedBefore;
+                        int recordedAfter;
+                        if (!string.Equals(existing.RewardType, RollFeeRewardType, StringComparison.Ordinal)
+                            || existing.Status != (int)MissionRewardStatus.Applied
+                            || !TryParseRollFeeEffectReference(
+                                existing.EffectReference,
+                                request.BatchIdentity,
+                                out recordedFee,
+                                out recordedBefore,
+                                out recordedAfter)
+                            || recordedFee != request.Fee)
+                        {
+                            transaction.Rollback();
+                            return RollFeeConflict(
+                                "Existing durable roll-fee claim conflicts with this batch.");
+                        }
+
+                        transaction.Commit();
+                        return new MissionRollFeeResult
+                               {
+                                   Status = MissionRollFeeStatus.AlreadyApplied,
+                                   CashBefore = recordedBefore,
+                                   CashAfter = cashBefore,
+                                   Failure = string.Empty
+                               };
+                    }
+
+                    if (cashBefore < request.Fee)
+                    {
+                        transaction.Rollback();
+                        return new MissionRollFeeResult
+                               {
+                                   Status = MissionRollFeeStatus.InsufficientCredits,
+                                   CashBefore = cashBefore,
+                                   CashAfter = cashBefore,
+                                   Failure = "Insufficient credits for generated mission roll fee."
+                               };
+                    }
+
+                    int cashAfter = cashBefore - request.Fee;
+                    connection.Execute(
+                        "INSERT INTO stats (Instance, Type, StatId, StatValue) "
+                        + "VALUES (@Instance, @Type, @StatId, @StatValue) "
+                        + "ON DUPLICATE KEY UPDATE StatValue=@StatValue",
+                        new
+                        {
+                            Instance = request.CharacterId,
+                            Type = request.CharacterType,
+                            StatId = (int)StatIds.cash,
+                            StatValue = cashAfter
+                        },
+                        transaction);
+
+                    string effectReference = CreateRollFeeEffectReference(
+                        request.BatchIdentity,
+                        request.Fee,
+                        cashBefore,
+                        cashAfter);
+                    int inserted = connection.Execute(
+                        "INSERT INTO missionrewardledger "
+                        + "(CharacterId, QuestId, RewardKey, RewardType, Status, Attempts, LastError, "
+                        + "EffectReference, ClaimToken, ClaimedAtUtcTicks, ClaimExpiresAtUtcTicks, "
+                        + "AppliedAtUtcTicks, CreatedAtUtcTicks, UpdatedAtUtcTicks, Version) VALUES "
+                        + "(@CharacterId, @QuestId, @RewardKey, @RewardType, @Status, 1, NULL, "
+                        + "@EffectReference, NULL, @AppliedAtUtcTicks, 0, @AppliedAtUtcTicks, "
+                        + "@AppliedAtUtcTicks, @AppliedAtUtcTicks, 1)",
+                        new
+                        {
+                            CharacterId = request.CharacterId,
+                            QuestId = questId,
+                            RewardKey = RollFeeRewardKey,
+                            RewardType = RollFeeRewardType,
+                            Status = (int)MissionRewardStatus.Applied,
+                            EffectReference = effectReference,
+                            request.AppliedAtUtcTicks
+                        },
+                        transaction);
+                    if (inserted != 1)
+                    {
+                        throw new InvalidOperationException(
+                            "Durable generated mission roll-fee claim was not inserted exactly once.");
+                    }
+
+                    transaction.Commit();
+                    return new MissionRollFeeResult
+                           {
+                               Status = MissionRollFeeStatus.Applied,
+                               CashBefore = cashBefore,
+                               CashAfter = cashAfter,
+                               Failure = string.Empty
+                           };
+                }
+                catch
+                {
+                    try
+                    {
+                        transaction.Rollback();
+                    }
+                    catch
+                    {
+                    }
+
+                    throw;
+                }
+            }
+        }
+
+        public bool MarkStartAreaSelectionPending(int characterId)
+        {
+            if (characterId <= 0)
+            {
+                return false;
+            }
+
+            const string Sql =
+                "INSERT INTO missionflags "
+                + "(CharacterId, QuestId, FlagKey, `Value`, CreatedAtUtcTicks, UpdatedAtUtcTicks, Version) "
+                + "VALUES (@CharacterId, @QuestId, @FlagKey, @Value, @NowUtcTicks, @NowUtcTicks, 1) "
+                + "ON DUPLICATE KEY UPDATE `Value`=`Value`";
+
+            try
+            {
+                using (IDbConnection connection = this.connectionFactory())
+                {
+                    connection.Execute(
+                        Sql,
+                        new
+                        {
+                            CharacterId = characterId,
+                            QuestId = StartAreaQuestId,
+                            FlagKey = StartAreaFlagKey,
+                            Value = MissionStartAreaSelectionStates.Pending,
+                            NowUtcTicks = DateTime.UtcNow.Ticks
+                        });
+                }
+
+                return string.Equals(
+                    this.GetStartAreaSelectionState(characterId),
+                    MissionStartAreaSelectionStates.Pending,
+                    StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception exception)
+            {
+                LogUtil.ErrorException(exception);
+                return false;
+            }
+        }
+
+        public string GetStartAreaSelectionState(int characterId)
+        {
+            if (characterId <= 0)
+            {
+                return null;
+            }
+
+            const string Sql =
+                "SELECT `Value` FROM missionflags "
+                + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND FlagKey=@FlagKey LIMIT 1";
+
+            try
+            {
+                using (IDbConnection connection = this.connectionFactory())
+                {
+                    return connection.Query<string>(
+                            Sql,
+                            new
+                            {
+                                CharacterId = characterId,
+                                QuestId = StartAreaQuestId,
+                                FlagKey = StartAreaFlagKey
+                            })
+                        .FirstOrDefault();
+                }
+            }
+            catch (Exception exception)
+            {
+                LogUtil.ErrorException(exception);
+                return null;
+            }
+        }
+
+        public bool TryCompleteStartAreaSelection(int characterId, string selectedState)
+        {
+            if (characterId <= 0 || !IsCompletedStartAreaState(selectedState))
+            {
+                return false;
+            }
+
+            const string Sql =
+                "UPDATE missionflags SET `Value`=@SelectedState, UpdatedAtUtcTicks=@NowUtcTicks, Version=Version+1 "
+                + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND FlagKey=@FlagKey AND `Value`=@PendingState";
+
+            try
+            {
+                using (IDbConnection connection = this.connectionFactory())
+                {
+                    return connection.Execute(
+                               Sql,
+                               new
+                               {
+                                   CharacterId = characterId,
+                                   QuestId = StartAreaQuestId,
+                                   FlagKey = StartAreaFlagKey,
+                                   PendingState = MissionStartAreaSelectionStates.Pending,
+                                   SelectedState = selectedState,
+                                   NowUtcTicks = DateTime.UtcNow.Ticks
+                               }) == 1;
+                }
+            }
+            catch (Exception exception)
+            {
+                LogUtil.ErrorException(exception);
+                return false;
+            }
+        }
+
+        private static int ReadCash(
+            IDbConnection connection,
+            IDbTransaction transaction,
+            int characterType,
+            int characterId)
+        {
+            int? persisted = connection.Query<int?>(
+                    "SELECT StatValue FROM stats WHERE Instance=@Instance AND Type=@Type "
+                    + "AND StatId=@StatId FOR UPDATE",
+                    new
+                    {
+                        Instance = characterId,
+                        Type = characterType,
+                        StatId = (int)StatIds.cash
+                    },
+                    transaction)
+                .FirstOrDefault();
+            return ClampCash(persisted.GetValueOrDefault());
+        }
+
+        private static int ClampCash(long cash)
+        {
+            const int ClientSafeMaxCash = 999999999;
+            return cash < 0 ? 0 : cash > ClientSafeMaxCash ? ClientSafeMaxCash : (int)cash;
+        }
+
+        private static string CreateRollFeeEffectReference(
+            string batchIdentity,
+            int fee,
+            int cashBefore,
+            int cashAfter)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "batch={0};fee={1};before={2};after={3}",
+                batchIdentity,
+                fee,
+                cashBefore,
+                cashAfter);
+        }
+
+        private static bool TryParseRollFeeEffectReference(
+            string effectReference,
+            string expectedBatchIdentity,
+            out int fee,
+            out int cashBefore,
+            out int cashAfter)
+        {
+            fee = 0;
+            cashBefore = 0;
+            cashAfter = 0;
+            if (string.IsNullOrEmpty(effectReference))
+            {
+                return false;
+            }
+
+            string[] parts = effectReference.Split(';');
+            return parts.Length == 4
+                   && string.Equals(parts[0], "batch=" + expectedBatchIdentity, StringComparison.Ordinal)
+                   && TryParseRollFeePart(parts[1], "fee=", out fee)
+                   && TryParseRollFeePart(parts[2], "before=", out cashBefore)
+                   && TryParseRollFeePart(parts[3], "after=", out cashAfter)
+                   && fee > 0
+                   && cashBefore >= fee
+                   && cashAfter == cashBefore - fee;
+        }
+
+        private static bool TryParseRollFeePart(string value, string prefix, out int parsed)
+        {
+            parsed = 0;
+            return value != null
+                   && value.StartsWith(prefix, StringComparison.Ordinal)
+                   && int.TryParse(
+                       value.Substring(prefix.Length),
+                       NumberStyles.Integer,
+                       CultureInfo.InvariantCulture,
+                       out parsed);
+        }
+
+        private static MissionRollFeeResult RollFeeConflict(string failure)
+        {
+            return new MissionRollFeeResult
+                   {
+                       Status = MissionRollFeeStatus.Conflict,
+                       Failure = failure ?? "Durable generated mission roll-fee claim conflict."
+                   };
+        }
+
+        private static bool IsCompletedStartAreaState(string state)
+        {
+            return string.Equals(state, MissionStartAreaSelectionStates.Arete, StringComparison.Ordinal)
+                   || string.Equals(
+                       state,
+                       MissionStartAreaSelectionStates.IccShuttleport,
+                       StringComparison.Ordinal);
         }
 
         private static MissionStateRecord QueryMission(
@@ -340,12 +748,21 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private sealed class MySqlMissionRepositoryTransaction : IMissionRepositoryTransaction
+        private sealed class MissionRollFeeLedgerRow
+        {
+            public string RewardType { get; set; }
+
+            public int Status { get; set; }
+
+            public string EffectReference { get; set; }
+        }
+
+        private sealed class MySqlMissionDaoTransaction : IMissionDaoTransaction
         {
             private readonly IDbConnection connection;
             private readonly IDbTransaction transaction;
 
-            public MySqlMissionRepositoryTransaction(
+            public MySqlMissionDaoTransaction(
                 int characterId,
                 string accountKey,
                 IDbConnection connection,

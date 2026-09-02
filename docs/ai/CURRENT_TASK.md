@@ -2,15 +2,13 @@
 
 ## Active
 
-Complete the PF620 Mercenary Camp wiki-loot supplement. AOWiki revision 45756
-resolves 24 local source items across 48 boss/item memberships. Ian Warr's 100%
-Breastplate of Azure Reveries, Nelly Johnson's 100% Little Black Dress, and Ris
-Lee's 100% Fancy Stethoscopic Glasses are active. Random Azure, Notum Tank,
-extra-item, and approximate-rate memberships remain inactive because per-item
-probabilities or duplicate behavior are not published. No PF620 specialized
-population exists, so the three active mappings remain dormant. Do not infer
-missing rates, selection weights, duplicate behavior, or spawn behavior from
-the wiki.
+Complete DAO Phase 1 infrastructure and the Phase 2 mission-persistence slice.
+Mission runtime must depend on `IMissionDao`, with SQL and provider APIs owned by
+`AORebirth.Database`, while preserving existing schema, transaction order,
+packets, and gameplay. Character aggregate persistence and every later DAO phase
+remain out of scope. Acceptance requires the architecture guard, focused and
+full mission regressions, Windows/Linux compile inventories, and disposable
+MySQL DAO validation when an isolated Docker engine is available.
 
 ## Prior active checkpoint
 

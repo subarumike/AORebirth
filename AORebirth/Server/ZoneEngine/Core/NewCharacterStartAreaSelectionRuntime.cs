@@ -10,7 +10,7 @@ namespace ZoneEngine.Core
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Vector;
-    using AORebirth.Database.Dao;
+    using AORebirth.Interfaces.Persistence.Missions;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -48,6 +48,21 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<int, Identity> ActiveTargetsByCharacter =
             new Dictionary<int, Identity>();
 
+        private static IMissionDao missionDao;
+
+        internal static void Initialize(IMissionDao dao)
+        {
+            if (dao == null)
+            {
+                throw new ArgumentNullException("dao");
+            }
+
+            lock (SyncRoot)
+            {
+                missionDao = dao;
+            }
+        }
+
         internal static void Schedule(IZoneClient client)
         {
             if (client == null || client.Controller == null || client.Controller.Character == null)
@@ -74,8 +89,8 @@ namespace ZoneEngine.Core
                         || character.Playfield == null
                         || character.Playfield.Identity.Instance != AretePlayfieldId
                         || !string.Equals(
-                            NewCharacterStartAreaSelectionDao.GetState(characterId),
-                            NewCharacterStartAreaSelectionDao.PendingState,
+                            GetMissionDao().GetStartAreaSelectionState(characterId),
+                            MissionStartAreaSelectionStates.Pending,
                             StringComparison.OrdinalIgnoreCase))
                     {
                         return;
@@ -111,11 +126,11 @@ namespace ZoneEngine.Core
             string selectedState;
             if (answerIndex == 0)
             {
-                selectedState = NewCharacterStartAreaSelectionDao.AreteState;
+                selectedState = MissionStartAreaSelectionStates.Arete;
             }
             else if (answerIndex == 1)
             {
-                selectedState = NewCharacterStartAreaSelectionDao.IccShuttleportState;
+                selectedState = MissionStartAreaSelectionStates.IccShuttleport;
             }
             else
             {
@@ -123,7 +138,7 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            if (!NewCharacterStartAreaSelectionDao.TryComplete(character.Identity.Instance, selectedState))
+            if (!GetMissionDao().TryCompleteStartAreaSelection(character.Identity.Instance, selectedState))
             {
                 SendChoices(character, target, "Your choice could not be saved. Please try again.");
                 return true;
@@ -134,7 +149,7 @@ namespace ZoneEngine.Core
 
             if (string.Equals(
                 selectedState,
-                NewCharacterStartAreaSelectionDao.IccShuttleportState,
+                MissionStartAreaSelectionStates.IccShuttleport,
                 StringComparison.Ordinal))
             {
                 TeleportToIccShuttleport(character);
@@ -203,6 +218,20 @@ namespace ZoneEngine.Core
             lock (SyncRoot)
             {
                 ActiveTargetsByCharacter.Remove(characterId);
+            }
+        }
+
+        private static IMissionDao GetMissionDao()
+        {
+            lock (SyncRoot)
+            {
+                if (missionDao == null)
+                {
+                    throw new InvalidOperationException(
+                        "New-character start-area persistence has not been initialized.");
+                }
+
+                return missionDao;
             }
         }
 

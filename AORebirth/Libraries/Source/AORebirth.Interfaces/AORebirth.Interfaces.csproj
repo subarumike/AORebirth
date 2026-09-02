@@ -59,6 +59,7 @@
     <Compile Include="ISummoner.cs" />
     <Compile Include="IUploadedNanos.cs" />
     <Compile Include="IVector3.cs" />
+    <Compile Include="Persistence\Missions\IMissionDao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

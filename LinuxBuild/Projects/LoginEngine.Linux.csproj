@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="AORebirth.Core.Login.Linux.csproj" />
     <ProjectReference Include="AORebirth.Database.Linux.csproj" />
+    <ProjectReference Include="AORebirth.Interfaces.Linux.csproj" />
     <ProjectReference Include="Cell.Core.Linux.csproj" />
     <ProjectReference Include="SmokeLounge.AOtomation.Messaging.Linux.csproj" />
     <ProjectReference Include="Translations.Linux.csproj" />

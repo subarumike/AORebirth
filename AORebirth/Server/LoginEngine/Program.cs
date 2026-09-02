@@ -45,11 +45,13 @@ namespace LoginEngine
     using AO.Core.Encryption;
 
     using AORebirth.Core.Components;
+    using AORebirth.Database;
     using AORebirth.Database.Dao;
 
     using locales;
 
     using LoginEngine.CoreServer;
+    using LoginEngine.Packets;
 
     using NBug;
     using NBug.Properties;
@@ -523,6 +525,8 @@ namespace LoginEngine
                 Colouring.Pop();
                 return false;
             }
+
+            CharacterName.InitializeMissionPersistence(DatabaseDaoFactory.CreateMissionDao());
 
             if (!InitializeConsoleCommands())
             {

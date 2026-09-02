@@ -97,7 +97,8 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/DailyMissionRewardRules.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardCoordinator.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MySqlMissionRepository.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionDaoRepositoryAdapter.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionDataMapper.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/PersistentMissionService.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Missions/MissionRuntime.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Subway/Quests/TotwGatewayInteractionHandler.cs" />

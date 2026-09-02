@@ -9,6 +9,16 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- DAO refactor Phase 1 infrastructure and the Phase 2 mission-persistence source
+  slice are implemented without schema, packet, or gameplay changes. Mission
+  runtime, roll-fee persistence, start-area selection, and mission account-key
+  lookup now depend on `IMissionDao`; `MySqlMissionDao` owns their SQL through
+  the existing Connector. The audit-mode architecture guard reports five
+  reviewed later-phase runtime SQL sites and zero direct mission runtime SQL.
+  Windows and Linux builds plus the 1,140-test AOtomation suite pass. Disposable
+  MySQL runtime validation and governed exact-SHA acceptance remain open until
+  an isolated Docker engine and acceptance environment are available.
+
 - ARPA3/ClickSaver Rubi-Ka mission evidence is archived and normalized offline
   with source/member SHA-256 provenance, deterministic regeneration, and no
   runtime dependency. The two retained ClickSaver 3.x catalogs decode to a

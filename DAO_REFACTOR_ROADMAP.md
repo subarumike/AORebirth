@@ -1,7 +1,17 @@
 # AORebirth DAO Refactor Roadmap
 
-Status: implementation-ready roadmap; DAO implementation has not started.  
+Status: Phase 1 infrastructure and Phase 2 mission slice implemented; final environment-dependent acceptance remains.
 Basis: `DAO_REFACTOR_AUDIT.md` and current repository source on 2026-09-01.
+
+Implementation checkpoint (2026-09-01): production MissionRuntime, generated
+mission roll-fee persistence, and new-character start-area selection now consume
+`IMissionDao`. Mission SQL is owned by `MySqlMissionDao` in
+`AORebirth.Database`; the Zone adapter retains the existing
+`IMissionRepository` service boundary. The architecture guard reports five
+reviewed non-mission legacy runtime SQL sites and zero mission runtime SQL sites.
+Disposable MySQL validation is implemented but still requires an available
+isolated Docker engine; exact-SHA acceptance is recorded only when its governed
+environment is available.
 
 ## 1. Target architecture
 
@@ -539,17 +549,20 @@ LINUX_ACCEPTANCE=PASS
 Phase 1 implementation checklist:
 
 ```text
-[ ] Add only mission DAO contracts/DTOs under AORebirth.Interfaces/Persistence/Missions
-[ ] Add DatabaseDaoFactory mission creation method, unused by production initially
-[ ] Add deterministic path-based DaoArchitectureGuard
-[ ] Baseline known violations in a reviewed manifest with owner and target phase
-[ ] Add guard fixture tests for runtime, Database, Tools, Tests, Migrations
-[ ] Wire guard to run_mandatory_integration_gate.cmd after it is stable
-[ ] Update Windows/Linux compile inventories through approved workflows
-[ ] Prove zero observable runtime changes
+[x] Add only mission DAO contracts/DTOs under AORebirth.Interfaces/Persistence/Missions
+[x] Add DatabaseDaoFactory mission creation method
+[x] Add deterministic path-based DaoArchitectureGuard
+[x] Baseline known violations in a reviewed manifest with owner and target phase
+[x] Add guard fixture tests for runtime, Database, Tools, Tests, Migrations
+[x] Wire guard to run_mandatory_integration_gate.cmd after it is stable
+[x] Update Windows/Linux compile inventories through approved workflows
+[x] Prove zero intended runtime behavior changes through contract/regression tests
 ```
 
 ### Phase 2 — First vertical slice: missions
+
+Implementation status (2026-09-01): code-complete; disposable MySQL and governed
+exact-SHA acceptance remain environment-dependent gates.
 
 - Goal: move mission SQL below DAO interfaces while preserving all behavior and transaction semantics.
 - Exact scope: files, tables, adapters, tests, construction, and rollback listed in section 6.
@@ -561,6 +574,20 @@ Phase 1 implementation checklist:
 - Rollback boundary: composition revert, same schema, no dual-write.
 - Risks: transaction/order/mapping drift, mission DTO divergence.
 - Must not change: mission definitions, rewards, packet bodies, gameplay progression, schema, startup behavior.
+
+Phase 2 implementation checklist:
+
+```text
+[x] Add IMissionDao and neutral mission persistence DTOs
+[x] Move mission repository, roll-fee, and start-area SQL into MySqlMissionDao
+[x] Add MissionDaoRepositoryAdapter and explicit composition-root construction
+[x] Remove SQL/provider dependencies from mission runtime files
+[x] Preserve character-deletion mission cleanup for the later character slice
+[x] Add adapter, architecture, guard, provider, rollback, idempotency, and concurrency tests
+[x] Update authoritative Windows and guarded Linux compile inventories
+[ ] Run disposable MySQL validation on an available isolated Docker engine
+[ ] Record governed exact-SHA Windows and Linux acceptance
+```
 
 ### Phase 3 — Character/account read and online-state seams
 
@@ -783,11 +810,11 @@ Do not remove legacy DAO code in the same commit that first activates its replac
 
 ```text
 DAO_REFACTOR_AUDIT=COMPLETE
-DIRECT_RUNTIME_SQL_SITES=7
+DIRECT_RUNTIME_SQL_SITES=5
 PROPOSED_DAOS=17
 RECOMMENDED_FIRST_SLICE=MISSION_PERSISTENCE
 PHASE_COUNT=10
 HIGHEST_RISK_AREA=CHARACTER_AGGREGATE_TRANSACTIONS
-IMPLEMENTATION_STARTED=NO
+MISSION_RUNTIME_DIRECT_SQL_SITES=0
+IMPLEMENTATION_STARTED=YES
 ```
-

@@ -15,6 +15,7 @@ namespace LoginEngine
     using AORebirth.Database;
 
     using LoginEngine.CoreServer;
+    using LoginEngine.Packets;
 
     using NLog;
 
@@ -119,6 +120,7 @@ namespace LoginEngine
                 InitializeLogging();
                 InitializeServer(configuration);
                 ValidateLiveConnection();
+                CharacterName.InitializeMissionPersistence(DatabaseDaoFactory.CreateMissionDao());
 
                 Console.WriteLine("Starting LoginEngine in headless mode.");
                 loginServer.Start(true, false);
