@@ -1,0 +1,2181 @@
+mission_ql,low_id,high_id,observed_item_ql,unknown,item_name,observation_count
+1,26471,26471,14,0,Nano Crystal (Ranged Special Attacks Incompetence),1
+1,26489,26489,10,0,Nano Crystal (Nano Skills Incompetence),1
+1,26503,26503,14,0,Nano Crystal (Melee Special Attacks Incompetence),1
+1,26541,26541,10,0,Nano Crystal (Drain Abilities),3
+1,27199,27199,10,0,Nano Crystal (Melee Weapons Incompetence),2
+1,27382,27382,1,0,Omni-Med Suit Boots,2
+1,27383,27383,1,0,Omni-Med Suit Shirt,1
+1,27385,27385,1,0,Omni-Med Suit Sleeves,2
+1,27386,27386,1,0,Omni-Med Suit Trousers,1
+1,27387,27387,1,0,Omni-Med Female Suit Shirt,2
+1,28751,28751,4,0,Nano Crystal (Team Quick Heal),2
+1,28752,28752,10,0,Nano Crystal (Terrain Knowledge),2
+1,28767,28767,7,0,Nano Crystal (Doctor's Grace),3
+1,28804,28804,10,0,Nano Crystal (Corrosive Spray),2
+1,28805,28805,4,0,Nano Crystal (Corruption),1
+1,28811,28811,7,0,Nano Crystal (Fire Stream),1
+1,28834,28834,4,0,Nano Crystal (Radiation Pulse),2
+1,28932,28932,7,0,Nano Crystal (Give Energy: 10),3
+1,28936,28936,7,0,Nano Crystal (Give Life: 10),3
+1,28943,28943,4,0,Nano Crystal (Iron Fist),6
+1,29192,29192,10,0,Nano Crystal (Symbol Helper),2
+1,29823,29823,1,0,Nano Crystal (Armor Megaboost),5
+1,29844,29844,10,0,Nano Crystal (Gun Enhancement),1
+1,29862,29862,7,0,Nano Crystal (Spike Shield),3
+1,30110,30110,10,0,Nano Crystal (Distracted Gaze),2
+1,30781,30781,10,0,Nano Crystal (Lend Nano: 50),6
+1,31498,31498,1,0,White Cloak,1
+1,31499,31499,1,0,Red Cloak,6
+1,31500,31500,1,0,Grey Cloak,4
+1,31501,31501,1,0,Green Cloak,2
+1,31502,31502,1,0,Brown Cloak,9
+1,31503,31503,1,0,Blue Cloak,2
+1,31504,31504,1,0,Jean Trenchcoat,1
+1,31505,31505,1,0,Black Trenchcoat,4
+1,31506,31506,1,0,Black Omni-Tek Commander Cloak,3
+1,31515,31515,1,0,Red Omni-Tek Commander Cloak,6
+1,31516,31516,1,0,Trenchcoat,4
+1,31517,31517,1,0,Black Cloak,7
+1,31528,31528,1,0,Red Cloak Hood,4
+1,31530,31530,1,0,Grey Cloak Hood,5
+1,31531,31531,1,0,Green Cloak Hood,7
+1,31532,31532,1,0,Brown Cloak Hood,8
+1,31533,31533,1,0,Blue Cloak Hood,4
+1,31534,31534,1,0,Black Cloak Hood,7
+1,32082,32082,10,0,Nano Crystal (False Profession: Enforcer),11
+1,36783,36783,1,0,Belt Component Platform Ti-100X,1
+1,42412,42412,1,0,Nano Crystal (Enhance Team Health),1
+1,42423,42423,4,0,Nano Crystal (Weak Team Heal),3
+1,43978,43978,4,0,Nano Crystal (Emergency Stitching),3
+1,43993,43993,10,0,Nano Crystal (Dress Wounds),3
+1,44186,44186,10,0,Nano Crystal (Dissolve Molecular Bonding),1
+1,44189,44189,7,0,Nano Crystal (Limited Nano Reaper),2
+1,45956,45956,7,0,Nano Crystal (Open Wound),1
+1,45965,45965,1,0,Nano Crystal (Minor Toxic Barb),2
+1,45994,45994,7,0,Nano Crystal (Feeble Blade Chaos),1
+1,46010,46010,10,0,Nano Crystal (Upgraded Automaton),2
+1,46074,46074,7,0,Nano Crystal (Automaton),2
+1,46456,46456,1,0,Nano Crystal (Basic Worker-Droid),4
+1,46462,46462,7,0,Nano Crystal (Advanced Worker),2
+1,49821,49821,4,0,Nano Crystal (Challenger to Cyclops),3
+1,55679,55679,1,0,Weapon Smithing Tutoring Device,1
+1,55681,55681,1,0,Psychology Tutoring Device,1
+1,55685,55685,1,0,Nano Programming Tutoring Device,2
+1,55690,55690,1,0,Mechanical Engineering Tutoring Device,2
+1,55694,55694,1,0,Electrical Engineering Tutoring Device,2
+1,55761,55761,10,0,Nano Crystal (Bristling Shield),3
+1,55762,55762,4,0,Nano Crystal (Avenging Shield),3
+1,55838,55838,7,0,Nano Crystal (Frost With Snow),2
+1,55863,55863,1,0,Nano Crystal (Coat of Barbs),4
+1,56003,56003,4,0,Nano Crystal (Lesser Illusory Paralysis),3
+1,56238,56238,1,0,Nano Crystal (Detain Suspect),3
+1,56259,56259,1,0,Nano Crystal (Lesser Detain Customer),3
+1,70401,70401,1,0,Nano Crystal (Partial Deflection Shield),2
+1,70403,70403,7,0,Nano Crystal (Partial Deflection Shield (Extended)),5
+1,70411,70411,10,0,Nano Crystal (Total Mirror Shield Mk I),3
+1,70558,70558,1,0,Battered Low-Tech Armor Boots,2
+1,70559,70559,1,0,Battered Low-Tech Body Armor,6
+1,70560,70560,1,0,Battered Low-Tech Female Body Armor,7
+1,70561,70561,1,0,Battered Low-Tech Armor Sleeves,5
+1,70562,70562,1,0,Battered Low-Tech Armor Gloves,6
+1,70563,70563,1,0,Battered Low-Tech Armor Helmet,5
+1,70564,70564,1,0,Battered Low-Tech Armor Pants,1
+1,70565,70565,1,0,Battered Low-Tech Armor Shorts,2
+1,70577,70577,4,0,Nano Crystal (Greater Armor Megaboost),1
+1,75354,75354,1,0,Nano Crystal (Toughen Skin),4
+1,75415,75415,4,0,Nano Crystal (Minor Combat Barrier),3
+1,78446,78446,10,0,Nano Crystal (Punishing Blade),4
+1,81848,81848,10,0,Nano Crystal (Crash of Thunder),3
+1,81952,81952,4,0,Nano Crystal (Lesser Suspicious Death),5
+1,82071,82071,10,0,Nano Crystal (Lesser Healing Touch),1
+1,82800,82800,4,0,Nano Crystal (Passive Micro Entanglement),3
+1,82816,82816,4,0,Nano Crystal (Lesser Stumbling Steps),3
+1,82838,82838,20,0,Nano Crystal (Pronouncement of Greatness),5
+1,83975,83975,4,0,Nano Crystal (Poke Eyes),1
+1,85273,85273,4,0,Nano Crystal (Basic Insurance Hack),2
+1,85279,85279,7,0,Nano Crystal (Passive Distributed Entanglement),3
+1,85366,85366,1,0,Simple Nano Kit,1
+1,85477,85477,1,0,Worn Cyber Armor Sleeves,13
+1,85481,85481,1,0,Battered Leather Vest,3
+1,85510,85510,1,0,Inferior Nail Armor Pants,6
+1,85517,85517,1,0,Battered Flak Armor Pants,5
+1,85531,85531,1,0,Worn Cyber Armor Pants,4
+1,85533,85533,1,0,Battered Light Combat Armor Pants,7
+1,85572,85572,1,0,Worn Cyber Armor Helmet,7
+1,85612,85612,1,0,Worn Cyber Armor Gloves,2
+1,85636,85636,1,0,Inferior Nail Armor Boots,10
+1,85655,85655,1,0,Worn Cyber Armor Boots,7
+1,85657,85657,1,0,Battered Light Combat Armor Boots,5
+1,85684,85684,1,0,Inferior Nail Body Armor,10
+1,85691,85691,1,0,Inferior Kevlar Vest,6
+1,85693,85693,1,0,Battered Flak Body Armor,8
+1,85711,85711,1,0,Worn Cyber Female Body Armor,3
+1,85712,85712,1,0,Worn Cyber Body Armor,4
+1,85714,85714,1,0,Battered Light Combat Body Armor,4
+1,85723,85723,1,0,Worn Nadir Steel-Ribbed Armor Sleeves,2
+1,85740,85740,1,0,Inferior Nail Armor Sleeves,4
+1,85746,85746,1,0,Battered Flak Armor Sleeves,5
+1,85761,85761,1,0,Battered Light Combat Armor Sleeves,9
+1,85873,85873,10,0,Nano Crystal (Ransack Skills (Weak)),2
+1,85894,85894,4,0,Nano Crystal (Deprive Skills (Weak)),2
+1,86438,86438,1,0,Katara Sunglasses,1
+1,86441,86441,1,0,Keelarr Sunglasses,1
+1,86443,86443,1,0,Visor,4
+1,87476,87476,1,0,Tattoo,2
+1,87479,87479,1,0,Tattoo,1
+1,87483,87483,1,0,Tattoo,1
+1,87810,87810,1,0,Hacker Tool,3
+1,95427,95427,10,0,Nano Crystal (CrunchCom Code Sieve),2
+1,95452,95452,4,0,Nano Crystal (Enhance Nano Communication),3
+1,95577,95577,1,0,Lock Pick,2
+1,95729,95729,4,0,Nano Crystal (Mongo's Troll),4
+1,99133,99133,7,0,Nano Crystal (Shed Anger),3
+1,99212,99212,20,0,Nano Crystal (Temporary Glamor),2
+1,99623,99623,7,0,Nano Crystal (Line of Credit),4
+1,100004,100004,1,0,"Body Tattoo, Front",1
+1,100007,100007,1,0,"Body Tattoo, Front",2
+1,100010,100010,1,0,"Body Tattoo, Back",1
+1,100011,100011,1,0,"Body Tattoo, Front",1
+1,100012,100012,1,0,Tattoo,1
+1,100013,100013,1,0,Tattoo,1
+1,100202,100202,17,0,Nano Crystal (Mongo Slam!),4
+1,101187,101187,1,0,"Left-Arm Implant: Radiation AC, Bright",1
+1,101207,101207,1,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+1,101269,101269,1,0,"Leg Implant: Imp/Proj AC, Shiny",1
+1,101309,101309,1,0,Imp/Proj AC Cluster - Faded (Waist),2
+1,101311,101311,1,0,Imp/Proj AC Cluster - Bright (Chest),2
+1,101313,101313,1,0,Imp/Proj AC Cluster - Shiny (Leg),1
+1,101319,101319,1,0,Melee/Ma AC Cluster - Shiny (Chest),2
+1,101321,101321,1,0,Energy AC Cluster - Faded (Waist),1
+1,101323,101323,1,0,Energy AC Cluster - Bright (Leg),1
+1,101325,101325,1,0,Energy AC Cluster - Shiny (Chest),1
+1,101327,101327,1,0,Chemical AC Cluster - Faded (Left-Arm),1
+1,101331,101331,1,0,Chemical AC Cluster - Shiny (Waist),1
+1,101335,101335,1,0,1h Blunt Cluster - Bright (Right-Wrist),1
+1,101337,101337,1,0,1h Blunt Cluster - Shiny (Right-Arm),1
+1,101343,101343,1,0,1h Edged Weapon Cluster - Shiny (Right-Arm),1
+1,101345,101345,1,0,Melee Ener Cluster - Faded (Right-Wrist),1
+1,101351,101351,1,0,2h Edged Cluster - Faded (Waist),2
+1,101353,101353,1,0,2h Edged Cluster - Bright (Left-Arm),1
+1,101359,101359,1,0,Piercing Cluster - Bright (Left-Arm),3
+1,101363,101363,1,0,2h Blunt Cluster - Faded (Chest),1
+1,101365,101365,1,0,2h Blunt Cluster - Bright (Left-Arm),3
+1,101369,101369,1,0,Sharp Obj Cluster - Faded (Eye),1
+1,101372,101372,1,0,Radiation AC Cluster - Bright (Left-Arm),1
+1,101376,101376,1,0,Cold AC Cluster - Faded (Left-Hand),1
+1,101378,101378,1,0,Cold AC Cluster - Bright (Right-Hand),1
+1,101388,101388,1,0,Fire AC Cluster - Faded (Right-Hand),1
+1,101390,101390,1,0,Fire AC Cluster - Bright (Left-Hand),1
+1,101394,101394,1,0,Martial Arts Cluster - Faded (Left-Hand),1
+1,101400,101400,1,0,Mult. Melee Cluster - Faded (Right-Wrist),1
+1,101404,101404,1,0,Mult. Melee Cluster - Shiny (Left-Wrist),1
+1,101410,101410,1,0,Matter Crea Cluster - Bright (Right-Hand),1
+1,101414,101414,1,0,Time & Space Cluster - Faded (Eye),3
+1,101418,101418,1,0,Time & Space Cluster - Shiny (Head),1
+1,101424,101424,1,0,Nano Pool Cluster - Shiny (Chest),2
+1,101425,101425,1,0,Sharp Obj Cluster - Bright (Right-Hand),2
+1,101429,101429,1,0,Grenade Cluster - Faded (Right-Hand),2
+1,101431,101431,1,0,Grenade Cluster - Bright (Eye),2
+1,101433,101433,1,0,Grenade Cluster - Shiny (Right-Arm),1
+1,101439,101439,1,0,Heavy Weapons Cluster - Shiny (Right-Arm),3
+1,101441,101441,1,0,Bow Cluster - Faded (Eye),1
+1,101443,101443,1,0,Bow Cluster - Bright (Left-Arm),1
+1,101447,101447,1,0,Pistol Cluster - Faded (Eye),1
+1,101449,101449,1,0,Pistol Cluster - Bright (Right-Hand),3
+1,101451,101451,1,0,Pistol Cluster - Shiny (Right-Wrist),2
+1,101455,101455,1,0,Rifle Cluster - Bright (Right-Wrist),1
+1,101457,101457,1,0,Rifle Cluster - Shiny (Eye),1
+1,101461,101461,1,0,MG / SMG Cluster - Bright (Right-Hand),1
+1,101463,101463,1,0,MG / SMG Cluster - Shiny (Right-Arm),2
+1,101467,101467,1,0,Shotgun Cluster - Bright (Right-Hand),2
+1,101471,101471,1,0,Assault Rif Cluster - Faded (Eye),1
+1,101477,101477,1,0,Vehicle Hydr Cluster - Faded (Ear),2
+1,101483,101483,1,0,Melee. Init Cluster - Faded (Waist),3
+1,101485,101485,1,0,Melee. Init Cluster - Bright (Leg),1
+1,101489,101489,1,0,Ranged. Init Cluster - Faded (Right-Hand),1
+1,101491,101491,1,0,Ranged. Init Cluster - Bright (Head),1
+1,101495,101495,1,0,Physic. Init Cluster - Faded (Left-Arm),1
+1,101497,101497,1,0,Physic. Init Cluster - Bright (Right-Arm),1
+1,101499,101499,1,0,Physic. Init Cluster - Shiny (Feet),2
+1,101501,101501,1,0,Bow Spc Att Cluster - Faded (Right-Wrist),1
+1,101503,101503,1,0,Bow Spc Att Cluster - Bright (Right-Hand),2
+1,101505,101505,1,0,Bow Spc Att Cluster - Shiny (Head),3
+1,101507,101507,1,0,Sensory Impr Cluster - Faded (Chest),1
+1,101521,101521,1,0,Treatment Cluster - Bright (Eye),1
+1,101523,101523,1,0,Treatment Cluster - Shiny (Head),1
+1,101539,101539,1,0,Matt.Metam Cluster - Bright (Chest),1
+1,101541,101541,1,0,Matt.Metam Cluster - Shiny (Head),1
+1,101545,101545,1,0,Bio.Metamor Cluster - Bright (Chest),3
+1,101547,101547,1,0,Bio.Metamor Cluster - Shiny (Head),1
+1,101551,101551,1,0,Psycho Modi Cluster - Bright (Eye),3
+1,101557,101557,1,0,Ranged Ener Cluster - Bright (Eye),1
+1,101561,101561,1,0,Multi Ranged Cluster - Faded (Eye),2
+1,101565,101565,1,0,Multi Ranged Cluster - Shiny (Left-Wrist),1
+1,101575,101575,1,0,Perception Cluster - Bright (Eye),4
+1,101581,101581,1,0,Adventuring Cluster - Bright (Waist),1
+1,101591,101591,1,0,Vehicle Air Cluster - Faded (Head),1
+1,101595,101595,1,0,Vehicle Air Cluster - Shiny (Eye),1
+1,101603,101603,1,0,Tutoring Cluster - Faded (Head),1
+1,101605,101605,1,0,Tutoring Cluster - Bright (Ear),1
+1,101617,101617,1,0,Riposte Cluster - Bright (Left-Wrist),2
+1,101619,101619,1,0,Riposte Cluster - Shiny (Right-Wrist),2
+1,101625,101625,1,0,Dimach Cluster - Shiny (Chest),2
+1,101627,101627,1,0,Parry Cluster - Faded (Right-Arm),1
+1,101629,101629,1,0,Parry Cluster - Bright (Left-Wrist),1
+1,101631,101631,1,0,Parry Cluster - Shiny (Right-Wrist),1
+1,101637,101637,1,0,Sneak Atck Cluster - Shiny (Feet),1
+1,101641,101641,1,0,Fast Attack Cluster - Bright (Right-Hand),1
+1,101651,101651,1,0,Fling Shot Cluster - Faded (Right-Wrist),2
+1,101655,101655,1,0,Fling Shot Cluster - Shiny (Right-Arm),2
+1,101661,101661,1,0,Aimed Shot Cluster - Shiny (Eye),2
+1,101663,101663,1,0,Body Dev Cluster - Faded (Leg),1
+1,101665,101665,1,0,Body Dev Cluster - Bright (Waist),1
+1,101667,101667,1,0,Body Dev Cluster - Shiny (Chest),2
+1,101671,101671,1,0,Duck-Exp Cluster - Bright (Waist),1
+1,101675,101675,1,0,Dodge-Rng Cluster - Faded (Waist),2
+1,101677,101677,1,0,Dodge-Rng Cluster - Bright (Feet),2
+1,101679,101679,1,0,Dodge-Rng Cluster - Shiny (Leg),3
+1,101681,101681,1,0,Evade-ClsC Cluster - Faded (Waist),1
+1,101683,101683,1,0,Evade-ClsC Cluster - Bright (Leg),1
+1,101687,101687,1,0,Quantum FT Cluster - Faded (Right-Hand),1
+1,101693,101693,1,0,Weapon Smt Cluster - Faded (Eye),1
+1,101695,101695,1,0,Weapon Smt Cluster - Bright (Head),2
+1,101699,101699,1,0,Pharma Tech Cluster - Faded (Right-Hand),1
+1,101705,101705,1,0,Nano Progra Cluster - Faded (Right-Hand),1
+1,101711,101711,1,0,Comp. Liter Cluster - Faded (Right-Hand),3
+1,101717,101717,1,0,Psychology Cluster - Faded (Eye),3
+1,101721,101721,1,0,Psychology Cluster - Shiny (Head),2
+1,101723,101723,1,0,Chemistry Cluster - Faded (Right-Hand),2
+1,101725,101725,1,0,Chemistry Cluster - Bright (Eye),1
+1,101729,101729,1,0,Concealment Cluster - Faded (Eye),1
+1,101731,101731,1,0,Concealment Cluster - Bright (Ear),1
+1,101737,101737,1,0,Break & Entry Cluster - Bright (Left-Arm),1
+1,101745,101745,1,0,Vehicle Grnd Cluster - Shiny (Head),1
+1,101747,101747,1,0,Full Auto Cluster - Faded (Waist),1
+1,101751,101751,1,0,Full Auto Cluster - Shiny (Right-Arm),1
+1,101755,101755,1,0,Burst Cluster - Bright (Right-Wrist),1
+1,101759,101759,1,0,Disease AC Cluster - Faded (Chest),1
+1,101773,101773,1,0,Strength Cluster - Bright (Left-Arm),1
+1,101777,101777,1,0,Agility Cluster - Faded (Waist),1
+1,101779,101779,1,0,Agility Cluster - Bright (Feet),1
+1,101783,101783,1,0,Stamina Cluster - Faded (Waist),1
+1,101789,101789,1,0,Intelligence Cluster - Faded (Ear),2
+1,101793,101793,1,0,Intelligence Cluster - Shiny (Head),1
+1,101797,101797,1,0,Sense Cluster - Bright (Waist),1
+1,101803,101803,1,0,Psychic Cluster - Bright (Chest),1
+1,101805,101805,1,0,Psychic Cluster - Shiny (Head),1
+1,101813,101813,1,0,Max Nano Cluster - Faded (Chest),2
+1,101837,101837,1,0,"Eye Implant: Map Navig, Shiny",1
+1,101999,101999,1,0,"Eye Implant: Mech. Engi, Bright",2
+1,102029,102029,1,0,"Eye Implant: Psycho Modi, Bright",1
+1,102144,102144,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,102226,102226,1,0,"Eye Implant: Tutoring, Shiny",1
+1,102291,102291,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,102329,102329,1,0,"Eye Implant: Tutoring, Shiny",1
+1,102378,102378,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,102417,102417,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,102455,102455,1,0,"Eye Implant: Nano Progra, Bright",1
+1,102472,102472,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,102579,102579,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,102583,102583,1,0,"Eye Implant: Tutoring, Shiny",1
+1,102623,102623,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,102633,102633,1,0,"Eye Implant: Map Navig, Shiny",1
+1,102730,102730,1,0,"Eye Implant: Map Navig, Shiny",1
+1,102749,102749,1,0,"Eye Implant: Chemistry, Bright",1
+1,102776,102776,1,0,"Eye Implant: Map Navig, Shiny",1
+1,102856,102856,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,102970,102970,1,0,"Eye Implant: Tutoring, Shiny",1
+1,103037,103037,1,0,"Eye Implant: Tutoring, Shiny",1
+1,103053,103053,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,103104,103104,1,0,"Eye Implant: Map Navig, Shiny",1
+1,103114,103114,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,103144,103144,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,103153,103153,1,0,"Eye Implant: Tutoring, Shiny",1
+1,103163,103163,1,0,"Eye Implant: Rifle, Shiny",1
+1,103165,103165,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,103221,103221,1,0,"Eye Implant: Elec. Engi, Shiny",2
+1,103356,103356,1,0,"Eye Implant: Map Navig, Shiny",1
+1,103408,103408,1,0,"Eye Implant: Grenade, Bright",1
+1,103416,103416,1,0,"Eye Implant: Map Navig, Shiny",1
+1,103520,103520,1,0,"Eye Implant: Map Navig, Shiny",1
+1,103540,103540,1,0,"Eye Implant: Treatment, Bright",1
+1,103592,103592,1,0,"Eye Implant: Tutoring, Shiny",1
+1,103653,103653,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,103659,103659,1,0,"Eye Implant: Aimed Shot, Shiny",2
+1,103691,103691,1,0,"Eye Implant: Rifle, Shiny",1
+1,103783,103783,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,103799,103799,1,0,"Eye Implant: Map Navig, Shiny",1
+1,103851,103851,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,104005,104005,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,104135,104135,1,0,"Eye Implant: Map Navig, Shiny",1
+1,104161,104161,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,104254,104254,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,104307,104307,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,104386,104386,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,104458,104458,1,0,"Eye Implant: Vehicle Air, Shiny",1
+1,104460,104460,1,0,"Eye Implant: Map Navig, Shiny",1
+1,104520,104520,1,0,"Eye Implant: Psychology, Faded",1
+1,104564,104564,1,0,"Eye Implant: Rifle, Shiny",1
+1,104566,104566,1,0,"Eye Implant: Elec. Engi, Shiny",1
+1,104607,104607,1,0,"Eye Implant: Map Navig, Shiny",1
+1,104639,104639,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,104709,104709,1,0,"Eye Implant: Aimed Shot, Shiny",1
+1,104830,104830,1,0,"Eye Implant: Map Navig, Shiny",1
+1,105113,105113,1,0,"Head Implant: Matter Crea, Shiny",1
+1,105125,105125,1,0,"Head Implant: Time & Space, Shiny",1
+1,105203,105203,1,0,"Head Implant: Melee Ener, Shiny",1
+1,105233,105233,1,0,"Head Implant: Matt.Metam, Shiny",1
+1,105235,105235,1,0,"Head Implant: Bio.Metamor, Shiny",1
+1,105263,105263,1,0,"Head Implant: Pharma Tech, Shiny",1
+1,105271,105271,1,0,"Head Implant: Comp. Liter, Shiny",1
+1,105299,105299,1,0,"Head Implant: Max Nano, Shiny",1
+1,105404,105404,1,0,"Head Implant: Psychology, Shiny",1
+1,105415,105415,1,0,"Head Implant: Nano Resist, Shiny",1
+1,105477,105477,1,0,"Head Implant: Quantum FT, Shiny",1
+1,105535,105535,1,0,"Head Implant: Bow Spc Att, Shiny",1
+1,105559,105559,1,0,"Head Implant: Bio.Metamor, Shiny",1
+1,105587,105587,1,0,"Head Implant: Pharma Tech, Shiny",1
+1,105817,105817,1,0,"Head Implant: Quantum FT, Shiny",1
+1,105903,105903,1,0,"Head Implant: Vehicle Hydr, Shiny",1
+1,105953,105953,1,0,"Head Implant: Nano Resist, Shiny",1
+1,105957,105957,1,0,"Head Implant: Vehicle Hydr, Shiny",1
+1,105969,105969,1,0,"Head Implant: Matt.Metam, Shiny",1
+1,106045,106045,1,0,"Head Implant: Psychology, Shiny",1
+1,106114,106114,1,0,"Head Implant: Ranged Ener, Shiny",1
+1,106158,106158,1,0,"Head Implant: First Aid, Shiny",1
+1,106182,106182,1,0,"Head Implant: Vehicle Grnd, Shiny",1
+1,106213,106213,1,0,"Head Implant: NanoC. Init, Shiny",1
+1,106275,106275,1,0,"Head Implant: Nano Pool, Bright",1
+1,106331,106331,1,0,"Head Implant: Comp. Liter, Shiny",2
+1,106345,106345,1,0,"Head Implant: Mech. Engi, Shiny",1
+1,106495,106495,1,0,"Head Implant: Sensory Impr, Shiny",1
+1,106550,106550,1,0,"Head Implant: Bio.Metamor, Shiny",1
+1,106578,106578,1,0,"Head Implant: Max Nano, Shiny",1
+1,106590,106590,1,0,"Head Implant: Sensory Impr, Shiny",1
+1,106751,106751,1,0,"Head Implant: Bow Spc Att, Shiny",1
+1,106851,106851,1,0,"Head Implant: Dimach, Bright",1
+1,106873,106873,1,0,"Head Implant: Nano Resist, Shiny",1
+1,106875,106875,1,0,"Head Implant: Nano Resist, Shiny",1
+1,106936,106936,1,0,"Head Implant: Chemistry, Shiny",1
+1,107027,107027,1,0,"Head Implant: Psychic, Shiny",1
+1,107057,107057,1,0,"Head Implant: Time & Space, Shiny",1
+1,107125,107125,1,0,"Head Implant: Psychology, Shiny",1
+1,107153,107153,1,0,"Head Implant: Psychic, Shiny",1
+1,107175,107175,1,0,"Head Implant: Matt.Metam, Shiny",1
+1,107183,107183,1,0,"Head Implant: Time & Space, Shiny",1
+1,107203,107203,1,0,"Head Implant: Sensory Impr, Shiny",1
+1,107219,107219,1,0,"Head Implant: Vehicle Grnd, Shiny",1
+1,107253,107253,1,0,"Ear Implant: Psycho Modi, Faded",1
+1,107301,107301,1,0,"Ear Implant: Perception, Shiny",1
+1,107331,107331,1,0,"Ear Implant: Intelligence, Faded",1
+1,107456,107456,1,0,"Right-Arm Implant: Shotgun, Shiny",1
+1,107534,107534,1,0,"Right-Arm Implant: Burst, Shiny",1
+1,107560,107560,1,0,"Right-Arm Implant: Piercing, Shiny",1
+1,107574,107574,1,0,"Right-Arm Implant: Bow, Shiny",1
+1,107580,107580,1,0,"Right-Arm Implant: 1h Blunt, Shiny",1
+1,107586,107586,1,0,"Right-Arm Implant: 1h Edged Weapon, Shiny",1
+1,107613,107613,1,0,"Right-Arm Implant: Break & Entry, Shiny",1
+1,107625,107625,1,0,"Right-Arm Implant: Strength, Shiny",1
+1,107637,107637,1,0,"Right-Arm Implant: 1h Edged Weapon, Shiny",1
+1,107647,107647,1,0,"Right-Arm Implant: 2h Blunt, Shiny",1
+1,107679,107679,1,0,"Right-Arm Implant: Break & Entry, Shiny",1
+1,107719,107719,1,0,"Right-Arm Implant: Grenade, Shiny",1
+1,107727,107727,1,0,"Right-Arm Implant: Bow, Shiny",1
+1,107857,107857,1,0,"Right-Arm Implant: Break & Entry, Shiny",1
+1,107895,107895,1,0,"Right-Arm Implant: Heavy Weapons, Shiny",1
+1,107921,107921,1,0,"Right-Arm Implant: Full Auto, Shiny",1
+1,107925,107925,1,0,"Right-Arm Implant: Burst, Shiny",1
+1,107933,107933,1,0,"Right-Arm Implant: Physic. Init, Bright",1
+1,108028,108028,1,0,"Right-Arm Implant: 2h Blunt, Shiny",1
+1,108066,108066,1,0,"Right-Arm Implant: 2h Edged, Shiny",1
+1,108075,108075,1,0,"Right-Arm Implant: Shotgun, Shiny",1
+1,108129,108129,1,0,"Right-Arm Implant: Break & Entry, Shiny",1
+1,108146,108146,1,0,"Right-Arm Implant: 1h Blunt, Shiny",1
+1,108210,108210,1,0,"Right-Arm Implant: Strength, Shiny",1
+1,108242,108242,1,0,"Right-Arm Implant: Heavy Weapons, Shiny",1
+1,108246,108246,1,0,"Right-Arm Implant: Bow, Shiny",1
+1,108260,108260,1,0,"Right-Arm Implant: Fling Shot, Shiny",1
+1,108345,108345,1,0,"Right-Arm Implant: Heavy Weapons, Shiny",1
+1,108359,108359,1,0,"Right-Arm Implant: Full Auto, Shiny",1
+1,108385,108385,1,0,"Chest Implant: Dimach, Shiny",1
+1,108408,108408,1,0,"Chest Implant: Body Dev, Shiny",1
+1,108492,108492,1,0,"Chest Implant: Dimach, Shiny",1
+1,108506,108506,1,0,"Chest Implant: Max Health, Shiny",1
+1,108516,108516,1,0,"Chest Implant: Melee/Ma AC, Shiny",1
+1,108622,108622,1,0,"Chest Implant: Energy AC, Shiny",1
+1,108662,108662,1,0,"Chest Implant: Dimach, Shiny",1
+1,108728,108728,1,0,"Chest Implant: Imp/Proj AC, Bright",1
+1,108730,108730,1,0,"Chest Implant: Melee/Ma AC, Shiny",1
+1,108740,108740,1,0,"Chest Implant: Nano Pool, Shiny",1
+1,108744,108744,1,0,"Chest Implant: Dimach, Shiny",1
+1,108808,108808,1,0,"Chest Implant: Body Dev, Shiny",1
+1,108832,108832,1,0,"Chest Implant: Dimach, Shiny",1
+1,108836,108836,1,0,"Chest Implant: Body Dev, Shiny",1
+1,108916,108916,1,0,"Chest Implant: Body Dev, Shiny",1
+1,108948,108948,1,0,"Chest Implant: Nano Pool, Shiny",1
+1,109070,109070,1,0,"Chest Implant: Imp/Proj AC, Bright",1
+1,109102,109102,1,0,"Chest Implant: Dimach, Shiny",1
+1,109112,109112,1,0,"Chest Implant: Dimach, Shiny",1
+1,109132,109132,1,0,"Chest Implant: Body Dev, Shiny",1
+1,109234,109234,1,0,"Chest Implant: Energy AC, Shiny",1
+1,109424,109424,1,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+1,109494,109494,1,0,"Right-Wrist Implant: Riposte, Shiny",1
+1,109612,109612,1,0,"Right-Wrist Implant: Parry, Shiny",1
+1,109692,109692,1,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+1,109700,109700,1,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+1,109736,109736,1,0,"Right-Wrist Implant: Parry, Shiny",1
+1,109772,109772,1,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+1,109842,109842,1,0,"Right-Wrist Implant: Parry, Shiny",1
+1,110020,110020,1,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+1,110094,110094,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110110,110110,1,0,"Waist Implant: Fire AC, Shiny",1
+1,110298,110298,1,0,"Waist Implant: Body Dev, Bright",1
+1,110306,110306,1,0,"Waist Implant: Fire AC, Shiny",1
+1,110332,110332,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110338,110338,1,0,"Waist Implant: Max Nano, Bright",1
+1,110342,110342,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110380,110380,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,110450,110450,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,110490,110490,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,110530,110530,1,0,"Waist Implant: Duck-Exp, Bright",1
+1,110542,110542,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,110586,110586,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110668,110668,1,0,"Waist Implant: Fire AC, Shiny",1
+1,110764,110764,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110822,110822,1,0,"Waist Implant: Cold AC, Shiny",1
+1,110824,110824,1,0,"Waist Implant: Cold AC, Shiny",1
+1,110854,110854,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110858,110858,1,0,"Waist Implant: Fire AC, Shiny",1
+1,110888,110888,1,0,"Waist Implant: Max Health, Bright",1
+1,110894,110894,1,0,"Waist Implant: Cold AC, Shiny",1
+1,110900,110900,1,0,"Waist Implant: Chemical AC, Shiny",2
+1,110924,110924,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,110954,110954,1,0,"Waist Implant: Cold AC, Shiny",1
+1,110970,110970,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,111056,111056,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,111126,111126,1,0,"Waist Implant: Fire AC, Shiny",1
+1,111162,111162,1,0,"Waist Implant: Cold AC, Shiny",1
+1,111188,111188,1,0,"Waist Implant: Duck-Exp, Bright",1
+1,111203,111203,1,0,"Left-Wrist Implant: Multi Ranged, Shiny",1
+1,111207,111207,1,0,"Waist Implant: Max Health, Bright",1
+1,111231,111231,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,111289,111289,1,0,"Waist Implant: Chemical AC, Shiny",1
+1,111381,111381,1,0,"Waist Implant: Radiation AC, Shiny",1
+1,111452,111452,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,111472,111472,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,111498,111498,1,0,"Right-Hand Implant: Martial Arts, Shiny",1
+1,111504,111504,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,111564,111564,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,111566,111566,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,111570,111570,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,111623,111623,1,0,"Right-Hand Implant: Fast Attack, Bright",1
+1,111809,111809,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,111838,111838,1,0,"Right-Hand Implant: Martial Arts, Shiny",2
+1,111923,111923,1,0,"Right-Hand Implant: Fling Shot, Bright",1
+1,111927,111927,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,111947,111947,1,0,"Right-Hand Implant: Sharp Obj, Bright",1
+1,111964,111964,1,0,"Right-Hand Implant: Martial Arts, Shiny",2
+1,111980,111980,1,0,"Right-Hand Implant: Martial Arts, Shiny",1
+1,111999,111999,1,0,"Right-Hand Implant: Martial Arts, Shiny",1
+1,112354,112354,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,112388,112388,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112404,112404,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112406,112406,1,0,"Right-Hand Implant: Shotgun, Bright",1
+1,112428,112428,1,0,"Right-Hand Implant: Weapon Smt, Shiny",2
+1,112479,112479,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,112512,112512,1,0,"Right-Hand Implant: Martial Arts, Shiny",1
+1,112516,112516,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112593,112593,1,0,"Right-Hand Implant: Fast Attack, Bright",1
+1,112603,112603,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112614,112614,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112701,112701,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112792,112792,1,0,"Right-Hand Implant: Martial Arts, Shiny",3
+1,112837,112837,1,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+1,112843,112843,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,112923,112923,1,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+1,112976,112976,1,0,"Leg Implant: Adventuring, Shiny",1
+1,113096,113096,1,0,"Right-Hand Implant: Martial Arts, Shiny",1
+1,113202,113202,1,0,"Leg Implant: Swimming, Shiny",1
+1,113257,113257,1,0,"Leg Implant: Stamina, Bright",1
+1,113424,113424,1,0,"Leg Implant: Melee. Init, Bright",1
+1,113454,113454,1,0,"Left-Hand Implant: Fast Attack, Shiny",1
+1,113501,113501,1,0,"Leg Implant: Duck-Exp, Shiny",1
+1,113538,113538,1,0,"Feet Implant: Sneak Atck, Shiny",1
+1,116800,116800,14,0,Nano Crystal (Quick Fix),2
+1,120609,120609,1,0,Omni-Med Cloak,8
+1,120628,120628,1,0,Medical Cloak,3
+1,121360,121360,8,0,Nano Crystal (Skill Wrangler (Weak)),6
+1,121515,121515,11,0,Nano Crystal (Novice Health Haggler),1
+1,121518,121518,4,0,Nano Crystal (Amateur Health Haggler),1
+1,121572,121572,1,0,Useless Triple-Blade,2
+1,121591,121591,1,0,Rusty Hand Blade,1
+1,121610,121610,1,0,Refitted Polearm,1
+1,121629,121629,1,0,Rusty Spiked Axe,1
+1,121722,121722,1,0,Dull Haxor 9922,1
+1,121741,121741,1,0,Unbalanced Right Slice,1
+1,121760,121760,1,0,Unbalanced Mini Axe,1
+1,121836,121836,1,0,Irreparable Sleekblaster,2
+1,121874,121874,1,0,Ill-Treated Plasmaprojector,1
+1,121893,121893,1,0,Ill-Treated Heavy Grinner,2
+1,121931,121931,1,0,Ill-Treated Gatling Saw 20k,2
+1,121969,121969,1,0,Dull Katana,1
+1,121988,121988,1,0,Irreparable Blackened Miniblaster,3
+1,122083,122083,1,0,Ill-Treated Blackened Blaster Rifle,2
+1,122102,122102,1,0,Unbalanced Stabber,1
+1,122121,122121,1,0,Ill-Treated E-Beamer,1
+1,122159,122159,1,0,Dull E-Blade,1
+1,122178,122178,1,0,Ill-Treated Megajolt,1
+1,122254,122254,1,0,Ill-Treated Eradicator XCI-52,1
+1,122273,122273,1,0,Irreparable Kolt PDW-37,1
+1,122292,122292,1,0,Irreparable Omni-Flamer Mk IV,3
+1,122330,122330,1,0,Irreparable Minigrinner,1
+1,122349,122349,1,0,Punctured Metaphysic Energy Shield,1
+1,122368,122368,1,0,Punctured Energy Shield,1
+1,122387,122387,1,0,Punctured Esoteric Energy Buckler,1
+1,122444,122444,1,0,Irreparable El Dieu,1
+1,122482,122482,1,0,Irreparable Ingram Blaster 23-X,1
+1,122501,122501,1,0,Ill-Treated Biogun,2
+1,122539,122539,1,0,Ill-Treated Omni-Pol Standard Flamer,2
+1,122615,122615,1,0,Irreparable Aero Borealis Corona,1
+1,122653,122653,1,0,Irreparable Silver Miniblaster,1
+1,122672,122672,1,0,Ill-Treated Heavy Lead Sprayer,2
+1,122691,122691,1,0,Unbalanced Advanced Baseballbat,4
+1,122710,122710,1,0,Ill-Treated Kevlar Bow,2
+1,122729,122729,1,0,Unbalanced Blackjack,2
+1,122748,122748,1,0,Dull Two-Handed Blackjack,2
+1,122767,122767,1,0,Ill-Treated Bow-Blaster,2
+1,122824,122824,1,0,Worn-Out Chair,1
+1,122886,122886,1,0,Irreparable Minielectronium,2
+1,122924,122924,1,0,Dull Blackjohn,1
+1,122943,122943,1,0,Unbalanced Mace,1
+1,122962,122962,1,0,Dull Notum Staff,2
+1,123000,123000,1,0,Dull Notum Spear,1
+1,123095,123095,1,0,Irreparable DNA-Targeted Executioner Pistol,2
+1,123171,123171,1,0,Irreparable Electron-Charged Pistol,2
+1,123190,123190,1,0,Ill-Treated Suppressor,2
+1,123476,123476,1,0,Irreparable MTI USP 21,2
+1,123514,123514,1,0,Irreparable Khemo-Tech Model 200,1
+1,123647,123647,1,0,Irreparable Sentinels ETE Strike Gun,2
+1,123666,123666,1,0,Irreparable River MV,1
+1,123704,123704,1,0,Rotting OT Biomag,4
+1,123723,123723,1,0,M-1 Bipower Prototype,1
+1,123742,123742,1,0,Rusty OT M-10 Flechette Pistol,1
+1,123774,123774,1,0,Rusty MTI 95 Match Pistol,1
+1,123844,123844,1,0,Rusty Freedom Arms Super 90,1
+1,123855,123855,1,0,Second-Hand Old English Trading Co.,2
+1,123879,123879,1,0,Worn BigBurger Inc.,1
+1,123893,123893,1,0,Rusty OT Backup,1
+1,123904,123904,1,0,Rusty OT 0120 Machine Pistol,1
+1,123909,123909,1,0,Rusty MTI SOCOM Mk IV,1
+1,123933,123933,1,0,Stained MTI USP 1200,1
+1,123968,123968,1,0,Rusty OT Boomer M30,4
+1,123974,123974,1,0,Shortened Gripo-Com AKR 1K20,2
+1,123979,123979,1,0,Rusty Nomad 21.7 BMG Ranger,1
+1,123984,123984,1,0,Rusty MTI-OT PF55 Flechette System,3
+1,124004,124004,1,0,Rusty M150 Booster Edition,1
+1,124025,124025,1,0,Battered Galahad Inc. 055,1
+1,124070,124070,1,0,M52A Pulse Rifle,1
+1,124073,124073,1,0,Rusty BBI PS500,1
+1,124092,124092,1,0,Rusted AcuTek Cruncher,1
+1,124106,124106,1,0,Worn Kalo-BBI Model 55,1
+1,124121,124121,1,0,Rusty ICC Arms SB21 Assault Shotgun,1
+1,124136,124136,1,0,ICC Arms 2Q2B Gun Bag,1
+1,124143,124143,1,0,OT-Windchaser M05 Rifle,2
+1,124217,124217,1,0,Old Galahad Inc. Scout,3
+1,124230,124230,1,0,Old Springfield Arms Home Defender,1
+1,124263,124263,1,0,Old OT MPS-00 Police Shotgun,1
+1,124276,124276,1,0,Rusty Krutt Assault 219,1
+1,124313,124313,1,0,Rusty Ithaca Ki-8,1
+1,124386,124386,1,0,Rusty MTI G02K,1
+1,124391,124391,1,0,OT Rancho Colonial Carbine,2
+1,124400,124400,1,0,Vektor V.21 Flechette Rifle,2
+1,124407,124407,1,0,Rusty MTI G-70,1
+1,124444,124444,1,0,Loose Kalinkalov Mz-99,1
+1,124487,124487,1,0,Manex SD 4004,1
+1,124510,124510,1,0,Rusty Sentinels Personal Edition,1
+1,124534,124534,1,0,Sooted YES Assault 1007 Model 5,1
+1,124545,124545,1,0,YES Support 1010,1
+1,124557,124557,1,0,Kang Tao Spitting Cobra,1
+1,124617,124617,1,0,Used MTI SO1210,1
+1,124624,124624,1,0,Ill-Treated MTI UMP22,1
+1,124643,124643,1,0,Ill-Treated Kalinkanov ZU-113 Security Weapon,1
+1,124662,124662,1,0,Ill-Treated Malorian Arms M25 Goodgun,1
+1,124681,124681,1,0,Ill-Treated MTI MPK-22 Briefcase Gun,1
+1,124700,124700,1,0,Ill-Treated Seburo C-19a,2
+1,124711,124711,1,0,Ill-Treated Nord Armwerk MAX,1
+1,124749,124749,1,0,Ill-Treated BBI WMMA CAW,2
+1,124768,124768,1,0,Ill-Treated OT ARL-10 Micromissile Launcher,1
+1,124798,124798,1,0,Ill-Treated OT M-110 Renegade SAW,2
+1,124891,124891,1,0,Ill-Treated OT M-00 Crystal,1
+1,124910,124910,1,0,Ill-Treated Westinghouse IM-50 Plasma Burner,2
+1,124929,124929,1,0,Ill-Treated IEC Flashpoint Laser Rifle,1
+1,124967,124967,1,0,Ill-Treated GE XM-559 Man-Portable Laser,1
+1,124986,124986,1,0,Ill-Treated Reet-Tech Stryker X,1
+1,125005,125005,1,0,Ill-Treated Joint Clans Exocet II,3
+1,125024,125024,1,0,Ill-Treated Joint Clans Patriot,2
+1,125081,125081,1,0,Ill-Treated Oneida Razor Half-Bow,2
+1,125343,125343,1,0,Splintered Protector Squibber,1
+1,125362,125362,1,0,Splintered Merchant Executioner,1
+1,125381,125381,1,0,Splintered Rider Executioner,1
+1,125438,125438,1,0,Crumbling Paper Hammer,2
+1,125445,125445,1,0,Tear-soaked Pillow with Important Stripes,1
+1,125454,125454,1,0,Creviced Concrete Cushion,2
+1,125459,125459,1,0,5th level Ninja Wakisashi,1
+1,125751,125751,17,0,Nano Crystal (Calling of Medinos),4
+1,128608,128608,1,0,Ill-treated MTI G-36K,2
+1,128636,128636,1,0,Ill-treated Seburo C-99a ,1
+1,128674,128674,1,0,Ill-treated HSR Arms Tech Assault V,1
+1,128710,128710,1,0,Rusty River Series 6,1
+1,128715,128715,1,0,Ill-treated Galahad Inc. 077 Personal Weapon,1
+1,128734,128734,1,0,1st edition Pistola Di Macchina Mini Automatico 2,1
+1,128758,128758,1,0,Ill-treated Fabrique Des Armes Bizon 20-19,2
+1,128787,128787,1,0,Leaky Old English Trading Co. SPP-502,1
+1,128792,128792,1,0,Ill-treated OT Cobra M-33,1
+1,128839,128839,1,0,Ill-treated OET Co. MP-21 Tactical Machine Pistol,1
+1,128858,128858,1,0,Ill-treated MTI MPK-22 ,1
+1,128916,128916,1,0,Water balloon,2
+1,128919,128919,1,0,Splintered Peasant Executioner,1
+1,128938,128938,1,0,Obtuse Peasant Warblade,2
+1,129026,129026,1,0,Cracked Sledgehammer,1
+1,129069,129069,1,0,Sparkling Breathing Space,2
+1,129638,129638,1,0,Over-tuned Wen-Wen,2
+1,129715,129715,10,0,Nano Crystal (Restock Ammo (Level OP-I)),2
+1,130003,130003,1,0,Run Speed Cluster - Faded (Leg),1
+1,130051,130051,1,0,Ancient Featherwood Staff,1
+1,130060,130060,1,0,Unbalanced Heavy Staff,2
+1,130071,130071,1,0,Splintered Light Staff,1
+1,130163,130163,1,0,Loose MTI Sword,1
+1,130323,130323,1,0,"Right-Wrist Implant: Run Speed, Shiny",1
+1,130348,130348,1,0,"Left-Wrist Implant: Mult. Melee, Shiny",1
+1,130407,130407,1,0,"Leg Implant: Dodge-Rng, Shiny",1
+1,130441,130441,1,0,"Leg Implant: Imp/Proj AC, Shiny",1
+1,131605,131605,1,0,Rough Club,1
+1,142773,142773,4,0,Nano Crystal (Swap Psyche),3
+1,142804,142804,1,0,Silent SSC Rustling Wakisashi,1
+1,143833,143833,1,0,Ill-Treated Sunburst Mk IV,2
+1,144063,144063,1,0,Splintered Survival Axe,2
+1,144101,144101,1,0,Sparkling Freedom Arms 4200,2
+1,144146,144146,1,0,Obtuse Burning Copper Katana,2
+1,150193,150193,1,0,,1
+1,150223,150223,1,0,,3
+1,150241,150241,1,0,,1
+1,150254,150254,1,0,,2
+1,150306,150306,1,0,,1
+1,152096,152096,1,0,,1
+1,152154,152154,1,0,,1
+1,152279,152279,1,0,,1
+1,152311,152311,1,0,,1
+1,152326,152326,1,0,,1
+1,152358,152358,1,0,,3
+1,152386,152386,1,0,,2
+1,152732,152732,1,0,,2
+1,152747,152747,1,0,,1
+1,153083,153083,1,0,,4
+1,154069,154069,1,0,,2
+1,154686,154686,1,0,,1
+1,155369,155369,8,0,,2
+1,155392,155392,8,0,,1
+1,156142,156142,4,0,,1
+1,156146,156146,11,0,,3
+1,158045,158045,1,0,,1
+1,159007,159007,1,0,,1
+1,159021,159021,1,0,,1
+1,159035,159035,1,0,,2
+1,159040,159040,1,0,,1
+1,159109,159109,1,0,,1
+1,160236,160236,1,0,,2
+1,160239,160239,1,0,,1
+1,160242,160242,1,0,,1
+1,160245,160245,1,0,,1
+1,160481,160481,1,0,,1
+1,172413,172413,1,0,,1
+1,178154,178154,1,0,,1
+1,191699,191699,1,0,,1
+1,202724,202724,8,0,,1
+1,202827,202827,8,0,,1
+1,202871,202871,10,0,,3
+1,204103,204103,1,0,,1
+1,204262,204262,1,0,,1
+1,204267,204267,1,0,,1
+1,204270,204270,1,0,,1
+1,206289,206289,1,0,,2
+1,209283,209283,1,0,,2
+1,209489,209489,4,0,,2
+1,210354,210354,4,0,,13
+1,210529,210529,1,0,,4
+1,210590,210590,2,0,,7
+1,210612,210612,8,0,,6
+1,210733,210733,5,0,,11
+1,218744,218744,1,0,,1
+1,218780,218780,1,0,,2
+1,218822,218822,1,0,,1
+1,227473,227473,30,0,,1
+1,297633,297633,10,0,,2
+2,26471,26471,14,0,Nano Crystal (Ranged Special Attacks Incompetence),1
+2,26503,26503,14,0,Nano Crystal (Melee Special Attacks Incompetence),3
+2,26541,26541,10,0,Nano Crystal (Drain Abilities),4
+2,27199,27199,10,0,Nano Crystal (Melee Weapons Incompetence),2
+2,27223,27223,4,0,Nano Crystal (Lethargy),2
+2,27381,27381,1,0,Omni-Med Suit Gloves,2
+2,27386,27386,1,0,Omni-Med Suit Trousers,1
+2,27387,27387,1,0,Omni-Med Female Suit Shirt,1
+2,28751,28751,4,0,Nano Crystal (Team Quick Heal),7
+2,28752,28752,10,0,Nano Crystal (Terrain Knowledge),1
+2,28767,28767,7,0,Nano Crystal (Doctor's Grace),1
+2,28805,28805,4,0,Nano Crystal (Corruption),1
+2,28811,28811,7,0,Nano Crystal (Fire Stream),3
+2,28834,28834,4,0,Nano Crystal (Radiation Pulse),2
+2,28932,28932,7,0,Nano Crystal (Give Energy: 10),2
+2,28936,28936,7,0,Nano Crystal (Give Life: 10),1
+2,28943,28943,4,0,Nano Crystal (Iron Fist),2
+2,29192,29192,10,0,Nano Crystal (Symbol Helper),5
+2,29823,29823,1,0,Nano Crystal (Armor Megaboost),3
+2,29844,29844,10,0,Nano Crystal (Gun Enhancement),2
+2,29862,29862,7,0,Nano Crystal (Spike Shield),4
+2,30781,30781,10,0,Nano Crystal (Lend Nano: 50),1
+2,31498,31498,1,0,White Cloak,3
+2,31499,31499,1,0,Red Cloak,1
+2,31500,31500,1,0,Grey Cloak,6
+2,31501,31501,1,0,Green Cloak,1
+2,31502,31502,1,0,Brown Cloak,3
+2,31503,31503,1,0,Blue Cloak,4
+2,31505,31505,1,0,Black Trenchcoat,9
+2,31506,31506,1,0,Black Omni-Tek Commander Cloak,6
+2,31515,31515,1,0,Red Omni-Tek Commander Cloak,7
+2,31516,31516,1,0,Trenchcoat,8
+2,31517,31517,1,0,Black Cloak,4
+2,31528,31528,1,0,Red Cloak Hood,4
+2,31530,31530,1,0,Grey Cloak Hood,7
+2,31531,31531,1,0,Green Cloak Hood,5
+2,31532,31532,1,0,Brown Cloak Hood,10
+2,31533,31533,1,0,Blue Cloak Hood,9
+2,31534,31534,1,0,Black Cloak Hood,4
+2,32082,32082,10,0,Nano Crystal (False Profession: Enforcer),4
+2,42412,42412,1,0,Nano Crystal (Enhance Team Health),3
+2,42423,42423,4,0,Nano Crystal (Weak Team Heal),2
+2,43145,43146,2,0,Attack of the Snake,1
+2,43552,43551,2,0,Portable Surgery Clinic,1
+2,43978,43978,4,0,Nano Crystal (Emergency Stitching),2
+2,43993,43993,10,0,Nano Crystal (Dress Wounds),1
+2,44189,44189,7,0,Nano Crystal (Limited Nano Reaper),5
+2,45956,45956,7,0,Nano Crystal (Open Wound),1
+2,45965,45965,1,0,Nano Crystal (Minor Toxic Barb),2
+2,45966,45966,10,0,Nano Crystal (Minor Toxic Field),1
+2,45994,45994,7,0,Nano Crystal (Feeble Blade Chaos),2
+2,46010,46010,10,0,Nano Crystal (Upgraded Automaton),1
+2,46059,46059,4,0,Nano Crystal (Lesser Automaton),2
+2,46074,46074,7,0,Nano Crystal (Automaton),2
+2,46462,46462,7,0,Nano Crystal (Advanced Worker),3
+2,49821,49821,4,0,Nano Crystal (Challenger to Cyclops),3
+2,55679,55678,2,0,Weapon Smithing Tutoring Device,2
+2,55681,55680,2,0,Psychology Tutoring Device,1
+2,55685,55684,2,0,Nano Programming Tutoring Device,1
+2,55688,55677,2,0,Chemistry Tutoring Device,1
+2,55690,55689,2,0,Mechanical Engineering Tutoring Device,1
+2,55697,55696,2,0,Boosted Stim,1
+2,55761,55761,10,0,Nano Crystal (Bristling Shield),3
+2,55838,55838,7,0,Nano Crystal (Frost With Snow),2
+2,55863,55863,1,0,Nano Crystal (Coat of Barbs),2
+2,56003,56003,4,0,Nano Crystal (Lesser Illusory Paralysis),3
+2,56238,56238,1,0,Nano Crystal (Detain Suspect),7
+2,56250,56250,4,0,Nano Crystal (Halt Flight),3
+2,56259,56259,1,0,Nano Crystal (Lesser Detain Customer),3
+2,70401,70401,1,0,Nano Crystal (Partial Deflection Shield),3
+2,70403,70403,7,0,Nano Crystal (Partial Deflection Shield (Extended)),3
+2,70411,70411,10,0,Nano Crystal (Total Mirror Shield Mk I),5
+2,70558,85640,2,0,Battered Low-Tech Armor Boots,3
+2,70559,85689,2,0,Battered Low-Tech Body Armor,10
+2,70560,85688,2,0,Battered Low-Tech Female Body Armor,4
+2,70561,85744,2,0,Battered Low-Tech Armor Sleeves,6
+2,70562,85597,2,0,Battered Low-Tech Armor Gloves,2
+2,70563,85558,2,0,Battered Low-Tech Armor Helmet,10
+2,70564,85515,2,0,Battered Low-Tech Armor Pants,4
+2,70565,85514,2,0,Battered Low-Tech Armor Shorts,7
+2,70577,70577,4,0,Nano Crystal (Greater Armor Megaboost),1
+2,70582,70582,7,0,Nano Crystal (Flawed Shielding Barrier),2
+2,75354,75354,1,0,Nano Crystal (Toughen Skin),1
+2,75415,75415,4,0,Nano Crystal (Minor Combat Barrier),3
+2,78446,78446,10,0,Nano Crystal (Punishing Blade),2
+2,81848,81848,10,0,Nano Crystal (Crash of Thunder),3
+2,81892,81892,10,0,Nano Crystal (Lesser Nano Boost),3
+2,81952,81952,4,0,Nano Crystal (Lesser Suspicious Death),4
+2,82071,82071,10,0,Nano Crystal (Lesser Healing Touch),3
+2,82188,82188,10,0,Nano Crystal (Mass Daze),1
+2,82800,82800,4,0,Nano Crystal (Passive Micro Entanglement),2
+2,82816,82816,4,0,Nano Crystal (Lesser Stumbling Steps),2
+2,82838,82838,20,0,Nano Crystal (Pronouncement of Greatness),5
+2,83975,83975,4,0,Nano Crystal (Poke Eyes),2
+2,83984,83984,7,0,Nano Crystal (Claw Eyes),2
+2,85273,85273,4,0,Nano Crystal (Basic Insurance Hack),1
+2,85368,85369,2,0,Burst of Speed Stim,1
+2,85477,21917,2,0,Worn Cyber Armor Sleeves,6
+2,85481,85690,2,0,Battered Leather Vest,10
+2,85510,85509,2,0,Inferior Nail Armor Pants,6
+2,85517,27360,2,0,Battered Flak Armor Pants,1
+2,85531,22289,2,0,Worn Cyber Armor Pants,5
+2,85533,85532,2,0,Battered Light Combat Armor Pants,5
+2,85572,22219,2,0,Worn Cyber Armor Helmet,2
+2,85612,22166,2,0,Worn Cyber Armor Gloves,9
+2,85636,85635,2,0,Inferior Nail Armor Boots,6
+2,85655,22104,2,0,Worn Cyber Armor Boots,4
+2,85657,85656,2,0,Battered Light Combat Armor Boots,4
+2,85684,85683,2,0,Inferior Nail Body Armor,3
+2,85691,22004,2,0,Inferior Kevlar Vest,9
+2,85693,27389,2,0,Battered Flak Body Armor,8
+2,85711,22014,2,0,Worn Cyber Female Body Armor,7
+2,85712,22010,2,0,Worn Cyber Body Armor,3
+2,85714,85713,2,0,Battered Light Combat Body Armor,4
+2,85723,85722,2,0,Worn Nadir Steel-Ribbed Armor Sleeves,6
+2,85740,85739,2,0,Inferior Nail Armor Sleeves,4
+2,85746,27391,2,0,Battered Flak Armor Sleeves,4
+2,85761,85760,2,0,Battered Light Combat Armor Sleeves,5
+2,85873,85873,10,0,Nano Crystal (Ransack Skills (Weak)),1
+2,85894,85894,4,0,Nano Crystal (Deprive Skills (Weak)),2
+2,86438,86438,1,0,Katara Sunglasses,1
+2,86441,86441,1,0,Keelarr Sunglasses,1
+2,86443,86443,1,0,Visor,1
+2,87471,87471,1,0,Tattoo,1
+2,87472,87472,1,0,Tattoo,2
+2,87474,87474,1,0,Tattoo,2
+2,87477,87477,1,0,Tattoo,1
+2,87478,87478,1,0,Tattoo,3
+2,87479,87479,1,0,Tattoo,1
+2,90409,90409,1,0,Nano Crystal (Rudimentary Humidity Extractor),2
+2,95427,95427,10,0,Nano Crystal (CrunchCom Code Sieve),1
+2,95729,95729,4,0,Nano Crystal (Mongo's Troll),1
+2,99133,99133,7,0,Nano Crystal (Shed Anger),1
+2,99589,99589,7,0,Nano Crystal (Tired Limbs),2
+2,99623,99623,7,0,Nano Crystal (Line of Credit),1
+2,99999,99999,1,0,"Body Tattoo, Back",1
+2,100006,100006,1,0,"Body Tattoo, Back",1
+2,100009,100009,1,0,"Body Tattoo, Back",1
+2,101127,101128,2,0,"Head Implant: Nano Resist, Shiny",1
+2,101255,101256,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,101309,101310,2,0,Imp/Proj AC Cluster - Faded (Waist),1
+2,101311,101312,2,0,Imp/Proj AC Cluster - Bright (Chest),1
+2,101313,101314,2,0,Imp/Proj AC Cluster - Shiny (Leg),2
+2,101315,101316,2,0,Melee/Ma AC Cluster - Faded (Leg),1
+2,101323,101324,2,0,Energy AC Cluster - Bright (Leg),1
+2,101325,101326,2,0,Energy AC Cluster - Shiny (Chest),1
+2,101329,101330,2,0,Chemical AC Cluster - Bright (Right-Arm),1
+2,101331,101332,2,0,Chemical AC Cluster - Shiny (Waist),1
+2,101337,101338,2,0,1h Blunt Cluster - Shiny (Right-Arm),1
+2,101339,101340,2,0,1h Edged Weapon Cluster - Faded (Right-Hand),1
+2,101361,101362,2,0,Piercing Cluster - Shiny (Right-Arm),1
+2,101367,101368,2,0,2h Blunt Cluster - Shiny (Right-Arm),1
+2,101369,101370,2,0,Sharp Obj Cluster - Faded (Eye),2
+2,101372,101373,2,0,Radiation AC Cluster - Bright (Left-Arm),1
+2,101376,101377,2,0,Cold AC Cluster - Faded (Left-Hand),2
+2,101380,101381,2,0,Cold AC Cluster - Shiny (Waist),2
+2,101386,101387,2,0,Nano Resist Cluster - Shiny (Head),4
+2,101388,101389,2,0,Fire AC Cluster - Faded (Right-Hand),2
+2,101390,101391,2,0,Fire AC Cluster - Bright (Left-Hand),2
+2,101392,101393,2,0,Fire AC Cluster - Shiny (Waist),1
+2,101394,101395,2,0,Martial Arts Cluster - Faded (Left-Hand),1
+2,101396,101397,2,0,Martial Arts Cluster - Bright (Feet),1
+2,101400,101401,2,0,Mult. Melee Cluster - Faded (Right-Wrist),1
+2,101404,101405,2,0,Mult. Melee Cluster - Shiny (Left-Wrist),1
+2,101406,101334,2,0,1h Blunt Cluster - Faded (Right-Hand),1
+2,101410,101411,2,0,Matter Crea Cluster - Bright (Right-Hand),1
+2,101414,101415,2,0,Time & Space Cluster - Faded (Eye),3
+2,101418,101419,2,0,Time & Space Cluster - Shiny (Head),2
+2,101420,101421,2,0,Nano Pool Cluster - Faded (Waist),1
+2,101422,101423,2,0,Nano Pool Cluster - Bright (Head),3
+2,101424,101554,2,0,Nano Pool Cluster - Shiny (Chest),1
+2,101425,101426,2,0,Sharp Obj Cluster - Bright (Right-Hand),1
+2,101427,101428,2,0,Sharp Obj Cluster - Shiny (Right-Wrist),1
+2,101431,101432,2,0,Grenade Cluster - Bright (Eye),2
+2,101435,101436,2,0,Heavy Weapons Cluster - Faded (Right-Hand),1
+2,101451,101452,2,0,Pistol Cluster - Shiny (Right-Wrist),1
+2,101453,101454,2,0,Rifle Cluster - Faded (Left-Wrist),1
+2,101455,101456,2,0,Rifle Cluster - Bright (Right-Wrist),1
+2,101457,101458,2,0,Rifle Cluster - Shiny (Eye),1
+2,101461,101462,2,0,MG / SMG Cluster - Bright (Right-Hand),2
+2,101467,101468,2,0,Shotgun Cluster - Bright (Right-Hand),1
+2,101469,101470,2,0,Shotgun Cluster - Shiny (Right-Arm),1
+2,101477,101478,2,0,Vehicle Hydr Cluster - Faded (Ear),1
+2,101481,101482,2,0,Vehicle Hydr Cluster - Shiny (Head),2
+2,101491,101492,2,0,Ranged. Init Cluster - Bright (Head),3
+2,101497,101498,2,0,Physic. Init Cluster - Bright (Right-Arm),2
+2,101503,101504,2,0,Bow Spc Att Cluster - Bright (Right-Hand),1
+2,101507,101508,2,0,Sensory Impr Cluster - Faded (Chest),1
+2,101509,101510,2,0,Sensory Impr Cluster - Bright (Eye),1
+2,101511,101512,2,0,Sensory Impr Cluster - Shiny (Head),2
+2,101515,101516,2,0,First Aid Cluster - Bright (Right-Hand),2
+2,101517,101518,2,0,First Aid Cluster - Shiny (Head),4
+2,101519,101520,2,0,Treatment Cluster - Faded (Right-Hand),1
+2,101523,101524,2,0,Treatment Cluster - Shiny (Head),2
+2,101525,101526,2,0,Mech. Engi Cluster - Faded (Right-Arm),1
+2,101529,101530,2,0,Mech. Engi Cluster - Shiny (Head),1
+2,101531,101532,2,0,Elec. Engi Cluster - Faded (Right-Hand),1
+2,101533,101534,2,0,Elec. Engi Cluster - Bright (Head),1
+2,101539,101540,2,0,Matt.Metam Cluster - Bright (Chest),2
+2,101543,101544,2,0,Bio.Metamor Cluster - Faded (Waist),2
+2,101545,101546,2,0,Bio.Metamor Cluster - Bright (Chest),1
+2,101549,101550,2,0,Psycho Modi Cluster - Faded (Ear),1
+2,101553,101407,2,0,Psycho Modi Cluster - Shiny (Head),2
+2,101555,101556,2,0,Ranged Ener Cluster - Faded (Left-Hand),2
+2,101559,101560,2,0,Ranged Ener Cluster - Shiny (Head),2
+2,101563,101564,2,0,Multi Ranged Cluster - Bright (Right-Wrist),1
+2,101569,101570,2,0,Trap Disarm Cluster - Bright (Left-Hand),1
+2,101571,101572,2,0,Trap Disarm Cluster - Shiny (Right-Hand),1
+2,101577,101578,2,0,Perception Cluster - Shiny (Ear),1
+2,101579,101580,2,0,Adventuring Cluster - Faded (Chest),1
+2,101591,101592,2,0,Vehicle Air Cluster - Faded (Head),2
+2,101593,101594,2,0,Vehicle Air Cluster - Bright (Ear),1
+2,101595,101596,2,0,Vehicle Air Cluster - Shiny (Eye),1
+2,101603,101604,2,0,Tutoring Cluster - Faded (Head),2
+2,101605,101606,2,0,Tutoring Cluster - Bright (Ear),1
+2,101609,101610,2,0,Brawling Cluster - Faded (Waist),1
+2,101619,101620,2,0,Riposte Cluster - Shiny (Right-Wrist),4
+2,101621,101622,2,0,Dimach Cluster - Faded (Waist),1
+2,101625,101626,2,0,Dimach Cluster - Shiny (Chest),1
+2,101633,101634,2,0,Sneak Atck Cluster - Faded (Eye),1
+2,101635,101636,2,0,Sneak Atck Cluster - Bright (Right-Wrist),1
+2,101641,101642,2,0,Fast Attack Cluster - Bright (Right-Hand),1
+2,101643,101644,2,0,Fast Attack Cluster - Shiny (Left-Hand),3
+2,101645,101646,2,0,NanoC. Init Cluster - Faded (Chest),4
+2,101647,101648,2,0,NanoC. Init Cluster - Bright (Eye),1
+2,101649,101650,2,0,NanoC. Init Cluster - Shiny (Head),1
+2,101651,101652,2,0,Fling Shot Cluster - Faded (Right-Wrist),2
+2,101653,101654,2,0,Fling Shot Cluster - Bright (Right-Hand),1
+2,101655,101656,2,0,Fling Shot Cluster - Shiny (Right-Arm),2
+2,101657,101658,2,0,Aimed Shot Cluster - Faded (Right-Hand),1
+2,101661,101662,2,0,Aimed Shot Cluster - Shiny (Eye),1
+2,101663,101664,2,0,Body Dev Cluster - Faded (Leg),1
+2,101665,101666,2,0,Body Dev Cluster - Bright (Waist),2
+2,101667,101668,2,0,Body Dev Cluster - Shiny (Chest),1
+2,101677,101678,2,0,Dodge-Rng Cluster - Bright (Feet),1
+2,101681,101682,2,0,Evade-ClsC Cluster - Faded (Waist),2
+2,101683,101684,2,0,Evade-ClsC Cluster - Bright (Leg),1
+2,101685,101686,2,0,Evade-ClsC Cluster - Shiny (Feet),1
+2,101689,101690,2,0,Quantum FT Cluster - Bright (Eye),1
+2,101695,101696,2,0,Weapon Smt Cluster - Bright (Head),1
+2,101697,101698,2,0,Weapon Smt Cluster - Shiny (Right-Hand),2
+2,101699,101700,2,0,Pharma Tech Cluster - Faded (Right-Hand),1
+2,101703,101704,2,0,Pharma Tech Cluster - Shiny (Head),1
+2,101705,101706,2,0,Nano Progra Cluster - Faded (Right-Hand),1
+2,101711,101712,2,0,Comp. Liter Cluster - Faded (Right-Hand),2
+2,101713,101714,2,0,Comp. Liter Cluster - Bright (Eye),2
+2,101721,101722,2,0,Psychology Cluster - Shiny (Head),2
+2,101723,101724,2,0,Chemistry Cluster - Faded (Right-Hand),1
+2,101725,101726,2,0,Chemistry Cluster - Bright (Eye),2
+2,101729,101730,2,0,Concealment Cluster - Faded (Eye),1
+2,101741,101742,2,0,Vehicle Grnd Cluster - Faded (Ear),2
+2,101743,101744,2,0,Vehicle Grnd Cluster - Bright (Eye),1
+2,101745,101746,2,0,Vehicle Grnd Cluster - Shiny (Head),1
+2,101747,101748,2,0,Full Auto Cluster - Faded (Waist),1
+2,101755,101756,2,0,Burst Cluster - Bright (Right-Wrist),1
+2,101757,101758,2,0,Burst Cluster - Shiny (Right-Arm),1
+2,101759,101760,2,0,Disease AC Cluster - Faded (Chest),3
+2,101771,101772,2,0,Strength Cluster - Faded (Chest),1
+2,101773,101774,2,0,Strength Cluster - Bright (Left-Arm),2
+2,101775,101776,2,0,Strength Cluster - Shiny (Right-Arm),1
+2,101781,101782,2,0,Agility Cluster - Shiny (Leg),1
+2,101783,101784,2,0,Stamina Cluster - Faded (Waist),1
+2,101785,101786,2,0,Stamina Cluster - Bright (Leg),1
+2,101787,101788,2,0,Stamina Cluster - Shiny (Chest),1
+2,101797,101798,2,0,Sense Cluster - Bright (Waist),1
+2,101799,101800,2,0,Sense Cluster - Shiny (Chest),2
+2,101801,101802,2,0,Psychic Cluster - Faded (Ear),4
+2,101803,101804,2,0,Psychic Cluster - Bright (Chest),1
+2,101807,101808,2,0,Max Health Cluster - Faded (Leg),2
+2,101811,101812,2,0,Max Health Cluster - Shiny (Chest),1
+2,101813,101814,2,0,Max Nano Cluster - Faded (Chest),1
+2,101815,101816,2,0,Max Nano Cluster - Bright (Waist),1
+2,101833,101834,2,0,"Eye Implant: Vehicle Air, Shiny",1
+2,101947,101948,2,0,"Eye Implant: Rifle, Shiny",1
+2,101959,101960,2,0,"Eye Implant: Map Navig, Shiny",1
+2,102090,102091,2,0,"Eye Implant: Map Navig, Shiny",1
+2,102148,102149,2,0,"Eye Implant: Map Navig, Shiny",1
+2,102182,102183,2,0,"Eye Implant: Rifle, Shiny",1
+2,102184,102185,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,102194,102195,2,0,"Eye Implant: Map Navig, Shiny",1
+2,102198,102199,2,0,"Eye Implant: Tutoring, Shiny",1
+2,102224,102225,2,0,"Eye Implant: Tutoring, Shiny",1
+2,102264,102265,2,0,"Eye Implant: Rifle, Shiny",1
+2,102360,102361,2,0,"Eye Implant: Rifle, Shiny",1
+2,102362,102363,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,102449,102450,2,0,"Eye Implant: Map Navig, Shiny",1
+2,102510,102511,2,0,"Eye Implant: Rifle, Shiny",1
+2,102573,102574,2,0,"Eye Implant: Vehicle Grnd, Bright",1
+2,102587,102588,2,0,"Eye Implant: Aimed Shot, Shiny",1
+2,102645,102646,2,0,"Eye Implant: Rifle, Shiny",1
+2,102755,102756,2,0,"Eye Implant: NanoC. Init, Bright",1
+2,102878,102879,2,0,"Eye Implant: Rifle, Shiny",1
+2,102880,102881,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,102900,102901,2,0,"Eye Implant: Map Navig, Shiny",1
+2,103031,103032,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,103043,103044,2,0,"Eye Implant: Map Navig, Shiny",1
+2,103078,103079,2,0,"Eye Implant: Tutoring, Shiny",1
+2,103114,103115,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,103203,103204,2,0,"Eye Implant: Sensory Impr, Bright",1
+2,103225,103226,2,0,"Eye Implant: Map Navig, Shiny",1
+2,103297,103298,2,0,"Eye Implant: Ranged Ener, Bright",1
+2,103316,103317,2,0,"Eye Implant: Rifle, Shiny",1
+2,103350,103351,2,0,"Eye Implant: Rifle, Shiny",1
+2,103374,103375,2,0,"Eye Implant: Map Navig, Shiny",1
+2,103496,103497,2,0,"Eye Implant: Aimed Shot, Shiny",1
+2,103504,103505,2,0,"Eye Implant: Vehicle Air, Shiny",1
+2,103522,103523,2,0,"Eye Implant: Tutoring, Shiny",1
+2,103544,103545,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,103572,103573,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,103596,103597,2,0,"Eye Implant: Perception, Bright",1
+2,103679,103680,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,103823,103824,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,103863,103864,2,0,"Eye Implant: Rifle, Shiny",1
+2,103869,103870,2,0,"Eye Implant: Map Navig, Shiny",1
+2,103935,103936,2,0,"Eye Implant: Rifle, Shiny",1
+2,104033,104034,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,104139,104140,2,0,"Eye Implant: Aimed Shot, Shiny",1
+2,104141,104142,2,0,"Eye Implant: Comp. Liter, Bright",1
+2,104186,104187,2,0,"Eye Implant: Aimed Shot, Shiny",1
+2,104198,104199,2,0,"Eye Implant: Tutoring, Shiny",1
+2,104200,104201,2,0,"Eye Implant: Aimed Shot, Shiny",1
+2,104222,104223,2,0,"Eye Implant: Rifle, Shiny",1
+2,104274,104275,2,0,"Eye Implant: Tutoring, Shiny",1
+2,104315,104316,2,0,"Eye Implant: Vehicle Air, Shiny",1
+2,104319,104320,2,0,"Eye Implant: Tutoring, Shiny",1
+2,104337,104338,2,0,"Eye Implant: Perception, Bright",1
+2,104380,104381,2,0,"Eye Implant: Vehicle Air, Shiny",1
+2,104425,104426,2,0,"Eye Implant: Elec. Engi, Shiny",1
+2,104621,104622,2,0,"Eye Implant: Map Navig, Shiny",1
+2,104647,104648,2,0,"Eye Implant: Vehicle Air, Shiny",1
+2,104736,104737,2,0,"Eye Implant: Rifle, Shiny",1
+2,104828,104829,2,0,"Eye Implant: Vehicle Air, Shiny",1
+2,104911,104912,2,0,"Head Implant: First Aid, Shiny",1
+2,104958,104959,2,0,"Eye Implant: Comp. Liter, Bright",1
+2,105041,105042,2,0,"Head Implant: Vehicle Hydr, Shiny",1
+2,105175,105176,2,0,"Head Implant: Intelligence, Shiny",1
+2,105191,105192,2,0,"Head Implant: Max Nano, Shiny",1
+2,105251,105252,2,0,"Head Implant: Ranged Ener, Shiny",1
+2,105267,105268,2,0,"Head Implant: Nano Progra, Shiny",1
+2,105275,105276,2,0,"Head Implant: Psychology, Shiny",1
+2,105315,105316,2,0,"Head Implant: Vehicle Hydr, Shiny",1
+2,105363,105364,2,0,"Head Implant: NanoC. Init, Shiny",1
+2,105415,105416,2,0,"Head Implant: Nano Resist, Shiny",1
+2,105459,105460,2,0,"Head Implant: Matter Crea, Shiny",1
+2,105465,105466,2,0,"Head Implant: Time & Space, Shiny",1
+2,105529,105530,2,0,"Head Implant: Melee Ener, Shiny",1
+2,105531,105532,2,0,"Head Implant: Vehicle Hydr, Shiny",1
+2,105621,105622,2,0,"Head Implant: Psychic, Shiny",1
+2,105887,105888,2,0,"Head Implant: Intelligence, Shiny",1
+2,106001,106002,2,0,"Head Implant: Psychic, Shiny",1
+2,106085,106123,2,0,"Head Implant: Vehicle Grnd, Shiny",1
+2,106148,106149,2,0,"Head Implant: Bow Spc Att, Shiny",1
+2,106164,106165,2,0,"Head Implant: Pharma Tech, Shiny",1
+2,106227,106228,2,0,"Head Implant: Vehicle Grnd, Shiny",1
+2,106389,106390,2,0,"Head Implant: Vehicle Hydr, Shiny",1
+2,106449,106450,2,0,"Head Implant: NanoC. Init, Shiny",1
+2,106507,106508,2,0,"Head Implant: Mech. Engi, Shiny",1
+2,106635,106636,2,0,"Head Implant: Nano Progra, Shiny",1
+2,106657,106658,2,0,"Head Implant: Melee Ener, Shiny",1
+2,106687,106688,2,0,"Head Implant: Pharma Tech, Shiny",1
+2,106717,106718,2,0,"Head Implant: Sensory Impr, Shiny",1
+2,106735,106736,2,0,"Head Implant: Ranged Ener, Shiny",2
+2,106785,106786,2,0,"Head Implant: Matter Crea, Shiny",1
+2,106839,106840,2,0,"Head Implant: Chemistry, Shiny",1
+2,106900,106901,2,0,"Head Implant: Matter Crea, Shiny",1
+2,106946,106947,2,0,"Head Implant: Intelligence, Shiny",1
+2,106977,106978,2,0,"Head Implant: Elec. Engi, Bright",1
+2,107097,107098,2,0,"Head Implant: First Aid, Shiny",1
+2,107115,107116,2,0,"Head Implant: NanoC. Init, Shiny",1
+2,107161,107162,2,0,"Head Implant: Melee Ener, Shiny",1
+2,107255,107256,2,0,"Ear Implant: Vehicle Air, Bright",1
+2,107303,107304,2,0,"Ear Implant: Psychology, Bright",1
+2,107394,107395,2,0,"Right-Arm Implant: 1h Edged Weapon, Shiny",1
+2,107456,107457,2,0,"Right-Arm Implant: Shotgun, Shiny",1
+2,107526,107527,2,0,"Right-Arm Implant: Break & Entry, Shiny",1
+2,107733,107734,2,0,"Right-Arm Implant: MG / SMG, Shiny",1
+2,107807,107808,2,0,"Right-Arm Implant: 2h Blunt, Shiny",1
+2,107931,107932,2,0,"Right-Arm Implant: Strength, Shiny",1
+2,107939,107940,2,0,"Right-Arm Implant: 2h Edged, Shiny",1
+2,107995,107996,2,0,"Right-Arm Implant: Heavy Weapons, Shiny",1
+2,108103,108104,2,0,"Right-Arm Implant: Physic. Init, Bright",1
+2,108176,108177,2,0,"Right-Arm Implant: Strength, Shiny",1
+2,108196,108197,2,0,"Right-Arm Implant: MG / SMG, Shiny",1
+2,108198,108199,2,0,"Right-Arm Implant: Shotgun, Shiny",1
+2,108200,108201,2,0,"Right-Arm Implant: Assault Rif, Shiny",1
+2,108226,108227,2,0,"Right-Arm Implant: 2h Edged, Shiny",1
+2,108264,108265,2,0,"Right-Arm Implant: Break & Entry, Shiny",1
+2,108290,108291,2,0,"Right-Arm Implant: 2h Blunt, Shiny",1
+2,108363,108364,2,0,"Right-Arm Implant: Strength, Shiny",1
+2,108476,108477,2,0,"Chest Implant: Matt.Metam, Bright",1
+2,108534,108535,2,0,"Chest Implant: Stamina, Shiny",1
+2,108562,108563,2,0,"Chest Implant: Dimach, Shiny",1
+2,108590,108591,2,0,"Chest Implant: Dimach, Shiny",1
+2,108606,108607,2,0,"Chest Implant: Nano Pool, Shiny",1
+2,108634,108635,2,0,"Chest Implant: Max Health, Shiny",1
+2,108644,108645,2,0,"Chest Implant: Energy AC, Shiny",1
+2,108658,108659,2,0,"Chest Implant: Energy AC, Shiny",1
+2,108672,108673,2,0,"Chest Implant: Bio.Metamor, Bright",1
+2,108674,108675,2,0,"Chest Implant: Melee/Ma AC, Shiny",1
+2,108790,108791,2,0,"Chest Implant: Body Dev, Shiny",1
+2,108862,108863,2,0,"Chest Implant: Body Dev, Shiny",1
+2,109150,109151,2,0,"Chest Implant: Body Dev, Shiny",1
+2,109210,109211,2,0,"Chest Implant: Max Health, Shiny",1
+2,109232,109233,2,0,"Chest Implant: Melee/Ma AC, Shiny",1
+2,109248,109249,2,0,"Chest Implant: Psychic, Bright",1
+2,109262,109263,2,0,"Chest Implant: Sense, Shiny",1
+2,109273,109274,2,0,"Left-Arm Implant: Brawling, Shiny",1
+2,109289,109290,2,0,"Left-Arm Implant: Brawling, Shiny",2
+2,109415,109416,2,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+2,109492,109493,2,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+2,109548,109549,2,0,"Right-Wrist Implant: Riposte, Shiny",1
+2,109564,109565,2,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+2,109566,109567,2,0,"Right-Wrist Implant: Pistol, Shiny",1
+2,109568,109569,2,0,"Right-Wrist Implant: Pistol, Shiny",1
+2,109612,109613,2,0,"Right-Wrist Implant: Parry, Shiny",1
+2,109620,109621,2,0,"Right-Wrist Implant: Aimed Shot, Bright",1
+2,109646,109647,2,0,"Right-Wrist Implant: Riposte, Shiny",1
+2,109708,109709,2,0,"Right-Wrist Implant: Parry, Shiny",1
+2,109766,109767,2,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+2,109838,109839,2,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+2,109852,109853,2,0,"Right-Wrist Implant: Riposte, Shiny",1
+2,109886,109887,2,0,"Right-Wrist Implant: Pistol, Shiny",1
+2,109964,109965,2,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+2,110006,110007,2,0,"Right-Wrist Implant: Rifle, Bright",1
+2,110064,110065,2,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+2,110080,110081,2,0,"Right-Wrist Implant: Pistol, Shiny",1
+2,110086,110087,2,0,"Right-Wrist Implant: Parry, Shiny",1
+2,110100,110101,2,0,"Waist Implant: Cold AC, Shiny",1
+2,110140,110141,2,0,"Waist Implant: Radiation AC, Shiny",1
+2,110168,110169,2,0,"Waist Implant: Radiation AC, Shiny",1
+2,110172,110173,2,0,"Waist Implant: Cold AC, Shiny",1
+2,110192,110193,2,0,"Waist Implant: Max Health, Bright",1
+2,110332,110333,2,0,"Waist Implant: Radiation AC, Shiny",1
+2,110428,110429,2,0,"Waist Implant: Fire AC, Shiny",1
+2,110510,110511,2,0,"Waist Implant: Melee/Ma AC, Bright",1
+2,110622,110623,2,0,"Waist Implant: Fire AC, Shiny",1
+2,110782,110783,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,110850,110851,2,0,"Waist Implant: Duck-Exp, Bright",1
+2,110852,110853,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,110900,110865,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,110962,110963,2,0,"Waist Implant: Radiation AC, Shiny",1
+2,110980,110981,2,0,"Waist Implant: Fire AC, Shiny",1
+2,111034,111035,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,111120,111121,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,111134,111135,2,0,"Waist Implant: Cold AC, Shiny",1
+2,111176,111177,2,0,"Waist Implant: Fire AC, Shiny",1
+2,111188,111063,2,0,"Waist Implant: Duck-Exp, Bright",1
+2,111191,111192,2,0,"Left-Wrist Implant: Multi Ranged, Shiny",1
+2,111233,111234,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,111281,111282,2,0,"Waist Implant: Radiation AC, Shiny",1
+2,111293,111294,2,0,"Waist Implant: Cold AC, Shiny",1
+2,111349,111350,2,0,"Waist Implant: Chemical AC, Shiny",1
+2,111458,111459,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,111547,111548,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,111568,111569,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,111613,111614,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,111698,111699,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,111714,111715,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,111732,111733,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,111740,111741,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,111757,111758,2,0,"Right-Hand Implant: 1h Edged Weapon, Faded",1
+2,111862,111863,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,111943,111944,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,111959,111960,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,111968,111969,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,111987,111988,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,111995,111996,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112059,112060,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112081,112082,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112086,112087,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112092,112093,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112102,112103,2,0,"Right-Hand Implant: Assault Rif, Bright",1
+2,112116,112117,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112132,112133,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112172,112173,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112209,112210,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112296,112297,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112366,112367,2,0,"Right-Hand Implant: Aimed Shot, Faded",1
+2,112422,112423,2,0,"Right-Hand Implant: Bow Spc Att, Bright",1
+2,112426,112427,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112432,112433,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112451,112452,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112453,112454,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112469,112470,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112479,112480,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112516,112517,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112564,112565,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112597,112598,2,0,"Right-Hand Implant: Bow Spc Att, Bright",1
+2,112624,112625,2,0,"Right-Hand Implant: MG / SMG, Bright",1
+2,112652,112653,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112660,112661,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112676,112677,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112695,112696,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112715,112716,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112746,112747,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112752,112753,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112780,112781,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112809,112810,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,112823,112824,2,0,"Right-Hand Implant: Shotgun, Bright",1
+2,112893,112894,2,0,"Right-Hand Implant: Martial Arts, Shiny",1
+2,112903,112904,2,0,"Right-Hand Implant: Sharp Obj, Bright",1
+2,112923,112924,2,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+2,112949,112950,2,0,"Right-Hand Implant: Weapon Smt, Shiny",2
+2,112957,112958,2,0,"Right-Hand Implant: Weapon Smt, Shiny",2
+2,112984,113110,2,0,"Leg Implant: Swimming, Shiny",1
+2,113092,113093,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,113108,113109,2,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+2,113125,113126,2,0,"Leg Implant: Dodge-Rng, Shiny",1
+2,113206,113207,2,0,"Leg Implant: Duck-Exp, Shiny",1
+2,113275,113276,2,0,"Leg Implant: Duck-Exp, Shiny",1
+2,113410,113411,2,0,"Leg Implant: Swimming, Shiny",1
+2,113422,113423,2,0,"Leg Implant: Agility, Shiny",1
+2,113466,113467,2,0,"Left-Hand Implant: Fast Attack, Shiny",1
+2,113491,113492,2,0,"Leg Implant: Agility, Shiny",1
+2,113573,113574,2,0,"Left-Hand Implant: Fire AC, Bright",1
+2,116800,116800,14,0,Nano Crystal (Quick Fix),1
+2,120609,120609,1,0,Omni-Med Cloak,6
+2,121305,121304,2,0,Information Tool - Aggressive,1
+2,121306,121307,2,0,Information Tool - Level,2
+2,121360,121360,8,0,Nano Crystal (Skill Wrangler (Weak)),1
+2,121518,121518,4,0,Nano Crystal (Amateur Health Haggler),1
+2,121591,121592,2,0,Rusty Hand Blade,2
+2,121610,121611,2,0,Refitted Polearm,2
+2,121629,121630,2,0,Rusty Spiked Axe,1
+2,121684,121685,2,0,Cracked  Bolter 42mm,1
+2,121703,121704,2,0,Dull Whings,1
+2,121722,121723,2,0,Dull Haxor 9922,1
+2,121741,121742,2,0,Unbalanced Right Slice,1
+2,121760,121761,2,0,Unbalanced Mini Axe,1
+2,121817,121818,2,0,Irreparable Sleekblaster Minor,1
+2,121855,121856,2,0,Ill-Treated Chunkprojector,1
+2,121912,121913,2,0,Ill-Treated Flamethrower,1
+2,121969,121970,2,0,Dull Katana,4
+2,122007,122008,2,0,Ill-Treated Blackened Blaster,2
+2,122083,122084,2,0,Ill-Treated Blackened Blaster Rifle,2
+2,122121,122122,2,0,Ill-Treated E-Beamer,1
+2,122178,122179,2,0,Ill-Treated Megajolt,1
+2,122197,122198,2,0,Ill-Treated DNA-Locked Blaster Rifle,1
+2,122235,122236,2,0,Ill-Treated Electrical Pacifier,1
+2,122254,122255,2,0,Ill-Treated Eradicator XCI-52,1
+2,122311,122312,2,0,Ill-Treated Stanton Stunner IV,2
+2,122330,122331,2,0,Irreparable Minigrinner,1
+2,122349,122350,2,0,Punctured Metaphysic Energy Shield,2
+2,122368,122369,2,0,Punctured Energy Shield,1
+2,122444,122445,2,0,Irreparable El Dieu,1
+2,122463,122464,2,0,Irreparable El Diablo,2
+2,122520,122521,2,0,Ill-Treated Omni-Flamer Strategic,3
+2,122539,122540,2,0,Ill-Treated Omni-Pol Standard Flamer,2
+2,122577,122578,2,0,Ill-Treated Supernova Mk VI,1
+2,122596,122597,2,0,Ill-Treated Blackhole Mk IX,2
+2,122615,122616,2,0,Irreparable Aero Borealis Corona,3
+2,122634,122635,2,0,Irreparable The Original Plasma-Emitter,1
+2,122710,122711,2,0,Ill-Treated Kevlar Bow,1
+2,122729,122730,2,0,Unbalanced Blackjack,1
+2,122748,122749,2,0,Dull Two-Handed Blackjack,1
+2,122767,122768,2,0,Ill-Treated Bow-Blaster,2
+2,122848,122849,2,0,Unbalanced Stun-Baton,1
+2,122905,122906,2,0,Dull Support Beam,1
+2,122924,122925,2,0,Dull Blackjohn,1
+2,122943,122944,2,0,Unbalanced Mace,2
+2,122962,122963,2,0,Dull Notum Staff,1
+2,122981,122982,2,0,Irreparable Kolt 58 Magnum,3
+2,123019,123020,2,0,Ill-Treated Mini-Shotgun,4
+2,123076,123077,2,0,Irreparable Sleekblaster Major,2
+2,123171,123172,2,0,Irreparable Electron-Charged Pistol,4
+2,123305,123306,2,0,Ill-Treated Enriched Uranium Sprayer,1
+2,123400,123401,2,0,Gluegun,1
+2,123419,123420,2,0,Ill-Treated Netgun,1
+2,123438,123439,2,0,Irreparable Ultra-Light Missile Pistol Raid 9-X,1
+2,123495,123496,2,0,Irreparable IMI Desert Reet 1000,2
+2,123628,123629,2,0,Irreparable BBI Sigma III,1
+2,123647,123648,2,0,Irreparable Sentinels ETE Strike Gun,2
+2,123723,123724,2,0,M-1 Bipower Prototype,1
+2,123742,123743,2,0,Rusty OT M-10 Flechette Pistol,1
+2,123808,123809,2,0,Rusty MTI SW500,1
+2,123837,123838,2,0,Rusty Zastaba Cz-200,2
+2,123844,123845,2,0,Rusty Freedom Arms Super 90,1
+2,123855,123856,2,0,Second-Hand Old English Trading Co.,1
+2,123904,123905,2,0,Rusty OT 0120 Machine Pistol,1
+2,123909,123910,2,0,Rusty MTI SOCOM Mk IV,1
+2,123928,123929,2,0,Rusty FN 7-7 Pistol,3
+2,123933,123934,2,0,Stained MTI USP 1200,1
+2,123942,123943,2,0,Burned-Out Galahad Inc T70,1
+2,123968,123970,2,0,Rusty OT Boomer M30,1
+2,123974,123975,2,0,Shortened Gripo-Com AKR 1K20,2
+2,123991,123992,2,0,Rusty Old English Trading Co. Type 77a,2
+2,124004,124005,2,0,Rusty M150 Booster Edition,1
+2,124042,124043,2,0,F.D.A. Insurgent Fly,2
+2,124070,124071,2,0,M52A Pulse Rifle,3
+2,124073,124074,2,0,Rusty BBI PS500,1
+2,124092,124093,2,0,Rusted AcuTek Cruncher,1
+2,124101,124102,2,0,O.E.T. Co. C70 Brigand,1
+2,124121,124122,2,0,Rusty ICC Arms SB21 Assault Shotgun,1
+2,124183,124184,2,0,Worn OT-Windchaser RM70,1
+2,124217,124218,2,0,Old Galahad Inc. Scout,2
+2,124256,124257,2,0,Sparking Vektor ND Shotgun,1
+2,124328,124329,2,0,Worn Sako J-21 P-96 Response Rifle,2
+2,124341,124342,2,0,Tsakachumi PTO-HV Counter-Sniper Rifle,3
+2,124348,124349,2,0,Battered OT M500 SWAT Rifle,1
+2,124364,124365,2,0,Rusty OT Anti-Cyborg Rifle,1
+2,124369,124370,2,0,Barret M-00 Anti-Material Rifle,1
+2,124372,124373,2,0,Battered BBI AS-90,2
+2,124383,124384,2,0,HSR Arms F-59,3
+2,124386,124387,2,0,Rusty MTI G02K,2
+2,124407,124408,2,0,Rusty MTI G-70,1
+2,124431,124432,2,0,Bent BBI Minami-90,1
+2,124484,124485,2,0,Ingram Morning Star,1
+2,124487,124488,2,0,Manex SD 4004,3
+2,124503,124504,2,0,Rusty OT Eskorpio 21,1
+2,124510,124511,2,0,Rusty Sentinels Personal Edition,2
+2,124545,124546,2,0,YES Support 1010,1
+2,124548,124549,2,0,Ill-Treated Seburo M35,2
+2,124557,124558,2,0,Kang Tao Spitting Cobra,2
+2,124560,124561,2,0,Ill-Treated OT Saladin,1
+2,124579,124580,2,0,Irreparable OT Viper IX,2
+2,124598,124599,2,0,Ill-Treated MTI MP200,1
+2,124624,124625,2,0,Ill-Treated MTI UMP22,1
+2,124643,124644,2,0,Ill-Treated Kalinkanov ZU-113 Security Weapon,2
+2,124681,124682,2,0,Ill-Treated MTI MPK-22 Briefcase Gun,2
+2,124700,124701,2,0,Ill-Treated Seburo C-19a,1
+2,124711,124712,2,0,Ill-Treated Nord Armwerk MAX,2
+2,124730,124731,2,0,Ill-Treated FN P00,1
+2,124749,124750,2,0,Ill-Treated BBI WMMA CAW,1
+2,124768,124769,2,0,Ill-Treated OT ARL-10 Micromissile Launcher,1
+2,124779,124780,2,0,Ill-Treated Tsunami Raiden MP-Drum,1
+2,124836,124837,2,0,Mistreated Vektor M-31 Automatic Grenade Launcher,1
+2,124910,124911,2,0,Ill-Treated Westinghouse IM-50 Plasma Burner,2
+2,124948,124949,2,0,Ill-Treated Techtronica Neural Disruptor,2
+2,125005,125006,2,0,Ill-Treated Joint Clans Exocet II,2
+2,125024,125025,2,0,Ill-Treated Joint Clans Patriot,2
+2,125043,125044,2,0,Ill-Treated Reet-Tech Junior Urban Crossbow,1
+2,125081,125082,2,0,Ill-Treated Oneida Razor Half-Bow,4
+2,125343,125344,2,0,Splintered Protector Squibber,1
+2,125400,125401,2,0,Splintered Protector Executioner,1
+2,125419,125420,2,0,Splintered Torch,1
+2,125438,125439,2,0,Crumbling Paper Hammer,1
+2,125445,125446,2,0,Tear-soaked Pillow with Important Stripes,2
+2,125751,125751,17,0,Nano Crystal (Calling of Medinos),3
+2,128497,128498,2,0,Uncle Bazzit Custom 22mm,2
+2,128603,128604,2,0,Fragile D-nort Compact Assault Rifle,1
+2,128627,128628,2,0,Rusty Ares Arms AR-90 Jet Rifle,1
+2,128655,128656,2,0,Ill-treated HSR Arms Tech Assault IV,1
+2,128734,128735,2,0,1st edition Pistola Di Macchina Mini Automatico 2,1
+2,128758,128759,2,0,Ill-treated Fabrique Des Armes Bizon 20-19,1
+2,128784,128785,2,0,MTI MP903A3D9,1
+2,128792,128793,2,0,Ill-treated OT Cobra M-33,1
+2,128811,128812,2,0,Ill-treated Zastaba M0-2 Assault Weapon (Zero),1
+2,128830,128831,2,0,Rusty Freedom Arms Defender,1
+2,128839,128840,2,0,Ill-treated OET Co. MP-21 Tactical Machine Pistol,1
+2,128858,128859,2,0,Ill-treated MTI MPK-22 ,2
+2,128871,128872,2,0,Ill-treated Arwen MM-50 Grenade Launcher,1
+2,128916,128917,2,0,Water balloon,2
+2,128976,128977,2,0,Obtuse Rider Warblade,3
+2,128995,128996,2,0,Obtuse Protector Warblade,2
+2,129069,129070,2,0,Sparkling Breathing Space,1
+2,129638,129639,2,0,Over-tuned Wen-Wen,2
+2,129715,129715,10,0,Nano Crystal (Restock Ammo (Level OP-I)),1
+2,130003,130004,2,0,Run Speed Cluster - Faded (Leg),1
+2,130007,130008,2,0,Run Speed Cluster - Shiny (Right-Wrist),1
+2,130051,130052,2,0,Ancient Featherwood Staff,1
+2,130060,130061,2,0,Unbalanced Heavy Staff,1
+2,130071,130072,2,0,Splintered Light Staff,1
+2,130082,130083,2,0,Faded Magical Stave of Inferno,1
+2,130106,130107,2,0,Obtuse Notum Lever,1
+2,130125,130126,2,0,Splintered Denunciatory Spear,2
+2,130172,130173,2,0,Bent OT Sword,1
+2,130197,130198,2,0,Splintered Bloodworm Carapace,3
+2,130214,130215,2,0,Splintered Light Spear,1
+2,130241,130242,2,0,"Right-Wrist Implant: Run Speed, Shiny",1
+2,130263,130264,2,0,"Right-Wrist Implant: Run Speed, Shiny",1
+2,130344,130345,2,0,"Left-Wrist Implant: Run Speed, Bright",1
+2,131605,131606,2,0,Rough Club,1
+2,142773,142773,4,0,Nano Crystal (Swap Psyche),2
+2,142804,142805,2,0,Silent SSC Rustling Wakisashi,1
+2,142817,142818,2,0,Obtuse Survival Knife,1
+2,142836,142837,2,0,Splintered Metaplast Mace,1
+2,142855,142856,2,0,Cast-off Eye Wind Onehander,2
+2,143833,143845,2,0,Ill-Treated Sunburst Mk IV,3
+2,144063,144064,2,0,Splintered Survival Axe,1
+2,144082,144083,2,0,Bent Tanto,1
+2,150193,150194,2,0,,3
+2,150254,150255,2,0,,1
+2,152064,152065,2,0,,1
+2,152096,152097,2,0,,2
+2,152135,152136,2,0,,1
+2,152279,152280,2,0,,1
+2,152298,154071,2,0,,1
+2,152326,152327,2,0,,1
+2,152358,152359,2,0,,3
+2,152367,152368,2,0,,2
+2,152732,152733,2,0,,1
+2,152766,152767,2,0,,1
+2,154070,150196,2,0,,1
+2,155369,155369,8,0,,1
+2,155392,155392,8,0,,1
+2,156142,156142,4,0,,2
+2,156146,156146,11,0,,3
+2,158963,158964,2,0,,1
+2,159007,159008,2,0,,1
+2,159035,159036,2,0,,1
+2,159083,159087,2,0,,1
+2,160216,160217,2,0,,2
+2,160219,160220,2,0,,2
+2,160233,160234,2,0,,1
+2,160236,160237,2,0,,2
+2,160239,160240,2,0,,1
+2,160242,160243,2,0,,1
+2,160245,160246,2,0,,2
+2,160264,160265,2,0,,2
+2,166253,166254,2,0,,1
+2,171781,171782,2,0,,1
+2,171923,171924,2,0,,1
+2,178134,178135,2,0,,1
+2,178170,178171,2,0,,1
+2,202724,202724,8,0,,2
+2,202827,202827,8,0,,2
+2,202871,202871,10,0,,6
+2,203594,203594,10,0,,3
+2,204139,204140,2,0,,2
+2,204262,204263,2,0,,1
+2,204267,204268,2,0,,1
+2,204270,204271,2,0,,1
+2,205224,205225,2,0,,1
+2,206289,206290,2,0,,2
+2,209283,209284,2,0,,1
+2,209489,209489,4,0,,3
+2,210354,210354,4,0,,10
+2,210529,210529,1,0,,4
+2,210590,210590,2,0,,8
+2,210612,210612,8,0,,7
+2,210733,210733,5,0,,10
+2,218780,218781,2,0,,1
+2,218822,218823,2,0,,1
+2,227473,227473,30,0,,2
+2,233792,233793,2,0,,1
+2,297633,297633,10,0,,3
+3,25812,25811,3,0,Treatment Laboratory,2
+3,26471,26471,14,0,Nano Crystal (Ranged Special Attacks Incompetence),1
+3,26489,26489,10,0,Nano Crystal (Nano Skills Incompetence),2
+3,26503,26503,14,0,Nano Crystal (Melee Special Attacks Incompetence),2
+3,26541,26541,10,0,Nano Crystal (Drain Abilities),1
+3,27199,27199,10,0,Nano Crystal (Melee Weapons Incompetence),3
+3,27223,27223,4,0,Nano Crystal (Lethargy),2
+3,27263,27263,10,0,Nano Crystal (Ranged Weapons Incompetence),1
+3,27383,27383,1,0,Omni-Med Suit Shirt,1
+3,27384,27384,1,0,Omni-Med Suit Skirt,4
+3,27385,27385,1,0,Omni-Med Suit Sleeves,1
+3,28751,28751,4,0,Nano Crystal (Team Quick Heal),5
+3,28752,28752,10,0,Nano Crystal (Terrain Knowledge),2
+3,28767,28767,7,0,Nano Crystal (Doctor's Grace),2
+3,28780,28780,7,0,Nano Crystal (Inflict Harm),1
+3,28804,28804,10,0,Nano Crystal (Corrosive Spray),1
+3,28805,28805,4,0,Nano Crystal (Corruption),2
+3,28811,28811,7,0,Nano Crystal (Fire Stream),2
+3,28932,28932,7,0,Nano Crystal (Give Energy: 10),3
+3,28936,28936,7,0,Nano Crystal (Give Life: 10),1
+3,28943,28943,4,0,Nano Crystal (Iron Fist),3
+3,29192,29192,10,0,Nano Crystal (Symbol Helper),1
+3,29823,29823,1,0,Nano Crystal (Armor Megaboost),1
+3,29862,29862,7,0,Nano Crystal (Spike Shield),3
+3,30110,30110,10,0,Nano Crystal (Distracted Gaze),4
+3,30781,30781,10,0,Nano Crystal (Lend Nano: 50),1
+3,31436,31436,1,0,Nano Crystal (Poison Modification),1
+3,31498,31498,1,0,White Cloak,4
+3,31499,31499,1,0,Red Cloak,4
+3,31500,31500,1,0,Grey Cloak,2
+3,31501,31501,1,0,Green Cloak,7
+3,31502,31502,1,0,Brown Cloak,3
+3,31503,31503,1,0,Blue Cloak,7
+3,31504,31504,1,0,Jean Trenchcoat,1
+3,31505,31505,1,0,Black Trenchcoat,6
+3,31506,31506,1,0,Black Omni-Tek Commander Cloak,3
+3,31515,31515,1,0,Red Omni-Tek Commander Cloak,6
+3,31516,31516,1,0,Trenchcoat,3
+3,31517,31517,1,0,Black Cloak,8
+3,31528,31528,1,0,Red Cloak Hood,6
+3,31530,31530,1,0,Grey Cloak Hood,4
+3,31531,31531,1,0,Green Cloak Hood,5
+3,31532,31532,1,0,Brown Cloak Hood,7
+3,31533,31533,1,0,Blue Cloak Hood,7
+3,31534,31534,1,0,Black Cloak Hood,5
+3,32082,32082,10,0,Nano Crystal (False Profession: Enforcer),5
+3,42412,42412,1,0,Nano Crystal (Enhance Team Health),1
+3,42423,42423,4,0,Nano Crystal (Weak Team Heal),2
+3,43978,43978,4,0,Nano Crystal (Emergency Stitching),1
+3,44186,44186,10,0,Nano Crystal (Dissolve Molecular Bonding),2
+3,45965,45965,1,0,Nano Crystal (Minor Toxic Barb),1
+3,45966,45966,10,0,Nano Crystal (Minor Toxic Field),2
+3,46010,46010,10,0,Nano Crystal (Upgraded Automaton),4
+3,46074,46074,7,0,Nano Crystal (Automaton),2
+3,46456,46456,1,0,Nano Crystal (Basic Worker-Droid),1
+3,46462,46462,7,0,Nano Crystal (Advanced Worker),5
+3,49821,49821,4,0,Nano Crystal (Challenger to Cyclops),2
+3,55679,55678,3,0,Weapon Smithing Tutoring Device,2
+3,55683,55682,3,0,Pharma Tech Tutoring Device,1
+3,55685,55684,3,0,Nano Programming Tutoring Device,1
+3,55688,55677,3,0,Chemistry Tutoring Device,1
+3,55690,55689,3,0,Mechanical Engineering Tutoring Device,1
+3,55838,55838,7,0,Nano Crystal (Frost With Snow),6
+3,55863,55863,1,0,Nano Crystal (Coat of Barbs),3
+3,56003,56003,4,0,Nano Crystal (Lesser Illusory Paralysis),1
+3,56238,56238,1,0,Nano Crystal (Detain Suspect),9
+3,56250,56250,4,0,Nano Crystal (Halt Flight),2
+3,56259,56259,1,0,Nano Crystal (Lesser Detain Customer),1
+3,70401,70401,1,0,Nano Crystal (Partial Deflection Shield),1
+3,70403,70403,7,0,Nano Crystal (Partial Deflection Shield (Extended)),4
+3,70411,70411,10,0,Nano Crystal (Total Mirror Shield Mk I),4
+3,70558,85640,3,0,Battered Low-Tech Armor Boots,4
+3,70559,85689,3,0,Battered Low-Tech Body Armor,8
+3,70560,85688,3,0,Battered Low-Tech Female Body Armor,5
+3,70561,85744,3,0,Battered Low-Tech Armor Sleeves,5
+3,70562,85597,3,0,Battered Low-Tech Armor Gloves,8
+3,70563,85558,3,0,Battered Low-Tech Armor Helmet,4
+3,70564,85515,3,0,Battered Low-Tech Armor Pants,7
+3,70565,85514,3,0,Battered Low-Tech Armor Shorts,4
+3,70577,70577,4,0,Nano Crystal (Greater Armor Megaboost),3
+3,70582,70582,7,0,Nano Crystal (Flawed Shielding Barrier),3
+3,75354,75354,1,0,Nano Crystal (Toughen Skin),3
+3,75415,75415,4,0,Nano Crystal (Minor Combat Barrier),7
+3,78418,78418,10,0,Nano Crystal (Lossy Health Funnel),3
+3,78446,78446,10,0,Nano Crystal (Punishing Blade),1
+3,81848,81848,10,0,Nano Crystal (Crash of Thunder),5
+3,81892,81892,10,0,Nano Crystal (Lesser Nano Boost),4
+3,81952,81952,4,0,Nano Crystal (Lesser Suspicious Death),8
+3,82071,82071,10,0,Nano Crystal (Lesser Healing Touch),3
+3,82188,82188,10,0,Nano Crystal (Mass Daze),1
+3,82800,82800,4,0,Nano Crystal (Passive Micro Entanglement),3
+3,82802,82802,10,0,Nano Crystal (Lesser Nano Net),1
+3,82816,82816,4,0,Nano Crystal (Lesser Stumbling Steps),1
+3,82838,82838,20,0,Nano Crystal (Pronouncement of Greatness),6
+3,83975,83975,4,0,Nano Crystal (Poke Eyes),2
+3,83984,83984,7,0,Nano Crystal (Claw Eyes),1
+3,85279,85279,7,0,Nano Crystal (Passive Distributed Entanglement),2
+3,85477,21917,3,0,Worn Cyber Armor Sleeves,8
+3,85481,85690,3,0,Battered Leather Vest,5
+3,85510,85509,3,0,Inferior Nail Armor Pants,3
+3,85517,27360,3,0,Battered Flak Armor Pants,9
+3,85531,22289,3,0,Worn Cyber Armor Pants,6
+3,85533,85532,3,0,Battered Light Combat Armor Pants,6
+3,85572,22219,3,0,Worn Cyber Armor Helmet,9
+3,85612,22166,3,0,Worn Cyber Armor Gloves,3
+3,85636,85635,3,0,Inferior Nail Armor Boots,4
+3,85655,22104,3,0,Worn Cyber Armor Boots,6
+3,85657,85656,3,0,Battered Light Combat Armor Boots,9
+3,85684,85683,3,0,Inferior Nail Body Armor,3
+3,85691,22004,3,0,Inferior Kevlar Vest,7
+3,85693,27389,3,0,Battered Flak Body Armor,5
+3,85711,22014,3,0,Worn Cyber Female Body Armor,2
+3,85712,22010,3,0,Worn Cyber Body Armor,6
+3,85714,85713,3,0,Battered Light Combat Body Armor,2
+3,85723,85722,3,0,Worn Nadir Steel-Ribbed Armor Sleeves,5
+3,85740,85739,3,0,Inferior Nail Armor Sleeves,6
+3,85746,27391,3,0,Battered Flak Armor Sleeves,5
+3,85761,85760,3,0,Battered Light Combat Armor Sleeves,4
+3,85873,85873,10,0,Nano Crystal (Ransack Skills (Weak)),1
+3,85894,85894,4,0,Nano Crystal (Deprive Skills (Weak)),2
+3,86438,86438,1,0,Katara Sunglasses,1
+3,86441,86441,1,0,Keelarr Sunglasses,1
+3,86443,86443,1,0,Visor,1
+3,87471,87471,1,0,Tattoo,2
+3,87472,87472,1,0,Tattoo,3
+3,87476,87476,1,0,Tattoo,2
+3,87477,87477,1,0,Tattoo,1
+3,87483,87483,1,0,Tattoo,3
+3,88383,88384,3,0,Trimmer - Positive Aggressive-Defensive,1
+3,90409,90409,1,0,Nano Crystal (Rudimentary Humidity Extractor),2
+3,95427,95427,10,0,Nano Crystal (CrunchCom Code Sieve),1
+3,95729,95729,4,0,Nano Crystal (Mongo's Troll),4
+3,97459,97459,4,0,Nano Crystal (Health Augmentation),2
+3,99133,99133,7,0,Nano Crystal (Shed Anger),4
+3,99212,99212,20,0,Nano Crystal (Temporary Glamor),2
+3,99589,99589,7,0,Nano Crystal (Tired Limbs),2
+3,100006,100006,1,0,"Body Tattoo, Back",1
+3,100009,100009,1,0,"Body Tattoo, Back",1
+3,100011,100011,1,0,"Body Tattoo, Front",2
+3,100012,100012,1,0,Tattoo,2
+3,100202,100202,17,0,Nano Crystal (Mongo Slam!),1
+3,101103,101104,3,0,"Eye Implant: Sharp Obj, Faded",1
+3,101125,101126,3,0,"Head Implant: Nano Resist, Shiny",1
+3,101129,101130,3,0,"Head Implant: Nano Resist, Shiny",1
+3,101137,101138,3,0,"Ear Implant: Vehicle Air, Bright",1
+3,101199,101200,3,0,"Right-Wrist Implant: Mult. Melee, Faded",2
+3,101223,101224,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,101261,101262,3,0,Basic Leg Implant,1
+3,101285,101286,3,0,"Left-Hand Implant: Fast Attack, Shiny",1
+3,101309,101310,3,0,Imp/Proj AC Cluster - Faded (Waist),1
+3,101313,101314,3,0,Imp/Proj AC Cluster - Shiny (Leg),1
+3,101319,101320,3,0,Melee/Ma AC Cluster - Shiny (Chest),1
+3,101321,101322,3,0,Energy AC Cluster - Faded (Waist),1
+3,101323,101324,3,0,Energy AC Cluster - Bright (Leg),2
+3,101331,101332,3,0,Chemical AC Cluster - Shiny (Waist),1
+3,101343,101344,3,0,1h Edged Weapon Cluster - Shiny (Right-Arm),1
+3,101351,101352,3,0,2h Edged Cluster - Faded (Waist),1
+3,101353,101354,3,0,2h Edged Cluster - Bright (Left-Arm),2
+3,101363,101364,3,0,2h Blunt Cluster - Faded (Chest),1
+3,101365,101366,3,0,2h Blunt Cluster - Bright (Left-Arm),3
+3,101367,101368,3,0,2h Blunt Cluster - Shiny (Right-Arm),1
+3,101372,101373,3,0,Radiation AC Cluster - Bright (Left-Arm),1
+3,101374,101375,3,0,Radiation AC Cluster - Shiny (Waist),1
+3,101378,101379,3,0,Cold AC Cluster - Bright (Right-Hand),1
+3,101382,101383,3,0,Nano Resist Cluster - Faded (Left-Wrist),1
+3,101384,101385,3,0,Nano Resist Cluster - Bright (Right-Wrist),1
+3,101386,101387,3,0,Nano Resist Cluster - Shiny (Head),1
+3,101388,101389,3,0,Fire AC Cluster - Faded (Right-Hand),1
+3,101390,101391,3,0,Fire AC Cluster - Bright (Left-Hand),1
+3,101402,101403,3,0,Mult. Melee Cluster - Bright (Eye),1
+3,101414,101415,3,0,Time & Space Cluster - Faded (Eye),1
+3,101424,101554,3,0,Nano Pool Cluster - Shiny (Chest),1
+3,101425,101426,3,0,Sharp Obj Cluster - Bright (Right-Hand),1
+3,101427,101428,3,0,Sharp Obj Cluster - Shiny (Right-Wrist),1
+3,101429,101430,3,0,Grenade Cluster - Faded (Right-Hand),1
+3,101431,101432,3,0,Grenade Cluster - Bright (Eye),3
+3,101433,101434,3,0,Grenade Cluster - Shiny (Right-Arm),3
+3,101437,101438,3,0,Heavy Weapons Cluster - Bright (Eye),1
+3,101441,101442,3,0,Bow Cluster - Faded (Eye),1
+3,101443,101444,3,0,Bow Cluster - Bright (Left-Arm),3
+3,101453,101454,3,0,Rifle Cluster - Faded (Left-Wrist),1
+3,101455,101456,3,0,Rifle Cluster - Bright (Right-Wrist),1
+3,101457,101458,3,0,Rifle Cluster - Shiny (Eye),1
+3,101459,101460,3,0,MG / SMG Cluster - Faded (Chest),1
+3,101461,101462,3,0,MG / SMG Cluster - Bright (Right-Hand),1
+3,101463,101464,3,0,MG / SMG Cluster - Shiny (Right-Arm),1
+3,101465,101466,3,0,Shotgun Cluster - Faded (Waist),2
+3,101477,101478,3,0,Vehicle Hydr Cluster - Faded (Ear),2
+3,101479,101480,3,0,Vehicle Hydr Cluster - Bright (Eye),2
+3,101481,101482,3,0,Vehicle Hydr Cluster - Shiny (Head),1
+3,101489,101490,3,0,Ranged. Init Cluster - Faded (Right-Hand),1
+3,101491,101492,3,0,Ranged. Init Cluster - Bright (Head),2
+3,101493,101494,3,0,Ranged. Init Cluster - Shiny (Right-Wrist),1
+3,101495,101496,3,0,Physic. Init Cluster - Faded (Left-Arm),1
+3,101497,101498,3,0,Physic. Init Cluster - Bright (Right-Arm),1
+3,101501,101502,3,0,Bow Spc Att Cluster - Faded (Right-Wrist),2
+3,101503,101504,3,0,Bow Spc Att Cluster - Bright (Right-Hand),1
+3,101507,101508,3,0,Sensory Impr Cluster - Faded (Chest),1
+3,101513,101514,3,0,First Aid Cluster - Faded (Left-Hand),1
+3,101521,101522,3,0,Treatment Cluster - Bright (Eye),1
+3,101525,101526,3,0,Mech. Engi Cluster - Faded (Right-Arm),1
+3,101527,101528,3,0,Mech. Engi Cluster - Bright (Eye),1
+3,101529,101530,3,0,Mech. Engi Cluster - Shiny (Head),1
+3,101539,101540,3,0,Matt.Metam Cluster - Bright (Chest),1
+3,101543,101544,3,0,Bio.Metamor Cluster - Faded (Waist),1
+3,101551,101552,3,0,Psycho Modi Cluster - Bright (Eye),1
+3,101553,101407,3,0,Psycho Modi Cluster - Shiny (Head),1
+3,101555,101556,3,0,Ranged Ener Cluster - Faded (Left-Hand),3
+3,101557,101558,3,0,Ranged Ener Cluster - Bright (Eye),1
+3,101559,101560,3,0,Ranged Ener Cluster - Shiny (Head),1
+3,101561,101562,3,0,Multi Ranged Cluster - Faded (Eye),3
+3,101563,101564,3,0,Multi Ranged Cluster - Bright (Right-Wrist),2
+3,101569,101570,3,0,Trap Disarm Cluster - Bright (Left-Hand),1
+3,101573,101574,3,0,Perception Cluster - Faded (Head),1
+3,101575,101576,3,0,Perception Cluster - Bright (Eye),1
+3,101577,101578,3,0,Perception Cluster - Shiny (Ear),1
+3,101583,101584,3,0,Adventuring Cluster - Shiny (Leg),1
+3,101591,101592,3,0,Vehicle Air Cluster - Faded (Head),2
+3,101605,101606,3,0,Tutoring Cluster - Bright (Ear),1
+3,101607,101608,3,0,Tutoring Cluster - Shiny (Eye),1
+3,101611,101612,3,0,Brawling Cluster - Bright (Right-Arm),2
+3,101613,101614,3,0,Brawling Cluster - Shiny (Left-Arm),1
+3,101619,101620,3,0,Riposte Cluster - Shiny (Right-Wrist),1
+3,101621,101622,3,0,Dimach Cluster - Faded (Waist),1
+3,101625,101626,3,0,Dimach Cluster - Shiny (Chest),2
+3,101633,101634,3,0,Sneak Atck Cluster - Faded (Eye),1
+3,101641,101642,3,0,Fast Attack Cluster - Bright (Right-Hand),1
+3,101643,101644,3,0,Fast Attack Cluster - Shiny (Left-Hand),1
+3,101647,101648,3,0,NanoC. Init Cluster - Bright (Eye),1
+3,101651,101652,3,0,Fling Shot Cluster - Faded (Right-Wrist),1
+3,101653,101654,3,0,Fling Shot Cluster - Bright (Right-Hand),2
+3,101657,101658,3,0,Aimed Shot Cluster - Faded (Right-Hand),1
+3,101663,101664,3,0,Body Dev Cluster - Faded (Leg),3
+3,101667,101668,3,0,Body Dev Cluster - Shiny (Chest),1
+3,101675,101676,3,0,Dodge-Rng Cluster - Faded (Waist),1
+3,101681,101682,3,0,Evade-ClsC Cluster - Faded (Waist),2
+3,101683,101684,3,0,Evade-ClsC Cluster - Bright (Leg),1
+3,101685,101686,3,0,Evade-ClsC Cluster - Shiny (Feet),2
+3,101687,101688,3,0,Quantum FT Cluster - Faded (Right-Hand),1
+3,101699,101700,3,0,Pharma Tech Cluster - Faded (Right-Hand),2
+3,101701,101702,3,0,Pharma Tech Cluster - Bright (Eye),2
+3,101705,101706,3,0,Nano Progra Cluster - Faded (Right-Hand),2
+3,101709,101710,3,0,Nano Progra Cluster - Shiny (Head),1
+3,101711,101712,3,0,Comp. Liter Cluster - Faded (Right-Hand),1
+3,101725,101726,3,0,Chemistry Cluster - Bright (Eye),1
+3,101727,101728,3,0,Chemistry Cluster - Shiny (Head),2
+3,101731,101732,3,0,Concealment Cluster - Bright (Ear),2
+3,101735,101736,3,0,Break & Entry Cluster - Faded (Chest),1
+3,101737,101738,3,0,Break & Entry Cluster - Bright (Left-Arm),1
+3,101739,101740,3,0,Break & Entry Cluster - Shiny (Right-Arm),1
+3,101743,101744,3,0,Vehicle Grnd Cluster - Bright (Eye),1
+3,101751,101752,3,0,Full Auto Cluster - Shiny (Right-Arm),1
+3,101759,101760,3,0,Disease AC Cluster - Faded (Chest),2
+3,101761,101762,3,0,Disease AC Cluster - Bright (Leg),2
+3,101787,101788,3,0,Stamina Cluster - Shiny (Chest),1
+3,101789,101790,3,0,Intelligence Cluster - Faded (Ear),1
+3,101791,101792,3,0,Intelligence Cluster - Bright (Eye),2
+3,101795,101796,3,0,Sense Cluster - Faded (Head),1
+3,101797,101798,3,0,Sense Cluster - Bright (Waist),2
+3,101801,101802,3,0,Psychic Cluster - Faded (Ear),1
+3,101803,101804,3,0,Psychic Cluster - Bright (Chest),1
+3,101809,101810,3,0,Max Health Cluster - Bright (Waist),1
+3,101811,101812,3,0,Max Health Cluster - Shiny (Chest),2
+3,101907,101908,3,0,"Eye Implant: Tutoring, Shiny",1
+3,101917,101918,3,0,"Eye Implant: Vehicle Hydr, Bright",1
+3,101999,102000,3,0,"Eye Implant: Mech. Engi, Bright",1
+3,102003,102004,3,0,"Eye Implant: Rifle, Shiny",1
+3,102011,102012,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,102112,102113,3,0,"Eye Implant: Elec. Engi, Shiny",1
+3,102118,102119,3,0,"Eye Implant: Map Navig, Shiny",1
+3,102144,102145,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,102194,102195,3,0,"Eye Implant: Map Navig, Shiny",1
+3,102210,102211,3,0,"Eye Implant: Rifle, Shiny",1
+3,102214,102215,3,0,"Eye Implant: Elec. Engi, Shiny",1
+3,102260,102261,3,0,"Eye Implant: Vehicle Grnd, Bright",1
+3,102266,102267,3,0,"Eye Implant: Rifle, Shiny",1
+3,102425,102426,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,102696,102697,3,0,"Eye Implant: Rifle, Shiny",1
+3,102842,102843,3,0,"Eye Implant: Rifle, Shiny",1
+3,102846,102847,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,102904,102734,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,102935,102936,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103010,103011,3,0,"Eye Implant: Map Navig, Shiny",1
+3,103014,103015,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103086,103087,3,0,"Eye Implant: Elec. Engi, Shiny",1
+3,103094,103095,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103132,103133,3,0,"Eye Implant: Map Navig, Shiny",1
+3,103175,103176,3,0,"Eye Implant: Heavy Weapons, Bright",1
+3,103252,103253,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103274,103275,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,103330,103331,3,0,"Eye Implant: Tutoring, Shiny",1
+3,103340,103341,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,103364,103365,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103380,103381,3,0,"Eye Implant: Time & Space, Faded",1
+3,103437,103438,3,0,"Eye Implant: Tutoring, Shiny",1
+3,103463,103464,3,0,"Eye Implant: Tutoring, Shiny",1
+3,103544,103545,3,0,"Eye Implant: Elec. Engi, Shiny",1
+3,103655,103656,3,0,"Eye Implant: Map Navig, Shiny",1
+3,103699,103700,3,0,"Eye Implant: Tutoring, Shiny",1
+3,103709,103710,3,0,"Eye Implant: Rifle, Shiny",1
+3,103755,103756,3,0,"Eye Implant: Vehicle Air, Shiny",1
+3,103869,103870,3,0,"Eye Implant: Map Navig, Shiny",1
+3,103898,103899,3,0,"Eye Implant: Intelligence, Bright",1
+3,103910,103911,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103955,103956,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,103961,103962,3,0,"Eye Implant: Rifle, Shiny",1
+3,103985,103986,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,104045,104046,3,0,"Eye Implant: Rifle, Shiny",1
+3,104091,104092,3,0,"Eye Implant: Vehicle Air, Shiny",2
+3,104097,104098,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,104139,104140,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,104182,104183,3,0,"Eye Implant: Map Navig, Shiny",1
+3,104354,104355,3,0,"Eye Implant: Map Navig, Shiny",1
+3,104382,104383,3,0,"Eye Implant: Map Navig, Shiny",1
+3,104506,104507,3,0,"Eye Implant: Intelligence, Bright",1
+3,104558,104559,3,0,"Eye Implant: Tutoring, Shiny",1
+3,104564,104565,3,0,"Eye Implant: Rifle, Shiny",1
+3,104677,104678,3,0,"Eye Implant: Map Navig, Shiny",1
+3,104679,104680,3,0,"Eye Implant: Tutoring, Shiny",1
+3,104820,104821,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,104852,104853,3,0,"Eye Implant: Rifle, Shiny",1
+3,104896,104897,3,0,"Eye Implant: Elec. Engi, Shiny",1
+3,104911,104912,3,0,"Head Implant: First Aid, Shiny",1
+3,104960,104961,3,0,"Eye Implant: Rifle, Shiny",1
+3,104970,104971,3,0,"Eye Implant: Aimed Shot, Shiny",1
+3,105002,105003,3,0,"Eye Implant: Rifle, Shiny",1
+3,105014,105015,3,0,"Head Implant: Melee Ener, Shiny",1
+3,105082,105083,3,0,"Head Implant: Psychology, Shiny",1
+3,105086,105087,3,0,"Head Implant: Psychology, Shiny",1
+3,105104,105105,3,0,"Head Implant: Vehicle Grnd, Shiny",1
+3,105143,105144,3,0,"Head Implant: NanoC. Init, Shiny",1
+3,105161,105162,3,0,"Head Implant: Nano Progra, Shiny",1
+3,105175,105176,3,0,"Head Implant: Intelligence, Shiny",1
+3,105189,105190,3,0,"Head Implant: Max Nano, Shiny",1
+3,105191,105192,3,0,"Head Implant: Max Nano, Shiny",1
+3,105209,105210,3,0,"Head Implant: Vehicle Hydr, Shiny",1
+3,105235,105236,3,0,"Head Implant: Bio.Metamor, Shiny",1
+3,105281,105282,3,0,"Head Implant: Chemistry, Shiny",1
+3,105283,105284,3,0,"Head Implant: Vehicle Grnd, Shiny",1
+3,105313,105314,3,0,"Head Implant: Melee Ener, Shiny",1
+3,105339,105340,3,0,"Head Implant: Matt.Metam, Shiny",1
+3,105449,105450,3,0,"Head Implant: Matt.Metam, Shiny",1
+3,105457,105458,3,0,"Head Implant: Psycho Modi, Shiny",1
+3,105485,105486,3,0,"Head Implant: Nano Progra, Shiny",1
+3,105557,105558,3,0,"Head Implant: Matt.Metam, Shiny",1
+3,105559,105560,3,0,"Head Implant: Bio.Metamor, Shiny",1
+3,105579,105580,3,0,"Head Implant: NanoC. Init, Shiny",1
+3,105593,105594,3,0,"Head Implant: Nano Progra, Shiny",1
+3,105635,105636,3,0,"Head Implant: Melee Ener, Shiny",1
+3,105687,105688,3,0,"Head Implant: NanoC. Init, Shiny",1
+3,105787,105788,3,0,"Head Implant: Time & Space, Shiny",1
+3,105833,105834,3,0,"Head Implant: Psychology, Shiny",1
+3,105839,105840,3,0,"Head Implant: Chemistry, Shiny",1
+3,105856,105857,3,0,"Head Implant: Psychic, Shiny",1
+3,105913,105914,3,0,"Head Implant: Mech. Engi, Shiny",1
+3,106027,106028,3,0,"Head Implant: Psycho Modi, Shiny",1
+3,106073,106074,3,0,"Head Implant: Quantum FT, Shiny",1
+3,106160,106235,3,0,"Head Implant: Treatment, Shiny",2
+3,106283,106284,3,0,"Head Implant: Bow Spc Att, Shiny",1
+3,106319,106320,3,0,"Head Implant: Bow Spc Att, Shiny",1
+3,106355,106356,3,0,"Head Implant: Time & Space, Shiny",1
+3,106365,106366,3,0,"Head Implant: Nano Progra, Shiny",1
+3,106397,106398,3,0,"Head Implant: Treatment, Shiny",1
+3,106479,106480,3,0,"Head Implant: Nano Resist, Shiny",1
+3,106546,106547,3,0,"Head Implant: Matt.Metam, Shiny",1
+3,106598,106599,3,0,"Head Implant: Matt.Metam, Shiny",1
+3,106679,106680,3,0,"Head Implant: Time & Space, Shiny",1
+3,106777,106778,3,0,"Head Implant: Pharma Tech, Shiny",1
+3,106827,106828,3,0,"Head Implant: First Aid, Shiny",1
+3,106837,106838,3,0,"Head Implant: Psychology, Shiny",1
+3,106916,106917,3,0,"Head Implant: Quantum FT, Shiny",1
+3,107013,107014,3,0,"Head Implant: Nano Progra, Shiny",1
+3,107015,107016,3,0,"Head Implant: Comp. Liter, Shiny",1
+3,107035,107036,3,0,"Head Implant: Melee Ener, Shiny",1
+3,107053,107054,3,0,"Head Implant: Psycho Modi, Shiny",1
+3,107107,107108,3,0,"Head Implant: Psycho Modi, Shiny",1
+3,107169,107170,3,0,"Head Implant: First Aid, Shiny",1
+3,107175,107176,3,0,"Head Implant: Matt.Metam, Shiny",1
+3,107203,107263,3,0,"Head Implant: Sensory Impr, Shiny",1
+3,107251,107252,3,0,"Ear Implant: Perception, Shiny",1
+3,107462,107463,3,0,"Right-Arm Implant: Assault Rif, Shiny",1
+3,107528,107529,3,0,"Right-Arm Implant: Break & Entry, Shiny",1
+3,107538,107539,3,0,"Right-Arm Implant: Strength, Shiny",1
+3,107605,107606,3,0,"Right-Arm Implant: Assault Rif, Shiny",1
+3,107633,107634,3,0,"Right-Arm Implant: 1h Blunt, Shiny",1
+3,107641,107642,3,0,"Right-Arm Implant: 2h Edged, Shiny",1
+3,107719,107720,3,0,"Right-Arm Implant: Grenade, Shiny",1
+3,107735,107736,3,0,"Right-Arm Implant: Shotgun, Shiny",1
+3,107797,107798,3,0,"Right-Arm Implant: Brawling, Bright",1
+3,107813,107814,3,0,"Right-Arm Implant: Bow, Shiny",1
+3,107841,107842,3,0,"Right-Arm Implant: 1h Edged Weapon, Shiny",1
+3,107863,107864,3,0,"Right-Arm Implant: Strength, Shiny",1
+3,107901,107902,3,0,"Right-Arm Implant: MG / SMG, Shiny",1
+3,107915,107916,3,0,"Right-Arm Implant: Fling Shot, Shiny",1
+3,108014,108015,3,0,"Right-Arm Implant: Burst, Shiny",1
+3,108024,108025,3,0,"Right-Arm Implant: 2h Edged, Shiny",1
+3,108180,108181,3,0,"Right-Arm Implant: 1h Blunt, Shiny",1
+3,108224,108225,3,0,"Right-Arm Implant: 2h Edged, Shiny",1
+3,108230,108231,3,0,"Right-Arm Implant: Piercing, Shiny",1
+3,108264,108265,3,0,"Right-Arm Implant: Break & Entry, Shiny",1
+3,108286,108287,3,0,"Right-Arm Implant: 2h Edged, Shiny",1
+3,108310,108311,3,0,"Right-Arm Implant: Burst, Shiny",1
+3,108377,108378,3,0,"Chest Implant: Nano Pool, Shiny",1
+3,108482,108483,3,0,"Chest Implant: Energy AC, Shiny",1
+3,108502,108503,3,0,"Chest Implant: Sense, Shiny",1
+3,108526,108527,3,0,"Chest Implant: Dimach, Shiny",1
+3,108530,108531,3,0,"Chest Implant: Body Dev, Shiny",1
+3,108640,108641,3,0,"Chest Implant: Melee/Ma AC, Shiny",1
+3,108664,108665,3,0,"Chest Implant: Body Dev, Shiny",1
+3,108778,108779,3,0,"Chest Implant: Max Health, Shiny",1
+3,108792,108793,3,0,"Chest Implant: Stamina, Shiny",1
+3,108874,108875,3,0,"Chest Implant: Energy AC, Shiny",1
+3,108880,108881,3,0,"Chest Implant: Body Dev, Shiny",1
+3,108894,108895,3,0,"Chest Implant: Melee/Ma AC, Shiny",1
+3,108956,108957,3,0,"Chest Implant: Sense, Shiny",1
+3,108958,108959,3,0,"Chest Implant: Max Health, Shiny",1
+3,109080,109081,3,0,"Chest Implant: Stamina, Shiny",1
+3,109104,109105,3,0,"Chest Implant: Dimach, Shiny",1
+3,109106,109107,3,0,"Chest Implant: Body Dev, Shiny",1
+3,109164,109165,3,0,"Chest Implant: Melee/Ma AC, Shiny",1
+3,109202,109203,3,0,"Chest Implant: Stamina, Shiny",1
+3,109234,109235,3,0,"Chest Implant: Energy AC, Shiny",1
+3,109421,109422,3,0,"Left-Arm Implant: Brawling, Shiny",1
+3,109471,109473,3,0,"Right-Wrist Implant: Parry, Shiny",1
+3,109528,109529,3,0,"Right-Wrist Implant: Pistol, Shiny",1
+3,109546,109547,3,0,"Right-Wrist Implant: Riposte, Shiny",1
+3,109594,109531,3,0,"Right-Wrist Implant: Multi Ranged, Bright",1
+3,109626,109627,3,0,"Right-Wrist Implant: Pistol, Shiny",1
+3,109632,109633,3,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+3,109706,109707,3,0,"Right-Wrist Implant: Parry, Shiny",1
+3,109780,109781,3,0,"Right-Wrist Implant: Burst, Bright",1
+3,109832,109833,3,0,"Right-Wrist Implant: Aimed Shot, Bright",1
+3,109870,109871,3,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+3,109942,109943,3,0,"Right-Wrist Implant: Pistol, Shiny",1
+3,109958,109959,3,0,"Right-Wrist Implant: Ranged. Init, Shiny",1
+3,110064,110065,3,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+3,110070,110071,3,0,"Right-Wrist Implant: Riposte, Shiny",2
+3,110078,110079,3,0,"Right-Wrist Implant: Sharp Obj, Shiny",1
+3,110148,110149,3,0,"Waist Implant: Fire AC, Shiny",1
+3,110206,110207,3,0,"Waist Implant: Duck-Exp, Bright",1
+3,110216,110217,3,0,"Waist Implant: Radiation AC, Shiny",1
+3,110264,110265,3,0,"Waist Implant: Fire AC, Shiny",1
+3,110308,110309,3,0,"Waist Implant: Duck-Exp, Bright",1
+3,110310,110311,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,110382,110383,3,0,"Waist Implant: Radiation AC, Shiny",1
+3,110396,110181,3,0,"Waist Implant: Fire AC, Shiny",1
+3,110434,110435,3,0,"Waist Implant: Fire AC, Shiny",1
+3,110532,110533,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,110570,110571,3,0,"Waist Implant: Fire AC, Shiny",1
+3,110596,110597,3,0,"Waist Implant: Radiation AC, Shiny",1
+3,110628,110629,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,110636,110637,3,0,"Waist Implant: Cold AC, Shiny",1
+3,110678,110679,3,0,"Waist Implant: Fire AC, Shiny",1
+3,110680,110681,3,0,"Waist Implant: Body Dev, Bright",1
+3,110682,110683,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,110792,110793,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,110944,110945,3,0,"Waist Implant: Cold AC, Shiny",2
+3,111032,111033,3,0,"Waist Implant: Max Nano, Bright",2
+3,111034,111035,3,0,"Waist Implant: Chemical AC, Shiny",1
+3,111058,111059,3,0,"Waist Implant: Radiation AC, Shiny",1
+3,111092,111093,3,0,"Waist Implant: Radiation AC, Shiny",1
+3,111193,111194,3,0,"Left-Wrist Implant: Parry, Bright",1
+3,111243,111244,3,0,"Waist Implant: Fire AC, Shiny",1
+3,111253,111254,3,0,"Waist Implant: Cold AC, Shiny",1
+3,111371,111372,3,0,"Waist Implant: Radiation AC, Shiny",1
+3,111494,111495,3,0,"Right-Hand Implant: MG / SMG, Bright",1
+3,111535,111536,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,111541,111542,3,0,"Right-Hand Implant: Assault Rif, Bright",1
+3,111598,111599,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,111646,111647,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,111678,111679,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,111684,111685,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,111704,111705,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,111710,111711,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,111753,111754,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,111769,111770,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,111783,111784,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,111824,111825,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,111854,111855,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,111903,111904,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,111980,112032,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112011,112012,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,112019,112020,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112065,112066,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,112067,112068,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,112203,112204,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,112209,112210,3,0,"Right-Hand Implant: Trap Disarm, Shiny",2
+3,112215,112216,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112249,112250,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112269,112270,3,0,"Right-Hand Implant: Pistol, Bright",1
+3,112370,112371,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112408,112409,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112489,112490,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112721,112722,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112742,112743,3,0,"Right-Hand Implant: Time & Space, Bright",1
+3,112744,112745,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112792,112793,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,112829,112830,3,0,"Right-Hand Implant: Weapon Smt, Shiny",1
+3,112929,112930,3,0,"Right-Hand Implant: Martial Arts, Shiny",1
+3,113050,113051,3,0,"Right-Hand Implant: Trap Disarm, Shiny",1
+3,113196,113197,3,0,"Leg Implant: Imp/Proj AC, Shiny",1
+3,113204,113205,3,0,"Leg Implant: Swimming, Shiny",1
+3,113279,113280,3,0,"Leg Implant: Dodge-Rng, Shiny",1
+3,113323,113324,3,0,"Leg Implant: Swimming, Shiny",1
+3,113400,113401,3,0,"Leg Implant: Imp/Proj AC, Shiny",1
+3,113458,113459,3,0,"Left-Hand Implant: Trap Disarm, Bright",1
+3,113460,113461,3,0,"Left-Hand Implant: Fast Attack, Shiny",1
+3,113462,113463,3,0,"Left-Hand Implant: First Aid, Faded",1
+3,113560,113561,3,0,"Feet Implant: Dodge-Rng, Bright",1
+3,113619,113620,3,0,"Feet Implant: Concealment, Shiny",1
+3,116800,116800,14,0,Nano Crystal (Quick Fix),3
+3,120609,120609,1,0,Omni-Med Cloak,7
+3,121306,121307,3,0,Information Tool - Level,1
+3,121360,121360,8,0,Nano Crystal (Skill Wrangler (Weak)),2
+3,121515,121515,11,0,Nano Crystal (Novice Health Haggler),1
+3,121572,121573,3,0,Useless Triple-Blade,1
+3,121610,121611,3,0,Refitted Polearm,2
+3,121648,121649,3,0,Chipped Polearm,1
+3,121684,121685,3,0,Cracked  Bolter 42mm,2
+3,121722,121723,3,0,Dull Haxor 9922,1
+3,121779,121780,3,0,Ill-Treated Subturbine,1
+3,121798,121799,3,0,Ill-Treated Disaffiliation Sniper,1
+3,121817,121818,3,0,Irreparable Sleekblaster Minor,1
+3,121836,121837,3,0,Irreparable Sleekblaster,2
+3,121874,121875,3,0,Ill-Treated Plasmaprojector,2
+3,121893,121894,3,0,Ill-Treated Heavy Grinner,1
+3,121931,121932,3,0,Ill-Treated Gatling Saw 20k,1
+3,122045,122046,3,0,Dull Longmoon,1
+3,122083,122084,3,0,Ill-Treated Blackened Blaster Rifle,4
+3,122121,122122,3,0,Ill-Treated E-Beamer,1
+3,122178,122179,3,0,Ill-Treated Megajolt,1
+3,122216,122217,3,0,Ill-Treated Stigma Rifle,1
+3,122254,122255,3,0,Ill-Treated Eradicator XCI-52,2
+3,122273,122274,3,0,Irreparable Kolt PDW-37,2
+3,122292,122293,3,0,Irreparable Omni-Flamer Mk IV,4
+3,122368,122369,3,0,Punctured Energy Shield,2
+3,122387,122388,3,0,Punctured Esoteric Energy Buckler,1
+3,122482,122483,3,0,Irreparable Ingram Blaster 23-X,2
+3,122577,122578,3,0,Ill-Treated Supernova Mk VI,2
+3,122615,122616,3,0,Irreparable Aero Borealis Corona,2
+3,122710,122711,3,0,Ill-Treated Kevlar Bow,2
+3,122729,122730,3,0,Unbalanced Blackjack,1
+3,122767,122768,3,0,Ill-Treated Bow-Blaster,2
+3,122786,122787,3,0,Dull Sword of Sir Galahad,1
+3,122805,122806,3,0,Dull Gofle-Prod,1
+3,122824,122825,3,0,Worn-Out Chair,2
+3,122867,122868,3,0,Ill-Treated Grenade-Thrower,1
+3,122886,122887,3,0,Irreparable Minielectronium,1
+3,122943,122944,3,0,Unbalanced Mace,1
+3,122981,122982,3,0,Irreparable Kolt 58 Magnum,1
+3,123076,123077,3,0,Irreparable Sleekblaster Major,2
+3,123095,123096,3,0,Irreparable DNA-Targeted Executioner Pistol,1
+3,123114,123115,3,0,Unbalanced Bow Split,1
+3,123171,123172,3,0,Irreparable Electron-Charged Pistol,3
+3,123190,123191,3,0,Ill-Treated Suppressor,1
+3,123305,123306,3,0,Ill-Treated Enriched Uranium Sprayer,1
+3,123362,123363,3,0,Unbalanced Lead Pipe,1
+3,123381,123382,3,0,Unbalanced Meat-Cleaver,1
+3,123419,123420,3,0,Ill-Treated Netgun,1
+3,123457,123458,3,0,Irreparable OT Boomer+.90AE,1
+3,123495,123496,3,0,Irreparable IMI Desert Reet 1000,1
+3,123609,123610,3,0,Irreparable PNG M1007A1 Tactical Revolver,1
+3,123628,123629,3,0,Irreparable BBI Sigma III,1
+3,123666,123667,3,0,Irreparable River MV,1
+3,123685,123686,3,0,Irreparable Seburo Bobsons,2
+3,123704,123705,3,0,Rotting OT Biomag,1
+3,123742,123743,3,0,Rusty OT M-10 Flechette Pistol,4
+3,123761,123762,3,0,Rusty Polizziotto M202F,3
+3,123774,123775,3,0,Rusty MTI 95 Match Pistol,1
+3,123789,123790,3,0,Leaking MTI VP300 Caseless,2
+3,123808,123809,3,0,Rusty MTI SW500,1
+3,123837,123838,3,0,Rusty Zastaba Cz-200,4
+3,123844,123845,3,0,Rusty Freedom Arms Super 90,3
+3,123855,123856,3,0,Second-Hand Old English Trading Co.,2
+3,123868,123869,3,0,Old Atlas Bern C.V.,3
+3,123879,123880,3,0,Worn BigBurger Inc.,2
+3,123886,123887,3,0,Sparkling HSR Arms,2
+3,123893,123894,3,0,Rusty OT Backup,1
+3,123909,123910,3,0,Rusty MTI SOCOM Mk IV,3
+3,123928,123929,3,0,Rusty FN 7-7 Pistol,1
+3,123968,123970,3,0,Rusty OT Boomer M30,2
+3,123991,123992,3,0,Rusty Old English Trading Co. Type 77a,1
+3,124016,124017,3,0,Rusty Sig SG 992 SWAT Edition 2,1
+3,124070,124071,3,0,M52A Pulse Rifle,2
+3,124101,124102,3,0,O.E.T. Co. C70 Brigand,1
+3,124121,124122,3,0,Rusty ICC Arms SB21 Assault Shotgun,2
+3,124136,124137,3,0,ICC Arms 2Q2B Gun Bag,1
+3,124183,124184,3,0,Worn OT-Windchaser RM70,1
+3,124198,124199,3,0,Worn OT-Windchaser RM70 Junior,1
+3,124230,124231,3,0,Old Springfield Arms Home Defender,2
+3,124241,124242,3,0,Rusty OT M50 Shotgun,1
+3,124256,124257,3,0,Sparking Vektor ND Shotgun,1
+3,124276,124277,3,0,Rusty Krutt Assault 219,1
+3,124285,124286,3,0,Rusty OT-Windchaser SM30 Shotgun,1
+3,124302,124303,3,0,Flawed Old English Trading Co. Urban Sniper,1
+3,124313,124314,3,0,Rusty Ithaca Ki-8,1
+3,124341,124342,3,0,Tsakachumi PTO-HV Counter-Sniper Rifle,1
+3,124348,124349,3,0,Battered OT M500 SWAT Rifle,1
+3,124357,124358,3,0,Flawed MTI G-90A3,1
+3,124383,124384,3,0,HSR Arms F-59,1
+3,124391,124392,3,0,OT Rancho Colonial Carbine,3
+3,124420,124421,3,0,Shaky MTI B-94,2
+3,124431,124432,3,0,Bent BBI Minami-90,1
+3,124444,124445,3,0,Loose Kalinkalov Mz-99,1
+3,124453,124454,3,0,Rusty EN-RAL,1
+3,124487,124488,3,0,Manex SD 4004,1
+3,124503,124504,3,0,Rusty OT Eskorpio 21,1
+3,124534,124535,3,0,Sooted YES Assault 1007 Model 5,1
+3,124545,124546,3,0,YES Support 1010,1
+3,124560,124561,3,0,Ill-Treated OT Saladin,1
+3,124579,124580,3,0,Irreparable OT Viper IX,3
+3,124598,124599,3,0,Ill-Treated MTI MP200,1
+3,124617,124618,3,0,Used MTI SO1210,3
+3,124624,124625,3,0,Ill-Treated MTI UMP22,2
+3,124643,124644,3,0,Ill-Treated Kalinkanov ZU-113 Security Weapon,1
+3,124700,124701,3,0,Ill-Treated Seburo C-19a,1
+3,124711,124712,3,0,Ill-Treated Nord Armwerk MAX,3
+3,124730,124731,3,0,Ill-Treated FN P00,1
+3,124749,124750,3,0,Ill-Treated BBI WMMA CAW,1
+3,124798,124799,3,0,Ill-Treated OT M-110 Renegade SAW,2
+3,124855,124856,3,0,Ill-Treated Planet Gripon Arms Hard-Boomer,1
+3,124891,124892,3,0,Ill-Treated OT M-00 Crystal,2
+3,124910,124911,3,0,Ill-Treated Westinghouse IM-50 Plasma Burner,1
+3,124967,124968,3,0,Ill-Treated GE XM-559 Man-Portable Laser,1
+3,124986,124987,3,0,Ill-Treated Reet-Tech Stryker X,1
+3,125005,125006,3,0,Ill-Treated Joint Clans Exocet II,1
+3,125024,125025,3,0,Ill-Treated Joint Clans Patriot,2
+3,125043,125044,3,0,Ill-Treated Reet-Tech Junior Urban Crossbow,2
+3,125081,125082,3,0,Ill-Treated Oneida Razor Half-Bow,2
+3,125296,125297,3,0,Splintered Peasant Squibber,2
+3,125330,125331,3,0,Splintered Large Rider Squibber,1
+3,125362,125363,3,0,Splintered Merchant Executioner,1
+3,125381,125382,3,0,Splintered Rider Executioner,1
+3,125419,125420,3,0,Splintered Torch,1
+3,125445,125446,3,0,Tear-soaked Pillow with Important Stripes,1
+3,125454,125455,3,0,Creviced Concrete Cushion,4
+3,125751,125751,17,0,Nano Crystal (Calling of Medinos),1
+3,128608,128609,3,0,Ill-treated MTI G-36K,1
+3,128674,128675,3,0,Ill-treated HSR Arms Tech Assault V,1
+3,128739,128740,3,0,Ill-treated Galahad Inc. Tactical Machine Pistol ,2
+3,128758,128759,3,0,Ill-treated Fabrique Des Armes Bizon 20-19,3
+3,128858,128859,3,0,Ill-treated MTI MPK-22 ,3
+3,128871,128872,3,0,Ill-treated Arwen MM-50 Grenade Launcher,1
+3,128890,128891,3,0,Ill-treated Steiner LM-5 Assault Laser,1
+3,128916,128917,3,0,Water balloon,3
+3,128919,128920,3,0,Splintered Peasant Executioner,1
+3,128938,128939,3,0,Obtuse Peasant Warblade,1
+3,128957,128958,3,0,Obtuse Merchant Warblade,3
+3,128995,128996,3,0,Obtuse Protector Warblade,2
+3,129026,129027,3,0,Cracked Sledgehammer,4
+3,129064,129065,3,0,3rd level Ninja Tanto,1
+3,129069,129070,3,0,Sparkling Breathing Space,1
+3,129638,129639,3,0,Over-tuned Wen-Wen,2
+3,129715,129715,10,0,Nano Crystal (Restock Ammo (Level OP-I)),1
+3,130051,130052,3,0,Ancient Featherwood Staff,3
+3,130060,130061,3,0,Unbalanced Heavy Staff,1
+3,130087,130088,3,0,Splintered Native Alloy Staff,1
+3,130125,130126,3,0,Splintered Denunciatory Spear,1
+3,130163,130164,3,0,Loose MTI Sword,4
+3,130197,130198,3,0,Splintered Bloodworm Carapace,1
+3,130239,130240,3,0,"Right-Wrist Implant: Run Speed, Shiny",1
+3,130287,130288,3,0,"Right-Wrist Implant: Run Speed, Shiny",1
+3,130361,130362,3,0,"Leg Implant: Imp/Proj AC, Shiny",1
+3,130386,130390,3,0,"Leg Implant: Dodge-Rng, Shiny",1
+3,130387,130388,3,0,"Leg Implant: Run Speed, Faded",1
+3,142773,142773,4,0,Nano Crystal (Swap Psyche),1
+3,142817,142818,3,0,Obtuse Survival Knife,1
+3,142836,142837,3,0,Splintered Metaplast Mace,1
+3,142855,142856,3,0,Cast-off Eye Wind Onehander,1
+3,144063,144064,3,0,Splintered Survival Axe,1
+3,144101,144102,3,0,Sparkling Freedom Arms 4200,2
+3,144146,144147,3,0,Obtuse Burning Copper Katana,1
+3,150223,150224,3,0,,2
+3,150254,150255,3,0,,1
+3,150306,150307,3,0,,1
+3,152064,152065,3,0,,1
+3,152083,152084,3,0,,1
+3,152109,152110,3,0,,3
+3,152122,152123,3,0,,1
+3,152135,152136,3,0,,2
+3,152298,154071,3,0,,1
+3,152326,152327,3,0,,1
+3,152339,152340,3,0,,1
+3,152386,152387,3,0,,3
+3,152723,152724,3,0,,1
+3,152732,152733,3,0,,1
+3,154069,150213,3,0,,1
+3,154070,150196,3,0,,1
+3,155369,155369,8,0,,2
+3,155379,155379,8,0,,3
+3,155392,155392,8,0,,1
+3,156142,156142,4,0,,4
+3,156146,156146,11,0,,8
+3,158045,158046,3,0,,2
+3,159007,159008,3,0,,1
+3,159035,159036,3,0,,1
+3,159040,159041,3,0,,1
+3,159083,159087,3,0,,2
+3,159196,159197,3,0,,2
+3,160216,160217,3,0,,1
+3,160219,160220,3,0,,1
+3,160239,160240,3,0,,1
+3,160242,160243,3,0,,1
+3,160279,160280,3,0,,3
+3,160476,160477,3,0,,1
+3,160481,160482,3,0,,5
+3,166257,166258,3,0,,1
+3,172581,172582,3,0,,2
+3,178162,178163,3,0,,1
+3,178190,178191,3,0,,1
+3,191270,191280,3,0,,1
+3,191703,191704,3,0,,1
+3,202724,202724,8,0,,4
+3,202827,202827,8,0,,3
+3,202871,202871,10,0,,2
+3,203594,203594,10,0,,1
+3,204103,204104,3,0,,2
+3,204139,204140,3,0,,1
+3,204262,204263,3,0,,2
+3,204267,204268,3,0,,1
+3,205224,205225,3,0,,1
+3,206289,206290,3,0,,2
+3,209489,209489,4,0,,4
+3,210354,210354,4,0,,5
+3,210529,210529,1,0,,4
+3,210590,210590,2,0,,3
+3,210612,210612,8,0,,2
+3,210733,210733,5,0,,7
+3,218744,218745,3,0,,1
+3,227473,227473,30,0,,1
+3,297633,297633,10,0,,3
