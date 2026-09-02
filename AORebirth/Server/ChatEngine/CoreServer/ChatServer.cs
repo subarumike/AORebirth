@@ -280,6 +280,11 @@ namespace ChatEngine.CoreServer
             }
 
             string text = chatCommand.ChatCommandString.Trim();
+            if (TeamChatBridge.TryHandle(this, chatCommand))
+            {
+                return;
+            }
+
             if (text.StartsWith(LftPlayfieldRegistry.PlayfieldCommandPrefix, StringComparison.Ordinal))
             {
                 string[] parts = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

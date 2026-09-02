@@ -1062,12 +1062,7 @@ namespace ZoneEngine.Core.Controllers
         /// </exception>
         public bool TransferTeamLeadership(Identity target)
         {
-            // Procedure:
-            // 1. Transfer Leadership
-            // 2. Send Team update message
-
-            ChatTextMessageHandler.Default.Send(this.Character, "Team leadership transfer is not wired yet.");
-            return false;
+            return TeamRuntime.TransferLeadership(this.Character, target);
         }
 
         /// <summary>
@@ -1203,6 +1198,15 @@ namespace ZoneEngine.Core.Controllers
 
         /// <summary>teamId → leader character instance.</summary>
         private static readonly Dictionary<int, int> TeamLeaders = new Dictionary<int, int>();
+
+        /// <summary>Teams converted to raid (capture 20260902-073932 RaidCmd).</summary>
+        private static readonly HashSet<int> RaidTeams = new HashSet<int>();
+
+        private const string TeamJoinChatCommandPrefix = "#aorebirth-team-join";
+
+        private const string RaidConvertChatCommandPrefix = "#aorebirth-raid-convert";
+
+        private const string TeamLeaveChatCommandPrefix = "#aorebirth-team-leave";
 
         private static int nextTeamId = 1;
 
@@ -1547,6 +1551,7 @@ namespace ZoneEngine.Core.Controllers
                 {
                     TeamMembers.Remove(teamId);
                     TeamLeaders.Remove(teamId);
+                    RaidTeams.Remove(teamId);
                 }
                 else if (wasLeader)
                 {
@@ -1557,6 +1562,7 @@ namespace ZoneEngine.Core.Controllers
             // Capture leave: TeamMemberLeft only — never re-broadcast TeamMember roster
             // (that stacked duplicate names in the team window).
             ApplyTeamStats(character, memberCount: 0);
+            ClearTeamChannelStat(character, teamId);
             CharacterActionMessageHandler.Default.SendTeamMemberLeft(
                 character,
                 character.Identity,
@@ -1608,6 +1614,7 @@ namespace ZoneEngine.Core.Controllers
             ApplyTeamStats(character, memberCount: 0);
             SendTeamStatSingle(character, StatIds.teamside, 0);
             SendTeamStatSingle(character, StatIds.socialstatus, 4);
+            ClearTeamChannelStat(character, 0);
             CharacterActionMessageHandler.Default.SendTeamMemberLeft(
                 character,
                 character.Identity,
@@ -1624,6 +1631,7 @@ namespace ZoneEngine.Core.Controllers
                 CharacterTeams.Remove(lastMemberIdentity.Instance);
                 TeamMembers.Remove(teamId);
                 TeamLeaders.Remove(teamId);
+                RaidTeams.Remove(teamId);
             }
 
             ICharacter last = FindOnlineCharacterByInstance(lastMemberIdentity.Instance)
@@ -1636,11 +1644,42 @@ namespace ZoneEngine.Core.Controllers
             ApplyTeamStats(last, memberCount: 0);
             SendTeamStatSingle(last, StatIds.teamside, 0);
             SendTeamStatSingle(last, StatIds.socialstatus, 4);
+            ClearTeamChannelStat(last, teamId);
             CharacterActionMessageHandler.Default.SendTeamMemberLeft(
                 last,
                 last.Identity,
                 teamId);
             ChatTextMessageHandler.Default.Send(last, "Your team has been disbanded.");
+        }
+
+        /// <summary>
+        /// Capture 20260902 cross-PF transfer: AcceptTeamRequest(Target=newLeader); leader SocialStatus=15, member=13.
+        /// </summary>
+        private static void NotifyLeadershipTransfer(int teamId, List<Identity> members, Identity newLeaderIdentity)
+        {
+            const int leaderSocial = 15;
+            const int memberSocial = 13;
+
+            foreach (Identity memberIdentity in members)
+            {
+                ICharacter member = FindOnlineCharacterByInstance(memberIdentity.Instance)
+                                 ?? LftInviteClientPresence.ResolveOnlinePlayer(null, memberIdentity)
+                                 ?? Pool.Instance.GetObject<ICharacter>(memberIdentity);
+                if (member == null)
+                {
+                    continue;
+                }
+
+                bool isLeader = member.Identity.Instance == newLeaderIdentity.Instance;
+                int social = isLeader ? leaderSocial : memberSocial;
+                ApplyTeamStats(member, members.Count, socialStatus: social, sendWireSingles: true);
+                SendTeamStatSingle(member, StatIds.socialstatus, social);
+                CharacterActionMessageHandler.Default.SendAcceptTeamRequest(
+                    member,
+                    newLeaderIdentity,
+                    teamId);
+                SendTeamStatSingle(member, StatIds.socialstatus, social);
+            }
         }
 
         /// <summary>
@@ -1793,6 +1832,190 @@ namespace ZoneEngine.Core.Controllers
 
                 members = roster.ToList();
                 return true;
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260902-065805 / 065802 cross-PF: invite → accept → TransferLeader.
+        /// </summary>
+        public static bool TransferLeadership(ICharacter currentLeader, Identity newLeaderIdentity)
+        {
+            if (currentLeader == null || newLeaderIdentity.Instance == 0)
+            {
+                return false;
+            }
+
+            if (newLeaderIdentity.Instance == currentLeader.Identity.Instance)
+            {
+                ChatTextMessageHandler.Default.Send(currentLeader, "You are already the team leader.");
+                return false;
+            }
+
+            int teamId;
+            lock (Sync)
+            {
+                if (!CharacterTeams.TryGetValue(currentLeader.Identity.Instance, out teamId))
+                {
+                    ChatTextMessageHandler.Default.Send(currentLeader, "You are not in a team.");
+                    return false;
+                }
+
+                int leaderInstance;
+                if (!TeamLeaders.TryGetValue(teamId, out leaderInstance)
+                    || leaderInstance != currentLeader.Identity.Instance)
+                {
+                    ChatTextMessageHandler.Default.Send(currentLeader, "Only the team leader can transfer leadership.");
+                    return false;
+                }
+
+                int targetTeamId;
+                if (!CharacterTeams.TryGetValue(newLeaderIdentity.Instance, out targetTeamId)
+                    || targetTeamId != teamId)
+                {
+                    ChatTextMessageHandler.Default.Send(currentLeader, "That player is not in your team.");
+                    return false;
+                }
+
+                TeamLeaders[teamId] = newLeaderIdentity.Instance;
+            }
+
+            List<Identity> members;
+            if (!TryGetTeamMembers(currentLeader, out members))
+            {
+                lock (Sync)
+                {
+                    TeamLeaders[teamId] = currentLeader.Identity.Instance;
+                }
+
+                return false;
+            }
+
+            ICharacter newLeader = FindOnlineCharacterByInstance(newLeaderIdentity.Instance)
+                                  ?? ResolveOnlineCharacter(currentLeader, newLeaderIdentity)
+                                  ?? Pool.Instance.GetObject<ICharacter>(newLeaderIdentity);
+            if (newLeader == null)
+            {
+                lock (Sync)
+                {
+                    TeamLeaders[teamId] = currentLeader.Identity.Instance;
+                }
+
+                ChatTextMessageHandler.Default.Send(
+                    currentLeader,
+                    "Team leadership transfer target is not available.");
+                return false;
+            }
+
+            NotifyLeadershipTransfer(teamId, members, newLeader.Identity);
+            ChatTextMessageHandler.Default.Send(
+                currentLeader,
+                "Team leadership transferred to " + newLeader.Name + ".");
+            return true;
+        }
+
+        /// <summary>
+        /// Capture 20260902-073932: OUT RaidCmd Command=1 → IN Raid + chat channel "Raid".
+        /// </summary>
+        public static bool ConvertToRaid(ICharacter leader)
+        {
+            if (leader == null)
+            {
+                return false;
+            }
+
+            int teamId;
+            lock (Sync)
+            {
+                if (!CharacterTeams.TryGetValue(leader.Identity.Instance, out teamId))
+                {
+                    ChatTextMessageHandler.Default.Send(leader, "You are not in a team.");
+                    return false;
+                }
+
+                int leaderInstance;
+                if (!TeamLeaders.TryGetValue(teamId, out leaderInstance)
+                    || leaderInstance != leader.Identity.Instance)
+                {
+                    ChatTextMessageHandler.Default.Send(leader, "Only the team leader can convert to raid.");
+                    return false;
+                }
+
+                if (RaidTeams.Contains(teamId))
+                {
+                    ChatTextMessageHandler.Default.Send(leader, "Your team is already a raid.");
+                    return false;
+                }
+
+                List<Identity> roster;
+                if (!TeamMembers.TryGetValue(teamId, out roster) || roster == null || roster.Count < 2)
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        leader,
+                        "You need at least one other team member to convert to raid.");
+                    return false;
+                }
+
+                RaidTeams.Add(teamId);
+            }
+
+            List<Identity> members;
+            if (!TryGetTeamMembers(leader, out members))
+            {
+                lock (Sync)
+                {
+                    RaidTeams.Remove(teamId);
+                }
+
+                return false;
+            }
+
+            int delivered = 0;
+            foreach (Identity memberIdentity in members)
+            {
+                ICharacter member;
+                if (!TryResolveConnectedTeamMember(memberIdentity, out member))
+                {
+                    // Still notify ChatEngine for this id — member may be chat-connected.
+                    SendTeamChatCommandByInstance(
+                        memberIdentity.Instance,
+                        RaidConvertChatCommandPrefix + " " + teamId);
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        "Raid convert: no ZoneClient for member teamId=" + teamId
+                        + " member=" + memberIdentity.ToString(true));
+                    continue;
+                }
+
+                // Capture 080839 leader + Pandemonium 071644 member @06:09:52:
+                // every online teammate receives IN Raid (Identity=self).
+                RaidMessageHandler.Default.Send(member);
+                ApplyTeamChannelStat(member, teamId);
+                SendTeamChatCommand(member, RaidConvertChatCommandPrefix + " " + teamId);
+                delivered++;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                "Raid convert teamId=" + teamId
+                + " roster=" + members.Count
+                + " raidDelivered=" + delivered);
+            ChatTextMessageHandler.Default.Send(leader, "Your team has been converted to a raid.");
+            return true;
+        }
+
+        /// <summary>True when character is on a team that was converted to raid.</summary>
+        public static bool TryIsInRaid(ICharacter character)
+        {
+            if (character == null)
+            {
+                return false;
+            }
+
+            lock (Sync)
+            {
+                int teamId;
+                return CharacterTeams.TryGetValue(character.Identity.Instance, out teamId)
+                       && RaidTeams.Contains(teamId);
             }
         }
 
@@ -2044,7 +2267,53 @@ namespace ZoneEngine.Core.Controllers
                     TeamMemberInfoMessageHandler.Default.Send(viewer, member.Identity, life, nano);
                     SendTeamStatSingle(viewer, StatIds.socialstatus, social);
                 }
+
+                ApplyTeamChannelStat(viewer, teamId);
+                SendTeamChatCommand(viewer, TeamJoinChatCommandPrefix + " " + teamId);
             }
+        }
+
+        private static void ApplyTeamChannelStat(ICharacter character, int teamId)
+        {
+            if (character == null || teamId == 0)
+            {
+                return;
+            }
+
+            character.Stats[StatIds.team].Value = teamId;
+            character.Stats[StatIds.team].BaseValue = (uint)teamId;
+            SendTeamStatSingle(character, StatIds.team, teamId);
+        }
+
+        private static void ClearTeamChannelStat(ICharacter character, int teamId)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            character.Stats[StatIds.team].Value = 0;
+            character.Stats[StatIds.team].BaseValue = 0;
+            SendTeamStatSingle(character, StatIds.team, 0);
+            if (teamId != 0)
+            {
+                SendTeamChatCommand(character, TeamLeaveChatCommandPrefix + " " + teamId);
+            }
+        }
+
+        private static void SendTeamChatCommand(ICharacter character, string command)
+        {
+            if (character == null || string.IsNullOrWhiteSpace(command) || Program.ISComClient == null)
+            {
+                return;
+            }
+
+            Program.ISComClient.TrySend(
+                new AORebirth.Communication.Messages.ChatCommand
+                {
+                    CharacterId = character.Identity.Instance,
+                    ChatCommandString = command
+                });
         }
 
         private static void SendTeamMemberAnnounce(ICharacter viewer, ICharacter member, Identity teamIdentity)
@@ -2200,11 +2469,74 @@ namespace ZoneEngine.Core.Controllers
             return ResolveOnlineCharacter(inviter, typed);
         }
 
+        /// <summary>
+        /// Raid convert must hit a live ZoneClient. Pool/same-PF hits without Client
+        /// cause character.Send() no-op — leader gets Raid, teammates do not.
+        /// </summary>
+        private static bool TryResolveConnectedTeamMember(Identity memberIdentity, out ICharacter member)
+        {
+            member = null;
+            if (memberIdentity.Instance == 0)
+            {
+                return false;
+            }
+
+            ZoneClient zoneClient;
+            if (TryFindZoneClientByInstance(memberIdentity.Instance, out zoneClient)
+                && zoneClient.Controller != null
+                && zoneClient.Controller.Character != null)
+            {
+                member = zoneClient.Controller.Character;
+                return true;
+            }
+
+            member = FindOnlineCharacterWithClient(memberIdentity.Instance);
+            return member != null;
+        }
+
+        private static bool TryFindZoneClientByInstance(int instance, out ZoneClient zoneClient)
+        {
+            zoneClient = null;
+            if (instance == 0 || Program.zoneServer == null)
+            {
+                return false;
+            }
+
+            uint want = unchecked((uint)instance);
+            lock (Program.zoneServer.Clients)
+            {
+                foreach (ZoneClient candidate in Program.zoneServer.Clients)
+                {
+                    if (candidate == null || candidate.Controller == null
+                        || candidate.Controller.Character == null)
+                    {
+                        continue;
+                    }
+
+                    if (unchecked((uint)candidate.Controller.Character.Identity.Instance) == want)
+                    {
+                        zoneClient = candidate;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private static ICharacter ResolveOnlineCharacter(ICharacter reference, Identity identity)
         {
             if (reference == null || identity.Instance == 0)
             {
                 return null;
+            }
+
+            ZoneClient zoneClient;
+            if (TryFindZoneClientByInstance(identity.Instance, out zoneClient)
+                && zoneClient.Controller != null
+                && zoneClient.Controller.Character != null)
+            {
+                return zoneClient.Controller.Character;
             }
 
             if (reference.Playfield != null)
@@ -2216,13 +2548,60 @@ namespace ZoneEngine.Core.Controllers
                         Type = IdentityType.CanbeAffected,
                         Instance = identity.Instance
                     });
-                if (samePf != null)
+                if (samePf != null
+                    && samePf.Controller != null
+                    && samePf.Controller.Client != null)
                 {
                     return samePf;
                 }
             }
 
-            return FindOnlineCharacterByInstance(identity.Instance);
+            return FindOnlineCharacterWithClient(identity.Instance);
+        }
+
+        private static ICharacter FindOnlineCharacterWithClient(int instance)
+        {
+            if (instance == 0)
+            {
+                return null;
+            }
+
+            uint want = unchecked((uint)instance);
+
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected))
+            {
+                if (candidate == null || candidate.Identity.Instance == 0)
+                {
+                    continue;
+                }
+
+                if (unchecked((uint)candidate.Identity.Instance) != want)
+                {
+                    continue;
+                }
+
+                if (candidate.Controller != null && candidate.Controller.Client != null)
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+
+        private static void SendTeamChatCommandByInstance(int characterInstance, string command)
+        {
+            if (characterInstance == 0 || string.IsNullOrWhiteSpace(command) || Program.ISComClient == null)
+            {
+                return;
+            }
+
+            Program.ISComClient.TrySend(
+                new AORebirth.Communication.Messages.ChatCommand
+                {
+                    CharacterId = characterInstance,
+                    ChatCommandString = command
+                });
         }
 
         private static ICharacter FindOnlineCharacterByInstance(int instance)

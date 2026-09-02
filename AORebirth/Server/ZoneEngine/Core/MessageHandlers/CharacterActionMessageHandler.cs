@@ -697,6 +697,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            this.SendAcceptTeamRequest(character, character.Identity, teamInstance);
+        }
+
+        /// <summary>
+        /// Capture 20260902-065805: leadership transfer — AcceptTeamRequest Target=new leader.
+        /// </summary>
+        public void SendAcceptTeamRequest(ICharacter character, Identity target, int teamInstance)
+        {
+            if (character == null || target.Instance == 0)
+            {
+                return;
+            }
+
             this.Send(
                 character,
                 x =>
@@ -705,7 +718,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.Unknown = 0;
                     x.Action = CharacterActionType.AcceptTeamRequest;
                     x.Unknown1 = 0;
-                    x.Target = character.Identity;
+                    x.Target = target;
                     x.Parameter1 = (int)IdentityType.TeamWindow;
                     x.Parameter2 = teamInstance;
                     x.Unknown2 = 0;
