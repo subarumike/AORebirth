@@ -899,7 +899,7 @@ namespace ZoneEngine.Core.Missions
 
         private static MissionAcgIdentityRecord ToRecord(Identity identity)
         {
-            if (identity == null || identity.Instance <= 0)
+            if (identity == null || (int)identity.Type == 0 || identity.Instance == 0)
             {
                 throw new ArgumentException("Concrete identity is required.", "identity");
             }
