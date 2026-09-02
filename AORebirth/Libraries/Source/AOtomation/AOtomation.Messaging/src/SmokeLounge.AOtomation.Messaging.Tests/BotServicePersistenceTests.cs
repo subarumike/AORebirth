@@ -18,10 +18,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             PersistentBotCredentialIssuer issuer = new PersistentBotCredentialIssuer();
             BotCredentialRecord record;
             BotCredentialIssue issue = issuer.Issue(Guid.NewGuid(), 1, out record);
+            char replacementLastCharacter =
+                issue.Credential[issue.Credential.Length - 1] == '0' ? '1' : '0';
+            string tamperedCredential =
+                issue.Credential.Substring(0, issue.Credential.Length - 1) + replacementLastCharacter;
 
             Assert.IsTrue(issue.Credential.StartsWith("bot_v1_", StringComparison.Ordinal));
             Assert.IsTrue(issuer.Verify(record, issue.Credential));
-            Assert.IsFalse(issuer.Verify(record, issue.Credential.Substring(0, issue.Credential.Length - 1) + "0"));
+            Assert.IsFalse(issuer.Verify(record, tamperedCredential));
             Assert.AreEqual(16, record.Salt.Length);
             Assert.AreEqual(32, record.Verifier.Length);
         }
