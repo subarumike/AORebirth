@@ -111,6 +111,17 @@ namespace AORebirth.Core.Combat
                 return new CombatStrikeDamageResult { IsHit = false, Damage = 0 };
             }
 
+            if (context.FixedDamage.HasValue && context.FixedDamage.Value > 0)
+            {
+                return new CombatStrikeDamageResult
+                       {
+                           IsHit = true,
+                           HitType = (HitType)context.AttackInfoHitType,
+                           Damage = context.FixedDamage.Value,
+                           RawDamageType = context.RawDamageType
+                       };
+            }
+
             if (!HasRequiredWeapon(context))
             {
                 return new CombatStrikeDamageResult { IsHit = false, Damage = 0 };
@@ -209,7 +220,9 @@ namespace AORebirth.Core.Combat
 
         private static bool HasRequiredWeapon(CombatStrikeContext context)
         {
-            return context.UsesEquippedWeapon && context.WeaponLowId > 0;
+            return context.UsesEquippedWeapon
+                       ? context.WeaponLowId > 0
+                       : context.MinDamage > 0;
         }
 
         private static ItemTemplate ResolveWeaponTemplate(CombatStrikeContext context)

@@ -790,7 +790,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             StringAssert.Contains(source, "this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);");
             StringAssert.Contains(source, "this.playfield.IsNpcAttackPathTraversable(attacker, target)");
-            StringAssert.Contains(source, "this.CalculateCombatDamage(attacker, attackSource)");
+            StringAssert.Contains(source, "this.BuildStrikeContext(attackerCharacter, attackSource)");
+            StringAssert.Contains(source, "attackerCharacter.Strike(target, strikeContext)");
             StringAssert.Contains(source, "if (!this.CanApplyNpcDamage(");
             StringAssert.Contains(source, "this.playfield.HoldNpcAtCombatPosition(attacker, target);");
             Assert.IsFalse(source.Contains("VergilAeneidMonsterData") && source.Contains("TryMoveNpcIntoCombatRange"));

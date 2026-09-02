@@ -19,10 +19,10 @@
       "sha256": "8f2436f9a0a5fcdef5b113b099d70abafb1e37268deb39e945376dd606138444"
     },
     {
-      "byteLength": 11349243,
+      "byteLength": 11351996,
       "path": "docs/generated/capture_backed_npc_combat_active_coverage.json",
       "role": "activeCoverage",
-      "sha256": "965c13c7d78e652ed41f37ba9988f603cb572cbc3a9cd502ba7973a0d93385d5"
+      "sha256": "28e2655e7576c1ad8a37a90e900db75447da5b4ac70d3e944e1e9adde8bff037"
     },
     {
       "byteLength": 9000177,
@@ -52,19 +52,19 @@
     "formulaBindings": 67,
     "formulaProfiles": 422,
     "generatorErrors": 0,
-    "initialActors": 1562,
-    "quarantined": 1003,
+    "initialActors": 1565,
+    "quarantined": 1006,
     "runtimeReadyDefinitions": 101,
     "runtimeReadyProfiles": 96,
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1499
   },
-  "generationIdentity": "fff698665eae5f5975d367974289edac272d9011354c49cca53eeb9c7d492a13",
+  "generationIdentity": "c5271ad8ebaa2d44e3b27fa81b12a506bb0e19f8864212f2375d0c739d651b53",
   "generators": {
     "activeCoverage": {
       "byteLength": 162936,
       "path": "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py",
-      "sha256": "5bd87a2c76f4fd4a9c15b5ef8fe7c5c90ab72043b7ee71cd75c3b5ce4e9264f3"
+      "sha256": "4172bb8b8923ea4bb00543b55ba7969564569181aaaa346cf9cc87217d54f258"
     },
     "attackRangeAudit": {
       "byteLength": 49287,
@@ -92,9 +92,9 @@
       "sha256": "909ae74a974ddad6ade1a5f6f3d8066ae081b34bf41cb2ee684806c64b0df15e"
     },
     "itemTemplateProjection": {
-      "byteLength": 7155,
+      "byteLength": 10073,
       "path": "tools-temp/AOSharpCaptureAnalyzer/ItemTemplateProjection.cs",
-      "sha256": "88281b5e19ec03a554ca03e74628ac657b985bf3625b01d30248bea629784cd7"
+      "sha256": "ac0373c1b604d6f32d2f8216833a73de5f7037734ef435e765b48186c19a6cf2"
     },
     "primary": {
       "byteLength": 371027,

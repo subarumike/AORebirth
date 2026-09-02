@@ -23,6 +23,16 @@ namespace AORebirth.Core.Combat
 
         public int AttackInfoWeaponInstance { get; set; }
 
+        public int AttackInfoUnknown { get; set; }
+
+        public byte AttackInfoN3Unknown { get; set; }
+
+        public int? LethalAttackInfoUnknown { get; set; }
+
+        public bool PreserveAttackInfoWireValues { get; set; }
+
+        public int? FixedDamage { get; set; }
+
         public CombatDamageSource DamageSource { get; set; }
 
         public WeaponSlot WeaponSlot { get; set; }

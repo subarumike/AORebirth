@@ -4895,6 +4895,11 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (corpse.IsEmpty)
+            {
+                this.ScheduleCorpseDespawn(corpse, corpse.EmptyCleanupDelay, "credits-empty");
+            }
+
             int cashAfter = CashStatRules.Clamp((long)cashBefore + corpse.Credits);
 
             looter.Stats[StatIds.cash].Set((uint)cashAfter);
