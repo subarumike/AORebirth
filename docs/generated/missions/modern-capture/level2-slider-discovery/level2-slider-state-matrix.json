@@ -1,0 +1,3940 @@
+{
+  "schema_version": 1,
+  "states": [
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1152,
+            1161,
+            1164,
+            1166,
+            1168,
+            1207,
+            1223,
+            1229,
+            1231
+          ],
+          "maximum": 1231,
+          "median": 1167.0,
+          "minimum": 1152
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31504,
+            31504
+          ],
+          [
+            31515,
+            31515
+          ],
+          [
+            31517,
+            31517
+          ],
+          [
+            70559,
+            70559
+          ],
+          [
+            110670,
+            110670
+          ],
+          [
+            112827,
+            112827
+          ],
+          [
+            124143,
+            124143
+          ],
+          [
+            125081,
+            125081
+          ],
+          [
+            128784,
+            128784
+          ],
+          [
+            159021,
+            159021
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2025.5,
+          "minimum": 2025
+        }
+      },
+      "label": "CENTERED_BASELINE_D1",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [],
+      "outbound_packet_sha256": "2e40ca9fc05c743d46b6132edf18409f13189ee88c8da0454711ccd3e33efe02",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T014541176Z-36962762-8baab3a4/request/00000001",
+        "mission-20260902T014714320Z-36962762-6d027b2f/request/00000001"
+      ],
+      "slider_state_id": "e14000f8b0964d780cba5cb1251fdc458e90b6f9e2708a3167d4d78b91102622",
+      "state_index": 1,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1152,
+            1163,
+            1186,
+            1206,
+            1208,
+            1213,
+            1224,
+            1228,
+            1233,
+            1253
+          ],
+          "maximum": 1253,
+          "median": 1210.5,
+          "minimum": 1152
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 2,
+          "11335": 2,
+          "11337": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            27199,
+            27199
+          ],
+          [
+            70562,
+            70562
+          ],
+          [
+            85517,
+            85517
+          ],
+          [
+            85531,
+            85531
+          ],
+          [
+            85657,
+            85657
+          ],
+          [
+            99133,
+            99133
+          ],
+          [
+            101645,
+            101645
+          ],
+          [
+            101801,
+            101801
+          ],
+          [
+            112658,
+            112658
+          ],
+          [
+            128890,
+            128890
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          7,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2024,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2024
+        }
+      },
+      "label": "GOOD_BAD_FULL_LEFT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 156,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        31
+      ],
+      "outbound_packet_sha256": "82a085971e196fafd57c1da2650c430766cc6162fa14f2ec9230357bdc6a2fcb",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T014735414Z-36962762-873d0f68/request/00000001",
+        "mission-20260902T014735414Z-36962762-873d0f68/request/00000002"
+      ],
+      "slider_state_id": "088c8270b8d13910d018c507a219d8474aef8e899ff8547a7888f2d0a1542b3a",
+      "state_index": 2,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1149,
+            1162,
+            1166,
+            1167,
+            1200,
+            1225,
+            1228,
+            1230,
+            1234
+          ],
+          "maximum": 1234,
+          "median": 1212.5,
+          "minimum": 1149
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 6,
+          "11337": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31500,
+            31500
+          ],
+          [
+            78446,
+            78446
+          ],
+          [
+            85684,
+            85684
+          ],
+          [
+            85691,
+            85691
+          ],
+          [
+            101521,
+            101521
+          ],
+          [
+            101675,
+            101675
+          ],
+          [
+            104705,
+            104705
+          ],
+          [
+            111878,
+            111878
+          ],
+          [
+            122216,
+            122216
+          ],
+          [
+            124534,
+            124534
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "GOOD_BAD_FULL_RIGHT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 100,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        31
+      ],
+      "outbound_packet_sha256": "50ed9d46b3d39d06ed6fb7fd449412255b2421f836ae5bf5bafe5e3e5a7c0d92",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T014742445Z-36962762-9639c44e/request/00000001",
+        "mission-20260902T014742445Z-36962762-9639c44e/request/00000002"
+      ],
+      "slider_state_id": "e2be38f1fd90f64a0dea7edf7d030ed0640ba084f852472704e7ee1a20992b0b",
+      "state_index": 3,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1147,
+            1163,
+            1164,
+            1166,
+            1178,
+            1208,
+            1222,
+            1224,
+            1229,
+            1243
+          ],
+          "maximum": 1243,
+          "median": 1193.0,
+          "minimum": 1147
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 6,
+          "11330": 2,
+          "11337": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            42423,
+            42423
+          ],
+          [
+            85693,
+            85693
+          ],
+          [
+            101317,
+            101317
+          ],
+          [
+            101559,
+            101559
+          ],
+          [
+            101607,
+            101607
+          ],
+          [
+            101647,
+            101647
+          ],
+          [
+            111797,
+            111797
+          ],
+          [
+            122905,
+            122905
+          ],
+          [
+            123647,
+            123647
+          ],
+          [
+            152279,
+            152279
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2024,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2025.5,
+          "minimum": 2024
+        }
+      },
+      "label": "GOOD_BAD_MINUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 206,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        31
+      ],
+      "outbound_packet_sha256": "ffb172e0143701dc002019ac9ca25c1679fab15e3617edbe19aad6088c4338c9",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015007588Z-36962762-c9da0b6d/request/00000001",
+        "mission-20260902T015007588Z-36962762-c9da0b6d/request/00000002"
+      ],
+      "slider_state_id": "e0df94e76660bfd0ee2174ebaf1d1c10d0983e631ca6c6d0f93b25dbf5b184e0",
+      "state_index": 4,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1164,
+            1166,
+            1208,
+            1220,
+            1225,
+            1228,
+            1234
+          ],
+          "maximum": 1234,
+          "median": 1214.0,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 9,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 6,
+          "11337": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            70559,
+            70559
+          ],
+          [
+            85481,
+            85481
+          ],
+          [
+            101577,
+            101577
+          ],
+          [
+            106441,
+            106441
+          ],
+          [
+            109353,
+            109353
+          ],
+          [
+            122026,
+            122026
+          ],
+          [
+            125362,
+            125362
+          ],
+          [
+            128739,
+            128739
+          ],
+          [
+            128957,
+            128957
+          ],
+          [
+            152311,
+            152311
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "GOOD_BAD_PLUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 50,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        31
+      ],
+      "outbound_packet_sha256": "88864c37f7e8aed68967304abd08404973f3e3d0e26a31120eb2edb685297d98",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015014799Z-36962762-02de7738/request/00000001",
+        "mission-20260902T015014799Z-36962762-02de7738/request/00000002"
+      ],
+      "slider_state_id": "3f4c90daffa821d29bb2cd0444d86143311a0f1b1e2ab6b3335979c8679f94bb",
+      "state_index": 5,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1149,
+            1150,
+            1151,
+            1165,
+            1166,
+            1203,
+            1208
+          ],
+          "maximum": 1208,
+          "median": 1151.0,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 6,
+          "11335": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            70558,
+            70558
+          ],
+          [
+            85655,
+            85655
+          ],
+          [
+            85693,
+            85693
+          ],
+          [
+            101363,
+            101363
+          ],
+          [
+            101376,
+            101376
+          ],
+          [
+            101461,
+            101461
+          ],
+          [
+            101473,
+            101473
+          ],
+          [
+            101643,
+            101643
+          ],
+          [
+            120609,
+            120609
+          ],
+          [
+            124779,
+            124779
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "ORDER_CHAOS_FULL_LEFT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 156,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        32
+      ],
+      "outbound_packet_sha256": "5c8af739ac80d01a69caf5de8502572f220c01d9b0fbc10db3b40073267fbac4",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015022092Z-36962762-506b7517/request/00000001",
+        "mission-20260902T015022092Z-36962762-506b7517/request/00000002"
+      ],
+      "slider_state_id": "879cf5c51d938e5f3d11a23637691d790f9d018e50b4c193cb450678f40e86f3",
+      "state_index": 6,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1149,
+            1151,
+            1153,
+            1201,
+            1202,
+            1203,
+            1209,
+            1210,
+            1212
+          ],
+          "maximum": 1212,
+          "median": 1201.5,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11335": 6,
+          "11337": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31531,
+            31531
+          ],
+          [
+            43993,
+            43993
+          ],
+          [
+            70403,
+            70403
+          ],
+          [
+            85481,
+            85481
+          ],
+          [
+            101533,
+            101533
+          ],
+          [
+            101615,
+            101615
+          ],
+          [
+            101813,
+            101813
+          ],
+          [
+            106631,
+            106631
+          ],
+          [
+            107777,
+            107777
+          ],
+          [
+            109928,
+            109928
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          7,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2026
+        }
+      },
+      "label": "ORDER_CHAOS_FULL_RIGHT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 100,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        32
+      ],
+      "outbound_packet_sha256": "44a7ee7ffd6e7d58b8cbb0f3975fb06c2b726d129fcebf122bd06a8f33c64b96",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015028181Z-36962762-144d797e/request/00000001",
+        "mission-20260902T015028181Z-36962762-144d797e/request/00000002"
+      ],
+      "slider_state_id": "4678a045e0d474ec350f1e938f0c987fcb738dc25c3361270af7e781228a4a54",
+      "state_index": 7,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1151,
+            1156,
+            1164,
+            1166,
+            1203,
+            1204,
+            1205,
+            1208,
+            1225
+          ],
+          "maximum": 1225,
+          "median": 1184.5,
+          "minimum": 1151
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 6,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            55761,
+            55761
+          ],
+          [
+            85712,
+            85712
+          ],
+          [
+            99133,
+            99133
+          ],
+          [
+            101388,
+            101388
+          ],
+          [
+            101647,
+            101647
+          ],
+          [
+            101723,
+            101723
+          ],
+          [
+            102669,
+            102669
+          ],
+          [
+            110756,
+            110756
+          ],
+          [
+            122007,
+            122007
+          ],
+          [
+            160279,
+            160279
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          7,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "ORDER_CHAOS_MINUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 206,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        32
+      ],
+      "outbound_packet_sha256": "f97957f8cbfa41dba89d5ac2300aaa340b6365b2826bba4cb66fc3a0484ecaee",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015428011Z-36962762-7323ad87/request/00000001",
+        "mission-20260902T015428011Z-36962762-7323ad87/request/00000002"
+      ],
+      "slider_state_id": "a29a82c607ff6c1484b32899c94f370267f2ec7e6f7522cf97d3fe01f4c8ec08",
+      "state_index": 8,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1147,
+            1151,
+            1152,
+            1160,
+            1204,
+            1208,
+            1210,
+            1212,
+            1222
+          ],
+          "maximum": 1222,
+          "median": 1182.0,
+          "minimum": 1147
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11335": 6,
+          "11337": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            26503,
+            26503
+          ],
+          [
+            28943,
+            28943
+          ],
+          [
+            55863,
+            55863
+          ],
+          [
+            70564,
+            70564
+          ],
+          [
+            85693,
+            85693
+          ],
+          [
+            107607,
+            107607
+          ],
+          [
+            122482,
+            122482
+          ],
+          [
+            124241,
+            124241
+          ],
+          [
+            129069,
+            129069
+          ],
+          [
+            210733,
+            210733
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4,
+          5,
+          14
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "ORDER_CHAOS_PLUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 50,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        32
+      ],
+      "outbound_packet_sha256": "d076b130ab72944e6b961f323d290d6846356bb858b53c2bb7e0f35bb8938dc6",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015501702Z-36962762-6fa0f567/request/00000001",
+        "mission-20260902T015501702Z-36962762-6fa0f567/request/00000002"
+      ],
+      "slider_state_id": "8216cf9ed1ab2ca489b150df3427d80965f44cb22a5334917861eb08fd0caa2e",
+      "state_index": 9,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1152,
+            1168,
+            1200,
+            1208,
+            1210,
+            1212,
+            1222,
+            1310
+          ],
+          "maximum": 1310,
+          "median": 1209.0,
+          "minimum": 1152
+        },
+        "destination_coordinate_count": 9,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 6,
+          "11335": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31515,
+            31515
+          ],
+          [
+            46456,
+            46456
+          ],
+          [
+            85714,
+            85714
+          ],
+          [
+            101384,
+            101384
+          ],
+          [
+            101625,
+            101625
+          ],
+          [
+            108554,
+            108554
+          ],
+          [
+            122767,
+            122767
+          ],
+          [
+            152135,
+            152135
+          ],
+          [
+            159109,
+            159109
+          ],
+          [
+            210612,
+            210612
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          8
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2022,
+            2023,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2022
+        }
+      },
+      "label": "OPEN_HIDDEN_FULL_LEFT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 156,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        33
+      ],
+      "outbound_packet_sha256": "4c6393bb49e7444f069242b4970a00a2cc7706de42c64676f0fc1b4d0f442820",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015507673Z-36962762-881b61c8/request/00000001",
+        "mission-20260902T015507673Z-36962762-881b61c8/request/00000002"
+      ],
+      "slider_state_id": "e205f55ce1b6805ed0d261f9b0c86ac645509f2f4d2f3089baff1c42696f07e5",
+      "state_index": 10,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1149,
+            1207,
+            1208,
+            1210
+          ],
+          "maximum": 1210,
+          "median": 1207.0,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11335": 2,
+          "11337": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            27223,
+            27223
+          ],
+          [
+            70558,
+            70558
+          ],
+          [
+            87476,
+            87476
+          ],
+          [
+            99589,
+            99589
+          ],
+          [
+            101487,
+            101487
+          ],
+          [
+            102301,
+            102301
+          ],
+          [
+            105915,
+            105915
+          ],
+          [
+            129069,
+            129069
+          ],
+          [
+            158045,
+            158045
+          ],
+          [
+            210529,
+            210529
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4,
+          7
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2026
+        }
+      },
+      "label": "OPEN_HIDDEN_FULL_RIGHT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 100,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        33
+      ],
+      "outbound_packet_sha256": "0985856a69cdc806accb4dd7f9b5a4c0f6d23524148090d38a10b559a2ed2039",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T015514152Z-36962762-cde432c3/request/00000001",
+        "mission-20260902T015514152Z-36962762-cde432c3/request/00000002"
+      ],
+      "slider_state_id": "de328d131eca223623e0264e0777e030f76567cb9a57c1107a9299e038fb714c",
+      "state_index": 11,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1151,
+            1164,
+            1167,
+            1206,
+            1222,
+            1223,
+            1230,
+            1233
+          ],
+          "maximum": 1233,
+          "median": 1222.5,
+          "minimum": 1151
+        },
+        "destination_coordinate_count": 6,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11335": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            70565,
+            70565
+          ],
+          [
+            75354,
+            75354
+          ],
+          [
+            85655,
+            85655
+          ],
+          [
+            85657,
+            85657
+          ],
+          [
+            101553,
+            101553
+          ],
+          [
+            101571,
+            101571
+          ],
+          [
+            122311,
+            122311
+          ],
+          [
+            122981,
+            122981
+          ],
+          [
+            124986,
+            124986
+          ],
+          [
+            156142,
+            156142
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2022,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2022
+        }
+      },
+      "label": "OPEN_HIDDEN_MINUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 206,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        33
+      ],
+      "outbound_packet_sha256": "e95eddb3111bcffbecdf292151af01d0212b0ac6410ac8365b14841f5e7008d5",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000001",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000002"
+      ],
+      "slider_state_id": "81beff1c9faf1ed91bd6bea9acb29503f4135d744b05a15c7e5185e9156dce87",
+      "state_index": 12,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1147,
+            1149,
+            1156,
+            1193,
+            1202,
+            1210,
+            1224,
+            1233,
+            1272
+          ],
+          "maximum": 1272,
+          "median": 1197.5,
+          "minimum": 1147
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 6,
+          "11337": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            45965,
+            45965
+          ],
+          [
+            70564,
+            70564
+          ],
+          [
+            81952,
+            81952
+          ],
+          [
+            82800,
+            82800
+          ],
+          [
+            85517,
+            85517
+          ],
+          [
+            99589,
+            99589
+          ],
+          [
+            104716,
+            104716
+          ],
+          [
+            109404,
+            109404
+          ],
+          [
+            110254,
+            110254
+          ],
+          [
+            124855,
+            124855
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4,
+          7
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2023,
+            2024,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2023
+        }
+      },
+      "label": "OPEN_HIDDEN_PLUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 50,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        33
+      ],
+      "outbound_packet_sha256": "bf82a00102d29947b139cf354e232b94175f88d0fb69b3fd8c03ce91a0f641be",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000003",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000004"
+      ],
+      "slider_state_id": "282abbc107e24d7e4722936b43429f5e63109d526924ce30ec0921c45a2c37ee",
+      "state_index": 13,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1152,
+            1167,
+            1207,
+            1223,
+            1224,
+            1226,
+            1229,
+            1231,
+            1264,
+            1268
+          ],
+          "maximum": 1268,
+          "median": 1225.0,
+          "minimum": 1152
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11337": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            105333,
+            105333
+          ],
+          [
+            121629,
+            121629
+          ],
+          [
+            122406,
+            122406
+          ],
+          [
+            122867,
+            122867
+          ],
+          [
+            123171,
+            123171
+          ],
+          [
+            124198,
+            124198
+          ],
+          [
+            130011,
+            130011
+          ],
+          [
+            130441,
+            130441
+          ],
+          [
+            142773,
+            142773
+          ],
+          [
+            144082,
+            144082
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2024,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2024
+        }
+      },
+      "label": "PHYSICAL_MYSTICAL_FULL_LEFT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 156
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        34
+      ],
+      "outbound_packet_sha256": "0ffb6e797aed22f10639a80c4d1bfcff136b0a65f778991f739e1ec72b28f6fa",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000005",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000006"
+      ],
+      "slider_state_id": "3c0f61c7be028a87dd65d3ba7772cccb8cd8f3c91f97cee749c73d6339c30a4e",
+      "state_index": 14,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1178,
+            1179,
+            1181,
+            1182,
+            1220,
+            1228,
+            1243,
+            1246,
+            1250
+          ],
+          "maximum": 1250,
+          "median": 1201.0,
+          "minimum": 1178
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 6,
+          "11335": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31515,
+            31515
+          ],
+          [
+            31530,
+            31530
+          ],
+          [
+            46059,
+            46059
+          ],
+          [
+            56250,
+            56250
+          ],
+          [
+            85481,
+            85481
+          ],
+          [
+            85636,
+            85636
+          ],
+          [
+            100010,
+            100010
+          ],
+          [
+            102923,
+            102923
+          ],
+          [
+            123438,
+            123438
+          ]
+        ],
+        "reward_identity_count": 9,
+        "reward_ql_values": [
+          1,
+          4
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2024,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2024.5,
+          "minimum": 2024
+        }
+      },
+      "label": "PHYSICAL_MYSTICAL_FULL_RIGHT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 100
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        34
+      ],
+      "outbound_packet_sha256": "de2cebc19d3858a63db3661e94348390fe31f0d90543869ef5986260ac1c80ef",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000007",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000008"
+      ],
+      "slider_state_id": "fd7923230853f187f152f06ab3be2e8528ca18ab43ce8648f5713392db3deefe",
+      "state_index": 15,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1150,
+            1151,
+            1160,
+            1166,
+            1220,
+            1226,
+            1227,
+            1229
+          ],
+          "maximum": 1229,
+          "median": 1193.0,
+          "minimum": 1150
+        },
+        "destination_coordinate_count": 9,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            29844,
+            29844
+          ],
+          [
+            70565,
+            70565
+          ],
+          [
+            101477,
+            101477
+          ],
+          [
+            102821,
+            102821
+          ],
+          [
+            112330,
+            112330
+          ],
+          [
+            123685,
+            123685
+          ],
+          [
+            123723,
+            123723
+          ],
+          [
+            124711,
+            124711
+          ],
+          [
+            128995,
+            128995
+          ],
+          [
+            160216,
+            160216
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "PHYSICAL_MYSTICAL_MINUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 206
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        34
+      ],
+      "outbound_packet_sha256": "d3d51c1c33590f485826fd298d0ae9b93bfccc0fa253e7ef5e97bf0d6f7272b5",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000009",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000010"
+      ],
+      "slider_state_id": "8b83136676d13e79c09f05e4552e69b4316f1d67d0cc6ecaddf60dd5e69d8e54",
+      "state_index": 16,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1149,
+            1164,
+            1165,
+            1167,
+            1224,
+            1229
+          ],
+          "maximum": 1229,
+          "median": 1164.5,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 9,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11337": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31516,
+            31516
+          ],
+          [
+            31534,
+            31534
+          ],
+          [
+            45965,
+            45965
+          ],
+          [
+            55688,
+            55688
+          ],
+          [
+            70562,
+            70562
+          ],
+          [
+            85761,
+            85761
+          ],
+          [
+            101445,
+            101445
+          ],
+          [
+            124431,
+            124431
+          ],
+          [
+            125081,
+            125081
+          ],
+          [
+            150193,
+            150193
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2025.0,
+          "minimum": 2025
+        }
+      },
+      "label": "PHYSICAL_MYSTICAL_PLUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 50
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        34
+      ],
+      "outbound_packet_sha256": "f041e5156bbc2de393a04e8d4a29881f247ba27f18be5f1546e286f0e7ee49b0",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000011",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000012"
+      ],
+      "slider_state_id": "6d4e976a0e05e765423df00e7637365b95bf5caa15c640e483a52133f2851670",
+      "state_index": 17,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1150,
+            1151,
+            1152,
+            1203,
+            1210,
+            1212
+          ],
+          "maximum": 1212,
+          "median": 1151.5,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11335": 6,
+          "11337": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31515,
+            31515
+          ],
+          [
+            31533,
+            31533
+          ],
+          [
+            81892,
+            81892
+          ],
+          [
+            83975,
+            83975
+          ],
+          [
+            87479,
+            87479
+          ],
+          [
+            122634,
+            122634
+          ],
+          [
+            128715,
+            128715
+          ],
+          [
+            142804,
+            142804
+          ],
+          [
+            150254,
+            150254
+          ],
+          [
+            150306,
+            150306
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2026
+        }
+      },
+      "label": "HEADON_STEALTH_FULL_LEFT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 156,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        35
+      ],
+      "outbound_packet_sha256": "72e40550517ba91dd7efe4d9a09827ad16870e883dd3759587c21809992f076a",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000013",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000014"
+      ],
+      "slider_state_id": "2d0df9be3316dc31009cda4726742a3b7d7095c506c11a4e745e27a128515ed7",
+      "state_index": 18,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1106,
+            1142,
+            1149,
+            1151,
+            1206,
+            1208,
+            1210,
+            1212
+          ],
+          "maximum": 1212,
+          "median": 1207.0,
+          "minimum": 1106
+        },
+        "destination_coordinate_count": 8,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11335": 6,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31499,
+            31499
+          ],
+          [
+            31531,
+            31531
+          ],
+          [
+            85636,
+            85636
+          ],
+          [
+            99133,
+            99133
+          ],
+          [
+            101463,
+            101463
+          ],
+          [
+            101725,
+            101725
+          ],
+          [
+            101787,
+            101787
+          ],
+          [
+            111116,
+            111116
+          ],
+          [
+            155369,
+            155369
+          ],
+          [
+            210733,
+            210733
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          5,
+          7,
+          8
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2026,
+            2028
+          ],
+          "maximum": 2028,
+          "median": 2026.0,
+          "minimum": 2026
+        }
+      },
+      "label": "HEADON_STEALTH_FULL_RIGHT",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 100,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        35
+      ],
+      "outbound_packet_sha256": "1d0971bdcb95cc55ac903ba2e4121639ca395d136dd2af3ef72498875fa6d5d6",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000015",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000016"
+      ],
+      "slider_state_id": "5d61a844c85facbb09abdd9def83c126a0c3efb353fcc9ea7afeda947cc99b3a",
+      "state_index": 19,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1149,
+            1151,
+            1152,
+            1155,
+            1200,
+            1203,
+            1206,
+            1210
+          ],
+          "maximum": 1210,
+          "median": 1177.5,
+          "minimum": 1149
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11335": 6,
+          "11337": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            27384,
+            27384
+          ],
+          [
+            31533,
+            31533
+          ],
+          [
+            85481,
+            85481
+          ],
+          [
+            85612,
+            85612
+          ],
+          [
+            101429,
+            101429
+          ],
+          [
+            106973,
+            106973
+          ],
+          [
+            111243,
+            111243
+          ],
+          [
+            123761,
+            123761
+          ],
+          [
+            159021,
+            159021
+          ],
+          [
+            202871,
+            202871
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2026
+        }
+      },
+      "label": "HEADON_STEALTH_MINUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 206,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        35
+      ],
+      "outbound_packet_sha256": "2e1d1d2b7abe6fc883686aba73fec05af8230508678f7215be4c9522dba6dfb9",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000017",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000018"
+      ],
+      "slider_state_id": "8f228aafa627cab1e2c0c5045f19d4d44d65b27c36785af4d20fe1a7957dddd4",
+      "state_index": 20,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1146,
+            1148,
+            1164,
+            1168,
+            1203,
+            1208,
+            1224,
+            1225,
+            1227,
+            1229
+          ],
+          "maximum": 1229,
+          "median": 1205.5,
+          "minimum": 1146
+        },
+        "destination_coordinate_count": 9,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11335": 2,
+          "11337": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31501,
+            31501
+          ],
+          [
+            82816,
+            82816
+          ],
+          [
+            85572,
+            85572
+          ],
+          [
+            101341,
+            101341
+          ],
+          [
+            101394,
+            101394
+          ],
+          [
+            101721,
+            101721
+          ],
+          [
+            103655,
+            103655
+          ],
+          [
+            105235,
+            105235
+          ],
+          [
+            108014,
+            108014
+          ],
+          [
+            123419,
+            123419
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          4
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "HEADON_STEALTH_PLUS_50",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 50,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        35
+      ],
+      "outbound_packet_sha256": "7737744a92514547e7ee08038a769380688200078f4261bf92b5fc5b78775d73",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000019",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000020"
+      ],
+      "slider_state_id": "1b917969b11d4d6f1debf1b682024a83facedb28bb08c3a8b62938d1a30b9c0e",
+      "state_index": 21,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1189,
+            1195,
+            1220,
+            1222,
+            1226,
+            1235,
+            1303,
+            1304,
+            1307,
+            1316
+          ],
+          "maximum": 1316,
+          "median": 1230.5,
+          "minimum": 1189
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11335": 6,
+          "11337": 2,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31528,
+            31528
+          ],
+          [
+            32082,
+            32082
+          ],
+          [
+            82188,
+            82188
+          ],
+          [
+            100012,
+            100012
+          ],
+          [
+            101577,
+            101577
+          ],
+          [
+            101607,
+            101607
+          ],
+          [
+            108240,
+            108240
+          ],
+          [
+            122824,
+            122824
+          ],
+          [
+            124967,
+            124967
+          ],
+          [
+            202724,
+            202724
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          8,
+          10
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2022,
+            2023,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2023.0,
+          "minimum": 2022
+        }
+      },
+      "label": "MONEY_XP_FULL_LEFT",
+      "native_slider_values": {
+        "credits_xp": 156,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        36
+      ],
+      "outbound_packet_sha256": "79b97c8c23e48460949a3613253231d74d7b66469f13c546e459e59fc716a573",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000021",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000022"
+      ],
+      "slider_state_id": "fd19fe20ea18f2b6b1e24a8df9e8e6706d6cf60290b6527b895be90c97ff7e01",
+      "state_index": 22,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1103,
+            1104,
+            1105,
+            1116,
+            1142,
+            1149,
+            1169
+          ],
+          "maximum": 1169,
+          "median": 1110.5,
+          "minimum": 1103
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 6,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31503,
+            31503
+          ],
+          [
+            31516,
+            31516
+          ],
+          [
+            75354,
+            75354
+          ],
+          [
+            85572,
+            85572
+          ],
+          [
+            101416,
+            101416
+          ],
+          [
+            101577,
+            101577
+          ],
+          [
+            101681,
+            101681
+          ],
+          [
+            110410,
+            110410
+          ],
+          [
+            124929,
+            124929
+          ]
+        ],
+        "reward_identity_count": 9,
+        "reward_ql_values": [
+          1
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2027,
+            2028,
+            2029
+          ],
+          "maximum": 2029,
+          "median": 2028.0,
+          "minimum": 2027
+        }
+      },
+      "label": "MONEY_XP_FULL_RIGHT",
+      "native_slider_values": {
+        "credits_xp": 100,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        36
+      ],
+      "outbound_packet_sha256": "c128a7f7cc7932ad447e85c4a67bed069f50aa890033bfd90906798da872c7ed",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000023",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000024"
+      ],
+      "slider_state_id": "17701cd082508768a9140c1f1cdd454368e9d6aa9593df833243fc6b4063d296",
+      "state_index": 23,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1164,
+            1171,
+            1221,
+            1225,
+            1226,
+            1228,
+            1229,
+            1306,
+            1309
+          ],
+          "maximum": 1309,
+          "median": 1227.0,
+          "minimum": 1164
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11335": 6,
+          "11342": 2
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            26503,
+            26503
+          ],
+          [
+            30781,
+            30781
+          ],
+          [
+            31505,
+            31505
+          ],
+          [
+            70411,
+            70411
+          ],
+          [
+            101361,
+            101361
+          ],
+          [
+            101761,
+            101761
+          ],
+          [
+            104282,
+            104282
+          ],
+          [
+            121912,
+            121912
+          ],
+          [
+            124263,
+            124263
+          ],
+          [
+            154070,
+            154070
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          10,
+          14
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2022,
+            2023,
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2023.0,
+          "minimum": 2022
+        }
+      },
+      "label": "MONEY_XP_MINUS_50",
+      "native_slider_values": {
+        "credits_xp": 206,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        36
+      ],
+      "outbound_packet_sha256": "5ac616142735ec2129a2e91b062d424b14a63bb2bef144ab946522a4863e211b",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000025",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000026"
+      ],
+      "slider_state_id": "9527ee3c49e5d1eaeba8fac73c30ae3668fbb4edc0d7f9ba3d7c37e0a2ece877",
+      "state_index": 24,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1148,
+            1164,
+            1166,
+            1202,
+            1203,
+            1210,
+            1227,
+            1229,
+            1231
+          ],
+          "maximum": 1231,
+          "median": 1202.5,
+          "minimum": 1148
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          695,
+          710
+        ],
+        "mission_icon_counts": {
+          "11330": 2,
+          "11337": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            55697,
+            55697
+          ],
+          [
+            70565,
+            70565
+          ],
+          [
+            85711,
+            85711
+          ],
+          [
+            101465,
+            101465
+          ],
+          [
+            106649,
+            106649
+          ],
+          [
+            110164,
+            110164
+          ],
+          [
+            110240,
+            110240
+          ],
+          [
+            111892,
+            111892
+          ],
+          [
+            125024,
+            125024
+          ],
+          [
+            125381,
+            125381
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2025,
+            2026
+          ],
+          "maximum": 2026,
+          "median": 2026.0,
+          "minimum": 2025
+        }
+      },
+      "label": "MONEY_XP_PLUS_50",
+      "native_slider_values": {
+        "credits_xp": 50,
+        "difficulty": 1,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        36
+      ],
+      "outbound_packet_sha256": "5b3e7f05db57d93c7b9deb499018e125b374f6182209091e0d25508fdba7a5a1",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000027",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000028"
+      ],
+      "slider_state_id": "ce90836ac17e4865f265132fd8b4c2bbdbe1d698c8ff6ce9c1053790947aa3b1",
+      "state_index": 25,
+      "static_expected_mission_ql": 1
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1215,
+            1218,
+            1232,
+            1233,
+            1235,
+            1237,
+            1321
+          ],
+          "maximum": 1321,
+          "median": 1232.5,
+          "minimum": 1215
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          687,
+          695
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            46462,
+            46462
+          ],
+          [
+            85691,
+            22004
+          ],
+          [
+            101481,
+            101482
+          ],
+          [
+            101605,
+            101606
+          ],
+          [
+            101671,
+            101672
+          ],
+          [
+            102192,
+            102193
+          ],
+          [
+            102708,
+            102709
+          ],
+          [
+            103053,
+            103054
+          ],
+          [
+            110264,
+            110265
+          ],
+          [
+            124073,
+            124074
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          2,
+          7
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2077,
+            2079
+          ],
+          "maximum": 2079,
+          "median": 2077.0,
+          "minimum": 2077
+        }
+      },
+      "label": "CENTERED_BASELINE_D6",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 6,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        30
+      ],
+      "outbound_packet_sha256": "7f3d1dc404a7598b178d39707a36b4020bd02fc64eda573293ed212ec46e10a8",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000029",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000030"
+      ],
+      "slider_state_id": "a370f27f16d746cd1a28560d57222f3cae6e202fe43c8d75e82a47aaee55e994",
+      "state_index": 26,
+      "static_expected_mission_ql": 2
+    },
+    {
+      "decoded_output_summary": {
+        "credits": {
+          "distinct_values": [
+            1320,
+            1321,
+            1350,
+            1355,
+            1356,
+            1357,
+            1479,
+            1481
+          ],
+          "maximum": 1481,
+          "median": 1355.0,
+          "minimum": 1320
+        },
+        "destination_coordinate_count": 10,
+        "destination_playfield_instances": [
+          687,
+          695
+        ],
+        "mission_icon_counts": {
+          "11329": 2,
+          "11330": 2,
+          "11342": 6
+        },
+        "mission_identity_count": 10,
+        "not_exposed_fields": [
+          "mission_ql",
+          "mission_template_or_type_id",
+          "objective_item_identity",
+          "objective_item_ql",
+          "objective_type",
+          "token_reward",
+          "destination_entrance_identity",
+          "faction_requirements"
+        ],
+        "offer_count": 10,
+        "reward_descriptor_versions": [
+          6
+        ],
+        "reward_identities": [
+          [
+            31517,
+            31517
+          ],
+          [
+            31528,
+            31528
+          ],
+          [
+            85712,
+            22010
+          ],
+          [
+            101339,
+            101340
+          ],
+          [
+            101623,
+            101624
+          ],
+          [
+            103256,
+            103257
+          ],
+          [
+            107039,
+            107040
+          ],
+          [
+            111980,
+            112032
+          ],
+          [
+            124256,
+            124257
+          ],
+          [
+            124534,
+            124535
+          ]
+        ],
+        "reward_identity_count": 10,
+        "reward_ql_values": [
+          1,
+          3
+        ],
+        "unknown_chunk_lengths": {
+          "UnkChunk1Base64": [
+            16
+          ],
+          "UnkChunk2Base64": [
+            8
+          ],
+          "UnkChunk3Base64": [
+            44
+          ],
+          "UnkChunk4Base64": [
+            120
+          ],
+          "UnkChunk5Base64": [
+            8
+          ],
+          "UnkChunk6Base64": [
+            61
+          ]
+        },
+        "xp": {
+          "distinct_values": [
+            2266,
+            2272,
+            2273
+          ],
+          "maximum": 2273,
+          "median": 2266.0,
+          "minimum": 2266
+        }
+      },
+      "label": "CENTERED_BASELINE_D10",
+      "native_slider_values": {
+        "credits_xp": 255,
+        "difficulty": 10,
+        "good_bad": 255,
+        "headon_stealth": 255,
+        "open_hidden": 255,
+        "order_chaos": 255,
+        "physical_mystical": 255
+      },
+      "offer_count": 10,
+      "outbound_diff_from_center_offsets": [
+        30
+      ],
+      "outbound_packet_sha256": "13d183b72a8e8baed5f468ff4f8cdaaa44e3112583c53c5ddf0dcad351fc1c0e",
+      "repeat_request_diff_offsets": [],
+      "request_count": 2,
+      "request_determinism": "REQUEST_PAYLOAD_DETERMINISTIC",
+      "request_ids": [
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000031",
+        "mission-20260902T020352939Z-36962762-c11633ff/request/00000032"
+      ],
+      "slider_state_id": "45490aa3ab40bb0c5f7aba0cdab3511d84819679b27a3e9f955a749152a47fb6",
+      "state_index": 27,
+      "static_expected_mission_ql": 3
+    }
+  ]
+}

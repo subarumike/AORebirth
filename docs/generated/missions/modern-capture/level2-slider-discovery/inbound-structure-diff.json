@@ -1,0 +1,824 @@
+{
+  "five_offer_grouping": true,
+  "one_raw_response_per_request": true,
+  "per_offer_raw_boundaries": "NOT_RECOVERED_FROM_CURRENT_AOSHARP_PACKET_DECODER",
+  "response_packet_count": 54,
+  "returned_slider_echo": {
+    "classification": "PROVEN_FROM_RAW_INBOUND_PACKET",
+    "common_unique_offset": 30,
+    "common_unique_offset_hex": "0x1E"
+  },
+  "states": [
+    {
+      "byte_lengths": [
+        4310,
+        4377
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "876d57ac26877a1ac2dfb75001ef656d39c1fc50c7707af3cdd6eb308c360f0c",
+        "1b3a76402cafd66e3e3e9522da99d97589d5d99fce77dea7650cd8dda8c85b58"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 1
+    },
+    {
+      "byte_lengths": [
+        4820,
+        4529
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "3b8f0dfb911cc63258ecb4f7c747cc4c9bcca0af23186af5a4298ad6726ecff1",
+        "2f2855445b94e20e9ca6b1fd73e57bf021baff40b7091d43f510dff1098e13b8"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 2
+    },
+    {
+      "byte_lengths": [
+        3866,
+        3858
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "83163d27a4af535a6b9510a6cede654143c6a2b3c2476b4c56b5ad8f9cba5fa7",
+        "3667fabce02da7d725c3d710d7f06d43a58bec3845e112a66ea2f54e5478d849"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 3
+    },
+    {
+      "byte_lengths": [
+        4533,
+        4184
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "766fd2f0603a09821fe9efc7b520147c994ffb2b5415070f9e14614ada6cf3ad",
+        "8b003fd8795feec1da8ee8405ec81efaf87bedab7c9cc4f3d3de83ea7c21a7fc"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 4
+    },
+    {
+      "byte_lengths": [
+        3855,
+        3810
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "d4cf503700aa22f483d8bf71678d42fa2c7d155c9c4ae48734c28e232c3a2343",
+        "aca41fe8a684e722650030114f3544e64b249066712e49ea54288244eb5eb9db"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 5
+    },
+    {
+      "byte_lengths": [
+        3248,
+        3595
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "f5e911b11a789080fccaedd44d42530abf0d17147ea4981e5fbdb41658918929",
+        "4bbe0d96e3a861e84c985374ca5fa34ff92dcec100bec8ec57fc0a407e7855f4"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 6
+    },
+    {
+      "byte_lengths": [
+        4461,
+        4548
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "b37b59168727f399090d555b59883034604f511856c022f8cd32aa6daa1d1b90",
+        "eb3299dedde3a6437661723f4b7704c66de8378df5941d84e284c2f4484c3dc5"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 7
+    },
+    {
+      "byte_lengths": [
+        3527,
+        3639
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "b627d454488fdff51dbf4400f738d7f2d4940a3e6b82b1e2aec1f7d322bf2c0d",
+        "7072f90ae2a0947e55bf2ddee6b9a974315358a56b95362fee8b79d860d5d73c"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 8
+    },
+    {
+      "byte_lengths": [
+        4922,
+        4656
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "566f85842a361aa78331d76d1669c49c4ec1767c1ef81be37fe4e794f6874566",
+        "e80a36b41397d4c63e98d1a1634b34a9f4a07854407371572f301e2998ae5b30"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 9
+    },
+    {
+      "byte_lengths": [
+        3826,
+        3530
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "eecf46040abb628ed331e934abf7ae4c4c4582802005074d55d75e128ef69516",
+        "7bcc37fca2dc78b7ed5321bdd7948803a0752123995991f9073450f75c9b9813"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 10
+    },
+    {
+      "byte_lengths": [
+        3243,
+        3148
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "c475279c8c7c636356144d63d6656eed51920396160a8a4584d13915b2963874",
+        "19536c936a8d0fd5bf1b602e0873137709c59e689a3204d2348f9c71b3d8260b"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 11
+    },
+    {
+      "byte_lengths": [
+        4460,
+        4332
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "bf5e2777916cf0021916c158c4c6f39f84ccfb3941964c83b6bc68d37d43d35e",
+        "2296a0923c7c5f14c451ee5d31b03f005d50ae5d86e5069a5c91babddb3e492a"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 12
+    },
+    {
+      "byte_lengths": [
+        3247,
+        3225
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "b5985a9eb1cb50be094891fc5e66df3662f6cc1b47e9748c70f75cb725754076",
+        "b575b23be2c3479f05387977760fa78f55c114100b51aa0f5e484064e3b4b3b2"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 13
+    },
+    {
+      "byte_lengths": [
+        4905,
+        4921
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "98cbfa64fec5eb10282b64cce4357a24ef2a75ab0c9db9cf74fbb6b0da140886",
+        "d6646b74b2fe54d5380aa625f68ea37fc14f852c9051fe55b50a30ad40120fb7"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 14
+    },
+    {
+      "byte_lengths": [
+        3472,
+        3388
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "639ba15b79a9c47871acd84c6b1885184c8646a352c570761fb395377d1f76ac",
+        "259a02a988abb3b38acde1f4c285688f7bbd4250007b659d16578a6040456bb8"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 15
+    },
+    {
+      "byte_lengths": [
+        4337,
+        4390
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "a1c816944d9572dd9ca6fbd9bbfc2a0b18563005e5106eb849e26a57b91fe7d8",
+        "480f811b8f8134907f54679dff8c9088cb5cdb828987892ec6aafb20f73cd4ab"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 16
+    },
+    {
+      "byte_lengths": [
+        4547,
+        4603
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "c6c9da62e930e0717441772f53b9f9d517966e9f6b194b8ae70f0cdcf3ffd5aa",
+        "da51b64e62d3f223f3b54dfee4dd81a43165b90e129ec91696362aa69fa21e56"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 17
+    },
+    {
+      "byte_lengths": [
+        3288,
+        3310
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "08e0186489cfc0b884307c412b1f683151fe09c1cbaa0d127e87e080d2e651fc",
+        "e515daa69b7bc1a5295fc566f72cb5ac644f8101af4273f15a7a6107d7f0d93b"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 18
+    },
+    {
+      "byte_lengths": [
+        2988,
+        2968
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "ea613ce47a876f926266260b97df5309e259462d8a899c675be0f1bfc4eb4b24",
+        "d6e77a51a9e2d590ace5de1242cac97e62a3ca0ce340949a9791fc0992cce5ff"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 19
+    },
+    {
+      "byte_lengths": [
+        3525,
+        3579
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "c2cf7de9767a138bd33c007126ea99cf14f2ec13886885ae2d8deb6d03d47942",
+        "3b83fb952802f24ea44655afc0f892024f673ffddbc48281cb15419f662e0ab1"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 20
+    },
+    {
+      "byte_lengths": [
+        4583,
+        4655
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "7a413feada14373e8e25d6b7631185fb6b93f4ff888bba4c459fd88901a79210",
+        "f96022b1313fc241036510414e91f042fbd7f9d48b1729c2b8197f9373a0bc2a"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 21
+    },
+    {
+      "byte_lengths": [
+        4323,
+        4420
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "56a40229875b5166fd228687e6bf0ae23bdf77f7ad49bbc43662eeda7b78127b",
+        "bc4fe7a5fa7e218d19660f34d822a97daf6da2ffbefd1c277ee04c379573c0ea"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 22
+    },
+    {
+      "byte_lengths": [
+        3495,
+        3941
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "7be379c927843ad68893c5d3c9651ca52bb81765e4b1f97b1ccc3f364467ca6e",
+        "5621e1ea3a46ddb07fe896fffd90911685ce4685dce2eae8318396071b71c517"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 23
+    },
+    {
+      "byte_lengths": [
+        3808,
+        3801
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "4af17a4c0265a6a4683ffa680ace62d32d873234256a8a4abf574ce433ad91ff",
+        "9592d16892aba65458a6f4281bb2d53aa0c6f2123123d843d5a6b1f26fb97d05"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 24
+    },
+    {
+      "byte_lengths": [
+        5336,
+        4407
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "620cc805618c3989963138c2e7e05bf922db616a82039e7023c305e7f9be650c",
+        "12ee08bafbc1340555117fb82cdf6695d039389a89bf4fe341180e88812251ee"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 25
+    },
+    {
+      "byte_lengths": [
+        4419,
+        4662
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "ae2421e91f5107b14bedbec01f53ea1956775750560265898c5d838ff363f6a2",
+        "9284aa197d86d8a9daec1b91a23068b9dfeb624eece14f59b2db1a64c8b72dc1"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 26
+    },
+    {
+      "byte_lengths": [
+        4473,
+        4569
+      ],
+      "decoded_offer_counts": [
+        5,
+        5
+      ],
+      "n3_message_types": [
+        1547920905
+      ],
+      "packet_sha256": [
+        "4522d5e72a280faa892f7b3219abffa3cdd3b70ec070b517781163debcd36fd9",
+        "c3b5faae46c18e97610d5a88dca9e6a2e4bcc04a6451774f1e5e2187c7ac65f3"
+      ],
+      "packet_types": [
+        10
+      ],
+      "response_packet_count": 2,
+      "slider_tuple_occurrences": [
+        [
+          30
+        ],
+        [
+          30
+        ]
+      ],
+      "state_index": 27
+    }
+  ],
+  "structural_boundary": "Fixed header and echoed slider tuple are comparable; variable strings and offer payload lengths prevent global fixed-offset interpretation after the header."
+}
