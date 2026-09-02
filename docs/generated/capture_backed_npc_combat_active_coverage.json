@@ -1,7 +1,7 @@
 {
   "bindingTotals": {
-    "actorCount": 1562,
-    "bindingRecordCount": 1548
+    "actorCount": 1565,
+    "bindingRecordCount": 1551
   },
   "bindings": [
     {
@@ -25276,6 +25276,87 @@
     },
     {
       "actorCount": 1,
+      "bindingKey": "b28529b86b74d28f2e40",
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260827-221909"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
+        "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+      ],
+      "coverageKey": "3038781929f9a52b3fc7",
+      "level": 28,
+      "levelCandidates": [
+        28
+      ],
+      "monsterData": 209333,
+      "name": "Crippler of Growth",
+      "runtimeAttackRangeMicrometers": null,
+      "runtimeContractReady": false,
+      "runtimePlayfieldOrResource": 4311,
+      "runtimeProfileSelector": null,
+      "runtimeSourceIdentityHint": null,
+      "runtimeSpecialAttackWeaponUnknown5": null,
+      "surface": "nascence-life"
+    },
+    {
+      "actorCount": 1,
+      "bindingKey": "fc74f6cd222384dbe85b",
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260827-221909"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
+        "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+      ],
+      "coverageKey": "3038781929f9a52b3fc7",
+      "level": 28,
+      "levelCandidates": [
+        28
+      ],
+      "monsterData": 209333,
+      "name": "Crippler of Growth",
+      "runtimeAttackRangeMicrometers": null,
+      "runtimeContractReady": false,
+      "runtimePlayfieldOrResource": 4311,
+      "runtimeProfileSelector": null,
+      "runtimeSourceIdentityHint": null,
+      "runtimeSpecialAttackWeaponUnknown5": null,
+      "surface": "nascence-life"
+    },
+    {
+      "actorCount": 1,
+      "bindingKey": "d65967a5648f135fcff4",
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260827-221909"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
+        "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs"
+      ],
+      "coverageKey": "3038781929f9a52b3fc7",
+      "level": 28,
+      "levelCandidates": [
+        28
+      ],
+      "monsterData": 209333,
+      "name": "Crippler of Growth",
+      "runtimeAttackRangeMicrometers": null,
+      "runtimeContractReady": false,
+      "runtimePlayfieldOrResource": 4311,
+      "runtimeProfileSelector": null,
+      "runtimeSourceIdentityHint": null,
+      "runtimeSpecialAttackWeaponUnknown5": null,
+      "surface": "nascence-life"
+    },
+    {
+      "actorCount": 1,
       "bindingKey": "2b214792b81a5993ac9f",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -40502,7 +40583,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceMobCombat.cs",
-      "sha256": "1b5ad6eb36c2ae519ba232724d0e216b22e97c8ad6849eea4c5a5610d66725e1"
+      "sha256": "a4fd562ee9b1befa8aee91d1182ebf147ff845e7454bd793f81325361a36797c"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40562,7 +40643,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
-      "sha256": "fe61ed164b6310cc2058f06e2ec0d379c1293a3201c3e28e3b6dde6767a5d443"
+      "sha256": "15e7d171e030e2391f8c074d320b95191f0f7eccbf3fa7879d05354f4d3185fb"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40582,7 +40663,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
-      "sha256": "cf4e3c8a2caaa40a9c501b62d87f93b5a257dd41808b4d6bf5d44a444cb6c674"
+      "sha256": "2f4d40b55dc762d058e1b46398ae3f15338ff5fb5b4a654b5c3bd350e9cd7fc1"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40597,7 +40678,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-      "sha256": "01ea89c5a28ea47bc59b19128b05df69a73270a4e29fca254374f1463ab04c38"
+      "sha256": "a4e59e40cda2d1fa74656381c07739ef9732d97d2553224dc9377b60212f71c0"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40652,7 +40733,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
-      "sha256": "98630af0b0e8a9bf30826a04291b33f600198e5531815d531ae3ce195f3b58f5"
+      "sha256": "60e1f902dc54d27736a2a10348e1ad85182ca23b6a16b638df21ebe88089829c"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40662,7 +40743,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-      "sha256": "69bc2860fda2f7c176abe12891f3670f958fbe0827ef187c551d47c20375e9e7"
+      "sha256": "bf1df3ae932fab2846dbb055eececacbeaaa70841bb46b4d007d92798f1a5e1d"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -41317,7 +41398,7 @@
     "captureCertifiedVariantCountWithMutableWeaponState": 5,
     "exactRawWireObservationCount": 2874,
     "finalCaptureCertifiedActorCount": 559,
-    "finalQuarantinedActorCount": 1003,
+    "finalQuarantinedActorCount": 1006,
     "fixedCertifiedProfileRowCount": 513,
     "fixedProfileRowCount": 799,
     "fixedUnresolvedProfileRowCount": 286,
@@ -58372,11 +58453,11 @@
     "runtimePlayfieldOrResource": 1931
   },
   "populationContract": {
-    "actualInitialActorCount": 1562,
-    "configuredMaximumActorCount": 1564,
+    "actualInitialActorCount": 1565,
+    "configuredMaximumActorCount": 1567,
     "cursedSilvertail": "a dynamic replacement for one of five Dreaming Silvertails and does not increase the Nascence Life count",
     "dynamicMissionMobs": "excluded from the fixed denominator because their count and identity are mission-instance data",
-    "expectedInitialActorCount": 1562,
+    "expectedInitialActorCount": 1565,
     "maximumExplanation": "two Infector slots arm only after Abmouth combat and are not initial actors"
   },
   "profiles": [
@@ -162924,7 +163005,7 @@
       ]
     },
     {
-      "actorCount": 49,
+      "actorCount": 52,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 383,
       "captureSessions": [],
@@ -162932,11 +163013,13 @@
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
         "20260718-173204",
-        "20260718-174130"
+        "20260718-174130",
+        "20260827-221909"
       ],
       "contentEvidenceCaptureIdsOutsideCombatInventory": [
         "20260718-173204",
-        "20260718-174130"
+        "20260718-174130",
+        "20260827-221909"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs",
@@ -162985,7 +163068,7 @@
       "missingEvidence": [
         "Attack packet in the same fight boundary",
         "SpecialAttackWeapon packet in the same fight boundary",
-        "content provenance not indexed by the canonical combat inventory: 20260718-173204, 20260718-174130",
+        "content provenance not indexed by the canonical combat inventory: 20260718-173204, 20260718-174130, 20260827-221909",
         "exact profile identity in the canonical capture corpus",
         "normal AttackInfo packet correlated to the same source generation",
         "owner-linked WeaponItemFullUpdate weapon definition"
@@ -225962,7 +226045,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          12186
+          12294
         ]
       },
       {
@@ -226071,10 +226154,10 @@
       "unresolved": 40
     },
     {
-      "actorCount": 865,
+      "actorCount": 868,
       "certified": 0,
       "surface": "nascence-life",
-      "unresolved": 865
+      "unresolved": 868
     },
     {
       "actorCount": 96,
@@ -226109,7 +226192,7 @@
   ],
   "totals": {
     "certified": 559,
-    "initialActorCount": 1562,
-    "unresolved": 1003
+    "initialActorCount": 1565,
+    "unresolved": 1006
   }
 }

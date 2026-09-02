@@ -785,22 +785,50 @@ namespace AORebirth.Core.Playfields
 
         private AORebirth.Core.Combat.CombatStrikeContext BuildStrikeContext(
             Character attackerCharacter,
-            CombatAttackSource attackSource)
+            CombatAttackSource attackSource,
+            int? fixedDamageOverride = null)
         {
             if (attackerCharacter == null || attackSource == null)
             {
                 return null;
             }
 
-            AORebirth.Core.Combat.CombatStrikeContext strikeContext =
-                AORebirth.Core.Combat.CharacterCombatStrikeBuilder.Build(
+            AORebirth.Core.Combat.CombatStrikeContext strikeContext;
+            if (attackSource.UsesEquippedWeapon)
+            {
+                strikeContext = AORebirth.Core.Combat.CharacterCombatStrikeBuilder.Build(
                     attackerCharacter,
                     AORebirth.Core.Entities.WeaponSlot.MainHand);
+            }
+            else
+            {
+                strikeContext = new AORebirth.Core.Combat.CombatStrikeContext
+                                {
+                                    MinDamage = attackSource.MinDamage,
+                                    MaxDamage = Math.Max(attackSource.MinDamage, attackSource.MaxDamage),
+                                    DamageBonus = attackSource.DamageBonus,
+                                    UsesEquippedWeapon = false,
+                                    WeaponSlot = AORebirth.Core.Entities.WeaponSlot.MainHand,
+                                    RawDamageType = attackerCharacter.Stats[StatIds.damagetype].Value
+                                };
+            }
+
             if (strikeContext == null)
             {
                 return null;
             }
 
+            if (attackSource.MinDamage > 0)
+            {
+                strikeContext.MinDamage = attackSource.MinDamage;
+            }
+
+            if (attackSource.MaxDamage > 0)
+            {
+                strikeContext.MaxDamage = Math.Max(strikeContext.MinDamage, attackSource.MaxDamage);
+            }
+
+            strikeContext.DamageBonus = attackSource.DamageBonus;
             strikeContext.Range = attackSource.Range > 0.0
                                     ? attackSource.Range
                                     : strikeContext.Range;
@@ -808,8 +836,26 @@ namespace AORebirth.Core.Playfields
             strikeContext.AttackInfoWeaponSlot = attackSource.AttackInfoWeaponSlot;
             strikeContext.AttackInfoHitType = attackSource.AttackInfoHitType;
             strikeContext.AttackInfoWeaponInstance = attackSource.AttackInfoWeaponInstance;
+            strikeContext.AttackInfoUnknown = attackSource.AttackInfoUnk1;
+            strikeContext.AttackInfoN3Unknown = attackSource.AttackInfoN3Unknown;
+            strikeContext.LethalAttackInfoUnknown = attackSource.LethalAttackInfoUnknown;
+            strikeContext.PreserveAttackInfoWireValues = true;
             strikeContext.SendAttackInfo = attackSource.SendAttackInfo;
-            strikeContext.DamageSource = AORebirth.Core.Combat.CombatDamageSource.WeaponAutoAttack;
+            strikeContext.DamageSource = attackSource.UsesEquippedWeapon
+                                             ? AORebirth.Core.Combat.CombatDamageSource.WeaponAutoAttack
+                                             : AORebirth.Core.Combat.CombatDamageSource.UnarmedAutoAttack;
+            if (fixedDamageOverride.HasValue && fixedDamageOverride.Value > 0)
+            {
+                strikeContext.FixedDamage = fixedDamageOverride.Value;
+            }
+            else if (attackSource.CapturedDamageObservations != null
+                     && attackSource.CapturedDamageObservations.Length > 0)
+            {
+                strikeContext.FixedDamage = this.capturedDamageObservationCursor.Select(
+                    attackerCharacter.Identity.Instance,
+                    attackSource.CapturedDamageObservations);
+            }
+
             return strikeContext;
         }
 
@@ -1410,6 +1456,12 @@ namespace AORebirth.Core.Playfields
             }
 
             CapturedBasicCombatStreamDefinition stream = streams[dueIndex];
+            CapturedBasicCombatDamageObservation observation =
+                this.SelectBasicDamageObservation(
+                    attacker.Identity.Instance,
+                    dueIndex,
+                    stream,
+                    streams.Length);
             Character attackerCharacter = attacker as Character;
             if (attackerCharacter == null)
             {
@@ -1418,12 +1470,15 @@ namespace AORebirth.Core.Playfields
 
             var attackSource = new CombatAttackSource
             {
+                MinDamage = observation.Amount,
+                MaxDamage = observation.Amount,
+                DamageBonus = 0,
                 Range = attackRange,
                 RechargeSeconds = 0.0d,
-                UsesEquippedWeapon = true,
+                UsesEquippedWeapon = false,
                 AttackInfoAmmoCount = stream.AttackInfoAmmoCount,
                 AttackInfoWeaponSlot = stream.AttackInfoWeaponSlot,
-                AttackInfoUnk1 = stream.AttackInfoHitTypeWire,
+                AttackInfoUnk1 = observation.AttackInfoDamageTypeWire,
                 AttackInfoHitType = stream.AttackInfoHitTypeWire,
                 AttackInfoWeaponInstance = stream.AttackInfoWeaponInstance,
                 AttackInfoN3Unknown = stream.AttackInfoN3Byte,
@@ -1431,7 +1486,10 @@ namespace AORebirth.Core.Playfields
             };
 
             AORebirth.Core.Combat.CombatStrikeContext strikeContext =
-                this.BuildStrikeContext(attackerCharacter, attackSource);
+                this.BuildStrikeContext(
+                    attackerCharacter,
+                    attackSource,
+                    observation.Amount);
             if (strikeContext == null)
             {
                 return;

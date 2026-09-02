@@ -11,7 +11,7 @@ two safe lookup modes as the generated runtime catalog:
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
-or if the fixed initial population does not reconcile to 1,562 actors.
+or if the fixed initial population does not reconcile to 1,565 actors.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1562
+EXPECTED_INITIAL_ACTORS = 1565
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -41,7 +41,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("temple-named-encounters", 12),
     ("temple-reanimated-corpse-adds", 2),
     ("nascence-core-hecklers", 40),
-    ("nascence-life", 865),
+    ("nascence-life", 868),
     ("arete-family", 96),
     ("arete-additional-captured-actors", 17),
     ("subway-merchants", 6),
@@ -1317,8 +1317,8 @@ def parse_nascence_life(repo_root: Path) -> List[ActorDefinition]:
     counts = defaultdict(int)
     for actor in actors:
         counts[actor.resource] += actor.actor_count
-    expected = {4001: 1, 4310: 272, 4311: 387, 4312: 197, 4531: 7, 4676: 1}
-    if dict(counts) != expected or len(actors) != 865:
+    expected = {4001: 1, 4310: 272, 4311: 390, 4312: 197, 4531: 7, 4676: 1}
+    if dict(counts) != expected or len(actors) != 868:
         raise CoverageError(
             f"Nascence Life parser found {len(actors)} actors with playfield counts {dict(counts)}"
         )

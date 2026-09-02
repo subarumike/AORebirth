@@ -64,6 +64,7 @@ namespace ZoneEngine.Core.Playfields
             ICharacter target = e.Target;
 
             MissionAcgOperationalRuntime.NotifyHealthChanged(target, e.NewHealth);
+            target.SendChangedStats();
 
             if (target.Controller is NPCController)
             {

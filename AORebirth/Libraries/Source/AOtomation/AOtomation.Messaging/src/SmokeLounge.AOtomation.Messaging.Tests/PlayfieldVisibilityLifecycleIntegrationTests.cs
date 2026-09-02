@@ -129,6 +129,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs");
             string coordinatorText = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs");
+            string characterCombatText = ReadRepositoryFile(
+                @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs");
             string visibilityGate = ExtractBlock(
                 playfieldText,
                 "internal bool EnsureNpcCombatVisibility(ICharacter attacker, ICharacter target)");
@@ -144,12 +146,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string damageCore = ExtractBlock(
                 coordinatorText,
                 "private void ApplyNpcCombatHitCore(");
-            string playfieldForceVisibility = ExtractBlock(
-                playfieldText,
-                "internal bool ForceCharacterVisibilityToRecipient(");
-            string runtimeForceVisibility = ExtractBlock(
-                runtimeSystemsText,
-                "internal bool ForceCharacterVisibilityToRecipient(");
+            string characterStrike = ExtractBlock(
+                characterCombatText,
+                "public CombatStrikeResult Strike(");
+            string receiveStrike = ExtractBlock(
+                characterCombatText,
+                "internal void ReceiveStrike(");
+            string playfieldForceVisibility = playfieldText;
+            string runtimeForceVisibility = runtimeSystemsText;
 
             const string visibilityLookup =
                 "this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity)";
@@ -175,9 +179,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && !visibilityGate.Contains("visible = true;"),
                 "Existing visibility must be reused, then refresh/forced SCFU-WIFU-CharInPlay entry must return success before visibility is accepted.");
             Assert.IsTrue(
-                playfieldForceVisibility.Contains("return false;")
+                playfieldForceVisibility.Contains(
+                    "return this.ForceCharacterVisibilityToRecipient(")
+                && playfieldForceVisibility.Contains("return false;")
                 && playfieldForceVisibility.Contains(
                     "return this.runtimeSystems.ForceCharacterVisibilityToRecipient(")
+                && runtimeForceVisibility.Contains(
+                    "return this.ForceCharacterVisibilityToRecipient(")
                 && runtimeForceVisibility.Contains("return false;")
                 && runtimeForceVisibility.Contains(
                     "return this.visibilityPackets.SendCharacterVisibilityEntry(")
@@ -198,9 +206,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Ordinary weapon-clock combat must prove visibility before entering the shared damage core.");
             AssertBefore(
                 damageCore,
-                "int damage = this.CalculateCombatDamage(attacker, attackSource);",
-                "target.Stats[StatIds.health].Value = newHealth;",
-                "The shared NPC damage core must calculate damage before mutating player health.");
+                "this.BuildStrikeContext(attackerCharacter, attackSource)",
+                "attackerCharacter.Strike(target, strikeContext)",
+                "The shared NPC damage core must construct its governed context before entering Character combat.");
+            AssertBefore(
+                characterStrike,
+                "CombatStrikeDamageCalculator.Calculate(",
+                "targetCharacter.ReceiveStrike(",
+                "Character combat must calculate damage before delivering the health mutation.");
+            Assert.IsTrue(
+                receiveStrike.Contains("this.Stats[StatIds.health].Value = newHealth;"),
+                "Character combat must retain one explicit health mutation after the visibility-gated strike entry.");
         }
 
         [TestMethod]

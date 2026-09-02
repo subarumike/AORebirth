@@ -570,6 +570,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinator = ReadPlayfieldSource(root, "NpcCombatTickCoordinator.cs");
             string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
             string lineOfSight = ReadPlayfieldSource(root, "NpcDamageLineOfSightRuntimeService.cs");
+            string characterCombat = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
             string capturedNormal = ExtractMethodBlock(coordinator, "internal void ProcessCombatTick");
             string ordinaryNormal = ExtractMethodBlock(coordinator, "internal void ApplyCombatHit");
             string normalDamageCore = ExtractMethodBlock(coordinator, "private void ApplyNpcCombatHitCore");
@@ -577,17 +581,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 coordinator,
                 "private void ProcessCapturedParallelAttackTicks");
             string gate = ExtractMethodBlock(coordinator, "private bool CanApplyNpcDamage");
-            int normalDamage = normalDamageCore.IndexOf(
-                "int currentHealth = target.Stats[StatIds.health].Value;",
+            string characterStrike = ExtractMethodBlock(characterCombat, "public CombatStrikeResult Strike(");
+            string receiveStrike = ExtractMethodBlock(characterCombat, "internal void ReceiveStrike(");
+            int normalContext = normalDamageCore.IndexOf(
+                "this.BuildStrikeContext(attackerCharacter, attackSource)",
                 StringComparison.Ordinal);
-            int normalDamageCalculation = normalDamageCore.IndexOf(
-                "int damage = this.CalculateCombatDamage(attacker, attackSource);",
+            int normalStrike = normalDamageCore.IndexOf(
+                "attackerCharacter.Strike(target, strikeContext)",
                 StringComparison.Ordinal);
-            int normalHealthMutation = normalDamageCore.IndexOf(
-                "target.Stats[StatIds.health].Value = newHealth;",
+            int strikeDamageCalculation = characterStrike.IndexOf(
+                "CombatStrikeDamageCalculator.Calculate(",
                 StringComparison.Ordinal);
-            int parallelDamage = parallel.IndexOf(
-                "int currentHealth = target.Stats[StatIds.health].Value;",
+            int strikeHealthSnapshot = characterStrike.IndexOf(
+                "int previousHealth = target.Stats[StatIds.health].Value;",
+                StringComparison.Ordinal);
+            int strikeDelivery = characterStrike.IndexOf(
+                "targetCharacter.ReceiveStrike(",
+                StringComparison.Ordinal);
+            int healthMutation = receiveStrike.IndexOf(
+                "this.Stats[StatIds.health].Value = newHealth;",
+                StringComparison.Ordinal);
+            int parallelStrike = parallel.IndexOf(
+                "attackerCharacter.Strike(target, strikeContext)",
                 StringComparison.Ordinal);
             int fallbackAttackSource = capturedNormal.IndexOf(
                 "CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);",
@@ -610,11 +625,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                              "this.CanApplyNpcDamage(",
                                              ordinaryCoreCall,
                                              StringComparison.Ordinal);
-            int parallelDamageGate = parallelDamage < 0
+            int parallelDamageGate = parallelStrike < 0
                                          ? -1
                                          : parallel.LastIndexOf(
                                              "this.CanApplyNpcDamage(",
-                                             parallelDamage,
+                                             parallelStrike,
                                              StringComparison.Ordinal);
             int vergilStart = contracts.IndexOf("case 203748:", StringComparison.Ordinal);
             int abmouthStart = contracts.IndexOf("case 155962:", StringComparison.Ordinal);
@@ -645,9 +660,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && lineOfSight.Contains("Pf127ChaseNavigationProvider.AttackLineProbeHeight")
                 && lineOfSight.Contains("start.Y + probeHeight")
                 && lineOfSight.Contains("end.Y + probeHeight"));
-            Assert.IsTrue(normalDamage > 0);
-            Assert.IsTrue(normalDamageCalculation > normalDamage);
-            Assert.IsTrue(normalHealthMutation > normalDamageCalculation);
+            Assert.IsTrue(normalContext >= 0);
+            Assert.IsTrue(normalStrike > normalContext);
+            Assert.IsTrue(strikeDamageCalculation >= 0);
+            Assert.IsTrue(strikeHealthSnapshot > strikeDamageCalculation);
+            Assert.IsTrue(strikeDelivery > strikeHealthSnapshot);
+            Assert.IsTrue(healthMutation >= 0);
             Assert.IsTrue(fallbackAttackSource >= 0);
             Assert.AreEqual(
                 2,
@@ -659,7 +677,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(capturedDamageGate > fallbackAttackSource);
             Assert.IsTrue(ordinaryCoreCall >= 0);
             Assert.IsTrue(ordinaryDamageGate >= 0);
-            Assert.IsTrue(parallelDamage > 0);
+            Assert.IsTrue(parallelStrike > 0);
             Assert.IsTrue(parallelDamageGate >= 0);
             Assert.IsTrue(gate.Contains("NpcCombatAttackRules.OutOfRangeRetrySeconds"));
             Assert.IsFalse(gate.Contains("ClearInvalidNpcCombatTarget"));

@@ -19,8 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1562;
-        private const int ExpectedBindingRecordCount = 1548;
+        private const int ExpectedInitialActorCount = 1565;
+        private const int ExpectedBindingRecordCount = 1551;
         private const string Pf127OrdinaryProfileResolutionMode =
             "production-owned-exact-pf127-ordinary-profile-resolver";
         private const string Pf1931ProfileResolutionMode =
@@ -45,7 +45,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1564, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1567, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -1246,7 +1246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "temple-named-encounters", 12 },
                 { "temple-reanimated-corpse-adds", 2 },
                 { "nascence-core-hecklers", 40 },
-                { "nascence-life", 865 },
+                { "nascence-life", 868 },
                 { "arete-family", 96 },
                 { "arete-additional-captured-actors", 17 },
                 { "subway-merchants", 6 },

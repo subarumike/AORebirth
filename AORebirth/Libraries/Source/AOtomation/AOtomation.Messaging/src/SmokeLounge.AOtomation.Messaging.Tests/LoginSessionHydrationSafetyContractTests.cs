@@ -95,13 +95,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 createCharacter,
                 "pooledCharacter.WaitForLogoutTimerDisposalToComplete(2000)",
-                "this.Controller.Character = new Character(");
+                "this.Controller.Character = new PlayerCharacter(");
             StringAssert.Contains(createCharacter, "Reconnect refused because the pending logout timer still owns");
             StringAssert.Contains(createCharacter, "pending logout timer disposal already claimed ownership");
             StringAssert.Contains(createCharacter, "HasRequiredPlayerInventoryPages(playerCharacter)");
             StringAssert.Contains(createCharacter, "DiscardUntrustedPooledCharacter(pooledCharacter");
             StringAssert.Contains(createCharacter, "this.IsPlayfieldTransferLogin = false;");
-            StringAssert.Contains(createCharacter, "this.Controller.Character = new Character(");
+            StringAssert.Contains(createCharacter, "this.Controller.Character = new PlayerCharacter(");
             StringAssert.Contains(zoneClient, "private static bool HasRequiredPlayerInventoryPages(Character character)");
             StringAssert.Contains(zoneClient, "(int)IdentityType.Inventory");
             StringAssert.Contains(zoneClient, "(int)IdentityType.WeaponPage");

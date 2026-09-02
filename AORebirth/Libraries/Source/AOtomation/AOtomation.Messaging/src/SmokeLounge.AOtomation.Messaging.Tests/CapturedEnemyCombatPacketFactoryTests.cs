@@ -3022,6 +3022,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     coreDirectory,
                     "Playfields",
                     "NpcCombatTickCoordinator.cs"));
+            string characterCombat = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    "AORebirth",
+                    "Libraries",
+                    "Source",
+                    "AORebirth.Core",
+                    "Entities",
+                    "Character.Combat.cs"));
             string visibility = File.ReadAllText(
                 Path.Combine(
                     coreDirectory,
@@ -3097,16 +3106,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo("));
             Assert.IsTrue(
                 coordinator.Contains(
-                    "if (killingHit && attackSource.LethalAttackInfoUnknown.HasValue)"));
+                    "strikeContext.LethalAttackInfoUnknown = attackSource.LethalAttackInfoUnknown;"));
             Assert.IsTrue(
                 coordinator.Contains(
-                    "if (newHealth == 0 && attackSource.LethalAttackInfoUnknown.HasValue)"));
+                    "strikeContext.AttackInfoUnknown = attackSource.AttackInfoUnk1;"));
             Assert.IsTrue(
                 coordinator.Contains(
-                    "attackSource.AttackInfoUnk1 ="));
+                    "strikeContext.AttackInfoN3Unknown = attackSource.AttackInfoN3Unknown;"));
             Assert.IsTrue(
-                coordinator.Contains(
-                    "attackSource.LethalAttackInfoUnknown.Value;"));
+                characterCombat.Contains(
+                    "killingHit && context.LethalAttackInfoUnknown.HasValue")
+                && characterCombat.Contains("context.LethalAttackInfoUnknown.Value")
+                && characterCombat.Contains("context.PreserveAttackInfoWireValues")
+                && characterCombat.Contains("context.AttackInfoHitType"));
             Assert.IsTrue(coordinator.Contains("CreateCapturedCleaningRobotSpecialAttacks(),"));
             Assert.IsTrue(visibility.Contains("CapturedEnemyCombatPacketFactory.CreateWeaponDefinition("));
             Assert.IsTrue(visibility.Contains("item.MultipleCount"));

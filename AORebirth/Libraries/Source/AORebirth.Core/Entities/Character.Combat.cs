@@ -115,6 +115,11 @@ namespace AORebirth.Core.Entities
                        AttackInfoWeaponSlot = source.AttackInfoWeaponSlot,
                        AttackInfoHitType = source.AttackInfoHitType,
                        AttackInfoWeaponInstance = source.AttackInfoWeaponInstance,
+                       AttackInfoUnknown = source.AttackInfoUnknown,
+                       AttackInfoN3Unknown = source.AttackInfoN3Unknown,
+                       LethalAttackInfoUnknown = source.LethalAttackInfoUnknown,
+                       PreserveAttackInfoWireValues = source.PreserveAttackInfoWireValues,
+                       FixedDamage = source.FixedDamage,
                        DamageSource = source.DamageSource,
                        WeaponSlot = source.WeaponSlot,
                        WeaponLowId = source.WeaponLowId,
@@ -141,7 +146,10 @@ namespace AORebirth.Core.Entities
                     new CombatStrikeResult { Outcome = StrikeOutcome.RejectedInvalidTarget });
             }
 
-            if (!context.UsesEquippedWeapon || context.WeaponLowId <= 0)
+            bool hasFixedDamage = context.FixedDamage.HasValue && context.FixedDamage.Value > 0;
+            bool hasEquippedWeapon = context.UsesEquippedWeapon && context.WeaponLowId > 0;
+            bool hasUnarmedDamage = !context.UsesEquippedWeapon && context.MinDamage > 0;
+            if (!hasFixedDamage && !hasEquippedWeapon && !hasUnarmedDamage)
             {
                 return this.LogAndReturnStrike(
                     target,
@@ -377,13 +385,19 @@ namespace AORebirth.Core.Entities
                 new AttackInfoMessage
                 {
                     Identity = this.Identity,
-                    Unknown = 0,
+                    Unknown = context.AttackInfoN3Unknown,
                     Target = target.Identity,
                     Unknown1 = damageResult.Damage,
                     Unknown2 = context.AttackInfoAmmoCount,
                     Unknown3 = context.AttackInfoWeaponSlot,
-                    Unknown4 = killingHit ? 4 : 0,
-                    Unknown5 = (int)damageResult.HitType,
+                    Unknown4 = killingHit && context.LethalAttackInfoUnknown.HasValue
+                                   ? context.LethalAttackInfoUnknown.Value
+                                   : (context.PreserveAttackInfoWireValues
+                                          ? context.AttackInfoUnknown
+                                          : (killingHit ? 4 : context.AttackInfoUnknown)),
+                    Unknown5 = context.PreserveAttackInfoWireValues
+                                   ? context.AttackInfoHitType
+                                   : (int)damageResult.HitType,
                     Unknown6 = context.AttackInfoWeaponInstance
                 });
         }
