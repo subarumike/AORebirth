@@ -1,0 +1,12 @@
+mission_ql,verified_requests,offers,observed_item_references,unique_item_pairs,unique_exact_item_descriptors,minimum_observed_item_ql,maximum_observed_item_ql,mission_types_observed,destination_playfields_observed
+17,250,1250,1250,838,838,1,30,3,2
+18,250,1250,1250,850,850,1,30,3,4
+20,250,1250,1250,850,850,1,30,3,4
+21,250,1250,1250,850,850,1,31,3,4
+22,250,1250,1250,868,868,1,31,3,4
+25,250,1250,1250,842,842,1,35,3,4
+27,250,1250,1250,825,825,1,37,3,9
+30,250,1250,1250,858,858,1,40,3,9
+32,250,1250,1250,843,843,1,42,3,7
+37,250,1250,1250,840,840,1,47,3,7
+44,250,1250,1250,870,870,1,54,3,7
