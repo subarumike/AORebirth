@@ -1,0 +1,312 @@
+{
+  "baseline": "LEVEL_37_MISSION_QL_SPECTRUM_V4",
+  "by_mission_ql": [
+    {
+      "destination_playfields_observed": 5,
+      "maximum_observed_item_ql": 35,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 25,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 856,
+      "unique_item_pairs": 856,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 9,
+      "maximum_observed_item_ql": 37,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 27,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 869,
+      "unique_item_pairs": 869,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 9,
+      "maximum_observed_item_ql": 38,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 29,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 845,
+      "unique_item_pairs": 845,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 9,
+      "maximum_observed_item_ql": 41,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 31,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 861,
+      "unique_item_pairs": 861,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 7,
+      "maximum_observed_item_ql": 43,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 33,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 851,
+      "unique_item_pairs": 851,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 7,
+      "maximum_observed_item_ql": 47,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 37,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 860,
+      "unique_item_pairs": 860,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 7,
+      "maximum_observed_item_ql": 50,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 40,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 874,
+      "unique_item_pairs": 874,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 7,
+      "maximum_observed_item_ql": 54,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 44,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 836,
+      "unique_item_pairs": 836,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 6,
+      "maximum_observed_item_ql": 58,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 48,
+      "mission_types_observed": 3,
+      "observed_item_references": 1250,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 827,
+      "unique_item_pairs": 827,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 8,
+      "maximum_observed_item_ql": 64,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 55,
+      "mission_types_observed": 3,
+      "observed_item_references": 1236,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 835,
+      "unique_item_pairs": 835,
+      "verified_requests": 250
+    },
+    {
+      "destination_playfields_observed": 8,
+      "maximum_observed_item_ql": 76,
+      "minimum_observed_item_ql": 1,
+      "mission_ql": 66,
+      "mission_types_observed": 3,
+      "observed_item_references": 1227,
+      "offers": 1250,
+      "unique_exact_item_descriptors": 854,
+      "unique_item_pairs": 854,
+      "verified_requests": 250
+    }
+  ],
+  "character_identity_instance": 32279304,
+  "character_level": 37,
+  "difficulty_position_to_actual_mission_ql": [
+    {
+      "actual_mission_ql": 25,
+      "difficulty_position": 1
+    },
+    {
+      "actual_mission_ql": 27,
+      "difficulty_position": 2
+    },
+    {
+      "actual_mission_ql": 29,
+      "difficulty_position": 3
+    },
+    {
+      "actual_mission_ql": 31,
+      "difficulty_position": 4
+    },
+    {
+      "actual_mission_ql": 33,
+      "difficulty_position": 5
+    },
+    {
+      "actual_mission_ql": 37,
+      "difficulty_position": 6
+    },
+    {
+      "actual_mission_ql": 40,
+      "difficulty_position": 7
+    },
+    {
+      "actual_mission_ql": 44,
+      "difficulty_position": 8
+    },
+    {
+      "actual_mission_ql": 48,
+      "difficulty_position": 9
+    },
+    {
+      "actual_mission_ql": 55,
+      "difficulty_position": 10
+    },
+    {
+      "actual_mission_ql": 66,
+      "difficulty_position": 11
+    }
+  ],
+  "field_coverage": {
+    "credits": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "description": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "mission_destination": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "mission_icon": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "mission_items": {
+      "offers": 13750,
+      "present": 13713
+    },
+    "mission_type": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "title": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "unknown_fields": {
+      "offers": 13750,
+      "present": 13750
+    },
+    "xp_reward": {
+      "offers": 13750,
+      "present": 13750
+    }
+  },
+  "input_files": [
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\campaigns\\MISSION_QL_SPECTRUM_V4\\level-037-character-32279304\\progress.jsonl",
+      "sha256": "0084863d5e16090d9ae15932df10c3c874c27aedef814bc44e2d93b172d0a36c"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T062510521Z-32279304-553129ed\\events.jsonl",
+      "sha256": "4778aecc6186c93b80a7f6334a9d1ee4f9b810c15b341a2619dd7fc9023edec6"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T073833108Z-32279304-d278ad9c\\events.jsonl",
+      "sha256": "3a29cc74f70ce9123b830a9886c07117e8945a0bfa7de17062368096d6dc2b7d"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\analysis\\level37-v4\\mission-20260903T062510521Z-32279304-553129ed\\mission_offer.jsonl",
+      "sha256": "8e05b996a62e48df4a604c0169b8decbc69095279fa2eb2a8a90308a290ba352"
+    },
+    {
+      "path": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\analysis\\level37-v4\\mission-20260903T073833108Z-32279304-d278ad9c\\mission_offer.jsonl",
+      "sha256": "2d3e061825dfe0712858e614c6d88580cfdc912a63b29facf26287e6eac598de"
+    }
+  ],
+  "not_proven_by_this_baseline": [
+    "complete item-pool membership or exclusions",
+    "server probability weights",
+    "item-family interpolation or every valid item QL",
+    "separately typed objective-item identity because AOSharp does not expose one here",
+    "mission interior layout, enemies, or semantic-slider effects"
+  ],
+  "schema_version": 1,
+  "secondary_slider_values": {
+    "credits_xp": 156,
+    "good_bad": 100,
+    "headon_stealth": 255,
+    "open_hidden": 100,
+    "order_chaos": 156,
+    "physical_mystical": 156
+  },
+  "sessions": [
+    {
+      "harvester_version": "1.6.3.0",
+      "session_id": "mission-20260903T062510521Z-32279304-553129ed",
+      "started_at_utc": "2026-09-03T06:25:10.5269968Z",
+      "stop_reason": "user_stop",
+      "stopped_at_utc": "2026-09-03T07:27:04.1860152Z",
+      "verified_completions_used": 1838
+    },
+    {
+      "harvester_version": "1.6.3.0",
+      "session_id": "mission-20260903T073833108Z-32279304-d278ad9c",
+      "started_at_utc": "2026-09-03T07:38:33.1108784Z",
+      "stop_reason": "character_campaign_completed",
+      "stopped_at_utc": "2026-09-03T08:09:13.8866133Z",
+      "verified_completions_used": 912
+    }
+  ],
+  "slider_presets": [
+    "FIND_ITEM_PERSON_SUPPLEMENT"
+  ],
+  "totals": {
+    "five_offer_cohorts": 2750,
+    "observed_item_references": 13713,
+    "offers": 13750,
+    "unique_descriptions": 11195,
+    "unique_exact_item_descriptors": 8195,
+    "unique_inbound_packet_hashes": 2750,
+    "unique_item_pairs": 4148,
+    "unique_mission_identities": 13750,
+    "unique_outbound_packet_hashes": 11,
+    "unique_titles": 512,
+    "verified_completed_requests": 2750
+  },
+  "useful_for": [
+    "candidate mission-item observations by roller level and actual mission QL",
+    "observed item QL values without requiring every database-supported interpolation",
+    "mission-type, credits, XP, text, and destination distributions",
+    "comparison with overlapping mission QLs captured by other roller levels",
+    "replay and parser validation through exact request/response packet provenance"
+  ],
+  "validation": {
+    "all_cohorts_have_five_offers": true,
+    "all_completion_markers_verified": true,
+    "all_raw_hash_links_match": true,
+    "all_requests_have_exact_inbound_raw_evidence": true,
+    "all_requests_have_exact_outbound_raw_evidence": true,
+    "all_requests_use_one_consistent_secondary_slider_state": true,
+    "all_response_ql_candidates_match_completion_records": true,
+    "completion_markers_unique": true
+  }
+}
