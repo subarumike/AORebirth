@@ -26,7 +26,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         {
             this.N3MessageType = N3MessageType.PlayfieldAnarchyF;
             this.Unknown = 0x00;
-            this.Unknown1 = 0x00000004;
+            this.Version = 0x00000004;
             this.Unknown2 = 0x61;
         }
 
@@ -35,7 +35,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         #region AoMember Properties
 
         [AoMember(0)]
-        public int Unknown1 { get; set; }
+        public int Version { get; set; }
 
         [AoMember(1)]
         public Vector3 CharacterCoordinates { get; set; }

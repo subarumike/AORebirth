@@ -48,13 +48,23 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         [AoMember(8)]
         public short PsychicBase { get; set; }
 
-        [AoMember(9, SerializeSize = ArraySizeType.Int16)]
+        /// <summary>
+        /// Written before first/last name when <c>HasOrgName</c> is set (AOSharp SCFU deserialize).
+        /// </summary>
+        public int OrgId { get; set; }
+
+        /// <summary>
+        /// Padding byte immediately after <see cref="OrgId"/> on the wire.
+        /// </summary>
+        public byte OrgIdPadding { get; set; }
+
+        [AoMember(9, SerializeSize = ArraySizeType.Byte)]
         public string FirstName { get; set; }
 
-        [AoMember(10, SerializeSize = ArraySizeType.Int16)]
+        [AoMember(10, SerializeSize = ArraySizeType.Byte)]
         public string LastName { get; set; }
 
-        [AoMember(11, SerializeSize = ArraySizeType.Int16)]
+        [AoMember(11, SerializeSize = ArraySizeType.Byte)]
         public string OrgName { get; set; }
 
         #endregion

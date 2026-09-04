@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>ZoneEngine_New</AssemblyName>
+    <RootNamespace>ZoneEngine_New</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_WIN_NET10</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>..\..\Built\Debug\ZoneEngine_New\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;AOREBIRTH_WIN_NET10</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>..\..\Built\Release\ZoneEngine_New\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="NLog" Version="6.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Communication.ZoneNew.WinNet10.csproj" />
+  </ItemGroup>
+
+  <!-- Sources under this directory are globbed by the SDK. Only the shared assembly info,
+       which lives outside the project cone, needs an explicit entry. -->
+  <ItemGroup>
+    <Compile Include="..\..\SolutionAssemblyInfo.cs">
+      <Link>Properties\SolutionAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\Config\Config.xml">
+      <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\..\Datafiles\items.dat">
+      <Link>items.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- Full GameData tree (MobTemplates + Playfields metadata/spawns) for locality and hash spawns. -->
+    <Content Include="..\..\GameData\**\*">
+      <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\EventType.cs">
+      <Link>Enums\EventType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ActionType.cs">
+      <Link>Enums\ActionType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\Operator.cs">
+      <Link>Enums\Operator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemTarget.cs">
+      <Link>Enums\ItemTarget.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

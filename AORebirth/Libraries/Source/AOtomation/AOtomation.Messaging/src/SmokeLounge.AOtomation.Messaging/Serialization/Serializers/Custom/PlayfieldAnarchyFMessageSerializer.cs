@@ -25,7 +25,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                                   N3MessageType = (N3MessageType)streamReader.ReadInt32(),
                                   Identity = streamReader.ReadIdentity(),
                                   Unknown = streamReader.ReadByte(),
-                                  Unknown1 = streamReader.ReadInt32(),
+                                  Version = streamReader.ReadInt32(),
                                   CharacterCoordinates =
                                       new Vector3
                                           {
@@ -100,7 +100,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             streamWriter.WriteInt32((int)message.N3MessageType);
             streamWriter.WriteIdentity(message.Identity);
             streamWriter.WriteByte(message.Unknown);
-            streamWriter.WriteInt32(message.Unknown1);
+            streamWriter.WriteInt32(message.Version);
             streamWriter.WriteSingle(message.CharacterCoordinates.X);
             streamWriter.WriteSingle(message.CharacterCoordinates.Y);
             streamWriter.WriteSingle(message.CharacterCoordinates.Z);

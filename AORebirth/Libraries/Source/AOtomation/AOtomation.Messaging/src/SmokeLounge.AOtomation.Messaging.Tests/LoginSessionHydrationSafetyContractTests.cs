@@ -34,7 +34,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string page = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Inventory\BaseInventoryPage.cs");
             string pages = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Inventory\BaseInventoryPages.cs");
-            string character = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs");
+            string character = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Entities\Character.cs");
             string pageWrite = page.Substring(page.IndexOf("public virtual bool Write()", StringComparison.Ordinal));
             string pagesWrite = pages.Substring(pages.IndexOf("public bool Write()", StringComparison.Ordinal));
 
@@ -82,7 +82,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string zoneClient = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs");
             string createCharacter = zoneClient.Substring(
                 zoneClient.IndexOf("public void CreateCharacter(int charId)", StringComparison.Ordinal));
-            string character = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs");
+            string character = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Entities\Character.cs");
 
             AssertTextBefore(
                 createCharacter,

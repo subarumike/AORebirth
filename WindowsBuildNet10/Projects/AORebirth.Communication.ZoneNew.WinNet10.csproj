@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>AORebirth.Communication</AssemblyName>
+    <RootNamespace>AORebirth.Communication</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_WIN_NET10</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
+    <ProjectReference Include="MemBus.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
+    <ProjectReference Include="Cell.Core.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="Utility.ZoneNew.WinNet10.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(AORebirthRepositoryRoot)/LinuxBuild/source-inventory/AORebirth.Communication.CompileItems.props" />
+</Project>

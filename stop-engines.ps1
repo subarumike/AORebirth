@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("ChatEngine", "LoginEngine", "ZoneEngine", "WebEngine")]
+    [ValidateSet("ChatEngine", "LoginEngine", "ZoneEngine", "ZoneEngine_New", "WebEngine")]
     [string[]]$EngineName
 )
 
@@ -15,6 +15,7 @@ $failed = $false
 
 $engineDefinitions = @(
     @{ Name = "ZoneEngine"; File = "ZoneEngine.exe" },
+    @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" },
     @{ Name = "WebEngine"; File = "WebEngine.exe" },
     @{ Name = "LoginEngine"; File = "LoginEngine.exe" },
     @{ Name = "ChatEngine"; File = "ChatEngine.exe" }
@@ -163,11 +164,24 @@ foreach ($engine in $engines) {
         Remove-Item -LiteralPath $shutdownFile -Force
     }
 
-    & $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name
-    $releaseExit = $LASTEXITCODE
-    if ($releaseExit -ne 0) {
-        Write-Warning "$($engine.Name) is not fully stopped with its ports released; no unmanaged process was killed."
-        $failed = $true
+    if ($engine.Name -eq "ZoneEngine_New") {
+        # net10 skeleton host is not registered in engine_status_probe (shared zone port / path).
+        $stillRunning = Get-Process -Name "ZoneEngine_New" -ErrorAction SilentlyContinue
+        if ($stillRunning) {
+            Write-Warning "ZoneEngine_New is still running after stop (pid=$($stillRunning.Id -join ','))."
+            $failed = $true
+        }
+        else {
+            Write-Host "ZoneEngine_New process is not running."
+        }
+    }
+    else {
+        & $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name
+        $releaseExit = $LASTEXITCODE
+        if ($releaseExit -ne 0) {
+            Write-Warning "$($engine.Name) is not fully stopped with its ports released; no unmanaged process was killed."
+            $failed = $true
+        }
     }
 }
 

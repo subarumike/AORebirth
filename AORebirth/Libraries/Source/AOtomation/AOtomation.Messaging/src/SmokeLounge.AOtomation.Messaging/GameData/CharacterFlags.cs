@@ -22,6 +22,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         // 0000 0000 0000 0000 0000 0000 0000 0000
         None = 0x00000000, 
 
+        /// <summary>
+        /// Bit 17. When set, SCFU carries one tower-specific byte after CharacterInfo
+        /// (AOSharp SimpleCharFullUpdateSerializer).
+        /// </summary>
+        Tower = 0x00020000,
+
         // 0000 0000 0100 0000 0000 0000 0000 0000
         HasVisibleName = 0x00400000,
 

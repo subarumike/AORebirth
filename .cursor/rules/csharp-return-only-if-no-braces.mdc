@@ -1,0 +1,35 @@
+---
+description: Omit braces on return-only if statements in C#
+globs: "**/*.cs"
+alwaysApply: false
+---
+
+# Return-Only If Statements
+
+Do not use curly braces when an `if` body is only a `return` (or only `continue` / `break` / `throw` of a single statement).
+
+```csharp
+// BAD
+if (session.State != SessionState.InPlay)
+{
+    return;
+}
+
+// GOOD
+if (session.State != SessionState.InPlay)
+    return;
+```
+
+```csharp
+// BAD
+if (player?.Cell == null)
+{
+    return;
+}
+
+// GOOD
+if (player?.Cell == null)
+    return;
+```
+
+Keep braces when the body has more than one statement, or when the single statement is not a bare control-flow exit.

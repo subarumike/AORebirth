@@ -127,10 +127,27 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(25)]
         public int Flags2 { get; set; }
 
+        /// <summary>
+        /// Pet/owner identity instance written when Flags2 has HasOwner (0x4).
+        /// </summary>
+        public int? OwnerInstance { get; set; }
+
         [AoMember(26)]
         public byte Unknown2 { get; set; }
 
         public byte Unknown4 { get; set; }
+
+        /// <summary>
+        /// Written when CharacterFlags.Tower is set (AOSharp ScfuTowerUnk).
+        /// </summary>
+        public byte ScfuTowerUnk { get; set; }
+
+        /// <summary>
+        /// Single padding bytes written when IsImmune / UnknownFlag3 are set.
+        /// </summary>
+        public byte IsImmunePadding { get; set; }
+
+        public byte UnknownFlag3Padding { get; set; }
 
         #endregion
     }

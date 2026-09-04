@@ -44,8 +44,6 @@ namespace AORebirth.Communication.ISComV2Server
     using MemBus;
     using MemBus.Configurators;
 
-    using MsgPack.Serialization;
-
     #endregion
 
     /// <summary>
@@ -184,8 +182,7 @@ namespace AORebirth.Communication.ISComV2Server
 
             try
             {
-                MessagePackSerializer<DynamicMessage> serializer = MessagePackSerializer.Create<DynamicMessage>();
-                DynamicMessage result = serializer.UnpackSingleObject(e.dataBytes);
+                DynamicMessage result = DynamicMessageCodec.Unpack(e.dataBytes);
                 this.DataReceived(sender, result);
             }
             catch (Exception ex)

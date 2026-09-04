@@ -260,17 +260,22 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             object value,
             PropertyMetaData propertyMetaData = null)
         {
+            // Wire order is the reverse of AOSharp SimpleCharFullUpdateSerializer.Deserialize.
             var scfu = (SimpleCharFullUpdateMessage)value;
+            var activeNanos = scfu.ActiveNanos ?? new ActiveNano[0];
+            var textures = scfu.Textures ?? new Texture[0];
+            var meshes = scfu.Meshes ?? new Mesh[0];
+            var unknown1 = scfu.Unknown1 ?? new byte[0];
+            var waypoints = scfu.Waypoints ?? new Vector3[0];
+            string name = scfu.Name ?? string.Empty;
 
-            // N3Message
             streamWriter.WriteInt32((int)scfu.N3MessageType);
             streamWriter.WriteInt32((int)scfu.Identity.Type);
             streamWriter.WriteInt32(scfu.Identity.Instance);
             streamWriter.WriteByte(scfu.Unknown);
 
-            // SCFU
             streamWriter.WriteByte(scfu.Version);
-            streamWriter.WriteInt32((int)scfu.Flags); // Will update the flags later
+            streamWriter.WriteInt32((int)scfu.Flags); // patched with final flags below
 
             var flags = SimpleCharFullUpdateFlags.None;
 
@@ -280,15 +285,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteInt32(scfu.PlayfieldId.Value);
             }
 
-            /*
-            if (scfu.FightingTarget != null)
-            {
-                flags |= SimpleCharFullUpdateFlags.HasFightingTarget;
-                streamWriter.WriteInt32((int)scfu.Identity.Type);
-                streamWriter.WriteInt32(scfu.Identity.Instance);
-            }
-            */
-
+            // Position is unconditional; FightingTarget is NOT early (AOSharp uses IsUnderAttack later).
             streamWriter.WriteSingle(scfu.Coordinates.X);
             streamWriter.WriteSingle(scfu.Coordinates.Y);
             streamWriter.WriteSingle(scfu.Coordinates.Z);
@@ -303,63 +300,62 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
 
             streamWriter.WriteUInt32(scfu.Appearance.Value);
-
-            streamWriter.WriteByte((byte)(scfu.Name.Length + 1));
-            streamWriter.WriteString(scfu.Name, scfu.Name.Length + 1);
+            WriteLengthPrefixedByteString(streamWriter, name);
 
             streamWriter.WriteInt32((int)scfu.CharacterFlags);
             streamWriter.WriteInt16(scfu.AccountFlags);
             streamWriter.WriteInt16(scfu.Expansions);
 
             var snpc = scfu.CharacterInfo as SimpleNpcInfo;
+            var spc = scfu.CharacterInfo as SimplePcInfo;
             if (snpc != null)
             {
                 flags |= SimpleCharFullUpdateFlags.IsNpc;
-                if (snpc.Family > byte.MaxValue)
-                {
-                    streamWriter.WriteInt16(snpc.Family);
-                }
-                else
+
+                // HasSmallNpcFamily set => byte; unset => Int16 (AOSharp deserialize).
+                if (snpc.Family >= 0 && snpc.Family <= byte.MaxValue)
                 {
                     flags |= SimpleCharFullUpdateFlags.HasSmallNpcFamily;
                     streamWriter.WriteByte((byte)snpc.Family);
                 }
-
-                if (snpc.LosHeight > byte.MaxValue)
-                {
-                    streamWriter.WriteInt16(snpc.LosHeight);
-                }
                 else
+                {
+                    streamWriter.WriteInt16(snpc.Family);
+                }
+
+                if (snpc.LosHeight >= 0 && snpc.LosHeight <= byte.MaxValue)
                 {
                     flags |= SimpleCharFullUpdateFlags.HasSmallNpcLosHeight;
                     streamWriter.WriteByte((byte)snpc.LosHeight);
                 }
-
-                // Unknown Data:
-                // SimpleCharFullUPdateFlags.UnknownDataFlag
-                // unset if short, set if byte
-                flags |= SimpleCharFullUpdateFlags.UnknownDataFlag;
-                streamWriter.WriteByte((byte)snpc.UnknownData);
-
-                streamWriter.WriteInt16(snpc.UnknownData2);
-                if (snpc.UnknownData2 > 0)
+                else
                 {
-                    streamWriter.WriteByte(snpc.UnknownData3);
+                    streamWriter.WriteInt16(snpc.LosHeight);
                 }
 
+                // AOSharp: when UnknownDataFlag, read Byte + Int16 (no trailing UnknownData3).
+                bool emitUnknownData =
+                    snpc.UnknownData != 0
+                    || snpc.UnknownData2 != 0
+                    || (scfu.AdditionalFlags & SimpleCharFullUpdateFlags.UnknownDataFlag) != 0;
+                if (emitUnknownData
+                    && (scfu.SuppressedFlags & SimpleCharFullUpdateFlags.UnknownDataFlag) == 0)
+                {
+                    flags |= SimpleCharFullUpdateFlags.UnknownDataFlag;
+                    streamWriter.WriteByte((byte)snpc.UnknownData);
+                    streamWriter.WriteInt16(snpc.UnknownData2);
+                }
+
+                // Live NPC SCFUs commonly carry these; preserve them on round-trip when
+                // AdditionalFlags/SuppressedFlags are unset (deserialize does not populate them).
                 flags |= SimpleCharFullUpdateFlags.UnknownFlag;
                 flags |= SimpleCharFullUpdateFlags.UnknownFlag2;
-                // flags |= SimpleCharFullUpdateFlags.UnknownDataFlag;
-                // flags |= SimpleCharFullUpdateFlags.IsNpc2;
             }
-
-            var spc = scfu.CharacterInfo as SimplePcInfo;
-            if (spc != null)
+            else if (spc != null)
             {
                 streamWriter.WriteUInt32(spc.CurrentNano);
                 streamWriter.WriteInt32(spc.Team);
                 streamWriter.WriteInt16(spc.Swim);
-
                 streamWriter.WriteInt16(spc.StrengthBase);
                 streamWriter.WriteInt16(spc.AgilityBase);
                 streamWriter.WriteInt16(spc.StaminaBase);
@@ -367,20 +363,29 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteInt16(spc.SenseBase);
                 streamWriter.WriteInt16(spc.PsychicBase);
 
-                if (scfu.CharacterFlags.HasFlag(CharacterFlags.HasVisibleName))
-                {
-                    streamWriter.WriteInt16((short)spc.FirstName.Length);
-                    streamWriter.WriteString(spc.FirstName);
-                    streamWriter.WriteInt16((short)spc.LastName.Length);
-                    streamWriter.WriteString(spc.LastName);
-                }
-
-                if (string.IsNullOrWhiteSpace(spc.OrgName) == false)
+                bool hasOrgName = string.IsNullOrWhiteSpace(spc.OrgName) == false || spc.OrgId != 0;
+                if (hasOrgName)
                 {
                     flags |= SimpleCharFullUpdateFlags.HasOrgName;
-                    streamWriter.WriteInt16((short)spc.OrgName.Length);
-                    streamWriter.WriteString(spc.OrgName);
+                    streamWriter.WriteInt32(spc.OrgId);
+                    streamWriter.WriteByte(spc.OrgIdPadding);
                 }
+
+                if (scfu.CharacterFlags.HasFlag(CharacterFlags.HasVisibleName))
+                {
+                    WriteLengthPrefixedByteString(streamWriter, spc.FirstName ?? string.Empty);
+                    WriteLengthPrefixedByteString(streamWriter, spc.LastName ?? string.Empty);
+                }
+
+                if (hasOrgName)
+                {
+                    WriteLengthPrefixedByteString(streamWriter, spc.OrgName ?? string.Empty);
+                }
+            }
+
+            if (scfu.CharacterFlags.HasFlag(CharacterFlags.Tower))
+            {
+                streamWriter.WriteByte(scfu.ScfuTowerUnk);
             }
 
             if (scfu.Level > byte.MaxValue)
@@ -403,22 +408,18 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteInt32(scfu.Health);
             }
 
-
             if (scfu.HealthDamage >= 0 && scfu.HealthDamage <= byte.MaxValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasSmallHealthDamage;
                 streamWriter.WriteByte((byte)scfu.HealthDamage);
             }
+            else if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
+            {
+                streamWriter.WriteUInt16((ushort)scfu.HealthDamage);
+            }
             else
             {
-                if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
-                {
-                    streamWriter.WriteUInt16((ushort)scfu.HealthDamage);
-                }
-                else
-                {
-                    streamWriter.WriteInt32(scfu.HealthDamage);
-                }
+                streamWriter.WriteInt32(scfu.HealthDamage);
             }
 
             streamWriter.WriteUInt32(scfu.MonsterData);
@@ -426,13 +427,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             streamWriter.WriteInt16(scfu.VisualFlags);
             streamWriter.WriteByte(scfu.VisibleTitle);
 
-            streamWriter.WriteInt32(scfu.Unknown1.Length);
-            streamWriter.WriteBytes(scfu.Unknown1);
+            streamWriter.WriteInt32(unknown1.Length);
+            streamWriter.WriteBytes(unknown1);
 
             if (scfu.HeadMesh.HasValue)
             {
                 flags |= SimpleCharFullUpdateFlags.HasHeadMesh;
-                streamWriter.WriteUInt32(scfu.HeadMesh.Value);
+                streamWriter.WriteInt32((int)scfu.HeadMesh.Value);
             }
 
             if (scfu.RunSpeedBase > byte.MaxValue)
@@ -445,15 +446,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteByte((byte)scfu.RunSpeedBase);
             }
 
-            
             if (scfu.FightingTarget != null)
             {
                 flags |= SimpleCharFullUpdateFlags.IsUnderAttack;
-                Identity fightingTarget = (Identity)scfu.FightingTarget;
+                Identity fightingTarget = scfu.FightingTarget.Value;
                 streamWriter.WriteInt32((int)fightingTarget.Type);
                 streamWriter.WriteInt32(fightingTarget.Instance);
             }
-            
 
             if (scfu.ExtendedTextureOverrideData != null && scfu.ExtendedTextureOverrideData.Length > 0)
             {
@@ -461,24 +460,20 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteBytes(scfu.ExtendedTextureOverrideData);
             }
 
-            /*
-            if (scfu.PetId != 0)
+            // Preview Additional/Suppressed so IsImmune / UnknownFlag3 padding matches final flags.
+            var previewFlags = (flags | scfu.AdditionalFlags) & ~scfu.SuppressedFlags;
+            if (previewFlags.HasFlag(SimpleCharFullUpdateFlags.IsImmune))
             {
-                flags |= SimpleCharFullUpdateFlags.IsPet;
-                streamWriter.WriteByte(scfu.PetId);
+                streamWriter.WriteByte(scfu.IsImmunePadding);
             }
-            */
 
-            /*
-            if (scfu.Unknownyet) 
+            if (previewFlags.HasFlag(SimpleCharFullUpdateFlags.UnknownFlag3))
             {
-                flags |= SimpleCharFullUpdateFlags.UnknownFlag3;
-                streamWriter.WriteByte(scfu.Unknownyet);
+                streamWriter.WriteByte(scfu.UnknownFlag3Padding);
             }
-            */
 
-            streamWriter.WriteInt32((scfu.ActiveNanos.Length + 1) * 0x3F1);
-            foreach (var activeNano in scfu.ActiveNanos)
+            streamWriter.WriteInt32((activeNanos.Length + 1) * 0x3F1);
+            foreach (var activeNano in activeNanos)
             {
                 streamWriter.WriteInt32((int)activeNano.NanoIdentity.Type);
                 streamWriter.WriteInt32(activeNano.NanoIdentity.Instance);
@@ -487,13 +482,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteInt32(activeNano.Time2);
             }
 
-            if (scfu.Waypoints != null && scfu.Waypoints.Length > 0)
+            if (waypoints.Length > 0)
             {
                 flags |= SimpleCharFullUpdateFlags.HasWaypoints;
                 streamWriter.WriteInt32((int)scfu.Identity.Type);
                 streamWriter.WriteInt32(scfu.Identity.Instance);
-                streamWriter.WriteInt32(scfu.Waypoints.Length);
-                foreach (var waypoint in scfu.Waypoints)
+                streamWriter.WriteInt32(waypoints.Length);
+                foreach (var waypoint in waypoints)
                 {
                     streamWriter.WriteSingle(waypoint.X);
                     streamWriter.WriteSingle(waypoint.Y);
@@ -501,17 +496,16 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 }
             }
 
-            streamWriter.WriteInt32((scfu.Textures.Length + 1) * 0x3F1);
-            foreach (var texture in scfu.Textures)
+            streamWriter.WriteInt32((textures.Length + 1) * 0x3F1);
+            foreach (var texture in textures)
             {
                 streamWriter.WriteInt32(texture.Place);
                 streamWriter.WriteInt32(texture.Id);
                 streamWriter.WriteInt32(texture.Unknown);
             }
 
-
-            streamWriter.WriteInt32((scfu.Meshes.Length + 1) * 0x3F1);
-            foreach (var mesh in scfu.Meshes)
+            streamWriter.WriteInt32((meshes.Length + 1) * 0x3F1);
+            foreach (var mesh in meshes)
             {
                 streamWriter.WriteByte(mesh.Position);
                 streamWriter.WriteUInt32(mesh.Id);
@@ -519,25 +513,23 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteByte(mesh.Layer);
             }
 
-            /*
-            if (scfu.UnknownYet2!=0)
-            {
-                flags |= SimpleCharFullUpdateFlags.UnknownFlag4;
-                streamWriter.WriteByte(scfu.UnknownYet2);
-            }
-            */
-
-            // And another one with a list of Identities, maybe team members?
-            // Flag 0x40000000
-            // Never seen that one before
-
-
-
-
-
-
             streamWriter.WriteInt32(scfu.Flags2);
+
+            // ScfuFlags2.HasOwner = 0x4
+            if ((scfu.Flags2 & 0x4) != 0)
+            {
+                streamWriter.WriteInt32(scfu.OwnerInstance ?? 0);
+            }
+
             streamWriter.WriteByte(scfu.Unknown2);
+
+            // ScfuFlags2.Unknown3 = 0x40 — special-attack list (empty count when none supplied).
+            if ((scfu.Flags2 & 0x40) != 0)
+            {
+                streamWriter.WriteByte(0);
+            }
+
+            // ScfuFlags2.Unknown1 = 0x2 — AOSharp has this commented; captures (Infector) require it.
             if ((scfu.Flags2 & 0x2) != 0)
             {
                 streamWriter.WriteByte(scfu.Unknown4);
@@ -592,7 +584,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 flags &= ~SimpleCharFullUpdateFlags.IsUnderAttack;
             }
 
-            if (scfu.Waypoints != null && scfu.Waypoints.Length > 0)
+            if (waypoints.Length > 0)
             {
                 flags |= SimpleCharFullUpdateFlags.HasWaypoints;
             }
@@ -601,10 +593,44 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 flags &= ~SimpleCharFullUpdateFlags.HasWaypoints;
             }
 
+            if (snpc != null)
+            {
+                flags |= SimpleCharFullUpdateFlags.IsNpc;
+                if (snpc.Family >= 0 && snpc.Family <= byte.MaxValue)
+                {
+                    flags |= SimpleCharFullUpdateFlags.HasSmallNpcFamily;
+                }
+                else
+                {
+                    flags &= ~SimpleCharFullUpdateFlags.HasSmallNpcFamily;
+                }
+
+                if (snpc.LosHeight >= 0 && snpc.LosHeight <= byte.MaxValue)
+                {
+                    flags |= SimpleCharFullUpdateFlags.HasSmallNpcLosHeight;
+                }
+                else
+                {
+                    flags &= ~SimpleCharFullUpdateFlags.HasSmallNpcLosHeight;
+                }
+            }
+
             var pos = streamWriter.Position;
             streamWriter.Position = 30;
             streamWriter.WriteInt32((int)flags);
             streamWriter.Position = pos;
+        }
+
+        private static void WriteLengthPrefixedByteString(StreamWriter streamWriter, string value)
+        {
+            int length = value.Length + 1;
+            if (length > byte.MaxValue)
+            {
+                length = byte.MaxValue;
+            }
+
+            streamWriter.WriteByte((byte)length);
+            streamWriter.WriteString(value, length);
         }
 
         public Expression SerializerExpression(

@@ -93,27 +93,69 @@
     <Compile Include="Combat\CombatStrikeDebugFormatter.cs" />
     <Compile Include="Combat\CombatStrikeDamageCalculator.cs" />
     <Compile Include="Combat\CombatStrikeResult.cs" />
-    <Compile Include="Entities\Character.Combat.cs" />
-    <Compile Include="Entities\Character.cs" />
-    <Compile Include="Entities\CharacterWeapon.cs" />
-    <Compile Include="Entities\NpcCharacter.cs" />
-    <Compile Include="Entities\PlayerCharacter.cs" />
-    <Compile Include="Entities\Dynel.cs" />
-    <Compile Include="Entities\Dynel.Stats.cs" />
-    <Compile Include="Entities\ICharacter.cs" />
-    <Compile Include="Entities\IController.cs" />
-    <Compile Include="Entities\IDynel.cs" />
-    <Compile Include="Entities\IInstancedEntity.cs" />
-    <Compile Include="Entities\IMoving.cs" />
-    <Compile Include="Entities\INamedEntity.cs" />
-    <Compile Include="Entities\ITargetingEntity.cs" />
-    <Compile Include="Entities\StaticDynel.cs" />
-    <Compile Include="Entities\TemporaryBag.cs" />
-    <Compile Include="Entities\TradeSkillInfo.cs" />
-    <Compile Include="Entities\Vendor.cs" />
-    <Compile Include="Entities\Waypoint.cs" />
-    <Compile Include="Entities\WeatherEntry.cs" />
-    <Compile Include="Entities\WeatherSettings.cs" />
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\Character.Combat.cs">
+      <Link>Entities\Character.Combat.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\Character.cs">
+      <Link>Entities\Character.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\CharacterWeapon.cs">
+      <Link>Entities\CharacterWeapon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\NpcCharacter.cs">
+      <Link>Entities\NpcCharacter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\PlayerCharacter.cs">
+      <Link>Entities\PlayerCharacter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\Dynel.cs">
+      <Link>Entities\Dynel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\Dynel.Stats.cs">
+      <Link>Entities\Dynel.Stats.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\ICharacter.cs">
+      <Link>Entities\ICharacter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\IController.cs">
+      <Link>Entities\IController.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\IDynel.cs">
+      <Link>Entities\IDynel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\IInstancedEntity.cs">
+      <Link>Entities\IInstancedEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\IMoving.cs">
+      <Link>Entities\IMoving.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\INamedEntity.cs">
+      <Link>Entities\INamedEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\ITargetingEntity.cs">
+      <Link>Entities\ITargetingEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\StaticDynel.cs">
+      <Link>Entities\StaticDynel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\TemporaryBag.cs">
+      <Link>Entities\TemporaryBag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\TradeSkillInfo.cs">
+      <Link>Entities\TradeSkillInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\Vendor.cs">
+      <Link>Entities\Vendor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\Waypoint.cs">
+      <Link>Entities\Waypoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\WeatherEntry.cs">
+      <Link>Entities\WeatherEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Server\ZoneEngine\Core\Entities\WeatherSettings.cs">
+      <Link>Entities\WeatherSettings.cs</Link>
+    </Compile>
     <Compile Include="EventHandlers\Events\MessageReceivedEvent.cs" />
     <Compile Include="EventHandlers\Handlers\MessageReceivedHandler.cs" />
     <Compile Include="Events\Events.cs" />

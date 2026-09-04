@@ -40,8 +40,6 @@ namespace AORebirth.Communication.ISComV2Client
 
     using AORebirth.Communication.Messages;
 
-    using MsgPack.Serialization;
-
     using Utility;
 
     #endregion
@@ -211,8 +209,7 @@ namespace AORebirth.Communication.ISComV2Client
                 return false;
             }
 
-            MessagePackSerializer<object> serializer = MessagePackSerializer.Create<object>();
-            byte[] data = serializer.PackSingleObject(dataObject);
+            byte[] data = DynamicMessageCodec.Pack(dataObject);
             byte[] finalData = new byte[8 + data.Length];
             BitConverter.GetBytes(0x00ff55aa).CopyTo(finalData, 0);
             BitConverter.GetBytes(data.Length).CopyTo(finalData, 4);
@@ -375,9 +372,8 @@ namespace AORebirth.Communication.ISComV2Client
                     try
                     {
                         // Direct write — avoid TrySend re-entry into link logic.
-                        MessagePackSerializer<object> serializer = MessagePackSerializer.Create<object>();
                         var wrap = new DynamicMessage { DataObject = ping };
-                        byte[] data = serializer.PackSingleObject(wrap);
+                        byte[] data = DynamicMessageCodec.Pack(wrap);
                         byte[] finalData = new byte[8 + data.Length];
                         BitConverter.GetBytes(0x00ff55aa).CopyTo(finalData, 0);
                         BitConverter.GetBytes(data.Length).CopyTo(finalData, 4);
@@ -430,8 +426,7 @@ namespace AORebirth.Communication.ISComV2Client
 
         private void ClientBaseReceivedData(object sender, OnDataReceivedArgs e)
         {
-            MessagePackSerializer<DynamicMessage> serializer = MessagePackSerializer.Create<DynamicMessage>();
-            DynamicMessage tmp = serializer.UnpackSingleObject(e.dataBytes);
+            DynamicMessage tmp = DynamicMessageCodec.Unpack(e.dataBytes);
 
             if (this.OnReceiveData != null)
             {

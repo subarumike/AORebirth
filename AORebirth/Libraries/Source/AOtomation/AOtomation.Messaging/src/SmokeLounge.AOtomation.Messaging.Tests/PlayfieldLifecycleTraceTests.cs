@@ -749,7 +749,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string playerCombatText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayerCombatRuntimeService.cs"));
             string characterCombatText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Entities\Character.Combat.cs"));
             string strikeBuilderText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AORebirth.Core\Combat\CharacterCombatStrikeBuilder.cs"));
             string combatSubscriptionsText = File.ReadAllText(
@@ -5101,7 +5101,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string characterEntityText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs"));
+                    @"AORebirth\Server\ZoneEngine\Core\Entities\Character.cs"));
             string aotomationDeliveryText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,

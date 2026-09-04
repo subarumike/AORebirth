@@ -41,8 +41,6 @@ namespace AORebirth.Communication.ISComV2Server
 
     using MemBus;
 
-    using MsgPack.Serialization;
-
     using Utility;
 
     #endregion
@@ -131,8 +129,7 @@ namespace AORebirth.Communication.ISComV2Server
         /// </param>
         public void Send(DynamicMessage dataObject)
         {
-            MessagePackSerializer<object> serializer = MessagePackSerializer.Create<object>();
-            byte[] data = serializer.PackSingleObject(dataObject);
+            byte[] data = DynamicMessageCodec.Pack(dataObject);
             byte[] header = new byte[8];
             BitConverter.GetBytes(0x00ff55aa).CopyTo(header, 0);
             BitConverter.GetBytes(data.Length).CopyTo(header, 4);

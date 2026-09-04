@@ -1,0 +1,37 @@
+---
+description: ZoneEngine_New MMORPG design — prefer best practices over legacy ZoneEngine patterns
+globs: AORebirth/Server/ZoneEngine_New/**
+alwaysApply: false
+---
+
+# ZoneEngine_New MMORPG Server Design
+
+When working in `ZoneEngine_New`, treat legacy `ZoneEngine` as an **untrusted reference**, not a template. Do **not** assume legacy is bad; do **not** trust it. Verify algorithms, types, invariants, and config before using them. Prefer a clean ZoneEngine_New module over copying ZoneEngine structure, `Controller`/`Dao` wiring, diagnostics, or capture-era send sequences.
+
+Do **not** use capture-backed logs, replay files, or legacy send sequences to justify ZoneEngine_New design or implementation unless Mike explicitly asks for legacy/capture parity in the current task.
+
+## Prefer (ZoneEngine_New target shape)
+
+- **Single hydration orchestrator** — one service loads character row, stats, inventory, perks, etc.; handlers stay thin.
+- **Repository boundaries** — `ICharacterRepository`, `IStatRepository`, `IInventoryRepository`; no `Dao.Instance` singletons in new code.
+- **Explicit readiness** — typed load result or session phase gate before gameplay, inventory, or combat handlers run.
+- **Separation of concerns** — loading, spawning, packet building, and session lifecycle are distinct layers.
+- **In-memory authority while online** — DB is source of truth on login/logout; zone hops keep memory, reconnect rehydrates mutable state.
+- **Phased loading** — spawn-critical data first; defer non-critical journal/mail/cosmetic resync when the client contract allows.
+- **DI and testability** — inject dependencies; avoid static globals and god objects.
+- **Async-ready I/O** — design loaders so DB work can move off the network thread later.
+- **Tidy cohesion over file sprawl** — keep related system logic together in clear, well-organized modules. Prefer a focused class or partial with logical regions over many bite-sized one-concern files that scatter a single system across the tree.
+
+## Avoid porting from legacy ZoneEngine
+
+- Scattered `Read()` / `Write()` across `Character`, `Dynel`, `Stats`, and packet handlers.
+- DB access inside `ClientConnected` or other packet-sending code.
+- Duplicate hydration on reconnect, zone hop, and CharInPlay without a single owner.
+- Implicit “fully loaded” with no typed contract or trust boundary.
+- Monolithic classes mixing persistence, combat, inventory, and messaging.
+- Over-fragmentation — splitting a system into dozens of tiny files (one interface, one DTO, one helper per file) when a single cohesive module would be easier to read and maintain.
+- Capture-driven packet ordering or gameplay parity workarounds copied from legacy.
+
+## Default guidance style
+
+When asked how to implement something in ZoneEngine_New, recommend the modern MMORPG pattern first. Do not defer to legacy ZoneEngine or capture evidence unless Mike explicitly asks for legacy/capture parity in the current task.

@@ -36,27 +36,69 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Combat/CombatStrikeDebugFormatter.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Combat/CombatStrikeDamageCalculator.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Combat/CombatStrikeResult.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Character.Combat.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Character.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/CharacterWeapon.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/NpcCharacter.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/PlayerCharacter.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Dynel.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Dynel.Stats.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/ICharacter.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/IController.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/IDynel.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/IInstancedEntity.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/IMoving.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/INamedEntity.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/ITargetingEntity.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/StaticDynel.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/TemporaryBag.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/TradeSkillInfo.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Vendor.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/Waypoint.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/WeatherEntry.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Entities/WeatherSettings.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/Character.Combat.cs">
+      <Link>Entities/Character.Combat.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/Character.cs">
+      <Link>Entities/Character.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/CharacterWeapon.cs">
+      <Link>Entities/CharacterWeapon.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/NpcCharacter.cs">
+      <Link>Entities/NpcCharacter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/PlayerCharacter.cs">
+      <Link>Entities/PlayerCharacter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/Dynel.cs">
+      <Link>Entities/Dynel.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/Dynel.Stats.cs">
+      <Link>Entities/Dynel.Stats.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/ICharacter.cs">
+      <Link>Entities/ICharacter.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/IController.cs">
+      <Link>Entities/IController.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/IDynel.cs">
+      <Link>Entities/IDynel.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/IInstancedEntity.cs">
+      <Link>Entities/IInstancedEntity.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/IMoving.cs">
+      <Link>Entities/IMoving.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/INamedEntity.cs">
+      <Link>Entities/INamedEntity.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/ITargetingEntity.cs">
+      <Link>Entities/ITargetingEntity.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/StaticDynel.cs">
+      <Link>Entities/StaticDynel.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/TemporaryBag.cs">
+      <Link>Entities/TemporaryBag.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/TradeSkillInfo.cs">
+      <Link>Entities/TradeSkillInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/Vendor.cs">
+      <Link>Entities/Vendor.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/Waypoint.cs">
+      <Link>Entities/Waypoint.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/WeatherEntry.cs">
+      <Link>Entities/WeatherEntry.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Core/Entities/WeatherSettings.cs">
+      <Link>Entities/WeatherSettings.cs</Link>
+    </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/EventHandlers/Events/MessageReceivedEvent.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/EventHandlers/Handlers/MessageReceivedHandler.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Events/Events.cs" />
@@ -145,6 +187,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Textures/MeshLayers.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Coordinate.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Quaternion.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Transform.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Vector3.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/VendorHandler/VendorHandler.cs" />
   </ItemGroup>
