@@ -4,17 +4,18 @@ namespace ZoneEngine_New.Core.Commands
     using System.Globalization;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Playfield;
 
     public sealed class SpawnCommand : IGmCommand
     {
-        private readonly IMobTemplateCatalog _mobTemplates;
+        private readonly IGameData _gameData;
 
-        public SpawnCommand(IMobTemplateCatalog mobTemplates)
+        public SpawnCommand(IGameData gameData)
         {
-            ArgumentNullException.ThrowIfNull(mobTemplates);
-            _mobTemplates = mobTemplates;
+            ArgumentNullException.ThrowIfNull(gameData);
+            _gameData = gameData;
         }
 
         public string Name => "spawn";
@@ -41,7 +42,7 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            if (!_mobTemplates.TryGet(hash, out MobTemplate _))
+            if (!_gameData.TryGetMobTemplate(hash, out MobTemplate _))
             {
                 GmCommandFeedback.Send(
                     context.Session,
@@ -58,7 +59,7 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             SpawnService spawn = playfield.GetRequiredService<SpawnService>();
-            Character npc = spawn.Spawn(hash, context.Player.Position, context.Player.Rotation, level);
+            NpcCharacter npc = spawn.Spawn(hash, context.Player.Position, context.Player.Rotation, level);
 
             GmCommandFeedback.Send(
                 context.Session,

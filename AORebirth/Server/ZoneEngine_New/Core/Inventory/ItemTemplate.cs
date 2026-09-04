@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Inventory
 
     using AORebirth.Enums;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     /// <summary>
     /// Shared item definition shape (catalog entry or builder-baked effective def).
     /// </summary>
@@ -21,11 +23,11 @@ namespace ZoneEngine_New.Core.Inventory
 
         public int MultipleCount { get; init; }
 
-        public Dictionary<int, int> Stats { get; init; } = new();
+        public Dictionary<CharacterStat, int> Stats { get; init; } = new();
 
-        public Dictionary<int, int> Attack { get; init; } = new();
+        public Dictionary<CharacterStat, int> Attack { get; init; } = new();
 
-        public Dictionary<int, int> Defend { get; init; } = new();
+        public Dictionary<CharacterStat, int> Defend { get; init; } = new();
 
         public Dictionary<EventType, List<ItemSpell>> SpellList { get; init; } = new();
 

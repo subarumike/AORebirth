@@ -2,9 +2,12 @@ namespace ZoneEngine_New.Core.Entities
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using AORebirth.Enums;
 
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
@@ -15,10 +18,14 @@ namespace ZoneEngine_New.Core.Entities
     /// </summary>
     public class Player : Character
     {
-        public Player(Identity identity, IZoneLogger logger)
+        readonly IItemBuilder _items;
+
+        public Player(Identity identity, IZoneLogger logger, IItemBuilder items)
             : base(identity)
         {
+            ArgumentNullException.ThrowIfNull(items);
             Logger = logger;
+            _items = items;
             Inventory = new PlayerInventory();
         }
 
@@ -33,10 +40,69 @@ namespace ZoneEngine_New.Core.Entities
 
         public PlayerInventory Inventory { get; }
 
+        //TODO: Put perks here
+
+
         /// <summary>Current look-at / selection target from the client.</summary>
         public Identity Target { get; set; } = Identity.None;
 
         internal IZoneLogger Logger { get; }
+
+        public override void Rebase() => RebaseWeapons();
+
+        public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
+        {
+            var messages = new List<WeaponItemFullUpdateMessage>();
+            if (!Inventory.IsHydrated)
+                return messages;
+
+            TryAddEquippedHandWifu(messages, (int)WeaponSlots.Righthand);
+            TryAddEquippedHandWifu(messages, (int)WeaponSlots.LeftHand);
+            return messages;
+        }
+
+        void TryAddEquippedHandWifu(List<WeaponItemFullUpdateMessage> messages, int equipmentSlot)
+        {
+            Item? item = Inventory.Equipment.Content.GetValueOrDefault(equipmentSlot);
+            if (item == null)
+                return;
+
+            WeaponItemFullUpdateMessage? message = TryBuildWeaponItemFullUpdate(item, equipmentSlot);
+            if (message != null)
+                messages.Add(message);
+        }
+
+        public override void RebaseWeapons()
+        {
+            ClearWeapons();
+
+            if (!Inventory.IsHydrated)
+            {
+                ArmMartialArtsFist(_items, WeaponSlot.MainHand);
+                ResetAllWeaponAttacks();
+                return;
+            }
+
+            Item? right = Inventory.Equipment.Content.GetValueOrDefault((int)WeaponSlots.Righthand);
+            Item? left = Inventory.Equipment.Content.GetValueOrDefault((int)WeaponSlots.LeftHand);
+
+            bool armedMain = false;
+            bool armedOff = false;
+            if (right?.IsWieldableCombatWeapon() == true)
+            {
+                ArmFromItem(WeaponSlot.MainHand, right);
+                armedMain = true;
+            }
+
+            if (left?.IsWieldableCombatWeapon() == true)
+            {
+                ArmFromItem(WeaponSlot.OffHand, left);
+                armedOff = true;
+            }
+
+            bool maCombined = (right?.IsMaCombinedWeapon() == true) || (left?.IsMaCombinedWeapon() == true);
+            FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
+        }
 
         public void EnterLinkDead(TimeSpan timeout)
         {
@@ -213,7 +279,45 @@ namespace ZoneEngine_New.Core.Entities
             // message.Unknown12 = ...
             // message.Unknown13 = ...
 
+            LogFullCharacterInventory(message);
             return message;
         }
+
+        void LogFullCharacterInventory(FullCharacterMessage message)
+        {
+            InventorySlot[] slots = message.InventorySlots ?? [];
+            Logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "FullCharacter inventory character={0} count={1}",
+                    Identity.Instance,
+                    slots.Length));
+
+            for (int i = 0; i < slots.Length; i++)
+            {
+                InventorySlot slot = slots[i];
+                Logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "FullCharacter item[{0}] placement={1} identity={2}:{3} low={4} high={5} ql={6} count={7} flags={8}",
+                        i,
+                        slot.Placement,
+                        slot.Identity.Type,
+                        slot.Identity.Instance,
+                        slot.ItemLowId,
+                        slot.ItemHighId,
+                        slot.Quality,
+                        slot.Count,
+                        slot.Flags));
+            }
+        }
+
+        protected override byte[] CreateMovementStatus(int movementMode) =>
+        [
+            0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            (byte)movementMode, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
+            0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        ];
     }
 }

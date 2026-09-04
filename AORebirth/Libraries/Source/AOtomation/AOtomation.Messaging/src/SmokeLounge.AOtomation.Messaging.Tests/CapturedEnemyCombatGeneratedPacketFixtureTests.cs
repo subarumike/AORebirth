@@ -86,7 +86,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             profile.SpecialAttackWeaponUnknown2,
                             profile.SpecialAttackWeaponUnknown3,
                             profile.SpecialAttackWeaponUnknown4,
-                            specialAttackWeapon.Unknown5),
+                            specialAttackWeapon.AggDef),
                         specialAttackWeapon.PacketId);
                 }
 
@@ -191,7 +191,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         profile.SpecialAttackWeaponUnknown2,
                         profile.SpecialAttackWeaponUnknown3,
                         profile.SpecialAttackWeaponUnknown4,
-                        saw.Unknown5),
+                        saw.AggDef),
                     CapturedEnemyCombatPacketFactory.CreateAttack(
                         IdentityOf(attack.SourceType, attack.SourceIdentity),
                         IdentityOf(attack.TargetType, attack.TargetIdentity),
@@ -238,11 +238,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         profile.SpecialAttackWeaponUnknown3,
                         profile.SpecialAttackWeaponUnknown4,
                         99);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown1, mutableState.Unknown1);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown2, mutableState.Unknown2);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown3, mutableState.Unknown3);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown4, mutableState.Unknown4);
-                Assert.AreEqual(99, mutableState.Unknown5);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown1, mutableState.MeleeInit);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown2, mutableState.RangedInit);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown3, mutableState.PhysicalInit);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown4, mutableState.NanoInit);
+                Assert.AreEqual(99, mutableState.AggDef);
                 Assert.AreEqual(0, mutableState.Specials.Length);
             }
         }

@@ -10,9 +10,7 @@ namespace ZoneEngine_New.Core.Characters
 
         public IReadOnlyList<StatRecord> Stats { get; init; } = [];
 
-        public IReadOnlyList<ItemRecord> Items { get; init; } = [];
-
-        public IReadOnlyList<InstancedItemRecord> InstancedItems { get; init; } = [];
+        public IReadOnlyList<ItemInstanceRecord> Items { get; init; } = [];
 
         public bool IsSpawnReady => Character != null && Stats.Count > 0;
     }

@@ -257,19 +257,19 @@ namespace ZoneEngine.Core.MessageHandlers
                           {
                               Identity = character.Identity,
                               Specials = CreateDefaultPlayerSpecialAttacks(),
-                              Unknown1 = rangedSpecials
+                              MeleeInit = rangedSpecials
                                              ? RangedCombatStartSpecialAttackUnknown1
                                              : CombatStartSpecialAttackUnknown1,
-                              Unknown2 = rangedSpecials
+                              RangedInit = rangedSpecials
                                              ? RangedCombatStartSpecialAttackUnknown2
                                              : CombatStartSpecialAttackUnknown2,
-                              Unknown3 = rangedSpecials
+                              PhysicalInit = rangedSpecials
                                              ? RangedCombatStartSpecialAttackUnknown3
                                              : CombatStartSpecialAttackUnknown3,
-                              Unknown4 = rangedSpecials
+                              NanoInit = rangedSpecials
                                              ? RangedCombatStartSpecialAttackUnknown4
                                              : CombatStartSpecialAttackUnknown4,
-                              Unknown5 = rangedSpecials
+                              AggDef = rangedSpecials
                                              ? RangedCombatStartSpecialAttackUnknown5
                                              : CombatStartSpecialAttackUnknown5
                           };

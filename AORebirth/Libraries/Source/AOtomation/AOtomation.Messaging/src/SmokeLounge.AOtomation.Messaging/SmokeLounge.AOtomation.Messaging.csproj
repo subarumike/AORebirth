@@ -166,6 +166,7 @@
     <Compile Include="GameData\IdentityType.cs" />
     <Compile Include="GameData\Mesh.cs" />
     <Compile Include="GameData\ActiveNano.cs" />
+    <Compile Include="GameData\AnimationEffect.cs" />
     <Compile Include="GameData\MonsterInfoPacket.cs" />
     <Compile Include="GameData\NanoEffect.cs" />
     <Compile Include="GameData\MissionItemReward.cs" />

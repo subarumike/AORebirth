@@ -11,6 +11,8 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
@@ -29,7 +31,8 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IZoneLogger _logger;
         private readonly Playfield _playfield;
         private readonly PlayfieldManager _playfieldManager;
-        private readonly IMobTemplateCatalog _mobTemplates;
+        private readonly IGameData _gameData;
+        private readonly IItemBuilder _items;
 
         public SpawnService(
             IServiceProvider services,
@@ -37,32 +40,35 @@ namespace ZoneEngine_New.Core.Playfield
             IZoneLogger logger,
             Playfield playfield,
             PlayfieldManager playfieldManager,
-            IMobTemplateCatalog mobTemplates)
+            IGameData gameData,
+            IItemBuilder items)
         {
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(registry);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(playfield);
             ArgumentNullException.ThrowIfNull(playfieldManager);
-            ArgumentNullException.ThrowIfNull(mobTemplates);
+            ArgumentNullException.ThrowIfNull(gameData);
+            ArgumentNullException.ThrowIfNull(items);
 
             _services = services;
             _registry = registry;
             _logger = logger;
             _playfield = playfield;
             _playfieldManager = playfieldManager;
-            _mobTemplates = mobTemplates;
+            _gameData = gameData;
+            _items = items;
         }
 
         /// <summary>Spawns an NPC from a mob template hash and registers it on this playfield.</summary>
-        public Character Spawn(string hash, Vector3 position, Quaternion? heading = null, int? level = null)
+        public NpcCharacter Spawn(string hash, Vector3 position, Quaternion? heading = null, int? level = null)
         {
             ArgumentException.ThrowIfNullOrEmpty(hash);
             ArgumentNullException.ThrowIfNull(position);
 
-            MobTemplate template = _mobTemplates.Require(hash);
+            MobTemplate template = _gameData.RequireMobTemplate(hash);
             Identity identity = _registry.AllocateNpcIdentity();
-            Character character = new Character(identity)
+            NpcCharacter npc = new NpcCharacter(identity, _items)
             {
                 Playfield = _playfield,
                 Name = template.Name,
@@ -71,14 +77,16 @@ namespace ZoneEngine_New.Core.Playfield
                 Rotation = heading ?? new Quaternion()
             };
 
-            foreach (MobStatEntry entry in template.Stats)
-                character.Stats.Set((CharacterStat)entry.Key, entry.Value);
+            foreach (var entry in template.Stats)
+                npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
             if (level.HasValue)
-                character.Stats.Set(CharacterStat.Level, level.Value);
+                npc.Stats.Set(CharacterStat.Level, level.Value);
 
-            _registry.Register(character);
-            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(character);
+            npc.Rebase();
+
+            _registry.Register(npc);
+            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
 
             _logger.Info(
                 string.Format(
@@ -91,7 +99,70 @@ namespace ZoneEngine_New.Core.Playfield
                     position.yf,
                     position.zf));
 
-            return character;
+            return npc;
+        }
+
+        /// <summary>
+        /// Spawns a corpse for a dead character. Resolves loot before cell registration (spawn packet).
+        /// </summary>
+        public Corpse SpawnCorpse(Character dead)
+        {
+            ArgumentNullException.ThrowIfNull(dead);
+
+            Identity identity = _registry.AllocateCorpseIdentity();
+            Corpse corpse = new Corpse(identity, dead, _gameData)
+            {
+                Playfield = _playfield
+            };
+
+            corpse.ResolveLoot(_gameData, _items);
+
+            _registry.Register(corpse);
+            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(corpse);
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Spawned corpse id={0} owner={1} name={2} loot={3}",
+                    identity.Instance,
+                    dead.Identity.Instance,
+                    corpse.Name,
+                    corpse.Loot.Content.Count));
+
+            return corpse;
+        }
+
+        /// <summary>Called from <see cref="Playfield.Tick"/> after inbound drain.</summary>
+        public void DespawnExpiredCorpses()
+        {
+            foreach (Dynel dynel in _registry.Dynels())
+            {
+                if (dynel is not Corpse corpse || !corpse.IsExpired)
+                    continue;
+
+                DespawnCorpse(corpse);
+            }
+        }
+
+        /// <summary>Removes a corpse from the playfield (visibility + registry).</summary>
+        public void DespawnCorpse(Corpse corpse)
+        {
+            ArgumentNullException.ThrowIfNull(corpse);
+
+            if (corpse.IsOpen)
+                corpse.Close();
+
+            Identity identity = corpse.Identity;
+            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(corpse);
+            _registry.Unregister(identity);
+            corpse.Playfield = null;
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Despawned corpse id={0} playfield={1}",
+                    identity.Instance,
+                    _playfield.Identity.Instance));
         }
 
         public Player SpawnPlayer(IZoneSession session, CharacterHydrationResult hydration)
@@ -114,6 +185,7 @@ namespace ZoneEngine_New.Core.Playfield
             player.EnterOnline(session);
 
             _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
+            player.Rebase();
 
             _registry.Register(player);
             _playfieldManager.RegisterPlayer(player);
@@ -152,6 +224,8 @@ namespace ZoneEngine_New.Core.Playfield
             SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
             ScfuSendLog.Write(spawn);
             session.Send(spawn);
+            foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
+                session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
             session.State = SessionState.InPlay;
 
@@ -196,6 +270,8 @@ namespace ZoneEngine_New.Core.Playfield
             SimpleCharFullUpdateMessage reconnectSpawn = player.BuildSpawnMessage();
             ScfuSendLog.Write(reconnectSpawn);
             session.Send(reconnectSpawn);
+            foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
+                session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
             session.State = SessionState.InPlay;
 
@@ -232,16 +308,14 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         /// <summary>Removes an NPC from the playfield (visibility + registry). Does not fire death.</summary>
-        public void DespawnNpc(Character character)
+        public void DespawnNpc(NpcCharacter npc)
         {
-            ArgumentNullException.ThrowIfNull(character);
-            if (character is Player)
-                throw new ArgumentException("Use player despawn path for players.", nameof(character));
+            ArgumentNullException.ThrowIfNull(npc);
 
-            Identity identity = character.Identity;
-            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(character);
+            Identity identity = npc.Identity;
+            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(npc);
             _registry.Unregister(identity);
-            character.Playfield = null;
+            npc.Playfield = null;
 
             _logger.Info(
                 string.Format(

@@ -11,8 +11,6 @@ namespace ZoneEngine_New.Core.Inventory
 
     public sealed class ItemBuilder : IItemBuilder
     {
-        private const int StackCountStatId = 412;
-
         private readonly IItemTemplateCatalog _catalog;
         private readonly IZoneLogger _logger;
 
@@ -29,6 +27,7 @@ namespace ZoneEngine_New.Core.Inventory
             int highId,
             int quality,
             int stackCount = 1,
+            int instanceId = 0,
             Identity? identity = null,
             byte[]? statsBlob = null)
         {
@@ -42,11 +41,12 @@ namespace ZoneEngine_New.Core.Inventory
             ApplyStatsBlob(definition, statsBlob);
 
             int resolvedStack = stackCount;
-            if (definition.Stats.TryGetValue(StackCountStatId, out int stackFromStats) && stackFromStats > 0)
+            if (definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats) && stackFromStats > 0)
                 resolvedStack = stackFromStats;
 
             return new Item
             {
+                InstanceId = instanceId,
                 Identity = identity ?? Identity.None,
                 LowId = lowId,
                 HighId = highId,
@@ -56,46 +56,22 @@ namespace ZoneEngine_New.Core.Inventory
             };
         }
 
-        public bool TryFromRecord(ItemRecord row, out Item item)
+        public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item)
         {
             ArgumentNullException.ThrowIfNull(row);
             try
             {
-                item = Create(row.LowId, row.HighId, row.Quality, row.MultipleCount, Identity.None);
-                return true;
-            }
-            catch (Exception exception)
-            {
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "ItemBuilder.TryFromRecord failed low={0} high={1}: {2}",
-                        row.LowId,
-                        row.HighId,
-                        exception.Message));
-                item = null!;
-                return false;
-            }
-        }
-
-        public bool TryFromInstancedRecord(InstancedItemRecord row, out Item item)
-        {
-            ArgumentNullException.ThrowIfNull(row);
-            try
-            {
-                var identity = new Identity
-                {
-                    Type = (IdentityType)row.ItemType,
-                    Instance = row.Id
-                };
+                Identity identity = row.ItemType != 0
+                    ? new Identity { Type = (IdentityType)row.ItemType, Instance = row.InstanceId }
+                    : Identity.None;
 
                 item = Create(
                     row.LowId,
                     row.HighId,
                     row.Quality,
-                    row.MultipleCount,
-                    identity,
-                    row.StatsBlob);
+                    row.StackCount,
+                    row.InstanceId,
+                    identity);
                 return true;
             }
             catch (Exception exception)
@@ -103,8 +79,8 @@ namespace ZoneEngine_New.Core.Inventory
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "ItemBuilder.TryFromInstancedRecord failed id={0} low={1}: {2}",
-                        row.Id,
+                        "ItemBuilder.TryFromInstanceRecord failed id={0} low={1}: {2}",
+                        row.InstanceId,
                         row.LowId,
                         exception.Message));
                 item = null!;
@@ -194,28 +170,28 @@ namespace ZoneEngine_New.Core.Inventory
                 Flags = source.Flags,
                 ItemType = source.ItemType,
                 MultipleCount = source.MultipleCount,
-                Stats = new Dictionary<int, int>(source.Stats),
-                Attack = new Dictionary<int, int>(source.Attack),
-                Defend = new Dictionary<int, int>(source.Defend),
+                Stats = new Dictionary<CharacterStat, int>(source.Stats),
+                Attack = new Dictionary<CharacterStat, int>(source.Attack),
+                Defend = new Dictionary<CharacterStat, int>(source.Defend),
                 SpellList = spellList,
                 Actions = actions,
                 Relations = new List<int>(source.Relations)
             };
         }
 
-        private static Dictionary<int, int> LerpIntMap(
-            Dictionary<int, int> low,
-            Dictionary<int, int> high,
+        private static Dictionary<CharacterStat, int> LerpIntMap(
+            Dictionary<CharacterStat, int> low,
+            Dictionary<CharacterStat, int> high,
             float factor)
         {
-            var result = new Dictionary<int, int>();
-            foreach (KeyValuePair<int, int> pair in low)
+            var result = new Dictionary<CharacterStat, int>();
+            foreach (KeyValuePair<CharacterStat, int> pair in low)
             {
                 int highValue = high.TryGetValue(pair.Key, out int hv) ? hv : pair.Value;
                 result[pair.Key] = LerpInt(pair.Value, highValue, factor);
             }
 
-            foreach (KeyValuePair<int, int> pair in high)
+            foreach (KeyValuePair<CharacterStat, int> pair in high)
             {
                 if (!result.ContainsKey(pair.Key))
                     result[pair.Key] = pair.Value;
@@ -302,7 +278,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             for (int offset = 0; offset + 8 <= statsBlob.Length; offset += 8)
             {
-                int attrId = BitConverter.ToInt32(statsBlob, offset);
+                var attrId = (CharacterStat)BitConverter.ToInt32(statsBlob, offset);
                 int value = BitConverter.ToInt32(statsBlob, offset + 4);
                 definition.Stats[attrId] = value;
             }

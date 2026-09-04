@@ -13,6 +13,7 @@ namespace ZoneEngine_New.Core.Network
     using System.Threading.Tasks;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
 
@@ -158,7 +159,8 @@ namespace ZoneEngine_New.Core.Network
             }
 
             LogNetworkMessage("Sent", body);
-            Send(_codec.Serialize(body, sender, receiver));
+            byte[] packet = _codec.Serialize(body, sender, receiver);
+            Send(packet);
         }
 
         public void SendInitiateCompression()

@@ -162,7 +162,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         StrainOmniTokens = 0x0000004B, 
 
-        EquipmentPage = 0x0000004C, 
+        ItemClass = 0x0000004C,
 
         RepairSkill = 0x0000004D, 
 
@@ -554,9 +554,9 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         XPKillRange = 0x00000113, 
 
-        AddAllOff = 0x00000114, 
+        AMSModifier = 0x00000114, 
 
-        AddAllDef = 0x00000115, 
+        DMSModifier = 0x00000115, 
 
         ProjectileDamageModifier = 0x00000116, 
 
@@ -570,7 +570,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         ItemHateValue = 0x0000011B, 
 
-        CriticalBonus = 0x0000011C, 
+        DamageBonus = 0x0000011C, 
 
         MaxDamage = 0x0000011D, 
 
@@ -672,7 +672,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         SavedXP = 0x0000014E, 
 
-        DamageType1 = 0x00000153, 
+        DamageOverrideType = 0x00000153, 
 
         BrainType = 0x00000154, 
 
@@ -836,7 +836,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         ReadOnly = 0x000001B3, 
 
-        DamageType2 = 0x000001B4, 
+        DamageType = 0x000001B4, 
 
         CollideCheckInterval = 0x000001B5, 
 

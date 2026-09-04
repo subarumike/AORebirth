@@ -70,7 +70,7 @@ namespace ZoneEngine_New.Core.Entities
             FlushDirtyStats();
         }
 
-        protected void FlushDirtyStats()
+        public void FlushDirtyStats()
         {
             GameTuple<CharacterStat, uint>[] dirtyStats = Stats.DrainDirty();
             if (dirtyStats.Length == 0)

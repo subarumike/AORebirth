@@ -23,6 +23,10 @@ namespace AORebirth.Core.GameData
 
         public const string MobTemplatesFileName = "MobTemplates.json";
 
+        public const string LootTableFileName = "LootTable.json";
+
+        public const string MonsterDataFileName = "MonsterData.json";
+
         public static string PlayfieldRelativeDirectory(int playfieldId)
         {
             if (playfieldId <= 0)

@@ -21,34 +21,64 @@ namespace ZoneEngine_New.Core.Playfield
         Dead = 1
     }
 
+    /// <summary>One candidate centre/heading/radius for a hash spawn point.</summary>
+    internal readonly struct SpawnSite
+    {
+        internal SpawnSite(Vector3 centre, Quaternion heading, float radius)
+        {
+            Centre = centre;
+            Heading = heading;
+            Radius = Math.Max(0f, radius);
+        }
+
+        internal Vector3 Centre { get; }
+
+        internal Quaternion Heading { get; }
+
+        internal float Radius { get; }
+    }
+
     /// <summary>
-    /// Runtime HashSpawnPoint: district spawn entry plus Alive/Dead state and Character link.
+    /// Runtime HashSpawnPoint: district spawn entry plus Alive/Dead state and NpcCharacter link.
     /// </summary>
     internal sealed class HashSpawnPoint
     {
         internal HashSpawnPoint(
             string hashText,
-            Vector3 position,
-            Quaternion heading,
+            SpawnSite[] sites,
             int respawnTimeSeconds,
+            int respawnChance,
+            int minLevel,
+            int maxLevel,
             int cellId)
         {
+            ArgumentNullException.ThrowIfNull(sites);
+            if (sites.Length == 0)
+                throw new ArgumentException("At least one spawn site is required.", nameof(sites));
+
             HashText = hashText;
-            Position = position;
-            Heading = heading;
+            Sites = sites;
             RespawnTimeSeconds = respawnTimeSeconds;
+            RespawnChance = Math.Clamp(respawnChance, 0, 100);
+            MinLevel = minLevel;
+            MaxLevel = maxLevel;
             CellId = cellId;
             State = HashSpawnState.Dead;
-            NextSpawnTime = DateTime.MinValue;
+            NextSpawnTime = DateTime.UtcNow;
         }
 
         internal string HashText { get; }
 
-        internal Vector3 Position { get; }
-
-        internal Quaternion Heading { get; }
+        internal SpawnSite[] Sites { get; }
 
         internal int RespawnTimeSeconds { get; }
+
+        /// <summary>Percent chance (0-100) to spawn when state is Dead and the timer has elapsed.</summary>
+        internal int RespawnChance { get; }
+
+        internal int MinLevel { get; }
+
+        internal int MaxLevel { get; }
 
         internal int CellId { get; }
 
@@ -56,7 +86,7 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal DateTime NextSpawnTime { get; set; }
 
-        internal Character? Spawned { get; set; }
+        internal NpcCharacter? Spawned { get; set; }
     }
 
     /// <summary>
@@ -66,29 +96,33 @@ namespace ZoneEngine_New.Core.Playfield
     {
         private const string FallbackMobHash = "AAAA";
 
+        /// <summary>Cap catch-up chance rolls so long sleep cannot explode roll count.</summary>
+        private const int MaxCatchUpRolls = 64;
+
         private readonly Playfield _playfield;
         private readonly SpawnService _spawnService;
-        private readonly IMobTemplateCatalog _mobTemplates;
+        private readonly IGameData _gameData;
         private readonly IZoneLogger _logger;
         private readonly Dictionary<int, List<HashSpawnPoint>> _pointsByCell = new();
         private readonly List<HashSpawnPoint> _allPoints = new();
+        private readonly Dictionary<NpcCharacter, HashSpawnPoint> _pointBySpawned = new();
         private int _spawnRate = 1;
         private bool _initialized;
 
         public HashSpawnSystem(
             Playfield playfield,
             SpawnService spawnService,
-            IMobTemplateCatalog mobTemplates,
+            IGameData gameData,
             IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(playfield);
             ArgumentNullException.ThrowIfNull(spawnService);
-            ArgumentNullException.ThrowIfNull(mobTemplates);
+            ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
 
             _playfield = playfield;
             _spawnService = spawnService;
-            _mobTemplates = mobTemplates;
+            _gameData = gameData;
             _logger = logger;
         }
 
@@ -122,7 +156,7 @@ namespace ZoneEngine_New.Core.Playfield
 
         private void LoadSpawns(CellGrid grid)
         {
-            PlayfieldSpawnsData data = GameDataLoader.LoadPlayfieldSpawns(_playfield.Identity.Instance);
+            PlayfieldSpawnsData data = _gameData.GetPlayfieldSpawns(_playfield.Identity.Instance);
             PlayfieldSpawnEntry[] entries = data.Spawns ?? [];
             int skipped = 0;
 
@@ -142,9 +176,9 @@ namespace ZoneEngine_New.Core.Playfield
                 }
 
                 string spawnHash = hashText;
-                if (!_mobTemplates.TryGet(hashText, out _))
+                if (!_gameData.TryGetMobTemplate(hashText, out _))
                 {
-                    if (!_mobTemplates.TryGet(FallbackMobHash, out _))
+                    if (!_gameData.TryGetMobTemplate(FallbackMobHash, out _))
                     {
                         _logger.Warn(
                             string.Format(
@@ -173,27 +207,36 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                Vector3 position = new Vector3(entry.Position[0], entry.Position[1], entry.Position[2]);
-                if (!grid.TryResolveCell(position, out Cell cell))
+                Vector3 primaryPosition = new Vector3(entry.Position[0], entry.Position[1], entry.Position[2]);
+                if (!grid.TryResolveCell(primaryPosition, out Cell cell))
                 {
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
                             "Hash spawn skipped OOB hash={0} pos=({1},{2},{3}) playfield={4}",
                             hashText,
-                            position.xf,
-                            position.yf,
-                            position.zf,
+                            primaryPosition.xf,
+                            primaryPosition.yf,
+                            primaryPosition.zf,
                             _playfield.Identity.Instance));
+                    skipped++;
+                    continue;
+                }
+
+                SpawnSite[] sites = BuildSites(entry, primaryPosition);
+                if (sites.Length == 0)
+                {
                     skipped++;
                     continue;
                 }
 
                 HashSpawnPoint point = new HashSpawnPoint(
                     spawnHash,
-                    position,
-                    HeadingFromAngles(entry.Angle, entry.AngleW),
+                    sites,
                     Math.Max(0, entry.RespawnTime),
+                    entry.RespawnChance,
+                    entry.MinLevel,
+                    entry.MaxLevel,
                     cell.Id);
 
                 if (!_pointsByCell.TryGetValue(cell.Id, out List<HashSpawnPoint>? list))
@@ -215,6 +258,35 @@ namespace ZoneEngine_New.Core.Playfield
                         skipped,
                         _playfield.Identity.Instance));
             }
+        }
+
+        private static SpawnSite[] BuildSites(PlayfieldSpawnEntry entry, Vector3 primaryPosition)
+        {
+            List<SpawnSite> sites = new()
+            {
+                new SpawnSite(
+                    primaryPosition,
+                    HeadingFromAngles(entry.Angle, entry.AngleW),
+                    entry.Radius)
+            };
+
+            PlayfieldRotationSpawnPoint[]? additional = entry.AdditionalPoints;
+            if (additional == null)
+                return sites.ToArray();
+
+            foreach (PlayfieldRotationSpawnPoint extra in additional)
+            {
+                if (extra?.Position == null || extra.Position.Length < 3)
+                    continue;
+
+                sites.Add(
+                    new SpawnSite(
+                        new Vector3(extra.Position[0], extra.Position[1], extra.Position[2]),
+                        HeadingFromAngles(extra.Angle, extra.AngleW),
+                        extra.Radius));
+            }
+
+            return sites.ToArray();
         }
 
         private void OnCellSleep(int cellId)
@@ -262,8 +334,10 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
-        private static bool ShouldSpawn(HashSpawnPoint point, DateTime now)
+        private bool ShouldSpawn(HashSpawnPoint point, DateTime now)
         {
+            RecoverOrphanedSpawn(point);
+
             if (point.Spawned != null)
                 return false;
 
@@ -275,17 +349,29 @@ namespace ZoneEngine_New.Core.Playfield
 
         private bool TrySpawn(HashSpawnPoint point)
         {
+            RecoverOrphanedSpawn(point);
+
+            if (point.State == HashSpawnState.Dead && !TryConsumeRespawnChance(point))
+                return false;
+
             try
             {
-                Character character = _spawnService.Spawn(point.HashText, point.Position, point.Heading);
+                PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
+                NpcCharacter character = _spawnService.Spawn(
+                    point.HashText,
+                    position,
+                    heading,
+                    RollLevel(point));
                 point.Spawned = character;
                 point.State = HashSpawnState.Alive;
+                _pointBySpawned[character] = point;
                 character.Died += OnSpawnedDied;
                 LogSpawn(
                     "spawn",
                     point,
                     character.Identity.Instance,
-                    character.Name);
+                    character.Name,
+                    position);
                 return true;
             }
             catch (Exception exception)
@@ -302,43 +388,150 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
+        /// <summary>
+        /// Dead points roll once per elapsed respawn window (catch-up while asleep).
+        /// Stops at the first success so at most one spawn is created.
+        /// </summary>
+        private static bool TryConsumeRespawnChance(HashSpawnPoint point)
+        {
+            DateTime now = DateTime.UtcNow;
+            int windowSeconds = point.RespawnTimeSeconds;
+            int rolls = 1;
+            if (windowSeconds > 0 && now > point.NextSpawnTime)
+            {
+                double elapsedSeconds = (now - point.NextSpawnTime).TotalSeconds;
+                rolls = 1 + (int)(elapsedSeconds / windowSeconds);
+                if (rolls > MaxCatchUpRolls)
+                    rolls = MaxCatchUpRolls;
+                else if (rolls < 1)
+                    rolls = 1;
+            }
+
+            for (int i = 0; i < rolls; i++)
+            {
+                if (PassesRespawnChance(point))
+                    return true;
+            }
+
+            point.NextSpawnTime = windowSeconds > 0
+                ? now.AddSeconds(windowSeconds)
+                : now;
+            return false;
+        }
+
+        private static bool PassesRespawnChance(HashSpawnPoint point)
+        {
+            if (point.RespawnChance >= 100)
+                return true;
+            if (point.RespawnChance <= 0)
+                return false;
+
+            return Random.Shared.Next(100) < point.RespawnChance;
+        }
+
+        /// <summary>
+        /// Inclusive random level from the spawn entry range. Returns null when the range is unset/invalid
+        /// so <see cref="SpawnService"/> keeps the template level.
+        /// </summary>
+        private static int? RollLevel(HashSpawnPoint point)
+        {
+            int min = point.MinLevel;
+            int max = point.MaxLevel;
+            if (max < min)
+                (min, max) = (max, min);
+            if (max < 1)
+                return null;
+            if (min < 1)
+                min = 1;
+
+            if (min == max)
+                return min;
+
+            return Random.Shared.Next(min, max + 1);
+        }
+
+        private static void PickSpawnTransform(
+            HashSpawnPoint point,
+            out Vector3 position,
+            out Quaternion heading)
+        {
+            SpawnSite site = point.Sites[Random.Shared.Next(point.Sites.Length)];
+            heading = site.Heading;
+            position = site.Centre;
+            if (site.Radius <= 0f)
+                return;
+
+            // Uniform disk on XZ; Y stays at the site centre.
+            double angle = Random.Shared.NextDouble() * (Math.PI * 2.0);
+            double distance = Math.Sqrt(Random.Shared.NextDouble()) * site.Radius;
+            position = new Vector3(
+                site.Centre.xf + (float)(Math.Cos(angle) * distance),
+                site.Centre.yf,
+                site.Centre.zf + (float)(Math.Sin(angle) * distance));
+        }
+
         private void DespawnForSleep(HashSpawnPoint point)
         {
-            Character? character = point.Spawned;
+            NpcCharacter? character = point.Spawned;
             if (character == null)
                 return;
 
             character.Died -= OnSpawnedDied;
+            _pointBySpawned.Remove(character);
             point.Spawned = null;
             // Stay Alive — sleep-despawned; respawn on next awake tick.
             point.State = HashSpawnState.Alive;
             int instance = character.Identity.Instance;
             string? name = character.Name;
+            Vector3 position = character.Position;
             _spawnService.DespawnNpc(character);
-            LogSpawn("sleep-despawn", point, instance, name);
+            LogSpawn("sleep-despawn", point, instance, name, position);
         }
 
         private void OnSpawnedDied(Character character)
         {
-            HashSpawnPoint? point = FindPointForCharacter(character);
-            if (point == null)
+            if (character is not NpcCharacter npc)
+                return;
+            if (!_pointBySpawned.TryGetValue(npc, out HashSpawnPoint? point))
                 return;
 
-            character.Died -= OnSpawnedDied;
+            npc.Died -= OnSpawnedDied;
+            _pointBySpawned.Remove(npc);
             point.Spawned = null;
             point.State = HashSpawnState.Dead;
             point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);
-            int instance = character.Identity.Instance;
-            string? name = character.Name;
+            int instance = npc.Identity.Instance;
+            string? name = npc.Name;
 
             // Death removes the live dynel from the world; sleep path uses DespawnNpc explicitly.
-            if (character.Playfield != null)
-                _spawnService.DespawnNpc(character);
+            if (npc.Playfield != null)
+                _spawnService.DespawnNpc(npc);
 
             LogSpawnDeath(point, instance, name);
         }
 
-        private void LogSpawn(string action, HashSpawnPoint point, int identityInstance, string? name)
+        /// <summary>
+        /// Clears ownership when an NPC was removed without raising <see cref="Character.Died"/>.
+        /// </summary>
+        private void RecoverOrphanedSpawn(HashSpawnPoint point)
+        {
+            NpcCharacter? character = point.Spawned;
+            if (character == null || character.Playfield != null)
+                return;
+
+            character.Died -= OnSpawnedDied;
+            _pointBySpawned.Remove(character);
+            point.Spawned = null;
+            point.State = HashSpawnState.Dead;
+            point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);
+        }
+
+        private void LogSpawn(
+            string action,
+            HashSpawnPoint point,
+            int identityInstance,
+            string? name,
+            Vector3 position)
         {
             if (!LogUtil.HasDetail(DebugInfoDetail.Locality))
                 return;
@@ -355,9 +548,9 @@ namespace ZoneEngine_New.Core.Playfield
                     identityInstance,
                     name ?? string.Empty,
                     point.State,
-                    point.Position.xf,
-                    point.Position.yf,
-                    point.Position.zf));
+                    position.xf,
+                    position.yf,
+                    position.zf));
         }
 
         private void LogSpawnDeath(HashSpawnPoint point, int identityInstance, string? name)
@@ -377,17 +570,6 @@ namespace ZoneEngine_New.Core.Playfield
                     name ?? string.Empty,
                     point.NextSpawnTime,
                     point.RespawnTimeSeconds));
-        }
-
-        private HashSpawnPoint? FindPointForCharacter(Character character)
-        {
-            foreach (HashSpawnPoint point in _allPoints)
-            {
-                if (ReferenceEquals(point.Spawned, character))
-                    return point;
-            }
-
-            return null;
         }
 
         /// <summary>

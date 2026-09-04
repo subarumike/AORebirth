@@ -5,10 +5,15 @@ namespace ZoneEngine_New.Core.Entities
 
     using AORebirth.Core.Textures;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Movement;
+    using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Helpers;
+    using ZoneEngine_New.Core.Playfield;
 
     using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
@@ -16,11 +21,11 @@ namespace ZoneEngine_New.Core.Entities
     //TODO: Nano casting should live here
 
     /// <summary>
-    /// Character layer between Dynel and Player (shared NPC/player fields).
+    /// Character layer between Dynel and <see cref="Player"/> / <see cref="NpcCharacter"/> (shared fields).
     /// </summary>
-    public class Character : Dynel
+    public abstract class Character : Dynel
     {
-        public Character(Identity identity)
+        protected Character(Identity identity)
             : base(identity)
         {
             Motor = new CharacterMotor(this);
@@ -35,38 +40,420 @@ namespace ZoneEngine_New.Core.Entities
 
         public string? Name { get; set; }
 
-        /// <summary>Source mob template when this character was spawned from <see cref="Mobs.IMobTemplateCatalog"/>.</summary>
-        public Mobs.MobTemplate? MobTemplate { get; set; }
+        public Dictionary<WeaponSlot, CharacterWeapon> Weapons { get; } = new();
 
-        /// <summary>Raised once when <see cref="NotifyDeath"/> is called.</summary>
+        readonly Dictionary<WeaponSlot, Action> _weaponAttackHandlers = new();
+
+        /// <summary>Current auto-attack target; <see cref="Identity.None"/> when not fighting.</summary>
+        public Identity FightingTarget { get; private set; } = Identity.None;
+
+        /// <summary>Raised once when the corpse swap completes (after <see cref="CorpseSwapDelayMilliseconds"/>).</summary>
         public event Action<Character>? Died;
 
-        bool _deathNotified;
+        public const int CorpseSwapDelayMilliseconds = 2500;
 
-        /// <summary>Notifies spawn/death listeners. Idempotent.</summary>
-        public void NotifyDeath()
+        const int DefaultNpcDeathAnimationKey = 0x1F7;
+        const int DefaultPlayerDeathAnimationKey = 500;
+
+        bool _deathNotified;
+        bool _corpseSwapPending;
+        double _corpseSwapRemainingSeconds;
+
+        public bool IsDead => _deathNotified;
+
+        /// <summary>
+        /// Idempotent death entry: death action + clear fight state immediately;
+        /// corpse spawn and <see cref="Died"/> after <see cref="CorpseSwapDelayMilliseconds"/>.
+        /// </summary>
+        public virtual void OnDeath(Character? killer = null)
         {
             if (_deathNotified)
                 return;
 
             _deathNotified = true;
+            SetFightingTarget(Identity.None);
+
+            Cell?.Announce(
+                new CharacterActionMessage
+                {
+                    Identity = Identity,
+                    Action = CharacterActionType.Death,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = IsPlayer ? DefaultPlayerDeathAnimationKey : DefaultNpcDeathAnimationKey
+                });
+
+            _corpseSwapPending = true;
+            _corpseSwapRemainingSeconds = CorpseSwapDelayMilliseconds / 1000.0;
+        }
+
+        void CompleteCorpseSwap()
+        {
+            if (!_corpseSwapPending)
+                return;
+
+            _corpseSwapPending = false;
+
+            Playfield?.GetRequiredService<SpawnService>().SpawnCorpse(this);
             Died?.Invoke(this);
+        }
+
+        public void SetFightingTarget(Identity identity)
+        {
+            FightingTarget = identity;
+            if (identity.Instance == 0)
+                ResetAllWeaponAttacks();
+        }
+
+        public void SetWeapon(WeaponSlot slot, CharacterWeapon weapon)
+        {
+            if (slot == WeaponSlot.None || weapon == null)
+                return;
+
+            if (Weapons.TryGetValue(slot, out CharacterWeapon? existing) && existing != null
+                && _weaponAttackHandlers.TryGetValue(slot, out Action? existingHandler))
+            {
+                existing.Attacked -= existingHandler;
+                _weaponAttackHandlers.Remove(slot);
+            }
+
+            weapon.Wielder = this;
+            Action handler = () => ProcessWeaponSwing(slot);
+            _weaponAttackHandlers[slot] = handler;
+            Weapons[slot] = weapon;
+            weapon.Attacked += handler;
+            weapon.RefreshEffectiveSpeeds();
+        }
+
+        public void ClearWeapons()
+        {
+            foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in Weapons)
+            {
+                if (pair.Value == null)
+                    continue;
+
+                if (_weaponAttackHandlers.TryGetValue(pair.Key, out Action? handler))
+                    pair.Value.Attacked -= handler;
+
+                pair.Value.Wielder = null;
+                pair.Value.Item = null;
+            }
+
+            _weaponAttackHandlers.Clear();
+            Weapons.Clear();
+        }
+
+        public void ResetAllWeaponAttacks()
+        {
+            foreach (CharacterWeapon weapon in Weapons.Values)
+                weapon?.ResetAttack();
         }
 
         public override void Tick(double deltaTime)
         {
+            if (_corpseSwapPending)
+            {
+                _corpseSwapRemainingSeconds -= deltaTime;
+                if (_corpseSwapRemainingSeconds <= 0.0)
+                {
+                    CompleteCorpseSwap();
+                    // NPC death listeners despawn this dynel; skip further tick work.
+                    if (Playfield == null)
+                        return;
+                }
+            }
+
             Motor.Tick(deltaTime);
+            if (FightingTarget.Instance != 0 && TryResolveFightingTarget() != null)
+                TickWeapons(deltaTime);
             base.Tick(deltaTime);
         }
+
+        void TickWeapons(double deltaTime)
+        {
+            CharacterWeapon? charging = null;
+            foreach (CharacterWeapon weapon in Weapons.Values)
+            {
+                if (weapon != null && weapon.State == WeaponState.Attacking)
+                {
+                    charging = weapon;
+                    break;
+                }
+            }
+
+            if (charging != null)
+            {
+                charging.Tick(deltaTime);
+                return;
+            }
+
+            foreach (CharacterWeapon weapon in Weapons.Values)
+                weapon?.Tick(deltaTime);
+        }
+
+        void ProcessWeaponSwing(WeaponSlot slot)
+        {
+            Character? target = TryResolveFightingTarget();
+            if (target == null)
+                return;
+
+            if (!Weapons.TryGetValue(slot, out CharacterWeapon? characterWeapon) || characterWeapon == null)
+                return;
+
+            Item? weapon = characterWeapon.Item;
+            double attackRange = weapon != null
+                ? NormalizeCombatStat(weapon.GetStat(CharacterStat.AttackRange))
+                : 0.0;
+            if (attackRange <= 0.0)
+                attackRange = MaxMeleeCombatDistance;
+
+            double distance = Distance3D(target);
+            if (distance > attackRange * HardRangeMultiplier)
+            {
+                if (IsPlayer)
+                    SetFightingTarget(Identity.None);
+                return;
+            }
+
+            if (distance > attackRange + SoftRangeGraceMeters)
+                return;
+
+            DamageCalculator.DamageResult result = DamageCalculator.CalculateFromWeapon(this, target, weapon);
+            if (!result.IsHit)
+            {
+                Cell?.Announce(
+                    new MissedAttackInfoMessage
+                    {
+                        Identity = Identity,
+                        Unknown1 = -1,
+                        Unknown2 = MapAttackInfoWeaponSlot(slot, weapon),
+                        Unknown3 = Identity,
+                        Unknown4 = target.Identity,
+                        Unknown5 = 0
+                    });
+                return;
+            }
+
+            bool killingHit = target.ApplyDamage(this, result.Damage, result.HitType);
+            Cell?.Announce(
+                new AttackInfoMessage
+                {
+                    Identity = Identity,
+                    Target = target.Identity,
+                    Unknown1 = result.Damage,
+                    Unknown2 = weapon != null ? NormalAttackInfoAmmoCount : PlayerUnarmedAttackInfoAmmoCount,
+                    Unknown3 = MapAttackInfoWeaponSlot(slot, weapon),
+                    Unknown4 = killingHit ? 4 : 0,
+                    Unknown5 = (int)result.HitType,
+                    Unknown6 = weapon != null ? 0 : PlayerUnarmedAttackInfoWeaponInstance
+                });
+        }
+
+        /// <summary>
+        /// Applies hit-point damage. Returns true when this hit killed the character.
+        /// </summary>
+        public bool ApplyDamage(Character attacker, int damage, HitType hitType)
+        {
+            if (_deathNotified || damage <= 0)
+                return false;
+
+            int previousHealth = NormalizeCombatStat(Stats.Get(CharacterStat.Health));
+            int newHealth = Math.Max(0, previousHealth - damage);
+            Stats.Set(CharacterStat.Health, newHealth, StatDetail.Base, dirty: true);
+
+            if (newHealth > 0)
+                return false;
+
+            OnDeath(attacker);
+            return true;
+        }
+
+        Character? TryResolveFightingTarget()
+        {
+            if (FightingTarget.Instance == 0 || Playfield == null)
+                return null;
+
+            DynelRegistry registry = Playfield.GetRequiredService<DynelRegistry>();
+            if (registry.TryGet(FightingTarget, out Dynel? dynel) && dynel is Character target && !target.IsDead)
+                return target;
+
+            Cell?.Announce(
+                new StopFightMessage
+                {
+                    Identity = Identity,
+                    Unknown1 = 1
+                });
+            SetFightingTarget(Identity.None);
+            return null;
+        }
+
+        static int MapAttackInfoWeaponSlot(WeaponSlot slot, Item? weapon)
+        {
+            if (weapon == null)
+                return 0;
+
+            return slot switch
+            {
+                WeaponSlot.OffHand => (int)WeaponSlots.LeftHand,
+                _ => (int)WeaponSlots.Righthand
+            };
+        }
+
+        static int NormalizeCombatStat(int value)
+            => value < 0 || StatCollection.IsUnset(value) ? 0 : value;
+
+        const double MaxMeleeCombatDistance = 4.0;
+        const double SoftRangeGraceMeters = 1.5;
+        const double HardRangeMultiplier = 3.0;
+        const int NormalAttackInfoAmmoCount = 40;
+        const int PlayerUnarmedAttackInfoAmmoCount = -1;
+        const int PlayerUnarmedAttackInfoWeaponInstance = 100;
 
         void OnStatChanged(CharacterStat stat, int previous, int next, bool isInitialSet)
         {
             Motor.OnStatChanged(stat, previous, next, isInitialSet);
+
+            if (stat != CharacterStat.AggDef)
+                return;
+
+            foreach (CharacterWeapon weapon in Weapons.Values)
+                weapon?.RefreshEffectiveSpeeds();
+        }
+
+
+        public abstract void Rebase();
+
+        public abstract void RebaseWeapons();
+
+        protected static double NormalizeDelayCentisecondsToSeconds(int delayCentiseconds, double fallbackSeconds)
+        {
+            if (delayCentiseconds <= 0)
+                return fallbackSeconds;
+            if (delayCentiseconds > 500)
+                delayCentiseconds = 100;
+            return Math.Max(0.05, delayCentiseconds / 100.0);
+        }
+
+        protected void ArmFromItem(WeaponSlot slot, Item item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            var weapon = new CharacterWeapon { Item = item };
+            weapon.ConfigureBaseSpeeds(
+                NormalizeDelayCentisecondsToSeconds(
+                    item.GetStat(CharacterStat.AttackDelay),
+                    CharacterWeapon.DefaultAttackSpeedSeconds),
+                NormalizeDelayCentisecondsToSeconds(
+                    item.GetStat(CharacterStat.RechargeDelay),
+                    CharacterWeapon.DefaultRechargeSpeedSeconds));
+            SetWeapon(slot, weapon);
+        }
+
+        protected void ArmMartialArtsFist(IItemBuilder items, WeaponSlot slot)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            Profession profession = (Profession)Stats.Get(CharacterStat.Profession);
+            int maSkill = Stats.Get(CharacterStat.MartialArts);
+            if (StatCollection.IsUnset(maSkill) || maSkill < 1)
+                maSkill = 1;
+
+            (int lowId, int highId, int quality) = MartialArtsFistResolver.Resolve(profession, maSkill);
+            Item fist = items.Create(lowId, highId, quality);
+            ArmFromItem(slot, fist);
+        }
+
+        /// <summary>
+        /// Shared end of RebaseWeapons after hand slots are considered.
+        /// </summary>
+        protected void FinishWeaponRebase(IItemBuilder items, bool armedMain, bool armedOff, bool maCombined)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            if (!armedMain && !armedOff)
+            {
+                ArmMartialArtsFist(items, WeaponSlot.MainHand);
+                ResetAllWeaponAttacks();
+                return;
+            }
+
+            if (maCombined)
+                ArmMartialArtsFist(items, WeaponSlot.CombinedMA);
+
+            ResetAllWeaponAttacks();
         }
 
         public List<AOTextures> Textures { get; } = new();
         public List<Mesh> Meshes { get; } = new();
         public List<int> UploadedNanoIds { get; } = new();
+
+        /// <summary>
+        /// Equipped-hand WeaponItemFullUpdate messages for observers (after SCFU).
+        /// Default empty; <see cref="Player"/> builds from inventory; NPCs stub empty for now.
+        /// </summary>
+        public virtual List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
+            => new();
+
+        /// <summary>
+        /// Builds one WIFU for an equipped hand-slot item, or null when the item should not be announced.
+        /// </summary>
+        protected WeaponItemFullUpdateMessage? TryBuildWeaponItemFullUpdate(Item item, int equipmentSlot)
+        {
+            if (item == null
+                || item.InstanceId == 0
+                || !item.IsWieldableCombatWeapon()
+                || item.IsMaCombinedWeapon())
+                return null;
+
+            int flags = item.Flags > 0 ? item.Flags : 0x403;
+            int multipleCount = item.StackCount > 0 ? item.StackCount : 1;
+            var stats = new List<GameTuple<CharacterStat, uint>>
+            {
+                StatTuple(CharacterStat.Flags, (uint)flags),
+                StatTuple(CharacterStat.StaticInstance, (uint)item.LowId),
+                StatTuple(CharacterStat.ACGItemLevel, (uint)item.Quality),
+                StatTuple(CharacterStat.ACGItemTemplateID, (uint)item.LowId),
+                StatTuple(CharacterStat.ACGItemTemplateID2, (uint)item.HighId),
+                StatTuple(CharacterStat.MultipleCount, (uint)multipleCount),
+                StatTuple(CharacterStat.Energy, 0)
+            };
+
+            int attackDelay = item.GetStat(CharacterStat.AttackDelay);
+            if (attackDelay > 0)
+                stats.Add(StatTuple(CharacterStat.AttackDelay, (uint)attackDelay));
+
+            int rechargeDelay = item.GetStat(CharacterStat.RechargeDelay);
+            if (rechargeDelay > 0)
+                stats.Add(StatTuple(CharacterStat.RechargeDelay, (uint)rechargeDelay));
+
+            return new WeaponItemFullUpdateMessage
+            {
+                Identity = new Identity
+                {
+                    Type = IdentityType.WeaponInstance,
+                    Instance = item.InstanceId
+                },
+                Unknown = 0,
+                Unknown1 = 0x0b,
+                Owner = new Identity
+                {
+                    Type = IdentityType.CanbeAffected,
+                    Instance = Identity.Instance
+                },
+                PlayfieldId = Playfield != null ? Playfield.Identity.Instance : 0,
+                StateMachine = new Identity
+                {
+                    Type = (IdentityType)0x000F424F,
+                    Instance = 0
+                },
+                Unknown2 = (short)(0x0100 | (equipmentSlot & 0xff)),
+                Stats = stats.ToArray(),
+                Unknown3 = 0
+            };
+        }
+
+        static GameTuple<CharacterStat, uint> StatTuple(CharacterStat stat, uint value)
+            => new() { Value1 = stat, Value2 = value };
 
         /// <summary>
         /// Builds a SimpleCharFullUpdate (SCFU) spawn packet from current character state.
@@ -166,15 +553,8 @@ namespace ZoneEngine_New.Core.Entities
                 scfu.Version = 58;
             }
 
-            int selectedTarget = Stats.Get(CharacterStat.SelectedTarget);
-            if (!StatCollection.IsUnset(selectedTarget) && selectedTarget != 0)
-            {
-                scfu.FightingTarget = new Identity
-                {
-                    Type = (IdentityType)Stats.Get(CharacterStat.SelectedTargetType),
-                    Instance = selectedTarget
-                };
-            }
+            if (FightingTarget.Instance != 0)
+                scfu.FightingTarget = FightingTarget;
 
             if (isNpc)
             {
@@ -257,9 +637,7 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             scfu.MonsterScale = StatCollection.IsUnset(monsterScale) ? (short)0 : (short)monsterScale;
-            scfu.Unknown1 = isNpc
-                ? CreateNpcUnknown1(movementMode)
-                : CreatePlayerUnknown1(movementMode);
+            scfu.Unknown1 = CreateMovementStatus(movementMode);
 
             if (!StatCollection.IsUnset(petMasterInstance) && petMasterInstance != 0)
             {
@@ -368,19 +746,8 @@ namespace ZoneEngine_New.Core.Entities
             new Texture { Place = 4, Id = 0, Unknown = 0 }
         ];
 
-        private static byte[] CreatePlayerUnknown1(int movementMode) =>
-        [
-            0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            (byte)movementMode, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
-            0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ];
-
-        private static byte[] CreateNpcUnknown1(int movementMode) =>
-        [
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            (byte)movementMode, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
-            0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00
-        ];
+        /// <summary>SCFU Unknown1 movement-status blob (player vs NPC layouts differ).</summary>
+        // TODO: Convert the arrays to a CharacterMovementStatus object.
+        protected abstract byte[] CreateMovementStatus(int movementMode);
     }
 }

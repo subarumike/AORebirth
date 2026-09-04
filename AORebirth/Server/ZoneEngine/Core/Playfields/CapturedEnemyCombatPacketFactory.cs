@@ -233,11 +233,11 @@ namespace AORebirth.Core.Playfields
                         Unknown3 = definition.Tag,
                         Unknown4 = definition.Name
                     }).ToArray(),
-                Unknown1 = unknown1,
-                Unknown2 = unknown2,
-                Unknown3 = unknown3,
-                Unknown4 = unknown4,
-                Unknown5 = unknown5
+                MeleeInit = unknown1,
+                RangedInit = unknown2,
+                PhysicalInit = unknown3,
+                NanoInit = unknown4,
+                AggDef = unknown5
             };
         }
 

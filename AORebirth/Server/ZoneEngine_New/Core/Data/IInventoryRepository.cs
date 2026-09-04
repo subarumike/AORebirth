@@ -4,8 +4,27 @@ namespace ZoneEngine_New.Core.Data
 
     public interface IInventoryRepository
     {
-        IReadOnlyList<ItemRecord> GetItemsForCharacter(int characterId);
+        /// <summary>
+        /// Carried pages only (inventory / equipment / armor / implant / social). Not bank or bag interiors.
+        /// </summary>
+        IReadOnlyList<ItemInstanceRecord> GetCarriedItems(int characterId);
 
-        IReadOnlyList<InstancedItemRecord> GetInstancedItemsForCharacter(int characterId);
+        IReadOnlyList<ItemInstanceRecord> GetBankItems(int characterId);
+
+        /// <summary>
+        /// Items whose parent is a backpack/container instance. Ownership follows the bag item location.
+        /// </summary>
+        IReadOnlyList<ItemInstanceRecord> GetContainerItems(int containerInstanceId);
+
+        /// <summary>
+        /// Inserts a new row and returns it with the minted <see cref="ItemInstanceRecord.InstanceId"/>.
+        /// Input <see cref="ItemInstanceRecord.InstanceId"/> is ignored.
+        /// </summary>
+        ItemInstanceRecord Insert(ItemInstanceRecord item);
+
+        /// <summary>
+        /// Moves an existing instance; does not remint InstanceId.
+        /// </summary>
+        void UpdateLocation(int instanceId, int containerType, int containerInstance, int containerPlacement);
     }
 }

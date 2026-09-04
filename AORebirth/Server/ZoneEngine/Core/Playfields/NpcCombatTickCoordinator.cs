@@ -1193,11 +1193,11 @@ namespace AORebirth.Core.Playfields
                         Identity = attacker.Identity,
                         Unknown = 0,
                         Specials = new SpecialAttack[0],
-                        Unknown1 = 0,
-                        Unknown2 = 0,
-                        Unknown3 = 0,
-                        Unknown4 = 0,
-                        Unknown5 = 0
+                        MeleeInit = 0,
+                        RangedInit = 0,
+                        PhysicalInit = 0,
+                        NanoInit = 0,
+                        AggDef = 0
                     });
                 this.playfield.Announce(
                     new AttackMessage
@@ -1263,11 +1263,11 @@ namespace AORebirth.Core.Playfields
                 {
                     Identity = attacker.Identity,
                     Specials = CreatePlayerOwnedAttackPetSpecialAttacks(),
-                    Unknown1 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    Unknown2 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    Unknown3 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    Unknown4 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    Unknown5 = 0
+                    MeleeInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    RangedInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    PhysicalInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    NanoInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    AggDef = 0
                 });
             this.playfield.Announce(
                 new AttackMessage

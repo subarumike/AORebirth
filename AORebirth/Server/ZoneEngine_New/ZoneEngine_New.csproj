@@ -47,9 +47,14 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Libraries\Source\AORebirth.Database\Migrations\*.sql"
+             Exclude="..\..\Libraries\Source\AORebirth.Database\Migrations\*account*">
+      <Link>Migrations\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="..\..\Datafiles\items.dat">
@@ -75,6 +80,12 @@
     </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemTarget.cs">
       <Link>Enums\ItemTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemClass.cs">
+      <Link>Enums\ItemClass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponSlots.cs">
+      <Link>Enums\WeaponSlots.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>
