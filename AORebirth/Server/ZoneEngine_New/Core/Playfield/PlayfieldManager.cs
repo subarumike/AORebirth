@@ -11,8 +11,9 @@ namespace ZoneEngine_New.Core.Playfield
 
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
-    using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
 
     public sealed class PlayfieldManager : IDisposable
@@ -25,24 +26,28 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IZoneLogger _logger;
         private readonly IMessageRouter _router;
         private readonly PlayerHydrator _playerHydrator;
-        private readonly IMobTemplateCatalog _mobTemplates;
+        private readonly IGameData _gameData;
+        private readonly IItemBuilder _items;
         private bool _disposed;
 
         public PlayfieldManager(
             IZoneLogger logger,
             IMessageRouter router,
             PlayerHydrator playerHydrator,
-            IMobTemplateCatalog mobTemplates)
+            IGameData gameData,
+            IItemBuilder items)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
             ArgumentNullException.ThrowIfNull(playerHydrator);
-            ArgumentNullException.ThrowIfNull(mobTemplates);
+            ArgumentNullException.ThrowIfNull(gameData);
+            ArgumentNullException.ThrowIfNull(items);
 
             _logger = logger;
             _router = router;
             _playerHydrator = playerHydrator;
-            _mobTemplates = mobTemplates;
+            _gameData = gameData;
+            _items = items;
         }
 
         public static TimeSpan ResolveLinkDeadTimeout()
@@ -65,31 +70,47 @@ namespace ZoneEngine_New.Core.Playfield
 
                 if (_playfields.TryGetValue(playfieldId, out Playfield? existing))
                     return existing;
+            }
 
-                IZoneLogger playfieldLogger = _logger.CreateForPlayfield(playfieldId);
-                Identity identity = new Identity
+            // Construct outside the manager lock. Playfield starts a heartbeat thread that may
+            // call back into Register/Unregister/FindPlayer; holding _sync here deadlocks login.
+            IZoneLogger playfieldLogger = _logger.CreateForPlayfield(playfieldId);
+            Identity identity = new Identity
+            {
+                Type = IdentityType.Playfield,
+                Instance = playfieldId
+            };
+
+            Playfield created = new Playfield(
+                identity,
+                playfieldLogger,
+                _router,
+                this,
+                _playerHydrator,
+                _gameData,
+                _items);
+
+            lock (_sync)
+            {
+                ObjectDisposedException.ThrowIf(_disposed, this);
+
+                if (_playfields.TryGetValue(playfieldId, out Playfield? raced))
                 {
-                    Type = IdentityType.Playfield,
-                    Instance = playfieldId
-                };
+                    created.Dispose();
+                    return raced;
+                }
 
-                Playfield playfield = new Playfield(
-                    identity,
-                    playfieldLogger,
-                    _router,
-                    this,
-                    _playerHydrator,
-                    _mobTemplates);
-                _playfields[playfieldId] = playfield;
+                _playfields[playfieldId] = created;
 
                 _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "PlayfieldManager created playfield {0}",
                         playfieldId));
-
-                return playfield;
             }
+
+            created.StartHeartbeat();
+            return created;
         }
 
         public bool TryGet(int playfieldId, out Playfield? playfield)
@@ -139,20 +160,20 @@ namespace ZoneEngine_New.Core.Playfield
 
         public void Dispose()
         {
+            List<Playfield> playfields;
             lock (_sync)
             {
                 if (_disposed)
                     return;
 
                 _disposed = true;
-                foreach (Playfield playfield in _playfields.Values)
-                {
-                    playfield.Dispose();
-                }
-
+                playfields = new List<Playfield>(_playfields.Values);
                 _playfields.Clear();
                 _playersByCharacterId.Clear();
             }
+
+            foreach (Playfield playfield in playfields)
+                playfield.Dispose();
         }
     }
 }

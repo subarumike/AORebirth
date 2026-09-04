@@ -260,6 +260,13 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             if (spawn is SimpleCharFullUpdateMessage scfu)
                 ScfuSendLog.Write(scfu);
             recipient.Session!.Send(spawn);
+
+            if (source is Character character)
+            {
+                foreach (WeaponItemFullUpdateMessage wifu in character.BuildWeaponInstanceMessages())
+                    recipient.Session.Send(wifu);
+            }
+
             return true;
         }
 

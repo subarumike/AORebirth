@@ -6,6 +6,8 @@ namespace ZoneEngine_New.Core.Inventory.Dat
 
     using MsgPack;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     internal static class DatItemMapper
     {
         public static ItemTemplate ToTemplate(DatItemTemplate dat, string name)
@@ -44,13 +46,25 @@ namespace ZoneEngine_New.Core.Inventory.Dat
                 Flags = dat.Flags,
                 ItemType = dat.ItemType,
                 MultipleCount = dat.MultipleCount,
-                Stats = dat.Stats != null ? new Dictionary<int, int>(dat.Stats) : new Dictionary<int, int>(),
-                Attack = dat.Attack != null ? new Dictionary<int, int>(dat.Attack) : new Dictionary<int, int>(),
-                Defend = dat.Defend != null ? new Dictionary<int, int>(dat.Defend) : new Dictionary<int, int>(),
+                Stats = ToCharacterStatMap(dat.Stats),
+                Attack = ToCharacterStatMap(dat.Attack),
+                Defend = ToCharacterStatMap(dat.Defend),
                 SpellList = spellList,
                 Actions = actions,
                 Relations = dat.Relations != null ? new List<int>(dat.Relations) : new List<int>()
             };
+        }
+
+        private static Dictionary<CharacterStat, int> ToCharacterStatMap(Dictionary<int, int>? source)
+        {
+            var result = new Dictionary<CharacterStat, int>();
+            if (source == null)
+                return result;
+
+            foreach (KeyValuePair<int, int> pair in source)
+                result[(CharacterStat)pair.Key] = pair.Value;
+
+            return result;
         }
 
         private static ItemSpell ToSpell(DatFunction function)

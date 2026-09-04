@@ -837,7 +837,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             setup.SpecialAttackWeaponUnknown2,
                             setup.SpecialAttackWeaponUnknown3,
                             setup.SpecialAttackWeaponUnknown4,
-                            saw.Unknown5);
+                            saw.AggDef);
                     Assert.AreEqual(
                         saw.BodyHex,
                         BitConverter.ToString(Serialize(generated)).Replace("-", string.Empty),
@@ -1088,7 +1088,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             setup.SpecialAttackWeaponUnknown2,
                             setup.SpecialAttackWeaponUnknown3,
                             setup.SpecialAttackWeaponUnknown4,
-                            saw.Unknown5);
+                            saw.AggDef);
                     Assert.AreEqual(
                         saw.BodyHex,
                         BitConverter.ToString(Serialize(generated)).Replace("-", string.Empty),

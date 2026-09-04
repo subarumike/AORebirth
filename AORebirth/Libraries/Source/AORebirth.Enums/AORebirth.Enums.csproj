@@ -53,7 +53,7 @@
     <Compile Include="InventoryError.cs" />
     <Compile Include="ItemFlags.cs" />
     <Compile Include="ItemTarget.cs" />
-    <Compile Include="ItemType.cs" />
+    <Compile Include="ItemClass.cs" />
     <Compile Include="MoveModes.cs" />
     <Compile Include="Operator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

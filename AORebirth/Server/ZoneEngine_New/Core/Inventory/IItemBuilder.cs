@@ -6,16 +6,16 @@ namespace ZoneEngine_New.Core.Inventory
 
     public interface IItemBuilder
     {
+        /// <param name="instanceId">Durable DB key; 0 for ephemeral non-persisted items.</param>
         Item Create(
             int lowId,
             int highId,
             int quality,
             int stackCount = 1,
+            int instanceId = 0,
             Identity? identity = null,
             byte[]? statsBlob = null);
 
-        bool TryFromRecord(ItemRecord row, out Item item);
-
-        bool TryFromInstancedRecord(InstancedItemRecord row, out Item item);
+        bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item);
     }
 }

@@ -3584,11 +3584,11 @@ namespace AORebirth.Core.Playfields
                 {
                     Identity = character.Identity,
                     Specials = CreateDefaultPlayerSpecialAttacks(),
-                    Unknown1 = 6,
-                    Unknown2 = 6,
-                    Unknown3 = 6,
-                    Unknown4 = 6,
-                    Unknown5 = 100
+                    MeleeInit = 6,
+                    RangedInit = 6,
+                    PhysicalInit = 6,
+                    NanoInit = 6,
+                    AggDef = 100
                 });
         }
 

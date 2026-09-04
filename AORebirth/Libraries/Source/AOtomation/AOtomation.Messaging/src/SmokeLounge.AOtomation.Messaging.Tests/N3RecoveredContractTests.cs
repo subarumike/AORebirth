@@ -760,11 +760,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                           Identity = thief,
                                           Unknown = 0,
                                           Specials = new SpecialAttack[0],
-                                          Unknown1 = 32,
-                                          Unknown2 = 32,
-                                          Unknown3 = 32,
-                                          Unknown4 = 32,
-                                          Unknown5 = 0
+                                          MeleeInit = 32,
+                                          RangedInit = 32,
+                                          PhysicalInit = 32,
+                                          NanoInit = 32,
+                                          AggDef = 0
                                       };
             CollectionAssert.AreEqual(
                 HexToBytes("1D3C0F1C0000C350795B5DB200000003F10000002000000020000000200000002000000000"),
@@ -818,11 +818,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                                              Unknown4 = "SIW1"
                                                          }
                                                      },
-                                          Unknown1 = 49,
-                                          Unknown2 = 49,
-                                          Unknown3 = 49,
-                                          Unknown4 = 49,
-                                          Unknown5 = 0
+                                          MeleeInit = 49,
+                                          RangedInit = 49,
+                                          PhysicalInit = 49,
+                                          NanoInit = 49,
+                                          AggDef = 0
                                       };
             CollectionAssert.AreEqual(
                 HexToBytes("1D3C0F1C0000C35079607CD000000007E2000235660002356753495731534957310000003100000031000000310000003100000000"),

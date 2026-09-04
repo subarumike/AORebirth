@@ -50,6 +50,19 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         private async Task HandleAsyncCore(ZoneLoginMessage message, IZoneSession session)
         {
+            try
+            {
+                await HandleAsyncCoreInner(message, session).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(exception, "ZoneLogin failed with unhandled exception.");
+                session.Close();
+            }
+        }
+
+        private async Task HandleAsyncCoreInner(ZoneLoginMessage message, IZoneSession session)
+        {
             // EXPLOIT
             // TODO: Validate ZoneLoginMessage session cookies against the login handoff
             // before loading the character (reject mismatched/missing cookies).

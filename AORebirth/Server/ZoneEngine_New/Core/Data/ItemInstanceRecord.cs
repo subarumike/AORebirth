@@ -1,8 +1,10 @@
 namespace ZoneEngine_New.Core.Data
 {
-    public sealed class InstancedItemRecord
+    public sealed class ItemInstanceRecord
     {
-        public int Id { get; init; }
+        public int InstanceId { get; init; }
+
+        public int ContainerType { get; init; }
 
         public int ContainerInstance { get; init; }
 
@@ -16,8 +18,6 @@ namespace ZoneEngine_New.Core.Data
 
         public int Quality { get; init; }
 
-        public int MultipleCount { get; init; }
-
-        public byte[]? StatsBlob { get; init; }
+        public int StackCount { get; init; }
     }
 }

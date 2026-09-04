@@ -41,15 +41,40 @@ namespace AORebirth.Tools.RDBDataExtractor
                 }
 
                 Directory.CreateDirectory(resolved.OutputDirectory);
+                Directory.CreateDirectory(resolved.GameDataDirectory);
 
                 int tilemapWritten = 0;
                 int tilemapSkipped = 0;
                 int districtWritten = 0;
                 int districtSkipped = 0;
+                int monsterDataWritten = 0;
+                int monsterDataSkipped = 0;
                 int failed = 0;
 
                 using (var controller = new RdbController(resolved.AoClientPath))
                 {
+                    if (!resolved.SkipMonsterData)
+                    {
+                        try
+                        {
+                            var monsterData = new MonsterDataExporter(
+                                controller,
+                                resolved.GameDataDirectory);
+                            ExportFileCounts monsterCounts = monsterData.Export(resolved.Overwrite);
+                            monsterDataWritten += monsterCounts.Written;
+                            monsterDataSkipped += monsterCounts.Skipped;
+                        }
+                        catch (Exception exception)
+                        {
+                            failed++;
+                            Console.Error.WriteLine(
+                                "FAIL MonsterData "
+                                + exception.GetType().Name
+                                + ": "
+                                + exception.Message);
+                        }
+                    }
+
                     var tilemaps = new TilemapExporter(controller, resolved.OutputDirectory);
                     var districts = new DistrictExporter(controller, resolved.OutputDirectory);
 
@@ -169,6 +194,10 @@ namespace AORebirth.Tools.RDBDataExtractor
                     + districtWritten
                     + " districtSkipped="
                     + districtSkipped
+                    + " monsterDataWritten="
+                    + monsterDataWritten
+                    + " monsterDataSkipped="
+                    + monsterDataSkipped
                     + " failed="
                     + failed);
                 return failed > 0 ? 1 : 0;

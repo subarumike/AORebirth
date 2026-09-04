@@ -38,20 +38,13 @@ namespace ZoneEngine_New.Core.Inventory
 
             CreatePages(characterId);
 
-            foreach (ItemRecord row in hydration.Items)
+            foreach (ItemInstanceRecord row in hydration.Items)
             {
-                if (!items.TryFromRecord(row, out Item item))
+                if (!items.TryFromInstanceRecord(row, out Item item))
                     continue;
 
-                AddItem(row.ContainerInstance, row.ContainerPlacement, item);
-            }
-
-            foreach (InstancedItemRecord row in hydration.InstancedItems)
-            {
-                if (!items.TryFromInstancedRecord(row, out Item item))
-                    continue;
-
-                AddItem(row.ContainerInstance, row.ContainerPlacement, item);
+                // ContainerType = page IdentityType; ContainerInstance = characterId
+                AddItem(row.ContainerType, row.ContainerPlacement, item);
             }
         }
 
@@ -69,7 +62,7 @@ namespace ZoneEngine_New.Core.Inventory
                     yield return new InventorySlot
                     {
                         Placement = slotEntry.Key,
-                        Flags = (short)item.Flags,
+                        Flags = ResolveInventorySlotFlags(item),
                         Count = (short)Math.Clamp(item.StackCount, short.MinValue, short.MaxValue),
                         Identity = item.Identity.Instance != 0
                             ? item.Identity
@@ -106,6 +99,21 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
 
             page.Add(slot, item);
+        }
+
+        /// <summary>
+        /// FullCharacter / InventoryUpdate slot flags are not the same as template Item.Flags.
+        /// TODO: revisit — ported from legacy FullCharacterMessageHandler; confirm real packet
+        /// flags vs template bits and whether InventoryUpdate should share this path.
+        /// </summary>
+        private static short ResolveInventorySlotFlags(Item item)
+        {
+            const int defaultTemplateItemSlotFlags = 0x00A1;
+            int flags = item.Flags;
+            if ((flags & 0x00A0) == 0)
+                flags = defaultTemplateItemSlotFlags;
+
+            return (short)flags;
         }
     }
 }

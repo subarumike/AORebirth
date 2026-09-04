@@ -351,7 +351,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -503,7 +503,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.First(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.First(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -571,7 +571,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 resolved.CapturedSpecialAttackWeaponUnknown5Observations);
             CollectionAssert.AreEqual(
                 expectedStates,
-                fixture.SpecialAttackWeaponPackets.Select(value => value.Unknown5).ToArray());
+                fixture.SpecialAttackWeaponPackets.Select(value => value.AggDef).ToArray());
 
             var cursor = new CapturedIntObservationCursor();
             for (int index = 0; index < fixture.SpecialAttackWeaponPackets.Length; index++)
@@ -664,11 +664,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(144743, specialAttackWeapon.Specials[0].Unknown2);
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown1, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown2, specialAttackWeapon.Unknown2);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown3, specialAttackWeapon.Unknown3);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown4, specialAttackWeapon.Unknown4);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown5, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown1, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown2, specialAttackWeapon.RangedInit);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown3, specialAttackWeapon.PhysicalInit);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown4, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown5, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(baseline.MinDamage, attackInfo.Unknown1);
@@ -730,7 +730,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemySpecialAttackWeaponPacketFixture saw =
                     fixture.SpecialAttackWeaponPackets.Single(
                         value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                                 && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                                 && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
                 CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
                 CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -819,7 +819,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -1016,7 +1016,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -1103,7 +1103,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -1200,7 +1200,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == 0);
+                             && value.AggDef == 0);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity
                          && value.TargetIdentity == unchecked((int)0x7944C065));
@@ -1287,7 +1287,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -1377,7 +1377,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -1465,7 +1465,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.Single(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -1689,7 +1689,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
             Assert.AreEqual(0, specialAttackWeapon.Specials.Length);
             Assert.AreEqual(0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual(0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -1769,19 +1769,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     out generatedSetup));
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown1,
-                specialAttackWeapon.Unknown1);
+                specialAttackWeapon.MeleeInit);
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown2,
-                specialAttackWeapon.Unknown2);
+                specialAttackWeapon.RangedInit);
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown3,
-                specialAttackWeapon.Unknown3);
+                specialAttackWeapon.PhysicalInit);
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown4,
-                specialAttackWeapon.Unknown4);
+                specialAttackWeapon.NanoInit);
             Assert.AreEqual(
                 NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
-                specialAttackWeapon.Unknown5);
+                specialAttackWeapon.AggDef);
             Assert.AreEqual(0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -1933,7 +1933,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.First(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.First(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -2031,7 +2031,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemySpecialAttackWeaponPacketFixture saw =
                 fixture.SpecialAttackWeaponPackets.First(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+                             && value.AggDef == resolved.SpecialAttackWeaponUnknown5);
             CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.First(
                 value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
             CapturedEnemyAttackInfoPacketFixture attackInfo =
@@ -2149,11 +2149,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
             Assert.AreEqual(1, specialAttackWeapon.Specials.Length);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown2);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown3);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown4);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
+            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -2230,8 +2230,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
             Assert.AreEqual(1, specialAttackWeapon.Specials.Length);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -2315,8 +2315,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -2400,11 +2400,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1145196631, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("DBPW", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown2);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown3);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown4);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
+            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -2488,11 +2488,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1145919558, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("DMXF", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown2);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown3);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown4);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
+            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -2576,11 +2576,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown2);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown3);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown4);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
+            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);
@@ -2664,11 +2664,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown2);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown3);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown4);
-            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
+            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
             Assert.AreEqual(target, attack.Target);

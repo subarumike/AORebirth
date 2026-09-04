@@ -21,8 +21,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     /// <summary>
     /// Outdoor cell tick cadence by heat tier. Indoor and disabled-heat paths tick every dynel every heartbeat.
     /// Warm/Cold pass accumulated wall-clock delta since the cell's last successful tick.
-    /// Heat candidates = occupied ∪ spawn-bearing ∪ cells within Warm range of connected players
-    /// (so empty neighbor heat transitions are tracked and logged).
+    /// Cells default Asleep until Hot/Warm (player proximity or forced hot); Cold is only the
+    /// post-Hot/Warm cooldown before sleep. Heat candidates = occupied ∪ spawn-bearing ∪ cells
+    /// within Warm range of connected players (so empty neighbor heat transitions are tracked).
     /// </summary>
     internal sealed class CellHeatScheduler
     {
@@ -37,6 +38,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly HashSet<int> _forcedHotCells = new();
         private readonly List<int> _heatCellBuffer = new();
         private readonly List<int> _neighborBuffer = new();
+        private readonly List<Dynel> _tickDynelBuffer = new();
         private Action<int>? _onCellSleep;
         private Action<int>? _onCellTick;
         private Action? _onIndoorSpawnTick;
@@ -75,8 +77,13 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             if (!_grid.IsOutdoor || !_policy.EnableCellHeatScheduling)
             {
+                // Snapshot: Tick may despawn/spawn (death → corpse) and mutate _tracked.
+                _tickDynelBuffer.Clear();
                 foreach (Dynel dynel in tracked)
-                    dynel.Tick(heartbeatDeltaTime);
+                    _tickDynelBuffer.Add(dynel);
+
+                for (int i = 0; i < _tickDynelBuffer.Count; i++)
+                    _tickDynelBuffer[i].Tick(heartbeatDeltaTime);
 
                 _onIndoorSpawnTick?.Invoke();
                 return;
@@ -123,6 +130,15 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 seenCells.Add(cellId);
                 bool isNewCell = !_heatByCell.TryGetValue(cellId, out CellHeat previousHeat);
                 CellHeat heat = ResolveHeat(cellId);
+
+                // Leaving Hot/Warm with no cold timer would resolve Asleep; enter Cold cooldown first.
+                if (!isNewCell
+                    && (previousHeat == CellHeat.Hot || previousHeat == CellHeat.Warm)
+                    && heat == CellHeat.Asleep)
+                {
+                    heat = CellHeat.Cold;
+                }
+
                 if (!isNewCell && previousHeat != heat)
                     LogHeatChange(cellId, previousHeat, heat);
 
@@ -152,8 +168,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
                 _lastTickUtcByCell[cellId] = now;
                 _onCellTick?.Invoke(cellId);
+
+                // Snapshot: Tick may despawn NPCs and spawn corpses into this cell.
+                _tickDynelBuffer.Clear();
                 foreach (Dynel dynel in _grid.OccupantsInCell(cellId))
-                    dynel.Tick(elapsed);
+                    _tickDynelBuffer.Add(dynel);
+
+                for (int i = 0; i < _tickDynelBuffer.Count; i++)
+                    _tickDynelBuffer[i].Tick(elapsed);
             }
 
             List<int> staleCells = new();
@@ -235,8 +257,11 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             if (minDistance <= _policy.WarmNeighborLevel)
                 return CellHeat.Warm;
 
-            if (_coldSinceUtcByCell.TryGetValue(cellId, out DateTime coldSince)
-                && (DateTime.UtcNow - coldSince).TotalSeconds >= _policy.CellSleepTimeSeconds)
+            // No cooling timer → never woken (or fully slept) → Asleep. Cold only while cooling.
+            if (!_coldSinceUtcByCell.TryGetValue(cellId, out DateTime coldSince))
+                return CellHeat.Asleep;
+
+            if ((DateTime.UtcNow - coldSince).TotalSeconds >= _policy.CellSleepTimeSeconds)
                 return CellHeat.Asleep;
 
             return CellHeat.Cold;
@@ -245,6 +270,12 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private void UpdateColdTimer(int cellId, CellHeat heat, DateTime now)
         {
             if (heat == CellHeat.Hot || heat == CellHeat.Warm)
+            {
+                _coldSinceUtcByCell.Remove(cellId);
+                return;
+            }
+
+            if (heat == CellHeat.Asleep)
             {
                 _coldSinceUtcByCell.Remove(cellId);
                 return;

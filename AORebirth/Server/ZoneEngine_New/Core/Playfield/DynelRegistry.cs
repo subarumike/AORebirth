@@ -11,10 +11,12 @@ namespace ZoneEngine_New.Core.Playfield
     public sealed class DynelRegistry
     {
         private const int FirstNpcInstance = 1_000_000;
+        private const int FirstCorpseInstance = 2_000_000;
 
         private readonly Lock _sync = new();
         private readonly Dictionary<ulong, Dynel> _dynels = new();
         private int _nextNpcInstance = FirstNpcInstance - 1;
+        private int _nextCorpseInstance = FirstCorpseInstance - 1;
 
         public Identity AllocateNpcIdentity()
         {
@@ -22,6 +24,16 @@ namespace ZoneEngine_New.Core.Playfield
             return new Identity
             {
                 Type = IdentityType.CanbeAffected,
+                Instance = instance
+            };
+        }
+
+        public Identity AllocateCorpseIdentity()
+        {
+            int instance = Interlocked.Increment(ref _nextCorpseInstance);
+            return new Identity
+            {
+                Type = IdentityType.Corpse,
                 Instance = instance
             };
         }

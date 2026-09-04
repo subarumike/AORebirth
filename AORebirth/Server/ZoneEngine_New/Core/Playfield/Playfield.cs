@@ -14,8 +14,8 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
-    using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
 
@@ -28,12 +28,14 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IMessageRouter _router;
         private readonly PlayfieldManager _playfieldManager;
         private readonly PlayerHydrator _playerHydrator;
-        private readonly IMobTemplateCatalog _mobTemplates;
+        private readonly IGameData _gameData;
+        private readonly IItemBuilder _items;
         private readonly ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
-        private readonly PlayfieldHeartbeat _heartBeat;
+        private PlayfieldHeartbeat? _heartBeat;
         private readonly Lock _tickSync = new();
+        private int _nextLootInventoryHandle = 0x70;
         private bool _disposed;
 
         public Playfield(
@@ -42,7 +44,8 @@ namespace ZoneEngine_New.Core.Playfield
             IMessageRouter router,
             PlayfieldManager playfieldManager,
             PlayerHydrator playerHydrator,
-            IMobTemplateCatalog mobTemplates)
+            IGameData gameData,
+            IItemBuilder items)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
                 playfieldIdentity.Instance,
@@ -51,28 +54,37 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(router);
             ArgumentNullException.ThrowIfNull(playfieldManager);
             ArgumentNullException.ThrowIfNull(playerHydrator);
-            ArgumentNullException.ThrowIfNull(mobTemplates);
+            ArgumentNullException.ThrowIfNull(gameData);
+            ArgumentNullException.ThrowIfNull(items);
 
             Identity = playfieldIdentity;
             _logger = playfieldLogger;
             _router = router;
             _playfieldManager = playfieldManager;
             _playerHydrator = playerHydrator;
-            _mobTemplates = mobTemplates;
-            MetaData = GameDataLoader.LoadPlayfieldMetaData(playfieldIdentity.Instance);
+            _gameData = gameData;
+            _items = items;
+            MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
 
             _serviceProvider = BuildServices().BuildServiceProvider();
             _dynelRegistry = _serviceProvider.GetRequiredService<DynelRegistry>();
             _serviceProvider.GetRequiredService<HashSpawnSystem>().Initialize(
                 _serviceProvider.GetRequiredService<PlayfieldLocality>());
 
-            _heartBeat = new PlayfieldHeartbeat(playfieldIdentity, Tick);
-
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "Playfield created metadata={0}",
                     MetaData == null ? "null(indoor)" : "loaded"));
+        }
+
+        /// <summary>Starts the tick thread after the playfield is registered with <see cref="PlayfieldManager"/>.</summary>
+        public void StartHeartbeat()
+        {
+            if (_heartBeat != null || _disposed)
+                return;
+
+            _heartBeat = new PlayfieldHeartbeat(Identity, Tick);
         }
 
         public Identity Identity { get; }
@@ -123,6 +135,15 @@ namespace ZoneEngine_New.Core.Playfield
             where T : class
             => _serviceProvider.GetRequiredService<T>();
 
+        /// <summary>Client inventory handle for an opened loot bag (0x70..0xFF).</summary>
+        public int AllocateLootInventoryHandle()
+        {
+            int handle = _nextLootInventoryHandle++;
+            if (_nextLootInventoryHandle > 0xff)
+                _nextLootInventoryHandle = 0x70;
+            return handle;
+        }
+
         /// <summary>Called from async I/O tasks. Handlers run on the playfield tick thread.</summary>
         public bool TryEnqueue(PlayfieldInboundItem item) => _inbound.TryEnqueue(item);
 
@@ -134,7 +155,8 @@ namespace ZoneEngine_New.Core.Playfield
             }
 
             _disposed = true;
-            _heartBeat.Dispose();
+            _heartBeat?.Dispose();
+            _heartBeat = null;
 
             lock (_tickSync)
             {
@@ -161,6 +183,7 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
                 _inbound.Drain(_router, spawn);
                 spawn.DespawnExpiredLinkDeadPlayers();
+                spawn.DespawnExpiredCorpses();
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
             }
@@ -174,7 +197,8 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_logger);
             services.AddSingleton(_playfieldManager);
             services.AddSingleton(_playerHydrator);
-            services.AddSingleton(_mobTemplates);
+            services.AddSingleton(_gameData);
+            services.AddSingleton(_items);
             services.Add(new ServiceDescriptor(typeof(Identity), Identity));
             if (MetaData != null)
             {

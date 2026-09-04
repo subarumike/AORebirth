@@ -33,22 +33,17 @@ namespace ZoneEngine_New.Core.Characters
         public CharacterHydrationResult? LoadForLogin(int characterId)
         {
             if (characterId <= 0)
-            {
                 return null;
-            }
 
             CharacterRecord? character = _characters.GetById(characterId);
             if (character == null || character.Playfield <= 0)
-            {
                 return null;
-            }
 
             var result = new CharacterHydrationResult
             {
                 Character = character,
                 Stats = _stats.GetForCharacter(characterId),
-                Items = _inventory.GetItemsForCharacter(characterId),
-                InstancedItems = _inventory.GetInstancedItemsForCharacter(characterId)
+                Items = _inventory.GetCarriedItems(characterId)
             };
 
             if (!result.IsSpawnReady)
@@ -65,11 +60,10 @@ namespace ZoneEngine_New.Core.Characters
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Character hydrated id={0} stats={1} items={2} instanced={3}",
+                    "Character hydrated id={0} stats={1} items={2}",
                     characterId,
                     result.Stats.Count,
-                    result.Items.Count,
-                    result.InstancedItems.Count));
+                    result.Items.Count));
 
             return result;
         }

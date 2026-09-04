@@ -18,7 +18,6 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.MessageHandlers;
-    using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -54,19 +53,35 @@ namespace ZoneEngine_New
                 return;
             }
 
+            if (!DatabaseMigrationRunner.TryApplyPendingMigrations())
+            {
+                Colouring.Push(ConsoleColor.Red);
+                Console.WriteLine("Startup aborted due to database migration failure.");
+                Colouring.Pop();
+                Console.WriteLine("Press enter to exit");
+                Console.ReadLine();
+                return;
+            }
+
             try
             {
-                GameDataLoader.EnsureRootExists();
-                LogLocalityStartup();
                 rootServices = BuildRootServices();
-                _ = rootServices.GetRequiredService<IMobTemplateCatalog>();
+                IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
+                IGameData gameData = rootServices.GetRequiredService<IGameData>();
+                LogLocalityStartup();
+                logger.Info(
+                    string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        "GameData ready root={0} mobs={1} loot={2} monsterData={3}",
+                        gameData.RootPath,
+                        gameData.MobTemplateCount,
+                        gameData.LootTableCount,
+                        gameData.MonsterDataCount));
                 chatEngineLink = rootServices.GetRequiredService<IChatEngineLink>();
                 chatEngineLink.Start();
                 playfieldManager = rootServices.GetRequiredService<PlayfieldManager>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
-
-                IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
                 logger.Info("ZoneEngine_New root container started.");
             }
             catch (Exception exception)
@@ -97,21 +112,31 @@ namespace ZoneEngine_New
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
             services.AddSingleton<IItemBuilder, ItemBuilder>();
-            services.AddSingleton<IMobTemplateCatalog, MobTemplateCatalog>();
+            services.AddSingleton<IGameData, GameDataStore>();
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
             services.AddSingleton<PlayfieldManager>();
             services.AddSingleton<ZoneMessageCodec>();
+
+            //Chat
             services.AddSingleton<IChatEngineLink, IsComChatEngineLink>();
             services.AddSingleton<VicinityChatRelay>();
+
+            //Commands
             services.AddSingleton<IGmCommand, SpawnCommand>();
             services.AddSingleton<IGmCommand, TeleportCommand>();
+            services.AddSingleton<IGmCommand, SetCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
+
+            //Networking
             AddMessageHandler<CharDCMoveMessageHandler>(services);
             AddMessageHandler<CharacterActionMessageHandler>(services);
             AddMessageHandler<CharInPlayMessageHandler>(services);
             AddMessageHandler<LookAtMessageHandler>(services);
+            AddMessageHandler<AttackMessageHandler>(services);
+            AddMessageHandler<StopFightMessageHandler>(services);
+            AddMessageHandler<GenericCmdMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();

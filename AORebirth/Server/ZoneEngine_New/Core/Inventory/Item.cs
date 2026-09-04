@@ -11,6 +11,11 @@ namespace ZoneEngine_New.Core.Inventory
     /// </summary>
     public sealed class Item
     {
+        /// <summary>
+        /// Durable server key from item_instances. 0 = ephemeral (not persisted).
+        /// </summary>
+        public int InstanceId { get; init; }
+
         public Identity Identity { get; init; }
 
         public int LowId { get; init; }
@@ -29,7 +34,13 @@ namespace ZoneEngine_New.Core.Inventory
 
         public Dictionary<EventType, List<ItemSpell>> SpellList => Definition.SpellList;
 
-        public int GetStat(int attrId)
-            => Definition.Stats.TryGetValue(attrId, out int value) ? value : 0;
+        public int GetStat(CharacterStat stat)
+            => Definition.Stats.TryGetValue(stat, out int value) ? value : 0;
+
+        public bool IsWieldableCombatWeapon()
+            => (ItemClass)GetStat(CharacterStat.ItemClass) == ItemClass.Weapon;
+
+        public bool IsMaCombinedWeapon()
+            => GetStat(CharacterStat.MartialArts) > 0;
     }
 }
