@@ -14,8 +14,8 @@ $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
 $failed = $false
 
 $engineDefinitions = @(
-    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe" },
     @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" },
+    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe" },
     @{ Name = "WebEngine"; File = "WebEngine.exe" },
     @{ Name = "LoginEngine"; File = "LoginEngine.exe" },
     @{ Name = "ChatEngine"; File = "ChatEngine.exe" }

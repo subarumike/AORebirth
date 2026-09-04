@@ -32,6 +32,7 @@ namespace ZoneEngine_New
         private static ZoneNetworkHost? networkHost;
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
+        private static int shutdownStarted;
 
         private static void Main(string[] args)
         {
@@ -128,6 +129,11 @@ namespace ZoneEngine_New
 
         private static void Shutdown()
         {
+            if (Interlocked.Exchange(ref shutdownStarted, 1) != 0)
+            {
+                return;
+            }
+
             if (networkHost != null)
             {
                 networkHost.DisposeAsync().AsTask().GetAwaiter().GetResult();
@@ -141,7 +147,11 @@ namespace ZoneEngine_New
             chatEngineLink?.Dispose();
             chatEngineLink = null;
 
-            rootServices?.Dispose();
+            if (rootServices != null)
+            {
+                rootServices.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            }
+
             rootServices = null;
 
             LogManager.Configuration = null;
@@ -270,6 +280,17 @@ namespace ZoneEngine_New
             if (HasArgument(args, "/autostart"))
             {
                 Console.WriteLine("ZoneEngine_New /autostart accepted (network already listening).");
+            }
+
+            if (HasArgument(args, "/headless") || HasArgument(args, "--headless"))
+            {
+                Console.WriteLine("ZoneEngine_New headless lifecycle active.");
+                while (!exited)
+                {
+                    Thread.Sleep(250);
+                }
+
+                return;
             }
 
             while (!exited)
