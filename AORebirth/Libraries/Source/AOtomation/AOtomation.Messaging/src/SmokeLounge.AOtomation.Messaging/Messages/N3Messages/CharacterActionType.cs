@@ -92,6 +92,11 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         StartSneak = 0x000000A3,
 
+        /// <summary>
+        /// Client→server: leave sneak. Action=0xAD.
+        /// </summary>
+        StopSneaking = 0x000000AD,
+
         SpecialAvailable = 0x000000A4,
 
         DisableXP = 0x000000A5,

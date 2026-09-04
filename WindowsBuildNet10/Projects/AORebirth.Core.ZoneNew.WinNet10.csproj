@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AORebirth.Core</AssemblyName>
+    <RootNamespace>AORebirth.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_WIN_NET10</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Interfaces.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Properties/AssemblyInfo.cs">
+      <Link>Properties/AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldMetaData.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldSpawnsData.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Textures/AOTextures.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Coordinate.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Quaternion.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Transform.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Vector/Vector3.cs" />
+  </ItemGroup>
+</Project>

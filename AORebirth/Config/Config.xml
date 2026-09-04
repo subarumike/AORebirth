@@ -10,6 +10,8 @@
   <CommPort>6996</CommPort>
   <!-- Playfield simulation ticks per second (default 32) -->
   <PlayfieldTickRate>32</PlayfieldTickRate>
+  <!-- Seconds a disconnected player stays visible (LinkDead) before despawn (default 60) -->
+  <LinkDeadTimeoutSeconds>60</LinkDeadTimeoutSeconds>
   <Locality>
     <!-- Safety default: locality visibility remains active while character ticks stay full-rate. -->
     <EnableCellHeatScheduling>false</EnableCellHeatScheduling>
@@ -17,10 +19,13 @@
     <HotNeighborLevel>1</HotNeighborLevel>
     <WarmNeighborLevel>2</WarmNeighborLevel>
     <CellSleepTime>30</CellSleepTime>
+    <!-- Max hash-spawns per awake cell tick (default 1). -->
+    <SpawnRate>1</SpawnRate>
   </Locality>
   <!-- Debug console categories: comma-separated DebugInfoDetail names (default Engine,Error) -->
-  <!-- Locality: player cell changes + cell heat (Hot/Warm/Cold/Asleep) in ZoneEngineLog -->
-  <!-- <DebugInfoDetail>Engine,Error,Locality</DebugInfoDetail> -->
+  <!-- Locality: player cell changes + cell heat (Hot/Warm/Cold/Asleep) + hash-spawns in ZoneEngine_NewLog -->
+  <!-- Network: ZoneEngine_New inbound/outbound message type names -->
+  <!-- <DebugInfoDetail>Engine,Error,Locality,Network</DebugInfoDetail> -->
   <!-- Log Area -->
   <SqlLog>true</SqlLog>
   <LogChat>false</LogChat>

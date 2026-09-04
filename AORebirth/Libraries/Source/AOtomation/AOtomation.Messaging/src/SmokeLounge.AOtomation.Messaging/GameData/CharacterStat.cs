@@ -122,7 +122,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         IP = 0x00000035, 
 
-        LevelNCUCost = 0x00000036, 
+        Level = 0x00000036, 
 
         InventoryId = 0x00000037, 
 
@@ -354,7 +354,11 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         HealthChangeWorst = 0x000000AB, 
 
-        HealthChange = 0x000000AC, 
+        HealthChange = 0x000000AC,
+
+        CurrentMovementMode = 0x000000AD,
+
+        PrevMovementMode = 0x000000AE,
 
         MoreFlags = 0x000000B1, 
 
@@ -394,7 +398,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         AccessKey = 0x000000C3, 
 
-        ConflictReputation = 0x000000C4, 
+        PetMaster = 0x000000C4, 
 
         OrientationMode = 0x000000C5, 
 

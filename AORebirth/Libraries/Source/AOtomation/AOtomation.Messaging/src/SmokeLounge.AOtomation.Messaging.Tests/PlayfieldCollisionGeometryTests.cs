@@ -573,7 +573,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string characterCombat = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
+                    @"AORebirth\Server\ZoneEngine\Core\Entities\Character.Combat.cs"));
             string capturedNormal = ExtractMethodBlock(coordinator, "internal void ProcessCombatTick");
             string ordinaryNormal = ExtractMethodBlock(coordinator, "internal void ApplyCombatHit");
             string normalDamageCore = ExtractMethodBlock(coordinator, "private void ApplyNpcCombatHitCore");

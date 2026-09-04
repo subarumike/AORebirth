@@ -21,6 +21,8 @@ namespace AORebirth.Core.GameData
 
         public const string SpawnsFileName = "Spawns.json";
 
+        public const string MobTemplatesFileName = "MobTemplates.json";
+
         public static string PlayfieldRelativeDirectory(int playfieldId)
         {
             if (playfieldId <= 0)

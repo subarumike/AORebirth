@@ -1,0 +1,481 @@
+[
+	{
+		"HasHeadMesh": false,
+		"Hash": "AAAA",
+		"Name": "To Be Determined",
+		"TemplateId": 43296,
+		"Stats": [
+			{
+				"Key": 1,
+				"Value": 12
+			},
+			{
+				"Key": 214,
+				"Value": 25
+			},
+			{
+				"Key": 47,
+				"Value": 1
+			},
+			{
+				"Key": 89,
+				"Value": 1
+			},
+			{
+				"Key": 359,
+				"Value": 17655
+			},
+			{
+				"Key": 60,
+				"Value": 0
+			},
+			{
+				"Key": 660,
+				"Value": 0
+			},
+			{
+				"Key": 389,
+				"Value": 0
+			},
+			{
+				"Key": 156,
+				"Value": 5
+			},
+			{
+				"Key": 466,
+				"Value": 0
+			},
+			{
+				"Key": 368,
+				"Value": 15
+			},
+			{
+				"Key": 54,
+				"Value": 1
+			},
+			{
+				"Key": 59,
+				"Value": 1
+			},
+			{
+				"Key": 60,
+				"Value": 0
+			},
+			{
+				"Key": 4,
+				"Value": 6
+			},
+			{
+				"Key": 360,
+				"Value": 90
+			},
+			{
+				"Key": 5,
+				"Value": 36
+			},
+			{
+				"Key": 455,
+				"Value": 36
+			},
+			{
+				"Key": 9016,
+				"Value": 80001
+			},
+			{
+				"Key": 33,
+				"Value": 3
+			},
+			{
+				"Key": 61,
+				"Value": 1
+			},
+			{
+				"Key": 27,
+				"Value": 12
+			},
+			{
+				"Key": 26,
+				"Value": 25
+			},
+			{
+				"Key": 52,
+				"Value": 202
+			},
+			{
+				"Key": 51,
+				"Value": 0
+			},
+			{
+				"Key": 63,
+				"Value": 0
+			},
+			{
+				"Key": 204,
+				"Value": 0
+			},
+			{
+				"Key": 342,
+				"Value": 30
+			},
+			{
+				"Key": 343,
+				"Value": 1
+			},
+			{
+				"Key": 16,
+				"Value": 7
+			},
+			{
+				"Key": 17,
+				"Value": 7
+			},
+			{
+				"Key": 18,
+				"Value": 7
+			},
+			{
+				"Key": 19,
+				"Value": 7
+			},
+			{
+				"Key": 20,
+				"Value": 7
+			},
+			{
+				"Key": 21,
+				"Value": 7
+			},
+			{
+				"Key": 100,
+				"Value": 9
+			},
+			{
+				"Key": 142,
+				"Value": 9
+			},
+			{
+				"Key": 143,
+				"Value": 9
+			},
+			{
+				"Key": 144,
+				"Value": 9
+			},
+			{
+				"Key": 102,
+				"Value": 9
+			},
+			{
+				"Key": 103,
+				"Value": 9
+			},
+			{
+				"Key": 106,
+				"Value": 9
+			},
+			{
+				"Key": 105,
+				"Value": 9
+			},
+			{
+				"Key": 107,
+				"Value": 9
+			},
+			{
+				"Key": 104,
+				"Value": 9
+			},
+			{
+				"Key": 145,
+				"Value": 8
+			},
+			{
+				"Key": 146,
+				"Value": 9
+			},
+			{
+				"Key": 101,
+				"Value": 9
+			},
+			{
+				"Key": 147,
+				"Value": 9
+			},
+			{
+				"Key": 108,
+				"Value": 9
+			},
+			{
+				"Key": 109,
+				"Value": 9
+			},
+			{
+				"Key": 110,
+				"Value": 9
+			},
+			{
+				"Key": 111,
+				"Value": 9
+			},
+			{
+				"Key": 112,
+				"Value": 9
+			},
+			{
+				"Key": 116,
+				"Value": 9
+			},
+			{
+				"Key": 114,
+				"Value": 9
+			},
+			{
+				"Key": 115,
+				"Value": 9
+			},
+			{
+				"Key": 113,
+				"Value": 9
+			},
+			{
+				"Key": 133,
+				"Value": 9
+			},
+			{
+				"Key": 150,
+				"Value": 9
+			},
+			{
+				"Key": 151,
+				"Value": 9
+			},
+			{
+				"Key": 148,
+				"Value": 9
+			},
+			{
+				"Key": 167,
+				"Value": 9
+			},
+			{
+				"Key": 111,
+				"Value": 9
+			},
+			{
+				"Key": 134,
+				"Value": 9
+			},
+			{
+				"Key": 118,
+				"Value": 9
+			},
+			{
+				"Key": 119,
+				"Value": 9
+			},
+			{
+				"Key": 120,
+				"Value": 9
+			},
+			{
+				"Key": 149,
+				"Value": 9
+			},
+			{
+				"Key": 138,
+				"Value": 9
+			},
+			{
+				"Key": 152,
+				"Value": 0
+			},
+			{
+				"Key": 153,
+				"Value": 10
+			},
+			{
+				"Key": 154,
+				"Value": 10
+			},
+			{
+				"Key": 155,
+				"Value": 12
+			},
+			{
+				"Key": 156,
+				"Value": 9
+			},
+			{
+				"Key": 90,
+				"Value": 0
+			},
+			{
+				"Key": 91,
+				"Value": 0
+			},
+			{
+				"Key": 92,
+				"Value": 0
+			},
+			{
+				"Key": 93,
+				"Value": 0
+			},
+			{
+				"Key": 94,
+				"Value": 0
+			},
+			{
+				"Key": 97,
+				"Value": 0
+			},
+			{
+				"Key": 95,
+				"Value": 0
+			},
+			{
+				"Key": 168,
+				"Value": 8
+			},
+			{
+				"Key": 96,
+				"Value": 0
+			},
+			{
+				"Key": 123,
+				"Value": 9
+			},
+			{
+				"Key": 124,
+				"Value": 9
+			},
+			{
+				"Key": 125,
+				"Value": 9
+			},
+			{
+				"Key": 126,
+				"Value": 9
+			},
+			{
+				"Key": 157,
+				"Value": 9
+			},
+			{
+				"Key": 158,
+				"Value": 9
+			},
+			{
+				"Key": 159,
+				"Value": 9
+			},
+			{
+				"Key": 160,
+				"Value": 9
+			},
+			{
+				"Key": 161,
+				"Value": 9
+			},
+			{
+				"Key": 162,
+				"Value": 9
+			},
+			{
+				"Key": 163,
+				"Value": 9
+			},
+			{
+				"Key": 141,
+				"Value": 9
+			},
+			{
+				"Key": 127,
+				"Value": 9
+			},
+			{
+				"Key": 128,
+				"Value": 9
+			},
+			{
+				"Key": 129,
+				"Value": 9
+			},
+			{
+				"Key": 130,
+				"Value": 9
+			},
+			{
+				"Key": 131,
+				"Value": 9
+			},
+			{
+				"Key": 122,
+				"Value": 9
+			},
+			{
+				"Key": 132,
+				"Value": 9
+			},
+			{
+				"Key": 0,
+				"Value": 0
+			},
+			{
+				"Key": 164,
+				"Value": 9
+			},
+			{
+				"Key": 165,
+				"Value": 9
+			},
+			{
+				"Key": 135,
+				"Value": 9
+			},
+			{
+				"Key": 136,
+				"Value": 9
+			},
+			{
+				"Key": 166,
+				"Value": 9
+			},
+			{
+				"Key": 139,
+				"Value": 9
+			},
+			{
+				"Key": 140,
+				"Value": 9
+			},
+			{
+				"Key": 484,
+				"Value": 13
+			},
+			{
+				"Key": 454,
+				"Value": 25
+			}
+		],
+		"MinLevel": 0,
+		"MaxLevel": 0,
+		"Equipment": [
+		],
+		"KnuBotId": 1131,
+		"ItemTable": [
+			{
+				"Hash": "AAAA",
+				"Repeats": 1,
+				"Chance": 100,
+				"LevelMod": 25
+			},
+			{
+				"Hash": "AAAB",
+				"Repeats": 1,
+				"Chance": 50,
+				"LevelMod": 25
+			},
+		]
+	}
+]

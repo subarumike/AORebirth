@@ -231,10 +231,15 @@ namespace Utility.Config
         /// </summary>
         public int PlayfieldTickRate { get; set; }
 
+        /// <summary>
+        /// Seconds a disconnected player stays LinkDead (visible) before despawn. Default 60 when omitted or &lt;= 0.
+        /// </summary>
+        public int LinkDeadTimeoutSeconds { get; set; }
+
         public LocalitySettings Locality { get; set; }
 
         /// <summary>
-        /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Combat,Locality). Defaults to Engine,Error when omitted.
+        /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Network,Combat,Locality). Defaults to Engine,Error when omitted.
         /// </summary>
         public string DebugInfoDetail { get; set; }
 

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AORebirth.Interfaces</AssemblyName>
+    <RootNamespace>AORebirth.Interfaces</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_WIN_NET10</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Properties/AssemblyInfo.cs">
+      <Link>Properties/AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/IVector3.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/ICoordinate.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/IQuaternion.cs" />
+  </ItemGroup>
+</Project>

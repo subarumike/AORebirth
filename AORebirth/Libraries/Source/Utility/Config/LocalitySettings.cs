@@ -11,5 +11,8 @@ namespace Utility.Config
         public int WarmNeighborLevel { get; set; }
 
         public int CellSleepTime { get; set; }
+
+        /// <summary>Max NPC hash-spawns per awake cell tick (default 1).</summary>
+        public int SpawnRate { get; set; }
     }
 }

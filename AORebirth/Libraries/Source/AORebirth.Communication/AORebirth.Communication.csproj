@@ -53,6 +53,7 @@
     <Compile Include="Messages\ChatCommand.cs" />
     <Compile Include="Messages\CpuRamLoad.cs" />
     <Compile Include="Messages\DynamicMessage.cs" />
+    <Compile Include="Messages\DynamicMessageCodec.cs" />
     <Compile Include="Messages\IMessageData.cs" />
     <Compile Include="Messages\MessageBase.cs" />
     <Compile Include="Messages\OnlineCharacters.cs" />

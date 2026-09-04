@@ -4,6 +4,7 @@ namespace AORebirth.Tools.RDBDataExtractor
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
 
     using AODB;
     using CommandLine;
@@ -12,6 +13,9 @@ namespace AORebirth.Tools.RDBDataExtractor
     {
         private static int Main(string[] args)
         {
+            // AODB reads RDB strings with Windows-1252; netcoreapp/net5+ need this provider.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             return Parser.Default.ParseArguments<ExtractionOptions>(args)
                 .MapResult(
                     Run,
