@@ -19,7 +19,7 @@ namespace AORebirth.Tools.MissionDaoValidation
 
     using MySqlConnector;
 
-    internal static class Program
+    internal static partial class Program
     {
         private const string AcknowledgementEnvironment = "AO_REBIRTH_ALLOW_DISPOSABLE_MISSION_DAO_VALIDATION";
         private const string ContainerName = "aorebirth-mission-dao-validation";
@@ -71,6 +71,13 @@ namespace AORebirth.Tools.MissionDaoValidation
                 ValidateRewards(dao);
                 ValidateRollFeeConcurrency(dao, disposable.RootConnectionString);
                 ValidateStartArea(dao);
+                ValidateHardening(dao, disposable.ApplicationConnectionString);
+
+#if MISSION_DAO_ISOLATED_TESTS
+                Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
+#else
+                Console.WriteLine("MISSION_DAO_TEST_MODE=FULL_PROJECT_REFERENCES");
+#endif
 
                 Console.WriteLine("MISSION_DAO_MYSQL_INTEGRATION=PASS");
                 Console.WriteLine("ROLLBACK_AND_CONCURRENCY_TESTS=PASS");

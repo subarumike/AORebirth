@@ -48,6 +48,55 @@ MISSION_FORBIDDEN_TOKENS = (
 
 EXCLUDED_PARTS = {"bin", "obj", "packages", ".git"}
 
+PERSISTENCE_ROOTS = (
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions",
+)
+ENGINE_TOKENS = (
+    "ZoneEngine", "ZoneEngine_New", "LoginEngine", "ChatEngine", "WebEngine",
+    "AORebirth.Core", "AORebirth.Stats", "SmokeLounge.AOtomation", "Cell.Core",
+    "Player", "Character", "ZoneClient", "IZoneSession", "IPlayfield", "Playfield",
+)
+CONTRACT_TOKENS = MISSION_FORBIDDEN_TOKENS + (
+    "AORebirth.Database", "AORebirth.Enums", "Utility", "MySqlConnector", "Npgsql",
+    "SqlClient", "IDbTransaction", "DbTransaction", "IDataReader", "DataTable",
+    "DataSet", "IQueryable", "DbDataReader",
+)
+
+
+def code_only(text: str) -> str:
+    # Contracts use C# 7.3. Strip comments and string/character literals before
+    # checking references, so documentation and SQL values do not impersonate code.
+    return re.sub(
+        r'//[^\n]*|/\*.*?\*/|(?:\$@|@\$|@)"(?:""|[^"])*"|\$?"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
+        " ", text, flags=re.DOTALL,
+    )
+
+
+def mission_persistence_violations(root: Path) -> list[str]:
+    violations = []
+    for relative_root in PERSISTENCE_ROOTS:
+        directory = root / relative_root
+        sources = sorted(path for path in directory.rglob("*.cs")
+                         if not set(path.relative_to(directory).parts) & EXCLUDED_PARTS)
+        if not sources:
+            violations.append(relative_root + ":missing-persistence-sources")
+        contract = "/AORebirth.Interfaces/" in relative_root
+        for path in sources:
+            text = path.read_text(encoding="utf-8-sig")
+            code = code_only(text)
+            relative = normalize(path.relative_to(root))
+            tokens = ENGINE_TOKENS + (CONTRACT_TOKENS if contract else ())
+            for token in tokens:
+                if re.search(r"(?<![\w])" + re.escape(token) + r"(?![\w])", code):
+                    violations.append(relative + ":" + token)
+            if contract and re.search(r"\bDB[A-Z]\w*\b", code):
+                violations.append(relative + ":database-row-type")
+            if contract and any(pattern.search(value) for value in extract_csharp_strings(text)
+                                for pattern in SQL_PATTERNS):
+                violations.append(relative + ":embedded-sql")
+    return sorted(set(violations))
+
 
 def normalize(path: Path) -> str:
     return path.as_posix()
@@ -217,7 +266,7 @@ def validate(root: Path, manifest_path: Path) -> tuple[list[str], list[str], lis
     baseline = load_manifest(manifest_path)
     new_sites = sorted(set(actual) - set(baseline))
     stale = sorted(set(baseline) - set(actual))
-    boundary = mission_boundary_violations(root)
+    boundary = mission_boundary_violations(root) + mission_persistence_violations(root)
     return new_sites, stale, boundary
 
 
@@ -229,6 +278,10 @@ def write(path: Path, content: str) -> None:
 def self_test() -> None:
     with tempfile.TemporaryDirectory(prefix="aorebirth-dao-guard-") as temporary:
         root = Path(temporary)
+        contract = root / PERSISTENCE_ROOTS[0] / "IMissionDao.cs"
+        implementation = root / PERSISTENCE_ROOTS[1] / "MySqlMissionDao.cs"
+        write(contract, 'namespace AORebirth.Interfaces.Persistence.Missions { public interface IMissionDao {} }')
+        write(implementation, 'using Dapper; class Dao { const string Sql = "SELECT State FROM missionstates"; }')
         runtime = root / "AORebirth/Server/ZoneEngine/RuntimeSql.cs"
         write(runtime, 'class RuntimeSql { const string Sql = "SELECT Id FROM characters"; }')
         write(
@@ -261,6 +314,25 @@ def self_test() -> None:
         if new_sites or stale or boundary:
             raise RuntimeError("positive fixture failed")
 
+        for bad_source in (
+            "using Data = System.Data; interface Bad { Data.IDbConnection Get(); }",
+            "interface Bad { AORebirth.Database.Entities.DBCharacter Get(); }",
+            "interface Bad { ZoneEngine_New.Core.Entities.Player Get(); }",
+            "using System.Linq; interface Bad { IQueryable<int> Get(); }",
+            'class Bad { const string Sql = "DELETE FROM arbitrary_table"; }',
+        ):
+            write(contract, bad_source)
+            if not mission_persistence_violations(root):
+                raise RuntimeError("persistence contract fixture was not rejected: " + bad_source)
+        write(contract, '// IDbConnection ZoneEngine_New\ninterface IMissionDao {}')
+        for token in ("ZoneEngine_New.Core.Entities.Player", "ZoneEngine.Core.Missions.MissionRuntime", "AORebirth.Core.Character"):
+            write(implementation, "class Bad { " + token + " field; }")
+            if not mission_persistence_violations(root):
+                raise RuntimeError("persistence engine dependency fixture was not rejected")
+        write(implementation, 'using Dapper; class Dao { const string Note = "ZoneEngine_New"; }')
+        if mission_persistence_violations(root):
+            raise RuntimeError("persistence comment/string fixture was rejected")
+
         write(
             root / "AORebirth/Server/ZoneEngine/Core/Missions/BadMission.cs",
             "using System.Data; class BadMission { IDbConnection value; }",
@@ -282,6 +354,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path)
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--mission-persistence-only", action="store_true")
     args = parser.parse_args()
 
     if args.self_test:
@@ -293,6 +366,18 @@ def main() -> int:
         parser.error("--root is required unless --self-test is used")
     root = args.root.resolve()
     manifest = (args.manifest or Path(__file__).with_name("known-violations.json")).resolve()
+    if args.mission_persistence_only:
+        try:
+            boundary = mission_boundary_violations(root) + mission_persistence_violations(root)
+        except (OSError, ValueError) as error:
+            print("MISSION_PERSISTENCE_GUARD=FAIL")
+            print("ERROR=" + str(error))
+            return 1
+        for value in boundary:
+            print("MISSION_BOUNDARY_VIOLATION=" + value)
+        print("MISSION_PERSISTENCE_GUARD=" + ("FAIL" if boundary else "PASS"))
+        print("MISSION_BOUNDARY_VIOLATIONS=" + str(len(boundary)))
+        return 1 if boundary else 0
     try:
         new_sites, stale, boundary = validate(root, manifest)
         actual = direct_sql_sites(root)
