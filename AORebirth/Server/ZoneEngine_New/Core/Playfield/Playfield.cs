@@ -82,6 +82,7 @@ namespace ZoneEngine_New.Core.Playfield
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
+            Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
 
             _serviceProvider = BuildServices().BuildServiceProvider();
             _dynelRegistry = _serviceProvider.GetRequiredService<DynelRegistry>();
@@ -91,8 +92,12 @@ namespace ZoneEngine_New.Core.Playfield
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Playfield created metadata={0}",
-                    MetaData == null ? "null(indoor)" : "loaded"));
+                    "Playfield created metadata={0} walls={1} dynels={2} tilemap={3} surface={4}",
+                    MetaData == null ? "null(indoor)" : "loaded",
+                    Geometry.Walls != null,
+                    Geometry.Dynels != null,
+                    Geometry.Tilemap != null,
+                    Geometry.Surface != null));
         }
 
         /// <summary>Starts the tick thread after the playfield is registered with <see cref="PlayfieldManager"/>.</summary>
@@ -108,6 +113,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>Null for playfields with no extracted GameData; those resolve to an indoor layout.</summary>
         public PlayfieldMetaData? MetaData { get; }
+
+        /// <summary>Parsed Walls.dat / Dynels.dat / Collision.dat; members null when files are missing.</summary>
+        public PlayfieldGeometryData Geometry { get; }
 
         /// <summary>
         /// Builds a PlayfieldAnarchyF login packet for this playfield.
@@ -250,6 +258,16 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 services.AddSingleton(MetaData);
             }
+
+            services.AddSingleton(Geometry);
+            if (Geometry.Walls != null)
+                services.AddSingleton(Geometry.Walls);
+            if (Geometry.Dynels != null)
+                services.AddSingleton(Geometry.Dynels);
+            if (Geometry.Tilemap != null)
+                services.AddSingleton(Geometry.Tilemap);
+            if (Geometry.Surface != null)
+                services.AddSingleton(Geometry.Surface);
 
             services.AddSingleton<DynelRegistry>();
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));

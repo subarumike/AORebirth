@@ -13,6 +13,8 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestHashHelper();
             TestPlayfieldMetaDataContract();
             TestDistrictAndSpawnContracts();
+            TestPlayfieldDatFileNames();
+            TestCollisionDatFraming();
             Console.WriteLine("RDBDataExtractor self-test PASS");
             return true;
         }
@@ -174,6 +176,77 @@ namespace AORebirth.Tools.RDBDataExtractor
             if (spawns.Spawns.Length != 1 || spawns.Spawns[0].HashText != "ABCD")
             {
                 throw new InvalidOperationException("Spawns contract smoke check failed.");
+            }
+        }
+
+        private static void TestPlayfieldDatFileNames()
+        {
+            if (GameDataPaths.WallsFileName != "Walls.dat"
+                || GameDataPaths.DynelsFileName != "Dynels.dat"
+                || GameDataPaths.CollisionFileName != "Collision.dat")
+            {
+                throw new InvalidOperationException(
+                    "Playfield dat file names were unexpected.");
+            }
+        }
+
+        private static void TestCollisionDatFraming()
+        {
+            byte[] tilemap = new byte[] { 1, 2, 3, 4 };
+            byte[] surface = new byte[] { 9, 8, 7 };
+            byte[] framed = PlayfieldCollisionDat.Build(tilemap, surface);
+            byte[] parsedTilemap;
+            byte[] parsedSurface;
+            PlayfieldCollisionDat.Parse(
+                framed,
+                out parsedTilemap,
+                out parsedSurface);
+
+            if (parsedTilemap.Length != tilemap.Length
+                || parsedSurface.Length != surface.Length)
+            {
+                throw new InvalidOperationException(
+                    "Collision.dat framing lengths did not round-trip.");
+            }
+
+            for (int index = 0; index < tilemap.Length; index++)
+            {
+                if (parsedTilemap[index] != tilemap[index])
+                {
+                    throw new InvalidOperationException(
+                        "Collision.dat tilemap payload did not round-trip.");
+                }
+            }
+
+            for (int index = 0; index < surface.Length; index++)
+            {
+                if (parsedSurface[index] != surface[index])
+                {
+                    throw new InvalidOperationException(
+                        "Collision.dat surface payload did not round-trip.");
+                }
+            }
+
+            byte[] tilemapOnly = PlayfieldCollisionDat.Build(tilemap, null);
+            PlayfieldCollisionDat.Parse(
+                tilemapOnly,
+                out parsedTilemap,
+                out parsedSurface);
+            if (parsedTilemap.Length != tilemap.Length || parsedSurface.Length != 0)
+            {
+                throw new InvalidOperationException(
+                    "Collision.dat tilemap-only framing failed.");
+            }
+
+            byte[] surfaceOnly = PlayfieldCollisionDat.Build(null, surface);
+            PlayfieldCollisionDat.Parse(
+                surfaceOnly,
+                out parsedTilemap,
+                out parsedSurface);
+            if (parsedTilemap.Length != 0 || parsedSurface.Length != surface.Length)
+            {
+                throw new InvalidOperationException(
+                    "Collision.dat surface-only framing failed.");
             }
         }
     }

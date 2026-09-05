@@ -7,6 +7,8 @@ namespace ZoneEngine_New.Core.GameData
     using System.Text.Json;
     using System.Threading;
 
+    using AODB.Common.RDBObjects;
+
     using AORebirth.Core.GameData;
 
     using Utility;
@@ -46,6 +48,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
+        private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
 
         public GameDataStore(IZoneLogger logger)
         {
@@ -145,6 +148,21 @@ namespace ZoneEngine_New.Core.GameData
 
                 PlayfieldSpawnsData loaded = ReadPlayfieldSpawns(playfieldId);
                 _playfieldSpawns[playfieldId] = loaded;
+                return loaded;
+            }
+        }
+
+        public PlayfieldGeometryData GetPlayfieldGeometry(int playfieldId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playfieldId);
+
+            lock (_playfieldSync)
+            {
+                if (_playfieldGeometry.TryGetValue(playfieldId, out PlayfieldGeometryData? cached))
+                    return cached;
+
+                PlayfieldGeometryData loaded = ReadPlayfieldGeometry(playfieldId);
+                _playfieldGeometry[playfieldId] = loaded;
                 return loaded;
             }
         }
@@ -508,6 +526,133 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return metaData;
+        }
+
+        private PlayfieldGeometryData ReadPlayfieldGeometry(int playfieldId)
+        {
+            PlayfieldWalls? walls = TryDeserializeRdbObject<PlayfieldWalls>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldWallsRelativePath(playfieldId)));
+            PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldDynelsRelativePath(playfieldId)));
+
+            Tilemap? tilemap = null;
+            SurfaceResource? surface = null;
+            string collisionPath = Path.Combine(
+                RootPath,
+                GameDataPaths.PlayfieldCollisionRelativePath(playfieldId));
+            if (File.Exists(collisionPath))
+            {
+                byte[] framed;
+                try
+                {
+                    framed = File.ReadAllBytes(collisionPath);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidDataException(
+                        "Playfield Collision.dat could not be read: "
+                        + collisionPath
+                        + " ("
+                        + exception.GetType().Name
+                        + ": "
+                        + exception.Message
+                        + ")",
+                        exception);
+                }
+
+                byte[] tilemapPayload;
+                byte[] surfacePayload;
+                try
+                {
+                    PlayfieldCollisionDat.Parse(framed, out tilemapPayload, out surfacePayload);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidDataException(
+                        "Playfield Collision.dat framing is invalid: "
+                        + collisionPath
+                        + " ("
+                        + exception.GetType().Name
+                        + ": "
+                        + exception.Message
+                        + ")",
+                        exception);
+                }
+
+                if (tilemapPayload.Length > 0)
+                    tilemap = DeserializeRdbObject<Tilemap>(tilemapPayload, collisionPath + "#tilemap");
+
+                if (surfacePayload.Length > 0)
+                {
+                    surface = DeserializeRdbObject<SurfaceResource>(
+                        surfacePayload,
+                        collisionPath + "#surface");
+                }
+            }
+
+            return new PlayfieldGeometryData
+            {
+                Walls = walls,
+                Dynels = dynels,
+                Tilemap = tilemap,
+                Surface = surface
+            };
+        }
+
+        private static T? TryDeserializeRdbObject<T>(string path)
+            where T : RDBObject, new()
+        {
+            if (!File.Exists(path))
+                return null;
+
+            byte[] payload;
+            try
+            {
+                payload = File.ReadAllBytes(path);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidDataException(
+                    "Playfield geometry could not be read: "
+                    + path
+                    + " ("
+                    + exception.GetType().Name
+                    + ": "
+                    + exception.Message
+                    + ")",
+                    exception);
+            }
+
+            if (payload.Length == 0)
+                return null;
+
+            return DeserializeRdbObject<T>(payload, path);
+        }
+
+        private static T DeserializeRdbObject<T>(byte[] payload, string sourcePath)
+            where T : RDBObject, new()
+        {
+            T record = new();
+            try
+            {
+                using MemoryStream stream = new(payload, writable: false);
+                using BinaryReader reader = new(stream);
+                record.Deserialize(reader);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidDataException(
+                    "Playfield geometry could not be deserialized: "
+                    + sourcePath
+                    + " ("
+                    + exception.GetType().Name
+                    + ": "
+                    + exception.Message
+                    + ")",
+                    exception);
+            }
+
+            return record;
         }
 
         #endregion
