@@ -39,6 +39,7 @@ namespace AORebirth.Tools.MissionDaoValidation
             run("snapshot-ordering", () => ValidateSnapshotOrdering(dao));
             run("mutation-cutpoints", () => ValidateMutationCutpoints(dao, connectionString));
             run("ledger-write-failure", () => ValidateLedgerWriteFailure(dao, connectionString));
+            run("acceptance-failures", () => ValidateAcceptanceFailures(dao, connectionString));
             if (failures.Count != 0)
             {
                 throw new InvalidOperationException(string.Join(", ", failures));
@@ -215,6 +216,8 @@ namespace AORebirth.Tools.MissionDaoValidation
             catch (ExpectedRollbackException actual)
             {
                 Require(ReferenceEquals(original, actual), "original-failure-not-masked-by-rollback");
+                Require(ReferenceEquals(connection.Transaction.Failure, actual.Data["MissionDao.RollbackFailure"]),
+                    "rollback-failure-remains-inspectable");
             }
             Require(connection.Disposed && connection.Transaction.Disposed, "failed-rollback-disposes-resources");
         }
@@ -413,6 +416,78 @@ namespace AORebirth.Tools.MissionDaoValidation
             Require(dao.Execute(101, tx => tx.GetReward(key)) == null, "failed-ledger-absent");
         }
 
+        private static void ValidateAcceptanceFailures(IMissionDao dao, string connectionString)
+        {
+            var fresh = new MySqlMissionDao(() => new MySqlConnection(connectionString));
+            MissionStateData parent = NewMission("acceptance.child-failure");
+            var child = new MissionObjectiveProgressData
+            {
+                CharacterId = 101, QuestId = parent.QuestId, ObjectiveId = "bad-\ud83d\ude00", RequiredCount = 2
+            };
+            bool childFailed = false;
+            Expect<InvalidOperationException>(() => dao.Execute(101, tx =>
+            {
+                tx.SaveMission(Key(parent.QuestId), parent);
+                try { tx.SaveObjective(new MissionObjectiveKeyData(Key(parent.QuestId), child.ObjectiveId), child); }
+                catch (MySqlException) { childFailed = true; }
+                return true;
+            }), "caught-child-failure-prevents-success");
+            Require(childFailed, "child-provider-write-failure-reached");
+            Require(parent.Version == 0 && child.Version == 0, "child-failure-restores-versions");
+            Require(fresh.GetMission(Key(parent.QuestId)) == null, "child-failure-parent-not-committed");
+            Require(Scalar(connectionString,
+                "SELECT COUNT(*) FROM missionobjectiveprogress WHERE CharacterId=101 AND QuestId='acceptance.child-failure'") == 0,
+                "child-failure-child-not-committed");
+
+            MissionStateData cancelled = NewMission("acceptance.cancelled");
+            var objective = new MissionObjectiveProgressData
+            {
+                CharacterId = 101, QuestId = cancelled.QuestId, ObjectiveId = "one", RequiredCount = 2
+            };
+            using (var cancellation = new CancellationTokenSource())
+            {
+                Expect<OperationCanceledException>(() => dao.Execute(101, tx =>
+                {
+                    tx.SaveMission(Key(cancelled.QuestId), cancelled);
+                    tx.SaveObjective(new MissionObjectiveKeyData(Key(cancelled.QuestId), "one"), objective);
+                    cancellation.Cancel();
+                    cancellation.Token.ThrowIfCancellationRequested();
+                    return true;
+                }), "callback-cancellation-propagates");
+            }
+            Require(cancelled.Version == 0 && objective.Version == 0, "cancellation-restores-versions");
+            Require(fresh.GetMission(Key(cancelled.QuestId)) == null, "cancellation-parent-absent-fresh-dao");
+            Require(Scalar(connectionString,
+                "SELECT COUNT(*) FROM missionobjectiveprogress WHERE CharacterId=101 AND QuestId='acceptance.cancelled'") == 0,
+                "cancellation-child-absent-fresh-connection");
+
+            // A real provider read error without altering any schema or fixture table.
+            var missingTable = new MySqlMissionDao(() =>
+            {
+                MySqlConnection connection = Open(connectionString);
+                try { connection.ChangeDatabase("information_schema"); return connection; }
+                catch { connection.Dispose(); throw; }
+            });
+            Expect<MySqlException>(() => missingTable.GetMissions(101), "read-error-not-empty-success");
+            Expect<MySqlException>(() => missingTable.ReadCharacter(101), "snapshot-read-error-not-empty-success");
+
+            MissionStateData pending = NewMission("acceptance.caught-stale");
+            MissionStateData stale = fresh.GetMission(Key("dao.lifecycle"));
+            stale.Version += 100;
+            bool mismatch = false;
+            Expect<InvalidOperationException>(() => dao.Execute(101, tx =>
+            {
+                tx.SaveMission(Key(pending.QuestId), pending);
+                try { tx.SaveMission(Key(stale.QuestId), stale); }
+                catch (InvalidOperationException) { mismatch = true; }
+                return true;
+            }), "caught-row-mismatch-prevents-success");
+            Require(mismatch, "affected-row-mismatch-reached");
+            Require(pending.Version == 0 && fresh.GetMission(Key(pending.QuestId)) == null,
+                "affected-row-mismatch-rolls-back-prior-write");
+            Require(fresh.GetMission(Key(stale.QuestId)).Version != stale.Version, "affected-row-mismatch-no-stale-overwrite");
+        }
+
         private sealed class FailingRollbackConnection : IDbConnection
         {
             internal bool Disposed;
@@ -433,10 +508,11 @@ namespace AORebirth.Tools.MissionDaoValidation
         private sealed class FailingRollbackTransaction : IDbTransaction
         {
             internal bool Disposed;
+            internal readonly Exception Failure = new InvalidOperationException("injected-rollback-failure");
             public IDbConnection Connection { get { return null; } }
             public IsolationLevel IsolationLevel { get { return IsolationLevel.RepeatableRead; } }
             public void Commit() { }
-            public void Rollback() { throw new InvalidOperationException("injected-rollback-failure"); }
+            public void Rollback() { throw this.Failure; }
             public void Dispose() { this.Disposed = true; }
         }
     }

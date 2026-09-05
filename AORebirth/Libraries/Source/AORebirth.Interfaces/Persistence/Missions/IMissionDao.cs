@@ -386,6 +386,8 @@ namespace AORebirth.Interfaces.Persistence.Missions
         /// Do not return a Task or retain/share the transaction. Exceptions should
         /// escape the callback; failed writes prevent commit even if caught there.
         /// The DAO does not retry callbacks or perform nested transaction enlistment.
+        /// If rollback also fails, the original exception is rethrown with that
+        /// exception in Data["MissionDao.RollbackFailure"]. Reconcile before retrying.
         /// </summary>
         T Execute<T>(int characterId, Func<IMissionDaoTransaction, T> operation);
         /// <summary>As above, with a locked character/account ownership check for account flags.</summary>
