@@ -183,15 +183,17 @@ namespace AORebirth.Database.Domain.Missions
                     scope.Complete(true);
                     return result;
                 }
-                catch
+                catch (Exception operationFailure)
                 {
                     try
                     {
                         transaction.Rollback();
                     }
-                    catch
+                    catch (Exception rollbackFailure)
                     {
-                        // A lost connection may also prevent rollback. Preserve the original failure.
+                        // Keep the original exception/stack while exposing an unsuccessful rollback.
+                        // Callers must reload/reconcile state before retrying an uncertain outcome.
+                        operationFailure.Data["MissionDao.RollbackFailure"] = rollbackFailure;
                     }
 
                     if (scope != null)
