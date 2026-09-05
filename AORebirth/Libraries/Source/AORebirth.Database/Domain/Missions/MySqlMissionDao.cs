@@ -12,6 +12,7 @@ namespace AORebirth.Database.Domain.Missions
     using AORebirth.Interfaces.Persistence.Missions;
 
     using Dapper;
+    using MySqlConnector;
 
     using Utility;
 
@@ -34,7 +35,7 @@ namespace AORebirth.Database.Domain.Missions
 
     /// <summary>
     /// MySQL-backed authoritative mission repository. Every write operation is
-    /// executed through a caller-scoped transaction and uses optimistic versions.
+    /// executed through a DAO-owned transaction and uses optimistic versions.
     /// </summary>
     public sealed class MySqlMissionDao : IMissionDao
     {
@@ -60,10 +61,34 @@ namespace AORebirth.Database.Domain.Missions
             this.connectionFactory = connectionFactory;
         }
 
+        private IDbConnection OpenConnection()
+        {
+            IDbConnection connection = this.connectionFactory();
+            if (connection == null)
+            {
+                throw new InvalidOperationException("Mission connection factory returned null.");
+            }
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+
+                return connection;
+            }
+            catch
+            {
+                connection.Dispose();
+                throw;
+            }
+        }
+
         public MissionStateRecord GetMission(MissionKey key)
         {
             ValidateMissionKey(key);
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             {
                 return QueryMission(connection, null, key, false);
             }
@@ -72,7 +97,7 @@ namespace AORebirth.Database.Domain.Missions
         public IList<MissionStateRecord> GetMissions(int characterId)
         {
             ValidateCharacterId(characterId);
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             {
                 return QueryMissions(connection, null, characterId);
             }
@@ -93,7 +118,7 @@ namespace AORebirth.Database.Domain.Missions
             }
 
             const string Sql = "SELECT Username FROM characters WHERE Id=@CharacterId";
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             {
                 string accountKey = connection.Query<string>(Sql, new { CharacterId = characterId }).SingleOrDefault();
                 return string.IsNullOrWhiteSpace(accountKey) ? null : accountKey.Trim();
@@ -105,7 +130,7 @@ namespace AORebirth.Database.Domain.Missions
             accountKey = NormalizeAccountKey(accountKey);
             ValidateText(flagKey, "flagKey", 128, false);
             flagKey = flagKey.Trim();
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             {
                 return QueryAccountFlag(connection, null, accountKey, flagKey, false);
             }
@@ -114,7 +139,7 @@ namespace AORebirth.Database.Domain.Missions
         public IList<MissionAccountFlagRecord> GetAccountFlags(string accountKey)
         {
             accountKey = NormalizeAccountKey(accountKey);
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             {
                 return QueryAccountFlags(connection, null, accountKey);
             }
@@ -141,23 +166,39 @@ namespace AORebirth.Database.Domain.Missions
                 throw new ArgumentNullException("operation");
             }
 
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             using (IDbTransaction transaction = connection.BeginTransaction())
             {
+                MySqlMissionDaoTransaction scope = null;
                 try
                 {
-                    T result = operation(
-                        new MySqlMissionDaoTransaction(
+                    scope = new MySqlMissionDaoTransaction(
                             characterId,
                             accountKey,
                             connection,
-                            transaction));
+                            transaction);
+                    T result = operation(scope);
+                    scope.EnsureCanCommit();
                     transaction.Commit();
+                    scope.Complete(true);
                     return result;
                 }
                 catch
                 {
-                    transaction.Rollback();
+                    try
+                    {
+                        transaction.Rollback();
+                    }
+                    catch
+                    {
+                        // A lost connection may also prevent rollback. Preserve the original failure.
+                    }
+
+                    if (scope != null)
+                    {
+                        scope.Complete(false);
+                    }
+
                     throw;
                 }
             }
@@ -168,8 +209,9 @@ namespace AORebirth.Database.Domain.Missions
             if (request == null
                 || request.CharacterType <= 0
                 || request.CharacterId <= 0
-                || string.IsNullOrEmpty(request.BatchIdentity)
+                || string.IsNullOrWhiteSpace(request.BatchIdentity)
                 || request.BatchIdentity.Length > 96
+                || request.BatchIdentity.IndexOf(';') >= 0
                 || request.Fee <= 0
                 || request.AppliedAtUtcTicks <= 0)
             {
@@ -177,7 +219,7 @@ namespace AORebirth.Database.Domain.Missions
             }
 
             string questId = "generated-offer:" + request.BatchIdentity;
-            using (IDbConnection connection = this.connectionFactory())
+            using (IDbConnection connection = this.OpenConnection())
             using (IDbTransaction transaction = connection.BeginTransaction())
             {
                 try
@@ -324,7 +366,7 @@ namespace AORebirth.Database.Domain.Missions
 
             try
             {
-                using (IDbConnection connection = this.connectionFactory())
+                using (IDbConnection connection = this.OpenConnection())
                 {
                     connection.Execute(
                         Sql,
@@ -363,7 +405,7 @@ namespace AORebirth.Database.Domain.Missions
 
             try
             {
-                using (IDbConnection connection = this.connectionFactory())
+                using (IDbConnection connection = this.OpenConnection())
                 {
                     return connection.Query<string>(
                             Sql,
@@ -396,7 +438,7 @@ namespace AORebirth.Database.Domain.Missions
 
             try
             {
-                using (IDbConnection connection = this.connectionFactory())
+                using (IDbConnection connection = this.OpenConnection())
                 {
                     return connection.Execute(
                                Sql,
@@ -761,6 +803,59 @@ namespace AORebirth.Database.Domain.Missions
         {
             private readonly IDbConnection connection;
             private readonly IDbTransaction transaction;
+            private readonly List<Action> restoreVersions = new List<Action>();
+            private bool active = true;
+            private bool failed;
+
+            public void EnsureCanCommit()
+            {
+                this.EnsureActive();
+                if (this.failed)
+                {
+                    throw new InvalidOperationException("Mission transaction contains a failed write and must roll back.");
+                }
+            }
+
+            public void Complete(bool committed)
+            {
+                this.active = false;
+                if (!committed)
+                {
+                    for (int index = this.restoreVersions.Count - 1; index >= 0; index--)
+                    {
+                        this.restoreVersions[index]();
+                    }
+                }
+
+                this.restoreVersions.Clear();
+            }
+
+            private void EnsureActive()
+            {
+                if (!this.active)
+                {
+                    throw new InvalidOperationException("Mission transaction is only valid inside its Execute callback.");
+                }
+            }
+
+            private void SetVersion(long previous, Action<long> setter, long next)
+            {
+                this.restoreVersions.Add(() => setter(previous));
+                setter(next);
+            }
+
+            private int ExecuteWrite(string sql, object parameters, IDbTransaction transaction)
+            {
+                try
+                {
+                    return this.connection.Execute(sql, parameters, transaction);
+                }
+                catch
+                {
+                    this.failed = true;
+                    throw;
+                }
+            }
 
             public MySqlMissionDaoTransaction(
                 int characterId,
@@ -821,6 +916,10 @@ namespace AORebirth.Database.Domain.Missions
 
                 this.ValidateRecordMissionKey(key, record.CharacterId, record.QuestId);
                 ValidateText(record.CurrentStepId, "CurrentStepId", 128, true);
+                if (!Enum.IsDefined(typeof(MissionLifecycleState), record.State))
+                {
+                    throw new ArgumentOutOfRangeException("record", "Unknown persisted mission lifecycle state.");
+                }
 
                 if (record.Version <= 0)
                 {
@@ -833,9 +932,9 @@ namespace AORebirth.Database.Domain.Missions
                         + "@CompletedAtUtcTicks, @FailedAtUtcTicks, @AbandonedAtUtcTicks, @CreatedAtUtcTicks, "
                         + "@UpdatedAtUtcTicks, 1)";
 
-                    int inserted = this.connection.Execute(InsertSql, record, this.transaction);
+                    int inserted = this.ExecuteWrite(InsertSql, record, this.transaction);
                     this.RequireSingleWrite(inserted, "mission insert", key.ToString(), record.Version);
-                    record.Version = 1;
+                    this.SetVersion(record.Version, value => record.Version = value, 1);
                     return;
                 }
 
@@ -848,7 +947,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "AND Version=@ExpectedVersion";
 
                 long expectedVersion = record.Version;
-                int updated = this.connection.Execute(
+                int updated = this.ExecuteWrite(
                     UpdateSql,
                     new
                     {
@@ -866,7 +965,7 @@ namespace AORebirth.Database.Domain.Missions
                     },
                     this.transaction);
                 this.RequireSingleWrite(updated, "mission update", key.ToString(), expectedVersion);
-                record.Version = expectedVersion + 1;
+                this.SetVersion(expectedVersion, value => record.Version = value, expectedVersion + 1);
             }
 
             public MissionObjectiveProgressRecord GetObjective(MissionObjectiveKey key)
@@ -907,9 +1006,9 @@ namespace AORebirth.Database.Domain.Missions
                         + "(@CharacterId, @QuestId, @ObjectiveId, @Progress, @RequiredCount, @LastObservationKey, "
                         + "@CreatedAtUtcTicks, @UpdatedAtUtcTicks, 1)";
 
-                    int inserted = this.connection.Execute(InsertSql, record, this.transaction);
+                    int inserted = this.ExecuteWrite(InsertSql, record, this.transaction);
                     this.RequireSingleWrite(inserted, "objective insert", key.ToString(), record.Version);
-                    record.Version = 1;
+                    this.SetVersion(record.Version, value => record.Version = value, 1);
                     return;
                 }
 
@@ -920,7 +1019,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "AND ObjectiveId=@ObjectiveId AND Version=@ExpectedVersion";
 
                 long expectedVersion = record.Version;
-                int updated = this.connection.Execute(
+                int updated = this.ExecuteWrite(
                     UpdateSql,
                     new
                     {
@@ -935,7 +1034,7 @@ namespace AORebirth.Database.Domain.Missions
                     },
                     this.transaction);
                 this.RequireSingleWrite(updated, "objective update", key.ToString(), expectedVersion);
-                record.Version = expectedVersion + 1;
+                this.SetVersion(expectedVersion, value => record.Version = value, expectedVersion + 1);
             }
 
             public bool TryAddObservation(MissionObjectiveObservationRecord observation)
@@ -957,13 +1056,26 @@ namespace AORebirth.Database.Domain.Missions
                 observation.ObservationKey = observation.ObservationKey.Trim();
 
                 const string Sql =
-                    "INSERT IGNORE INTO missionobjectiveobservations "
+                    "INSERT INTO missionobjectiveobservations "
                     + "(CharacterId, QuestId, ObjectiveId, ObservationKey, EventType, SourceIdentity, "
                     + "TargetIdentity, ObservedAtUtcTicks) VALUES "
                     + "(@CharacterId, @QuestId, @ObjectiveId, @ObservationKey, @EventType, @SourceIdentity, "
                     + "@TargetIdentity, @ObservedAtUtcTicks)";
 
-                return this.connection.Execute(Sql, observation, this.transaction) == 1;
+                try
+                {
+                    return this.connection.Execute(Sql, observation, this.transaction) == 1;
+                }
+                catch (MySqlException exception) when (exception.Number == 1062)
+                {
+                    // Only a duplicate key is an idempotent replay. Other SQL failures must surface.
+                    return false;
+                }
+                catch
+                {
+                    this.failed = true;
+                    throw;
+                }
             }
 
             public MissionFlagRecord GetFlag(MissionKey key, string flagKey)
@@ -996,9 +1108,9 @@ namespace AORebirth.Database.Domain.Missions
                         + "(CharacterId, QuestId, FlagKey, `Value`, CreatedAtUtcTicks, UpdatedAtUtcTicks, Version) "
                         + "VALUES (@CharacterId, @QuestId, @FlagKey, @Value, @CreatedAtUtcTicks, @UpdatedAtUtcTicks, 1)";
 
-                    int inserted = this.connection.Execute(InsertSql, flag, this.transaction);
+                    int inserted = this.ExecuteWrite(InsertSql, flag, this.transaction);
                     this.RequireSingleWrite(inserted, "mission flag insert", key + "|" + flag.FlagKey, flag.Version);
-                    flag.Version = 1;
+                    this.SetVersion(flag.Version, value => flag.Version = value, 1);
                     return;
                 }
 
@@ -1008,7 +1120,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "AND FlagKey=@FlagKey AND Version=@ExpectedVersion";
 
                 long expectedVersion = flag.Version;
-                int updated = this.connection.Execute(
+                int updated = this.ExecuteWrite(
                     UpdateSql,
                     new
                     {
@@ -1021,7 +1133,7 @@ namespace AORebirth.Database.Domain.Missions
                     },
                     this.transaction);
                 this.RequireSingleWrite(updated, "mission flag update", key + "|" + flag.FlagKey, expectedVersion);
-                flag.Version = expectedVersion + 1;
+                this.SetVersion(expectedVersion, value => flag.Version = value, expectedVersion + 1);
             }
 
             public MissionAccountFlagRecord GetAccountFlag(string accountKey, string flagKey)
@@ -1063,9 +1175,9 @@ namespace AORebirth.Database.Domain.Missions
                         + "VALUES (@AccountKey, @FlagKey, @Value, @SourceQuestId, @CreatedAtUtcTicks, "
                         + "@UpdatedAtUtcTicks, 1)";
 
-                    int inserted = this.connection.Execute(InsertSql, flag, this.transaction);
+                    int inserted = this.ExecuteWrite(InsertSql, flag, this.transaction);
                     this.RequireSingleWrite(inserted, "account flag insert", accountKey + "|" + flag.FlagKey, flag.Version);
-                    flag.Version = 1;
+                    this.SetVersion(flag.Version, value => flag.Version = value, 1);
                     return;
                 }
 
@@ -1075,7 +1187,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "WHERE AccountKey=@AccountKey AND FlagKey=@FlagKey AND Version=@ExpectedVersion";
 
                 long expectedVersion = flag.Version;
-                int updated = this.connection.Execute(
+                int updated = this.ExecuteWrite(
                     UpdateSql,
                     new
                     {
@@ -1088,7 +1200,7 @@ namespace AORebirth.Database.Domain.Missions
                     },
                     this.transaction);
                 this.RequireSingleWrite(updated, "account flag update", accountKey + "|" + flag.FlagKey, expectedVersion);
-                flag.Version = expectedVersion + 1;
+                this.SetVersion(expectedVersion, value => flag.Version = value, expectedVersion + 1);
             }
 
             public MissionRewardStageRecord GetReward(MissionRewardKey key)
@@ -1142,7 +1254,7 @@ namespace AORebirth.Database.Domain.Missions
                         + "@ClaimToken, @ClaimedAtUtcTicks, @ClaimExpiresAtUtcTicks, 0, "
                         + "@ClaimedAtUtcTicks, @ClaimedAtUtcTicks, 1)";
 
-                    int inserted = this.connection.Execute(
+                    int inserted = this.ExecuteWrite(
                         InsertSql,
                         new
                         {
@@ -1196,7 +1308,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "Version=Version+1 WHERE CharacterId=@CharacterId AND QuestId=@QuestId "
                     + "AND RewardKey=@RewardKey AND Version=@ExpectedVersion";
 
-                int reclaimed = this.connection.Execute(
+                int reclaimed = this.ExecuteWrite(
                     ReclaimSql,
                     new
                     {
@@ -1250,7 +1362,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND RewardKey=@RewardKey "
                     + "AND Status=@ExpectedStatus AND ClaimToken=@ClaimToken AND Version=@ExpectedVersion";
 
-                int updated = this.connection.Execute(
+                int updated = this.ExecuteWrite(
                     Sql,
                     new
                     {
@@ -1294,7 +1406,7 @@ namespace AORebirth.Database.Domain.Missions
                     + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND RewardKey=@RewardKey "
                     + "AND Status=@ExpectedStatus AND ClaimToken=@ClaimToken AND Version=@ExpectedVersion";
 
-                int updated = this.connection.Execute(
+                int updated = this.ExecuteWrite(
                     Sql,
                     new
                     {
@@ -1315,6 +1427,25 @@ namespace AORebirth.Database.Domain.Missions
             }
 
             public MissionAtomicStatRewardResult TryApplyCharacterStatReward(
+                MissionRewardKey key,
+                string rewardType,
+                IList<MissionCharacterStatMutation> mutations,
+                string effectReference,
+                long appliedAtUtcTicks)
+            {
+                this.EnsureActive();
+                try
+                {
+                    return this.ApplyCharacterStatReward(key, rewardType, mutations, effectReference, appliedAtUtcTicks);
+                }
+                catch
+                {
+                    this.failed = true;
+                    throw;
+                }
+            }
+
+            private MissionAtomicStatRewardResult ApplyCharacterStatReward(
                 MissionRewardKey key,
                 string rewardType,
                 IList<MissionCharacterStatMutation> mutations,
@@ -1346,6 +1477,17 @@ namespace AORebirth.Database.Domain.Missions
                         null,
                         new MissionCharacterStatValue[0],
                         "At least one character stat mutation is required.");
+                }
+
+                var seen = new HashSet<string>(StringComparer.Ordinal);
+                foreach (MissionCharacterStatMutation mutation in mutations)
+                {
+                    ValidateStatMutation(mutation);
+                    string mutationKey = mutation.StatIdentityType + "|" + mutation.StatId;
+                    if (!seen.Add(mutationKey))
+                    {
+                        throw new InvalidOperationException("Duplicate character stat mutation: " + mutationKey);
+                    }
                 }
 
                 MissionRewardStageRecord existing = QueryReward(this.connection, this.transaction, key, true);
@@ -1391,7 +1533,7 @@ namespace AORebirth.Database.Domain.Missions
                         + "@EffectReference, NULL, @AppliedAtUtcTicks, 0, @AppliedAtUtcTicks, "
                         + "@AppliedAtUtcTicks, @AppliedAtUtcTicks, 1)";
 
-                    int inserted = this.connection.Execute(
+                    int inserted = this.ExecuteWrite(
                         InsertSql,
                         new
                         {
@@ -1416,7 +1558,7 @@ namespace AORebirth.Database.Domain.Missions
                         + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND RewardKey=@RewardKey "
                         + "AND Version=@ExpectedVersion";
 
-                    int updated = this.connection.Execute(
+                    int updated = this.ExecuteWrite(
                         UpdateSql,
                         new
                         {
@@ -1441,6 +1583,7 @@ namespace AORebirth.Database.Domain.Missions
 
             public MissionCharacterSnapshot ReadCharacter()
             {
+                this.EnsureActive();
                 return new MissionCharacterSnapshot(
                     this.CharacterId,
                     QueryMissions(this.connection, this.transaction, this.CharacterId),
@@ -1452,17 +1595,9 @@ namespace AORebirth.Database.Domain.Missions
             private IList<MissionCharacterStatValue> ApplyStatMutations(
                 IList<MissionCharacterStatMutation> mutations)
             {
-                var seen = new HashSet<string>(StringComparer.Ordinal);
                 var values = new List<MissionCharacterStatValue>();
                 foreach (MissionCharacterStatMutation mutation in mutations)
                 {
-                    ValidateStatMutation(mutation);
-                    string mutationKey = mutation.StatIdentityType + "|" + mutation.StatId;
-                    if (!seen.Add(mutationKey))
-                    {
-                        throw new InvalidOperationException("Duplicate character stat mutation: " + mutationKey);
-                    }
-
                     long currentValue = this.ReadStatValue(mutation.StatIdentityType, mutation.StatId);
                     long nextValue = mutation.Kind == MissionStatMutationKind.Set
                         ? Clamp(mutation.Value, mutation.MinimumValue, mutation.MaximumValue)
@@ -1477,7 +1612,7 @@ namespace AORebirth.Database.Domain.Missions
                         + "VALUES (@Instance, @Type, @StatId, @StatValue) "
                         + "ON DUPLICATE KEY UPDATE StatValue=@StatValue";
 
-                    this.connection.Execute(
+                    this.ExecuteWrite(
                         UpsertSql,
                         new
                         {
@@ -1534,6 +1669,7 @@ namespace AORebirth.Database.Domain.Missions
 
             private void ValidateCharacterScope(int characterId)
             {
+                this.EnsureActive();
                 ValidateCharacterId(characterId);
                 if (characterId != this.CharacterId)
                 {
@@ -1545,6 +1681,7 @@ namespace AORebirth.Database.Domain.Missions
 
             private void ValidateAccountScope(string accountKey)
             {
+                this.EnsureActive();
                 accountKey = NormalizeAccountKey(accountKey);
                 if (this.AccountKey == null)
                 {
@@ -1573,6 +1710,7 @@ namespace AORebirth.Database.Domain.Missions
             {
                 if (rows != 1)
                 {
+                    this.failed = true;
                     throw new InvalidOperationException(
                         "Persistent " + operation + " failed optimistic concurrency for '" + key
                         + "' at version " + expectedVersion + ".");
