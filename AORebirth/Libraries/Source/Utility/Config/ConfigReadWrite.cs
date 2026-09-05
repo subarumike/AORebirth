@@ -108,6 +108,8 @@ namespace Utility.Config
                 {
                     Console.WriteLine("Error parsing configuration: {0}", ex.Message);
                     this._config = new Config();
+                    // Still honor AO_REBIRTH_MYSQL_CONNECTION when the config file is missing/invalid.
+                    ApplyMysqlConnectionOverride(this._config);
                 }
 
                 return this._config;
@@ -160,7 +162,11 @@ namespace Utility.Config
             string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
             if (!string.IsNullOrWhiteSpace(configuredPath))
             {
-                return configuredPath;
+                configuredPath = configuredPath.Trim().Trim('"');
+                if (!string.IsNullOrWhiteSpace(configuredPath))
+                {
+                    return configuredPath;
+                }
             }
 
             string baseDirectoryConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
@@ -179,13 +185,17 @@ namespace Utility.Config
                     new XmlSerializer(typeof(Config)).Deserialize(
                         new MemoryStream(File.ReadAllBytes(GetConfigPath())));
 
+            ApplyMysqlConnectionOverride(config);
+            return config;
+        }
+
+        private static void ApplyMysqlConnectionOverride(Config config)
+        {
             string mysqlConnection = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
             if (!string.IsNullOrWhiteSpace(mysqlConnection))
             {
                 config.MysqlConnection = mysqlConnection;
             }
-
-            return config;
         }
 
         #endregion

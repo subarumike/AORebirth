@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Playfield
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Characters;
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
@@ -30,12 +31,16 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayerHydrator _playerHydrator;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
+        private readonly IInventoryRepository _inventoryRepository;
+        private readonly IItemInstanceIdAllocator _instanceIds;
+        private readonly InventoryMoveService _inventoryMoves;
+        private readonly InventoryFlushService _inventoryFlush;
         private readonly ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
         private PlayfieldHeartbeat? _heartBeat;
         private readonly Lock _tickSync = new();
-        private int _nextLootInventoryHandle = 0x70;
+        private int _nextContainerInventoryHandle = 1;
         private bool _disposed;
 
         public Playfield(
@@ -45,7 +50,11 @@ namespace ZoneEngine_New.Core.Playfield
             PlayfieldManager playfieldManager,
             PlayerHydrator playerHydrator,
             IGameData gameData,
-            IItemBuilder items)
+            IItemBuilder items,
+            IInventoryRepository inventoryRepository,
+            IItemInstanceIdAllocator instanceIds,
+            InventoryMoveService inventoryMoves,
+            InventoryFlushService inventoryFlush)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
                 playfieldIdentity.Instance,
@@ -56,6 +65,10 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(playerHydrator);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ArgumentNullException.ThrowIfNull(instanceIds);
+            ArgumentNullException.ThrowIfNull(inventoryMoves);
+            ArgumentNullException.ThrowIfNull(inventoryFlush);
 
             Identity = playfieldIdentity;
             _logger = playfieldLogger;
@@ -64,6 +77,10 @@ namespace ZoneEngine_New.Core.Playfield
             _playerHydrator = playerHydrator;
             _gameData = gameData;
             _items = items;
+            _inventoryRepository = inventoryRepository;
+            _instanceIds = instanceIds;
+            _inventoryMoves = inventoryMoves;
+            _inventoryFlush = inventoryFlush;
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
 
             _serviceProvider = BuildServices().BuildServiceProvider();
@@ -135,17 +152,42 @@ namespace ZoneEngine_New.Core.Playfield
             where T : class
             => _serviceProvider.GetRequiredService<T>();
 
-        /// <summary>Client inventory handle for an opened loot bag (0x70..0xFF).</summary>
-        public int AllocateLootInventoryHandle()
+        /// <summary>Client inventory handle for an opened container (bags, corpses, chests). Range 1..ushort.MaxValue.</summary>
+        public int AllocateContainerInventoryHandle()
         {
-            int handle = _nextLootInventoryHandle++;
-            if (_nextLootInventoryHandle > 0xff)
-                _nextLootInventoryHandle = 0x70;
+            int handle = _nextContainerInventoryHandle;
+            if (_nextContainerInventoryHandle == ushort.MaxValue)
+                _nextContainerInventoryHandle = 1;
+            else
+                _nextContainerInventoryHandle++;
+
             return handle;
         }
 
         /// <summary>Called from async I/O tasks. Handlers run on the playfield tick thread.</summary>
         public bool TryEnqueue(PlayfieldInboundItem item) => _inbound.TryEnqueue(item);
+
+        /// <summary>
+        /// Registers a transferred player on this playfield under the tick lock (safe from another PF tick).
+        /// </summary>
+        public void ArriveTransferredPlayer(Player player, AORebirth.Core.Vector.Vector3 position)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(position);
+
+            lock (_tickSync)
+            {
+                ObjectDisposedException.ThrowIf(_disposed, this);
+                GetRequiredService<SpawnService>().ArriveFromTransfer(player, position);
+            }
+        }
+
+        /// <summary>Soft-leave for playfield transfer. Must run on this playfield's tick thread.</summary>
+        public void LeaveTransferredPlayer(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            GetRequiredService<SpawnService>().LeaveForTransfer(player);
+        }
 
         public void Dispose()
         {
@@ -182,8 +224,8 @@ namespace ZoneEngine_New.Core.Playfield
 
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
                 _inbound.Drain(_router, spawn);
-                spawn.DespawnExpiredLinkDeadPlayers();
-                spawn.DespawnExpiredCorpses();
+                spawn.Tick();
+                _inventoryMoves.Tick(this, deltaTime);
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
             }
@@ -199,6 +241,10 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
             services.AddSingleton(_items);
+            services.AddSingleton(_inventoryRepository);
+            services.AddSingleton(_instanceIds);
+            services.AddSingleton(_inventoryMoves);
+            services.AddSingleton(_inventoryFlush);
             services.Add(new ServiceDescriptor(typeof(Identity), Identity));
             if (MetaData != null)
             {

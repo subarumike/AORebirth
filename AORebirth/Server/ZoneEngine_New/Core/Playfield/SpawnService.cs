@@ -33,6 +33,9 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayfieldManager _playfieldManager;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
+        private readonly IItemInstanceIdAllocator _ids;
+        private readonly InventoryMoveService _moves;
+        private readonly InventoryFlushService _flush;
 
         public SpawnService(
             IServiceProvider services,
@@ -41,7 +44,10 @@ namespace ZoneEngine_New.Core.Playfield
             Playfield playfield,
             PlayfieldManager playfieldManager,
             IGameData gameData,
-            IItemBuilder items)
+            IItemBuilder items,
+            IItemInstanceIdAllocator ids,
+            InventoryMoveService moves,
+            InventoryFlushService flush)
         {
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(registry);
@@ -50,6 +56,9 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(playfieldManager);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(ids);
+            ArgumentNullException.ThrowIfNull(moves);
+            ArgumentNullException.ThrowIfNull(flush);
 
             _services = services;
             _registry = registry;
@@ -58,10 +67,18 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager = playfieldManager;
             _gameData = gameData;
             _items = items;
+            _ids = ids;
+            _moves = moves;
+            _flush = flush;
         }
 
         /// <summary>Spawns an NPC from a mob template hash and registers it on this playfield.</summary>
-        public NpcCharacter Spawn(string hash, Vector3 position, Quaternion? heading = null, int? level = null)
+        public NpcCharacter Spawn(
+            string hash,
+            Vector3 position,
+            Quaternion? heading = null,
+            int? level = null,
+            SpawnSource spawnSource = SpawnSource.None)
         {
             ArgumentException.ThrowIfNullOrEmpty(hash);
             ArgumentNullException.ThrowIfNull(position);
@@ -74,7 +91,8 @@ namespace ZoneEngine_New.Core.Playfield
                 Name = template.Name,
                 MobTemplate = template,
                 Position = position,
-                Rotation = heading ?? new Quaternion()
+                Rotation = heading ?? new Quaternion(),
+                SpawnSource = spawnSource
             };
 
             foreach (var entry in template.Stats)
@@ -112,10 +130,11 @@ namespace ZoneEngine_New.Core.Playfield
             Identity identity = _registry.AllocateCorpseIdentity();
             Corpse corpse = new Corpse(identity, dead, _gameData)
             {
-                Playfield = _playfield
+                Playfield = _playfield,
+                SpawnSource = SpawnSource.Corpse
             };
 
-            corpse.ResolveLoot(_gameData, _items);
+            corpse.ResolveLoot(_gameData, _items, _ids);
 
             _registry.Register(corpse);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(corpse);
@@ -132,35 +151,60 @@ namespace ZoneEngine_New.Core.Playfield
             return corpse;
         }
 
-        /// <summary>Called from <see cref="Playfield.Tick"/> after inbound drain.</summary>
-        public void DespawnExpiredCorpses()
+        /// <summary>Lifetime / expiry pass. Called from <see cref="Playfield.Tick"/> after inbound drain.</summary>
+        public void Tick()
+        {
+            DespawnExpiredLinkDeadPlayers();
+            DespawnExpiredCorpses();
+            DespawnEmptyLootables();
+        }
+
+        void DespawnExpiredCorpses()
         {
             foreach (Dynel dynel in _registry.Dynels())
             {
                 if (dynel is not Corpse corpse || !corpse.IsExpired)
                     continue;
 
-                DespawnCorpse(corpse);
+                DespawnLootable(corpse);
+            }
+        }
+
+        /// <summary>
+        /// Despawns opened lootables whose loot is empty after the 1s delay.
+        /// </summary>
+        void DespawnEmptyLootables()
+        {
+            foreach (Dynel dynel in _registry.Dynels())
+            {
+                if (dynel is not LootableDynel lootable || !lootable.ShouldDespawnEmpty)
+                    continue;
+
+                DespawnLootable(lootable);
             }
         }
 
         /// <summary>Removes a corpse from the playfield (visibility + registry).</summary>
-        public void DespawnCorpse(Corpse corpse)
+        public void DespawnCorpse(Corpse corpse) => DespawnLootable(corpse);
+
+        /// <summary>Removes a lootable dynel from the playfield (visibility + registry).</summary>
+        public void DespawnLootable(LootableDynel lootable)
         {
-            ArgumentNullException.ThrowIfNull(corpse);
+            ArgumentNullException.ThrowIfNull(lootable);
 
-            if (corpse.IsOpen)
-                corpse.Close();
+            if (lootable.IsOpen)
+                lootable.Close();
 
-            Identity identity = corpse.Identity;
-            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(corpse);
+            Identity identity = lootable.Identity;
+            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(lootable);
             _registry.Unregister(identity);
-            corpse.Playfield = null;
+            lootable.Playfield = null;
 
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Despawned corpse id={0} playfield={1}",
+                    "Despawned lootable {0} id={1} playfield={2}",
+                    lootable.GetType().Name,
                     identity.Instance,
                     _playfield.Identity.Instance));
         }
@@ -182,6 +226,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             Player player = ActivatorUtilities.CreateInstance<Player>(_services, identity);
             player.Playfield = _playfield;
+            player.SpawnSource = SpawnSource.Player;
             player.EnterOnline(session);
 
             _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
@@ -285,8 +330,7 @@ namespace ZoneEngine_New.Core.Playfield
                     _playfield.Identity.Instance));
         }
 
-        /// <summary>Called from <see cref="Playfield.Tick"/> after inbound drain.</summary>
-        public void DespawnExpiredLinkDeadPlayers()
+        void DespawnExpiredLinkDeadPlayers()
         {
             DateTime now = DateTime.UtcNow;
             foreach (Player player in _registry.PlayerEntities())
@@ -305,6 +349,56 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentNullException.ThrowIfNull(player);
             DespawnPlayer(player);
+        }
+
+        /// <summary>
+        /// Soft-leave for cross-playfield transfer. Keeps <see cref="PlayfieldManager"/> registration and session.
+        /// </summary>
+        public void LeaveForTransfer(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (!ReferenceEquals(player.Playfield, _playfield))
+                throw new InvalidOperationException("Player is not on this playfield.");
+
+            player.SetFightingTarget(Identity.None);
+            player.Target = Identity.None;
+
+            _flush.HardFlush(player);
+
+            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+            _registry.Unregister(player.Identity);
+            player.Playfield = null;
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player {0} left playfield {1} for transfer",
+                    player.Identity.Instance,
+                    _playfield.Identity.Instance));
+        }
+
+        /// <summary>
+        /// Soft-arrive after cross-playfield transfer. Does not activate locality visibility (reconnect does).
+        /// </summary>
+        public void ArriveFromTransfer(Player player, Vector3 position)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(position);
+
+            player.Position = position;
+            player.Playfield = _playfield;
+            _registry.Register(player);
+            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player {0} arrived playfield {1} at ({2},{3},{4})",
+                    player.Identity.Instance,
+                    _playfield.Identity.Instance,
+                    position.xf,
+                    position.yf,
+                    position.zf));
         }
 
         /// <summary>Removes an NPC from the playfield (visibility + registry). Does not fire death.</summary>
@@ -345,6 +439,10 @@ namespace ZoneEngine_New.Core.Playfield
         private void DespawnPlayer(Player player)
         {
             int characterId = player.Identity.Instance;
+
+            _moves.CancelPending(characterId);
+            if (player.Inventory.IsHydrated)
+                _flush.HardFlush(player);
 
             IZoneSession? session = player.Session;
             if (session != null)

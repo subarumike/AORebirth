@@ -7,19 +7,27 @@ namespace ZoneEngine_New.Core.Network
     using System.IO;
     using System.IO.Compression;
     using System.IO.Pipelines;
+    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Channels;
     using System.Threading.Tasks;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 
     using Utility;
+    using Utility.Config;
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Playfield;
+
+    using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
+    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     public sealed class ZoneSession : IZoneSession, IAsyncDisposable
     {
@@ -173,6 +181,127 @@ namespace ZoneEngine_New.Core.Network
 
             LogUtil.Debug(DebugInfoDetail.Network, "Sent InitiateCompression");
             Send(InitiateCompressionPacket);
+        }
+
+        public void TransferToPlayfield(Playfield destination, Vector3 landing)
+        {
+            ArgumentNullException.ThrowIfNull(destination);
+            ArgumentNullException.ThrowIfNull(landing);
+
+            Player? player = Player;
+            if (player == null)
+                throw new InvalidOperationException("Session has no bound player.");
+
+            Playfield? source = player.Playfield;
+            if (source == null)
+                throw new InvalidOperationException("Player is not on a playfield.");
+
+            if (ReferenceEquals(source, destination))
+                throw new InvalidOperationException("Destination playfield matches current playfield.");
+
+            int characterId = player.Identity.Instance;
+            int destId = destination.Identity.Instance;
+
+            source.LeaveTransferredPlayer(player);
+            destination.ArriveTransferredPlayer(player, landing);
+
+            Send(
+                BuildNormalTeleport(player, landing, destId),
+                destId,
+                characterId);
+            Send(
+                BuildZoneRedirection(),
+                destId,
+                characterId);
+
+            player.Session = null;
+            UnbindPlayer();
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield transfer character={0} from={1} to={2} landing=({3},{4},{5})",
+                    characterId,
+                    source.Identity.Instance,
+                    destId,
+                    landing.xf,
+                    landing.yf,
+                    landing.zf));
+        }
+
+        private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId)
+        {
+            const IdentityType livePlayfieldProxyType = (IdentityType)0x0000C79E;
+
+            byte[] payload = new byte[12];
+            BinaryPrimitives.WriteSingleBigEndian(payload.AsSpan(0, 4), landing.xf);
+            BinaryPrimitives.WriteSingleBigEndian(payload.AsSpan(4, 4), landing.yf);
+            BinaryPrimitives.WriteSingleBigEndian(payload.AsSpan(8, 4), landing.zf);
+
+            return new N3TeleportMessage
+            {
+                Identity = player.Identity,
+                Unknown = 0,
+                Destination = new MsgVector3
+                {
+                    X = landing.xf,
+                    Y = landing.yf,
+                    Z = landing.zf
+                },
+                Heading = new MsgQuaternion
+                {
+                    X = player.Rotation.xf,
+                    Y = player.Rotation.yf,
+                    Z = player.Rotation.zf,
+                    W = player.Rotation.wf
+                },
+                Unknown1 = 0x61,
+                Playfield = new Identity
+                {
+                    Type = livePlayfieldProxyType,
+                    Instance = destPlayfieldId
+                },
+                GameServerId = 1,
+                SgId = 0,
+                ChangePlayfield = new Identity
+                {
+                    Type = IdentityType.Playfield2,
+                    Instance = destPlayfieldId
+                },
+                Unknown4 = 0,
+                Unknown5 = 0,
+                Playfield2 = Identity.None,
+                Payload = payload
+            };
+        }
+
+        private static ZoneRedirectionMessage BuildZoneRedirection()
+        {
+            Config? config = ConfigReadWrite.Instance.CurrentConfig;
+            string host = config == null || string.IsNullOrWhiteSpace(config.ZoneIP)
+                ? "127.0.0.1"
+                : config.ZoneIP;
+            int port = config == null || config.ZonePort <= 0 ? 7501 : config.ZonePort;
+
+            return new ZoneRedirectionMessage
+            {
+                ServerIpAddress = ResolveZoneRedirectAddress(host),
+                ServerPort = (ushort)port
+            };
+        }
+
+        private static IPAddress ResolveZoneRedirectAddress(string host)
+        {
+            if (IPAddress.TryParse(host, out IPAddress? parsed))
+                return parsed;
+
+            foreach (IPAddress ip in Dns.GetHostEntry(host).AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    return ip;
+            }
+
+            return IPAddress.Loopback;
         }
 
         public void Close()
