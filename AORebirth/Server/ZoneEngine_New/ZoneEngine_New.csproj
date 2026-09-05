@@ -25,11 +25,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AODB" Version="1.0.6" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="NLog" Version="6.1.4" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -90,6 +92,9 @@
     </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponSlots.cs">
       <Link>Enums\WeaponSlots.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\MeshLayer.cs">
+      <Link>Enums\MeshLayer.cs</Link>
     </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\CanFlags.cs">
       <Link>Enums\CanFlags.cs</Link>

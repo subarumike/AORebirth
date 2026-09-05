@@ -47,6 +47,8 @@ namespace AORebirth.Tools.RDBDataExtractor
                 int tilemapSkipped = 0;
                 int districtWritten = 0;
                 int districtSkipped = 0;
+                int playfieldDatWritten = 0;
+                int playfieldDatSkipped = 0;
                 int monsterDataWritten = 0;
                 int monsterDataSkipped = 0;
                 int failed = 0;
@@ -77,6 +79,9 @@ namespace AORebirth.Tools.RDBDataExtractor
 
                     var tilemaps = new TilemapExporter(controller, resolved.OutputDirectory);
                     var districts = new DistrictExporter(controller, resolved.OutputDirectory);
+                    var playfieldDats = new PlayfieldDatExporter(
+                        controller,
+                        resolved.OutputDirectory);
 
                     IEnumerable<int> playfieldIds;
                     if (resolved.TilemapId.HasValue)
@@ -182,6 +187,40 @@ namespace AORebirth.Tools.RDBDataExtractor
                                 }
                             }
                         }
+
+                        try
+                        {
+                            ExportFileCounts datCounts = playfieldDats.Export(
+                                playfieldId,
+                                resolved.Overwrite);
+                            playfieldDatWritten += datCounts.Written;
+                            playfieldDatSkipped += datCounts.Skipped;
+                            if (datCounts.Written > 0)
+                            {
+                                Console.WriteLine(
+                                    "exported playfield dat "
+                                    + playfieldId
+                                    + " written="
+                                    + datCounts.Written
+                                    + " skipped="
+                                    + datCounts.Skipped);
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            failed++;
+                            Console.Error.WriteLine(
+                                "FAIL playfield dat "
+                                + playfieldId
+                                + " "
+                                + exception.GetType().Name
+                                + ": "
+                                + exception.Message);
+                            if (resolved.TilemapId.HasValue)
+                            {
+                                return 1;
+                            }
+                        }
                     }
                 }
 
@@ -194,6 +233,10 @@ namespace AORebirth.Tools.RDBDataExtractor
                     + districtWritten
                     + " districtSkipped="
                     + districtSkipped
+                    + " playfieldDatWritten="
+                    + playfieldDatWritten
+                    + " playfieldDatSkipped="
+                    + playfieldDatSkipped
                     + " monsterDataWritten="
                     + monsterDataWritten
                     + " monsterDataSkipped="

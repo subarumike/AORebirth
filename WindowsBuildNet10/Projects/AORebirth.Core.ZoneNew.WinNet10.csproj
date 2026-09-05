@@ -27,6 +27,7 @@
       <Link>Properties/AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldCollisionDat.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldMetaData.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldSpawnsData.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Core/Textures/AOTextures.cs" />

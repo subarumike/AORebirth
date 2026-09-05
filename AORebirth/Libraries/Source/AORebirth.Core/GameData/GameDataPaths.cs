@@ -27,6 +27,12 @@ namespace AORebirth.Core.GameData
 
         public const string MonsterDataFileName = "MonsterData.json";
 
+        public const string WallsFileName = "Walls.dat";
+
+        public const string DynelsFileName = "Dynels.dat";
+
+        public const string CollisionFileName = "Collision.dat";
+
         public static string PlayfieldRelativeDirectory(int playfieldId)
         {
             if (playfieldId <= 0)
@@ -55,6 +61,21 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldSpawnsRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SpawnsFileName);
+        }
+
+        public static string PlayfieldWallsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), WallsFileName);
+        }
+
+        public static string PlayfieldDynelsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DynelsFileName);
+        }
+
+        public static string PlayfieldCollisionRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), CollisionFileName);
         }
     }
 }
