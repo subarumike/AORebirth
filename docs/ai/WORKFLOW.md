@@ -184,6 +184,22 @@ launched-PID ownership and rolls back only processes launched by that
 invocation. Managed shutdown trusts only PID metadata whose executable path and
 start time match and never falls back to killing processes by name.
 
+`ZoneEngine_New` remains an explicit development route. Build it with:
+
+```cmd
+dotnet build AORebirth\Server\ZoneEngine_New\ZoneEngine_New.csproj --configuration Debug
+```
+
+Then start ChatEngine, LoginEngine, and `ZoneEngine_New` in the governed order
+with:
+
+```cmd
+cmd /d /c restart-engines.cmd -NewZoneEngine
+```
+
+This option does not change the default legacy route and does not authorize a
+Linux or production migration.
+
 WebEngine remains excluded from normal startup. Its explicit optional workflow
 is:
 

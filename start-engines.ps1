@@ -2,6 +2,7 @@ param(
     [switch]$WithWeb,
     [switch]$WebOnly,
     [switch]$Visible,
+    [switch]$NewZoneEngine,
     [int]$StartupTimeoutSeconds = 60
 )
 
@@ -29,6 +30,10 @@ $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
 
 if ($WithWeb -and $WebOnly) {
     throw "WithWeb and WebOnly cannot be combined."
+}
+
+if ($NewZoneEngine -and $WebOnly) {
+    throw "NewZoneEngine and WebOnly cannot be combined."
 }
 
 if (-not (Test-Path $engineDir)) {
@@ -81,7 +86,10 @@ function Wait-EngineOwnership {
         [int]$TimeoutSeconds,
 
         [Parameter(Mandatory = $true)]
-        [System.Diagnostics.Process]$Process
+        [System.Diagnostics.Process]$Process,
+
+        [Parameter(Mandatory = $true)]
+        [int[]]$Ports
     )
 
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -92,14 +100,33 @@ function Wait-EngineOwnership {
             return $false
         }
 
-        $probeExit = Invoke-EngineStatusProbe -Arguments @(
-            "--engine-required",
-            $EngineName,
-            "--expect-pid",
-            "$EngineName=$($Process.Id)"
-        ) -Quiet
-        if ($probeExit -eq 0) {
-            return $true
+        if ($EngineName -eq "ZoneEngine_New") {
+            $ownsEveryPort = $true
+            foreach ($port in $Ports) {
+                $ownedListeners = @(
+                    Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue |
+                        Where-Object { $_.OwningProcess -eq $Process.Id }
+                )
+                if ($ownedListeners.Count -eq 0) {
+                    $ownsEveryPort = $false
+                    break
+                }
+            }
+
+            if ($ownsEveryPort) {
+                return $true
+            }
+        }
+        else {
+            $probeExit = Invoke-EngineStatusProbe -Arguments @(
+                "--engine-required",
+                $EngineName,
+                "--expect-pid",
+                "$EngineName=$($Process.Id)"
+            ) -Quiet
+            if ($probeExit -eq 0) {
+                return $true
+            }
         }
 
         Start-Sleep -Milliseconds 500
@@ -188,10 +215,17 @@ function Start-HiddenEngineProcess {
     return $process
 }
 
+$zoneEngine = if ($NewZoneEngine) {
+    @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe"; Ports = @(7501) }
+}
+else {
+    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe"; Ports = @(7501) }
+}
+
 $coreEngines = @(
     @{ Name = "ChatEngine"; File = "ChatEngine.exe"; Ports = @(6996, 7012) },
     @{ Name = "LoginEngine"; File = "LoginEngine.exe"; Ports = @(7500) },
-    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe"; Ports = @(7501) }
+    $zoneEngine
 )
 $webEngine = @{ Name = "WebEngine"; File = "WebEngine.exe"; Ports = @(8181) }
 
@@ -220,14 +254,28 @@ foreach ($engine in $engines) {
         break
     }
 
-    $prestartExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $processName)
-    if ($prestartExit -eq 3) {
-        Write-Host "$($engine.File) is already running with verified executable and port ownership."
-        continue
+    if ($processName -eq "ZoneEngine_New") {
+        $existingProcesses = @(Get-Process -Name $processName -ErrorAction SilentlyContinue)
+        $existingListeners = @(
+            foreach ($port in $engine.Ports) {
+                Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
+            }
+        )
+        if ($existingProcesses.Count -gt 0 -or $existingListeners.Count -gt 0) {
+            $failures.Add("ZoneEngine_New pre-start check requires no existing process and a free zone port.")
+            break
+        }
     }
-    if ($prestartExit -ne 0) {
-        $failures.Add("$processName pre-start ownership check failed with exit code $prestartExit.")
-        break
+    else {
+        $prestartExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $processName)
+        if ($prestartExit -eq 3) {
+            Write-Host "$($engine.File) is already running with verified executable and port ownership."
+            continue
+        }
+        if ($prestartExit -ne 0) {
+            $failures.Add("$processName pre-start ownership check failed with exit code $prestartExit.")
+            break
+        }
     }
 
     if (Test-Path $shutdownFile) {
@@ -241,11 +289,12 @@ foreach ($engine in $engines) {
         @("/headless", "/shutdown-file", $shutdownFile, "/stdout-log", $stdoutLog, "/stderr-log", $stderrLog)
     }
 
+    $workingDirectory = Split-Path -Parent $exePath
     if ($Visible) {
-        $process = Start-Process -FilePath $exePath -ArgumentList $arguments -WorkingDirectory $engineDir -WindowStyle $windowStyle -PassThru
+        $process = Start-Process -FilePath $exePath -ArgumentList $arguments -WorkingDirectory $workingDirectory -WindowStyle $windowStyle -PassThru
     }
     else {
-        $process = Start-HiddenEngineProcess -ExePath $exePath -Arguments $arguments -WorkingDirectory $engineDir
+        $process = Start-HiddenEngineProcess -ExePath $exePath -Arguments $arguments -WorkingDirectory $workingDirectory
     }
 
     $metadata = [ordered]@{
@@ -273,22 +322,41 @@ foreach ($engine in $engines) {
 
     Write-Host "Started $($engine.File) pid=$($process.Id)"
 
-    if (-not (Wait-EngineOwnership -EngineName $processName -TimeoutSeconds $StartupTimeoutSeconds -Process $process)) {
+    if (-not (Wait-EngineOwnership -EngineName $processName -TimeoutSeconds $StartupTimeoutSeconds -Process $process -Ports $engine.Ports)) {
         $failures.Add("$processName did not establish exact PID ownership of every configured port within $StartupTimeoutSeconds seconds.")
         break
     }
 
-    [void](Invoke-EngineStatusProbe -Arguments @(
-        "--engine-required",
-        $processName,
-        "--expect-pid",
-        "$processName=$($process.Id)"
-    ))
+    if ($processName -eq "ZoneEngine_New") {
+        Write-Host "[AORebirth Status] engine=ZoneEngine_New processPid=$($process.Id) port=7501 ownership=PASS"
+    }
+    else {
+        [void](Invoke-EngineStatusProbe -Arguments @(
+            "--engine-required",
+            $processName,
+            "--expect-pid",
+            "$processName=$($process.Id)"
+        ))
+    }
 }
 
 if ($failures.Count -eq 0) {
     if ($WebOnly) {
         $finalStatus = Invoke-EngineStatusProbe -Arguments @("--web-required")
+    }
+    elseif ($NewZoneEngine) {
+        $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "ChatEngine")
+        if ($finalStatus -eq 0) {
+            $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "LoginEngine")
+        }
+
+        $newZoneProcesses = @(Get-Process -Name "ZoneEngine_New" -ErrorAction SilentlyContinue)
+        $newZoneListeners = @(Get-NetTCPConnection -State Listen -LocalPort 7501 -ErrorAction SilentlyContinue)
+        if (($newZoneProcesses.Count -ne 1) -or
+            ($newZoneListeners.Count -ne 1) -or
+            ($newZoneListeners[0].OwningProcess -ne $newZoneProcesses[0].Id)) {
+            $finalStatus = 1
+        }
     }
     else {
         $finalStatus = Invoke-EngineStatusProbe -Arguments @("--core")
@@ -327,9 +395,19 @@ if ($failures.Count -gt 0) {
         }
 
         try {
-            $releasedExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $entry.Engine)
-            if ($releasedExit -ne 0) {
-                $failures.Add("$($entry.Engine) cleanup did not release its managed process and ports.")
+            if ($entry.Engine -eq "ZoneEngine_New") {
+                if (Get-Process -Name "ZoneEngine_New" -ErrorAction SilentlyContinue) {
+                    $failures.Add("ZoneEngine_New cleanup did not stop its managed process.")
+                }
+                if (Get-NetTCPConnection -State Listen -LocalPort 7501 -ErrorAction SilentlyContinue) {
+                    $failures.Add("ZoneEngine_New cleanup did not release port 7501.")
+                }
+            }
+            else {
+                $releasedExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $entry.Engine)
+                if ($releasedExit -ne 0) {
+                    $failures.Add("$($entry.Engine) cleanup did not release its managed process and ports.")
+                }
             }
         }
         catch {

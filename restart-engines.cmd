@@ -26,7 +26,7 @@ if not "%STOP_EXIT%"=="0" (
 )
 
 echo [AORebirth Restart] Starting engines...
-call "%~dp0start-engines.cmd"
+call "%~dp0start-engines.cmd" %*
 set START_EXIT=%ERRORLEVEL%
 if not "%START_EXIT%"=="0" (
     echo [AORebirth Restart] Start failed with exit code %START_EXIT%.
