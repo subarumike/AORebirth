@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Playfield
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Threading;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -10,6 +11,7 @@ namespace ZoneEngine_New.Core.Playfield
     using Utility.Config;
 
     using ZoneEngine_New.Core.Characters;
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
@@ -28,6 +30,10 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayerHydrator _playerHydrator;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
+        private readonly IInventoryRepository _inventoryRepository;
+        private readonly IItemInstanceIdAllocator _instanceIds;
+        private readonly InventoryMoveService _inventoryMoves;
+        private readonly InventoryFlushService _inventoryFlush;
         private bool _disposed;
 
         public PlayfieldManager(
@@ -35,19 +41,31 @@ namespace ZoneEngine_New.Core.Playfield
             IMessageRouter router,
             PlayerHydrator playerHydrator,
             IGameData gameData,
-            IItemBuilder items)
+            IItemBuilder items,
+            IInventoryRepository inventoryRepository,
+            IItemInstanceIdAllocator instanceIds,
+            InventoryMoveService inventoryMoves,
+            InventoryFlushService inventoryFlush)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
             ArgumentNullException.ThrowIfNull(playerHydrator);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ArgumentNullException.ThrowIfNull(instanceIds);
+            ArgumentNullException.ThrowIfNull(inventoryMoves);
+            ArgumentNullException.ThrowIfNull(inventoryFlush);
 
             _logger = logger;
             _router = router;
             _playerHydrator = playerHydrator;
             _gameData = gameData;
             _items = items;
+            _inventoryRepository = inventoryRepository;
+            _instanceIds = instanceIds;
+            _inventoryMoves = inventoryMoves;
+            _inventoryFlush = inventoryFlush;
         }
 
         public static TimeSpan ResolveLinkDeadTimeout()
@@ -88,7 +106,11 @@ namespace ZoneEngine_New.Core.Playfield
                 this,
                 _playerHydrator,
                 _gameData,
-                _items);
+                _items,
+                _inventoryRepository,
+                _instanceIds,
+                _inventoryMoves,
+                _inventoryFlush);
 
             lock (_sync)
             {
@@ -126,6 +148,14 @@ namespace ZoneEngine_New.Core.Playfield
             lock (_sync)
             {
                 return _playersByCharacterId.TryGetValue(characterId, out player!);
+            }
+        }
+
+        public IReadOnlyList<Player> SnapshotPlayers()
+        {
+            lock (_sync)
+            {
+                return _playersByCharacterId.Values.ToList();
             }
         }
 

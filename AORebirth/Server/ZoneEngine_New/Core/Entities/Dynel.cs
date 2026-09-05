@@ -14,6 +14,16 @@ namespace ZoneEngine_New.Core.Entities
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
+    /// <summary>How a dynel was introduced into the world.</summary>
+    public enum SpawnSource
+    {
+        None = 0,
+        HashSpawn = 1,
+        Command = 2,
+        Player = 3,
+        Corpse = 4
+    }
+
     /// <summary>
     /// Skeleton dynel: identity and world transform until full entities land.
     /// </summary>
@@ -35,6 +45,9 @@ namespace ZoneEngine_New.Core.Entities
         public Playfield? Playfield { get; set; }
 
         public Cell? Cell { get; internal set; }
+
+        /// <summary>Origin of this dynel in the world (hash spawn, GM command, login, etc.).</summary>
+        public SpawnSource SpawnSource { get; set; }
 
         public virtual bool IsPlayer => false;
 

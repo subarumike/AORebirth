@@ -24,8 +24,6 @@ namespace ZoneEngine_New.Core.Inventory
     /// </summary>
     public class Container
     {
-        const short DefaultEntryFlags = 0x00A1;
-
         public Container(IdentityType type, int offset, int capacity, int instanceId = 0)
         {
             Identity = new Identity { Type = type, Instance = instanceId };
@@ -42,6 +40,16 @@ namespace ZoneEngine_New.Core.Inventory
         public int Offset { get; }
 
         public int Capacity { get; }
+
+        public bool IsOpen { get; set; }
+
+        public bool IsHydrated { get; set; } = true;
+
+        public int InventoryHandle { get; set; }
+
+        public Item? LinkedItem { get; set; }
+
+        public Identity ParentSlot { get; set; } = Identity.None;
 
         public bool Add(int slot, Item item)
         {
@@ -64,18 +72,62 @@ namespace ZoneEngine_New.Core.Inventory
             return item;
         }
 
+        public int FindFreeSlot()
+        {
+            for (int slot = Offset; slot < Offset + Capacity; slot++)
+            {
+                if (!Content.ContainsKey(slot))
+                    return slot;
+            }
+
+            return -1;
+        }
+
+        public ChestItemFullUpdateMessage BuildChestItemFullUpdate(
+            Identity owner,
+            int playfieldId,
+            Identity sourceInventorySlot)
+        {
+            Item bag = LinkedItem
+                ?? throw new InvalidOperationException("Container has no LinkedItem for ChestItemFullUpdate.");
+
+            return new ChestItemFullUpdateMessage
+            {
+                Identity = Identity,
+                Unknown = 0,
+                Unknown1 = 0x0b,
+                Owner = owner,
+                PlayfieldId = playfieldId,
+                StateMachine = new Identity { Type = (IdentityType)1000015, Instance = 0 },
+                Unknown5 = (short)(0x0100 | (sourceInventorySlot.Instance & 0xff)),
+                Stats =
+                [
+                    StatTuple(CharacterStat.Flags, (uint)bag.Flags),
+                    StatTuple(CharacterStat.StaticInstance, (uint)bag.HighId),
+                    StatTuple(CharacterStat.ACGItemLevel, (uint)bag.Quality),
+                    StatTuple(CharacterStat.ACGItemTemplateID, (uint)bag.LowId),
+                    StatTuple(CharacterStat.ACGItemTemplateID2, (uint)bag.HighId),
+                    StatTuple(
+                        CharacterStat.MultipleCount,
+                        (uint)Math.Max(1, bag.StackCount))
+                ],
+                Unknown6 = 0,
+                Unknown7 = 2,
+                Unknown8 = 50,
+                UnknownArray = [],
+                Unknown9 = 3
+            };
+        }
+
         /// <summary>
         /// Builds an open/update packet for this container's current contents.
         /// </summary>
-        /// <param name="recipient">Player identity receiving the update.</param>
-        /// <param name="bagIdentity">Wire bag identity (e.g. corpse dynel identity).</param>
-        /// <param name="slotNumberInMainInventory">Client inventory handle for this bag.</param>
-        /// <param name="unknown1">Wire Unknown1 (corpse open uses 2).</param>
         public InventoryUpdateMessage BuildInventoryUpdateMessage(
             Identity recipient,
             Identity bagIdentity,
             int slotNumberInMainInventory,
-            int unknown1 = 2)
+            int unknown1 = 2,
+            int unknown2 = 1)
         {
             var entries = new InventoryEntry[Content.Count];
             int index = 0;
@@ -83,14 +135,11 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 Item item = slot.Value;
                 short count = (short)Math.Clamp(Math.Max(1, item.StackCount), 1, short.MaxValue);
-                short flags = item.Flags != 0
-                    ? (short)Math.Clamp(item.Flags, short.MinValue, short.MaxValue)
-                    : DefaultEntryFlags;
 
                 entries[index++] = new InventoryEntry
                 {
                     Slotnumber = slot.Key,
-                    UnknownFlags = flags,
+                    UnknownFlags = item.ToInventoryPacketFlags(),
                     Unknown1 = count,
                     Identity = item.Identity,
                     LowId = item.LowId,
@@ -109,8 +158,11 @@ namespace ZoneEngine_New.Core.Inventory
                 Entries = entries,
                 BagIdentity = bagIdentity,
                 SlotnumberInMainInventory = slotNumberInMainInventory,
-                Unknown2 = 1
+                Unknown2 = unknown2
             };
         }
+
+        static GameTuple<CharacterStat, uint> StatTuple(CharacterStat stat, uint value)
+            => new() { Value1 = stat, Value2 = value };
     }
 }

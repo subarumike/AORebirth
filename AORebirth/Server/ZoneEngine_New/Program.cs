@@ -2,6 +2,7 @@ namespace ZoneEngine_New
 {
     using System;
     using System.IO;
+    using System.Text;
     using System.Threading;
 
     using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,9 @@ namespace ZoneEngine_New
 
         private static void Main(string[] args)
         {
+            // AODB playfield RDB parsers read strings with Windows-1252.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             Console.CancelKeyPress += ConsoleCancelKeyPress;
 
             OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
@@ -80,6 +84,7 @@ namespace ZoneEngine_New
                 chatEngineLink = rootServices.GetRequiredService<IChatEngineLink>();
                 chatEngineLink.Start();
                 playfieldManager = rootServices.GetRequiredService<PlayfieldManager>();
+                _ = rootServices.GetRequiredService<InventoryFlushService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
                 logger.Info("ZoneEngine_New root container started.");
@@ -109,6 +114,7 @@ namespace ZoneEngine_New
             services.AddSingleton<ICharacterRepository, MySqlCharacterRepository>();
             services.AddSingleton<IStatRepository, MySqlStatRepository>();
             services.AddSingleton<IInventoryRepository, MySqlInventoryRepository>();
+            services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
             services.AddSingleton<IItemBuilder, ItemBuilder>();
@@ -116,6 +122,10 @@ namespace ZoneEngine_New
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
             services.AddSingleton<PlayfieldManager>();
+            // Explicit Lazy so TeleportCommand can break the PlayfieldManager <-> command handler cycle.
+            services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
+            services.AddSingleton<InventoryFlushService>();
+            services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ZoneMessageCodec>();
 
             //Chat
@@ -137,6 +147,7 @@ namespace ZoneEngine_New
             AddMessageHandler<AttackMessageHandler>(services);
             AddMessageHandler<StopFightMessageHandler>(services);
             AddMessageHandler<GenericCmdMessageHandler>(services);
+            AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();

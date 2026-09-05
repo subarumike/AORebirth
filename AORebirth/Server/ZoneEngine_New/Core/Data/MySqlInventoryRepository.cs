@@ -37,10 +37,17 @@ namespace ZoneEngine_New.Core.Data
             + (int)IdentityType.Container
             + " AND ContainerInstance = @ContainerInstanceId";
 
+        private const string LeaseAdvanceSql =
+            "UPDATE item_instance_id_sequence "
+            + "SET NextInstanceId = LAST_INSERT_ID(NextInstanceId) + @Count "
+            + "WHERE Id = 1";
+
+        private const string LeaseStartSql = "SELECT LAST_INSERT_ID()";
+
         private const string InsertSql =
             "INSERT INTO item_instances "
-            + "(ContainerType, ContainerInstance, ContainerPlacement, ItemType, LowId, HighId, Quality, StackCount) "
-            + "VALUES (@ContainerType, @ContainerInstance, @ContainerPlacement, @ItemType, @LowId, @HighId, @Quality, @StackCount)";
+            + "(InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, LowId, HighId, Quality, StackCount) "
+            + "VALUES (@InstanceId, @ContainerType, @ContainerInstance, @ContainerPlacement, @ItemType, @LowId, @HighId, @Quality, @StackCount)";
 
         private const string UpdateLocationSql =
             "UPDATE item_instances SET ContainerType = @ContainerType, "
@@ -93,42 +100,42 @@ namespace ZoneEngine_New.Core.Data
                 "GetContainerItems");
         }
 
-        public ItemInstanceRecord Insert(ItemInstanceRecord item)
+        public int LeaseInstanceIdBlock(int count)
         {
-            ArgumentNullException.ThrowIfNull(item);
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
             try
             {
                 using MySqlConnection connection = new MySqlConnection(_connectionString);
                 connection.Open();
+                using MySqlTransaction transaction = connection.BeginTransaction();
 
-                using MySqlCommand command = new MySqlCommand(InsertSql, connection);
-                command.Parameters.AddWithValue("@ContainerType", item.ContainerType);
-                command.Parameters.AddWithValue("@ContainerInstance", item.ContainerInstance);
-                command.Parameters.AddWithValue("@ContainerPlacement", item.ContainerPlacement);
-                command.Parameters.AddWithValue("@ItemType", item.ItemType);
-                command.Parameters.AddWithValue("@LowId", item.LowId);
-                command.Parameters.AddWithValue("@HighId", item.HighId);
-                command.Parameters.AddWithValue("@Quality", item.Quality);
-                command.Parameters.AddWithValue("@StackCount", item.StackCount);
-
-                command.ExecuteNonQuery();
-                int instanceId = checked((int)command.LastInsertedId);
-                if (instanceId <= 0)
-                    throw new InvalidOperationException("Insert did not return a positive InstanceId.");
-
-                return new ItemInstanceRecord
+                using (MySqlCommand advance = new MySqlCommand(LeaseAdvanceSql, connection, transaction))
                 {
-                    InstanceId = instanceId,
-                    ContainerType = item.ContainerType,
-                    ContainerInstance = item.ContainerInstance,
-                    ContainerPlacement = item.ContainerPlacement,
-                    ItemType = item.ItemType,
-                    LowId = item.LowId,
-                    HighId = item.HighId,
-                    Quality = item.Quality,
-                    StackCount = item.StackCount
-                };
+                    advance.Parameters.AddWithValue("@Count", count);
+                    if (advance.ExecuteNonQuery() == 0)
+                    {
+                        throw new InvalidOperationException(
+                            "item_instance_id_sequence row Id=1 is missing; apply SqlTables/migrations.");
+                    }
+                }
+
+                int start;
+                using (MySqlCommand readStart = new MySqlCommand(LeaseStartSql, connection, transaction))
+                {
+                    object? result = readStart.ExecuteScalar();
+                    if (result == null || result is DBNull)
+                        throw new InvalidOperationException("LeaseInstanceIdBlock could not read LAST_INSERT_ID().");
+
+                    start = Convert.ToInt32(result, CultureInfo.InvariantCulture);
+                }
+
+                if (start <= 0)
+                    throw new InvalidOperationException("LeaseInstanceIdBlock returned a non-positive start.");
+
+                transaction.Commit();
+                return start;
             }
             catch (Exception exception)
             {
@@ -136,7 +143,33 @@ namespace ZoneEngine_New.Core.Data
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "InventoryRepository.Insert failed low={0} placement={1}",
+                        "InventoryRepository.LeaseInstanceIdBlock failed count={0}",
+                        count));
+                throw;
+            }
+        }
+
+        public ItemInstanceRecord Insert(ItemInstanceRecord item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            if (item.InstanceId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(item), "Insert requires a pre-allocated InstanceId.");
+
+            try
+            {
+                using MySqlConnection connection = new MySqlConnection(_connectionString);
+                connection.Open();
+                ExecuteInsert(item, connection, transaction: null);
+                return item;
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "InventoryRepository.Insert failed id={0} low={1} placement={2}",
+                        item.InstanceId,
                         item.LowId,
                         item.ContainerPlacement));
                 throw;
@@ -179,6 +212,102 @@ namespace ZoneEngine_New.Core.Data
                         instanceId));
                 throw;
             }
+        }
+
+        public void UpdateLocations(IReadOnlyList<ItemLocationUpdate> locations)
+        {
+            PersistNewAndUpdateLocations([], locations);
+        }
+
+        public void PersistNewAndUpdateLocations(
+            IReadOnlyList<ItemInstanceRecord> inserts,
+            IReadOnlyList<ItemLocationUpdate> updates)
+        {
+            ArgumentNullException.ThrowIfNull(inserts);
+            ArgumentNullException.ThrowIfNull(updates);
+            if (inserts.Count == 0 && updates.Count == 0)
+                return;
+
+            try
+            {
+                using MySqlConnection connection = new MySqlConnection(_connectionString);
+                connection.Open();
+                using MySqlTransaction transaction = connection.BeginTransaction();
+
+                for (int i = 0; i < inserts.Count; i++)
+                {
+                    ItemInstanceRecord item = inserts[i];
+                    if (item.InstanceId <= 0)
+                        throw new ArgumentOutOfRangeException(nameof(inserts));
+                    ExecuteInsert(item, connection, transaction);
+                }
+
+                // Park updates into unique negative placements first so swaps cannot collide.
+                for (int i = 0; i < updates.Count; i++)
+                {
+                    ItemLocationUpdate update = updates[i];
+                    if (update.InstanceId <= 0)
+                        throw new ArgumentOutOfRangeException(nameof(updates));
+
+                    using MySqlCommand park = new MySqlCommand(UpdateLocationSql, connection, transaction);
+                    park.Parameters.AddWithValue("@InstanceId", update.InstanceId);
+                    park.Parameters.AddWithValue("@ContainerType", update.ContainerType);
+                    park.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
+                    park.Parameters.AddWithValue("@ContainerPlacement", -(i + 1));
+                    if (park.ExecuteNonQuery() == 0)
+                    {
+                        throw new InvalidOperationException(
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "UpdateLocations park found no row for InstanceId={0}",
+                                update.InstanceId));
+                    }
+                }
+
+                foreach (ItemLocationUpdate update in updates)
+                {
+                    using MySqlCommand commit = new MySqlCommand(UpdateLocationSql, connection, transaction);
+                    commit.Parameters.AddWithValue("@InstanceId", update.InstanceId);
+                    commit.Parameters.AddWithValue("@ContainerType", update.ContainerType);
+                    commit.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
+                    commit.Parameters.AddWithValue("@ContainerPlacement", update.ContainerPlacement);
+                    if (commit.ExecuteNonQuery() == 0)
+                    {
+                        throw new InvalidOperationException(
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "UpdateLocations commit found no row for InstanceId={0}",
+                                update.InstanceId));
+                    }
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(exception, "InventoryRepository.PersistNewAndUpdateLocations failed");
+                throw;
+            }
+        }
+
+        private static void ExecuteInsert(
+            ItemInstanceRecord item,
+            MySqlConnection connection,
+            MySqlTransaction? transaction)
+        {
+            using MySqlCommand command = transaction == null
+                ? new MySqlCommand(InsertSql, connection)
+                : new MySqlCommand(InsertSql, connection, transaction);
+            command.Parameters.AddWithValue("@InstanceId", item.InstanceId);
+            command.Parameters.AddWithValue("@ContainerType", item.ContainerType);
+            command.Parameters.AddWithValue("@ContainerInstance", item.ContainerInstance);
+            command.Parameters.AddWithValue("@ContainerPlacement", item.ContainerPlacement);
+            command.Parameters.AddWithValue("@ItemType", item.ItemType);
+            command.Parameters.AddWithValue("@LowId", item.LowId);
+            command.Parameters.AddWithValue("@HighId", item.HighId);
+            command.Parameters.AddWithValue("@Quality", item.Quality);
+            command.Parameters.AddWithValue("@StackCount", item.StackCount);
+            command.ExecuteNonQuery();
         }
 
         private IReadOnlyList<ItemInstanceRecord> Query(

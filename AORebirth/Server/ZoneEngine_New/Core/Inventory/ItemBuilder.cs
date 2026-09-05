@@ -72,6 +72,8 @@ namespace ZoneEngine_New.Core.Inventory
                     row.StackCount,
                     row.InstanceId,
                     identity);
+                item.IsPersisted = true;
+                item.ApplyContainerIdentityIfBag();
                 return true;
             }
             catch (Exception exception)

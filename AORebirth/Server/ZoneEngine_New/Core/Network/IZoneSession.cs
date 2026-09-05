@@ -3,6 +3,9 @@ namespace ZoneEngine_New.Core.Network
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Playfield;
+
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     public interface IZoneSession
     {
@@ -14,6 +17,8 @@ namespace ZoneEngine_New.Core.Network
 
         /// <summary>Clears session→player without world teardown (used after LinkDead / steal / despawn).</summary>
         void UnbindPlayer();
+
+        void TransferToPlayfield(Playfield destination, Vector3 landing);
 
         void Send(byte[] packet);
 

@@ -9,12 +9,25 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
     using Utility;
 
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
     public sealed class GenericCmdMessageHandler : IMessageHandler<GenericCmdMessage>
     {
+        private readonly IInventoryRepository _inventoryRepository;
+        private readonly IItemBuilder _items;
+
+        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items)
+        {
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ArgumentNullException.ThrowIfNull(items);
+            _inventoryRepository = inventoryRepository;
+            _items = items;
+        }
+
         public Type MessageBodyType => typeof(GenericCmdMessage);
 
         public void Handle(MessageBody body, IZoneSession session)
@@ -70,23 +83,105 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
         }
 
-        static void HandleUse(GenericCmdMessage message, IZoneSession session, Player player, Playfield playfield)
+        void HandleUse(GenericCmdMessage message, IZoneSession session, Player player, Playfield playfield)
         {
             Identity target = message.Target != null && message.Target.Length > 0
                 ? message.Target[0]
                 : Identity.None;
 
-            if (target.Instance == 0
-                || !playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel)
-                || dynel is not LootableDynel lootable)
+            switch (target.Type)
+            {
+                case IdentityType.Inventory:
+                case IdentityType.ArmorPage:
+                case IdentityType.SocialPage:
+                    HandleUseInventoryItem(message, session, player, target);
+                    break;
+
+                case IdentityType.Corpse:
+                case IdentityType.Container:
+                    HandleUseLootable(message, session, player, playfield, target);
+                    break;
+
+                default:
+                    player.Logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Deserialized but unhandled GenericCmd Use target type={0}({1}) character={2}",
+                            target.Type,
+                            (int)target.Type,
+                            player.Identity.Instance));
+                    Deny(session, message);
+                    break;
+            }
+        }
+
+        void HandleUseInventoryItem(
+            GenericCmdMessage message,
+            IZoneSession session,
+            Player player,
+            Identity target)
+        {
+            if (!player.Inventory.IsHydrated
+                || !player.Inventory.TryGetItem(target.Type, target.Instance, out Item item))
             {
                 Deny(session, message);
                 return;
             }
 
-            if (!lootable.TryOpen(player))
+            if (!item.Use(player, target, _inventoryRepository, _items))
             {
                 Deny(session, message);
+                return;
+            }
+
+            Acknowledge(session, message, target);
+        }
+
+        static void HandleUseLootable(
+            GenericCmdMessage message,
+            IZoneSession session,
+            Player player,
+            Playfield playfield,
+            Identity target)
+        {
+            if (target.Instance == 0)
+            {
+                Deny(session, message, player, "lootable target instance=0");
+                return;
+            }
+
+            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel))
+            {
+                Deny(session, message, player, "lootable dynel not in registry: " + target);
+                return;
+            }
+
+            if (dynel is not LootableDynel lootable)
+            {
+                Deny(
+                    session,
+                    message,
+                    player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "dynel {0} is {1}, not LootableDynel",
+                        target,
+                        dynel?.GetType().Name ?? "null"));
+                return;
+            }
+
+            if (!lootable.TryOpen(player))
+            {
+                Deny(
+                    session,
+                    message,
+                    player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "TryOpen failed on {0} isOpen={1} opener={2}",
+                        lootable.Identity,
+                        lootable.IsOpen,
+                        lootable.OpenerIdentity));
                 return;
             }
 
@@ -109,6 +204,19 @@ namespace ZoneEngine_New.Core.MessageHandlers
         static void Deny(IZoneSession session, GenericCmdMessage message)
         {
             session.Send(Reply(message, Identity.None, temp1: 2));
+        }
+
+        static void Deny(IZoneSession session, GenericCmdMessage message, Player player, string reason)
+        {
+            player.Logger.Warn(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "GenericCmd Use denied char={0} action={1} target={2}: {3}",
+                    player.Identity.Instance,
+                    message.Action,
+                    FormatTarget(message),
+                    reason));
+            Deny(session, message);
         }
 
         static GenericCmdMessage Reply(GenericCmdMessage message, Identity targetOverride, int temp1)

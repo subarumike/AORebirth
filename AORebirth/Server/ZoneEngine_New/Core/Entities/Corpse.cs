@@ -28,6 +28,7 @@ namespace ZoneEngine_New.Core.Entities
         private const int DefaultCorpseFlags = 1579013;
 
         private readonly IGameData _gameData;
+        private bool _cashClaimed;
 
         public Corpse(Identity identity, Character dead, IGameData gameData)
             : base(identity, IdentityType.Corpse, LootCapacity)
@@ -48,6 +49,33 @@ namespace ZoneEngine_New.Core.Entities
             TimeExist = DefaultTimeExist;
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
             CopySourceStats(dead);
+        }
+
+        /// <summary>
+        /// First opener receives any cash on the corpse; later openers get none.
+        /// </summary>
+        protected override void OnOpened(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            if (_cashClaimed)
+                return;
+
+            _cashClaimed = true;
+
+            if (!SourceStats.TryGetValue(CharacterStat.Cash, out int cash) || cash <= 0)
+                return;
+
+            SourceStats[CharacterStat.Cash] = 0;
+
+            int current = player.Stats.Get(CharacterStat.Cash, StatDetail.Base);
+            if (StatCollection.IsUnset(current) || current < 0)
+                current = 0;
+
+            long sum = (long)current + cash;
+            int newCash = sum > int.MaxValue ? int.MaxValue : (int)sum;
+
+            player.Stats.Set(CharacterStat.Cash, newCash, StatDetail.Base, dirty: false); // Client somehow knows?
         }
 
         public Identity Owner { get; }
