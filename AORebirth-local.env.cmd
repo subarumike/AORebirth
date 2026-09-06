@@ -1,0 +1,1 @@
+set "AO_REBIRTH_MYSQL_CONNECTION=Server=localhost;Database=cellao_codex_clean;Uid=root;Pwd="
