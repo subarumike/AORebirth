@@ -31,14 +31,10 @@ namespace ZoneEngine_New.Core.Inventory
             Identity? identity = null,
             byte[]? statsBlob = null)
         {
-            ItemTemplate low = ResolveTemplate(lowId);
-            ItemTemplate high = highId == lowId || !_catalog.TryGet(highId, out ItemTemplate? highTemplate)
-                ? low
-                : highTemplate!;
-
-            int clampedQuality = ClampQuality(quality, low.Quality, high.Quality);
-            ItemTemplate definition = BuildEffectiveDefinition(low, high, clampedQuality);
+            ItemTemplate definition = CreateTemplate(lowId, highId, quality);
             ApplyStatsBlob(definition, statsBlob);
+
+            int clampedQuality = definition.Quality;
 
             int resolvedStack = stackCount;
             if (definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats) && stackFromStats > 0)
@@ -54,6 +50,17 @@ namespace ZoneEngine_New.Core.Inventory
                 StackCount = Math.Max(1, resolvedStack),
                 Definition = definition
             };
+        }
+
+        public ItemTemplate CreateTemplate(int lowId, int highId, int quality)
+        {
+            ItemTemplate low = ResolveTemplate(lowId);
+            ItemTemplate high = highId == lowId || !_catalog.TryGet(highId, out ItemTemplate? highTemplate)
+                ? low
+                : highTemplate!;
+
+            int clampedQuality = ClampQuality(quality, low.Quality, high.Quality);
+            return BuildEffectiveDefinition(low, high, clampedQuality);
         }
 
         public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item)

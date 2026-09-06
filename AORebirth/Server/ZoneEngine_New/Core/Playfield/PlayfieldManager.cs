@@ -34,6 +34,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IItemInstanceIdAllocator _instanceIds;
         private readonly InventoryMoveService _inventoryMoves;
         private readonly InventoryFlushService _inventoryFlush;
+        private readonly CharacterSnapshotService _characterSnapshot;
         private bool _disposed;
 
         public PlayfieldManager(
@@ -45,7 +46,8 @@ namespace ZoneEngine_New.Core.Playfield
             IInventoryRepository inventoryRepository,
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
-            InventoryFlushService inventoryFlush)
+            InventoryFlushService inventoryFlush,
+            CharacterSnapshotService characterSnapshot)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -56,6 +58,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(instanceIds);
             ArgumentNullException.ThrowIfNull(inventoryMoves);
             ArgumentNullException.ThrowIfNull(inventoryFlush);
+            ArgumentNullException.ThrowIfNull(characterSnapshot);
 
             _logger = logger;
             _router = router;
@@ -66,6 +69,7 @@ namespace ZoneEngine_New.Core.Playfield
             _instanceIds = instanceIds;
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
+            _characterSnapshot = characterSnapshot;
         }
 
         public static TimeSpan ResolveLinkDeadTimeout()
@@ -99,18 +103,41 @@ namespace ZoneEngine_New.Core.Playfield
                 Instance = playfieldId
             };
 
-            Playfield created = new Playfield(
-                identity,
-                playfieldLogger,
-                _router,
-                this,
-                _playerHydrator,
-                _gameData,
-                _items,
-                _inventoryRepository,
-                _instanceIds,
-                _inventoryMoves,
-                _inventoryFlush);
+            Playfield created;
+            if (_gameData.GetPlayfieldMetaData(playfieldId) != null)
+            {
+                created = new ACGPlayfield(
+                    identity,
+                    playfieldLogger,
+                    _router,
+                    this,
+                    _playerHydrator,
+                    _gameData,
+                    _items,
+                    _inventoryRepository,
+                    _instanceIds,
+                    _inventoryMoves,
+                    _inventoryFlush,
+                    _characterSnapshot);
+            }
+            else
+            {
+                created = new Playfield(
+                    identity,
+                    playfieldLogger,
+                    _router,
+                    this,
+                    _playerHydrator,
+                    _gameData,
+                    _items,
+                    _inventoryRepository,
+                    _instanceIds,
+                    _inventoryMoves,
+                    _inventoryFlush,
+                    _characterSnapshot);
+            }
+
+            created.Build();
 
             lock (_sync)
             {

@@ -534,6 +534,8 @@ namespace ZoneEngine_New.Core.GameData
                 Path.Combine(RootPath, GameDataPaths.PlayfieldWallsRelativePath(playfieldId)));
             PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(
                 Path.Combine(RootPath, GameDataPaths.PlayfieldDynelsRelativePath(playfieldId)));
+            PlayfieldDoors? doors = TryDeserializeRdbObject<PlayfieldDoors>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldDoorsRelativePath(playfieldId)));
 
             Tilemap? tilemap = null;
             SurfaceResource? surface = null;
@@ -594,6 +596,7 @@ namespace ZoneEngine_New.Core.GameData
             {
                 Walls = walls,
                 Dynels = dynels,
+                Doors = doors,
                 Tilemap = tilemap,
                 Surface = surface
             };
@@ -626,33 +629,92 @@ namespace ZoneEngine_New.Core.GameData
             if (payload.Length == 0)
                 return null;
 
-            return DeserializeRdbObject<T>(payload, path);
-        }
-
-        private static T DeserializeRdbObject<T>(byte[] payload, string sourcePath)
-            where T : RDBObject, new()
-        {
-            T record = new();
             try
             {
-                using MemoryStream stream = new(payload, writable: false);
-                using BinaryReader reader = new(stream);
-                record.Deserialize(reader);
+                return DeserializeRdbObject<T>(payload, path);
             }
             catch (Exception exception)
             {
-                throw new InvalidDataException(
-                    "Playfield geometry could not be deserialized: "
-                    + sourcePath
-                    + " ("
-                    + exception.GetType().Name
+                // Optional geometry: prefer null over aborting playfield load.
+                // Callers that need hard failure use DeserializeRdbObject directly (Collision.dat).
+                System.Diagnostics.Debug.WriteLine(
+                    "GameData skipped unreadable geometry file "
+                    + path
                     + ": "
-                    + exception.Message
-                    + ")",
-                    exception);
+                    + exception.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// RDBDataExtractor writes GetRaw payloads that begin with type+id+version (12 bytes).
+        /// Prefer a parse that consumes the stream; partial "success" at wrong offsets is common.
+        /// </summary>
+        private static T DeserializeRdbObject<T>(byte[] payload, string sourcePath)
+            where T : RDBObject, new()
+        {
+            Exception? lastFailure = null;
+            T? best = null;
+            long bestRemaining = long.MaxValue;
+            int[] offsets = ResolveDeserializeOffsets(payload);
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                int offset = offsets[i];
+                if (offset < 0 || offset >= payload.Length)
+                    continue;
+
+                try
+                {
+                    T record = new();
+                    using MemoryStream stream = new(payload, offset, payload.Length - offset, writable: false);
+                    using BinaryReader reader = new(stream);
+                    record.Deserialize(reader);
+                    long remaining = stream.Length - stream.Position;
+                    if (remaining < bestRemaining)
+                    {
+                        best = record;
+                        bestRemaining = remaining;
+                        if (remaining == 0)
+                            return record;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    lastFailure = exception;
+                }
             }
 
-            return record;
+            if (best != null)
+                return best;
+
+            throw new InvalidDataException(
+                "Playfield geometry could not be deserialized: "
+                + sourcePath
+                + " ("
+                + (lastFailure?.GetType().Name ?? "Error")
+                + ": "
+                + (lastFailure?.Message ?? "no viable offset")
+                + ")",
+                lastFailure);
+        }
+
+        private static int[] ResolveDeserializeOffsets(byte[] payload)
+        {
+            if (payload.Length < 8)
+                return new[] { 0 };
+
+            uint typeId = unchecked((uint)BitConverter.ToInt32(payload, 0));
+            // AODB ResourceTypeId values used for playfield geometry (e.g. PlayfieldWall = 0xF4255).
+            bool looksLikeRdbHeader =
+                typeId is >= 0x000F4200 and <= 0x000F42FF
+                or >= 0x000F6900 and <= 0x000F69FF
+                or 0x000FDE97;
+
+            if (!looksLikeRdbHeader)
+                return new[] { 0 };
+
+            // type(4)+id(4)+version(4) is the common GetRaw prefix for these records.
+            return new[] { 12, 8, 0 };
         }
 
         #endregion

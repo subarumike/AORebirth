@@ -15,6 +15,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Chat;
     using ZoneEngine_New.Core.Commands;
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
@@ -72,6 +73,7 @@ namespace ZoneEngine_New
                 rootServices = BuildRootServices();
                 IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
                 IGameData gameData = rootServices.GetRequiredService<IGameData>();
+                DestinationsCatalog.Instance.ConfigureRoot(gameData.RootPath);
                 LogLocalityStartup();
                 logger.Info(
                     string.Format(
@@ -121,6 +123,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IGameData, GameDataStore>();
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
+            services.AddSingleton<CharacterSnapshotService>();
             services.AddSingleton<PlayfieldManager>();
             // Explicit Lazy so TeleportCommand can break the PlayfieldManager <-> command handler cycle.
             services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));

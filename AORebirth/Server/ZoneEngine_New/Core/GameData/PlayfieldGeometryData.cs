@@ -3,7 +3,7 @@ namespace ZoneEngine_New.Core.GameData
     using AODB.Common.RDBObjects;
 
     /// <summary>
-    /// Parsed Walls.dat / Dynels.dat / Collision.dat for one playfield.
+    /// Parsed Walls.dat / Dynels.dat / Doors.dat / Collision.dat for one playfield.
     /// Missing files yield null members.
     /// </summary>
     public sealed class PlayfieldGeometryData
@@ -12,11 +12,17 @@ namespace ZoneEngine_New.Core.GameData
 
         public PlayfieldDynels? Dynels { get; init; }
 
+        public PlayfieldDoors? Doors { get; init; }
+
         public Tilemap? Tilemap { get; init; }
 
         public SurfaceResource? Surface { get; init; }
 
         public bool HasAny =>
-            Walls != null || Dynels != null || Tilemap != null || Surface != null;
+            Walls != null
+            || Dynels != null
+            || Doors != null
+            || Tilemap != null
+            || Surface != null;
     }
 }

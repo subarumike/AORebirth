@@ -31,7 +31,28 @@ namespace AORebirth.Core.GameData
 
         public const string DynelsFileName = "Dynels.dat";
 
+        public const string DoorsFileName = "Doors.dat";
+
         public const string CollisionFileName = "Collision.dat";
+
+        public const string DestinationsFileName = "Destinations.dat";
+
+        /// <summary>
+        /// Outdoor SurfaceResource RDB instance id for a locality cell:
+        /// <c>(playfieldId &lt;&lt; 16) | (cellId &amp; 0xFFFF)</c>.
+        /// </summary>
+        public static int CollisionSurfaceResourceRecordId(int playfieldId, int cellId)
+        {
+            if (playfieldId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(playfieldId),
+                    playfieldId,
+                    "A positive playfield id is required.");
+            }
+
+            return (playfieldId << 16) | (cellId & 0xFFFF);
+        }
 
         public static string PlayfieldRelativeDirectory(int playfieldId)
         {
@@ -73,9 +94,19 @@ namespace AORebirth.Core.GameData
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DynelsFileName);
         }
 
+        public static string PlayfieldDoorsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DoorsFileName);
+        }
+
         public static string PlayfieldCollisionRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), CollisionFileName);
+        }
+
+        public static string PlayfieldDestinationsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DestinationsFileName);
         }
     }
 }

@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="AODB" Version="1.0.6" />
+    <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
@@ -54,8 +55,7 @@
       <Link>Config.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\Libraries\Source\AORebirth.Database\Migrations\*.sql"
-             Exclude="..\..\Libraries\Source\AORebirth.Database\Migrations\*account*">
+    <Content Include="..\..\Libraries\Source\AORebirth.Database\Migrations\*.sql" Exclude="..\..\Libraries\Source\AORebirth.Database\Migrations\*account*">
       <Link>Migrations\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
