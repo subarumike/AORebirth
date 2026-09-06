@@ -1,5 +1,6 @@
 namespace ZoneEngine_New.Core.Inventory
 {
+    using System;
     using System.Collections.Generic;
 
     using AORebirth.Enums;
@@ -34,5 +35,50 @@ namespace ZoneEngine_New.Core.Inventory
         public List<ItemAction> Actions { get; init; } = new();
 
         public List<int> Relations { get; init; } = new();
+
+        /// <summary>
+        /// True when <paramref name="actionType"/> is missing, or every requirement on that action passes.
+        /// </summary>
+        public bool MeetsActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType)
+        {
+            ArgumentNullException.ThrowIfNull(getStat);
+
+            ItemAction? action = null;
+            foreach (ItemAction candidate in Actions)
+            {
+                if (candidate.ActionType == (int)actionType)
+                {
+                    action = candidate;
+                    break;
+                }
+            }
+
+            if (action == null)
+                return true;
+
+            foreach (ItemRequirement requirement in action.Requirements)
+            {
+                if (!EvaluateRequirement(getStat((CharacterStat)requirement.StatNumber), requirement))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool EvaluateRequirement(int statValue, ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+
+            int required = requirement.Value;
+            return (Operator)requirement.Operator switch
+            {
+                Operator.EqualTo => statValue == required,
+                Operator.GreaterThan => statValue > required,
+                Operator.LessThan => statValue < required,
+                Operator.BitAnd => (statValue & required) != 0,
+                Operator.NotBitAnd => (statValue & required) == 0,
+                _ => true
+            };
+        }
     }
 }

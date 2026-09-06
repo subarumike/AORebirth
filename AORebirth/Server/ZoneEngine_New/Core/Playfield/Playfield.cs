@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Playfield
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
 
@@ -19,11 +20,12 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
     /// Playfield instance: GameData metadata, child DI (DynelRegistry, SpawnService), heartbeat.
     /// </summary>
-    public sealed class Playfield : IDisposable
+    public class Playfield : IPlayfield, IDisposable
     {
         private readonly IZoneLogger _logger;
         private readonly IMessageRouter _router;
@@ -35,13 +37,15 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IItemInstanceIdAllocator _instanceIds;
         private readonly InventoryMoveService _inventoryMoves;
         private readonly InventoryFlushService _inventoryFlush;
-        private readonly ServiceProvider _serviceProvider;
+        private readonly CharacterSnapshotService _characterSnapshot;
+        private ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
         private PlayfieldHeartbeat? _heartBeat;
         private readonly Lock _tickSync = new();
         private int _nextContainerInventoryHandle = 1;
         private bool _disposed;
+        private bool _built;
 
         public Playfield(
             Identity playfieldIdentity,
@@ -54,7 +58,8 @@ namespace ZoneEngine_New.Core.Playfield
             IInventoryRepository inventoryRepository,
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
-            InventoryFlushService inventoryFlush)
+            InventoryFlushService inventoryFlush,
+            CharacterSnapshotService characterSnapshot)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
                 playfieldIdentity.Instance,
@@ -69,6 +74,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(instanceIds);
             ArgumentNullException.ThrowIfNull(inventoryMoves);
             ArgumentNullException.ThrowIfNull(inventoryFlush);
+            ArgumentNullException.ThrowIfNull(characterSnapshot);
 
             Identity = playfieldIdentity;
             _logger = playfieldLogger;
@@ -81,6 +87,7 @@ namespace ZoneEngine_New.Core.Playfield
             _instanceIds = instanceIds;
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
+            _characterSnapshot = characterSnapshot;
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
             Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
 
@@ -92,13 +99,39 @@ namespace ZoneEngine_New.Core.Playfield
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Playfield created metadata={0} walls={1} dynels={2} tilemap={3} surface={4}",
+                    "Playfield created metadata={0} walls={1} dynels={2} doors={3} tilemap={4} surface={5}",
                     MetaData == null ? "null(indoor)" : "loaded",
                     Geometry.Walls != null,
                     Geometry.Dynels != null,
+                    Geometry.Doors != null,
                     Geometry.Tilemap != null,
                     Geometry.Surface != null));
         }
+
+        /// <summary>
+        /// Default Build loads static dynels (indoor / non-ACG). Outdoor world construction lives on <see cref="ACGPlayfield"/>.
+        /// </summary>
+        public virtual void Build()
+        {
+            if (_built)
+                return;
+
+            _built = true;
+            Stopwatch sw = Stopwatch.StartNew();
+            int staticDynels = SpawnStaticDynels();
+            sw.Stop();
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield Build complete id={0} elapsedMs={1} statics=0 wallTriggers=0 portalTriggers=0 doors={2} staticDynels={3}",
+                    Identity.Instance,
+                    sw.ElapsedMilliseconds,
+                    Geometry.Doors?.Doors?.Count ?? 0,
+                    staticDynels));
+        }
+
+        protected int SpawnStaticDynels()
+            => GetRequiredService<SpawnService>().LoadStaticDynels();
 
         /// <summary>Starts the tick thread after the playfield is registered with <see cref="PlayfieldManager"/>.</summary>
         public void StartHeartbeat()
@@ -111,11 +144,25 @@ namespace ZoneEngine_New.Core.Playfield
 
         public Identity Identity { get; }
 
+        protected IZoneLogger Logger => _logger;
+
         /// <summary>Null for playfields with no extracted GameData; those resolve to an indoor layout.</summary>
         public PlayfieldMetaData? MetaData { get; }
 
-        /// <summary>Parsed Walls.dat / Dynels.dat / Collision.dat; members null when files are missing.</summary>
+        /// <summary>Parsed Walls.dat / Dynels.dat / Doors.dat / Collision.dat; members null when files are missing.</summary>
         public PlayfieldGeometryData Geometry { get; }
+
+        /// <summary>Optional world simulation assigned by <see cref="ACGPlayfield.Build"/>.</summary>
+        public WorldSimulationAccess WorldAccess =>
+            _serviceProvider.GetRequiredService<WorldSimulationAccess>();
+
+        protected void MarkBuilt() => _built = true;
+
+        protected void RegisterWorldServices(WorldSimulation.PlayfieldWorldSimulation world)
+        {
+            ArgumentNullException.ThrowIfNull(world);
+            WorldAccess.Instance = world;
+        }
 
         /// <summary>
         /// Builds a PlayfieldAnarchyF login packet for this playfield.
@@ -210,15 +257,34 @@ namespace ZoneEngine_New.Core.Playfield
 
             lock (_tickSync)
             {
-                foreach (Player player in _dynelRegistry.PlayerEntities())
+                SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
+                Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
+                foreach (Player player in remaining)
                 {
-                    _playfieldManager.UnregisterPlayer(player);
+                    try
+                    {
+                        spawn.LogoutPlayer(player);
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.Error(
+                            exception,
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Shutdown logout failed for character {0}",
+                                player.Identity.Instance));
+                    }
                 }
 
                 _dynelRegistry.Clear();
             }
 
+            OnDispose();
             _serviceProvider.Dispose();
+        }
+
+        protected virtual void OnDispose()
+        {
         }
 
         public void Tick(double deltaTime)
@@ -234,6 +300,9 @@ namespace ZoneEngine_New.Core.Playfield
                 _inbound.Drain(_router, spawn);
                 spawn.Tick();
                 _inventoryMoves.Tick(this, deltaTime);
+
+                WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
+                world?.TickSoftTriggers(this, deltaTime);
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
             }
@@ -253,6 +322,8 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_instanceIds);
             services.AddSingleton(_inventoryMoves);
             services.AddSingleton(_inventoryFlush);
+            services.AddSingleton(_characterSnapshot);
+            services.AddSingleton(new WorldSimulationAccess());
             services.Add(new ServiceDescriptor(typeof(Identity), Identity));
             if (MetaData != null)
             {
@@ -264,6 +335,8 @@ namespace ZoneEngine_New.Core.Playfield
                 services.AddSingleton(Geometry.Walls);
             if (Geometry.Dynels != null)
                 services.AddSingleton(Geometry.Dynels);
+            if (Geometry.Doors != null)
+                services.AddSingleton(Geometry.Doors);
             if (Geometry.Tilemap != null)
                 services.AddSingleton(Geometry.Tilemap);
             if (Geometry.Surface != null)

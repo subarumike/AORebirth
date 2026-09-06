@@ -21,7 +21,8 @@ namespace ZoneEngine_New.Core.Entities
         HashSpawn = 1,
         Command = 2,
         Player = 3,
-        Corpse = 4
+        Corpse = 4,
+        StaticDynel = 5
     }
 
     /// <summary>
@@ -70,6 +71,34 @@ namespace ZoneEngine_New.Core.Entities
             ArgumentNullException.ThrowIfNull(other);
             Vector3 delta = Position - other.Position;
             return Vector3.Abs(delta);
+        }
+
+        /// <summary>
+        /// True when hard world geometry does not occlude the eye-height ray to <paramref name="other"/>.
+        /// Soft zone triggers never block LOS. Missing WorldSimulation → true.
+        /// </summary>
+        public bool HasLineOfSightTo(Dynel other)
+        {
+            if (other == null)
+                return false;
+            if (ReferenceEquals(other, this))
+                return true;
+            if (Playfield == null || other.Playfield == null
+                || Playfield.Identity.Instance != other.Playfield.Identity.Instance)
+                return false;
+
+            WorldSimulation.PlayfieldWorldSimulation? world = Playfield.WorldAccess.Instance;
+            if (world == null)
+                return true;
+
+            const float eye = Movement.MovementConfig.LineOfSightEyeHeight;
+            Vector3 from = new(Position.x, Position.y + eye, Position.z);
+            Vector3 to = new(other.Position.x, other.Position.y + eye, other.Position.z);
+            double dist = Vector3.Abs(to - from);
+            if (dist > 200)
+                return false;
+
+            return world.HasLineOfSight(from, to);
         }
 
         public virtual MessageBody BuildSpawnMessage()

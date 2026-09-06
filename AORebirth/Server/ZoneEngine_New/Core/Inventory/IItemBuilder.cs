@@ -16,6 +16,11 @@ namespace ZoneEngine_New.Core.Inventory
             Identity? identity = null,
             byte[]? statsBlob = null);
 
+        /// <summary>
+        /// Interpolated catalog definition only. No instance id or occupancy identity.
+        /// </summary>
+        ItemTemplate CreateTemplate(int lowId, int highId, int quality);
+
         bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item);
     }
 }

@@ -34,7 +34,7 @@ namespace ZoneEngine_New.Core.GameData
         PlayfieldSpawnsData GetPlayfieldSpawns(int playfieldId);
 
         /// <summary>
-        /// Walls.dat / Dynels.dat / Collision.dat. Missing files yield null members (no throw).
+        /// Walls.dat / Dynels.dat / Doors.dat / Collision.dat. Missing files yield null members (no throw).
         /// </summary>
         PlayfieldGeometryData GetPlayfieldGeometry(int playfieldId);
     }

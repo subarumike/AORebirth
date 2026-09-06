@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Core.Playfield
     using System;
     using System.Globalization;
 
+    using AODB.Common.RDBObjects;
+
     using Microsoft.Extensions.DependencyInjection;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -36,6 +38,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IItemInstanceIdAllocator _ids;
         private readonly InventoryMoveService _moves;
         private readonly InventoryFlushService _flush;
+        private readonly CharacterSnapshotService _snapshot;
 
         public SpawnService(
             IServiceProvider services,
@@ -47,7 +50,8 @@ namespace ZoneEngine_New.Core.Playfield
             IItemBuilder items,
             IItemInstanceIdAllocator ids,
             InventoryMoveService moves,
-            InventoryFlushService flush)
+            InventoryFlushService flush,
+            CharacterSnapshotService snapshot)
         {
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(registry);
@@ -59,6 +63,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(moves);
             ArgumentNullException.ThrowIfNull(flush);
+            ArgumentNullException.ThrowIfNull(snapshot);
 
             _services = services;
             _registry = registry;
@@ -70,6 +75,7 @@ namespace ZoneEngine_New.Core.Playfield
             _ids = ids;
             _moves = moves;
             _flush = flush;
+            _snapshot = snapshot;
         }
 
         /// <summary>Spawns an NPC from a mob template hash and registers it on this playfield.</summary>
@@ -149,6 +155,59 @@ namespace ZoneEngine_New.Core.Playfield
                     corpse.Loot.Content.Count));
 
             return corpse;
+        }
+
+        /// <summary>
+        /// Materializes every Dynels.dat record as a <see cref="StaticDynel"/> on this playfield.
+        /// </summary>
+        public int LoadStaticDynels()
+        {
+            PlayfieldDynels? dynels = _playfield.Geometry.Dynels;
+            if (dynels?.Dynels == null)
+                return 0;
+
+            int spawned = 0;
+            for (int i = 0; i < dynels.Dynels.Count; i++)
+            {
+                PlayfieldDynel record = dynels.Dynels[i];
+                StaticDynel dynel = CreateStaticDynel(record);
+                _registry.Register(dynel);
+                _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(dynel);
+                spawned++;
+            }
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Loaded static dynels playfield={0} count={1}",
+                    _playfield.Identity.Instance,
+                    spawned));
+
+            return spawned;
+        }
+
+        StaticDynel CreateStaticDynel(PlayfieldDynel record)
+        {
+            var identity = new Identity
+            {
+                Type = (IdentityType)record.IdentityType,
+                Instance = record.IdentityInstance
+            };
+
+            ItemTemplate template = _items.CreateTemplate(record.TemplateId, record.TemplateId, 1);
+            StaticDynel dynel = MissionTerminal.IsMissionTerminalType(identity.Type)
+                ? new MissionTerminal(identity, template)
+                : new PlayfieldStaticDynel(identity, template);
+
+            dynel.Playfield = _playfield;
+            dynel.Position = new Vector3(record.Position.X, record.Position.Y, record.Position.Z);
+            dynel.Rotation = new Quaternion(
+                record.Heading.X,
+                record.Heading.Y,
+                record.Heading.Z,
+                record.Heading.W);
+            dynel.SpawnSource = SpawnSource.StaticDynel;
+            return dynel;
         }
 
         /// <summary>Lifetime / expiry pass. Called from <see cref="Playfield.Tick"/> after inbound drain.</summary>
@@ -387,6 +446,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             player.Position = position;
             player.Playfield = _playfield;
+            player.Logger = _logger;
             _registry.Register(player);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
 
@@ -443,6 +503,8 @@ namespace ZoneEngine_New.Core.Playfield
             _moves.CancelPending(characterId);
             if (player.Inventory.IsHydrated)
                 _flush.HardFlush(player);
+
+            _snapshot.Commit(player);
 
             IZoneSession? session = player.Session;
             if (session != null)
