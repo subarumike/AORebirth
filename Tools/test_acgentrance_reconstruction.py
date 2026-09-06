@@ -184,6 +184,12 @@ class ReconstructionTests(unittest.TestCase):
         self.assertEqual(summary['capture_corpora']['full']['unresolved_offers'],355)
         self.assertTrue(all(r['operational_entrance_key'] is None for r in self.rows))
 
+    def test_repository_source_paths_are_worktree_independent(self):
+        retained=ROOT/'docs/reference/missions/example/events.jsonl'
+        self.assertEqual(a.stable_source_path(retained),'docs/reference/missions/example/events.jsonl')
+        external=ROOT.parent/'external-capture/events.jsonl'
+        self.assertEqual(a.stable_source_path(external),str(external.resolve()))
+
     def test_stale_artifact_detection_without_writes(self):
         previous=a.CHECK
         a.CHECK=True

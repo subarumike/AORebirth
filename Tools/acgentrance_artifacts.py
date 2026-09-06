@@ -18,6 +18,15 @@ GENERATED = {}
 CHECK = False
 
 
+def stable_source_path(path):
+    """Keep repository-owned provenance independent of the active worktree path."""
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(resolved)
+
+
 def audit_index(raw):
     if len(raw)<188:
         raise ValueError('Truncated RDB index header')
@@ -359,7 +368,7 @@ def reprocess(rows):
                         decoded_index[key] = d
         if digest.hexdigest()!=src['sha256']:
             raise ValueError('CAPTURE_SOURCE_DRIFT: '+sid)
-        source_coverage.append({'session_id':sid, 'path_read':str(path), 'prior_source_sha256':src['sha256'], 'counts':dict(counts)})
+        source_coverage.append({'session_id':sid, 'path_read':stable_source_path(path), 'prior_source_sha256':src['sha256'], 'counts':dict(counts)})
     if observed_keys!=set(prior_index):
         raise ValueError('INCOMPLETE_SOURCE_COVERAGE')
     index = position_candidates(rows)

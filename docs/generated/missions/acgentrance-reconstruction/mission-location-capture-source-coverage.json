@@ -263,7 +263,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 5
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014541176Z-36962762-8baab3a4\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T014541176Z-36962762-8baab3a4/events.jsonl",
     "prior_source_sha256": "50a3a33f1c93678a6281947203b9f1f3604bd033a3af580ed3d2a598a65f57a0",
     "session_id": "mission-20260902T014541176Z-36962762-8baab3a4"
   },
@@ -284,7 +284,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 5
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014714320Z-36962762-6d027b2f\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T014714320Z-36962762-6d027b2f/events.jsonl",
     "prior_source_sha256": "0e845f6815e2fb227176e63788df04d13d7d54fab5b3e14dc02b135499976523",
     "session_id": "mission-20260902T014714320Z-36962762-6d027b2f"
   },
@@ -305,7 +305,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014735414Z-36962762-873d0f68\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T014735414Z-36962762-873d0f68/events.jsonl",
     "prior_source_sha256": "87ad08efbded96e6c8cf501ce4c44deac51cc98b4e9fd67882fb185db5463656",
     "session_id": "mission-20260902T014735414Z-36962762-873d0f68"
   },
@@ -326,7 +326,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014742445Z-36962762-9639c44e\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T014742445Z-36962762-9639c44e/events.jsonl",
     "prior_source_sha256": "0b60a77577d09bf2afaa470acf82cf4a06fe0860dacccfd88045ea1a8116429a",
     "session_id": "mission-20260902T014742445Z-36962762-9639c44e"
   },
@@ -347,7 +347,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015007588Z-36962762-c9da0b6d\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015007588Z-36962762-c9da0b6d/events.jsonl",
     "prior_source_sha256": "a0578b7c118d5e878f0192af875c2a733dea8424eca6e4b2258dbd2cee600fab",
     "session_id": "mission-20260902T015007588Z-36962762-c9da0b6d"
   },
@@ -368,7 +368,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015014799Z-36962762-02de7738\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015014799Z-36962762-02de7738/events.jsonl",
     "prior_source_sha256": "fea2e8742715e350cd8f54b0347e209cbe17e21218ef8d1fe150c2b57c33f985",
     "session_id": "mission-20260902T015014799Z-36962762-02de7738"
   },
@@ -389,7 +389,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015022092Z-36962762-506b7517\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015022092Z-36962762-506b7517/events.jsonl",
     "prior_source_sha256": "22c8ab365ab9a7fdc6fedae7049482d1abe3c3c246f1f3ab8dcfcd5fdfbd77d8",
     "session_id": "mission-20260902T015022092Z-36962762-506b7517"
   },
@@ -410,7 +410,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015028181Z-36962762-144d797e\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015028181Z-36962762-144d797e/events.jsonl",
     "prior_source_sha256": "d65b6bb825fed77c585745f0336bc17c5d07e043e5dfd621c52211d8bfa6494d",
     "session_id": "mission-20260902T015028181Z-36962762-144d797e"
   },
@@ -431,7 +431,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015428011Z-36962762-7323ad87\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015428011Z-36962762-7323ad87/events.jsonl",
     "prior_source_sha256": "1226355d77318de674bb5e8e213c7369d70fa320bb996d83c57d8771e87ca7a9",
     "session_id": "mission-20260902T015428011Z-36962762-7323ad87"
   },
@@ -452,7 +452,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015453668Z-36962762-6ee79742\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015453668Z-36962762-6ee79742/events.jsonl",
     "prior_source_sha256": "255d4ac189b8f0bdb762fbb5d9b9c5221cb14f81f9f0917ddffca6c2ded2c3a3",
     "session_id": "mission-20260902T015453668Z-36962762-6ee79742"
   },
@@ -473,7 +473,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015501702Z-36962762-6fa0f567\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015501702Z-36962762-6fa0f567/events.jsonl",
     "prior_source_sha256": "221f7481632fec01b98cf7a9bd74f3671a29025a76982ab5b0b90fbfe0b22e5f",
     "session_id": "mission-20260902T015501702Z-36962762-6fa0f567"
   },
@@ -494,7 +494,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015507673Z-36962762-881b61c8\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015507673Z-36962762-881b61c8/events.jsonl",
     "prior_source_sha256": "3d057e19be3d3c85d585edc816dfa2f101153632b418b87e2914cb62490b3e10",
     "session_id": "mission-20260902T015507673Z-36962762-881b61c8"
   },
@@ -515,7 +515,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 10
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015514152Z-36962762-cde432c3\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T015514152Z-36962762-cde432c3/events.jsonl",
     "prior_source_sha256": "26a4fb06e5d7a023a997f84cd04845154ec03bae5d8529e5489a90b929064ffe",
     "session_id": "mission-20260902T015514152Z-36962762-cde432c3"
   },
@@ -536,7 +536,7 @@
       "with_proven_operational_key": 0,
       "with_slider_metadata": 160
     },
-    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T020352939Z-36962762-c11633ff\\events.jsonl",
+    "path_read": "docs/reference/missions/modern-capture/level2-slider-discovery/raw/mission-20260902T020352939Z-36962762-c11633ff/events.jsonl",
     "prior_source_sha256": "9743c577b973f75c07ed7bd1299c0c802401a8a807c7659dccf2f069a6fd1442",
     "session_id": "mission-20260902T020352939Z-36962762-c11633ff"
   },
