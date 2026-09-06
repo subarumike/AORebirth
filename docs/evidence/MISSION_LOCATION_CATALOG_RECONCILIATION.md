@@ -40,8 +40,10 @@ SOURCE_ROLE: AUTHORITATIVE_EXTERNAL_GAME_CODE_EXTRACT
 AUTHORITATIVE_FOR: Complete mission-location ID catalog; exact location ID
 values; exact associated display names.
 
-ORIGIN: Supplied by another project; reportedly extracted directly from AO
-game code. No project revision, source function or extraction log was supplied.
+ORIGIN: Supplied from `never-knows-best/aosharp.utils/Neko`; reportedly extracted
+directly from AO game code. The source consumer was subsequently inspected at
+revision `fdc5017a1abd77ed6c85dfee19e3e6459aba0c11`; no extraction function or
+extraction log was supplied.
 
 AOREBIRTH_LOCAL_GHIDRA_EXTRACTION: NO
 AOREBIRTH_INDEPENDENT_REPRODUCTION: NO
@@ -151,6 +153,21 @@ are retained in `MISSION_LOCATION_RECONCILIATION_REPOSITORY_SNAPSHOT.md`.
 The primary worktree and all unrelated worktrees remain unchanged.
 
 ## Remaining evidence needed
+
+### Source-project follow-up
+
+Mike supplied the Neko project URL after the initial audit. Its
+[`KeyWarper.cs`](https://gitlab.com/never-knows-best/aosharp.utils/-/blob/fdc5017a1abd77ed6c85dfee19e3e6459aba0c11/Neko/KeyWarper.cs)
+confirms that each catalog number is the instance part of an
+`IdentityType.ACGEntrance` identity, not an XYZ position. The upstream catalog
+matches the supplied mapping when line endings are ignored.
+
+Neko strips the mission-key name prefix, looks up the resulting name, tries
+candidate entrance identities with the key, and caches the accepted identity.
+Names with several IDs are handled by trying candidates, not by a coordinate
+conversion. Inspecting this consumer establishes the intended identity type but
+does not independently reproduce the game-code extraction or provide the
+missing offer-to-entrance bridge. No Neko plugin was built, loaded or used.
 
 The useful next source is an entrance catalog that joins each location ID to
 its destination playfield and exact marker coordinates, or the supplying
