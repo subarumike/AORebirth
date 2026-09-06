@@ -71,6 +71,43 @@ CONTRACT_TOKENS = MISSION_FORBIDDEN_TOKENS + (
     "DataSet", "IQueryable", "DbDataReader",
 )
 
+# Account enforcement is deliberately opt-in. The legacy runtime SQL baseline
+# and mission rules above remain independent of this parallel foundation.
+ACCOUNT_PERSISTENCE_ROOTS = (
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Accounts",
+)
+ACCOUNT_CONTRACT_TOKENS = CONTRACT_TOKENS + (
+    "Connector", "DBLoginData", "LoginDataDao", "MySqlAccountDao",
+    "DbProviderFactory", "IDataParameter", "IDbDataParameter", "DbParameter",
+    "IDbDataAdapter", "DataAdapter", "DbDataAdapter", "SqlMapper", "IDao",
+)
+ACCOUNT_DOMAIN_TOKENS = (
+    "AORebirth.AccountBroker", "AORebirth.BotService", "IAccountIdentityDao",
+    "ICharacterDao", "DBCharacter", "CharacterDao", "LoginDataDao",
+)
+ACCOUNT_CONCEPT_PATTERN = re.compile(
+    r"\b\w*(?:AccountIdentity|AccountBroker|BotService|Token|PasswordReset|"
+    r"EmailVerification|Provisioning|ExternalMapping|Logoff|Logout|Offline|Online)\w*\b",
+    re.IGNORECASE,
+)
+ACCOUNT_GM_MUTATION_PATTERN = re.compile(
+    r"\b(?:Set|Update|Change|Write|Save|Grant|Revoke|Reset|Assign|Apply|Enable|"
+    r"Disable|Promote|Demote)\w*(?:Gm|GameMaster)\w*\s*(?:<[^;{}]*>)?\s*\(",
+    re.IGNORECASE,
+)
+ACCOUNT_GENERIC_PATTERN = re.compile(
+    r"\b(?:I?GenericRepository|I?Repository|I?GenericDao|Dao)\s*<|"
+    r"\b(?:GetAll|GetWhere|Query|Save|Delete|Add)\s*(?:<|\()|"
+    r"\b(?:object|dynamic|tableName|columnName|queryObject|sql)\b", re.IGNORECASE,
+)
+ACCOUNT_STORAGE_LITERAL_PATTERN = re.compile(
+    r"\b(?:login|characters|account_[a-z_]+|bot_[a-z_]+|information_schema)\b|"
+    r"^\s*[`\[\]]*(?:Id|CreationDate|Email|FirstName|LastName|Username|Password|"
+    r"AllowedCharacters|Flags|AccountFlags|Expansions|GM|Online)[`\[\]]*\s*$",
+    re.IGNORECASE,
+)
+
 
 def code_only(text: str) -> str:
     # Contracts use C# 7.3. Strip comments and string/character literals before
@@ -102,6 +139,52 @@ def mission_persistence_violations(root: Path) -> list[str]:
                 violations.append(relative + ":database-row-type")
             if contract and any(pattern.search(value) for value in extract_csharp_strings(text)
                                 for pattern in SQL_PATTERNS):
+                violations.append(relative + ":embedded-sql")
+    return sorted(set(violations))
+
+
+def account_persistence_violations(root: Path) -> list[str]:
+    violations = []
+    for relative_root in ACCOUNT_PERSISTENCE_ROOTS:
+        directory = root / relative_root
+        sources = sorted(path for path in directory.rglob("*.cs")
+                         if not set(path.relative_to(directory).parts) & EXCLUDED_PARTS)
+        if not sources:
+            violations.append(relative_root + ":missing-persistence-sources")
+        contract = "/AORebirth.Interfaces/" in relative_root
+        for path in sources:
+            text = path.read_text(encoding="utf-8-sig")
+            # C# permits whitespace and comments around a qualified-name dot.
+            # Account-only normalization leaves the existing mission scan intact.
+            code = re.sub(r"\s*\.\s*", ".", code_only(text))
+            relative = normalize(path.relative_to(root))
+            tokens = ENGINE_TOKENS + ACCOUNT_DOMAIN_TOKENS
+            if contract:
+                tokens += ACCOUNT_CONTRACT_TOKENS
+            for token in tokens:
+                if re.search(r"(?<![\w])" + re.escape(token) + r"(?![\w])", code):
+                    violations.append(relative + ":" + token)
+            if ACCOUNT_CONCEPT_PATTERN.search(code):
+                violations.append(relative + ":cross-domain-account-concept")
+            if not contract:
+                continue
+            if re.search(r"\bDB[A-Z]\w*\b", code):
+                violations.append(relative + ":database-row-type")
+            if ACCOUNT_GM_MUTATION_PATTERN.search(code):
+                violations.append(relative + ":blocked-gm-mutation")
+            if ACCOUNT_GENERIC_PATTERN.search(code):
+                violations.append(relative + ":generic-or-untyped-persistence-api")
+            values = extract_csharp_strings(text)
+            literal_candidates = []
+            for start in range(len(values)):
+                for width in range(1, min(6, len(values) - start) + 1):
+                    pieces = values[start:start + width]
+                    literal_candidates.extend((" ".join(pieces), "".join(pieces)))
+            if any(ACCOUNT_STORAGE_LITERAL_PATTERN.search(value) for value in literal_candidates):
+                violations.append(relative + ":storage-name-literal")
+            # Inspect both separated and concatenated pieces, including SQL on
+            # arbitrary tables. Table-name filters would miss this contract leak.
+            if any(pattern.search(value) for value in literal_candidates for pattern in SQL_PATTERNS):
                 violations.append(relative + ":embedded-sql")
     return sorted(set(violations))
 
@@ -395,12 +478,125 @@ def self_test() -> None:
             raise RuntimeError("new runtime SQL fixture was not rejected")
 
 
+def account_self_test() -> int:
+    checks = 0
+    with tempfile.TemporaryDirectory(prefix="aorebirth-account-dao-guard-") as temporary:
+        root = Path(temporary)
+        contract = root / ACCOUNT_PERSISTENCE_ROOTS[0] / "IAccountDao.cs"
+        implementation = root / ACCOUNT_PERSISTENCE_ROOTS[1] / "MySqlAccountDao.cs"
+        good_contract = '''namespace AORebirth.Interfaces.Persistence.Accounts {
+            public interface IAccountDao {
+                GameAccountData LoadByUsername(string username);
+                int ChangePassword(string username, string passwordHash);
+            }
+            public sealed class GameAccountData {
+                public int GmLevel { get; set; }
+                public string PasswordHash { get; set; }
+            }
+            // LogoffChars, DBLoginData, Connector and token ownership are excluded.
+        }'''
+        good_implementation = '''using System.Data;
+            using Dapper; using MySqlConnector;
+            class MySqlAccountDao {
+                const string Sql = "SELECT GM FROM login WHERE Username=@Username";
+                // ZoneEngine_New, CharacterDao and LogoffChars are not dependencies.
+            }'''
+        write(contract, good_contract)
+        write(implementation, good_implementation)
+        write(root / ACCOUNT_PERSISTENCE_ROOTS[0] / "bin/Ignored.cs", "class Bad { IDbConnection db; }")
+        write(root / "AORebirth/Server/ZoneEngine_New/UnchangedLegacy.cs", "class Bad { IDbConnection db; }")
+        if account_persistence_violations(root):
+            raise RuntimeError("neutral account contract or internal provider fixture was rejected")
+        checks += 1
+
+        contract_cases = (
+            ("using Data = System.Data; interface Bad { Data.IDbConnection Get(); }", "System.Data"),
+            ("interface Bad { global::System . Data . IDbCommand Get(); }", "System.Data"),
+            ("interface Bad { System/*comment*/.Data.IDbTransaction Get(); }", "System.Data"),
+            ("using Provider = MySqlConnector; interface Bad {}", "MySqlConnector"),
+            ("interface Bad { global::Dapper.SqlMapper.GridReader Get(); }", "Dapper"),
+            ("interface Bad { System.Data.Common.DbProviderFactory Get(); }", "DbProviderFactory"),
+            ("interface Bad { AORebirth.Database.Dao.DBLoginData Get(); }", "DBLoginData"),
+            ("class Bad { Connector connection; }", "Connector"),
+            ("interface Bad { ZoneEngine_New.Core.Entities.Player Get(); }", "ZoneEngine_New"),
+            ("interface Bad { AORebirth.Stats.CharacterStats Get(); }", "AORebirth.Stats"),
+            ("interface Bad { global::AORebirth . Core . Character Get(); }", "AORebirth.Core"),
+            ('class Bad { const string QueryText = "SELECT value FROM arbitrary_table"; }', "embedded-sql"),
+            ('class Bad { const string QueryText = "SEL" + "ECT value FR" + "OM arbitrary_table"; }', "embedded-sql"),
+            ('class Bad { const string QueryText = @"UPDATE arbitrary_table\nSET value=1"; }', "embedded-sql"),
+            ('class Bad { const string Table = "login"; }', "storage-name-literal"),
+            ('class Bad { const string Table = "lo" + "gin"; }', "storage-name-literal"),
+            ('class Bad { const string Column = "Username"; }', "storage-name-literal"),
+            ('class Bad { const string Column = "User" + "name"; }', "storage-name-literal"),
+            ('class Bad { const string Column = "`CreationDate`"; }', "storage-name-literal"),
+            ('class Bad { const string Table = "account_password_reset_tokens"; }', "storage-name-literal"),
+            ("interface Bad { IAccountIdentityDao GetIdentity(); }", "cross-domain-account-concept"),
+            ("interface Bad { void IssuePasswordResetToken(string username); }", "cross-domain-account-concept"),
+            ("interface Bad { void VerifyEmailVerification(string username); }", "cross-domain-account-concept"),
+            ("interface Bad { void StartProvisioningJob(string username); }", "cross-domain-account-concept"),
+            ("interface Bad { void LogoffChars(string username); }", "cross-domain-account-concept"),
+            ("interface Bad { void MarkAllCharactersOffline(string username); }", "cross-domain-account-concept"),
+            ("interface Bad { void SetOnline(string username); }", "cross-domain-account-concept"),
+            ("interface Bad { void SetGmLevel(string username, int value); }", "blocked-gm-mutation"),
+            ("interface Bad { void UpdateAllGM(int value); }", "blocked-gm-mutation"),
+            ("interface Bad { void GrantGameMaster(string username); }", "blocked-gm-mutation"),
+            ("interface Bad { void AssignGmLevel(string username, int value); }", "blocked-gm-mutation"),
+            ("interface Bad { void ApplyGM<T>(T values); }", "blocked-gm-mutation"),
+            ("interface Bad { IGenericRepository<int> Get(); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { GenericDao<int> Get(); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { T GetAll<T>(); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { int GetWhere(string username); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Save<T>(T entity); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Read(string tableName); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Read(object parameters); }", "generic-or-untyped-persistence-api"),
+        )
+        for bad_source, expected in contract_cases:
+            write(contract, bad_source)
+            violations = account_persistence_violations(root)
+            if not any(value.endswith(":" + expected) for value in violations):
+                raise RuntimeError("account contract fixture was not rejected as " + expected + ": " + bad_source)
+            checks += 1
+        write(contract, good_contract)
+
+        for token in (
+            "ZoneEngine_New.Core.Entities.Player", "ZoneEngine.Core.Character",
+            "global::LoginEngine . Packets . Login", "ChatEngine.Client",
+            "WebEngine.Server", "AORebirth.Stats.CharacterStats", "AORebirth.Core.Character",
+            "SmokeLounge.AOtomation.Messaging.Packet", "AORebirth.AccountBroker.AccountBrokerService",
+            "AORebirth.BotService.BotPersistence", "CharacterDao", "DBCharacter", "LoginDataDao",
+        ):
+            write(implementation, "class Bad { " + token + " field; }")
+            if not account_persistence_violations(root):
+                raise RuntimeError("account implementation dependency fixture was not rejected: " + token)
+            checks += 1
+        write(implementation, good_implementation)
+        if account_persistence_violations(root):
+            raise RuntimeError("account contract fixture reset did not pass")
+        checks += 1
+
+        # Each directory is independently required; a missing surface must not
+        # yield a vacuous pass. These are temporary fixtures only.
+        contract.unlink()
+        if not any(value.endswith(":missing-persistence-sources") for value in account_persistence_violations(root)):
+            raise RuntimeError("missing account contracts did not fail closed")
+        checks += 1
+        write(contract, good_contract)
+        implementation.unlink()
+        if not any(value.endswith(":missing-persistence-sources") for value in account_persistence_violations(root)):
+            raise RuntimeError("missing account implementation did not fail closed")
+        checks += 1
+    return checks
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path)
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--self-test", action="store_true")
-    parser.add_argument("--mission-persistence-only", action="store_true")
+    parser.add_argument("--account-self-test", action="store_true")
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument("--mission-persistence-only", action="store_true")
+    scope.add_argument("--account-persistence-only", action="store_true")
     args = parser.parse_args()
 
     if args.self_test:
@@ -408,10 +604,28 @@ def main() -> int:
         print("DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS")
         return 0
 
+    if args.account_self_test:
+        count = account_self_test()
+        print("ACCOUNT_PERSISTENCE_GUARD_SELF_TEST=PASS")
+        print("ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=" + str(count))
+        return 0
+
     if args.root is None:
         parser.error("--root is required unless --self-test is used")
     root = args.root.resolve()
     manifest = (args.manifest or Path(__file__).with_name("known-violations.json")).resolve()
+    if args.account_persistence_only:
+        try:
+            boundary = account_persistence_violations(root)
+        except (OSError, ValueError) as error:
+            print("ACCOUNT_PERSISTENCE_GUARD=FAIL")
+            print("ERROR=" + str(error))
+            return 1
+        for value in boundary:
+            print("ACCOUNT_BOUNDARY_VIOLATION=" + value)
+        print("ACCOUNT_PERSISTENCE_GUARD=" + ("FAIL" if boundary else "PASS"))
+        print("ACCOUNT_BOUNDARY_VIOLATIONS=" + str(len(boundary)))
+        return 1 if boundary else 0
     if args.mission_persistence_only:
         try:
             boundary = mission_boundary_violations(root) + mission_persistence_violations(root)

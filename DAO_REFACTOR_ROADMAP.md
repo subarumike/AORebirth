@@ -592,6 +592,8 @@ Phase 2 implementation checklist:
 
 ### Phase 3 — Character/account read and online-state seams
 
+- Parallel account foundation: `IAccountDao` / `MySqlAccountDao` now provide eight unconsumed legacy game-account operations; disposable MySQL validation is 273 checks PASS twice, mission regression 202 PASS, and account/mission scoped guards PASS. All 21 production `LoginDataDao` invocations remain unchanged. GM mutation is blocked by the pre-existing unscoped update; logoff remains character/online-state owned; AccountIdentity and runtime wiring remain deferred. **Phase 3 is not complete.** See `docs/reports/ACCOUNT_DAO_PARALLEL_HANDOFF.md` for compatibility mappings and reproduced broader baseline failures.
+
 - Goal: establish shared character/account DAOs before moving aggregate saves.
 - Exact scope: authentication loads, character lists/lookups/ownership, online state, stale recovery, Web read-only counts/list.
 - Files/subsystems: Login handlers/queries, Chat auth/directory, Zone stale recovery and handoff, Web IndexPHP, `CharacterDao` read/online methods.
