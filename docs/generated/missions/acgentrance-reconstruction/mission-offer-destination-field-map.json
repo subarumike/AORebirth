@@ -1,0 +1,70 @@
+{
+  "GetEntranceDoor_mission_call": "Not found in recovered action/WorldPos/accessor paths; import/xref negative scope retained separately. Not a proof about arbitrary dynamic calls.",
+  "byte_order": "big endian",
+  "decoder_scope": "Exact captured-schema-assisted verification. Opaque AOSharp spans must match byte-for-byte; not a general independent Quest_t implementation.",
+  "destination_accessor": "Gamecode.dll N3Msg_GetQuestWorldPos RVA0x1ABC9 (accepted quest accessor); selection list RVA0x2065E",
+  "fields": [
+    {
+      "classification": "PROVEN_TERMINAL_IDENTITY",
+      "name": "request_terminal_identity",
+      "object": "ACGQuestIIR_t+0x3C/+0x40",
+      "offset": 42,
+      "width": 8,
+      "wire": "UInt32 type,UInt32 instance"
+    },
+    {
+      "classification": "PROVEN_DESTINATION_PLAYFIELD",
+      "name": "destination_playfield",
+      "object": "QuestAction+0x6C, WorldPos+0",
+      "offset": "D (recorded per offer)",
+      "width": 8,
+      "wire": "UInt32 type,UInt32 instance"
+    },
+    {
+      "classification": "PROVEN_DESTINATION_COORDINATE",
+      "name": "world_origin_xz",
+      "object": "temporary integers, used to compute WorldPos+8 world vector",
+      "offset": "D+8",
+      "prior_name": "UnkChunk5Base64; NOT stat 0xBD",
+      "width": 8,
+      "wire": "2 signed int32"
+    },
+    {
+      "classification": "PROVEN_DESTINATION_COORDINATE",
+      "name": "local_position_xyz",
+      "object": "QuestAction+0x80, WorldPos+0x14",
+      "offset": "D+16",
+      "width": 12,
+      "wire": "3 IEEE754 binary32"
+    },
+    {
+      "classification": "CANDIDATE_DESTINATION_FIELD",
+      "name": "description",
+      "note": "May contain generic words, approximate coordinate text or a location name; not an identity resolver",
+      "offset": "per-offer +60",
+      "width": "preceding BE uint32 length",
+      "wire": "byte string; raw retained by original capture"
+    },
+    {
+      "classification": "UNKNOWN",
+      "name": "operational_entrance_key",
+      "offset": null,
+      "width": null,
+      "wire": null
+    },
+    {
+      "classification": "UNKNOWN",
+      "name": "complete_acgentrance_identity",
+      "offset": null,
+      "width": null,
+      "wire": null
+    }
+  ],
+  "name_encoding": "Resource bytes preserved as Latin-1 identity mapping; raw bytes authoritative. Packet strings not used as assignment keys.",
+  "offer_reader_rva": "0xABEA7",
+  "opcode_absolute_packet_offset": 16,
+  "packet_type": "QuestAlternative 0x5C436609",
+  "parser_module": "Gamecode.dll",
+  "parser_rva": "0xCB232",
+  "per_offer_boundaries": "First offer at51; subsequent starts follow parsed previous offer end. Variable description, rewards and captured opaque sections; count byte at50."
+}

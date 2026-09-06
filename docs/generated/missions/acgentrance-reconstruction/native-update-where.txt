@@ -1,0 +1,41 @@
+Program: N3.dll
+Executable SHA256: 8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb
+Image base: 10000000
+Evidence format: COMPACT_ADDRESS_BYTE_WINDOWS_V1
+Full private analysis export SHA256: 78ae3ec18418b0f63e70d414e919b7b7b21ee3249969bdb47cccb514651119fa
+Full decompiler text intentionally excluded. Small functions retain all instructions; larger functions retain calls/branches and nearby address-byte windows.
+
+## Target RVA 0x52ad
+XREF 1004d648 DATA null
+XREF Entry Point EXTERNAL null
+XREF 10005a5b UNCONDITIONAL_CALL n3Dynel_t::AddChildDynel
+XREF 10005b49 UNCONDITIONAL_CALL n3Dynel_t::RelocateDynel
+XREF 1000d474 UNCONDITIONAL_CALL n3Playfield_t::AddChildDynel
+XREF 1000d533 UNCONDITIONAL_CALL n3Playfield_t::RelocateDynel
+XREF 1000d557 UNCONDITIONAL_CALL n3Playfield_t::RelocateDynel
+Function: n3Dynel_t::UpdateWhere @ 100052ad
+ASSEMBLY ADDRESS/BYTE WINDOWS:
+100052ad 55 PUSH EBP
+100052ae 8bec MOV EBP,ESP
+100052b0 56 PUSH ESI
+100052b1 57 PUSH EDI
+100052b2 ff7508 PUSH dword ptr [EBP + 0x8]
+100052b5 8bf1 MOV ESI,ECX
+100052b7 e8abfdffff CALL 0x10005067
+100052bc ff7508 PUSH dword ptr [EBP + 0x8]
+100052bf 8b3e MOV EDI,dword ptr [ESI]
+100052c1 e8e87c0000 CALL 0x1000cfae
+100052c6 59 POP ECX
+100052c7 50 PUSH EAX
+100052c8 8bce MOV ECX,ESI
+100052ca ff5748 CALL dword ptr [EDI + 0x48]
+100052cd ff7510 PUSH dword ptr [EBP + 0x10]
+100052d0 8b4e50 MOV ECX,dword ptr [ESI + 0x50]
+100052d3 ff750c PUSH dword ptr [EBP + 0xc]
+100052d6 ff1594c60310 CALL dword ptr [0x1003c694]
+100052dc 8bce MOV ECX,ESI
+100052de e88bedffff CALL 0x1000406e
+100052e3 5f POP EDI
+100052e4 5e POP ESI
+100052e5 5d POP EBP
+100052e6 c20c00 RET 0xc

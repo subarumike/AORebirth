@@ -1,0 +1,4 @@
+# Exploratory diagnostics; final reproducible catalog is acgentrance-records.jsonl.
+acgentrance-records-initial.json
+templates/
+*-relevant-symbols.json

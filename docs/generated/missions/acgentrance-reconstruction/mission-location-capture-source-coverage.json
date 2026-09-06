@@ -1,0 +1,1583 @@
+[
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T105113054Z-36962762-4c52f74f\\events.jsonl",
+    "prior_source_sha256": "6af1cabd8a9eccd1bb9bdf8ee5addc084e374491e9a5df989504b2f4509579fb",
+    "session_id": "mission-20260901T105113054Z-36962762-4c52f74f"
+  },
+  {
+    "counts": {
+      "cohorts": 10,
+      "five_offer_cohorts": 10,
+      "offers": 50
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 50,
+      "with_catalog_name_candidates_in_description": 10,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 50,
+      "with_destination_playfield": 50,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T105803389Z-36962762-83c00fcc\\events.jsonl",
+    "prior_source_sha256": "c794ae325087b4727cab35f58a23844c7afa14af8e1e308b8edfadf157650079",
+    "session_id": "mission-20260901T105803389Z-36962762-83c00fcc"
+  },
+  {
+    "counts": {
+      "cohorts": 10,
+      "five_offer_cohorts": 10,
+      "offers": 50
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 50,
+      "with_catalog_name_candidates_in_description": 10,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 50,
+      "with_destination_playfield": 50,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T110315876Z-36962762-bc11bed9\\events.jsonl",
+    "prior_source_sha256": "6e8ded21e5d95c68dd2cf4a82383aa60ff3a939a27e91f3abfd9a85efaa4b795",
+    "session_id": "mission-20260901T110315876Z-36962762-bc11bed9"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T111210600Z-36962762-599c941f\\events.jsonl",
+    "prior_source_sha256": "6df5b6dd4b48bd26e0b0247ae4722b42e260de0f5b0612e40f29179d07ce4d94",
+    "session_id": "mission-20260901T111210600Z-36962762-599c941f"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T111502019Z-36962762-9b7ccad4\\events.jsonl",
+    "prior_source_sha256": "2182c0ee07c70bbee29d59451869b6320dea259c99346fc4b55a8f6bd8e1a36d",
+    "session_id": "mission-20260901T111502019Z-36962762-9b7ccad4"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112717725Z-36962762-eaed3266\\events.jsonl",
+    "prior_source_sha256": "016c3122142999661a565dd87d330d813197c326f8c7dab76b60da6e9d0d6d56",
+    "session_id": "mission-20260901T112717725Z-36962762-eaed3266"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112729560Z-36962762-4f64a2e1\\events.jsonl",
+    "prior_source_sha256": "c958334d3ae78913f743dc1d02adf2bf7092f32a9b75ec9a6c5ff4bdf42dd609",
+    "session_id": "mission-20260901T112729560Z-36962762-4f64a2e1"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112740014Z-36962762-70ce83d6\\events.jsonl",
+    "prior_source_sha256": "20f4296f64a94efc1c52e58c4282329e4b527228e3d31af1054f2abfe42ac050",
+    "session_id": "mission-20260901T112740014Z-36962762-70ce83d6"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112750609Z-36962762-ad5d6ad1\\events.jsonl",
+    "prior_source_sha256": "a08d4ef8e6b83bfad3c82d6446272983a6a3937bdb1c2b5f9f9aaaa68460ef76",
+    "session_id": "mission-20260901T112750609Z-36962762-ad5d6ad1"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112801368Z-36962762-8873e308\\events.jsonl",
+    "prior_source_sha256": "4ad2abeb676772789f13b6e002b322ced035c25ce44f9829a5a8ab2481aa35e5",
+    "session_id": "mission-20260901T112801368Z-36962762-8873e308"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112811983Z-36962762-a468929b\\events.jsonl",
+    "prior_source_sha256": "88231349ba22614c5ad9c12a7ab0b9ca9c59044d908cbcf9cb349c671d642328",
+    "session_id": "mission-20260901T112811983Z-36962762-a468929b"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112822873Z-36962762-1286a140\\events.jsonl",
+    "prior_source_sha256": "a6ac18ff70365451498cc30771053064f3c08a61edd4539b5597e683c97ef8e8",
+    "session_id": "mission-20260901T112822873Z-36962762-1286a140"
+  },
+  {
+    "counts": {
+      "cohorts": 5,
+      "five_offer_cohorts": 5,
+      "offers": 25
+    },
+    "offer_metadata_coverage": {
+      "RAW_PACKET_MISSING": 25,
+      "with_catalog_name_candidates_in_description": 5,
+      "with_character_level_metadata": 0,
+      "with_coordinates": 25,
+      "with_destination_playfield": 25,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260901T112836126Z-36962762-81be8bc5\\events.jsonl",
+    "prior_source_sha256": "4e27e1f0aa981dc1da588d351024edac41007555940a9976ffa0688b8aa6a5c3",
+    "session_id": "mission-20260901T112836126Z-36962762-81be8bc5"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014541176Z-36962762-8baab3a4\\events.jsonl",
+    "prior_source_sha256": "50a3a33f1c93678a6281947203b9f1f3604bd033a3af580ed3d2a598a65f57a0",
+    "session_id": "mission-20260902T014541176Z-36962762-8baab3a4"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014714320Z-36962762-6d027b2f\\events.jsonl",
+    "prior_source_sha256": "0e845f6815e2fb227176e63788df04d13d7d54fab5b3e14dc02b135499976523",
+    "session_id": "mission-20260902T014714320Z-36962762-6d027b2f"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 4,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014735414Z-36962762-873d0f68\\events.jsonl",
+    "prior_source_sha256": "87ad08efbded96e6c8cf501ce4c44deac51cc98b4e9fd67882fb185db5463656",
+    "session_id": "mission-20260902T014735414Z-36962762-873d0f68"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 10,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T014742445Z-36962762-9639c44e\\events.jsonl",
+    "prior_source_sha256": "0b60a77577d09bf2afaa470acf82cf4a06fe0860dacccfd88045ea1a8116429a",
+    "session_id": "mission-20260902T014742445Z-36962762-9639c44e"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 6,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015007588Z-36962762-c9da0b6d\\events.jsonl",
+    "prior_source_sha256": "a0578b7c118d5e878f0192af875c2a733dea8424eca6e4b2258dbd2cee600fab",
+    "session_id": "mission-20260902T015007588Z-36962762-c9da0b6d"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 10,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015014799Z-36962762-02de7738\\events.jsonl",
+    "prior_source_sha256": "fea2e8742715e350cd8f54b0347e209cbe17e21218ef8d1fe150c2b57c33f985",
+    "session_id": "mission-20260902T015014799Z-36962762-02de7738"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 2,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015022092Z-36962762-506b7517\\events.jsonl",
+    "prior_source_sha256": "22c8ab365ab9a7fdc6fedae7049482d1abe3c3c246f1f3ab8dcfcd5fdfbd77d8",
+    "session_id": "mission-20260902T015022092Z-36962762-506b7517"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 2,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015028181Z-36962762-144d797e\\events.jsonl",
+    "prior_source_sha256": "d65b6bb825fed77c585745f0336bc17c5d07e043e5dfd621c52211d8bfa6494d",
+    "session_id": "mission-20260902T015028181Z-36962762-144d797e"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 4,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015428011Z-36962762-7323ad87\\events.jsonl",
+    "prior_source_sha256": "1226355d77318de674bb5e8e213c7369d70fa320bb996d83c57d8771e87ca7a9",
+    "session_id": "mission-20260902T015428011Z-36962762-7323ad87"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 4,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015453668Z-36962762-6ee79742\\events.jsonl",
+    "prior_source_sha256": "255d4ac189b8f0bdb762fbb5d9b9c5221cb14f81f9f0917ddffca6c2ded2c3a3",
+    "session_id": "mission-20260902T015453668Z-36962762-6ee79742"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 2,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015501702Z-36962762-6fa0f567\\events.jsonl",
+    "prior_source_sha256": "221f7481632fec01b98cf7a9bd74f3671a29025a76982ab5b0b90fbfe0b22e5f",
+    "session_id": "mission-20260902T015501702Z-36962762-6fa0f567"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 8,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015507673Z-36962762-881b61c8\\events.jsonl",
+    "prior_source_sha256": "3d057e19be3d3c85d585edc816dfa2f101153632b418b87e2914cb62490b3e10",
+    "session_id": "mission-20260902T015507673Z-36962762-881b61c8"
+  },
+  {
+    "counts": {
+      "cohorts": 2,
+      "five_offer_cohorts": 2,
+      "offers": 10,
+      "offers_decoded": 10,
+      "offers_with_raw": 10
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 10,
+      "with_catalog_name_candidates_in_description": 6,
+      "with_character_level_metadata": 10,
+      "with_coordinates": 10,
+      "with_destination_playfield": 10,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 10
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T015514152Z-36962762-cde432c3\\events.jsonl",
+    "prior_source_sha256": "26a4fb06e5d7a023a997f84cd04845154ec03bae5d8529e5489a90b929064ffe",
+    "session_id": "mission-20260902T015514152Z-36962762-cde432c3"
+  },
+  {
+    "counts": {
+      "cohorts": 32,
+      "five_offer_cohorts": 32,
+      "offers": 160,
+      "offers_decoded": 160,
+      "offers_with_raw": 160
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 160,
+      "with_catalog_name_candidates_in_description": 50,
+      "with_character_level_metadata": 160,
+      "with_coordinates": 160,
+      "with_destination_playfield": 160,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 160
+    },
+    "path_read": "C:\\Users\\Mike\\Documents\\AORebirth-acgentrance-registry-reconstruction\\docs\\reference\\missions\\modern-capture\\level2-slider-discovery\\raw\\mission-20260902T020352939Z-36962762-c11633ff\\events.jsonl",
+    "prior_source_sha256": "9743c577b973f75c07ed7bd1299c0c802401a8a807c7659dccf2f069a6fd1442",
+    "session_id": "mission-20260902T020352939Z-36962762-c11633ff"
+  },
+  {
+    "counts": {
+      "cohorts": 2542,
+      "five_offer_cohorts": 2542,
+      "offers": 12710,
+      "offers_decoded": 12710,
+      "offers_with_raw": 12710
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 12710,
+      "with_catalog_name_candidates_in_description": 5871,
+      "with_character_level_metadata": 12710,
+      "with_coordinates": 12710,
+      "with_destination_playfield": 12710,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 12710
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T050909317Z-36962762-99d539de\\events.jsonl",
+    "prior_source_sha256": "ae7cfed7ab87d1b544cccc4bd5875ca86f1ef0d4bf8477399e5eac3081f21e3d",
+    "session_id": "mission-20260902T050909317Z-36962762-99d539de"
+  },
+  {
+    "counts": {
+      "cohorts": 2452,
+      "five_offer_cohorts": 2452,
+      "offers": 12260,
+      "offers_decoded": 12260,
+      "offers_with_raw": 12260
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 12260,
+      "with_catalog_name_candidates_in_description": 5464,
+      "with_character_level_metadata": 12260,
+      "with_coordinates": 12260,
+      "with_destination_playfield": 12260,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 12260
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T051218175Z-37165191-a530d823\\events.jsonl",
+    "prior_source_sha256": "29494d25dd054fec996e54825b1033f6c426df1f933881c55eb2c00ef3f94ac0",
+    "session_id": "mission-20260902T051218175Z-37165191-a530d823"
+  },
+  {
+    "counts": {
+      "cohorts": 81,
+      "five_offer_cohorts": 81,
+      "offers": 405,
+      "offers_decoded": 405,
+      "offers_with_raw": 405
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 405,
+      "with_catalog_name_candidates_in_description": 81,
+      "with_character_level_metadata": 405,
+      "with_coordinates": 405,
+      "with_destination_playfield": 405,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 405
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T080652128Z-36962762-2ceb97f2\\events.jsonl",
+    "prior_source_sha256": "4cce56b8c026c6d9b233617cba5d786d50d40f23f3e1ede4576cf54847aa5140",
+    "session_id": "mission-20260902T080652128Z-36962762-2ceb97f2"
+  },
+  {
+    "counts": {
+      "cohorts": 47,
+      "five_offer_cohorts": 47,
+      "offers": 235,
+      "offers_decoded": 235,
+      "offers_with_raw": 235
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 235,
+      "with_catalog_name_candidates_in_description": 47,
+      "with_character_level_metadata": 235,
+      "with_coordinates": 235,
+      "with_destination_playfield": 235,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 235
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T081648963Z-36962762-131a4645\\events.jsonl",
+    "prior_source_sha256": "e4ac2b46bc407cc715d34a0fafa3d2ff14c17844d7679093044f4a9d277197bc",
+    "session_id": "mission-20260902T081648963Z-36962762-131a4645"
+  },
+  {
+    "counts": {
+      "cohorts": 622,
+      "five_offer_cohorts": 622,
+      "offers": 3110,
+      "offers_decoded": 3110,
+      "offers_with_raw": 3110
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 3110,
+      "with_catalog_name_candidates_in_description": 622,
+      "with_character_level_metadata": 3110,
+      "with_coordinates": 3110,
+      "with_destination_playfield": 3110,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 3110
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T082715693Z-36962762-abd3cc4f\\events.jsonl",
+    "prior_source_sha256": "6baddc60dcb3e9ff6e2e1c09b06af7725503f2fdc69d73e5d4ec87ea725eaebf",
+    "session_id": "mission-20260902T082715693Z-36962762-abd3cc4f"
+  },
+  {
+    "counts": {
+      "cohorts": 7,
+      "five_offer_cohorts": 7,
+      "offers": 35,
+      "offers_decoded": 35,
+      "offers_with_raw": 35
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 35,
+      "with_catalog_name_candidates_in_description": 7,
+      "with_character_level_metadata": 35,
+      "with_coordinates": 35,
+      "with_destination_playfield": 35,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 35
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T082908255Z-37165191-c3e4f4b4\\events.jsonl",
+    "prior_source_sha256": "28d81c6c67e2ce04bd0d1f79e31d2f830498c8f02445f395556e71e6ba48bb51",
+    "session_id": "mission-20260902T082908255Z-37165191-c3e4f4b4"
+  },
+  {
+    "counts": {
+      "cohorts": 1993,
+      "five_offer_cohorts": 1993,
+      "offers": 9965,
+      "offers_decoded": 9965,
+      "offers_with_raw": 9965
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 9965,
+      "with_catalog_name_candidates_in_description": 1993,
+      "with_character_level_metadata": 9965,
+      "with_coordinates": 9965,
+      "with_destination_playfield": 9965,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 9965
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T083013056Z-37165191-19266cac\\events.jsonl",
+    "prior_source_sha256": "67327b9446f0085ee0c6f5199fbc5713455c29e685b4cc5e5195b9a03674c31d",
+    "session_id": "mission-20260902T083013056Z-37165191-19266cac"
+  },
+  {
+    "counts": {
+      "cohorts": 2250,
+      "five_offer_cohorts": 2250,
+      "offers": 11250,
+      "offers_decoded": 11250,
+      "offers_with_raw": 11250
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 11250,
+      "with_catalog_name_candidates_in_description": 2250,
+      "with_character_level_metadata": 11250,
+      "with_coordinates": 11250,
+      "with_destination_playfield": 11250,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 11250
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T085353671Z-32280351-f964caed\\events.jsonl",
+    "prior_source_sha256": "93e7638dc12c88bfd57d0d63df5b3969ce6eca3d1ccb124b06e93e6415877164",
+    "session_id": "mission-20260902T085353671Z-32280351-f964caed"
+  },
+  {
+    "counts": {
+      "cohorts": 200,
+      "five_offer_cohorts": 200,
+      "offers": 1000,
+      "offers_decoded": 1000,
+      "offers_with_raw": 1000
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 1000,
+      "with_catalog_name_candidates_in_description": 203,
+      "with_character_level_metadata": 1000,
+      "with_coordinates": 1000,
+      "with_destination_playfield": 1000,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 1000
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T112414812Z-37165191-78da3fb7\\events.jsonl",
+    "prior_source_sha256": "925426f3bad159e268b51e53b83d0b97ef5349bc3753302d182ec7e2d64c210a",
+    "session_id": "mission-20260902T112414812Z-37165191-78da3fb7"
+  },
+  {
+    "counts": {
+      "cohorts": 11,
+      "five_offer_cohorts": 11,
+      "offers": 55,
+      "offers_decoded": 55,
+      "offers_with_raw": 55
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 55,
+      "with_catalog_name_candidates_in_description": 0,
+      "with_character_level_metadata": 55,
+      "with_coordinates": 55,
+      "with_destination_playfield": 55,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 55
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260902T115834350Z-37165191-17c32ee1\\events.jsonl",
+    "prior_source_sha256": "8f0123f45bc97b0931ccb96632775107bb9ed6395d2de9d31ec58d5e3594a01c",
+    "session_id": "mission-20260902T115834350Z-37165191-17c32ee1"
+  },
+  {
+    "counts": {
+      "cohorts": 11,
+      "five_offer_cohorts": 11,
+      "offers": 55,
+      "offers_decoded": 55,
+      "offers_with_raw": 55
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 55,
+      "with_catalog_name_candidates_in_description": 0,
+      "with_character_level_metadata": 55,
+      "with_coordinates": 55,
+      "with_destination_playfield": 55,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 55
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T010844105Z-36962762-69e7bc0a\\events.jsonl",
+    "prior_source_sha256": "182a5889167623f50ba56a7648399371c684a0145f4805324b79ad3d3b1d48d3",
+    "session_id": "mission-20260903T010844105Z-36962762-69e7bc0a"
+  },
+  {
+    "counts": {
+      "cohorts": 11,
+      "five_offer_cohorts": 11,
+      "offers": 55,
+      "offers_decoded": 55,
+      "offers_with_raw": 55
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 55,
+      "with_catalog_name_candidates_in_description": 0,
+      "with_character_level_metadata": 55,
+      "with_coordinates": 55,
+      "with_destination_playfield": 55,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 55
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T011110698Z-32280351-dc158f9c\\events.jsonl",
+    "prior_source_sha256": "67a7ca715bc3eea657e52838257d7cdbb5c52b261fad6f13ad5d5caa7d10625c",
+    "session_id": "mission-20260903T011110698Z-32280351-dc158f9c"
+  },
+  {
+    "counts": {
+      "cohorts": 2750,
+      "five_offer_cohorts": 2750,
+      "offers": 13750,
+      "offers_decoded": 13750,
+      "offers_with_raw": 13750
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 13750,
+      "with_catalog_name_candidates_in_description": 30,
+      "with_character_level_metadata": 13750,
+      "with_coordinates": 13750,
+      "with_destination_playfield": 13750,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 13750
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T013307118Z-29212150-d0ee7663\\events.jsonl",
+    "prior_source_sha256": "8ba73e1b50ae5e1b6b285606a54c771848bfdd01d27a20166af8d5b2840e0cd0",
+    "session_id": "mission-20260903T013307118Z-29212150-d0ee7663"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "offers": 0,
+      "offers_decoded": 0,
+      "offers_with_raw": 0
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T030938856Z-32279304-2c007c1c\\events.jsonl",
+    "prior_source_sha256": "330b3cfc3d5725e4f96f7e66d1d191ef04cf2008c851006362a2b050cdb3500b",
+    "session_id": "mission-20260903T030938856Z-32279304-2c007c1c"
+  },
+  {
+    "counts": {
+      "cohorts": 2750,
+      "five_offer_cohorts": 2750,
+      "offers": 13750,
+      "offers_decoded": 13750,
+      "offers_with_raw": 13750
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 13750,
+      "with_catalog_name_candidates_in_description": 170,
+      "with_character_level_metadata": 13750,
+      "with_coordinates": 13750,
+      "with_destination_playfield": 13750,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 13750
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T031034244Z-32279304-3002fb26\\events.jsonl",
+    "prior_source_sha256": "e09c84860200e598f60cc959a724d82a7b5d031ee4437f55f02821fd93b2ac5f",
+    "session_id": "mission-20260903T031034244Z-32279304-3002fb26"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T031944878Z-29212150-25d46d31\\events.jsonl",
+    "prior_source_sha256": "599e2e726418a872b7b4d3a98c68f5d47a56c1c2464083a4bf28adc84f6e30f4",
+    "session_id": "mission-20260903T031944878Z-29212150-25d46d31"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T031951758Z-29212150-8d57b478\\events.jsonl",
+    "prior_source_sha256": "d2007d4ec718d53e3aa83da1d3cedd01e096900a0cfe862b88195134b00809ee",
+    "session_id": "mission-20260903T031951758Z-29212150-8d57b478"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T031959023Z-29212150-58517235\\events.jsonl",
+    "prior_source_sha256": "05a7625030c421884f3e25704bc692f97d28b712e67f06a96788afe148733b5e",
+    "session_id": "mission-20260903T031959023Z-29212150-58517235"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032005098Z-29212150-1ffb7cb1\\events.jsonl",
+    "prior_source_sha256": "2f9baf8385ea577a61f3cf5fadfb5ef61339bb230fda4d45d034fb45042ce7b8",
+    "session_id": "mission-20260903T032005098Z-29212150-1ffb7cb1"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032013035Z-29212150-df1b8e4a\\events.jsonl",
+    "prior_source_sha256": "65d8f99d6cb4884053cde0e3df110a7566bbe3a935dac232c66b10afa0bb1510",
+    "session_id": "mission-20260903T032013035Z-29212150-df1b8e4a"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032018475Z-29212150-e77527d3\\events.jsonl",
+    "prior_source_sha256": "72a846b27342bd01eb5bc4a69a5a03395086958064bd8b02db549b0cba0ac92e",
+    "session_id": "mission-20260903T032018475Z-29212150-e77527d3"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032023572Z-29212150-db043862\\events.jsonl",
+    "prior_source_sha256": "b06d253ad49cf8318146fa85fd6d8f94b19fbcaf3db21adb7350146f99b38485",
+    "session_id": "mission-20260903T032023572Z-29212150-db043862"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032036945Z-29212150-dbb059f8\\events.jsonl",
+    "prior_source_sha256": "c3013b941ab9513f6fffa802d68ddc9cfc24dec1b9f3e3f35cf21edf063e2bd2",
+    "session_id": "mission-20260903T032036945Z-29212150-dbb059f8"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032045514Z-29212150-a7ab31a5\\events.jsonl",
+    "prior_source_sha256": "bc9d426d3e7becf3c02378fc3340d30593dd8afe484ebbb777c72a415ed1427c",
+    "session_id": "mission-20260903T032045514Z-29212150-a7ab31a5"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032050733Z-29212150-5c4400fc\\events.jsonl",
+    "prior_source_sha256": "8ac62f69868d1531fb8a2313de3475aa72eed0b4bf189802c3f78993672e4c6a",
+    "session_id": "mission-20260903T032050733Z-29212150-5c4400fc"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T032056348Z-29212150-0923eb4c\\events.jsonl",
+    "prior_source_sha256": "450f79ce5151cb1fe4517cb08db28d748cfc249332ebfb9a9ea586ac4727112d",
+    "session_id": "mission-20260903T032056348Z-29212150-0923eb4c"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 3,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045459331Z-32279304-019e29e4\\events.jsonl",
+    "prior_source_sha256": "8c61dca218c1d36caf2f60f74d03265384c662c0f81e9b76fd5dc6380debbb1e",
+    "session_id": "mission-20260903T045459331Z-32279304-019e29e4"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045504841Z-32279304-045145fe\\events.jsonl",
+    "prior_source_sha256": "37185e461a98fa5cd21d7049188d619b41cff08c3d2578f4ae8ed0aa6e583e59",
+    "session_id": "mission-20260903T045504841Z-32279304-045145fe"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045510490Z-32279304-7c378e68\\events.jsonl",
+    "prior_source_sha256": "0e447f3f9584334b73006dcedfe83069ecc832661d2713bf7ba8a4bad8102029",
+    "session_id": "mission-20260903T045510490Z-32279304-7c378e68"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045516581Z-32279304-25b44d4a\\events.jsonl",
+    "prior_source_sha256": "335ab3780ce2bff94176275d17464aa0b6a0a060e3fb50f6d9c9d3b1dff22ae0",
+    "session_id": "mission-20260903T045516581Z-32279304-25b44d4a"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045522151Z-32279304-f3026326\\events.jsonl",
+    "prior_source_sha256": "9c87f3511078e3bb3136fd66b26c8dd9f7a81dfc80af1acd61a05218773a83b8",
+    "session_id": "mission-20260903T045522151Z-32279304-f3026326"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045527013Z-32279304-aa044293\\events.jsonl",
+    "prior_source_sha256": "c064c3fbe107a8955c5fa8dff2f6571b29779b36c8c97d5e4be8acfe0af669e8",
+    "session_id": "mission-20260903T045527013Z-32279304-aa044293"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 2,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045532123Z-32279304-8ca2e239\\events.jsonl",
+    "prior_source_sha256": "3d8b62b7263a07238443cb283c05ca036e728422fe82958ba29cceae88e11bc0",
+    "session_id": "mission-20260903T045532123Z-32279304-8ca2e239"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 2,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045536841Z-32279304-fff10408\\events.jsonl",
+    "prior_source_sha256": "87997fd7d2b425cf6213440cc568cf62c668b53df38b7592e177708180f959d6",
+    "session_id": "mission-20260903T045536841Z-32279304-fff10408"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045542554Z-32279304-15097055\\events.jsonl",
+    "prior_source_sha256": "fcd0cdf77085b9c7d8cfa84b6cee4712322ecb11d1b10ff04538ffbf17e3d155",
+    "session_id": "mission-20260903T045542554Z-32279304-15097055"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045547202Z-32279304-c5d238d5\\events.jsonl",
+    "prior_source_sha256": "c79d95c7ead2d7a5bfff2a8c75f3869639a1c47fe014e56477877e34a483dcbb",
+    "session_id": "mission-20260903T045547202Z-32279304-c5d238d5"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T045553354Z-32279304-ccd80b7a\\events.jsonl",
+    "prior_source_sha256": "cc0f545df9a745cbaaf55b7900902bd052b963285744ac9ff3a55fdf2efc04c1",
+    "session_id": "mission-20260903T045553354Z-32279304-ccd80b7a"
+  },
+  {
+    "counts": {
+      "cohorts": 1838,
+      "five_offer_cohorts": 1838,
+      "offers": 9190,
+      "offers_decoded": 9190,
+      "offers_with_raw": 9190
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 9190,
+      "with_catalog_name_candidates_in_description": 15,
+      "with_character_level_metadata": 9190,
+      "with_coordinates": 9190,
+      "with_destination_playfield": 9190,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 9190
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T062510521Z-32279304-553129ed\\events.jsonl",
+    "prior_source_sha256": "4778aecc6186c93b80a7f6334a9d1ee4f9b810c15b341a2619dd7fc9023edec6",
+    "session_id": "mission-20260903T062510521Z-32279304-553129ed"
+  },
+  {
+    "counts": {
+      "cohorts": 912,
+      "five_offer_cohorts": 912,
+      "offers": 4560,
+      "offers_decoded": 4560,
+      "offers_with_raw": 4560
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 4560,
+      "with_catalog_name_candidates_in_description": 10,
+      "with_character_level_metadata": 4560,
+      "with_coordinates": 4560,
+      "with_destination_playfield": 4560,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 4560
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T073833108Z-32279304-d278ad9c\\events.jsonl",
+    "prior_source_sha256": "3a29cc74f70ce9123b830a9886c07117e8945a0bfa7de17062368096d6dc2b7d",
+    "session_id": "mission-20260903T073833108Z-32279304-d278ad9c"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082608467Z-32279304-0a5ddb26\\events.jsonl",
+    "prior_source_sha256": "ed88d6c92280c541287fdd409ef163232a36240c6957eb3465cbe2f57591df72",
+    "session_id": "mission-20260903T082608467Z-32279304-0a5ddb26"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082616687Z-32279304-ee0ee732\\events.jsonl",
+    "prior_source_sha256": "5a1e3a5fcd177162c5afe7940492486affba521d39d30b0c7dceaa995ae5b265",
+    "session_id": "mission-20260903T082616687Z-32279304-ee0ee732"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082621833Z-32279304-2da9e304\\events.jsonl",
+    "prior_source_sha256": "d4d5aef29b17b9182ae63ddea9802b05a88f654ffa2f34223198c9d15eb8a812",
+    "session_id": "mission-20260903T082621833Z-32279304-2da9e304"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082628685Z-32279304-952e913e\\events.jsonl",
+    "prior_source_sha256": "67d9fd571eef7fdf55a416a285621ac4d9bf32fc1b8cdb3d0077defa9edb05e4",
+    "session_id": "mission-20260903T082628685Z-32279304-952e913e"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082634820Z-32279304-2dacbfc2\\events.jsonl",
+    "prior_source_sha256": "8155942548317d8cdc91aefc600cbc3a29e4d1d67e285f22dac259cf2e31b15d",
+    "session_id": "mission-20260903T082634820Z-32279304-2dacbfc2"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082640488Z-32279304-e689cdfb\\events.jsonl",
+    "prior_source_sha256": "bc7975faebc34913eb4b5cfc013c7a722b7e7510d5e4f47842f964873b9d960e",
+    "session_id": "mission-20260903T082640488Z-32279304-e689cdfb"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082646836Z-32279304-115767ae\\events.jsonl",
+    "prior_source_sha256": "a5efc2918655b49d1d6915c01741f5d067ce261f21d3b8ec0fdb4f0188eb4a33",
+    "session_id": "mission-20260903T082646836Z-32279304-115767ae"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082652805Z-32279304-692882b1\\events.jsonl",
+    "prior_source_sha256": "fba2cc70b8278bd9061a7e256a01c967046f837ce0adac8cc244b42ab4457a0f",
+    "session_id": "mission-20260903T082652805Z-32279304-692882b1"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082658280Z-32279304-eda2ddb3\\events.jsonl",
+    "prior_source_sha256": "0d0f2d3b44a30970aa038087ed757fd661422076ea851313962eca5b869662a7",
+    "session_id": "mission-20260903T082658280Z-32279304-eda2ddb3"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082703285Z-32279304-90a51719\\events.jsonl",
+    "prior_source_sha256": "1974e2d0053883824ff69c51319bf135c7d8fb4e92facdf283c7ead5be72acfa",
+    "session_id": "mission-20260903T082703285Z-32279304-90a51719"
+  },
+  {
+    "counts": {
+      "cohorts": 1,
+      "five_offer_cohorts": 1,
+      "offers": 5,
+      "offers_decoded": 5,
+      "offers_with_raw": 5
+    },
+    "offer_metadata_coverage": {
+      "EXACT_PLAYFIELD_COORDINATE_MATCH": 5,
+      "with_catalog_name_candidates_in_description": 1,
+      "with_character_level_metadata": 5,
+      "with_coordinates": 5,
+      "with_destination_playfield": 5,
+      "with_proven_operational_key": 0,
+      "with_slider_metadata": 5
+    },
+    "path_read": "C:\\Users\\Mike\\AppData\\Local\\AOSharp\\MissionOfferHarvester\\sessions\\mission-20260903T082708308Z-32279304-2c5dd802\\events.jsonl",
+    "prior_source_sha256": "608870a8f987dd13d4bbad9f195320e340f01ac896fec24c6654a33185daf02c",
+    "session_id": "mission-20260903T082708308Z-32279304-2c5dd802"
+  }
+]

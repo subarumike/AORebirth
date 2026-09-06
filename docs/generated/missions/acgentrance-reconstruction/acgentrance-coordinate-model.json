@@ -1,0 +1,28 @@
+{
+  "axis_conversion": "Identity XYZ; no AO-to-Godot transform; no coordinate permutation, rounding or nearest-neighbor radius",
+  "corroboration": "All 93185 normalized offer locations match one local placement exactly; all 92830 raw-backed records are independently byte-verified. 355 normalized-only rows remain unpromoted.",
+  "evidence_classification": [
+    "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "PROVEN_FROM_MODERN_CLIENT_RESOURCE",
+    "SUPPORTED_BY_EXISTING_CAPTURE"
+  ],
+  "matching_rule": "SAME_EXPLICIT_PLAYFIELD_AND_ALL_THREE_IDENTICAL_LOCAL_IEEE754_BINARY32_COMPONENTS",
+  "mission_path": [
+    "Gamecode.dll QuestAlternative parser RVA0xCB232",
+    "Quest_t reader RVA0xABEA7",
+    "action-array RVA0xACCDF",
+    "action reader RVA0xACBA0 -> action+0x6C WorldPos_c",
+    "GameData.dll reader RVA0xCA52 local vector at WorldPos+0x14",
+    "GameData.dll GetLocalPos RVA0xC7D2"
+  ],
+  "placement_path": [
+    "Gamecode.dll CreateRDBDynels RVA0x12231E passes Vector3_t",
+    "N3.dll AddChildDynel RVA0xD415",
+    "N3.dll UpdateWhere RVA0x52AD -> Vehicle_t::SetRelPosRot"
+  ],
+  "quantization": "Packet local vector is raw binary32; placement local vector is raw binary32; matching tolerance is exactly zero bits",
+  "rotation": "Raw four-component Quaternion_t retained. Full rotation convention/scale is not needed for XYZ match and is not invented.",
+  "semantic_boundary": "An exact match identifies the client catalog placement advertised as mission destination. It does not establish an interaction radius, room link, physical collision plane, statel index, or positive operational entrance key.",
+  "units": "AO client local coordinate units on both sides; no physical-meter claim required or made",
+  "world_conversion": "The separate world vector adds the two signed packet integer offsets to local X/Z and stores float32. Never compare this world vector directly to the local placement vector."
+}

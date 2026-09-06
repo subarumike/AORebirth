@@ -1,0 +1,158 @@
+{
+  "capture_time_note": "Main DLL/database hashes were taken before task analysis. Supplemental reference hashes were recorded during analysis and rechecked before handoff.",
+  "files": [
+    {
+      "filename": "gamecode_acg_entrance_type.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamecode_acg_entrance_type.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "5d6c5437ebfb4428e6adabb2e7f25b1e30f5934d0294ea55477ee1d0ea10f1e5",
+      "size": 6150,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamecode_c000_usage.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamecode_c000_usage.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "2e0496be91401d69cfb7c757ceea229d836c0f0d9b0e519d0b14d10fc9959592",
+      "size": 12228,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamecode_entrance_caller.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamecode_entrance_caller.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "b7b9249ecb80d7ee61f52c4cbb09a837b914271e7c8b897fd04357b77a87506c",
+      "size": 6774,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamecode_getpospf.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamecode_getpospf.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "893ecec59771fb3844b7414511a553ae5bf8a9719c1affed6f61e8a51e45b4b1",
+      "size": 5463,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamecode_import_refs.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamecode_import_refs.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "ec2dfec27c9be464d60843e845960a1e3a4b03d3fd7499706ef40a04c8ee34b0",
+      "size": 100422,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamecode_proxy_log.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamecode_proxy_log.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "5eae885f50683baf8c8c58b34b03d7715312704e7e922bb1321fc0ec1d1364d2",
+      "size": 7626,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamedata_acg_entrance.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\gamedata_acg_entrance.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "95b932522e9f858c5fda8bd313a6f907995185c3a4b3cf51bf3517c7907792b0",
+      "size": 15315,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_accessors.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_accessors.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "213d50674e0b0af5201b61acc7ecd69a15f1995698698944b467de0d41fcaf56",
+      "size": 12368,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_constructor.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_constructor.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "06650786ffa8ed97420d2b91e95256e30a95c4a65ded8e6a22011bb8a910fb36",
+      "size": 7839,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_dynel_lookup.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_dynel_lookup.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "b5abc86ce1411be4ad3c63728745c7f5ed199b5bde66eb5659ec5abd067f86cb",
+      "size": 3639,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_identity_compare.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_identity_compare.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "a49f45d30126848f519547abf26d2a1a955b4cbf235261b8395836901d44d42c",
+      "size": 5630,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_identity_door.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_identity_door.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "ea52ecb86ce7f438abe59929767b256b79e37b858ffc04aa0d81d99ba42e75f8",
+      "size": 77228,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_identity_map_find.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_identity_map_find.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "e8c7592b73318e12ffb2e04b5155fa31554106fcf6a99b967ee3d2eeb9b67993",
+      "size": 3361,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_instance_static_refs.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_instance_static_refs.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "e2201fed695f031b9aaca7b93e06498c8582786ad7fefb5d6ea47b63801ebc8d",
+      "size": 1402,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_proxy_lookup.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_proxy_lookup.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "f2fc5698deaa8cc7f18bc6c006b9f7ff22bd326fe6c3c777d8c1253ad322f91f",
+      "size": 61898,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_rdb_playfield.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_rdb_playfield.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "53c02ecd9b7766fc5c7cfbcd6e8df9ba3fbcaeb2496fe31a66982201ef4ecfa9",
+      "size": 16178,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_register_entrance.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_register_entrance.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "e2e4a2bfeca5df44ca4cac05ebcc5f30fcfccf67215c3ac929c9bd67217e8b19",
+      "size": 15933,
+      "status": "HASHED"
+    },
+    {
+      "filename": "n3_set_dynel_pf.md",
+      "path": "C:\\temp\\ao-ghidra-pf-instance-20260905\\n3_set_dynel_pf.md",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "b0080e974360626b14abac3793350e6dfe304cc91b2362da4dd7a03e4b59459e",
+      "size": 3543,
+      "status": "HASHED"
+    },
+    {
+      "filename": "gamecode_objdump_d_intel.txt",
+      "path": "C:\\Users\\Mike\\Documents\\AO stripdown\\Anarchy Online\\decompile_report\\_intermediate\\gamecode_objdump_d_intel.txt",
+      "role": "PRIOR_REVERSE_ENGINEERING_REFERENCE_ONLY",
+      "sha256": "764ad8c6b0675cdd34e615dd9d63debe6a43e092568bab7520dcaab65b1bc360",
+      "size": 49565652,
+      "status": "HASHED"
+    }
+  ],
+  "source_ghidra_projects": "Existing copied programs were newer than available Ghidra; fresh private imports were used. No source projects analyzed in place."
+}

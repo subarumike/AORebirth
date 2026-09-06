@@ -1,0 +1,87 @@
+{
+  "container": "LE uint32 record count; repeated LE uint32 byte_length followed by exactly byte_length bytes",
+  "counts": "(n+1)*1009 for encoded section element counts",
+  "fields": [
+    {
+      "format": "LE uint32",
+      "name": "identity_type",
+      "offset": 0,
+      "width": 4
+    },
+    {
+      "format": "LE uint32",
+      "name": "identity_instance",
+      "offset": 4,
+      "width": 4
+    },
+    {
+      "format": "LE uint32",
+      "name": "unknown/version",
+      "offset": 8,
+      "width": 4
+    },
+    {
+      "format": "raw 2 DWORDs",
+      "name": "coordinate ownership identity",
+      "offset": 12,
+      "width": 8
+    },
+    {
+      "format": "LE uint32",
+      "name": "explicit_playfield_id",
+      "offset": 20,
+      "width": 4
+    },
+    {
+      "format": "LE IEEE754 binary32 XYZ",
+      "name": "placement position",
+      "offset": 24,
+      "width": 12
+    },
+    {
+      "format": "LE 4 binary32",
+      "name": "Quaternion_t raw order",
+      "offset": 36,
+      "width": 16
+    },
+    {
+      "format": "LE DWORD",
+      "name": "unknown; not assigned template-identity semantics",
+      "offset": 52,
+      "width": 4
+    },
+    {
+      "format": "LE uint32",
+      "name": "template resource instance",
+      "offset": 56,
+      "width": 4
+    },
+    {
+      "format": "LE uint32",
+      "name": "override byte length",
+      "offset": 60,
+      "width": 4
+    },
+    {
+      "format": "BE structured flat content",
+      "name": "override data",
+      "offset": 64,
+      "width": null
+    }
+  ],
+  "name": "section21 subtype33; uint16 name length and description length; exact bytes; no terminator assumed",
+  "native_support": "Gamecode.dll RVA0x12231E,0x2B458,0x2E7D9; acgentrance-ghidra-function-map.json",
+  "override": "BE header three DWORDs, section count at12; 15 stats,21 name,2 events; all payload boundaries checked",
+  "parent_resource_type": 1000026,
+  "reader_reused": "Tools/export_pf1931_dungeon_geometry.py::RdbReader",
+  "record_length_rule": "64 + override_length; reject truncation, mismatched count, nonfinite transform and unparsed container tail",
+  "repository_structural_support": [
+    "Tools/Algorithman/Extractor Serializer/PlayfieldParser.cs",
+    "Tools/Algorithman/Extractor Serializer/Structs/PFCoordHeading.cs",
+    "Tools/Algorithman/Extractor Serializer/NewParser.cs"
+  ],
+  "scale": "Not present in the extracted placement structure; null",
+  "template": "LE type DWORD and section count; sections 15 stats,21 name,20 animation/sound,22 actions",
+  "template_resource_type": 1000020,
+  "trailer": "empty or one zero DWORD only"
+}
