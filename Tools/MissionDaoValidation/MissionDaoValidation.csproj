@@ -17,6 +17,8 @@
   <ItemGroup Condition="'$(IsolatedMissionSources)' == 'true'">
     <!-- Compile the actual persistence sources, never a second DAO implementation. -->
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Accounts/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/**/*.cs" />

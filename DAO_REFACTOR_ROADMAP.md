@@ -592,6 +592,8 @@ Phase 2 implementation checklist:
 
 ### Phase 3 — Character/account read and online-state seams
 
+- Parallel character foundation: `ICharacterDao` / `MySqlCharacterDao` provide eight unconsumed identity, directory, ownership, online-state and atomic stale-online database recovery operations. The seven-field directory projection is not a character aggregate; online writes retain the legacy owned transaction, while process/session/port guards remain runtime-owned. All 53 direct production `CharacterDao` invocations remain unchanged. Character save/location, deletion, stats, buddy persistence and runtime wiring remain deferred. **Phase 3 is not complete.** See `docs/reports/CHARACTER_DAO_PARALLEL_HANDOFF.md` for exact compatibility mappings and current validation evidence.
+
 - Parallel account foundation: `IAccountDao` / `MySqlAccountDao` now provide eight unconsumed legacy game-account operations; disposable MySQL validation is 273 checks PASS twice, mission regression 202 PASS, and account/mission scoped guards PASS. All 21 production `LoginDataDao` invocations remain unchanged. GM mutation is blocked by the pre-existing unscoped update; logoff remains character/online-state owned; AccountIdentity and runtime wiring remain deferred. **Phase 3 is not complete.** See `docs/reports/ACCOUNT_DAO_PARALLEL_HANDOFF.md` for compatibility mappings and reproduced broader baseline failures.
 
 - Goal: establish shared character/account DAOs before moving aggregate saves.

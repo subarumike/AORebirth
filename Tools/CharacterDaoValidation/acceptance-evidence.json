@@ -1,0 +1,3431 @@
+{
+  "start_sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+  "branch": "codex/character-read-online-dao-parallel-foundation",
+  "scope": "CHARACTER_ACCOUNT_AND_MISSION",
+  "runtime_integrated": false,
+  "schema_changed": false,
+  "live_deployment": false,
+  "primary_preserved": true,
+  "protected_paths_unchanged": true,
+  "character_assertion_count": 529,
+  "character_category_counts": {
+    "fixture": 3,
+    "contract": 11,
+    "directory": 73,
+    "matched-rows": 25,
+    "changed-rows": 25,
+    "stale": 29,
+    "ownership": 42,
+    "faults": 248,
+    "uncertain": 32,
+    "concurrency": 28,
+    "synthetic-defensive": 5,
+    "legacy-offline": 8
+  },
+  "character_runs": [
+    {
+      "name": "character-mysql1",
+      "count": 529,
+      "log_sha256": "aee48297a4da235a686c165759450a940170cc45b342b23af2202b2e20bbeae9"
+    },
+    {
+      "name": "character-mysql2",
+      "count": 529,
+      "log_sha256": "aee48297a4da235a686c165759450a940170cc45b342b23af2202b2e20bbeae9"
+    }
+  ],
+  "character_assertions": [
+    {
+      "category": "fixture",
+      "name": "fixture-database-identity"
+    },
+    {
+      "category": "fixture",
+      "name": "fixture-current-name-collation"
+    },
+    {
+      "category": "fixture",
+      "name": "fixture-primary-key-retained"
+    },
+    {
+      "category": "contract",
+      "name": "exact-eight-operation-contract"
+    },
+    {
+      "category": "contract",
+      "name": "sealed-neutral-data"
+    },
+    {
+      "category": "contract",
+      "name": "exact-seven-directory-fields"
+    },
+    {
+      "category": "contract",
+      "name": "nullable-online-factual-distinction"
+    },
+    {
+      "category": "contract",
+      "name": "immutable-stale-public-properties"
+    },
+    {
+      "category": "contract",
+      "name": "factory-returns-character-interface"
+    },
+    {
+      "category": "contract",
+      "name": "existing-factories-preserved"
+    },
+    {
+      "category": "contract",
+      "name": "all-factories-lazy-no-sql"
+    },
+    {
+      "category": "contract",
+      "name": "null-injected-factory-rejected"
+    },
+    {
+      "category": "contract",
+      "name": "unsupported-default-provider-rejected"
+    },
+    {
+      "category": "contract",
+      "name": "unsupported-provider-disposed-before-sql"
+    },
+    {
+      "category": "directory",
+      "name": "empty-id-parity"
+    },
+    {
+      "category": "directory",
+      "name": "empty-name-parity"
+    },
+    {
+      "category": "directory",
+      "name": "empty-account-parity"
+    },
+    {
+      "category": "directory",
+      "name": "empty-online-parity"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-missing-name-empty-online-zero"
+    },
+    {
+      "category": "directory",
+      "name": "real-schema-duplicate-names-permitted"
+    },
+    {
+      "category": "directory",
+      "name": "all-seven-directory-fields-map"
+    },
+    {
+      "category": "directory",
+      "name": "online-zero-one-other-null-distinguished"
+    },
+    {
+      "category": "directory",
+      "name": "missing-boundary-ids-not-offline-record"
+    },
+    {
+      "category": "directory",
+      "name": "null-missing-name-results"
+    },
+    {
+      "category": "directory",
+      "name": "empty-display-and-profile-names-permitted"
+    },
+    {
+      "category": "directory",
+      "name": "actual-name-case-and-trailing-space-collation"
+    },
+    {
+      "category": "directory",
+      "name": "leading-name-space-not-trimmed"
+    },
+    {
+      "category": "directory",
+      "name": "duplicate-name-first-row-belongs-to-match-set-no-universal-order"
+    },
+    {
+      "category": "directory",
+      "name": "account-case-and-trailing-space-collation"
+    },
+    {
+      "category": "directory",
+      "name": "account-leading-space-and-null-unchanged"
+    },
+    {
+      "category": "directory",
+      "name": "empty-account-name-is-data"
+    },
+    {
+      "category": "directory",
+      "name": "multiple-list-no-cross-account"
+    },
+    {
+      "category": "directory",
+      "name": "exact-other-account-filter"
+    },
+    {
+      "category": "directory",
+      "name": "logged-in-filter-exact-one-not-any-nonzero"
+    },
+    {
+      "category": "directory",
+      "name": "ownership-correct-wrong-missing-null"
+    },
+    {
+      "category": "directory",
+      "name": "ownership-column-collation-and-empty"
+    },
+    {
+      "category": "directory",
+      "name": "ownership-unsigned-id-boundaries"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-RGlzcGxheU9uZQ=="
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-RGlzcGxheU9uZQ=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-projection-parity-RGlzcGxheU9uZQ=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-RHVwbGljYXRl"
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-RHVwbGljYXRl"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-ZGlzcGxheW9uZQ=="
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-ZGlzcGxheW9uZQ=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-projection-parity-ZGlzcGxheW9uZQ=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-RGlzcGxheU9uZSA="
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-RGlzcGxheU9uZSA="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-projection-parity-RGlzcGxheU9uZSA="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-empty"
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-empty"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-projection-parity-empty"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-bWlzc2luZw=="
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-bWlzc2luZw=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-projection-parity-bWlzc2luZw=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-presence-parity-null"
+    },
+    {
+      "category": "directory",
+      "name": "name-existence-derived-parity-null"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-name-projection-parity-null"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-account-normalized-parity-T3duZXJB"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-account-normalized-parity-T3duZXJC"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-account-normalized-parity-empty"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-account-normalized-parity-null"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-account-normalized-parity-bWlzc2luZw=="
+    },
+    {
+      "category": "directory",
+      "name": "legacy-id-full-projection-parity"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-null-online-collapses-to-zero"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-online-directory-parity"
+    },
+    {
+      "category": "directory",
+      "name": "legacy-exact-one-ownership-parity"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-name-account-120"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-ownership-120"
+    },
+    {
+      "category": "directory",
+      "name": "literal-roundtrip-online-120"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-name-account-121"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-ownership-121"
+    },
+    {
+      "category": "directory",
+      "name": "literal-roundtrip-online-121"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-name-account-122"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-ownership-122"
+    },
+    {
+      "category": "directory",
+      "name": "literal-roundtrip-online-122"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-name-account-123"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-ownership-123"
+    },
+    {
+      "category": "directory",
+      "name": "literal-roundtrip-online-123"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-name-account-124"
+    },
+    {
+      "category": "directory",
+      "name": "literal-punctuation-ownership-124"
+    },
+    {
+      "category": "directory",
+      "name": "literal-roundtrip-online-124"
+    },
+    {
+      "category": "directory",
+      "name": "injection-not-executed"
+    },
+    {
+      "category": "directory",
+      "name": "buffered-list-detached-after-owned-connection-disposal"
+    },
+    {
+      "category": "directory",
+      "name": "ordinary-list-order-unspecified"
+    },
+    {
+      "category": "directory",
+      "name": "canonical-id-duplicates-rejected"
+    },
+    {
+      "category": "directory",
+      "name": "canonical-null-display-name-rejected"
+    },
+    {
+      "category": "directory",
+      "name": "canonical-null-owner-rejected"
+    },
+    {
+      "category": "matched-rows",
+      "name": "mark-existing-online"
+    },
+    {
+      "category": "matched-rows",
+      "name": "same-online-provider-count"
+    },
+    {
+      "category": "matched-rows",
+      "name": "mark-existing-offline"
+    },
+    {
+      "category": "matched-rows",
+      "name": "same-offline-provider-count"
+    },
+    {
+      "category": "matched-rows",
+      "name": "missing-online-writes-zero"
+    },
+    {
+      "category": "matched-rows",
+      "name": "boundary-online-writes-missing"
+    },
+    {
+      "category": "matched-rows",
+      "name": "null-to-online-write"
+    },
+    {
+      "category": "matched-rows",
+      "name": "null-to-offline-write"
+    },
+    {
+      "category": "matched-rows",
+      "name": "online-writes-only-target-online-column"
+    },
+    {
+      "category": "matched-rows",
+      "name": "owned-default-transaction-True"
+    },
+    {
+      "category": "matched-rows",
+      "name": "online-statement-parameterized-id-True"
+    },
+    {
+      "category": "matched-rows",
+      "name": "online-success-resources-disposed-True"
+    },
+    {
+      "category": "matched-rows",
+      "name": "owned-default-transaction-False"
+    },
+    {
+      "category": "matched-rows",
+      "name": "online-statement-parameterized-id-False"
+    },
+    {
+      "category": "matched-rows",
+      "name": "online-success-resources-disposed-False"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-set-online-parity"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-set-offline-parity"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-raw-provider-count-True-101"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-online-owned-transaction-True-101"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-raw-provider-count-True-999"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-online-owned-transaction-True-999"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-raw-provider-count-False-101"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-online-owned-transaction-False-101"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-raw-provider-count-False-999"
+    },
+    {
+      "category": "matched-rows",
+      "name": "actual-legacy-online-owned-transaction-False-999"
+    },
+    {
+      "category": "changed-rows",
+      "name": "mark-existing-online"
+    },
+    {
+      "category": "changed-rows",
+      "name": "same-online-provider-count"
+    },
+    {
+      "category": "changed-rows",
+      "name": "mark-existing-offline"
+    },
+    {
+      "category": "changed-rows",
+      "name": "same-offline-provider-count"
+    },
+    {
+      "category": "changed-rows",
+      "name": "missing-online-writes-zero"
+    },
+    {
+      "category": "changed-rows",
+      "name": "boundary-online-writes-missing"
+    },
+    {
+      "category": "changed-rows",
+      "name": "null-to-online-write"
+    },
+    {
+      "category": "changed-rows",
+      "name": "null-to-offline-write"
+    },
+    {
+      "category": "changed-rows",
+      "name": "online-writes-only-target-online-column"
+    },
+    {
+      "category": "changed-rows",
+      "name": "owned-default-transaction-True"
+    },
+    {
+      "category": "changed-rows",
+      "name": "online-statement-parameterized-id-True"
+    },
+    {
+      "category": "changed-rows",
+      "name": "online-success-resources-disposed-True"
+    },
+    {
+      "category": "changed-rows",
+      "name": "owned-default-transaction-False"
+    },
+    {
+      "category": "changed-rows",
+      "name": "online-statement-parameterized-id-False"
+    },
+    {
+      "category": "changed-rows",
+      "name": "online-success-resources-disposed-False"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-set-online-parity"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-set-offline-parity"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-raw-provider-count-True-101"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-online-owned-transaction-True-101"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-raw-provider-count-True-999"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-online-owned-transaction-True-999"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-raw-provider-count-False-101"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-online-owned-transaction-False-101"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-raw-provider-count-False-999"
+    },
+    {
+      "category": "changed-rows",
+      "name": "actual-legacy-online-owned-transaction-False-999"
+    },
+    {
+      "category": "stale",
+      "name": "no-stale-neutral-result"
+    },
+    {
+      "category": "stale",
+      "name": "no-stale-read-only-rollback-no-count-or-commit"
+    },
+    {
+      "category": "stale",
+      "name": "no-stale-resource-disposal"
+    },
+    {
+      "category": "stale",
+      "name": "one-stale-exact-result"
+    },
+    {
+      "category": "stale",
+      "name": "captured-stale-ascending-id-order"
+    },
+    {
+      "category": "stale",
+      "name": "captured-previous-online-exact-values"
+    },
+    {
+      "category": "stale",
+      "name": "multiple-stale-exact-row-verification"
+    },
+    {
+      "category": "stale",
+      "name": "stale-leaves-null-and-other-columns-unchanged"
+    },
+    {
+      "category": "stale",
+      "name": "stale-serializable-owned-commit"
+    },
+    {
+      "category": "stale",
+      "name": "stale-all-four-statements-same-transaction"
+    },
+    {
+      "category": "stale",
+      "name": "stale-database-before-lock-read-order"
+    },
+    {
+      "category": "stale",
+      "name": "bounded-update-uses-exact-captured-ids"
+    },
+    {
+      "category": "stale",
+      "name": "bounded-update-rechecks-nonzero"
+    },
+    {
+      "category": "stale",
+      "name": "stale-success-all-resources-disposed"
+    },
+    {
+      "category": "stale",
+      "name": "stale-captured-collection-read-only"
+    },
+    {
+      "category": "stale",
+      "name": "expected-database-refusal-QU9SRUJJUlRIX0NIQVJBQ1RFUl9EQU9fVkFMSURBVElPTg=="
+    },
+    {
+      "category": "stale",
+      "name": "database-refusal-before-mutation-QU9SRUJJUlRIX0NIQVJBQ1RFUl9EQU9fVkFMSURBVElPTg=="
+    },
+    {
+      "category": "stale",
+      "name": "expected-database-refusal-YW9yZWJpcnRoX2NoYXJhY3Rlcl9kYW9fdmFsaWRhdGlvbiA="
+    },
+    {
+      "category": "stale",
+      "name": "database-refusal-before-mutation-YW9yZWJpcnRoX2NoYXJhY3Rlcl9kYW9fdmFsaWRhdGlvbiA="
+    },
+    {
+      "category": "stale",
+      "name": "expected-database-refusal-d3Jvbmc="
+    },
+    {
+      "category": "stale",
+      "name": "database-refusal-before-mutation-d3Jvbmc="
+    },
+    {
+      "category": "stale",
+      "name": "expected-database-refusal-null"
+    },
+    {
+      "category": "stale",
+      "name": "database-refusal-before-mutation-null"
+    },
+    {
+      "category": "stale",
+      "name": "expected-database-refusal-empty"
+    },
+    {
+      "category": "stale",
+      "name": "database-refusal-before-mutation-empty"
+    },
+    {
+      "category": "stale",
+      "name": "actual-legacy-stale-database"
+    },
+    {
+      "category": "stale",
+      "name": "actual-legacy-stale-capture"
+    },
+    {
+      "category": "stale",
+      "name": "actual-legacy-stale-bounded-clear-count"
+    },
+    {
+      "category": "stale",
+      "name": "actual-legacy-stale-commit-durable"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadById-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadById-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadById-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadById-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadById-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadByName-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadByName-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadByName-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadByName-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "LoadByName-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "ListForAccount-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "ListForAccount-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "ListForAccount-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "ListForAccount-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "ListForAccount-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "IsOwnedByAccount-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "IsOwnedByAccount-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "IsOwnedByAccount-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "IsOwnedByAccount-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "IsOwnedByAccount-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOnline-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOnline-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOnline-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOnline-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOnline-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOffline-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOffline-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOffline-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOffline-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "MarkOffline-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "ListLoggedIn-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "ListLoggedIn-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "ListLoggedIn-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "ListLoggedIn-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "ListLoggedIn-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "RecoverStaleOnline-success-resources-0"
+    },
+    {
+      "category": "ownership",
+      "name": "RecoverStaleOnline-success-owned-lifetime-0"
+    },
+    {
+      "category": "ownership",
+      "name": "RecoverStaleOnline-success-resources-1"
+    },
+    {
+      "category": "ownership",
+      "name": "RecoverStaleOnline-success-owned-lifetime-1"
+    },
+    {
+      "category": "ownership",
+      "name": "RecoverStaleOnline-fresh-connections-on-same-dao"
+    },
+    {
+      "category": "ownership",
+      "name": "already-open-returned-connection-not-reopened"
+    },
+    {
+      "category": "ownership",
+      "name": "default-factory-actual-mysql-operation"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-read-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-read-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-read-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-read-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadById-read-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-read-failure"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-read-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-read-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-read-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "LoadByName-read-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-read-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-read-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-read-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-read-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-read-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-read-failure"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-read-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-read-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-read-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "IsOwnedByAccount-read-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-null-returned-transaction-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-null-transaction-no-sql-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-begin-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-begin-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-begin-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-begin-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOnline-begin-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-null-returned-transaction-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-null-transaction-no-sql-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-begin-failure"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-begin-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-begin-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-begin-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "MarkOffline-begin-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-read-failure"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-read-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-read-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-read-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-read-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-factory-failure-propagates"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-factory-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-null-returned-connection-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-null-returned-transaction-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-null-transaction-no-sql-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-open-failure"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-open-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-open-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-open-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-open-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-create-failure"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-create-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-create-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-create-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-create-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-execute-failure"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-execute-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-execute-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-execute-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-execute-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-begin-failure"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-begin-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-begin-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-begin-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-begin-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-read-failure"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-read-primary-identity"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-read-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-read-transaction-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "RecoverStaleOnline-read-no-persisted-change"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-partial-reader-never-returns-partial-success"
+    },
+    {
+      "category": "faults",
+      "name": "ListForAccount-partial-reader-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-partial-reader-never-returns-partial-success"
+    },
+    {
+      "category": "faults",
+      "name": "ListLoggedIn-partial-reader-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-1-failure"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-1-primary-rollback"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-1-atomic-restoration-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-2-failure"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-2-primary-rollback"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-2-atomic-restoration-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-3-failure"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-3-primary-rollback"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-3-atomic-restoration-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-4-failure"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-4-primary-rollback"
+    },
+    {
+      "category": "faults",
+      "name": "stale-command-4-atomic-restoration-disposal"
+    },
+    {
+      "category": "faults",
+      "name": "stale-after-write-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "stale-after-write-no-partial-cleanup"
+    },
+    {
+      "category": "faults",
+      "name": "stale-after-write-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "stale-row-count-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "stale-row-count-no-partial-cleanup"
+    },
+    {
+      "category": "faults",
+      "name": "stale-row-count-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "stale-post-count-rejected"
+    },
+    {
+      "category": "faults",
+      "name": "stale-post-count-no-partial-cleanup"
+    },
+    {
+      "category": "faults",
+      "name": "stale-post-count-resources-disposed"
+    },
+    {
+      "category": "faults",
+      "name": "stale-partial-capture-failure"
+    },
+    {
+      "category": "faults",
+      "name": "stale-partial-capture-no-update"
+    },
+    {
+      "category": "faults",
+      "name": "ordinary-write-executed-before-failure-True"
+    },
+    {
+      "category": "faults",
+      "name": "ordinary-write-precommit-failure-rolls-back-True"
+    },
+    {
+      "category": "faults",
+      "name": "ordinary-write-executed-before-failure-False"
+    },
+    {
+      "category": "faults",
+      "name": "ordinary-write-precommit-failure-rolls-back-False"
+    },
+    {
+      "category": "faults",
+      "name": "rollback-after-primary-thrown"
+    },
+    {
+      "category": "faults",
+      "name": "rollback-after-secondary-retained"
+    },
+    {
+      "category": "faults",
+      "name": "rollback-after-owned-disposal-rolls-back"
+    },
+    {
+      "category": "faults",
+      "name": "rollback-before-primary-thrown"
+    },
+    {
+      "category": "faults",
+      "name": "rollback-before-secondary-retained"
+    },
+    {
+      "category": "faults",
+      "name": "rollback-before-owned-disposal-rolls-back"
+    },
+    {
+      "category": "faults",
+      "name": "empty-stale-rollback-failure-visible"
+    },
+    {
+      "category": "faults",
+      "name": "empty-stale-rollback-original-not-retried"
+    },
+    {
+      "category": "faults",
+      "name": "connection-dispose-failure-False"
+    },
+    {
+      "category": "faults",
+      "name": "connection-dispose-success-error-may-follow-commit"
+    },
+    {
+      "category": "faults",
+      "name": "connection-dispose-both-owners-attempted-False"
+    },
+    {
+      "category": "faults",
+      "name": "connection-dispose-failure-True"
+    },
+    {
+      "category": "faults",
+      "name": "connection-dispose-keeps-primary-secondary"
+    },
+    {
+      "category": "faults",
+      "name": "connection-dispose-both-owners-attempted-True"
+    },
+    {
+      "category": "faults",
+      "name": "transaction-dispose-failure-False"
+    },
+    {
+      "category": "faults",
+      "name": "transaction-dispose-success-error-may-follow-commit"
+    },
+    {
+      "category": "faults",
+      "name": "transaction-dispose-both-owners-attempted-False"
+    },
+    {
+      "category": "faults",
+      "name": "transaction-dispose-failure-True"
+    },
+    {
+      "category": "faults",
+      "name": "transaction-dispose-keeps-primary-secondary"
+    },
+    {
+      "category": "faults",
+      "name": "transaction-dispose-both-owners-attempted-True"
+    },
+    {
+      "category": "faults",
+      "name": "both-disposal-failures-visible-after-commit"
+    },
+    {
+      "category": "faults",
+      "name": "first-disposal-error-primary-second-attached-commit-durable"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-before-durable-throws"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-False-primary-preserved"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-False-resource-termination"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-False-actual-durable-reconciliation"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-lost-ack-throws"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-True-primary-preserved"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-True-resource-termination"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-commit-True-actual-durable-reconciliation"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-lost-ack-rollback-failure-secondary"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-lost-ack-fresh-read-is-stable"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOnline-lost-ack-repeated-state-write-no-physical-change"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-before-durable-throws"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-False-primary-preserved"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-False-resource-termination"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-False-actual-durable-reconciliation"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-lost-ack-throws"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-True-primary-preserved"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-True-resource-termination"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-commit-True-actual-durable-reconciliation"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-lost-ack-rollback-failure-secondary"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-lost-ack-fresh-read-is-stable"
+    },
+    {
+      "category": "uncertain",
+      "name": "MarkOffline-lost-ack-repeated-state-write-no-physical-change"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-before-durable-throws"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-False-primary-preserved"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-False-resource-termination"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-False-actual-durable-reconciliation"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-lost-ack-throws"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-True-primary-preserved"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-True-resource-termination"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-commit-True-actual-durable-reconciliation"
+    },
+    {
+      "category": "uncertain",
+      "name": "RecoverStaleOnline-lost-ack-rollback-failure-secondary"
+    },
+    {
+      "category": "uncertain",
+      "name": "stale-lost-ack-safe-empty-reconciliation"
+    },
+    {
+      "category": "concurrency",
+      "name": "real-lock-read-reached-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "real-mysql-writer-lock-wait-observed-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "writer-blocked-before-recovery-boundary-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "writer-proceeds-after-owned-boundary-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-owned-resources-disposed-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-capture-stable-before-later-writer-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "post-commit-writer-does-not-rewrite-historical-result-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "fresh-reconciliation-captures-later-state-101-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "real-lock-read-reached-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "real-mysql-writer-lock-wait-observed-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "writer-blocked-before-recovery-boundary-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "writer-proceeds-after-owned-boundary-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-owned-resources-disposed-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-capture-stable-before-later-writer-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "post-commit-writer-does-not-rewrite-historical-result-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "fresh-reconciliation-captures-later-state-103-commit"
+    },
+    {
+      "category": "concurrency",
+      "name": "real-lock-read-reached-101-rollback"
+    },
+    {
+      "category": "concurrency",
+      "name": "real-mysql-writer-lock-wait-observed-101-rollback"
+    },
+    {
+      "category": "concurrency",
+      "name": "writer-blocked-before-recovery-boundary-101-rollback"
+    },
+    {
+      "category": "concurrency",
+      "name": "writer-proceeds-after-owned-boundary-101-rollback"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-owned-resources-disposed-101-rollback"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-recovery-failure-original-and-rollback"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-rollback-no-partial-cleanup"
+    },
+    {
+      "category": "concurrency",
+      "name": "simultaneous-recovery-no-double-clear"
+    },
+    {
+      "category": "concurrency",
+      "name": "simultaneous-recovery-one-committed-one-read-only"
+    },
+    {
+      "category": "concurrency",
+      "name": "simultaneous-recovery-durable-cleared-state"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-state-writes-return-matched-row-counts"
+    },
+    {
+      "category": "concurrency",
+      "name": "concurrent-state-writes-serialized-valid-last-state-only"
+    },
+    {
+      "category": "synthetic-defensive",
+      "name": "invalid-schema-duplicate-id-rejected"
+    },
+    {
+      "category": "synthetic-defensive",
+      "name": "invalid-schema-duplicate-ownership-exact-one-not-any"
+    },
+    {
+      "category": "synthetic-defensive",
+      "name": "invalid-reader-online-mapping-failure-not-offline"
+    },
+    {
+      "category": "synthetic-defensive",
+      "name": "invalid-mapping-reader-disposed"
+    },
+    {
+      "category": "synthetic-defensive",
+      "name": "invalid-schema-null-name-owner-preserved-defensively"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "unchanged-stale-online-recovery-11-cases"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "unchanged-login-handoff-lifecycle-13-cases"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "hydration-loaded-empty-versus-failure-source-contract"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "hydration-destructive-rewrite-fail-closed-source-contract"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "hydration-optional-gmi-schema-source-contract"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "hydration-transfer-aware-session-source-contract"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "hydration-reconnect-ownership-source-contract"
+    },
+    {
+      "category": "legacy-offline",
+      "name": "offline-compatibility-no-database-acquisition"
+    }
+  ],
+  "legacy_offline_cases": 29,
+  "offline_case_note": "Stale 11 and handoff 13 cases plus five unchanged source-contract methods. Counted by eight host assertions, not added again to the character assertion total. No engine initialized.",
+  "account_regression_count": 273,
+  "mission_regression_count": 202,
+  "broader_baseline_failures": [
+    {
+      "gate": "dao-guard",
+      "command": "call Tools\\run_dao_architecture_guard.cmd",
+      "identical_errors": [
+        "NEW_VIOLATION=AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
+        "NEW_VIOLATION=AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs"
+      ]
+    },
+    {
+      "gate": "mission-full",
+      "command": "call Tools\\run_mission_dao_validation.cmd",
+      "identical_errors": [
+        "CSC : error CS2001: Source file '<ROOT>/AORebirth/Libraries/Source/AORebirth.Enums/ItemType.cs' could not be found. [<ROOT>/LinuxBuild/Projects/AORebirth.Enums.Linux.csproj]"
+      ]
+    },
+    {
+      "gate": "compatibility",
+      "command": "call Tools\\run_aotomation_messaging_tests.cmd",
+      "identical_errors": [
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatGeneratedPacketFixtureTests.cs(194,29): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatGeneratedPacketFixtureTests.cs(89,49): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1019,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1106,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1203,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1290,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1380,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1468,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1936,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(2034,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(354,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(506,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(574,74): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(733,43): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(822,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs(483,25): error CS0117: 'PlayfieldAnarchyFMessage' does not contain a definition for 'Unknown1' [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs(1091,33): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs(840,33): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]"
+      ]
+    },
+    {
+      "gate": "inventory",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --manifest LinuxBuild/source-inventory/inventory.json --check",
+      "identical_errors": [
+        "STALE: source inventory does not match <ROOT>/AORebirth/Libraries/Source/AORebirth.Enums/AORebirth.Enums.csproj"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "state": "base",
+      "name": "account-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --account-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:31.571913+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.549,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\account-guard.log",
+      "raw_log_sha256": "4584123c45de081f026dd3e0acd65699aec0ce85c4c11c8bf0bd26b2243bf794",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=56",
+        "ACCOUNT_PERSISTENCE_GUARD=PASS",
+        "ACCOUNT_BOUNDARY_VIOLATIONS=0"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "account-mysql",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_account_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:33.148774+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 105.855,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\account-mysql.log",
+      "raw_log_sha256": "448bb57f7fe8c8a6545e2b4a7027673663b71b27b2884a0751761556b1180b7f",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "ACCOUNT_DAO_STARTUP_LAST_ERROR=MySqlException",
+        "ACCOUNT_DAO_STARTUP_MYSQL_NUMBER=1042",
+        "ACCOUNT_DAO_MYSQL_INTEGRATION=FAIL",
+        "ACCOUNT_DAO_DISPOSABLE_CLEANUP=PASS"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "account-mysqlretry",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_account_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:33:18.130204+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 36.318,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\account-mysqlretry.log",
+      "raw_log_sha256": "996e8b275af160e8806aa634f476343dab461ab7ebebd4f288ba98bcb6a26529",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "ACCOUNT_DAO_FIXTURE_USERNAME_COLLATION=latin1_swedish_ci",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_DAO_TRANSACTION_TESTS=NO_TRANSACTION_API_SINGLE_STATEMENT_AUTOCOMMIT",
+        "ACCOUNT_DAO_NULL_SCHEMA_FIELDS=NOT_NULL_CONSTRAINTS_RETAINED",
+        "ACCOUNT_DAO_TEST_MODE=ISOLATED_PRODUCTION_AND_LEGACY_SOURCES",
+        "ACCOUNT_DAO_CHECKS=273",
+        "ACCOUNT_DAO_MYSQL_INTEGRATION=PASS",
+        "ACCOUNT_DAO_DISPOSABLE_CLEANUP=PASS"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "broker-build",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Tools/AccountBrokerValidation/AccountBrokerValidation.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:31:16.123676+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 29.373,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\broker-build.log",
+      "raw_log_sha256": "9d5ceffa393ba53b1e34b3f22690482b060aa9918a800b6572bc23dda9325bab",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "compatibility",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_aotomation_messaging_tests.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:47.541672+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 7.704,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\compatibility.log",
+      "raw_log_sha256": "e2f59a75f368d203c1b0806479fb36c320e3a19038d01be16d5f5604c354d28d",
+      "errors": [
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatGeneratedPacketFixtureTests.cs(194,29): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatGeneratedPacketFixtureTests.cs(89,49): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1019,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1106,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1203,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1290,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1380,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1468,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1936,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(2034,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(354,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(506,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(574,74): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(733,43): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(822,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs(483,25): error CS0117: 'PlayfieldAnarchyFMessage' does not contain a definition for 'Unknown1' [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs(1091,33): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs(840,33): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]"
+      ],
+      "error_count": 18,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "dao-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:09.646431+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 21.919,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\dao-guard.log",
+      "raw_log_sha256": "37b04698f724409dd6398578e9fb448c4a5b09713a0e34bf403c0d2adbd7ef32",
+      "errors": [
+        "NEW_VIOLATION=AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
+        "NEW_VIOLATION=AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs"
+      ],
+      "error_count": 2,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "DAO_ARCHITECTURE_GUARD=FAIL",
+        "MISSION_RUNTIME_DIRECT_SQL=0"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "database",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:28:58.316227+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 11.318,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\database.log",
+      "raw_log_sha256": "bddd8518b357bf683ffc37dc7258c188ff44c4b741707fac053db30f8af59a00",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "generated-combat",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\generate_capture_backed_npc_combat_inventory.cmd --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:02.126019+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.917,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\generated-combat.log",
+      "raw_log_sha256": "ab07cf53ec4dfb47fc4beba7e24e5927d12df32ee34c745e862498300816e887",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "generated-mission",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\generate_mission_level_graph.cmd --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:06.073960+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.237,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\generated-mission.log",
+      "raw_log_sha256": "c50740af08ae5f1181daedecce5d21c63f8a043bb84770b1833a02b2740c7c11",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "interfaces",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:28:52.736843+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 5.54,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\interfaces.log",
+      "raw_log_sha256": "53214d54eb6aeaf6a111c31cef6394a41396e4e52c62393fbe621cf3ca3230d5",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "inventory",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --manifest LinuxBuild/source-inventory/inventory.json --check",
+      "lease": true,
+      "started_utc": "2026-09-06T02:29:55.263932+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 6.86,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\inventory.log",
+      "raw_log_sha256": "0225416c2ee1006407211ddb3e876721d382f75719c1d63b75dcd5b1e505dfa2",
+      "errors": [
+        "STALE: source inventory does not match <ROOT>/AORebirth/Libraries/Source/AORebirth.Enums/AORebirth.Enums.csproj"
+      ],
+      "error_count": 1,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "login-auth-build",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Tools/LoginAuthenticationValidation/LoginAuthenticationValidation.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:30:55.135096+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 19.44,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\login-auth-build.log",
+      "raw_log_sha256": "420f9770ab1aa983b3dcacfce67bb0b3de7e59d13ee422e40309ed4b699d104a",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "login-auth",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "Tools\\LoginAuthenticationValidation\\bin\\Debug\\LoginAuthenticationValidation.exe",
+      "lease": false,
+      "started_utc": "2026-09-06T02:31:14.577335+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.544,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\login-auth.log",
+      "raw_log_sha256": "75bf74d51768671d09ad04f66f9b56ce827ad26c543fc7310b505114e6900837",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "mission-full",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_mission_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:35.211730+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 12.328,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\mission-full.log",
+      "raw_log_sha256": "4e29f6f4b904603658a89a04185b544c9606707c954e369f8dad29f78bc9ac1b",
+      "errors": [
+        "CSC : error CS2001: Source file '<ROOT>/AORebirth/Libraries/Source/AORebirth.Enums/ItemType.cs' could not be found. [<ROOT>/LinuxBuild/Projects/AORebirth.Enums.Linux.csproj]"
+      ],
+      "error_count": 1,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "mission-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --mission-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:32.122101+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 2.02,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\mission-guard.log",
+      "raw_log_sha256": "173e08b863a08b4756a2ad1865a9a100ecb4d29fe84874c14fea454750675505",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "MISSION_PERSISTENCE_GUARD=PASS",
+        "MISSION_BOUNDARY_VIOLATIONS=0"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "mission-isolated",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_mission_dao_validation.cmd --isolated-sources",
+      "lease": false,
+      "started_utc": "2026-09-06T02:31:19.006488+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 81.655,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\mission-isolated.log",
+      "raw_log_sha256": "d340e8eb84f599d24048db13b454dad219320cd8691de75a398b9fdfa10213f6",
+      "errors": [
+        "ERROR=InvalidOperationException:disposable-mysql-startup-timeout"
+      ],
+      "error_count": 1,
+      "result_markers": [
+        "MISSION_DAO_MYSQL_INTEGRATION=FAIL"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "mission-isolatedretry",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_mission_dao_validation.cmd --isolated-sources",
+      "lease": false,
+      "started_utc": "2026-09-06T02:34:15.685781+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 35.959,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\mission-isolatedretry.log",
+      "raw_log_sha256": "d340e8eb84f599d24048db13b454dad219320cd8691de75a398b9fdfa10213f6",
+      "errors": [
+        "ERROR=InvalidOperationException:disposable-mysql-startup-timeout"
+      ],
+      "error_count": 1,
+      "result_markers": [
+        "MISSION_DAO_MYSQL_INTEGRATION=FAIL"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "mission-isolatedserial3",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_mission_dao_validation.cmd --isolated-sources",
+      "lease": false,
+      "started_utc": "2026-09-06T02:38:14.790090+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 24.203,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\mission-isolatedserial3.log",
+      "raw_log_sha256": "634224e0f7d03bdb2f90689e0f186758f1c6cfc759b9c668e6b3510f8fd2b6d4",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "MISSION_TEST_HOST_LOG=InjectedPersistenceException",
+        "MISSION_TEST_HOST_LOG=InjectedPersistenceException",
+        "MISSION_TEST_HOST_LOG=InjectedPersistenceException",
+        "MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES",
+        "MISSION_DAO_MYSQL_INTEGRATION=PASS",
+        "ROLLBACK_AND_CONCURRENCY_TESTS=PASS",
+        "MISSION_DAO_CHECKS=202"
+      ]
+    },
+    {
+      "state": "base",
+      "name": "restore",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/AORebirth.sln\" /t:Restore /p:Configuration=Debug /m:1 /nr:false /v:minimal /p:RestorePackagesConfig=true",
+      "lease": true,
+      "started_utc": "2026-09-06T02:25:12.610330+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 15.541,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\restore.log",
+      "raw_log_sha256": "7cd84e5b8607660d70af20d393e3937edb7fb7f97f0744670ae99795aff13e58",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "secrets",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\scan_secrets.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:06.313558+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 48.105,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\secrets.log",
+      "raw_log_sha256": "a9e5b94efcbc1d75137632cecd02479e982d7f6579708cee8ca3ec4a44cbe991",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "solution",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/AORebirth.sln\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:25:28.162727+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 204.414,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\solution.log",
+      "raw_log_sha256": "b610047ab886048da486e5bd569399363b9f595ac0acb9ba4fd085a36f0b4777",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "unified-build",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Tools/UnifiedAccountFlowValidation/UnifiedAccountFlowValidation.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:31:45.580383+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 9.922,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\unified-build.log",
+      "raw_log_sha256": "133a375659310baa6ee9b45142d48ad193a6a594aedc10ee41e97c39df3c355b",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "base",
+      "name": "whitespace",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-base",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "git diff --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:54.675855+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.342,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\base\\whitespace.log",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "account-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --account-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:50.073139+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.745,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\account-guard.log",
+      "raw_log_sha256": "4584123c45de081f026dd3e0acd65699aec0ce85c4c11c8bf0bd26b2243bf794",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=56",
+        "ACCOUNT_PERSISTENCE_GUARD=PASS",
+        "ACCOUNT_BOUNDARY_VIOLATIONS=0"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "account-guardfinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --account-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:41:58.593813+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.448,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\account-guardfinal.log",
+      "raw_log_sha256": "4584123c45de081f026dd3e0acd65699aec0ce85c4c11c8bf0bd26b2243bf794",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=56",
+        "ACCOUNT_PERSISTENCE_GUARD=PASS",
+        "ACCOUNT_BOUNDARY_VIOLATIONS=0"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "account-mysql",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_account_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:35:42.223310+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 20.754,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\account-mysql.log",
+      "raw_log_sha256": "e3575fab3ce520298ed629c4b21a45e55f9568b7dd1b110951154982789fe6d9",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "ACCOUNT_DAO_FIXTURE_USERNAME_COLLATION=latin1_swedish_ci",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_TEST_HOST_LOG=InjectedFailure",
+        "ACCOUNT_DAO_TRANSACTION_TESTS=NO_TRANSACTION_API_SINGLE_STATEMENT_AUTOCOMMIT",
+        "ACCOUNT_DAO_NULL_SCHEMA_FIELDS=NOT_NULL_CONSTRAINTS_RETAINED",
+        "ACCOUNT_DAO_TEST_MODE=ISOLATED_PRODUCTION_AND_LEGACY_SOURCES",
+        "ACCOUNT_DAO_CHECKS=273",
+        "ACCOUNT_DAO_MYSQL_INTEGRATION=PASS",
+        "ACCOUNT_DAO_DISPOSABLE_CLEANUP=PASS"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "broker-build",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Tools/AccountBrokerValidation/AccountBrokerValidation.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:31:14.113360+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 31.135,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\broker-build.log",
+      "raw_log_sha256": "dd40326631fc058e724778372745fbaff495e8760878fe1bfcb936f7b39fc591",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "character-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --character-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:46.822284+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 3.25,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\character-guard.log",
+      "raw_log_sha256": "80aafc97794997d63f77c658248e62dd30e87011bad6a818986f21ef712460fb",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=56",
+        "CHARACTER_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "CHARACTER_PERSISTENCE_GUARD_SELF_TEST_CHECKS=74",
+        "CHARACTER_PERSISTENCE_GUARD=PASS",
+        "CHARACTER_BOUNDARY_VIOLATIONS=0",
+        "ACCOUNT_PERSISTENCE_GUARD=PASS",
+        "ACCOUNT_BOUNDARY_VIOLATIONS=0",
+        "MISSION_PERSISTENCE_GUARD=PASS",
+        "MISSION_BOUNDARY_VIOLATIONS=0",
+        "DAO_GUARD=PASS",
+        "DAO_GUARD_SCOPE=CHARACTER_ACCOUNT_AND_MISSION"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "character-guardfinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --character-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:41:55.753080+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 2.839,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\character-guardfinal.log",
+      "raw_log_sha256": "80aafc97794997d63f77c658248e62dd30e87011bad6a818986f21ef712460fb",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=56",
+        "CHARACTER_PERSISTENCE_GUARD_SELF_TEST=PASS",
+        "CHARACTER_PERSISTENCE_GUARD_SELF_TEST_CHECKS=74",
+        "CHARACTER_PERSISTENCE_GUARD=PASS",
+        "CHARACTER_BOUNDARY_VIOLATIONS=0",
+        "ACCOUNT_PERSISTENCE_GUARD=PASS",
+        "ACCOUNT_BOUNDARY_VIOLATIONS=0",
+        "MISSION_PERSISTENCE_GUARD=PASS",
+        "MISSION_BOUNDARY_VIOLATIONS=0",
+        "DAO_GUARD=PASS",
+        "DAO_GUARD_SCOPE=CHARACTER_ACCOUNT_AND_MISSION"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "character-mysql1",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_character_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:41:12.465796+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 21.671,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\character-mysql1.log",
+      "raw_log_sha256": "aee48297a4da235a686c165759450a940170cc45b342b23af2202b2e20bbeae9",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "CHARACTER_DAO_FIXTURE_NAME_COLLATION=latin1_swedish_ci",
+        "CHARACTER_DAO_DIRECTORY_ORDER=UNSPECIFIED_NORMALIZED_PARITY",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Online TARGET=SameValue AFFECTED=1 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Online TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Offline TARGET=SameValue AFFECTED=1 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Offline TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_AFFECTED_MODE=Matched SAME_VALUE=1 MISSING=0",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Online TARGET=SameValue AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Online TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Offline TARGET=SameValue AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Offline TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_AFFECTED_MODE=Changed SAME_VALUE=0 MISSING=0",
+        "CHARACTER_DAO_ONLINE_ATOMICITY=OWNED_TRANSACTION_NOT_AUTOCOMMIT",
+        "CHARACTER_DAO_COMMIT_EXCEPTION=OUTCOME_REQUIRES_RECONCILIATION",
+        "CHARACTER_DAO_SYNTHETIC_CASES=INVALID_PRIMARY_KEY_AND_NON_NULL_NAME_OWNER_ONLY",
+        "CHARACTER_DAO_LEGACY_OFFLINE_CASES=29",
+        "CHARACTER_DAO_HYDRATION_VALIDATION=FIVE_UNCHANGED_SOURCE_CONTRACT_METHODS_NOT_FULL_MSTEST",
+        "CHARACTER_DAO_TEST_MODE=ISOLATED_PRODUCTION_AND_LEGACY_SOURCES",
+        "CHARACTER_DAO_CHECKS=529",
+        "CHARACTER_DAO_MYSQL_INTEGRATION=PASS",
+        "CHARACTER_DAO_DISPOSABLE_CLEANUP=PASS"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "character-mysql2",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_character_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:41:34.139799+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 21.611,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\character-mysql2.log",
+      "raw_log_sha256": "aee48297a4da235a686c165759450a940170cc45b342b23af2202b2e20bbeae9",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "CHARACTER_DAO_FIXTURE_NAME_COLLATION=latin1_swedish_ci",
+        "CHARACTER_DAO_DIRECTORY_ORDER=UNSPECIFIED_NORMALIZED_PARITY",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Online TARGET=SameValue AFFECTED=1 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Online TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Offline TARGET=SameValue AFFECTED=1 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Matched OP=Offline TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_AFFECTED_MODE=Matched SAME_VALUE=1 MISSING=0",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Online TARGET=SameValue AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Online TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Offline TARGET=SameValue AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE=Changed OP=Offline TARGET=Missing AFFECTED=0 TRANSACTION=Owned COMMIT=1",
+        "CHARACTER_DAO_AFFECTED_MODE=Changed SAME_VALUE=0 MISSING=0",
+        "CHARACTER_DAO_ONLINE_ATOMICITY=OWNED_TRANSACTION_NOT_AUTOCOMMIT",
+        "CHARACTER_DAO_COMMIT_EXCEPTION=OUTCOME_REQUIRES_RECONCILIATION",
+        "CHARACTER_DAO_SYNTHETIC_CASES=INVALID_PRIMARY_KEY_AND_NON_NULL_NAME_OWNER_ONLY",
+        "CHARACTER_DAO_LEGACY_OFFLINE_CASES=29",
+        "CHARACTER_DAO_HYDRATION_VALIDATION=FIVE_UNCHANGED_SOURCE_CONTRACT_METHODS_NOT_FULL_MSTEST",
+        "CHARACTER_DAO_TEST_MODE=ISOLATED_PRODUCTION_AND_LEGACY_SOURCES",
+        "CHARACTER_DAO_CHECKS=529",
+        "CHARACTER_DAO_MYSQL_INTEGRATION=PASS",
+        "CHARACTER_DAO_DISPOSABLE_CLEANUP=PASS"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "compatibility",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_aotomation_messaging_tests.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:06.116831+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 5.525,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\compatibility.log",
+      "raw_log_sha256": "b842843ecfc4b4fbfe0a68220e9cfc21ac9716fa94f29fe3bfb950adcb634501",
+      "errors": [
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatGeneratedPacketFixtureTests.cs(194,29): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatGeneratedPacketFixtureTests.cs(89,49): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1019,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1106,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1203,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1290,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1380,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1468,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(1936,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(2034,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(354,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(506,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(574,74): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(733,43): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs(822,39): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs(483,25): error CS0117: 'PlayfieldAnarchyFMessage' does not contain a definition for 'Unknown1' [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs(1091,33): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]",
+        "<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs(840,33): error CS1061: 'CapturedEnemySpecialAttackWeaponPacketFixture' does not contain a definition for 'AggDef' and no accessible extension method 'AggDef' accepting a first argument of type 'CapturedEnemySpecialAttackWeaponPacketFixture' could be found (are you missing a using directive or an assembly reference?) [<ROOT>/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj]"
+      ],
+      "error_count": 18,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "dao-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:53.188356+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 18.526,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\dao-guard.log",
+      "raw_log_sha256": "37b04698f724409dd6398578e9fb448c4a5b09713a0e34bf403c0d2adbd7ef32",
+      "errors": [
+        "NEW_VIOLATION=AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
+        "NEW_VIOLATION=AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs"
+      ],
+      "error_count": 2,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "DAO_ARCHITECTURE_GUARD=FAIL",
+        "MISSION_RUNTIME_DIRECT_SQL=0"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "database",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:29:51.356152+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 5.559,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\database.log",
+      "raw_log_sha256": "82d46aad3871e46ad70a9822c051cee5013c1ba81d0c466ad70bb97cc6a81401",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "databasefinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:34:25.827194+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 4.187,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\databasefinal.log",
+      "raw_log_sha256": "82d46aad3871e46ad70a9822c051cee5013c1ba81d0c466ad70bb97cc6a81401",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "generated-combat",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\generate_capture_backed_npc_combat_inventory.cmd --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:16.750028+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.789,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\generated-combat.log",
+      "raw_log_sha256": "ab07cf53ec4dfb47fc4beba7e24e5927d12df32ee34c745e862498300816e887",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "generated-mission",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\generate_mission_level_graph.cmd --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:18.549791+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.608,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\generated-mission.log",
+      "raw_log_sha256": "c50740af08ae5f1181daedecce5d21c63f8a043bb84770b1833a02b2740c7c11",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "interfaces",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:29:40.245083+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 11.031,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\interfaces.log",
+      "raw_log_sha256": "85ef8d8e6c1a84a68e2ffaf35055f8caf990a396e6188719a9db8a4cfe4bdeaf",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "inventory-database",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --legacy-project AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj --output LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props --check",
+      "lease": true,
+      "started_utc": "2026-09-06T02:28:56.959178+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 12.163,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\inventory-database.log",
+      "raw_log_sha256": "4c0ab5e03d8884439d6b0eac5ba72f2c17ae23dd7954f1e5b6c020bde127e10d",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "inventory-databasefinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --legacy-project AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj --output LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props --check",
+      "lease": true,
+      "started_utc": "2026-09-06T02:42:10.797539+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 4.597,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\inventory-databasefinal.log",
+      "raw_log_sha256": "4c0ab5e03d8884439d6b0eac5ba72f2c17ae23dd7954f1e5b6c020bde127e10d",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "inventory-interfaces",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --legacy-project AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj --output LinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props --check",
+      "lease": true,
+      "started_utc": "2026-09-06T02:28:52.102000+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 4.856,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\inventory-interfaces.log",
+      "raw_log_sha256": "f5c196088c7dd2fd31510d95e5bd3c9737957ce594eafa2a4d89f78c5b7491a3",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "inventory-interfacesfinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --legacy-project AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj --output LinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props --check",
+      "lease": true,
+      "started_utc": "2026-09-06T02:42:06.196345+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 4.6,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\inventory-interfacesfinal.log",
+      "raw_log_sha256": "f5c196088c7dd2fd31510d95e5bd3c9737957ce594eafa2a4d89f78c5b7491a3",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "inventory",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --manifest LinuxBuild/source-inventory/inventory.json --check",
+      "lease": true,
+      "started_utc": "2026-09-06T02:30:11.643912+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 5.04,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\inventory.log",
+      "raw_log_sha256": "9655595cbe77033385b4e8cb8405fc42cb44d5b55c9bfd5fae31ee5e8e8b7696",
+      "errors": [
+        "STALE: source inventory does not match <ROOT>/AORebirth/Libraries/Source/AORebirth.Enums/AORebirth.Enums.csproj"
+      ],
+      "error_count": 1,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "login-auth-build",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Tools/LoginAuthenticationValidation/LoginAuthenticationValidation.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:30:54.420666+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 17.627,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\login-auth-build.log",
+      "raw_log_sha256": "0d1a3223793bbb0633dcae7e7fa568fc8ab3d908b997755bbb55df2c7a57884f",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "login-auth",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "Tools\\LoginAuthenticationValidation\\bin\\Debug\\LoginAuthenticationValidation.exe",
+      "lease": false,
+      "started_utc": "2026-09-06T02:31:12.165949+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.945,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\login-auth.log",
+      "raw_log_sha256": "75bf74d51768671d09ad04f66f9b56ce827ad26c543fc7310b505114e6900837",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "mission-full",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_mission_dao_validation.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:58.387045+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 7.728,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\mission-full.log",
+      "raw_log_sha256": "4d58428f3e2e1970b29b7c9dae80859f6b2bf19839ab0ed194e88f921360e0a6",
+      "errors": [
+        "CSC : error CS2001: Source file '<ROOT>/AORebirth/Libraries/Source/AORebirth.Enums/ItemType.cs' could not be found. [<ROOT>/LinuxBuild/Projects/AORebirth.Enums.Linux.csproj]"
+      ],
+      "error_count": 1,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "mission-guard",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --mission-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:29:50.819461+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 2.368,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\mission-guard.log",
+      "raw_log_sha256": "173e08b863a08b4756a2ad1865a9a100ecb4d29fe84874c14fea454750675505",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "MISSION_PERSISTENCE_GUARD=PASS",
+        "MISSION_BOUNDARY_VIOLATIONS=0"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "mission-guardfinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_dao_architecture_guard.cmd --mission-persistence-only",
+      "lease": false,
+      "started_utc": "2026-09-06T02:41:59.042727+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 1.848,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\mission-guardfinal.log",
+      "raw_log_sha256": "173e08b863a08b4756a2ad1865a9a100ecb4d29fe84874c14fea454750675505",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "DAO_ARCHITECTURE_GUARD_SELF_TEST=PASS",
+        "MISSION_PERSISTENCE_GUARD=PASS",
+        "MISSION_BOUNDARY_VIOLATIONS=0"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "mission-isolated",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\run_mission_dao_validation.cmd --isolated-sources",
+      "lease": false,
+      "started_utc": "2026-09-06T02:36:02.978835+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 17.465,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\mission-isolated.log",
+      "raw_log_sha256": "634224e0f7d03bdb2f90689e0f186758f1c6cfc759b9c668e6b3510f8fd2b6d4",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": [
+        "MISSION_TEST_HOST_LOG=InjectedPersistenceException",
+        "MISSION_TEST_HOST_LOG=InjectedPersistenceException",
+        "MISSION_TEST_HOST_LOG=InjectedPersistenceException",
+        "MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES",
+        "MISSION_DAO_MYSQL_INTEGRATION=PASS",
+        "ROLLBACK_AND_CONCURRENCY_TESTS=PASS",
+        "MISSION_DAO_CHECKS=202"
+      ]
+    },
+    {
+      "state": "work",
+      "name": "restore",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/AORebirth.sln\" /t:Restore /p:Configuration=Debug /m:1 /nr:false /v:minimal /p:RestorePackagesConfig=true",
+      "lease": true,
+      "started_utc": "2026-09-06T02:29:09.133878+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 8.607,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\restore.log",
+      "raw_log_sha256": "e6769c799322b6bf0328c8fe295cc9e6243550673d2dd0d30891559bd5d0ed71",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "secrets",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\scan_secrets.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:20.180193+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 34.238,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\secrets.log",
+      "raw_log_sha256": "a9e5b94efcbc1d75137632cecd02479e982d7f6579708cee8ca3ec4a44cbe991",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "secretsfinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "call Tools\\scan_secrets.cmd",
+      "lease": false,
+      "started_utc": "2026-09-06T02:42:00.892062+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 5.207,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\secretsfinal.log",
+      "raw_log_sha256": "a9e5b94efcbc1d75137632cecd02479e982d7f6579708cee8ca3ec4a44cbe991",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "solution",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/AORebirth.sln\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:29:17.744408+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 22.498,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\solution.log",
+      "raw_log_sha256": "d18c0f4f16505335bf3e3d757a6e4f08deafa784458b54e7f24d9344020834d0",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "solutionfinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"AORebirth/AORebirth.sln\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:34:30.019128+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 9.368,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\solutionfinal.log",
+      "raw_log_sha256": "d18c0f4f16505335bf3e3d757a6e4f08deafa784458b54e7f24d9344020834d0",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "unified-build",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"Tools/UnifiedAccountFlowValidation/UnifiedAccountFlowValidation.csproj\" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal",
+      "lease": true,
+      "started_utc": "2026-09-06T02:31:45.305079+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 9.474,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\unified-build.log",
+      "raw_log_sha256": "7ab3e27dbc5b69c8ecf13c6bec2e386350aaee4f098ce480b9f0372d0ead9274",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "whitespace",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "git diff --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:30:11.716267+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.2,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\whitespace.log",
+      "raw_log_sha256": "a648fccf372b8032b6715e49421cbed09855cf8291192fd333886824d7f36141",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "whitespacefinal",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "git diff --check",
+      "lease": false,
+      "started_utc": "2026-09-06T02:42:06.100856+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.094,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\whitespacefinal.log",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "write-database",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --legacy-project AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj --output LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props --write",
+      "lease": true,
+      "started_utc": "2026-09-06T02:28:47.139770+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 4.961,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\write-database.log",
+      "raw_log_sha256": "2992ce59d3054e94dcd3bd35f4a92f5d2adde2ee6df9533a9524feba17479598",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    },
+    {
+      "state": "work",
+      "name": "write-interfaces",
+      "cwd": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation",
+      "sha": "e3acc4c58132809fd67bd2fe8aa58939109fe0dc",
+      "command": "dotnet run --project LinuxBuild/Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- --repository-root . --legacy-project AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj --output LinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props --write",
+      "lease": true,
+      "started_utc": "2026-09-06T02:26:26.102721+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 141,
+      "raw_log": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\worktree-snapshots\\character-dao-parallel-foundation\\build-verify\\character-parallel\\work\\write-interfaces.log",
+      "raw_log_sha256": "8d0ec147e5cea2d8eff65d0cc195a0de92a214db4868604bd6f09757c2e1c064",
+      "errors": [],
+      "error_count": 0,
+      "result_markers": []
+    }
+  ],
+  "changed_paths": [
+    "Tools/CharacterDaoValidation/acceptance-evidence.json",
+    "AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj",
+    "AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineCharacterData.cs",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineRecoveryData.cs",
+    "DAO_REFACTOR_ROADMAP.md",
+    "LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props",
+    "LinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props",
+    "Tools/AccountDaoValidation/AccountDaoValidation.csproj",
+    "Tools/CharacterDaoValidation/CharacterDaoValidation.csproj",
+    "Tools/CharacterDaoValidation/ConcurrencyChecks.cs",
+    "Tools/CharacterDaoValidation/DisposableMySql.cs",
+    "Tools/CharacterDaoValidation/FailureChecks.cs",
+    "Tools/CharacterDaoValidation/IsolatedHost.cs",
+    "Tools/CharacterDaoValidation/ObservedConnection.cs",
+    "Tools/CharacterDaoValidation/OfflineCompatibilityChecks.cs",
+    "Tools/CharacterDaoValidation/Program.cs",
+    "Tools/CharacterDaoValidation/README.md",
+    "Tools/DaoArchitectureGuard/dao_architecture_guard.py",
+    "Tools/MissionDaoValidation/MissionDaoValidation.csproj",
+    "Tools/run_character_dao_validation.cmd",
+    "Tools/run_dao_architecture_guard.cmd",
+    "docs/reports/CHARACTER_DAO_PARALLEL_HANDOFF.md"
+  ],
+  "source_sha256": {
+    "AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj": "f55e363754705b2a5313a186de8d189ac00ad48ff28977733637f3b791af39e5",
+    "AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs": "b0016f6980cfa4079ac6fc70bba5d08494455864fc9247be833ad4829ef43c0d",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs": "508ef74ed7c49336b4d8ad0518ae66ad45969ada046df5ee206a6bba5b9b9780",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj": "ebb06eea18d1c67c1a5bc38571f2006634aadc7e0171dd261e6d4ffd6928cd4d",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs": "e6b09ba1f2b485baeb478b1447d9d91f9e1f6fc714db29d0ead6617e2336fac8",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs": "c21f5dd38a560cce3e2bf8070aa3fc1c7db1d95e70077653b515b72632ba74e5",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineCharacterData.cs": "a8d582cf51629aa2f6f4899fba54af2cad0ba61dd1b933d40aed289d8d8a92f0",
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineRecoveryData.cs": "8726d62ddcd8df7b4ab9c7072d3d0214fd308d85e6d09a77caf50dd7fa74d67b",
+    "DAO_REFACTOR_ROADMAP.md": "02ae5d4b774061907982302d893714322350156f83a2244fedbaf644a0b333cf",
+    "LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props": "8ed487d9b132571e09c22531cd12bd2360d6d3f317da299078bf049d03285acd",
+    "LinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props": "a4fdf37fe2d6868a5a0878c4a5ed3885516106e30f4771712bce2ea6eb10c62a",
+    "Tools/AccountDaoValidation/AccountDaoValidation.csproj": "c493f8fd54db27f9bdcf42fcfcf8dc828225e957da10ca78d482c691cb9139af",
+    "Tools/CharacterDaoValidation/CharacterDaoValidation.csproj": "09577dd8cdd9b0f84fc5c876747abaff52e6f42c28f74552aeefaaf2c66b1ab8",
+    "Tools/CharacterDaoValidation/ConcurrencyChecks.cs": "420eb6126cb8d90da0192a5b67c3abad3eb1329ef0b41ce3da64ec3d94858e08",
+    "Tools/CharacterDaoValidation/DisposableMySql.cs": "4f0c96b2c79e97d5ec2cf6f50b36592d2cd5390f20a8e0c5403c112f9d6b17fe",
+    "Tools/CharacterDaoValidation/FailureChecks.cs": "2bbc3b688f8b20482ca97d70dd5401e3e4e170221a801e9da52bf5904c0a2c00",
+    "Tools/CharacterDaoValidation/IsolatedHost.cs": "5bfcfd1f647b9037ad5cb88a882a3a3adb98d14c799e17ccbf842449b3091dc7",
+    "Tools/CharacterDaoValidation/ObservedConnection.cs": "3406d9a55d2c21b9b13db7c8e239fdbe28632d0e95e022353beb2d9e587632c0",
+    "Tools/CharacterDaoValidation/OfflineCompatibilityChecks.cs": "4b601cb6ce5ba7e80cbdd312c802da1d29323839c2efac56210ac20795338424",
+    "Tools/CharacterDaoValidation/Program.cs": "3890a7497950fccdc1fbba01dafdd4da88858ac02085cfce67a8741934c777df",
+    "Tools/CharacterDaoValidation/README.md": "6f6bc30af9d542f806662b673c2103305827a4f30cb024c8f2c50f9d1236fd47",
+    "Tools/DaoArchitectureGuard/dao_architecture_guard.py": "f58f620c4cac462056570163980e35a98465fa471246fd7629ef77d20de69157",
+    "Tools/MissionDaoValidation/MissionDaoValidation.csproj": "b3b58c61112cea6a5aa3e3007d574ef3dcfd33ff4b1a74f08733f0f78961fe4d",
+    "Tools/run_character_dao_validation.cmd": "45e151ad22e0823a6189f7e3d6c81e38f3f2b716d901bdf77dc3a85b28458829",
+    "Tools/run_dao_architecture_guard.cmd": "a7d15b76a2e6461984051519fbaa52d1a2b95075b4cb2c243f7436c49aba5a7a"
+  },
+  "hash_exclusions": [
+    "docs/reports/CHARACTER_DAO_PARALLEL_HANDOFF.md",
+    "Tools/CharacterDaoValidation/acceptance-evidence.json"
+  ],
+  "hash_note": "Report/evidence excluded to avoid a self-referential content digest. File bytes are the validated local source snapshot before commit."
+}

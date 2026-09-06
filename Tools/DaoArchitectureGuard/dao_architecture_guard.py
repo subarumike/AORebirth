@@ -108,6 +108,32 @@ ACCOUNT_STORAGE_LITERAL_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+CHARACTER_PERSISTENCE_ROOTS = (
+    "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters",
+)
+CHARACTER_CONTRACT_TOKENS = ACCOUNT_CONTRACT_TOKENS + (
+    "DBCharacter", "CharacterDao", "MySqlCharacterDao", "IAccountDao", "IMissionDao",
+)
+CHARACTER_RUNTIME_TOKENS = (
+    "CharacterOnlineOwnershipGuard", "System.Threading", "System.Diagnostics",
+    "File", "Directory", "FileStream", "StreamReader", "StreamWriter", "FileInfo", "DirectoryInfo",
+    "Process", "Thread", "ZoneLeaseReference", "HeldZoneLease",
+    "AORebirth.AccountBroker", "AORebirth.BotService", "CharacterDao", "LoginDataDao",
+)
+CHARACTER_EXCLUDED_PATTERN = re.compile(
+    r"\b\w*(?:Inventory|Stats|StatValue|StatData|Nano|Perk|Organi[sz]ation|Mission|"
+    r"Buddy|RecentMessage|AccountIdentity|Token|Password|Hydrat|Location|Heading|"
+    r"Texture|Coordinate|Delete|RemoveBuddy|AddBuddy|SaveProfile|SaveCharacter|"
+    r"SaveLocation|CreateCharacter|SetPlayfield)\w*\b", re.IGNORECASE,
+)
+CHARACTER_STORAGE_LITERAL_PATTERN = re.compile(
+    r"\b(?:characters|login|stats|items|instanceditems|organizations|mission[a-z_]+|"
+    r"account_[a-z_]+|bot_[a-z_]+|information_schema)\b|"
+    r"^\s*[`\[\]]*(?:Id|Username|Name|FirstName|LastName|Playfield|Online|"
+    r"BuddyList|X|Y|Z|Heading[XYZW]|Textures[0-4])[`\[\]]*\s*$", re.IGNORECASE,
+)
+
 
 def code_only(text: str) -> str:
     # Contracts use C# 7.3. Strip comments and string/character literals before
@@ -186,6 +212,64 @@ def account_persistence_violations(root: Path) -> list[str]:
             # arbitrary tables. Table-name filters would miss this contract leak.
             if any(pattern.search(value) for value in literal_candidates for pattern in SQL_PATTERNS):
                 violations.append(relative + ":embedded-sql")
+    return sorted(set(violations))
+
+
+def character_persistence_violations(root: Path) -> list[str]:
+    """Bounded lexical checks, not a semantic C# analyzer or global migration gate."""
+    violations = []
+    for relative_root in CHARACTER_PERSISTENCE_ROOTS:
+        directory = root / relative_root
+        sources = sorted(path for path in directory.rglob("*.cs")
+                         if not set(path.relative_to(directory).parts) & EXCLUDED_PARTS)
+        if not sources:
+            violations.append(relative_root + ":missing-persistence-sources")
+        contract = "/AORebirth.Interfaces/" in relative_root
+        for path in sources:
+            text = path.read_text(encoding="utf-8-sig")
+            code = re.sub(r"\s*\.\s*", ".", code_only(text))
+            relative = normalize(path.relative_to(root))
+            # Playfield is an approved scalar projection property, not permission
+            # to expose the engine's Playfield class. Qualified names remain
+            # covered by the engine namespace rules; bare type uses are below.
+            tokens = tuple(token for token in ENGINE_TOKENS if token != "Playfield") + CHARACTER_RUNTIME_TOKENS
+            if contract:
+                tokens += CHARACTER_CONTRACT_TOKENS
+            for token in tokens:
+                if re.search(r"(?<![\w])" + re.escape(token) + r"(?![\w])", code):
+                    violations.append(relative + ":" + token)
+            if re.search(r"\bPlayfield\s*(?:<|>|\[|\?|,|\)|\s+[A-Za-z_]\w*)", code):
+                violations.append(relative + ":Playfield-runtime-type")
+            if not contract:
+                continue
+            if re.search(r"\bDB[A-Z]\w*\b", code):
+                violations.append(relative + ":database-row-type")
+            if CHARACTER_EXCLUDED_PATTERN.search(code):
+                violations.append(relative + ":excluded-character-aggregate")
+            if re.search(r"\b(?:float|double|decimal)\s+(?:X|Y|Z)\s*\{", code):
+                violations.append(relative + ":excluded-character-aggregate")
+            if ACCOUNT_GENERIC_PATTERN.search(code) or re.search(
+                    r"\b(?:Get|Update|Insert|Remove|Create)\s*(?:<|\()", code):
+                violations.append(relative + ":generic-or-untyped-persistence-api")
+            values = extract_csharp_strings(text)
+            candidates = []
+            for start in range(len(values)):
+                for width in range(1, min(6, len(values) - start) + 1):
+                    pieces = values[start:start + width]
+                    candidates.extend((" ".join(pieces), "".join(pieces)))
+            if any(CHARACTER_STORAGE_LITERAL_PATTERN.search(value) for value in candidates):
+                violations.append(relative + ":storage-name-literal")
+            if any(pattern.search(value) for value in candidates for pattern in SQL_PATTERNS):
+                violations.append(relative + ":embedded-sql")
+
+    # Do not invent a repository-wide runtime fail mode. The existing governed
+    # mission-domain folders are the only runtime roots extended in this scope.
+    for path in mission_boundary_files(root):
+        relative = normalize(path.relative_to(root))
+        code = re.sub(r"\s*\.\s*", ".", code_only(path.read_text(encoding="utf-8-sig")))
+        for token in ("MySqlCharacterDao", "MySqlAccountDao", "DatabaseDaoFactory"):
+            if re.search(r"(?<![\w])" + re.escape(token) + r"(?![\w])", code):
+                violations.append(relative + ":runtime-construction:" + token)
     return sorted(set(violations))
 
 
@@ -588,15 +672,144 @@ def account_self_test() -> int:
     return checks
 
 
+def character_self_test() -> int:
+    checks = 0
+    with tempfile.TemporaryDirectory(prefix="aorebirth-character-dao-guard-") as temporary:
+        root = Path(temporary)
+        contract = root / CHARACTER_PERSISTENCE_ROOTS[0] / "ICharacterDao.cs"
+        implementation = root / CHARACTER_PERSISTENCE_ROOTS[1] / "MySqlCharacterDao.cs"
+        good_contract = '''namespace AORebirth.Interfaces.Persistence.Characters {
+            public interface ICharacterDao {
+                CharacterDirectoryData LoadById(int characterId);
+                int MarkOnline(int characterId);
+                StaleOnlineRecoveryResult RecoverStaleOnline(string expectedDatabase);
+            }
+            public sealed class CharacterDirectoryData {
+                public int CharacterId { get; set; }
+                public string AccountUsername { get; set; }
+                public string Name { get; set; }
+                public string FirstName { get; set; }
+                public string LastName { get; set; }
+                public int Playfield { get; set; }
+                public int? Online { get; set; }
+            }
+            // DBCharacter, inventory, BuddyList and CharacterOnlineOwnershipGuard remain outside.
+        }'''
+        good_implementation = '''using System.Data; using Dapper; using MySqlConnector; using System.IO;
+            class MySqlCharacterDao {
+                const string Sql = "SELECT Id, Online FROM characters WHERE Online<>0 FOR UPDATE";
+                private InvalidDataException InvalidResult() { return new InvalidDataException("Invalid result"); }
+                // No ZoneEngine, CharacterOnlineOwnershipGuard or file-lock policy here.
+            }'''
+        write(contract, good_contract)
+        write(implementation, good_implementation)
+        write(root / CHARACTER_PERSISTENCE_ROOTS[0] / "obj/Ignored.cs", "interface Bad { IDbConnection Get(); }")
+        write(root / "AORebirth/Server/ZoneEngine_New/Program.cs", "class Program { MySqlCharacterDao dao; }")
+        write(root / "AORebirth/Server/ZoneEngine_New/Core/Data/Legacy.cs", 'class Legacy { string Sql = "SELECT Id FROM characters"; }')
+        if character_persistence_violations(root):
+            raise RuntimeError("valid character projection, provider implementation or out-of-scope fixture rejected")
+        checks += 1
+        cases = (
+            ("using Ado = System.Data; interface Bad {}", "System.Data"),
+            ("interface Bad { global::System . Data . IDbConnection Get(); }", "System.Data"),
+            ("interface Bad { System/*comment*/.Data.IDbCommand Get(); }", "System.Data"),
+            ("interface Bad { IDataReader Read(); }", "IDataReader"),
+            ("interface Bad { IDbTransaction Begin(); }", "IDbTransaction"),
+            ("interface Bad { Dapper.SqlMapper.GridReader Read(); }", "Dapper"),
+            ("using Provider = MySqlConnector; interface Bad {}", "MySqlConnector"),
+            ("interface Bad { NpgsqlConnection Read(); }", "NpgsqlConnection"),
+            ("interface Bad { SqlCommand Read(); }", "SqlCommand"),
+            ("interface Bad { DbProviderFactory Read(); }", "DbProviderFactory"),
+            ("class Bad { Connector connection; }", "Connector"),
+            ("interface Bad { AORebirth.Database.Entities.DBCharacter Read(); }", "DBCharacter"),
+            ("interface Bad { ZoneEngine_New.Core.Player Read(); }", "ZoneEngine_New"),
+            ("interface Bad { Playfield Read(); }", "Playfield-runtime-type"),
+            ("interface Bad { IList<Playfield> Read(); }", "Playfield-runtime-type"),
+            ("interface Bad { DatabaseDaoFactory Read(); }", "DatabaseDaoFactory"),
+            ('class Bad { const string Value = "SELECT x FROM arbitrary_table"; }', "embedded-sql"),
+            ('class Bad { const string Value = "SEL" + "ECT x FR" + "OM arbitrary_table"; }', "embedded-sql"),
+            ('class Bad { const string Value = @"UPDATE arbitrary_table\nSET x=1"; }', "embedded-sql"),
+            ('class Bad { const string Value = "char" + "acters"; }', "storage-name-literal"),
+            ('class Bad { const string Value = "On" + "line"; }', "storage-name-literal"),
+            ("interface Bad { IGenericRepository<int> Read(); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { T GetAll<T>(); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { T Get<T>(); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Update<T>(T row); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Save<T>(T row); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Add(int id); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Read(object query); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { void Read(string tableName); }", "generic-or-untyped-persistence-api"),
+            ("interface Bad { IAccountDao Read(); }", "IAccountDao"),
+            ("interface Bad { void LoadInventory(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void LoadStats(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void LoadActiveNanos(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void LoadPerks(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void LoadOrganization(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void LoadMission(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void AddBuddy(int id, int buddy); }", "excluded-character-aggregate"),
+            ("class Bad { public string BuddyList { get; set; } }", "excluded-character-aggregate"),
+            ("interface Bad { void DeleteCharacter(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void DeleteOwnedData(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void SaveProfile(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void CreateCharacter(int id); }", "excluded-character-aggregate"),
+            ("interface Bad { void SetPlayfield(int id, int playfield); }", "excluded-character-aggregate"),
+            ("class Bad { public float HeadingX { get; set; } }", "excluded-character-aggregate"),
+            ("class Bad { public float X { get; set; } }", "excluded-character-aggregate"),
+            ("class Bad { public int Textures0 { get; set; } }", "excluded-character-aggregate"),
+            ("interface Bad { void ChangePassword(string hash); }", "excluded-character-aggregate"),
+        )
+        for bad_source, expected in cases:
+            write(contract, bad_source)
+            if not any(value.endswith(":" + expected) for value in character_persistence_violations(root)):
+                raise RuntimeError("character contract fixture was not rejected as " + expected + ": " + bad_source)
+            checks += 1
+        write(contract, good_contract)
+        for token in (
+            "ZoneEngine.Core.Character", "global::ZoneEngine_New . Core . Player", "LoginEngine.Client",
+            "ChatEngine.Client", "WebEngine.Server", "AORebirth.Core.Character", "AORebirth.Stats.Stats",
+            "SmokeLounge.AOtomation.Messaging.Packet", "CharacterOnlineOwnershipGuard",
+            "System.IO.FileStream", "System.IO.File", "System.IO.Directory", "System.Threading.Thread", "System.Diagnostics.Process",
+            "AORebirth.AccountBroker.AccountBrokerService", "CharacterDao", "LoginDataDao",
+        ):
+            write(implementation, "class Bad { " + token + " value; }")
+            if not character_persistence_violations(root):
+                raise RuntimeError("character implementation fixture was not rejected: " + token)
+            checks += 1
+        write(implementation, good_implementation)
+        for engine in ("ZoneEngine", "ZoneEngine_New"):
+            runtime = root / ("AORebirth/Server/" + engine + "/Core/Missions/Nested/Adapter.cs")
+            for token in ("MySqlCharacterDao", "MySqlAccountDao", "DatabaseDaoFactory"):
+                write(runtime, "class Bad { global::AORebirth.Database." + token + " value; }")
+                if not any(":runtime-construction:" + token in value for value in character_persistence_violations(root)):
+                    raise RuntimeError("scoped runtime construction was not rejected: " + token)
+                checks += 1
+            write(runtime, '// MySqlCharacterDao DatabaseDaoFactory\nclass Good { string Note="MySqlAccountDao"; }')
+        if character_persistence_violations(root):
+            raise RuntimeError("character comment/string fixture was rejected")
+        checks += 1
+        contract.unlink()
+        if not any(value.endswith(":missing-persistence-sources") for value in character_persistence_violations(root)):
+            raise RuntimeError("missing character contract did not fail closed")
+        checks += 1
+        write(contract, good_contract)
+        implementation.unlink()
+        if not any(value.endswith(":missing-persistence-sources") for value in character_persistence_violations(root)):
+            raise RuntimeError("missing character implementation did not fail closed")
+        checks += 1
+    return checks
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path)
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--account-self-test", action="store_true")
+    parser.add_argument("--character-self-test", action="store_true")
     scope = parser.add_mutually_exclusive_group()
     scope.add_argument("--mission-persistence-only", action="store_true")
     scope.add_argument("--account-persistence-only", action="store_true")
+    scope.add_argument("--character-persistence-only", action="store_true")
     args = parser.parse_args()
 
     if args.self_test:
@@ -610,10 +823,35 @@ def main() -> int:
         print("ACCOUNT_PERSISTENCE_GUARD_SELF_TEST_CHECKS=" + str(count))
         return 0
 
+    if args.character_self_test:
+        count = character_self_test()
+        print("CHARACTER_PERSISTENCE_GUARD_SELF_TEST=PASS")
+        print("CHARACTER_PERSISTENCE_GUARD_SELF_TEST_CHECKS=" + str(count))
+        return 0
+
     if args.root is None:
         parser.error("--root is required unless --self-test is used")
     root = args.root.resolve()
     manifest = (args.manifest or Path(__file__).with_name("known-violations.json")).resolve()
+    if args.character_persistence_only:
+        try:
+            character = character_persistence_violations(root)
+            account = account_persistence_violations(root)
+            mission = mission_boundary_violations(root) + mission_persistence_violations(root)
+        except (OSError, ValueError) as error:
+            print("DAO_GUARD=FAIL")
+            print("DAO_GUARD_SCOPE=CHARACTER_ACCOUNT_AND_MISSION")
+            print("ERROR=" + str(error))
+            return 1
+        for domain, boundary in (("CHARACTER", character), ("ACCOUNT", account), ("MISSION", mission)):
+            for value in boundary:
+                print(domain + "_BOUNDARY_VIOLATION=" + value)
+            print(domain + "_PERSISTENCE_GUARD=" + ("FAIL" if boundary else "PASS"))
+            print(domain + "_BOUNDARY_VIOLATIONS=" + str(len(boundary)))
+        passed = not character and not account and not mission
+        print("DAO_GUARD=" + ("PASS" if passed else "FAIL"))
+        print("DAO_GUARD_SCOPE=CHARACTER_ACCOUNT_AND_MISSION")
+        return 0 if passed else 1
     if args.account_persistence_only:
         try:
             boundary = account_persistence_violations(root)
