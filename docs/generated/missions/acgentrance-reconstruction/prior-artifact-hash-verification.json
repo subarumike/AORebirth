@@ -1,0 +1,50 @@
+[
+  {
+    "actual_sha256": "29e1018c315253c585610ec254fe1d6cd442e5296138b78f31d9ef9c4ec4b93e",
+    "crlf_equivalent_sha256": "f5e6a0692935814548e53bb094a786a05c2b61710782a68e27fe1dae93c340c7",
+    "file": "summary.json",
+    "lf_to_crlf_matches_recorded": true,
+    "matches": false,
+    "recorded_sha256": "f5e6a0692935814548e53bb094a786a05c2b61710782a68e27fe1dae93c340c7"
+  },
+  {
+    "actual_sha256": "ab811eb353f26a9c036e484166b5b15a2051fc3ef2bc40a18204a2602ac49f93",
+    "crlf_equivalent_sha256": "90999e23cfd19e253eb0873a4c6e2c695f7905bc6a5abb87edb3e58e2335f21c",
+    "file": "source-manifest.json",
+    "lf_to_crlf_matches_recorded": true,
+    "matches": false,
+    "recorded_sha256": "90999e23cfd19e253eb0873a4c6e2c695f7905bc6a5abb87edb3e58e2335f21c"
+  },
+  {
+    "actual_sha256": "b0fcb09bb430a4d4a64ca4907eece756d0260bb9b7836a8fbaf011ba57a02778",
+    "crlf_equivalent_sha256": "43dca9a29c6982c6b9ee7124fa1e750549deb82ecf3bc171cd0579120de54351",
+    "file": "catalog-index.json",
+    "lf_to_crlf_matches_recorded": true,
+    "matches": false,
+    "recorded_sha256": "43dca9a29c6982c6b9ee7124fa1e750549deb82ecf3bc171cd0579120de54351"
+  },
+  {
+    "actual_sha256": "fc86cb152bf00c09a00af5b8bd7a4ed0fc7f39577cc55af6a4ff7314e6ebab3c",
+    "crlf_equivalent_sha256": "31cd750c1541767779359d5ec0d38a82223ccecdb7e5ea99dd2fb7fed6464a2b",
+    "file": "observed-destinations.json",
+    "lf_to_crlf_matches_recorded": true,
+    "matches": false,
+    "recorded_sha256": "31cd750c1541767779359d5ec0d38a82223ccecdb7e5ea99dd2fb7fed6464a2b"
+  },
+  {
+    "actual_sha256": "18797fb2fd2ebd3ac88523e70521e3f9d9d8f57ba7f7e3b029d6bd16774e7bbf",
+    "crlf_equivalent_sha256": "313469a6c334e11864ca5687853a0f1d8017e8f26191453e7ab2b32727f867f7",
+    "file": "level2-offers.jsonl",
+    "lf_to_crlf_matches_recorded": true,
+    "matches": false,
+    "recorded_sha256": "313469a6c334e11864ca5687853a0f1d8017e8f26191453e7ab2b32727f867f7"
+  },
+  {
+    "actual_sha256": "d70d43317b0b5c19c8004e634922e5559c3bea8c58c0ce488d9e2731e4eeb2df",
+    "crlf_equivalent_sha256": null,
+    "file": "all-offers.jsonl.gz",
+    "lf_to_crlf_matches_recorded": false,
+    "matches": true,
+    "recorded_sha256": "d70d43317b0b5c19c8004e634922e5559c3bea8c58c0ce488d9e2731e4eeb2df"
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "absent_key": "First identity if nonempty; zero identity if empty/null; forbidden as evidence-resolution fallback",
+  "cleanup_rva": "N3.dll 0xE1FF",
+  "constructor_rva": "N3.dll 0xE09B",
+  "counter_offset": "0x4C",
+  "duplicate_keys": "Appended, not rejected; lookup first equal key wins",
+  "entry_fields": [
+    "int32 operational key",
+    "UInt32 Identity_t.type",
+    "UInt32 Identity_t.instance"
+  ],
+  "entry_stride": 12,
+  "lifetime": "Constructor initializes pointer null and counter1; field allocated by scene setup and freed on destruction. Not a global key namespace.",
+  "lookup_calls": "No static local-code xrefs in N3 and no GetEntranceDoor imports in inspected client DLL inventory. Dynamic lookup/uninspected executables not excluded.",
+  "lookup_rva": "N3.dll 0xCA9D",
+  "owner": "n3Playfield_t loaded object instance",
+  "registration_calls": "Gamecode.dll Door_t::LinkDoorToRooms 0x800CB (dungeon boundary and positive non-dungeon stat paths)",
+  "registration_rva": "N3.dll 0xD98C",
+  "static_crosswalk_limit": "No loaded owner instance, no proven per-placement final positive key. Null crosswalk is retained rather than deriving keys from identity bits.",
+  "symbolic_name": {
+    "client_symbol_proof": null,
+    "name": "ExitInstance",
+    "status": "SYMBOLIC_NAME_SUPPORTED",
+    "support": [
+      "AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs:792",
+      "AORebirth/Libraries/Source/AORebirth.Stats/StatNamesDefaults.cs:261"
+    ]
+  },
+  "vector_pointer_offset": "0x48"
+}

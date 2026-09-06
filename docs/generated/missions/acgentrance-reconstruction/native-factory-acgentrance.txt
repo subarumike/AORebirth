@@ -1,0 +1,18 @@
+Program: Gamecode.dll
+Executable SHA256: 654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726
+Image base: 10000000
+Evidence format: COMPACT_ADDRESS_BYTE_WINDOWS_V1
+Full private analysis export SHA256: 19dc9832d3140d44c3676a1ce6ce5124c2e57259e4fffdcc7fe6f513ab138695
+Full decompiler text intentionally excluded. Small functions retain all instructions; larger functions retain calls/branches and nearby address-byte windows.
+
+## Target RVA 0x152559
+XREF 101558d4 DATA null
+Function: EvidenceFunction_10152559 @ 10152559
+ASSEMBLY ADDRESS/BYTE WINDOWS:
+10152559 6813d20010 PUSH 0x1000d213
+1015255e 68c6da0000 PUSH 0xdac6
+10152563 ff1530411510 CALL dword ptr [0x10154130]
+10152569 682c321510 PUSH 0x1015322c
+1015256e e8e1cefeff CALL 0x1013f454
+10152573 83c40c ADD ESP,0xc
+10152576 c3 RET

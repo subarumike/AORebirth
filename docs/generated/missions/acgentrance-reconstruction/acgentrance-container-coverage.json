@@ -1,0 +1,6302 @@
+[
+  {
+    "acgentrances": 0,
+    "payload_offset": 287129259,
+    "payload_sha256": "4e02062fb7be548b3a186081952dabe64565b4e8803eee2e8d81a3d6d6931968",
+    "placements": 3,
+    "resource": [
+      1000026,
+      6
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 287129589,
+    "payload_sha256": "f3f63213c6f6d46c95b53379bb0ae04f3aada3aa91ea50c52b425df40f794885",
+    "placements": 70,
+    "resource": [
+      1000026,
+      100
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287137718,
+    "payload_sha256": "6d7e1f51de18eca60944b6c5238859433f73002c92c8718b393114b00c31368f",
+    "placements": 52,
+    "resource": [
+      1000026,
+      101
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287150047,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      102
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287150085,
+    "payload_sha256": "9d6d0abd9f70f1d49c0afcd326848c83038e014a6f4ab65912654545eaee6376",
+    "placements": 2,
+    "resource": [
+      1000026,
+      103
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287150299,
+    "payload_sha256": "2084bc37ce6552f70003e15c81ffcdbbf41ada976a1ac2702f2586e8cd96f94a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      104
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 287150425,
+    "payload_sha256": "0723d53731ec0094bc4f13bd1a243315245e9f76001e0d6da6212052c3aa215a",
+    "placements": 2,
+    "resource": [
+      1000026,
+      105
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287150707,
+    "payload_sha256": "2ba1b56d0951b23fda1e7accbc6e0cd91e2cec6c6d452985d8fadb5c1a05c76e",
+    "placements": 121,
+    "resource": [
+      1000026,
+      106
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287163981,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      107
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287164019,
+    "payload_sha256": "54cdac2eefc73e321ebd00238e8564e1758cc9413646d533aeafe300c5dc9cdd",
+    "placements": 2,
+    "resource": [
+      1000026,
+      109
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287164233,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      110
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287164271,
+    "payload_sha256": "636a790faea83a81820735c91900666ccaa3e8ccfd79046223769a01517388cd",
+    "placements": 1,
+    "resource": [
+      1000026,
+      111
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287164661,
+    "payload_sha256": "d421ff705a970c5f8e0493a3d3a7b4643ef2f9a373c55cd05737de188f090df0",
+    "placements": 38,
+    "resource": [
+      1000026,
+      120
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287168871,
+    "payload_sha256": "a63c712e9e041652473ddba719525109ad316573debd97878a3b6058293863e9",
+    "placements": 15,
+    "resource": [
+      1000026,
+      124
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287170269,
+    "payload_sha256": "1f691396aeb4e9b9e7c17fcb483961e650dedc5bc9cfcd6310481173d81e3c95",
+    "placements": 113,
+    "resource": [
+      1000026,
+      125
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287183409,
+    "payload_sha256": "71f2291de4c672601664481d4135ee797fb9a9a97d074f533846580d79bb55ae",
+    "placements": 60,
+    "resource": [
+      1000026,
+      127
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287190126,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      128
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287190164,
+    "payload_sha256": "27d476d73a12566fd75cc310f725a3fbed3dd494518b6129808b8001121b601e",
+    "placements": 86,
+    "resource": [
+      1000026,
+      152
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209430,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      320
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209468,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      321
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209506,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      322
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209544,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      324
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209582,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      331
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209620,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      341
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209658,
+    "payload_sha256": "400a65e612184e50f9226673806f11a377ac8e57bc0c5d70e80761dafe755c96",
+    "placements": 2,
+    "resource": [
+      1000026,
+      346
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209872,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      351
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209910,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      362
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209948,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      382
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287209986,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      386
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287210024,
+    "payload_sha256": "8292f2d30c44569f7ffb940c560441c361e8b2bf4ed6db69967aee4ba4bcd036",
+    "placements": 177,
+    "resource": [
+      1000026,
+      500
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287228307,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      501
+    ]
+  },
+  {
+    "acgentrances": 29,
+    "payload_offset": 287228345,
+    "payload_sha256": "79d3372de540b52cc7e971e2cab270e7db6a152bc40a018e6d2013d762365fa6",
+    "placements": 170,
+    "resource": [
+      1000026,
+      505
+    ]
+  },
+  {
+    "acgentrances": 42,
+    "payload_offset": 287256807,
+    "payload_sha256": "cb4f8094de173b03a4ef0f20d38502c0f5d1b65a3d63544f34445499e8f6dfc0",
+    "placements": 126,
+    "resource": [
+      1000026,
+      540
+    ]
+  },
+  {
+    "acgentrances": 8,
+    "payload_offset": 287276003,
+    "payload_sha256": "98197fa48b3fe03198a8e280a32a8d2d3968f5976b84f1799128e81090bd526c",
+    "placements": 80,
+    "resource": [
+      1000026,
+      545
+    ]
+  },
+  {
+    "acgentrances": 26,
+    "payload_offset": 287288664,
+    "payload_sha256": "d8c1c67ac2d4d0dfd3c5e146888e3ff0e0ee596b1e2eeb80520c503d93fdadef",
+    "placements": 71,
+    "resource": [
+      1000026,
+      550
+    ]
+  },
+  {
+    "acgentrances": 53,
+    "payload_offset": 287296709,
+    "payload_sha256": "2da2e0597d9fdbc6f22a0206eb3fb915355210b103a130d1a36c37cee7c774fe",
+    "placements": 80,
+    "resource": [
+      1000026,
+      551
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287306994,
+    "payload_sha256": "4a7142a0b9e9fd41bfcbd2221028f22b658a485a0c063c5e804cbba7c89051bd",
+    "placements": 3,
+    "resource": [
+      1000026,
+      556
+    ]
+  },
+  {
+    "acgentrances": 47,
+    "payload_offset": 287308112,
+    "payload_sha256": "18efb91117fea5c18a4d4a599b67c2ff6a2c10e7fe392730795093ce1aee5f98",
+    "placements": 90,
+    "resource": [
+      1000026,
+      560
+    ]
+  },
+  {
+    "acgentrances": 50,
+    "payload_offset": 287321711,
+    "payload_sha256": "7e36d17758de4f3f0c2d13c70ee507190a7ea22047c137756e84a9a49578ce54",
+    "placements": 78,
+    "resource": [
+      1000026,
+      565
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 287332156,
+    "payload_sha256": "ca6e8cb10e9a001243b04d41114984dc6fe9de7265b585301585de6d94439807",
+    "placements": 55,
+    "resource": [
+      1000026,
+      566
+    ]
+  },
+  {
+    "acgentrances": 21,
+    "payload_offset": 287340860,
+    "payload_sha256": "331ed65d9662661a54d0b46e64ec9226723a709dabde3141480aece3558416f5",
+    "placements": 28,
+    "resource": [
+      1000026,
+      567
+    ]
+  },
+  {
+    "acgentrances": 75,
+    "payload_offset": 287344799,
+    "payload_sha256": "2c5f793df3ae3c31ef4c816061e653686fbe92db17e86dae0ccae1e17582ab8f",
+    "placements": 210,
+    "resource": [
+      1000026,
+      570
+    ]
+  },
+  {
+    "acgentrances": 14,
+    "payload_offset": 287374123,
+    "payload_sha256": "2834a21767f3bbdcb3b5a65f827257e018a9bf50e8eb3a4cb59f3f9947ba3e90",
+    "placements": 43,
+    "resource": [
+      1000026,
+      585
+    ]
+  },
+  {
+    "acgentrances": 17,
+    "payload_offset": 287379592,
+    "payload_sha256": "4f4561d6b14f1dbeab3a1bb9e0434b83100856e7e37d7391c6d5372373a7f9ab",
+    "placements": 83,
+    "resource": [
+      1000026,
+      586
+    ]
+  },
+  {
+    "acgentrances": 116,
+    "payload_offset": 287389174,
+    "payload_sha256": "53fec9bf73c4c98f595fe6bf68f5ed194d0fc7366e9b6eaa554a58d3c9c47b52",
+    "placements": 121,
+    "resource": [
+      1000026,
+      590
+    ]
+  },
+  {
+    "acgentrances": 68,
+    "payload_offset": 287405481,
+    "payload_sha256": "90005ef1d2a201c57182878b08d66ceabdfb8822ddf5d8f96bdcc4ee913040e7",
+    "placements": 97,
+    "resource": [
+      1000026,
+      595
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287419249,
+    "payload_sha256": "a3fe3d3042346cfbc8b6e736308b24bd921220900a34674792330faff7410b52",
+    "placements": 1,
+    "resource": [
+      1000026,
+      596
+    ]
+  },
+  {
+    "acgentrances": 29,
+    "payload_offset": 287419455,
+    "payload_sha256": "c668bffe64813841aa523883919d324e800f38f103995347cb721d9a516379e7",
+    "placements": 70,
+    "resource": [
+      1000026,
+      600
+    ]
+  },
+  {
+    "acgentrances": 50,
+    "payload_offset": 287431343,
+    "payload_sha256": "cf2896c555adc73a59c7efd9b5594d76a71170aa21798404c9466600e5281e51",
+    "placements": 108,
+    "resource": [
+      1000026,
+      605
+    ]
+  },
+  {
+    "acgentrances": 109,
+    "payload_offset": 287448305,
+    "payload_sha256": "bfd3dd9814dbe325701bc8a9ba29d5bbe1e16b0618f49f14865a9ae38de26194",
+    "placements": 189,
+    "resource": [
+      1000026,
+      610
+    ]
+  },
+  {
+    "acgentrances": 23,
+    "payload_offset": 287473019,
+    "payload_sha256": "3403e9b9861dee74be98c401047192aab4d1d7eb7529fab9beded428d0cfc040",
+    "placements": 65,
+    "resource": [
+      1000026,
+      615
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 287481653,
+    "payload_sha256": "e39f60af788ca8ad430804ed87d30f0f21a39f1d06ac0157476b3d92eb5b9238",
+    "placements": 105,
+    "resource": [
+      1000026,
+      620
+    ]
+  },
+  {
+    "acgentrances": 119,
+    "payload_offset": 287495609,
+    "payload_sha256": "26911a391c717ca1d86c4b473610cdf06fd423d31d49fc73975891adf3447a33",
+    "placements": 158,
+    "resource": [
+      1000026,
+      625
+    ]
+  },
+  {
+    "acgentrances": 78,
+    "payload_offset": 287516134,
+    "payload_sha256": "21da25e06038b0f5afb922613fdcacd60b595590d30c85fce1af6e8056b00e1d",
+    "placements": 138,
+    "resource": [
+      1000026,
+      630
+    ]
+  },
+  {
+    "acgentrances": 37,
+    "payload_offset": 287535614,
+    "payload_sha256": "f114464f8cc4d8473f4fddace4d1aa88cc7496872b2ea218cb0fcbe52f043ad6",
+    "placements": 109,
+    "resource": [
+      1000026,
+      635
+    ]
+  },
+  {
+    "acgentrances": 10,
+    "payload_offset": 287554420,
+    "payload_sha256": "f440b3e701e8a3d6503aaf490c53281d92e3566ad639960204a58a82e6325989",
+    "placements": 236,
+    "resource": [
+      1000026,
+      640
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287595399,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      641
+    ]
+  },
+  {
+    "acgentrances": 14,
+    "payload_offset": 287595437,
+    "payload_sha256": "eee1c93408af5e1f6902acc32d564888809d28c76e267bccfde3c7f93c1c2028",
+    "placements": 144,
+    "resource": [
+      1000026,
+      646
+    ]
+  },
+  {
+    "acgentrances": 8,
+    "payload_offset": 287620133,
+    "payload_sha256": "cf27bfa1edbb64939aad929c5b010cde47858036a48506ed56b471b6fa4b0546",
+    "placements": 34,
+    "resource": [
+      1000026,
+      647
+    ]
+  },
+  {
+    "acgentrances": 9,
+    "payload_offset": 287625169,
+    "payload_sha256": "6b591c868bc80c6a440de140ed00303a68a1757588bd0635df555364839bd36a",
+    "placements": 45,
+    "resource": [
+      1000026,
+      650
+    ]
+  },
+  {
+    "acgentrances": 60,
+    "payload_offset": 287632004,
+    "payload_sha256": "3a002792f1ee3f71c003ef68ebe1c933efa3af174bcdcea83320e9a701db9f5f",
+    "placements": 128,
+    "resource": [
+      1000026,
+      655
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287652285,
+    "payload_sha256": "f7a03e5fb7f7d34773e2d6999c1a8b36e1eef3ae83a98db5e653444e49c57b6b",
+    "placements": 3,
+    "resource": [
+      1000026,
+      656
+    ]
+  },
+  {
+    "acgentrances": 89,
+    "payload_offset": 287653403,
+    "payload_sha256": "278e284ba7eb7292e7e3a6498af0cd6daffff7292b009899d932c323e48e2e77",
+    "placements": 249,
+    "resource": [
+      1000026,
+      665
+    ]
+  },
+  {
+    "acgentrances": 82,
+    "payload_offset": 287686954,
+    "payload_sha256": "712c8d050723e60f898bcd80b9a80a3ff9549fd9db911e6b4428c084ec985b70",
+    "placements": 242,
+    "resource": [
+      1000026,
+      670
+    ]
+  },
+  {
+    "acgentrances": 13,
+    "payload_offset": 287725759,
+    "payload_sha256": "92f5938dcef39a16da01a4aac46d6ac4d43d365515a8d30504f9d96c8e51ed19",
+    "placements": 95,
+    "resource": [
+      1000026,
+      685
+    ]
+  },
+  {
+    "acgentrances": 15,
+    "payload_offset": 287742162,
+    "payload_sha256": "4499b2f4c5596711276aec0fc4e3b28c9452ec9e185f557d166487da40adfc56",
+    "placements": 34,
+    "resource": [
+      1000026,
+      687
+    ]
+  },
+  {
+    "acgentrances": 113,
+    "payload_offset": 287746730,
+    "payload_sha256": "7e601ecf24c0f0312c1edd9855e9f897f22c5dd7fb924bc9bd58a63e4bfde078",
+    "placements": 202,
+    "resource": [
+      1000026,
+      695
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 287776849,
+    "payload_sha256": "790f1a6e2a58f86e0aeca0af868853cf49022824c746866ec382771d8aa98947",
+    "placements": 8,
+    "resource": [
+      1000026,
+      696
+    ]
+  },
+  {
+    "acgentrances": 15,
+    "payload_offset": 287778267,
+    "payload_sha256": "834e7633a5613d0206eaed81ecede324a6a84b94bfd954fb1089548a11a7fbac",
+    "placements": 16,
+    "resource": [
+      1000026,
+      700
+    ]
+  },
+  {
+    "acgentrances": 176,
+    "payload_offset": 287780969,
+    "payload_sha256": "c0e9b93007083842abce661084bb25437fc6b375964403006fcdbb63606dbd59",
+    "placements": 281,
+    "resource": [
+      1000026,
+      705
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287826030,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      706
+    ]
+  },
+  {
+    "acgentrances": 60,
+    "payload_offset": 287826068,
+    "payload_sha256": "15b6e299abb58869dbd3c17d031b76cb845010ebf8ba35d76a1a246ddb6a897a",
+    "placements": 144,
+    "resource": [
+      1000026,
+      710
+    ]
+  },
+  {
+    "acgentrances": 16,
+    "payload_offset": 287847621,
+    "payload_sha256": "783cd213a93b4884c132ca3c9d4fcee364f4b8d7764ee830159c4daeba53ee41",
+    "placements": 74,
+    "resource": [
+      1000026,
+      716
+    ]
+  },
+  {
+    "acgentrances": 37,
+    "payload_offset": 287859273,
+    "payload_sha256": "ee7f0fcd6dbdcad5c5225fa650f36359744d1ca7c90f0683a4fa6dfa3b3916d5",
+    "placements": 45,
+    "resource": [
+      1000026,
+      717
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287866905,
+    "payload_sha256": "1cb07cfe97233659fa519e1089dec6bdbefec1a37d27d344fe48c1dac0e8e7dd",
+    "placements": 16,
+    "resource": [
+      1000026,
+      730
+    ]
+  },
+  {
+    "acgentrances": 8,
+    "payload_offset": 287870728,
+    "payload_sha256": "820112599d57b769b0e8ced90bacb19144499b75f8352bd391cff8444ee5a7a8",
+    "placements": 67,
+    "resource": [
+      1000026,
+      735
+    ]
+  },
+  {
+    "acgentrances": 8,
+    "payload_offset": 287879999,
+    "payload_sha256": "75fb49d34790f115401be2add2b9f145ee1243c63e12e2d28360d2729ed9d044",
+    "placements": 59,
+    "resource": [
+      1000026,
+      740
+    ]
+  },
+  {
+    "acgentrances": 26,
+    "payload_offset": 287888248,
+    "payload_sha256": "a923090ac6edca1eeb580058d39af0aff93d9b9149ad9a4f9fadcbb4d09b070a",
+    "placements": 55,
+    "resource": [
+      1000026,
+      750
+    ]
+  },
+  {
+    "acgentrances": 15,
+    "payload_offset": 287898027,
+    "payload_sha256": "872f377adaff189e1c4416a7e056a37c8820b03ba9f08ce2f2bbee2c434cc841",
+    "placements": 102,
+    "resource": [
+      1000026,
+      760
+    ]
+  },
+  {
+    "acgentrances": 125,
+    "payload_offset": 287914836,
+    "payload_sha256": "9a10a7b5144b6e985ba7d75b4fb2a58523db1112b9d97123ba486a7559212a6d",
+    "placements": 143,
+    "resource": [
+      1000026,
+      790
+    ]
+  },
+  {
+    "acgentrances": 24,
+    "payload_offset": 287934408,
+    "payload_sha256": "b24c58c6b70e67755f274cb63bfc237fecfd2d334bb7d7f42d678da1cc25a930",
+    "placements": 30,
+    "resource": [
+      1000026,
+      791
+    ]
+  },
+  {
+    "acgentrances": 72,
+    "payload_offset": 287938141,
+    "payload_sha256": "46811c10b44b5ef7f541680f750dc4c612621bdd87633f126e5e65a38597b458",
+    "placements": 179,
+    "resource": [
+      1000026,
+      795
+    ]
+  },
+  {
+    "acgentrances": 7,
+    "payload_offset": 287963826,
+    "payload_sha256": "a4837f4cdd222f3fcce8b9468d5b182da93275ea78923a6d62f31e45cdc101f8",
+    "placements": 72,
+    "resource": [
+      1000026,
+      800
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287975570,
+    "payload_sha256": "69d0d4afe44c9f0c922f3055cc31fedd4c5d2c9b5daa3bd55617c0c21323ed6d",
+    "placements": 63,
+    "resource": [
+      1000026,
+      896
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287985823,
+    "payload_sha256": "692c6f79c724ba1292efa2d100f6e71f55e5115b21a35f28540bf36833ecd7be",
+    "placements": 7,
+    "resource": [
+      1000026,
+      950
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 287986538,
+    "payload_sha256": "489ff25868124542a4d5459b0bad164a79aa551a520cfc7e37ddb7e064987785",
+    "placements": 7,
+    "resource": [
+      1000026,
+      952
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 287987253,
+    "payload_sha256": "2779fb5a89f27bc23d5093f96e76102a3640d54c1b257f8b22868d07ce112e15",
+    "placements": 65,
+    "resource": [
+      1000026,
+      953
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288007751,
+    "payload_sha256": "08d20e52bef421326dea120433eddf794ee2c2d3d2a92678f3819a6317eada25",
+    "placements": 7,
+    "resource": [
+      1000026,
+      954
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288008469,
+    "payload_sha256": "54be526f0f466795df4cf51e786e57f1c7434eda6983333a9400fc1dc51f656b",
+    "placements": 39,
+    "resource": [
+      1000026,
+      955
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288019175,
+    "payload_sha256": "01008667a04ec35a14f3ccee858a58e266ec977efd47d7c21883ffa91e350af1",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1001
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288019321,
+    "payload_sha256": "93000bc2b70a757213b00ca105b2f2b8d6bc86263c08318dda0bd950e9d053ec",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1002
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288019575,
+    "payload_sha256": "afdf1e0a4a6c1ab76c1110027b0113b8c7e889ce667d747c8045a556aef32b1a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1003
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288019721,
+    "payload_sha256": "8d40af8aea1eda551b23ec7550ab58b05cb60e6dd60e0868b78124c539124bd0",
+    "placements": 22,
+    "resource": [
+      1000026,
+      1004
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288022115,
+    "payload_sha256": "e4eb46929f5ba97409f87161f5dd1c05fb415ea94d9ee71d564c06ccc6455d7a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1005
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288022261,
+    "payload_sha256": "c11041497b7ee5e2c03c817cd6da96061c53fd26fc0af6ef492ed15012eb2476",
+    "placements": 3,
+    "resource": [
+      1000026,
+      1011
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288022583,
+    "payload_sha256": "a639d68c8101437a9e10bff36ca69d63a8beb2614804300846f029322aaf6058",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1012
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288022729,
+    "payload_sha256": "ede3830b830e56774a8b7cc2ea883665d00012604eda487d53372f17345d46fb",
+    "placements": 4,
+    "resource": [
+      1000026,
+      1021
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288023139,
+    "payload_sha256": "82b05929c1243585ba5e7d6bec0ad23579279502f5116abb3c09a6da3cb0ebca",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1031
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288023265,
+    "payload_sha256": "efbe5501ac1e84e4ba39df625596de40cdbf0ebf827123451d3d599290be4106",
+    "placements": 9,
+    "resource": [
+      1000026,
+      1136
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288024115,
+    "payload_sha256": "5f4289194fc0a84c4a76f2ba3a6bf0aafbdeff41413437e546af289bda9db346",
+    "placements": 9,
+    "resource": [
+      1000026,
+      1137
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288024965,
+    "payload_sha256": "dc549e60e13b30d8dc0dab6fe5ba31a785499532159ad49416129befd7d4fac3",
+    "placements": 67,
+    "resource": [
+      1000026,
+      1180
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288031319,
+    "payload_sha256": "35d756e4bfc8ad6b27d476b6e837f3569137b5e88a4b73614804143ce7fa0d06",
+    "placements": 49,
+    "resource": [
+      1000026,
+      1181
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288036109,
+    "payload_sha256": "69072843929e273e9a02d4abbc69a843138d0ee970e434a1c1597bf4e5546621",
+    "placements": 49,
+    "resource": [
+      1000026,
+      1182
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288040931,
+    "payload_sha256": "a9848a2da48f2abc3f484274a8b66ecd7c17e8a14ecfb1bbe60c1bfa0d458f3c",
+    "placements": 88,
+    "resource": [
+      1000026,
+      1183
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288049533,
+    "payload_sha256": "e2dcbb33196da6e53e18f67a86bc77acc45e1d169ba7e2d7ac81cc0fccf7c50d",
+    "placements": 74,
+    "resource": [
+      1000026,
+      1184
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288056903,
+    "payload_sha256": "6f72be40dbc715984b2424e8c899dddd930efbccd9c1fbf86d7d92af26014b37",
+    "placements": 74,
+    "resource": [
+      1000026,
+      1185
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288064273,
+    "payload_sha256": "c43c573104ba1f9ec9f93486ea533f8487bf35dcdd32db56f30db97194571844",
+    "placements": 73,
+    "resource": [
+      1000026,
+      1186
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288070735,
+    "payload_sha256": "061251273405e40ca06459d52c047e1622a2d3124db43db769d149033650cfa5",
+    "placements": 73,
+    "resource": [
+      1000026,
+      1187
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288077197,
+    "payload_sha256": "9c99b4003ef16356e69ac521b942363818587aba7940ebfec7a597f056ca9b39",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1189
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288077695,
+    "payload_sha256": "b5aec21f678388fc7fadf2987e3bb6e229513258c839ca269c95a3f720edec4a",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1190
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288078193,
+    "payload_sha256": "3ed5a4433d53c0b25f6423bb422023ea06e9d6b02dbabaed07ad2b75676d6a91",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1191
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288078691,
+    "payload_sha256": "7b05c1a5a1fb63e85b23f56f80299627be1d6318f9f51976beba5e6fbc037d77",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1192
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288079189,
+    "payload_sha256": "ff46068e2f3225b23aaac9583c79d9f19047878f64146d66475f8d223c8721d9",
+    "placements": 7,
+    "resource": [
+      1000026,
+      1193
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288079863,
+    "payload_sha256": "4dd5ea8a79e43a943e1e332262d755c44b4d09c40e9d105f7824da2b8f8e1981",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1211
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288080077,
+    "payload_sha256": "e10964dcb36e752469ffd731fd7242a7b9ba62c19bed4958cb92cc034a260834",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1231
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288080663,
+    "payload_sha256": "0c469dae461a33578e09dee7fe88e7765d2074adc5cccb490cd64e0a1822cef1",
+    "placements": 8,
+    "resource": [
+      1000026,
+      1232
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288081573,
+    "payload_sha256": "65aca74b6863bcaa5a2885cc395dbdc51505213f843441ad898d73b8b95ec12a",
+    "placements": 7,
+    "resource": [
+      1000026,
+      1233
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288082375,
+    "payload_sha256": "a91a3c61fbb05f4084be6bf7c4acccdc2cd840f05f7bc3c700d3f69454f99895",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1241
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288082961,
+    "payload_sha256": "07511ef7102980ef4c5f6d49e1ed976a12f65ea4fbc70392d8f1fa168f3b925b",
+    "placements": 6,
+    "resource": [
+      1000026,
+      1242
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288083655,
+    "payload_sha256": "1f40b908e02a8b0b66a97b1861aaaf7045eb077bad0b4ce04978c5a7bbb557e5",
+    "placements": 7,
+    "resource": [
+      1000026,
+      1243
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288084457,
+    "payload_sha256": "e2f0bc149cfb44ce9297b918be686fe9ede56fbd3e8e3867e89062631a8940f8",
+    "placements": 13,
+    "resource": [
+      1000026,
+      1251
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288085899,
+    "payload_sha256": "754b18074ccf173670c8211348933b37c817ed9debc8b40e51b585c8882d471a",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1321
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288086153,
+    "payload_sha256": "2c4a546153bb9290ac1b8ed16c7854e3b8a297fa3a91801279d5a902f6005ef2",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1322
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288086299,
+    "payload_sha256": "0ddfa6ae11cda629b3c28bd65dea0198f378c71a0c9cad5795f7e58e1bce74c7",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1323
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288086445,
+    "payload_sha256": "6534189910fca441ef8f4529ebd74f91ba65e1ac8d32b79a0800b3c3f8102cea",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1324
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288086591,
+    "payload_sha256": "fef8a5e7d788b5605e553d4cad6b498fc66fd50f4a30099d5083873f7214ec54",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1325
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288086737,
+    "payload_sha256": "9bd19958c082d34f7db1e67eb50671b249699ade5a6e51dcadf22b3802d0ef69",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1326
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288086883,
+    "payload_sha256": "db88db57bdac5857d38dfe0ce8f3bc49f65a3bdcfeeb40f25d56469431b20d97",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1327
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288087029,
+    "payload_sha256": "3c1babf9516827598b94bfa147809bab7b2aec4fc2220180ec695e66daf14f9d",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1328
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288087283,
+    "payload_sha256": "602c8f68f3c025e7a05a2d25baaa04cf6ee659d0d20029af3f71c1217db0af8b",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1329
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288087429,
+    "payload_sha256": "1f19d0bec1cb382df524f04f74078b80edd9dc89022a4855943fa2b82bd14055",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1330
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288087575,
+    "payload_sha256": "699318f44fe75758aaa172065323be139925b0cf95357426aa8d246b728ee115",
+    "placements": 7,
+    "resource": [
+      1000026,
+      1404
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288088739,
+    "payload_sha256": "5d5004d5916e3e074ce0f4b567c205aa655b6586669b8c5523e07da1616a3156",
+    "placements": 4,
+    "resource": [
+      1000026,
+      1405
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288089149,
+    "payload_sha256": "7e1b6254b7117f6f0669f6461e2e0680e6bf9686614bfd1abe1922d95337738e",
+    "placements": 4,
+    "resource": [
+      1000026,
+      1406
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288089559,
+    "payload_sha256": "dc560b714a73b92d31ba1c5adaa74fde5e5675db9ba782d94a74e71df25d9087",
+    "placements": 4,
+    "resource": [
+      1000026,
+      1407
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288089969,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      1410
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288090007,
+    "payload_sha256": "cc6f0b4f8b0b201e92ae24413c363584b75b122d4bc3ce00da8dcfa02945b663",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1421
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288090153,
+    "payload_sha256": "f6cb44c8790ee97826504283ce20d99401927850d8e1c3f259352ebf1bdd8126",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1422
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288090299,
+    "payload_sha256": "14571f86e98bb2bf22e87c443ffaa77440f917c0ce7d5ae05c5228a76d8377b4",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1423
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288090445,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      1424
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288090483,
+    "payload_sha256": "3a3cbcb98afa1bb2ee536c849513ee74b13544f2b9dcb19529fbb0a0feed30de",
+    "placements": 4,
+    "resource": [
+      1000026,
+      1426
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288090873,
+    "payload_sha256": "4675bdc6df942f453e013799222d61da06913a56116ee99b28e58e224029811d",
+    "placements": 3,
+    "resource": [
+      1000026,
+      1427
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288091175,
+    "payload_sha256": "6ba08353f35ae71faedd955d52ebad508980dd7396bf7a625dfaa7227e06f0b8",
+    "placements": 3,
+    "resource": [
+      1000026,
+      1428
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288091477,
+    "payload_sha256": "497f4031231a43a900f50e7665936a22b2b563f4b1d95ce10694363b406d4081",
+    "placements": 3,
+    "resource": [
+      1000026,
+      1501
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288091807,
+    "payload_sha256": "14bd79d1a491011aab37a3136be18d3734b9f50ca3934eed5bc113fa4e83ae1e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1502
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288091953,
+    "payload_sha256": "845cb857767320314a19cbff6e0804ebb58222fbeae90c0c21a06f217f8ab018",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1503
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288092099,
+    "payload_sha256": "ebecc23e716d251512f00a3f38b91a220c8ebf0de019e4f17d3edda0e9dba498",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1504
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288092245,
+    "payload_sha256": "0f8edebc66899c783cc22198beb035538c7589e7146d2c5434d6d9be7a4a3cf4",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1505
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288092391,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      1506
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288092429,
+    "payload_sha256": "3ee06be3e13a51c1583199a6b5f0b363545600b8e64b84e4d3e6c7495a4ebf66",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1507
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288092575,
+    "payload_sha256": "8ddc115fc3856daa5b70d97a2189bfe97d90e408a84b50ca4183dde6aa0b1adb",
+    "placements": 3,
+    "resource": [
+      1000026,
+      1510
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288093219,
+    "payload_sha256": "0418e6bdaf20d4292ba4b222efbe404368fa915e38720cf0f13fdd650455cdd7",
+    "placements": 8,
+    "resource": [
+      1000026,
+      1511
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288096331,
+    "payload_sha256": "31bbef634e321e953807e10a22178c5c6354d9f8632fceb14c915f1210c8dfa2",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1601
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288096477,
+    "payload_sha256": "b0655077fff8c58554c9988c8fa4d6478d1908038b5d5cf222e7784246a9a136",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1602
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288096623,
+    "payload_sha256": "ba8f8fb27a7235a143184cf0b99b813ab34bad17c31da67149b1d05b57cfffe0",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1603
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288096769,
+    "payload_sha256": "7c7abb403592bea3926ec4a74b48dbf3854c1188119934385876c995ea522d6d",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1604
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288096915,
+    "payload_sha256": "770b96c70dcc839e3d586950b33cbac76e23fa40a72b898487ab13e42f45de27",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1611
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288097061,
+    "payload_sha256": "07422fa9e8cbf3faf4c91585cad2ea8eafd1e8168c31fece4d5b8933d491e55a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1612
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288097207,
+    "payload_sha256": "7c54bc767796563ad908ec36478ab81ddb99d2944efbed7b30f511926e7beea7",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1613
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288097353,
+    "payload_sha256": "7c03d7fbaed66a2aed74de4c8ed1e2c5910b030730c4174e7aa117f53cdd1e03",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1614
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288097587,
+    "payload_sha256": "ea39e972a0ec9b74c116d379cba952f12c2af2f90ab3b22e1b46ea9566e6e905",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1621
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288097733,
+    "payload_sha256": "91552abed1d5dd6f55f529aa70d49ee1058eacb29e363e40195773521a4c66b7",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1622
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288097879,
+    "payload_sha256": "d20bc784243952b1bf2452128035019f91d646d49b8b948d92a46582d794a578",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1623
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288098025,
+    "payload_sha256": "a83355668fef298c6b0c097d1fefc1076e0227651885305d6753e5fddd93cdeb",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1624
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288098171,
+    "payload_sha256": "e214cd16e5965e82638f4665cb6e8c211576c9fa16a53426db5117f69034c2fd",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1625
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288098317,
+    "payload_sha256": "9ecc6d361cceca403272038581b34fc68e1601ac78728b1ee728da7783ded3d1",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1626
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288098463,
+    "payload_sha256": "33a43ca9096d6f44865cf6e60bc859c52da1d43b95109c7de6f2caa86511a947",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1627
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288098609,
+    "payload_sha256": "5b71d23f9ce26985d89656318179ef0324863c8a51179d09d67511cd3eb0ea95",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1641
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288098755,
+    "payload_sha256": "703acca8154a900e333721d7cff62ec811d739b0182ac94c5003457fc85fded5",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1642
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099009,
+    "payload_sha256": "b582c510e524b57612b8cbb849948137ebe664a6fddade80ca3b64d222afe375",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1643
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099155,
+    "payload_sha256": "99ca7c95345ebe8662ff1d47eb1dd957c37574d234313e3aea793bbeac3b2612",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1644
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099301,
+    "payload_sha256": "f7b8facc73cb9db8563439a9c7df9299214e077aa575cd48c2845a0c5b870afc",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1645
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099447,
+    "payload_sha256": "c19dcb89ff5e9dffeebe2e8bb20b4e7d8d57fa55cdac8ed078e812747e5b9278",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1646
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099593,
+    "payload_sha256": "68fcc5b80c384f4cfd99768a55a476a5328375f8450f0cafe192d132e061a063",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1647
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099739,
+    "payload_sha256": "9dc64a554c131e11b978d0907160ea58218e82b2fa2c66038a6ac61c783e1277",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1648
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288099885,
+    "payload_sha256": "4fd2c192471ad30336e0483c0d551894c208cfe1fb3efacde6a8c3bafa3aff4e",
+    "placements": 3,
+    "resource": [
+      1000026,
+      1651
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288100187,
+    "payload_sha256": "619389370a17ac02a7bc326a20a17ec1fd9dc0f6d0f26fe7b455e8a260ddcfc3",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1652
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288100333,
+    "payload_sha256": "589393fcbc0847a0c5eacee59cb1aa326a0be96b2f5619a936b239094dff75b0",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1653
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288100479,
+    "payload_sha256": "f6a8067b92b93a3e3fc8cc03388808b29e99496d2928b3c1d700311c7339a3b6",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1661
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288100625,
+    "payload_sha256": "a3ee683f3712563e7187800fbe4eddbb5e1b3717b724db3258a2d7e58186feaa",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1662
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288100771,
+    "payload_sha256": "8b75b9f138ba5bd5ee63326fdc95be07476657eaf74f9332436108e6910cf695",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1663
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288100917,
+    "payload_sha256": "f1da33362154bc48d2ee384e491c5efe8dd900a0d275dd3863fbaf2e2240b53e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1671
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101063,
+    "payload_sha256": "1bbccd1136f58563d8ef9bb0f9d1dbe1bcea9c774dbb173382098a0ad3ed5d55",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1672
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101209,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      1673
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101247,
+    "payload_sha256": "52843b48793883d232e2a032e14c994bbf91c93281cfabffe4b34133e03c3b10",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1674
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101481,
+    "payload_sha256": "970864aafb769a0d2c8594715d98a33633ee88527d207ad45596e5d071776997",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1675
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101627,
+    "payload_sha256": "b7445a7455896e99e7b2116e3242603036733d0f888de95cf4d423fa9a9e5546",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1701
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101773,
+    "payload_sha256": "cdf9ba20ea2dd4aeec9b95f781b0a97d652b12f6e4a2aa6076aa064227317e31",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1702
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288101919,
+    "payload_sha256": "79b3096480abbba85ca9348e40c5ef6aec5fd17829c2a100ed28e62a047cbf4b",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1703
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102065,
+    "payload_sha256": "05d12faf9ed4b544818c37633d2df3b57585e7bb2892c140ddb545f4c2716dd4",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1711
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102211,
+    "payload_sha256": "c8b2368d822ba95d5bf1be5b9f0b1e5397aa01901d4b5d30f1a5d44c67ed407a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1712
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102357,
+    "payload_sha256": "451eeadd2ecee9316caec71aab3ca997577a6d70e159a766a53b1cfbe2fd7b0c",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1721
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102503,
+    "payload_sha256": "dd6cac2c7c3afac77ad223ec550af9c978c6826025d3d58415603c6d8ea69d2f",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1722
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102649,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      1741
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102687,
+    "payload_sha256": "539ef6dff76296ffb46ff17549e97d5f732aa587ed90a4549a2a236efdbe335e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1742
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102813,
+    "payload_sha256": "d588c75d0e20a2fb8f501aaa18c7839c2c56e3f8409b6b4574e076f05ccaa789",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1743
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288102939,
+    "payload_sha256": "2836e12a217f62dcb473a6e0ed66eaf6244e50979d17a81bf045d823368e472e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1826
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288103085,
+    "payload_sha256": "2bc57eabb40f8f09608a2ac1410917db228a7ef2e69a14d7ea41a98362d71860",
+    "placements": 2,
+    "resource": [
+      1000026,
+      1827
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288103319,
+    "payload_sha256": "88278b964200e4d878fd7d374220ace9fc74c243fe15bef1d8445489b7f6a148",
+    "placements": 12,
+    "resource": [
+      1000026,
+      1833
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288104433,
+    "payload_sha256": "71676711e623786dcc83c2a018df03ffa0923b510a79db7cbcff2a2e1c13d2ee",
+    "placements": 13,
+    "resource": [
+      1000026,
+      1836
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288105835,
+    "payload_sha256": "97bc0e527dc1ce65b19a7bab3127d8ca8047ab4cd2d8193588d9aa64f88db91a",
+    "placements": 7,
+    "resource": [
+      1000026,
+      1840
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288106509,
+    "payload_sha256": "015ce97798b6ff4d4d7d41bedad01c9c3910a56f4d2f0f0254bfd45ba2563af1",
+    "placements": 7,
+    "resource": [
+      1000026,
+      1846
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288107163,
+    "payload_sha256": "9b6438bb5b8a8c20db37fa1ac8166fa1e294b841b03025f83e4b07221ec575f9",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1862
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288107396,
+    "payload_sha256": "82e55aeaaa7f82efdf25c49ed43eee4565647cd24b3e02df22b8e664d11b4fa4",
+    "placements": 10,
+    "resource": [
+      1000026,
+      1866
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288108314,
+    "payload_sha256": "e1618a8cd05f7064a1420a870baea46d3b9b7bc964aad81bbfd07001d86342dd",
+    "placements": 34,
+    "resource": [
+      1000026,
+      1886
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288111364,
+    "payload_sha256": "6edb8143e1c22d5c056f329abcf15c3284f3aa30223301d34f3ffbc53d530612",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1887
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288111862,
+    "payload_sha256": "75bdff03614b37cfe78e489e926e3285c364e83cc2ef5e9a63b9241122925e9e",
+    "placements": 13,
+    "resource": [
+      1000026,
+      1891
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288113064,
+    "payload_sha256": "fe516d8b62f0c3db9ba4bbf573f032ea0e9c47316c7eb2f08a5a4a8c758bf649",
+    "placements": 6,
+    "resource": [
+      1000026,
+      1892
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288113966,
+    "payload_sha256": "52b4698bcbfc9344e52bb2ee651715122aea3639cbe51f7db92a0b0880959fa5",
+    "placements": 1,
+    "resource": [
+      1000026,
+      1893
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288114112,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      1894
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288114150,
+    "payload_sha256": "5b3f869ec6c24255a667cb4223eab138275f7097513f681608e93b056ba5d37c",
+    "placements": 4,
+    "resource": [
+      1000026,
+      1901
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288114540,
+    "payload_sha256": "9e5ff1a8e8365c7eead0eaae7ac3b439d373a5c9d051faa1334fb0d6125ce413",
+    "placements": 5,
+    "resource": [
+      1000026,
+      1902
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288115018,
+    "payload_sha256": "a396be6cb85b2f1cd8d8694378fb4299e7e5515e05b358567db89663759a3ae4",
+    "placements": 17,
+    "resource": [
+      1000026,
+      1913
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288116592,
+    "payload_sha256": "0c7c1bc0314b63d662a08c0e01ed45efdf50f733dd7124a8a89ad85bc748187a",
+    "placements": 44,
+    "resource": [
+      1000026,
+      1931
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288120502,
+    "payload_sha256": "87463821354bcfde60ba273673fc9584428080d0297b68bb9193a5ea1eba36b1",
+    "placements": 18,
+    "resource": [
+      1000026,
+      1933
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288122215,
+    "payload_sha256": "acf941c9252ca928c6acf2037181270a9d989e88f55cffe85a296f84b3ffea12",
+    "placements": 80,
+    "resource": [
+      1000026,
+      1941
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288131622,
+    "payload_sha256": "fe69d0206bb68cfe280ffcff5ecc3ee6cf2e2de95242ce86ec7ba3fd79cd2ad2",
+    "placements": 8,
+    "resource": [
+      1000026,
+      1943
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288133730,
+    "payload_sha256": "d7eb9414e4c8f5f97ba8ac6b54601fd2e912a178365d1a216865cfbf1ad445a1",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2001
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288133876,
+    "payload_sha256": "0d5addd8a39f66510729d777ccc71a9cf07e4af0cab661b2e4077c7a712467b5",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2002
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134022,
+    "payload_sha256": "ca487bfaa650ea80ea373a42736da5d73540f16587928469cbf7c295836fd451",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2003
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134168,
+    "payload_sha256": "ffdf36c6226254fd3c6ece3c42ce76e231296a6e3b450e14e3751fd69512192e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2004
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134314,
+    "payload_sha256": "bf7a4ddbb0f3c96089cce92f223a7fab5e72224c17ca5d258885ab4e7594cd7e",
+    "placements": 2,
+    "resource": [
+      1000026,
+      2005
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134548,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      2006
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134586,
+    "payload_sha256": "04a6be8ea4c3b20fb5de03917be9087389f09c271a5a2bf2c580a0c432929d84",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2010
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134732,
+    "payload_sha256": "d33a2a97a8e75b5c6ab947845cf0a4fdae6d1b9d42e2ae99deb3061d5178f2c6",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2011
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288134878,
+    "payload_sha256": "78121869f9b5a637de26c4e4b6a04bfc429902c8545b7cbf61a5984a2952ef64",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2012
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135024,
+    "payload_sha256": "91ea6f864489cf32c94257e993bb61677c2e47265ccf87fd61bc7a2bd30e2350",
+    "placements": 2,
+    "resource": [
+      1000026,
+      2013
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135258,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      2014
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135296,
+    "payload_sha256": "8bd64e533bef3f6b0c5caab81494ef6cce7daf810708008cb336ec3ee749f8b4",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2020
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135442,
+    "payload_sha256": "8f9159553a8fb550e8eadc9432a208a0e5c962e67201b79e7614cd45ad907d8a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2021
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135588,
+    "payload_sha256": "7a7c9d56eff595c0c5b5fd9abc6696b83a79ada236dfa4e9109a425ed22944ba",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2022
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135734,
+    "payload_sha256": "5b78891b5d66e1a23627c5401f35de5db9cd2313f72b6c1469805c0ce08eb9a1",
+    "placements": 2,
+    "resource": [
+      1000026,
+      2023
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288135968,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      2024
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136006,
+    "payload_sha256": "cdcc6fdcaf2dcf477416d103b7e76878771b4ec8001a3d38d01cb01ab59c157d",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2030
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136152,
+    "payload_sha256": "0950eac814ae45d4de140e71933949407800e5a1f8bef4255c187c39542bc9c4",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2031
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136298,
+    "payload_sha256": "0aea0efe3b0903627e582818867e4051404be20e015cffab6a0fcd752e0861f7",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2032
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136444,
+    "payload_sha256": "cfee911edd9d4b1fc00d93bf25e051cb6f4f4101c962a040ad6a6761f8473426",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2033
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136590,
+    "payload_sha256": "dce128d8ad52f1ca76c9552aa00b3df24e66b4da5d26e6a0493f083cbd608063",
+    "placements": 2,
+    "resource": [
+      1000026,
+      2034
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136824,
+    "payload_sha256": "9db0ec17593869ec773dd3a8afc959a4aded9cddf80e12296e0bb78efd111d88",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2040
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288136970,
+    "payload_sha256": "983fa04f0011e88d2abcac514a53139f3f41de7b3896fd003ba3dc2387aa0a83",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2041
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288137116,
+    "payload_sha256": "101ef1d17db6514330f493815490f5d21896cd4999451d974dae8587a08b0c9d",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2042
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288137262,
+    "payload_sha256": "be7c6231effe9f7be14d63a7c14c39ce133057b3ea7f9abfa26f4d22dec37ece",
+    "placements": 2,
+    "resource": [
+      1000026,
+      2043
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288137496,
+    "payload_sha256": "c375bc242d256d9cc741c53a0e309862209744449cf2bc642cb7c4f94cf899f3",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2050
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288137642,
+    "payload_sha256": "95e926dc63501ef47c7964b825f47f358e5cc1e8e598757cf63542c6dc8e3327",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2051
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288137788,
+    "payload_sha256": "8a90373e40a6fe82f8a94b1c6e3ffa4ee274ec55bb12c63b05ddbd7854659897",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2052
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288137934,
+    "payload_sha256": "a89102a81bc8e784112ff16c3226d211e7c4467457b18d1f8450e481f2501d36",
+    "placements": 2,
+    "resource": [
+      1000026,
+      2053
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288138168,
+    "payload_sha256": "3278869750759841261ceee4b333bb0028ae030ccbad599c991ec36aa9c7d7db",
+    "placements": 6,
+    "resource": [
+      1000026,
+      2060
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288138734,
+    "payload_sha256": "c5b4f1f59f99932b7b01e7473676136ce5197799d740bdfbf8238ed94c7d9533",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2061
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288138860,
+    "payload_sha256": "53f04ed21b8c213aee7c7c9b58b685d193be348e0374ee2889f593290ae677af",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2062
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288138986,
+    "payload_sha256": "937f1c6d450a6d3005e3df5e77c2e06e799458cfb2613e34d54a24fdae4d5f93",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2063
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288139132,
+    "payload_sha256": "f4819d0483f5e09a412590ec8760b98065fe225f5fd4a61cbcbfe0eca6bf27d6",
+    "placements": 18,
+    "resource": [
+      1000026,
+      2064
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288140754,
+    "payload_sha256": "e2ccfbdca4798f77c70dbec0d887d5c0b12d87ffb158b00774546f2a4cafbc2e",
+    "placements": 6,
+    "resource": [
+      1000026,
+      2070
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288141320,
+    "payload_sha256": "d61af0ead4da96b8514785d2ac4349a2c060719048d46033172defc6a13fae75",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2071
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288141446,
+    "payload_sha256": "3f21def8c340c5b56c25d86cdeca31f3365434717049267bccd65cfef061e293",
+    "placements": 1,
+    "resource": [
+      1000026,
+      2072
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288141572,
+    "payload_sha256": "dc868908f700cbb083133b21b5cbdf10e215416d458d8e22dc802e53c4250fd2",
+    "placements": 18,
+    "resource": [
+      1000026,
+      2073
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288143194,
+    "payload_sha256": "12444b864b4c394cc09c42695c6bda09b48ea09381ffe67a9800fcc648c686c3",
+    "placements": 8,
+    "resource": [
+      1000026,
+      2096
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288143956,
+    "payload_sha256": "f339dfbbfae52c83cbf9751746982ba5544e4629f95ebc714263fe352842102e",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3000
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288146678,
+    "payload_sha256": "12ea75605750f79a069b0ad7c9ad2ac05c703c43898ca34185b7f964b4c9c597",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3001
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288149400,
+    "payload_sha256": "11846fbd7bc24e2d347c3ac426d144e7f1b982649ffd774392a77f9caac42608",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3002
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288152122,
+    "payload_sha256": "298d9f91c2552db960153bee76e49a80858c019745b8d1b7a3aac69478d84bea",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3003
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288154844,
+    "payload_sha256": "666c2ed6c6d936e88f5919b81e54938e61d8beb0fc0575ce2e5ba06183317b64",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3004
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288157566,
+    "payload_sha256": "f17d92798af508fee94c04a1206a1305e4eb3daee5bc62807b83beecfc2fc5dc",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3005
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288160288,
+    "payload_sha256": "a894948abb8f5b5ca888ffd8a6f186618e3e048d65ae27bfe34f15eda42eaf06",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3006
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288163010,
+    "payload_sha256": "645479d34df857341867c74bd360e67efa003df3185cd6a00ae31652fd0de787",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3007
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288165732,
+    "payload_sha256": "8f07f6c5ef639e7088683408389036ab5b1565ceda2ada45585bb7811ef649b1",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3008
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288168454,
+    "payload_sha256": "a313e484177d25b3cc4b35ceff21ee08154b3ca5aa77ab90037fda9dcd62609b",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3009
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288171176,
+    "payload_sha256": "8865ccda69dda6175178ceee29cdc20f6ed2d4e586c787c9a5addb2d8fe1882b",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3010
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288173898,
+    "payload_sha256": "4906b1e352ad2f9fdc8cc026947ab8be0aa55719417bad786de60524ddc6c14d",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3011
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288176620,
+    "payload_sha256": "a79ba27b1f3c26c07a63e8cd6aac3708743081ab28037f5c5fbb25011a954af9",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3012
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288179342,
+    "payload_sha256": "a6ab991b24555f6779644a44bf333b195e4ded2ac78c06a2fdf63faf0c0e71fe",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3013
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288182064,
+    "payload_sha256": "2d57d274959a033c7e579bdf78d1a2d14dd090427ba935e8b4b1b15b38b31d24",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3014
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288184786,
+    "payload_sha256": "4d5188933ff084b6676fe6c0c54153e0890dfd6d67f962a1d955f3f780072d78",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3015
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288187508,
+    "payload_sha256": "048b94673cc1ba15088dc78dc13f5e26cfefae1497c76000bf375492fffba171",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3016
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288190230,
+    "payload_sha256": "715c12c27e3db37e49d6f3f188da2e707395f1d1f0bd96b1dc3a3f810108327a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3017
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288192952,
+    "payload_sha256": "1469a2c11bebd63b21f801c7265abaa1bec52d3a6f7d13f2ea61e8718f1cf51a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3018
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288195674,
+    "payload_sha256": "1fd466e86081e42a8ad73f8eb08aff291a715d8620aab1d966ef19c769657008",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3019
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288198396,
+    "payload_sha256": "32f4f0f36292fff31e089c68426f417bceaba7c41b64f6831e8788ea2180a26d",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3020
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288201118,
+    "payload_sha256": "3686a799e5d4ea521e3a4d759ec3435f4b703c17d732f6c9b6407710b7e0f64e",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3021
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288203840,
+    "payload_sha256": "7103c465a7762f0e994facf11c16b6aad43a9f69c7807b6254992ead42d95429",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3022
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288206562,
+    "payload_sha256": "278dd2624077b85b2aa80929c09020e03d899dcb45859b4a05c16f967467e845",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3023
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288209284,
+    "payload_sha256": "d1d6abf870ebc6571df5b2539d7a66378d7337bd79746521f2e00a85a702d73c",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3024
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288212006,
+    "payload_sha256": "02557010060d63bdae42c55396db22ae70dcebbb2da4e399225ca1df31969e92",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3025
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288214728,
+    "payload_sha256": "c0461b0f9f87f6d8c33766135d1ece090d8baa80b0278727c94af5e8d247f382",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3026
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288217450,
+    "payload_sha256": "2a2dbc58bcf5a25edd78e449402d6b631e1701aa7392b8a4800536ae6dbaf320",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3027
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288220172,
+    "payload_sha256": "b8cdfd8e5600bfcfd89b2f80a687990e84ec685642b3fc923ce0008c3a2b187a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3028
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288222894,
+    "payload_sha256": "d1589d6aa0e9173fd2e5251f1b3e7b3c641bf9ea17551fc671e0367fbf3d1a2a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3029
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288225616,
+    "payload_sha256": "75cfd34df041ba10cfe05efc6b566253ed2210cddc59a1583194e2d0fec83a00",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3030
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288228338,
+    "payload_sha256": "270e28c52448fd796c6165dfd8b3b78460a241a81a6f05f3229940da14f094ac",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3031
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288231060,
+    "payload_sha256": "258b5375ab1410b67ab1269e6745a007abc028f290482917b2db33e6684b3ad8",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3032
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288233782,
+    "payload_sha256": "45bdf4a8c3b021c19104f8d16ed965f9f573d8f2e0828d2473ea5c1a4b0b96ae",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3033
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288236504,
+    "payload_sha256": "2a8d27286cdc1692d3e795e23444d7e45fdb028b79544c725199fdfda020398d",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3034
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288239226,
+    "payload_sha256": "db75b97c01ceb491050acbd1d2d5ec480f26680c29f73491d0a1afd076c4a2dc",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3035
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288241948,
+    "payload_sha256": "d275e23df6874dbb1b602fbedde1f4b75a6bfbc5ef7f9047c32cd80809ef2d1a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3036
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288244670,
+    "payload_sha256": "c9cc8872197f7bbada4c8b78ff7ff36291363d12fa26580fb98e302459afd65a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3037
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288247392,
+    "payload_sha256": "b9f1b2aedaadde93c963004ac808b460b6d65f8f6aadf788b661043fd3b94d15",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3038
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288250114,
+    "payload_sha256": "bed17d649b0e79502b10a79603e5ff9b172a12dc8cdca5a60fdee45b8fd41a3c",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3039
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288252836,
+    "payload_sha256": "2e8bad018e354016b04803ea3b05ac764bd4500aef641d07ac9ffddfccf3d37a",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3040
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288255558,
+    "payload_sha256": "218516e330115eb26eeced77081b291a7e939e12e0b0f7cd1af511c8e71d2b95",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3041
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288258280,
+    "payload_sha256": "2bbb6a523ab5263a7271f689f71030a086ad911ab8a45f73462b8d583b274c78",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3042
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288261002,
+    "payload_sha256": "0836e32b7128715b07721de3c788d2739b7b91a715998d6bc439f6baaad11007",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3043
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288263724,
+    "payload_sha256": "4ef872ca1917d6b7ab5ff3fd8fe5843bd2d86c7d4a6af2ec28fde2b39c2583b9",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3044
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288266446,
+    "payload_sha256": "33ef5d1b2d8615b5558b198b5b3a346529f4fa56516218ce2bc80b26da5ea63e",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3045
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288269168,
+    "payload_sha256": "a171852e4ea96dfc3ee58334b52978b0ba64ae2b0cb70fe23f36648162ead785",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3046
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288271890,
+    "payload_sha256": "d4636115488f3aa5c9dfd5bfa873a71af02a8b6897259f4c9425c4abea81df48",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3047
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288274612,
+    "payload_sha256": "d5ffdcd64f84f344bbc8daeebb2fd6c2a4f60f4ea789a8ae4aa1b61c208426c1",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3048
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288277334,
+    "payload_sha256": "7baa3598b457e632153baa92250bcb986b4c198267cd54f207d928e5c7b90bea",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3049
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288280056,
+    "payload_sha256": "d887c626e217d3e33b52a434187ad23cc2806efbea840608289a7962115ffc43",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3050
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288282778,
+    "payload_sha256": "62a4e932f3b1895628887026a65dad90e2b2fc3b31bcf40b0ecfd8eb6a7086bd",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3051
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288285500,
+    "payload_sha256": "956b63645690d6b76e126e9df458a8acaa35c04d5ee25c104b1439428e098b70",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3052
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288288222,
+    "payload_sha256": "93a509ec13e19ebba5c47263989bbac3ea472a881a3c539fd2b055ac8ba4e048",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3053
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288290944,
+    "payload_sha256": "27541280bc54b02c473cbd575726ee7a4f8843b60a5ec35f39e0874ebc8460c3",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3054
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288293666,
+    "payload_sha256": "b41adb89cdbf01f6ac4b98bc26f08a841a0e06237e7711eeeb809937dc1e6cf4",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3055
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288296388,
+    "payload_sha256": "5b871378455b4acf9185d50c7002442b66271b0641b8a5cd23f38951e1e2c366",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3056
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288299110,
+    "payload_sha256": "e03e45e0a4cd916b6cdb0b9fda58d3d0aa554fd3b54fadcd7e8ad46dba35c8eb",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3057
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288301832,
+    "payload_sha256": "99ebab9f3c74fe98059e0f304497795c6a12a4b4babf7c245378943a58a8ed5b",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3058
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288304554,
+    "payload_sha256": "7e552716e760cc1b23e64cf72b5f9dc9b7cb5ca97334c23e9b134a862122aa46",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3059
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288307276,
+    "payload_sha256": "bbe25d4f474967e5878a621c0a933f2b73062002a50924f5b4732ace80740dff",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3060
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288309880,
+    "payload_sha256": "7a1dc28ddfb785d8736b6a333ced8a8035333fc6ed2df5c67570a1efbd509a5c",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3061
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288312484,
+    "payload_sha256": "400a15718b8f50d0030552793751b06096ec607fa5f245220951e93b578357b6",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3062
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288315088,
+    "payload_sha256": "4ec67e51c5dac06f743168f3668769e8084c8bc9e6a234e24c0d03e98639ecc3",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3063
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288317692,
+    "payload_sha256": "b401f13441ffc8a690a9e64fffa670e4443489e9c3c5880b575268e219e5b75b",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3064
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288320296,
+    "payload_sha256": "ab930811acc452b1dd173193cc96bd3da72961fec3882a1c31d630dec290b79f",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3065
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288322900,
+    "payload_sha256": "bd35531d910108477bb624ab3ab7d2107550fafa0850f73e4af33fda214e35ef",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3066
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288325504,
+    "payload_sha256": "33a965e106d84fec25462477b2d7b43795158dfad70676b79118ff82e8828fb6",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3067
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288328108,
+    "payload_sha256": "68c7f1c576ac2d3e4e2208d1ef65f6603582cdb07e0b5b1049dbf23ebe8954f1",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3068
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288330712,
+    "payload_sha256": "9df4c8b6ba4e7f54bcbd8da1998e8fa0def27a4859796b39c03cf9d6dfb09f20",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3069
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288333316,
+    "payload_sha256": "a6cd71e6980bc86f9f88127ccf209e67b31bacf2f720e898aa0c40ca34c35cb4",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3070
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288335920,
+    "payload_sha256": "2c666624914d899a1d59ddb464fec98bcdb1116cf05f311de9b72f64b0e95029",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3071
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288338524,
+    "payload_sha256": "39b4023178fe6d3a7b6b5adbdea04fa9c7753dd636bc4e94d7317ae629489080",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3080
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288341128,
+    "payload_sha256": "df737d9ff20bda70f65dad5b50a93f3e66d674ea1d005bf97158f9e7e07165f8",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3081
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288343732,
+    "payload_sha256": "3c81b9b66cfdf7bfedbb91e697f993ba607fdbd1ee3b7234ce510c05259e4a16",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3082
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288346336,
+    "payload_sha256": "eed17a4dfdfdf9eee98fe22e93fed847061bc1f5ea07e69779543d8cc398622a",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3083
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288348940,
+    "payload_sha256": "bc5f6e217d728c343e4dc92d301d2d7b06501f963317691dbd76dfd8171c2b48",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3084
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288351544,
+    "payload_sha256": "6e251dbda249685ce1efc6bdabaef58255b04a2e5fe400fb8cebb595fb533f8e",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3085
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288354148,
+    "payload_sha256": "72bdad76324c8fa41e91d828a1a6fb789ed0b8c3cf853322d4172a1b4867d76d",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3086
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288356752,
+    "payload_sha256": "a367d4f4e95d4f2d44fce07c6ae66cac62d6871d916511acc12e8652647db223",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3087
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288359356,
+    "payload_sha256": "076d3ae08c6a6510e5c0404d9ecd907235f6d75bc8219a1529da399210690ff4",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3088
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288361960,
+    "payload_sha256": "69ed13cbb9e92258ab77b9272d38c3811b744e0b1e6c62b5de61319144a7ffd9",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3089
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288364564,
+    "payload_sha256": "c79ae27e6d31006299889f24216889868d20a5537071bc3d043def6a4a95d45c",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3100
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288367172,
+    "payload_sha256": "fe3c5e7d45e65510287a125f5af7b6cb21968c46f3ae76b5acb86c6b83135d25",
+    "placements": 19,
+    "resource": [
+      1000026,
+      3101
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288369955,
+    "payload_sha256": "8db887305de1f4eb4d560db981a86e9404b41df92c792a993054b3bb5f22c202",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3102
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288372563,
+    "payload_sha256": "d9c8d27851cd208c63a5fd9593263b579bf5bdeb3e9f00fb2ac94917e3179f7c",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3103
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288375171,
+    "payload_sha256": "ec6e17c578922b5153900174b3e2fabab846cb22854a2f3265591d87f57808b9",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3104
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288377779,
+    "payload_sha256": "a4d021a315ca97e9da4588fcb0837b71e233ec13eded7b15d6ca001098a5faea",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3105
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288380387,
+    "payload_sha256": "7cd09d118bf47dc020a9c94051d7675632e7c5fd697476abf205236c955735c4",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3106
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288382995,
+    "payload_sha256": "5747954bcd87713a1901c2d6b1eaf5fe3a6cee771eb27af042692619eaaed913",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3107
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288385603,
+    "payload_sha256": "a3ed101318510f51a0618c42924b1ecb0cb0eaffd2c9c20f6f3046023c17ab16",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3108
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288388211,
+    "payload_sha256": "0435b0eede8d591f51d0a8d6055acf7381c1ce73ef836362a2c57022e647bd75",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3109
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288390819,
+    "payload_sha256": "5cf11f049fb85e82600576686a64d8737ac360c7f7f16ffacd1f04042374514b",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3110
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288393427,
+    "payload_sha256": "c03aac219a3ea4daacf3562efc3e842128de3588122e57183c1d348082607eb6",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3111
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288396035,
+    "payload_sha256": "19c383a6f516e067005e75f4897e02e770977f428a69e49ffb3ee39855afab45",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3112
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288398643,
+    "payload_sha256": "b434485a203dbe3596736b760784c778bd34663917f944e7ac288049e9335262",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3113
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288401251,
+    "payload_sha256": "f7901fbc8f4ab9c9b0ab6ddc650a6bb06e57518de13192139b3de81098fddb49",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3114
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288403859,
+    "payload_sha256": "88da25c2ab088a921ca4cb059ccafe01190790d67371693ad4c14daf3d827813",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3115
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288406467,
+    "payload_sha256": "8e01cbafa80d1bb2b72bef6c7dd6c8d828d99083cc9c74555abbf11b840646c5",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3116
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288409075,
+    "payload_sha256": "80512624f4948c1f65a3fc2aebc69e2dc9ad3834b8df0e4f847a351720b93904",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3117
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288411683,
+    "payload_sha256": "3cc17eeabac58db3fd2a7872527358476bcb10ef12cd87a7b4fdb839d8c46662",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3120
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288414291,
+    "payload_sha256": "d64e941e56d3a8b07cbc9501037db2d71f8d3ff56bfaee6804b69c8f9574398d",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3121
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288416899,
+    "payload_sha256": "4250a1154a4edd207a313becb68e229f5f1b039b9acfbf33dd5626458e22bcd0",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3122
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288419507,
+    "payload_sha256": "d125a6e179d6dc550bbfb8f02c9719c7e34b4870a00409f905f9627f2961ce34",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3123
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288422115,
+    "payload_sha256": "04b09c300d75dbb3dbf88d7939486b6ddb3ab2520ca7a6f504b83927c8486f89",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3124
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288424723,
+    "payload_sha256": "128eaa19722e9ef7fba5a91c1e7bfe887cfa9c19039bda07f1285bafdc12b4ee",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3125
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288427331,
+    "payload_sha256": "c93d4df9e0e7e6b4d812c43b7f5c4496ee2be1763b58ef2e1296dd0a6516ec78",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3126
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288429939,
+    "payload_sha256": "f3a231fa8e823026819268f643d9a90336adec69e4c92fdf424dbf74b369c6ee",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3127
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288432547,
+    "payload_sha256": "a705a799a82234d1ae8bb37eaa2c3f9f816e96a85356bb234957902f22006c87",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3128
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288435155,
+    "payload_sha256": "a1ec2cf5d185c5262cc12f33692282407f061baaa2a84c7e9e81948dc8f879b0",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3129
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288437763,
+    "payload_sha256": "b3905d538c3255b9e422c18fe0a0158a7fc0297cab79a2d5b564514ec814a970",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3130
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288440371,
+    "payload_sha256": "3f1ff37a6ed7a2f2f7dd2aaeddd72518d103b2ffefbcb4f9c12eb95c8e7a9606",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3131
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288442979,
+    "payload_sha256": "ee545863652b5a098056a7e4ea0f896fa2ce436eb7f7a8e92d4181ac5f70186c",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3132
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288445587,
+    "payload_sha256": "db998355dec94f3b633e0a74450775644601400cab668ef674b99614d9673676",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3133
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288448195,
+    "payload_sha256": "a42df67d3137a4db6a007a459ae14d7b9f92ac6b142d042fc6ecec9c8bb08da1",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3134
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288450803,
+    "payload_sha256": "b321ca64f0764ad4b79b16291134c411c8a792c84b7b144b2a665704b0bb24bc",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3135
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288453411,
+    "payload_sha256": "1fe22ce32b51abc5a736f25e39ffb56b90c271f12a433d7b6b6613c4a8bb86c6",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3136
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288456019,
+    "payload_sha256": "56949d3afed20933133a7b1c8e1d65ed56e68e4131e4f94a0b83eb85a90f8f38",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3137
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288458627,
+    "payload_sha256": "73d8bdfdfa8e0fea4ba89eaa7a43586d35c79a766ec3d9bf831c475cc37d62fc",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3138
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288461235,
+    "payload_sha256": "e9b679d91e525dd49741b352d3e90a8598422f1ff1d4235f267f1fed146c325e",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3139
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288463843,
+    "payload_sha256": "bb03ab053c852615bd8d17b1760ca079ba836c340c90a4765b6cd3459bfccf06",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3140
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288466451,
+    "payload_sha256": "bdce72327c8a0c2c0c04a271d8a9d3231fad7de9e02c5a261bea7bbe97e72536",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3141
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288469059,
+    "payload_sha256": "d965f5a4a83edf13497af0ce8c24511867b19af227400fd8f78a2b20f4563b07",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3142
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288471667,
+    "payload_sha256": "4709ceaa2a2006753cf6f57b6c5ebf297c3738b72f61bc2171a68de78f38e8b4",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3143
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288474275,
+    "payload_sha256": "79a1eb79d456c6f995735969f3e57e204c2d71de8f47c327664936f77cb79070",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3144
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288476883,
+    "payload_sha256": "30a812351a37010c1c79540e4adafdbd87c4093955f1df47627d3ff2e2345a63",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3145
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288479491,
+    "payload_sha256": "fc9dbc5adc96274328adb5771cd7a9f536d8a8496453cce57ef2a259ad3a5eb1",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3146
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288482099,
+    "payload_sha256": "c0cc8225f2e1abd723eae59a338ffb07a1508130a338b977e92382793ae8340e",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3147
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288484707,
+    "payload_sha256": "26d3e50a7e2eed86f017197c7489323adaac4ae0e4f2f8474069b0848261eccc",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3148
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288487315,
+    "payload_sha256": "52b523d631dbb03b30bdaae0f29a19a598c1f7cd3dcf2f9a36d883b06e0b634d",
+    "placements": 18,
+    "resource": [
+      1000026,
+      3149
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288489923,
+    "payload_sha256": "06318591962fdd4bca07d711c4b061881197a7cc11df51c6d2f77d7fc34bfc24",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4001
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288491219,
+    "payload_sha256": "29605fbf294fce1b87e7758f46533b65da615386e06d67cc93d7780f112291a5",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4005
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288492741,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4006
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288492779,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4010
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288492817,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4011
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288492855,
+    "payload_sha256": "bee64d041006530a0912756a56c92603c6fbad1b05bea974611a8b664b2e6cad",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4021
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288493081,
+    "payload_sha256": "ef15ee89d20262fe87dd926db78017abc8febb4a9c849c33ac1422a97b74c310",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4102
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288493315,
+    "payload_sha256": "cefac1ae626622ee143cbff33d47e74970f32db3eccf99a5972a652e1686c5e6",
+    "placements": 98,
+    "resource": [
+      1000026,
+      4107
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288510857,
+    "payload_sha256": "88a0c7d710e5004c8ef78e1809ae6b88e086f9290759c674849e588cc477a630",
+    "placements": 75,
+    "resource": [
+      1000026,
+      4121
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288522153,
+    "payload_sha256": "3785bdee848cef18fd9859579d8ca62f5ae593f3d6cf31beff158b555436d6e1",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4211
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288523461,
+    "payload_sha256": "e52302e21c8a600201b122ea8deaf3735f61f6b7b7ca859e350148142ca3caa9",
+    "placements": 22,
+    "resource": [
+      1000026,
+      4212
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288525694,
+    "payload_sha256": "13bc0743e89acbd562bf1d20dc1e9895a59e94740d8be9309d3b586a8e583638",
+    "placements": 20,
+    "resource": [
+      1000026,
+      4213
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288527751,
+    "payload_sha256": "595055e3e03c923b1d3725b3f418a001b98b7cee02c2e83f1ec7278003df4246",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4214
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288529459,
+    "payload_sha256": "8254c27a6fa46a75169d56281cbc40958e5ba867359045e86e63332dd6be35fe",
+    "placements": 27,
+    "resource": [
+      1000026,
+      4215
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288532357,
+    "payload_sha256": "ab66f4a304bf9f93885d2c617affb513d8efb29894c403b052424ee0b831d69b",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4220
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288533665,
+    "payload_sha256": "340e7afee3b44248972ae799e118fdf2efde6236dc10d51bba6dd0c84b745b9f",
+    "placements": 22,
+    "resource": [
+      1000026,
+      4221
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288535898,
+    "payload_sha256": "6fefa10a612cee2421144c8123e05c0590afaccdb655fa9b70872495f33d5990",
+    "placements": 20,
+    "resource": [
+      1000026,
+      4222
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288537955,
+    "payload_sha256": "e60e8b7d8f68c0493a9039be92034485eba279b3580a389c633b1e32cdfcb8c2",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4223
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288539663,
+    "payload_sha256": "04b8b01dc9d27aa43ebbd3ad7baee11c2c951ae5458df2dd7d5931e1390b4be2",
+    "placements": 27,
+    "resource": [
+      1000026,
+      4224
+    ]
+  },
+  {
+    "acgentrances": 4,
+    "payload_offset": 288542511,
+    "payload_sha256": "90f2eca39f0f5a91e26a87f8c94e84842d9d2601e32cfd28d15c24e5806fd632",
+    "placements": 4,
+    "resource": [
+      1000026,
+      4310
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 288543325,
+    "payload_sha256": "46a816e637400d4452b5d58374c583ca376b110c722092c093c25c2f6ea0eaed",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4311
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 288544414,
+    "payload_sha256": "37c4dd3a6d579eaf6c49c2ea93aa6350c545b1263cff6fc63f88fcd0e81ac574",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4312
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288545531,
+    "payload_sha256": "0ac1c63c99815ef9c8dc2116f483af607e3ef34149a6f05b71f132dd40296971",
+    "placements": 4,
+    "resource": [
+      1000026,
+      4313
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288546186,
+    "payload_sha256": "1a1e040e9f61c4acb5ccd73e429c1201247442fd13d715df31a0a9f30e8a447f",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4314
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288546444,
+    "payload_sha256": "3cee2383520d5b536750722e9b9c1a603c376e48b733b1fe7ccac0a42a2b10fd",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4315
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288546702,
+    "payload_sha256": "d7d1048c6af427a2fd5d89078fd24ccd6b152618280bdb2c1df2329486b7b085",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4316
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288546960,
+    "payload_sha256": "90a86619a105117ae9fd9f1f3fa0a3e2bba485a59824849184cd3ab893f53611",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4318
+    ]
+  },
+  {
+    "acgentrances": 4,
+    "payload_offset": 288547334,
+    "payload_sha256": "bad113a9c56c56a52c9aa89ff960f021df9e56a1425c34d6f6295744bf8b59e7",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4320
+    ]
+  },
+  {
+    "acgentrances": 6,
+    "payload_offset": 288548965,
+    "payload_sha256": "4a6e8a2e69d078f43fb66b850a04235487ae30cd92595c0e66d929365dfc795e",
+    "placements": 13,
+    "resource": [
+      1000026,
+      4321
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288551356,
+    "payload_sha256": "10b133511a410375a9bca0684a0ae155a9003296248b2fda71e8814ab1d8421d",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4322
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288553858,
+    "payload_sha256": "4dd9c84fc048450f92ac0a00a3c7e6177c9bdbb2a2b154f58485086ab7a215c2",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4324
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288554155,
+    "payload_sha256": "fa497dde9770402b3df0c5123b7eed2f374dfa991cc0ec484755ce77ba84acaf",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4327
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288554301,
+    "payload_sha256": "3d4ca5b36279920cab9f2c9f1b02b082376d3172bb5598bd4221cf4081dd0336",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4328
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288555909,
+    "payload_sha256": "65ad30e2a69aac064a7329f2ca083e2e9313dd7f8ef421e39209c005a8562b88",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4329
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288556285,
+    "payload_sha256": "b3b325a0ad4d5a5f3467486d4ec2ce109fb25caa44958d36147cbf51b0947343",
+    "placements": 40,
+    "resource": [
+      1000026,
+      4330
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288563973,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4331
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288564011,
+    "payload_sha256": "49ceef17944e28c612218aa3c2bfce7ad8b3e71fc93cf33ad4f857e2063e0976",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4334
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288565363,
+    "payload_sha256": "ff5703d21b016b29a37eb84b4be0f69a1b23a62bcaaa7c717190967c14cbc496",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4335
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288565678,
+    "payload_sha256": "9beb84f4e96a3d163fa1bed181849f34fcb5eae6d13d8879122f8d204955712f",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4336
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288565905,
+    "payload_sha256": "68dae2127441a4f2dbe23a86e33c7a3ce17964bc11ab500f707797f08b0a452a",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4337
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288566111,
+    "payload_sha256": "973d51b235270521458a6710cb72aa39d837d257fa7c9b2fbd099d4c0a86e0a6",
+    "placements": 13,
+    "resource": [
+      1000026,
+      4341
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288568329,
+    "payload_sha256": "f440d72550099e1d14e8466848327ef37b8741ed4b0d9bf34f7f9496cb3c851d",
+    "placements": 13,
+    "resource": [
+      1000026,
+      4342
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288570547,
+    "payload_sha256": "4080e9cfda755955cd7de6973762de9b5de98b4184636e4fb73116f4365b7205",
+    "placements": 13,
+    "resource": [
+      1000026,
+      4343
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288572765,
+    "payload_sha256": "909ef84443f071d7db6e0487e64ea019079786d8dc061fc117bc7a4de2920b4e",
+    "placements": 14,
+    "resource": [
+      1000026,
+      4344
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288575091,
+    "payload_sha256": "1f51bc1fe1f234c53b5db3a692dbb301a0e8f8f82829f7257f650d9894c7ffa9",
+    "placements": 14,
+    "resource": [
+      1000026,
+      4345
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288577417,
+    "payload_sha256": "12b62a4dcf1cae416aa80e4bdba80d68ae1185990abf51ca269e103e837c29da",
+    "placements": 14,
+    "resource": [
+      1000026,
+      4346
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288579743,
+    "payload_sha256": "e7093b6ccd824e8f85d7b3c05acdab98bfe0bfee602104b7a1d2da3679c0da15",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4347
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288581566,
+    "payload_sha256": "ffdc11411d6bcf15651ac65cb33d1b20aa3053611de015f8bc6fd1ca355c3803",
+    "placements": 15,
+    "resource": [
+      1000026,
+      4348
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288583980,
+    "payload_sha256": "c1e2203d65ec73e96e96fb4e46486a64e629d7f08941fe55864c8c4525af7ae0",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4349
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288585803,
+    "payload_sha256": "5ffee3d6195bc52d49b92c1d7474fce0a8a5b964bbd463a4ea28f2c1c2e29d7f",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4350
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288585929,
+    "payload_sha256": "c37cb740c58f154a6b201044de44ad55c103613226d0b49189af6e0e2af14fd8",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4351
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288586075,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4352
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288586113,
+    "payload_sha256": "3fc9330d7895fe0e71ab12e24b716524c0ce234ce2754e8c513756c0fd399a67",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4354
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288586699,
+    "payload_sha256": "f71c0e1298c96c131fa113060608efdb9873126607c9bbbbb6ffbb48f41d0896",
+    "placements": 32,
+    "resource": [
+      1000026,
+      4355
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288590413,
+    "payload_sha256": "b27e68c4101acead2aec74e9eb9cb1b86bb20e1a55d0f587b60c58b01a77c1ae",
+    "placements": 62,
+    "resource": [
+      1000026,
+      4356
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288597607,
+    "payload_sha256": "327118826277119e670a367077b16a1b361e2fd68ea428efa731dcc15e8b3431",
+    "placements": 123,
+    "resource": [
+      1000026,
+      4357
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288611869,
+    "payload_sha256": "20b022fe1b8c2400a206464fe10c1417da4feeb28ede6233ee02061c3e2230c6",
+    "placements": 9,
+    "resource": [
+      1000026,
+      4360
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288612843,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4363
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288612881,
+    "payload_sha256": "1270ca6e7694e0209719c4faad7f971650823e5d995645dd73a2d7388806b6f0",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4364
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288615916,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4365
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288615954,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4366
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288615992,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4367
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288616030,
+    "payload_sha256": "1577b2c73c56744d21a6b4eef294b650ae1cbbda12c28dee4c41ee63e201c198",
+    "placements": 4,
+    "resource": [
+      1000026,
+      4368
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288616971,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4370
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288617009,
+    "payload_sha256": "43bdb58c94d161e0ca61ad3e9f15665195379679d52fd4c14a690e4afbf43ac9",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4374
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288617839,
+    "payload_sha256": "83ace21ee1ad731f093de8b545d2cae7f31b7133c4562abd53c6c6e2be04608d",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4376
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288617985,
+    "payload_sha256": "8055cbc6c1ccc9248979598f472cd4da0887a639d40dabfc1bac7b08559f025e",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4380
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288623047,
+    "payload_sha256": "1ef52a440aa2e03acf8d2bdff677a0460b786b4120e2cbb3c8a73c2007e8876c",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4381
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288628109,
+    "payload_sha256": "2f7c4cdf002e1bc8d328478eef043bfc0992e09d1752003aca442f4a6f73220c",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4382
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288633207,
+    "payload_sha256": "a2250afd15cb7f639202dae8789a60cdbca05c6a29e42531370d8a87b56d40f9",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4383
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288638269,
+    "payload_sha256": "402b6938f31caff26af2395907e4169c4414575800435bed3876891743e1212f",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4384
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288643331,
+    "payload_sha256": "a30161f0ca4156a6f352dbe1135ea95b6fda24a8405a909d70b5d51093f9b266",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4385
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288648393,
+    "payload_sha256": "9c29949e4648c37a364a0572e5996dfd9f238fbd4172dd3ca842549904dc2fa1",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4386
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288653455,
+    "payload_sha256": "a6b9d4e3a8a75c13aa14a389a81202d52189384ec985dd156bcc58f52533bb33",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4387
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288658517,
+    "payload_sha256": "d042689fa081ae8f4c4fe3a8d0f010de7d6cd8ce17311aaf6989527040ab2944",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4388
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288663579,
+    "payload_sha256": "a05ec4b07ee0c35783b9d4f287ce95b1b470a41a1baf64fb0de3cde579b5759b",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4389
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288665118,
+    "payload_sha256": "e75f056ed124a6fed068de1a06a9b04e7faff23c462b0020e7b7f52b5fbbfe40",
+    "placements": 63,
+    "resource": [
+      1000026,
+      4390
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288683005,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4391
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288683043,
+    "payload_sha256": "bcdb9794e04772136be3f3cf2217303f9a6bf86dfb40612845b4cee7faa573ac",
+    "placements": 3,
+    "resource": [
+      1000026,
+      4468
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288683885,
+    "payload_sha256": "67df4d68603e780a577883c8368b3f96299a078181fe0222b9f616bc53663c16",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4474
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288684128,
+    "payload_sha256": "e2dc12e2e39f74ccf1cee611c1d5c6ccf4b447658354974b6775ae58bdbfb539",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4475
+    ]
+  },
+  {
+    "acgentrances": 3,
+    "payload_offset": 288684371,
+    "payload_sha256": "1327c0146acf567c0ad245154d0243c2324f6b5f7ff284db2679933b342b1d12",
+    "placements": 51,
+    "resource": [
+      1000026,
+      4504
+    ]
+  },
+  {
+    "acgentrances": 3,
+    "payload_offset": 288693309,
+    "payload_sha256": "a32309677ba15b8c404e8418cfdba02aa51eef38e166ba07e861cc476dfb33f8",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4505
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288696892,
+    "payload_sha256": "d79438f57adde180715193e4eb29646ab4a129616a4cd4484059eeee6e6820ad",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4530
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288697790,
+    "payload_sha256": "e69974793726eeea70448f1aa5118e9809124adf1535099842d3c99b03113f7a",
+    "placements": 10,
+    "resource": [
+      1000026,
+      4531
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288699373,
+    "payload_sha256": "be1c595883e0d45288dbe1797595b12b507b6a0223829f26c720589308c42e5d",
+    "placements": 10,
+    "resource": [
+      1000026,
+      4532
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288700862,
+    "payload_sha256": "d5f375ec73870a3fa4359ece59d558641c0ab4aa17ec8c0713b39d0c80355089",
+    "placements": 10,
+    "resource": [
+      1000026,
+      4533
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288702333,
+    "payload_sha256": "d0e34ecd5fec27255305d311c4324ac41c50c79f0af2c242e28eb1b30f9a87bb",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4534
+    ]
+  },
+  {
+    "acgentrances": 3,
+    "payload_offset": 288702687,
+    "payload_sha256": "411e3ae43e75db609f222449110845088c0ba9bfe28d0c44f70a35c50c9380e6",
+    "placements": 28,
+    "resource": [
+      1000026,
+      4540
+    ]
+  },
+  {
+    "acgentrances": 3,
+    "payload_offset": 288706270,
+    "payload_sha256": "b8fe3ea0e8786f671405cec531496330c246a92a079f4002611fac58d899d40d",
+    "placements": 34,
+    "resource": [
+      1000026,
+      4541
+    ]
+  },
+  {
+    "acgentrances": 3,
+    "payload_offset": 288712065,
+    "payload_sha256": "bb855d615dad3ecadbeeaa0cbf38dac2634a4f99735ece917a7d3ea8cd776220",
+    "placements": 50,
+    "resource": [
+      1000026,
+      4542
+    ]
+  },
+  {
+    "acgentrances": 4,
+    "payload_offset": 288718420,
+    "payload_sha256": "262cbb76078e6e7719e4aebf849c04714fd848e6d93d3385e2d575c47ac13cc5",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4543
+    ]
+  },
+  {
+    "acgentrances": 5,
+    "payload_offset": 288720194,
+    "payload_sha256": "820c3c5653c9a963dfed8fe16b3bb02b14fbb2bed155b28bab3e41ae005e6fe0",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4544
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288722427,
+    "payload_sha256": "29b67412442601ae4548f96b750bfb54629cb99c3454a6ef214271bd806f87e1",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4561
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288722685,
+    "payload_sha256": "6308a97308692e625504f00b2dab67a5c6cfa6c0040e29ca9cf707f7d4de22e9",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4563
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288723279,
+    "payload_sha256": "ecba04cc3672fcf060b00c52744ca169d34e45b5559886f7efa26ae8fb0c0011",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4564
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288723873,
+    "payload_sha256": "983698fbeabe2655026e54f0e058fece1e6093c63295eec2eae0a4e5b337f965",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4565
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288724555,
+    "payload_sha256": "f0ea28b06a3ecc1d69444ae16dbd0425073753e4eb10c6e96aef211ae3638b43",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4567
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288725345,
+    "payload_sha256": "eb3bd2e29726e64e3d3d1a9d9bdfff171bab10c3dd9c9bb5d2ada42e3fee8d42",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4568
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288726135,
+    "payload_sha256": "274e258a5cc6a9d1eef25e1407008282d805b762412fde646c473ceb6f276e70",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4569
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288726925,
+    "payload_sha256": "e690a7a115ef0a54228e71658169c05aa6a6b167bb83e5f8abeca4ed125627db",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4571
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288728047,
+    "payload_sha256": "fbc6f7f0c68f2868c5a8461e0ce47464c0a12badced7fcfe1334ae86915c21aa",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4572
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288729169,
+    "payload_sha256": "0b7a4f9e76057e758e8f44c165949253cb4276298fdf61016ecb3bc95fe1242d",
+    "placements": 12,
+    "resource": [
+      1000026,
+      4573
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288730291,
+    "payload_sha256": "606b41271b875802e7817d4ebba9c844800ca59d4ded5fc71fca8fa0a41f9502",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4575
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288730437,
+    "payload_sha256": "edc1dc9716ddf73736c4ee93efc08a6722dc990c9b1c10d59c7d801e2eada5a3",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4576
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288730583,
+    "payload_sha256": "707beac36f18f0805b89a7b0938807c96462d423be28012ef562e969dc98d8cc",
+    "placements": 1,
+    "resource": [
+      1000026,
+      4577
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288730737,
+    "payload_sha256": "c5efe61a296b87b5d82ff87d42c2b656ab0b54406282cb4dad36352f184a3ff3",
+    "placements": 2,
+    "resource": [
+      1000026,
+      4582
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288731120,
+    "payload_sha256": "ad2875443671432665d421fba44d5d1ffd928ff409c296ad2e8343527d1470f2",
+    "placements": 11,
+    "resource": [
+      1000026,
+      4604
+    ]
+  },
+  {
+    "acgentrances": 5,
+    "payload_offset": 288737362,
+    "payload_sha256": "7b4024e0ed34cc2b80ce4712a3c45d8b30254b90445fb719108d978f9c6542e0",
+    "placements": 11,
+    "resource": [
+      1000026,
+      4605
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288739955,
+    "payload_sha256": "eeb1ae0e818301dc74a7d8a056bc63f655e71e76281c92a00318fc4ec3ecb6c6",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4621
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288743119,
+    "payload_sha256": "3f5ec979e3fa9cb03e487a4c9f30c5c448af3fba66be10e5b04c43461eb5b882",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4622
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288746291,
+    "payload_sha256": "5e63da810906c5fcdd980aa44156b733654aa87767e2c313c6dea632c17cc772",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4623
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288749455,
+    "payload_sha256": "5ac9726d5914ff2c99d69e06a74250c3876db7d16c0d7672b7ef680b40c95762",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4624
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288752627,
+    "payload_sha256": "af4fa9092bd54e5b3e9b3001f29dcb7537186539b68cdec577b5587407038d3b",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4625
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288755791,
+    "payload_sha256": "54291b97e8c8d14527cf5e0ec179382a0abb7fa5dd4c94175dfd59a7b8c1ef67",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4626
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288758963,
+    "payload_sha256": "263c874930ddd40f8562ac14f3da560b4725d0114ee02671a0062b1468fc2083",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4627
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288762127,
+    "payload_sha256": "2331bdaded04fe10085e3edf2c47e03002e84ce8ecb3941e59227ae72da764bf",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4628
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288765299,
+    "payload_sha256": "946667b2ee9b7adb0a2152072d12eb0f48d31c78410933ab5cdf745a96fc1222",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4629
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288768463,
+    "payload_sha256": "0c291c4da171e9574de888231604a89d794fb6aeb6705d6002bd22ad02ce3d80",
+    "placements": 16,
+    "resource": [
+      1000026,
+      4630
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288771635,
+    "payload_sha256": "87887c4b38244da88c414b4cdb6c0441fe3ab63dedf3f32241ace6c1eb1486cf",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4676
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288772238,
+    "payload_sha256": "033d1b962350b2a27bacfbefdd3975f7ebd86fe8855fbc859aff18adf20875ac",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4677
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288773017,
+    "payload_sha256": "cb487a070393e2bbff5ba23f145154012daa40af6d039901a2e8cf4bf4552915",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4678
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288773620,
+    "payload_sha256": "494ca0a322db1a99180d9decc7ee21d24983e3a2a03c5649a3254a279d1725f6",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4679
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288774223,
+    "payload_sha256": "2fd1f7cab9dbea0889c332f7542e422e24ea1cfa52fa4dd7296fdf56f8daae10",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4680
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288775002,
+    "payload_sha256": "5beb6cb4a5852b6d51e09ceaa44ceed55e0427bb304ab85229e64a88a612e9df",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4681
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288775781,
+    "payload_sha256": "3e2db240fb7d3f887969f79477169bd0745ebb1ed4edd3a9127e4beb93067342",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4682
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288776384,
+    "payload_sha256": "2d9fc05d9b31120858f467e55a4b4e9340ad98c9d1aa53e5bba8484942a494b2",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4683
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288777131,
+    "payload_sha256": "e55b39698a4f581543fc34ec7e003982b700109b8658c24141652ed2476fe556",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4684
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288777702,
+    "payload_sha256": "a003bc83ac447995be4106330253df0ca40f9ba6211cb9eeb2672ff496580868",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4685
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288778273,
+    "payload_sha256": "29ce054be421288755dc15cb6891858bfb87073875b6d8c4edb0f024ad48875d",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4686
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288779020,
+    "payload_sha256": "859581830a67c3355a1e6b9a914fbd4d63fa45713dffe780b73e5984d5f6bda2",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4687
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288779767,
+    "payload_sha256": "d1c6b20b90846ba1bc875c1d26189282c99dcd64c7653704d36e62117c79758c",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4688
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288780370,
+    "payload_sha256": "8d0a8c4d8f7eb6ac5e38e24b8a09dbe7a29f30ca45b8375e0002477a4e000fdf",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4689
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288780973,
+    "payload_sha256": "a7de85e35660f74307a1d44ae33e848bfeaa717869e5cf118e7f60a34a34a361",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4690
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288781752,
+    "payload_sha256": "d9e13d13ef34a73bd5847c06318af60ebcd7721ae6028aff1f4cc5e1c9b0407f",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4691
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288782531,
+    "payload_sha256": "6f5c48463bdf25e6a3417e4d17857181a999c07e0d98ddfe2e679e1461236312",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4692
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288783946,
+    "payload_sha256": "4476fb504177d4bea462376062ab2fe2d083e6ab64f7d30413675a77cb192517",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4693
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288784517,
+    "payload_sha256": "1a797175cbf87b58e3abb2b6cc0ab85f212d052d61437c5875a62ef2258aa3ed",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4694
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288786106,
+    "payload_sha256": "dc56ddc17ebfccf30f282657ca735b78eb8a4e7ddc5c1505152c85bd341d3a5b",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4695
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288786853,
+    "payload_sha256": "68b79fa84d1696caed78f3bec73c3a7f1087c87e22da222ceed6a1b3d3e648ae",
+    "placements": 6,
+    "resource": [
+      1000026,
+      4696
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288787703,
+    "payload_sha256": "654a933f05e580f18bc0ec2263aab71550296b8aaffa0ffe9cfb250a73bf406b",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4697
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288788732,
+    "payload_sha256": "e153b3d7e3c02ae4786cebf81389232f41fc2b982824ab1b3231836f1f33f9f4",
+    "placements": 5,
+    "resource": [
+      1000026,
+      4698
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288789335,
+    "payload_sha256": "92da70178cf60f54ab5c057713a2384e645c7a022fc4bad3c5eb3ebc259a76cd",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4699
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288790114,
+    "payload_sha256": "0c2931b45b00beb8ea988b8212d03b41d14a79cd7c318c625dccf9ccee99dda3",
+    "placements": 19,
+    "resource": [
+      1000026,
+      4704
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288791872,
+    "payload_sha256": "5d34b0f4b6df7c336a424d931cad763d41df2637358258e537b090ad3e85580d",
+    "placements": 34,
+    "resource": [
+      1000026,
+      4805
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288800434,
+    "payload_sha256": "a4d0f021971212f5cb8206dc958dc054d520c6262d21e1531dc2c7f29060feb9",
+    "placements": 7,
+    "resource": [
+      1000026,
+      4833
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288801629,
+    "payload_sha256": "a3f1782e5c2d304b8d90c046eed40e37b649c684a6729529fb2ad49171a4a465",
+    "placements": 23,
+    "resource": [
+      1000026,
+      4872
+    ]
+  },
+  {
+    "acgentrances": 8,
+    "payload_offset": 288806581,
+    "payload_sha256": "86944100ed41cb6544b30970cc7f91be66c4104ffbc49219d697845f2e2d7f63",
+    "placements": 18,
+    "resource": [
+      1000026,
+      4873
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288810523,
+    "payload_sha256": "334c1ff51e789605d0e893397853236cf61b2fba0781c8a8d9136831e9e84cfa",
+    "placements": 14,
+    "resource": [
+      1000026,
+      4877
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288812933,
+    "payload_sha256": "4a6cbbc99f449d9c3ab3b1e019b6b2cc1b7fb5cf7e2359e994dd95cf97379340",
+    "placements": 8,
+    "resource": [
+      1000026,
+      4880
+    ]
+  },
+  {
+    "acgentrances": 2,
+    "payload_offset": 288814547,
+    "payload_sha256": "3fb553c13490fc39db7e02408a64513640f1cc38fa36a4c7457b35196a15c413",
+    "placements": 22,
+    "resource": [
+      1000026,
+      4881
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288819887,
+    "payload_sha256": "67df7970d3b068271160ec8882fe6f4ce2adef7551394771530f86b327fb99dc",
+    "placements": 17,
+    "resource": [
+      1000026,
+      4885
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288821769,
+    "payload_sha256": "b230997afb792f79b4d85058c51c9cc9d79eb3acc604de2048add5998d54b0bf",
+    "placements": 80,
+    "resource": [
+      1000026,
+      4894
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288830835,
+    "payload_sha256": "3f4e71a6e00d8561d5c1b19019cda1dc71409a90ebc653c3e92ef008dd801b89",
+    "placements": 3,
+    "resource": [
+      1000026,
+      4898
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288831275,
+    "payload_sha256": "74a565c462f3dbdadf6de96c37383cb8911263ca956cdede84c0ccec168c9f0d",
+    "placements": 4,
+    "resource": [
+      1000026,
+      4899
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288831941,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      4900
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288831979,
+    "payload_sha256": "386e77122d485310bf4ec67b07fd755697af6dddd765722063388bd2159e1553",
+    "placements": 3,
+    "resource": [
+      1000026,
+      5001
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288832405,
+    "payload_sha256": "01b9d93b9469ee02761481d3b962c48dff6ede07454a6052e6c4596f88430450",
+    "placements": 3,
+    "resource": [
+      1000026,
+      5002
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288832831,
+    "payload_sha256": "0454c63b9a63b5d3ceca911dd1b171b9c4cae500dc0b42ff33381c553329d0c8",
+    "placements": 8,
+    "resource": [
+      1000026,
+      6001
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288834110,
+    "payload_sha256": "ad79f9a8a7977670360a73fe2c90f75ece3145d459bf96bb01baa8a12b0f26b2",
+    "placements": 8,
+    "resource": [
+      1000026,
+      6002
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288835470,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6003
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288835508,
+    "payload_sha256": "e5d906b75834ed2b59e5798705c10987c1b1ba9aabefe4c629537969dfd53f15",
+    "placements": 24,
+    "resource": [
+      1000026,
+      6007
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288838046,
+    "payload_sha256": "91f05fb2ca9c93f0a95f0b3932e6a9c76e66bc09e93478397bfdc0f4b39e6230",
+    "placements": 3,
+    "resource": [
+      1000026,
+      6010
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288838472,
+    "payload_sha256": "f9e5e00466499d021d49f0a378ab67893060dad74d535b7bbc9112f161c5c7a5",
+    "placements": 3,
+    "resource": [
+      1000026,
+      6011
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288839429,
+    "payload_sha256": "01431d0dafedeb4199b7cca6eb85ab415569f79a04813d16f257a9ef838e902a",
+    "placements": 4,
+    "resource": [
+      1000026,
+      6012
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288840551,
+    "payload_sha256": "4dc0e5b1ff6137d23cadeb801f0a1fd4018c675a97bcf155f8e93f195d5958b8",
+    "placements": 10,
+    "resource": [
+      1000026,
+      6013
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843022,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6014
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843060,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6015
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843098,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6017
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843136,
+    "payload_sha256": "f0bbbad60e031cbac0e1f34932365144fffa762c123db96cb960ba9ac808b8b5",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6020
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843282,
+    "payload_sha256": "5a3b1396913b587b0de163dc945d2f4b16e1426b7ff94f8b841a3fdb8bad97d9",
+    "placements": 2,
+    "resource": [
+      1000026,
+      6021
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843755,
+    "payload_sha256": "a71e8e80c6da3d17cabe0736d163875371c3eba7883726173d3ece016027c6a8",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6022
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288843961,
+    "payload_sha256": "a5af4e24a06358497967f5a376a52bb008127cc7d4ddeeabf56fe0b4681b215e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6024
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288844167,
+    "payload_sha256": "1493286bcadcfa86db9e2082adf34cba379abae4ec9002c5f5624050f26ea13f",
+    "placements": 8,
+    "resource": [
+      1000026,
+      6026
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288845057,
+    "payload_sha256": "8076572d00d1271226cd59f5e5c46b0ad6519ce19fa660bad8c550258c2b085f",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6028
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288845298,
+    "payload_sha256": "d3e5859fa5cbd928d0fab67618566ebbc351dc9939609b95ae1f598f3dc78f28",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6035
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288845525,
+    "payload_sha256": "0b8cbba1ec58141d9800808fc5c321e79c481b9e50f310f3022f988972bb3e60",
+    "placements": 2,
+    "resource": [
+      1000026,
+      6036
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288845840,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6041
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288845878,
+    "payload_sha256": "0bfff1baf895e67597d551d3cee11f9431eaea7d3394082f6f3ce65a7cf9f1ab",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6050
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846108,
+    "payload_sha256": "e406aa99079bb0d7a62db9d9eccb262ea9dede03d764c6fe2691e4b1a53d00bb",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6051
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846338,
+    "payload_sha256": "0ed2201572d2dd778d92796f0a238df5c5084bb63214531d56f1edf2cba46016",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6052
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846568,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6055
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846606,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6056
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846644,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6057
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846682,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6060
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846720,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6061
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288846758,
+    "payload_sha256": "56cbf2a0df0c225f4a8382a6470218714c371c61d65d9c659001227099f49f1e",
+    "placements": 12,
+    "resource": [
+      1000026,
+      6071
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288848199,
+    "payload_sha256": "792d7d78c3015fa62828e0642ce32d7f9fdadbd4fe3f95c7b34e0cc25f648fbb",
+    "placements": 49,
+    "resource": [
+      1000026,
+      6101
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288853861,
+    "payload_sha256": "88c8d1363d237989cba76c5c0f49edf59236056f88ccd3a90a7123b0698a0776",
+    "placements": 49,
+    "resource": [
+      1000026,
+      6102
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288859523,
+    "payload_sha256": "33b016feb8bb59f07bcbbc2bf9acda05105eca643d405bb506b51a29890fb94e",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6104
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288862289,
+    "payload_sha256": "dfe88d7cf9e24cf3694fa84d11ade91abc0808a07898efeb508259e94122d3fc",
+    "placements": 11,
+    "resource": [
+      1000026,
+      6111
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288863613,
+    "payload_sha256": "50afe76e4940ebb3a85d730b85d16128cf4142378aa3228c83a605133413df27",
+    "placements": 11,
+    "resource": [
+      1000026,
+      6112
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288864899,
+    "payload_sha256": "13ab1a07f3169b9a30f8990dc1ce3b1b3f5a062a4397668cf4ebb375932524e2",
+    "placements": 11,
+    "resource": [
+      1000026,
+      6113
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288866185,
+    "payload_sha256": "3cd8e0617df74daa21f6db31a921b1c635e5f9629e834c79a705802077a641ee",
+    "placements": 8,
+    "resource": [
+      1000026,
+      6115
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288866947,
+    "payload_sha256": "dd8754122d45dc4608786bab0577d317770f9df91a58ccfe63b8895ae6aca573",
+    "placements": 21,
+    "resource": [
+      1000026,
+      6121
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288868951,
+    "payload_sha256": "e911d4c51ea8fdf2de2f2402d855181edd696fe2a6f540909c59db75475a401b",
+    "placements": 33,
+    "resource": [
+      1000026,
+      6123
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288871925,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6125
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288871963,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6127
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288872001,
+    "payload_sha256": "63de8ccd891724889da908f5046ef4f94e13f548dff80945e4674ac0a28c7db0",
+    "placements": 12,
+    "resource": [
+      1000026,
+      6129
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288873213,
+    "payload_sha256": "fe26d3c2ca54f19b223d1cc44c37c186c8620eec7be12bb9575ee418917936dc",
+    "placements": 6,
+    "resource": [
+      1000026,
+      6131
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288873863,
+    "payload_sha256": "60cfc6d9517978d2629c61a0d7201f66c5e46aa8861001807ac019a84f655e1e",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6133
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288874017,
+    "payload_sha256": "a0fa40e8bfda48853d44b894f125cd9d3d0a3df72a47a2d87afb7cc66b6183f4",
+    "placements": 25,
+    "resource": [
+      1000026,
+      6211
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288876355,
+    "payload_sha256": "110befa4e82a80e2431b2f9fa3262904e882e783f83539516e5b08145db35fc6",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6300
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288879121,
+    "payload_sha256": "a4d1e5f4299cedd68618fe228867e002cc9b27d353d1bbf7f3156e824cd1091c",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6301
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288881887,
+    "payload_sha256": "f197497be13ed731dc1632b30013396dc5635f655653e93997add2963018f4c2",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6302
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288884653,
+    "payload_sha256": "9415bb9e67ba4bffec882d18777578b49680ef0f78e2fd6d1d91a291037de951",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6303
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288887419,
+    "payload_sha256": "674bb5c68a0d82b3dd5ec45ef3659bf52524a7eba1aa4e97d12f87946f4bab92",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6304
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288890185,
+    "payload_sha256": "5a736650d633d9d8917cfe4e7aaaffba813d61b2ed07ba74efecfc36b97a25fa",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6305
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288892951,
+    "payload_sha256": "3dd4748331277fad62d6007a44f44ab5b861f2e61d26486f305efac7d126e6c0",
+    "placements": 31,
+    "resource": [
+      1000026,
+      6306
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288895717,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      6550
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288895755,
+    "payload_sha256": "c971fb69f182ae3c57460cd63c8b3351f5668693fe0c9ed543450bca5912e85c",
+    "placements": 1,
+    "resource": [
+      1000026,
+      6551
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288895965,
+    "payload_sha256": "962b4b19482032a71cedae3231774678bc53a1db8c3e3f497c158cd10d3fee1c",
+    "placements": 27,
+    "resource": [
+      1000026,
+      6553
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288899674,
+    "payload_sha256": "a7262c0bf7b46b5a1f5a0d2da4e7a3cfc342ede25039aad950e8e08c521b1d63",
+    "placements": 1,
+    "resource": [
+      1000026,
+      7001
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288899860,
+    "payload_sha256": "567195797475f5f6e92367fcdd95424cad47eb3e6451fa5f1968b1efa68162c9",
+    "placements": 1,
+    "resource": [
+      1000026,
+      7010
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288900157,
+    "payload_sha256": "60d11ac0ae58af3d9c0bcac316179ab546bb3e103c30beae45c39e70fd7d7498",
+    "placements": 2,
+    "resource": [
+      1000026,
+      7011
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288900505,
+    "payload_sha256": "5e67133bbad08ff79e1598a14d3641477e529f29c56f910843b7669312bf3ab1",
+    "placements": 2,
+    "resource": [
+      1000026,
+      7012
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288900845,
+    "payload_sha256": "15f0299fa2100c37b786a09a20079f3907b31e90ef2f97c5f30990e9020d671f",
+    "placements": 3,
+    "resource": [
+      1000026,
+      7013
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288901891,
+    "payload_sha256": "651396e4a39c8583bcab2e5cb8dd8332e9141058a00733f9ec37e93f9dab2a80",
+    "placements": 1,
+    "resource": [
+      1000026,
+      7015
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288902104,
+    "payload_sha256": "d216662859fab5625002d4f037ccb9963ad3317e0411ec64daef4bda3253a99a",
+    "placements": 2,
+    "resource": [
+      1000026,
+      7018
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288902338,
+    "payload_sha256": "728f517c7b8792e141fdbe88c62d594c279da7a09cf3003d541335eac11753b9",
+    "placements": 2,
+    "resource": [
+      1000026,
+      7019
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288902572,
+    "payload_sha256": "a3ad74a71ede9494bd1e4c44aef61799000ff9a6e0fce7bd2241a58a3bdacf9b",
+    "placements": 2,
+    "resource": [
+      1000026,
+      7020
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288902806,
+    "payload_sha256": "24f02e69869c5284783628a4e94fa7d93ee32ef0b16bc71e50fb96576dd6d1a9",
+    "placements": 21,
+    "resource": [
+      1000026,
+      7051
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288904712,
+    "payload_sha256": "9c472616bd1f5ff0c61b31af21436c7689a5c1cefdf28a7b6843c9345b7533e0",
+    "placements": 22,
+    "resource": [
+      1000026,
+      7054
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288906746,
+    "payload_sha256": "e44020173683b8ee29c28a5a5470abb9654e045627b150b0dec2209dafe8ceba",
+    "placements": 5,
+    "resource": [
+      1000026,
+      7092
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288908282,
+    "payload_sha256": "8a1e9d68423eff30a7acdc46871239688f95348e430f241e5bec631496655347",
+    "placements": 2,
+    "resource": [
+      1000026,
+      7101
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288908719,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      8002
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288908757,
+    "payload_sha256": "98c14e94ce94a421fa2f6be9892b75cf7fb00ae47bb11226e427fa40eb023afe",
+    "placements": 34,
+    "resource": [
+      1000026,
+      8004
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288911899,
+    "payload_sha256": "8044a933226a6f9616600f657212426be8e8e6f0c720dffe37e25d4e920c6c05",
+    "placements": 34,
+    "resource": [
+      1000026,
+      8006
+    ]
+  },
+  {
+    "acgentrances": 1,
+    "payload_offset": 288915009,
+    "payload_sha256": "7bd6ba698a766e1c9e6da72f67e882004ba7565fdad0eb5e9aeb963fa59541dd",
+    "placements": 2,
+    "resource": [
+      1000026,
+      8009
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288915385,
+    "payload_sha256": "b52b365d1ec32f27486de5b123c2b9a82a70a14087064ce60a0c0ebefc3d3c6e",
+    "placements": 59,
+    "resource": [
+      1000026,
+      8020
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288920643,
+    "payload_sha256": "691a7630cf08504da0bdbf69cf789b7a7ec9c536b2522fd05f87745dcd0aba47",
+    "placements": 2,
+    "resource": [
+      1000026,
+      8030
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288920857,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      8040
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288920895,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      8045
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288920933,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      8046
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288920971,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      8050
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288921009,
+    "payload_sha256": "e9d9dbdf00dc2cda2bf50ce17493408ffe23c7d1bbb53ece864f5814d3952219",
+    "placements": 29,
+    "resource": [
+      1000026,
+      8060
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288923719,
+    "payload_sha256": "26c762e129685bc3bc4c3244ccb27a05b42c1969fb427f74b29249db0b31b496",
+    "placements": 22,
+    "resource": [
+      1000026,
+      8070
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288925813,
+    "payload_sha256": "198b68943f90b42d9793822cdccf56cdfe135fc24bf7cb8abbb332e2781110a0",
+    "placements": 1,
+    "resource": [
+      1000026,
+      8080
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288926011,
+    "payload_sha256": "899a85dc39956719d78aac6f0a9adb3b87e389e449e368879bb8726a6d1d00c1",
+    "placements": 5,
+    "resource": [
+      1000026,
+      9041
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288926509,
+    "payload_sha256": "41e948bb30d8e8bcdcaf73ddb82961e4fff079e30d4df0b0765d31933a9950ca",
+    "placements": 1,
+    "resource": [
+      1000026,
+      9042
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288926715,
+    "payload_sha256": "0e1f8d8cd5a7ba3a31fb46d339e4d9c16289ae6b1cd3f4f9930cab11bfb9cde0",
+    "placements": 26,
+    "resource": [
+      1000026,
+      9050
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 288929041,
+    "payload_sha256": "3faecb2457c4d4b5c2c27b8a189ab0307ad6c63b89bd9425ab0fe1b2723d9513",
+    "placements": 54,
+    "resource": [
+      1000026,
+      9061
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 72302455,
+    "payload_sha256": "deeaf42549600db468f590b850936b6b3c3c9915a4008ae67ef80d8758a4c6c0",
+    "placements": 73,
+    "resource": [
+      1000026,
+      9070
+    ]
+  },
+  {
+    "acgentrances": 0,
+    "payload_offset": 284466772,
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+    "placements": 0,
+    "resource": [
+      1000026,
+      9080
+    ]
+  }
+]

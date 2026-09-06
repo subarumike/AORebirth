@@ -1,0 +1,20 @@
+{
+  "SOURCE_INDEPENDENTLY_REPRODUCED": "PARTIAL",
+  "classifications": {
+    "EXACT_ID_ENCODING_DIFFERENCE": 1,
+    "EXACT_ID_NAME_MATCH": 2234,
+    "LOCAL_ONLY": 7
+  },
+  "exact_id_intersection": 2235,
+  "external_catalog_sha256": "da64734fd544d93c3ccfb2ae56ad4248c18a101b86fed7e0deadc8f315d6c1c8",
+  "external_duplicate_ids": {},
+  "external_exact_name_keys": 370,
+  "external_source_role": "AUTHORITATIVE_EXTERNAL_GAME_CODE_EXTRACT",
+  "external_total_ids": 2235,
+  "external_unique_ids": 2235,
+  "local_duplicate_ids": [],
+  "local_total_ids": 2242,
+  "local_unique_ids": 2242,
+  "provenance": "Supplied by another project, reportedly extracted from AO game code/client content. This task independently extracts local records, not the origin of the supplied file.",
+  "version_related_differences": "UNKNOWN; no external source-client version fingerprint"
+}

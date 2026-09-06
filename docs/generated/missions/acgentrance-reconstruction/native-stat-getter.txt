@@ -1,0 +1,36 @@
+Program: Gamecode.dll
+Executable SHA256: 654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726
+Image base: 10000000
+Evidence format: COMPACT_ADDRESS_BYTE_WINDOWS_V1
+Full private analysis export SHA256: 0b0504fdd8aa8ba197fa173a2e5832dc1fd5d5e8a366c42fc06b79dc1f9ce141
+Full decompiler text intentionally excluded. Small functions retain all instructions; larger functions retain calls/branches and nearby address-byte windows.
+
+## Target RVA 0x3d90
+XREF 10155d60 DATA null
+XREF 10162b40 DATA null
+XREF 10162e58 DATA null
+XREF 10163148 DATA null
+XREF 10163350 DATA null
+XREF 10163578 DATA null
+XREF 10163aa0 DATA null
+XREF 10163b20 DATA null
+XREF 10163d90 DATA null
+XREF 101640f8 DATA null
+XREF 10164210 DATA null
+XREF 101643b8 DATA null
+XREF 101645f0 DATA null
+XREF 10164818 DATA null
+XREF 10164bc8 DATA null
+XREF 10167068 DATA null
+XREF 101672f0 DATA null
+XREF 10167668 DATA null
+XREF 10167878 DATA null
+XREF 10172058 DATA null
+Function: FUN_10003d90 @ 10003d90
+ASSEMBLY ADDRESS/BYTE WINDOWS:
+10003d90 55 PUSH EBP
+10003d91 8bec MOV EBP,ESP
+10003d93 83c134 ADD ECX,0x34
+10003d96 8b01 MOV EAX,dword ptr [ECX]
+10003d98 5d POP EBP
+10003d99 ff6004 JMP dword ptr [EAX + 0x4]

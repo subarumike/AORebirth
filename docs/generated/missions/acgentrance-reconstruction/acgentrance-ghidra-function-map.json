@@ -1,0 +1,1583 @@
+[
+  {
+    "absolute_address": "0x10001BD9",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "10001eb5 UNCONDITIONAL_CALL GameData::AutoContentPoint_t::Translate",
+      "1000c85e UNCONDITIONAL_CALL GameData::WorldPos_c::WorldPos_c",
+      "1000cab9 UNCONDITIONAL_CALL GameData::operator>>"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10001bd9",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": null,
+    "program": "GameData.dll",
+    "proposed_function_name": "FUN_10001bd9",
+    "rva": "0x00001BD9",
+    "source_evidence_path": "native-worldpos-math.txt",
+    "source_evidence_sha256": "877d75972828d72bc6830dff62ea0c8fe9191b32409e81ba1e6740ba889b9cf6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10001D8C",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "10001ee7 UNCONDITIONAL_CALL GameData::operator>>",
+      "10003519 UNCONDITIONAL_CALL GameData::operator>>",
+      "1000e772 UNCONDITIONAL_CALL GameData::operator>>",
+      "1000ca8b UNCONDITIONAL_CALL GameData::operator>>"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10001d8c",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": null,
+    "program": "GameData.dll",
+    "proposed_function_name": "FUN_10001d8c",
+    "rva": "0x00001D8C",
+    "source_evidence_path": "native-worldpos-math.txt",
+    "source_evidence_sha256": "877d75972828d72bc6830dff62ea0c8fe9191b32409e81ba1e6740ba889b9cf6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000C7CE",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "100293d8 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "GameData::WorldPos_c::GetWorldPos",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": "?GetWorldPos@WorldPos_c@GameData@@QBEABVVector3_t@@XZ",
+    "program": "GameData.dll",
+    "proposed_function_name": "WorldPos_c::GetWorldPos",
+    "rva": "0x0000C7CE",
+    "source_evidence_path": "native-worldpos.txt",
+    "source_evidence_sha256": "396675a9f21b4ca3ed1db5c423c3cb3434c27ae925856f6901dda49c80c86e52",
+    "structure_offsets_and_pseudocode": "Returns this+8, computed global-world XYZ, not the raw local packet vector.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000C7D2",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "100292f8 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "GameData::WorldPos_c::GetLocalPos",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": "?GetLocalPos@WorldPos_c@GameData@@QBEABVVector3_t@@XZ",
+    "program": "GameData.dll",
+    "proposed_function_name": "WorldPos_c::GetLocalPos",
+    "rva": "0x0000C7D2",
+    "source_evidence_path": "native-worldpos.txt",
+    "source_evidence_sha256": "396675a9f21b4ca3ed1db5c423c3cb3434c27ae925856f6901dda49c80c86e52",
+    "structure_offsets_and_pseudocode": "Returns this+0x14, the raw local float32 XYZ read from the packet.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000C819",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "10028f7c DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x10001bd9"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "GameData::WorldPos_c::WorldPos_c",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": "??0WorldPos_c@GameData@@QAE@ABVIdentity_t@@HHABVVector3_t@@@Z",
+    "program": "GameData.dll",
+    "proposed_function_name": "GameData::WorldPos_c::WorldPos_c",
+    "rva": "0x0000C819",
+    "source_evidence_path": "native-worldpos.txt",
+    "source_evidence_sha256": "396675a9f21b4ca3ed1db5c423c3cb3434c27ae925856f6901dda49c80c86e52",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000C8A0",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "10029348 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x10001c17",
+      "0x1001b280"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "GameData::WorldPos_c::GetPlayfieldPos",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": "?GetPlayfieldPos@WorldPos_c@GameData@@QBEXAAH0@Z",
+    "program": "GameData.dll",
+    "proposed_function_name": "GameData::WorldPos_c::GetPlayfieldPos",
+    "rva": "0x0000C8A0",
+    "source_evidence_path": "native-worldpos.txt",
+    "source_evidence_sha256": "396675a9f21b4ca3ed1db5c423c3cb3434c27ae925856f6901dda49c80c86e52",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000C9D8",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "10029298 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x10001848"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "GameData::WorldPos_c::GetDescription",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "sprintf"
+    ],
+    "module": "GameData.dll",
+    "original_export_name": "?GetDescription@WorldPos_c@GameData@@QBE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
+    "program": "GameData.dll",
+    "proposed_function_name": "GameData::WorldPos_c::GetDescription",
+    "rva": "0x0000C9D8",
+    "source_evidence_path": "native-worldpos.txt",
+    "source_evidence_sha256": "396675a9f21b4ca3ed1db5c423c3cb3434c27ae925856f6901dda49c80c86e52",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000CA52",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "100290a4 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x100017ad",
+      "0x100018f7",
+      "0x10001bd9",
+      "0x10001d8c",
+      "0x1000c903",
+      "0x1001aba2",
+      "0x1001b242",
+      "0x1001b254"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "GameData::operator>>",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": "??5GameData@@YAAAVBinaryStream@@AAV1@AAVWorldPos_c@0@@Z",
+    "program": "GameData.dll",
+    "proposed_function_name": "GameData WorldPos_c stream reader",
+    "rva": "0x0000CA52",
+    "source_evidence_path": "native-worldpos.txt",
+    "source_evidence_sha256": "396675a9f21b4ca3ed1db5c423c3cb3434c27ae925856f6901dda49c80c86e52",
+    "structure_offsets_and_pseudocode": "Reads Identity_t, two signed int32 offsets, local float32 XYZ. WorldXYZ=float32(localXYZ+float32(intX,0,intZ)); stored separately.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1001ABA2",
+    "binary_sha256": "7b7d4a44a9bcbbd771507332e3641bbfaf0f80f2a4ff2335c6757f6653f870e3",
+    "callers_and_references": [
+      "1000ca75 UNCONDITIONAL_CALL GameData::operator>>"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1001aba2",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGameDatadll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "GameData.dll",
+    "original_export_name": null,
+    "program": "GameData.dll",
+    "proposed_function_name": "FUN_1001aba2",
+    "rva": "0x0001ABA2",
+    "source_evidence_path": "native-worldpos-math.txt",
+    "source_evidence_sha256": "877d75972828d72bc6830dff62ea0c8fe9191b32409e81ba1e6740ba889b9cf6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10002CCE",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100824ac UNCONDITIONAL_CALL FUN_10082497",
+      "1005d0e7 UNCONDITIONAL_CALL FUN_1005d0b1"
+    ],
+    "direct_callee_addresses": [
+      "0x1002e017",
+      "0x1002e4c0",
+      "0x100a7301",
+      "0x100c4c57",
+      "0x1013f17c",
+      "0x1013f1f4"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10002cce",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_10002cce",
+    "rva": "0x00002CCE",
+    "source_evidence_path": "native-item-construction.txt",
+    "source_evidence_sha256": "d8bed613a0daa48b6dfaa13936831bcb7dee395bc6c80e92213436fb3286d2e6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10003D90",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10155d60 DATA null",
+      "10162b40 DATA null",
+      "10162e58 DATA null",
+      "10163148 DATA null",
+      "10163350 DATA null",
+      "10163578 DATA null",
+      "10163aa0 DATA null",
+      "10163b20 DATA null",
+      "10163d90 DATA null",
+      "101640f8 DATA null",
+      "10164210 DATA null",
+      "101643b8 DATA null",
+      "101645f0 DATA null",
+      "10164818 DATA null",
+      "10164bc8 DATA null",
+      "10167068 DATA null",
+      "101672f0 DATA null",
+      "10167668 DATA null",
+      "10167878 DATA null",
+      "10172058 DATA null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10003d90",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "Beholder stat-getter thunk",
+    "rva": "0x00003D90",
+    "source_evidence_path": "native-stat-getter.txt",
+    "source_evidence_sha256": "44170ae8b61f953cbb63ec544df39d40c9fc4f8e8b8ea293136ef2f92f0a1277",
+    "structure_offsets_and_pseudocode": "Adjusts this+0x34 and jumps through embedded StatHolder vtable+4.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10009D97",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1002e4ed UNCONDITIONAL_CALL FUN_1002e4c0",
+      "100a1d5b UNCONDITIONAL_CALL FUN_100a1ce2",
+      "10079784 UNCONDITIONAL_CALL FUN_1007916d",
+      "10075597 UNCONDITIONAL_CALL FUN_10075557",
+      "10152983 UNCONDITIONAL_CALL null",
+      "101529e7 UNCONDITIONAL_CALL null"
+    ],
+    "direct_callee_addresses": [
+      "0x10009e91"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10009d97",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_10009d97",
+    "rva": "0x00009D97",
+    "source_evidence_path": "native-item-construction.txt",
+    "source_evidence_sha256": "d8bed613a0daa48b6dfaa13936831bcb7dee395bc6c80e92213436fb3286d2e6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000D213",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1015217b DATA null",
+      "10152559 DATA null",
+      "10152577 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x1007f5e0",
+      "0x1013f17c",
+      "0x1013f1f4"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1000d213",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1000d213",
+    "rva": "0x0000D213",
+    "source_evidence_path": "native-door-defaults.txt",
+    "source_evidence_sha256": "c4b2beef4be4e12e6cdcf072516a95c7a715b02f74c09c9d022582d276678ec3",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1001ABC9",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "101b1744 DATA null",
+      "Entry Point EXTERNAL null",
+      "1001ad49 UNCONDITIONAL_CALL n3EngineClientAnarchy_t::N3Msg_GetPositionData"
+    ],
+    "direct_callee_addresses": [
+      "0x100569fa",
+      "0x10058cbf"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3EngineClientAnarchy_t::N3Msg_GetQuestWorldPos",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?GetClientControlDynel@n3EngineClient_t@@QBEPAVn3VisualDynel_t@@XZ"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": "?N3Msg_GetQuestWorldPos@n3EngineClientAnarchy_t@@QBE_NABVIdentity_t@@AAV2@AAVVector3_t@@2@Z",
+    "program": "Gamecode.dll",
+    "proposed_function_name": "N3Msg_GetQuestWorldPos",
+    "rva": "0x0001ABC9",
+    "source_evidence_path": "native-registry.txt",
+    "source_evidence_sha256": "6442acbc2f8a87eec26453ec2c3341e54f6ed38660b24b646186cd746e27a10e",
+    "structure_offsets_and_pseudocode": "Accepted quest accessor copies first action WorldPos identity, world vector and local vector; no GetEntranceDoor call.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002065E",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "101b16c0 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x10056947",
+      "0x10058cbf",
+      "0x1005937d",
+      "0x10083e47",
+      "0x100c8fdf",
+      "0x1013f454"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3EngineClientAnarchy_t::N3Msg_GetMissionSelectionList",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": "?N3Msg_GetMissionSelectionList@n3EngineClientAnarchy_t@@QBEPBV?$vector@VMissionData_t@@V?$allocator@VMissionData_t@@@std@@@std@@XZ",
+    "program": "Gamecode.dll",
+    "proposed_function_name": "n3EngineClientAnarchy_t::N3Msg_GetMissionSelectionList",
+    "rva": "0x0002065E",
+    "source_evidence_path": "native-registry.txt",
+    "source_evidence_sha256": "6442acbc2f8a87eec26453ec2c3341e54f6ed38660b24b646186cd746e27a10e",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002B458",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1012248c UNCONDITIONAL_CALL PlayfieldAnarchy_t::CreateRDBDynels",
+      "10080c6e UNCONDITIONAL_CALL FUN_10080c58"
+    ],
+    "direct_callee_addresses": [
+      "0x1000210d",
+      "0x10009e3c",
+      "0x1002a5db",
+      "0x1002b27e",
+      "0x1002b2be",
+      "0x1002b40d",
+      "0x1002ba77",
+      "0x1002baf8",
+      "0x1002bb2e",
+      "0x1002d20f",
+      "0x1002e2e4",
+      "0x1002e3df",
+      "0x1002e7d9",
+      "0x1003852d",
+      "0x1003bdc0",
+      "0x1005014a",
+      "0x10056a1b",
+      "0x10058c70",
+      "0x10058cbf",
+      "0x10058ff8",
+      "0x1007dae8",
+      "0x1007dc1e",
+      "0x1008095c",
+      "0x1008097e",
+      "0x1008a551",
+      "0x100a71ae",
+      "0x100ab510",
+      "0x100ac2ba",
+      "0x100ac3c0",
+      "0x100cd9ad",
+      "0x1013f17c",
+      "0x1013f1ee",
+      "0x1013f1f4",
+      "0x1013f232"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002b458",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??5BinaryStream@@QAEAAV0@AAF@Z",
+      "??5BinaryStream@@QAEAAV0@AAH@Z",
+      "?read@BinaryStream@@QAEAAV1@PADI@Z",
+      "malloc"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002b458",
+    "rva": "0x0002B458",
+    "source_evidence_path": "native-registry.txt",
+    "source_evidence_sha256": "6442acbc2f8a87eec26453ec2c3341e54f6ed38660b24b646186cd746e27a10e",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E4C0",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10002d0c UNCONDITIONAL_CALL FUN_10002cce",
+      "10059105 UNCONDITIONAL_CALL FUN_100590b8"
+    ],
+    "direct_callee_addresses": [
+      "0x10009d97",
+      "0x1013f17c",
+      "0x1013f1f4"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e4c0",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e4c0",
+    "rva": "0x0002E4C0",
+    "source_evidence_path": "native-action-destination.txt",
+    "source_evidence_sha256": "bbebf16935372853264ec719167ffdeae44f7456cda80db99f3a180e6ddd3571",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E519",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10159c48 DATA null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e519",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e519",
+    "rva": "0x0002E519",
+    "source_evidence_path": "native-quest-fields.txt",
+    "source_evidence_sha256": "90570eb967abf12d2dc3d70e47c05cc4acdcb8429fd1d1a4351f8c1da4096786",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E558",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10159c44 DATA null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e558",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e558",
+    "rva": "0x0002E558",
+    "source_evidence_path": "native-mission-spatial.txt",
+    "source_evidence_sha256": "f48b2dea74f69698afd708c86ba3618fc9cda62b77879e16051774856ae26c17",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E585",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10159c40 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x100458bb",
+      "0x100c4b98"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e585",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "StatHolder_t add/set slot",
+    "rva": "0x0002E585",
+    "source_evidence_path": "native-mission-spatial.txt",
+    "source_evidence_sha256": "f48b2dea74f69698afd708c86ba3618fc9cda62b77879e16051774856ae26c17",
+    "structure_offsets_and_pseudocode": "Grows the array with 1234567890 sentinels and writes a non-sentinel value.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E605",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10002db1 UNCONDITIONAL_CALL FUN_10002d60",
+      "10140172 UNCONDITIONAL_CALL Unwind@1014016c",
+      "101401a4 UNCONDITIONAL_CALL Unwind@1014019e",
+      "1002e697 UNCONDITIONAL_CALL FUN_1002e691"
+    ],
+    "direct_callee_addresses": [
+      "0x100570dd",
+      "0x1013f1ee"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e605",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e605",
+    "rva": "0x0002E605",
+    "source_evidence_path": "native-action-destination.txt",
+    "source_evidence_sha256": "bbebf16935372853264ec719167ffdeae44f7456cda80db99f3a180e6ddd3571",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E62B",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10159c38 DATA null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e62b",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "StatHolder_t getter",
+    "rva": "0x0002E62B",
+    "source_evidence_path": "native-stat-and-quest.txt",
+    "source_evidence_sha256": "61ff626698aa6aaf7b1119f4489304a8136aefae43cc9118e74c582569bcbda6",
+    "structure_offsets_and_pseudocode": "Reads array[stat] if in range; else 1234567890. Second parameter (mode) is ignored in this implementation; RET 8.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E650",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10159c3c DATA null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e650",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e650",
+    "rva": "0x0002E650",
+    "source_evidence_path": "native-mission-spatial.txt",
+    "source_evidence_sha256": "f48b2dea74f69698afd708c86ba3618fc9cda62b77879e16051774856ae26c17",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E6E9",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1002e81a UNCONDITIONAL_CALL FUN_1002e7d9",
+      "1002e83c UNCONDITIONAL_CALL FUN_1002e7d9"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e6e9",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e6e9",
+    "rva": "0x0002E6E9",
+    "source_evidence_path": "native-action-destination.txt",
+    "source_evidence_sha256": "bbebf16935372853264ec719167ffdeae44f7456cda80db99f3a180e6ddd3571",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1002E7D9",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1004de84 UNCONDITIONAL_CALL FUN_1004de5d",
+      "1002b6c0 UNCONDITIONAL_CALL FUN_1002b458",
+      "10073e46 UNCONDITIONAL_CALL FUN_10073dca",
+      "10073e4f UNCONDITIONAL_CALL FUN_10073dca",
+      "100a1729 UNCONDITIONAL_CALL FUN_100a1661"
+    ],
+    "direct_callee_addresses": [
+      "0x1002e6e9",
+      "0x1002e7a3",
+      "0x1002e85a",
+      "0x100c471b"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1002e7d9",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??5BinaryStream@@QAEAAV0@AAH@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1002e7d9",
+    "rva": "0x0002E7D9",
+    "source_evidence_path": "native-stat-and-quest.txt",
+    "source_evidence_sha256": "61ff626698aa6aaf7b1119f4489304a8136aefae43cc9118e74c582569bcbda6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1007F113",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1007f650 UNCONDITIONAL_CALL FUN_1007f5e0"
+    ],
+    "direct_callee_addresses": [
+      "0x100805bf",
+      "0x1008060c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1007f113",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?DisableGroundCollision@n3Dynel_t@@QAEXXZ"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "Door_t construction defaults",
+    "rva": "0x0007F113",
+    "source_evidence_path": "native-door-defaults.txt",
+    "source_evidence_sha256": "c4b2beef4be4e12e6cdcf072516a95c7a715b02f74c09c9d022582d276678ec3",
+    "structure_offsets_and_pseudocode": "Virtual slot+0x44 initializes stat 0xBD to zero; this is not a positive unique registration key.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1007F255",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1008054c UNCONDITIONAL_CALL FUN_10080546"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1007f255",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1007f255",
+    "rva": "0x0007F255",
+    "source_evidence_path": "native-door-constructor.txt",
+    "source_evidence_sha256": "718c03d5222ca30a679817aaed590b45699c19f597340dd4aaa8b7673e0f7f47",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1007F5E0",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1000d239 UNCONDITIONAL_CALL FUN_1000d213",
+      "1009ff5c UNCONDITIONAL_CALL FUN_1009ff32",
+      "10116a7e UNCONDITIONAL_CALL FUN_10116a31"
+    ],
+    "direct_callee_addresses": [
+      "0x10002198",
+      "0x1007f113",
+      "0x10085749",
+      "0x100a7301",
+      "0x1013f17c",
+      "0x1013f1f4"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_1007f5e0",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_1007f5e0",
+    "rva": "0x0007F5E0",
+    "source_evidence_path": "native-door-constructor.txt",
+    "source_evidence_sha256": "718c03d5222ca30a679817aaed590b45699c19f597340dd4aaa8b7673e0f7f47",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100800CB",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10122535 UNCONDITIONAL_CALL PlayfieldAnarchy_t::CreateRDBDynels",
+      "100a0066 UNCONDITIONAL_CALL FUN_1009fff9"
+    ],
+    "direct_callee_addresses": [
+      "0x100014b2",
+      "0x10080565",
+      "0x1013f17c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100800cb",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?Die@n3Dynel_t@@QAEXXZ",
+      "?GetCell@n3Dynel_t@@QBEHXZ",
+      "?GetDoorLinkFromPos@n3Room_t@@QAEXPBVn3Tilemap_t@@ABVVector3_t@@MAAHAAF@Z",
+      "?GetGlobalPos@Vehicle_t@@QBEABVVector3_t@@XZ",
+      "?GetName@n3Room_t@@QBEPBDXZ",
+      "?GetPlayfield@n3Playfield_t@@SAPAV1@I@Z",
+      "?GetPlayfieldProxy@n3Playfield_t@@QBEABVPlayfieldProxy_t@@XZ",
+      "?GetRoom@n3Playfield_t@@QBEPBVn3Room_t@@H@Z",
+      "?IsDungeon@n3Playfield_t@@QBE_NXZ",
+      "?PosToRoom@n3Playfield_t@@QBEPBVn3Room_t@@ABVVector3_t@@H@Z",
+      "?RegisterDoorPosition@n3Room_t@@QAEXPBVn3Tilemap_t@@ABVVector3_t@@M@Z",
+      "?RegisterDoorWithRoomLink@n3Playfield_t@@QAEXHABVIdentity_t@@@Z",
+      "?RegisterEntranceDoor@n3Playfield_t@@QAEXHABVIdentity_t@@H@Z",
+      "printf"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "Door_t::LinkDoorToRooms",
+    "rva": "0x000800CB",
+    "source_evidence_path": "native-door-construction-refs.txt",
+    "source_evidence_sha256": "51eabf1e6d9794d5d44863f292f93f757fcac2d1437b22eda6b4c0cfa938f90c",
+    "structure_offsets_and_pseudocode": "Reads stat 189, mode 2. Dungeon room-link endpoint can auto-register zero and write allocated key back. Non-dungeon path registers only positive values. Room lookup can fail and kill the door.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10080BB7",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "10122493 UNCONDITIONAL_CALL PlayfieldAnarchy_t::CreateRDBDynels"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10080bb7",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_10080bb7",
+    "rva": "0x00080BB7",
+    "source_evidence_path": "native-item-construction.txt",
+    "source_evidence_sha256": "d8bed613a0daa48b6dfaa13936831bcb7dee395bc6c80e92213436fb3286d2e6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10085749",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1007e8cc UNCONDITIONAL_CALL FUN_1007e8b8",
+      "1007f5f5 UNCONDITIONAL_CALL FUN_1007f5e0",
+      "100a0b0c UNCONDITIONAL_CALL FUN_100a0ae2"
+    ],
+    "direct_callee_addresses": [
+      "0x100854a2",
+      "0x1008985d",
+      "0x1013f17c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10085749",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_10085749",
+    "rva": "0x00085749",
+    "source_evidence_path": "native-door-defaults.txt",
+    "source_evidence_sha256": "c4b2beef4be4e12e6cdcf072516a95c7a715b02f74c09c9d022582d276678ec3",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100870A8",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100abf8a UNCONDITIONAL_CALL FUN_100abea7"
+    ],
+    "direct_callee_addresses": [
+      "0x10001ada",
+      "0x1002ba77",
+      "0x10046894",
+      "0x100ac3c0",
+      "0x100cd9ad",
+      "0x1013f17c",
+      "0x1013f1ee",
+      "0x1013f20c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100870a8",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??0DataStreamException_t@GameData@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+      "??5GameData@@YAAAVBinaryStream@@AAV1@AAVACGItem_t@0@@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_100870a8",
+    "rva": "0x000870A8",
+    "source_evidence_path": "native-mission-spatial.txt",
+    "source_evidence_sha256": "f48b2dea74f69698afd708c86ba3618fc9cda62b77879e16051774856ae26c17",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100ABEA7",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100ac33c UNCONDITIONAL_CALL FUN_100ac2ba",
+      "100cb2e7 UNCONDITIONAL_CALL FUN_100cb232"
+    ],
+    "direct_callee_addresses": [
+      "0x10001ada",
+      "0x10001c9a",
+      "0x1002ba77",
+      "0x100458bb",
+      "0x100870a8",
+      "0x100abde6",
+      "0x100ac3c0",
+      "0x100ac5c7",
+      "0x100ac9ac",
+      "0x100accdf",
+      "0x100cd9ad",
+      "0x1013d2f9",
+      "0x1013f17c",
+      "0x1013f1ee",
+      "0x1013f1f4",
+      "0x1013f20c",
+      "0x1013f220",
+      "0x1013f226"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100abea7",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??0DataStreamException_t@GameData@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+      "??5BinaryStream@@QAEAAV0@PAD@Z",
+      "?read@BinaryStream@@QAEAAV1@PADI@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "Quest_t stream reader",
+    "rva": "0x000ABEA7",
+    "source_evidence_path": "native-quest-fields.txt",
+    "source_evidence_sha256": "90570eb967abf12d2dc3d70e47c05cc4acdcb8429fd1d1a4351f8c1da4096786",
+    "structure_offsets_and_pseudocode": "Accepts versions7..15; reads title/description, rewards, action array via 0xACCDF and versioned trailing fields.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100ACBA0",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100acd4b UNCONDITIONAL_CALL FUN_100accdf"
+    ],
+    "direct_callee_addresses": [
+      "0x10001ada",
+      "0x1013d2f9",
+      "0x1013f17c",
+      "0x1013f20c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100acba0",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??0DataStreamException_t@GameData@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+      "??5GameData@@YAAAVBinaryStream@@AAV1@AAVWorldPos_c@0@@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "QuestAction WorldPos reader",
+    "rva": "0x000ACBA0",
+    "source_evidence_path": "native-action-destination.txt",
+    "source_evidence_sha256": "bbebf16935372853264ec719167ffdeae44f7456cda80db99f3a180e6ddd3571",
+    "structure_offsets_and_pseudocode": "Reads action fields then GameData::operator>>(WorldPos_c&) into action+0x6C. No entrance-registry lookup here.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100ACCDF",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100abfb6 UNCONDITIONAL_CALL FUN_100abea7"
+    ],
+    "direct_callee_addresses": [
+      "0x10001ada",
+      "0x1003878e",
+      "0x100acafc",
+      "0x100acba0",
+      "0x1013f17c",
+      "0x1013f1f4",
+      "0x1013f20c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100accdf",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??0DataStreamException_t@GameData@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+      "??5BinaryStream@@QAEAAV0@AAH@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "Quest action array reader",
+    "rva": "0x000ACCDF",
+    "source_evidence_path": "native-mission-spatial.txt",
+    "source_evidence_sha256": "f48b2dea74f69698afd708c86ba3618fc9cda62b77879e16051774856ae26c17",
+    "structure_offsets_and_pseudocode": "Validates positive 0x3F1 count encoding; allocates 0x8C action objects, calls RVA0xACBA0.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100C8FDF",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100206f9 UNCONDITIONAL_CALL n3EngineClientAnarchy_t::N3Msg_GetMissionSelectionList",
+      "1003be12 UNCONDITIONAL_CALL FUN_1003bdc0",
+      "100c7734 UNCONDITIONAL_CALL FUN_100c7719",
+      "100c7da9 UNCONDITIONAL_CALL FUN_100c793f",
+      "100c7e79 UNCONDITIONAL_CALL FUN_100c793f",
+      "10128936 UNCONDITIONAL_CALL FUN_101288c2"
+    ],
+    "direct_callee_addresses": [
+      "0x100246b6",
+      "0x10128984",
+      "0x10128a5c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100c8fdf",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_100c8fdf",
+    "rva": "0x000C8FDF",
+    "source_evidence_path": "native-stat-and-quest.txt",
+    "source_evidence_sha256": "61ff626698aa6aaf7b1119f4489304a8136aefae43cc9118e74c582569bcbda6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100C9EF9",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1016ba84 DATA null",
+      "1016c008 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x1005937d",
+      "0x1005a1e7"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100c9ef9",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?GetDynel@n3Dynel_t@@SAPAV1@ABVIdentity_t@@@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_100c9ef9",
+    "rva": "0x000C9EF9",
+    "source_evidence_path": "native-stat-and-quest.txt",
+    "source_evidence_sha256": "61ff626698aa6aaf7b1119f4489304a8136aefae43cc9118e74c582569bcbda6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100C9F49",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "100cb24a UNCONDITIONAL_CALL FUN_100cb232",
+      "1016ba9c DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x100014b2",
+      "0x100c9dbb",
+      "0x1013d2f9",
+      "0x1013f17c"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100c9f49",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??4ACE_Time_Value@@QAEAAV0@ABV0@@Z",
+      "??5BinaryStream@@QAEAAV0@AAH@Z",
+      "??5GameData@@YAAAVBinaryStream@@AAV1@AAVDimensionValues_t@0@@Z",
+      "?GetValuesAsText@DimensionValues_t@GameData@@QBE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
+      "printf"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "ACGQuestIIR_t inherited header reader",
+    "rva": "0x000C9F49",
+    "source_evidence_path": "native-quest-fields.txt",
+    "source_evidence_sha256": "90570eb967abf12d2dc3d70e47c05cc4acdcb8429fd1d1a4351f8c1da4096786",
+    "structure_offsets_and_pseudocode": "Reads version, difficulty, dimension sliders, seed, origin-kind, originator identity. This originator is the request terminal, not a destination.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100CB181",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1016c00c DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x100118de",
+      "0x100119dd",
+      "0x10012a87",
+      "0x10056df4",
+      "0x10056edd",
+      "0x10058cbf",
+      "0x1005937d",
+      "0x100c4df6"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100cb181",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??0DimensionValues_t@GameData@@QAE@XZ"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "FUN_100cb181",
+    "rva": "0x000CB181",
+    "source_evidence_path": "native-stat-and-quest.txt",
+    "source_evidence_sha256": "61ff626698aa6aaf7b1119f4489304a8136aefae43cc9118e74c582569bcbda6",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100CB232",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "1016c020 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x100458bb",
+      "0x100ab79a",
+      "0x100abea7",
+      "0x100c9f49",
+      "0x1013d2f9",
+      "0x1013f17c",
+      "0x1013f1f4"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_100cb232",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "printf"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "QuestAlternativeIIR_t stream reader",
+    "rva": "0x000CB232",
+    "source_evidence_path": "native-stat-and-quest.txt",
+    "source_evidence_sha256": "61ff626698aa6aaf7b1119f4489304a8136aefae43cc9118e74c582569bcbda6",
+    "structure_offsets_and_pseudocode": "Reads inherited ACGQuest header, byte offer count (<6), full mission identity, Quest_t through RVA0xABEA7, final offer byte.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1012231E",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "101b1298 DATA null",
+      "Entry Point EXTERNAL null",
+      "1016b918 DATA null",
+      "10170d88 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x1002b458",
+      "0x100800cb",
+      "0x10080bb7",
+      "0x10084e6e",
+      "0x100859a1",
+      "0x1013e554",
+      "0x1013f17c",
+      "0x1013f232"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "PlayfieldAnarchy_t::CreateRDBDynels",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "??0BinaryStream@@QAE@PAXI@Z",
+      "??1BinaryStream@@QAE@XZ",
+      "?AddChildDynel@n3Playfield_t@@QAEXPAVn3Dynel_t@@ABVVector3_t@@ABVQuaternion_t@@@Z",
+      "?CreateFromTemplate@n3ObjectFactory_t@@QAEPAVn3Dynel_t@@IABVIdentity_t@@W4DynelDataStatus_e@GameData@@@Z",
+      "?GetDynel@n3Dynel_t@@SAPAV1@ABVIdentity_t@@@Z",
+      "?GetInstance@n3Playfield_t@@QBEIXZ",
+      "?GetPlayfield@n3Playfield_t@@SAPAV1@XZ",
+      "?SetRelRot@n3Dynel_t@@QAEXABVQuaternion_t@@@Z",
+      "?StopDying@n3Dynel_t@@QAEX_N@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": "?CreateRDBDynels@PlayfieldAnarchy_t@@UAEXH@Z",
+    "program": "Gamecode.dll",
+    "proposed_function_name": "PlayfieldAnarchy_t::CreateRDBDynels",
+    "rva": "0x0012231E",
+    "source_evidence_path": "native-registry.txt",
+    "source_evidence_sha256": "6442acbc2f8a87eec26453ec2c3341e54f6ed38660b24b646186cd746e27a10e",
+    "structure_offsets_and_pseudocode": "Copies the stored complete identity for ordinary RDB placements, calls CreateFromTemplate, applies overrides, passes raw Vector3/Quaternion to AddChildDynel, casts Door_t and calls LinkDoorToRooms. Instanced/generated paths can use a separate identity map; do not claim all runtime identities always equal static placements.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10152559",
+    "binary_sha256": "654969a6b65946cb161f0e60aed8589260fc5eca1795488f66bb56f8fff73726",
+    "callers_and_references": [
+      "101558d4 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x1013f454"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "EvidenceFunction_10152559",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshGamecodedll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?Register@DbObject_t@@SAXW4TypeID_e@@P6APAV1@ABVIdentity_t@@@Z@Z"
+    ],
+    "module": "Gamecode.dll",
+    "original_export_name": null,
+    "program": "Gamecode.dll",
+    "proposed_function_name": "ACGEntrance factory registration",
+    "rva": "0x00152559",
+    "source_evidence_path": "native-factory-acgentrance.txt",
+    "source_evidence_sha256": "de5a5148ade6df7a59aed590bbd5446ab011e42919c1d4a26704ab6c6feb1de7",
+    "structure_offsets_and_pseudocode": "DbObject_t::Register(0xDAC6, creator RVA0xD213). Creator calls Door_t constructor RVA0x7F5E0.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10003E99",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1001bc8b UNCONDITIONAL_CALL FUN_1001bc6b",
+      "1001ba30 UNCONDITIONAL_CALL FUN_1001ba1b",
+      "1001bab3 UNCONDITIONAL_CALL FUN_1001ba97",
+      "1001bace UNCONDITIONAL_CALL FUN_1001ba97",
+      "1001bafd UNCONDITIONAL_CALL FUN_1001ba97",
+      "1001bba9 UNCONDITIONAL_CALL FUN_1001bb7f",
+      "1001bbc0 UNCONDITIONAL_CALL FUN_1001bb7f",
+      "1001bc1c UNCONDITIONAL_CALL FUN_1001bb7f"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "FUN_10003e99",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": null,
+    "program": "N3.dll",
+    "proposed_function_name": "Identity_t ordered comparison",
+    "rva": "0x00003E99",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Compares both complete identity DWORDs; unsigned instance comparison preserves the C000 component.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10004061",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004d4e0 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Dynel_t::SetRelPos",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "?SetRelPos@n3Dynel_t@@QAEXABVVector3_t@@@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Dynel_t::SetRelPos",
+    "rva": "0x00004061",
+    "source_evidence_path": "native-placement-transform.txt",
+    "source_evidence_sha256": "332fb68f69d746bff9b8cc48aea5db6703e4d21c1a3c5c77b77da9871206c3ad",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100052AD",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004d648 DATA null",
+      "Entry Point EXTERNAL null",
+      "10005a5b UNCONDITIONAL_CALL n3Dynel_t::AddChildDynel",
+      "10005b49 UNCONDITIONAL_CALL n3Dynel_t::RelocateDynel",
+      "1000d474 UNCONDITIONAL_CALL n3Playfield_t::AddChildDynel",
+      "1000d533 UNCONDITIONAL_CALL n3Playfield_t::RelocateDynel",
+      "1000d557 UNCONDITIONAL_CALL n3Playfield_t::RelocateDynel"
+    ],
+    "direct_callee_addresses": [
+      "0x1000406e",
+      "0x10005067",
+      "0x1000cfae"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Dynel_t::UpdateWhere",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?SetRelPosRot@Vehicle_t@@QAEXABVVector3_t@@ABVQuaternion_t@@@Z"
+    ],
+    "module": "N3.dll",
+    "original_export_name": "?UpdateWhere@n3Dynel_t@@IAEXIABVVector3_t@@ABVQuaternion_t@@@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Dynel_t::UpdateWhere",
+    "rva": "0x000052AD",
+    "source_evidence_path": "native-update-where.txt",
+    "source_evidence_sha256": "855b662c52a76713b77b334d4c9a4de9614458d6a6b33b143f839a4318584d76",
+    "structure_offsets_and_pseudocode": "Sets playfield, attaches playfield parent and calls Vehicle_t::SetRelPosRot with the passed vectors unchanged.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x10005494",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004ce6c DATA null",
+      "Entry Point EXTERNAL null",
+      "10003836 UNCONDITIONAL_CALL n3Command_t::Activate",
+      "10005598 UNCONDITIONAL_CALL n3Dynel_t::GetParentDynel",
+      "100055df UNCONDITIONAL_CALL n3Dynel_t::GetParentGlobalRot",
+      "10005601 UNCONDITIONAL_CALL n3Dynel_t::GetParentGlobalRot",
+      "1000561e UNCONDITIONAL_CALL n3Dynel_t::ParentDetach",
+      "1000564b UNCONDITIONAL_CALL n3Dynel_t::ParentDetach",
+      "1000b7f9 UNCONDITIONAL_CALL n3LocalityUpdateIIR_t::Activate",
+      "1002038c UNCONDITIONAL_CALL n3Camera_t::SetSelectedTarget",
+      "100203d2 UNCONDITIONAL_CALL n3Camera_t::SetSelectedTarget",
+      "10029e64 UNCONDITIONAL_CALL n3TeleportIIR_t::PollStatus",
+      "10029f96 UNCONDITIONAL_CALL n3TeleportIIR_t::Activate",
+      "1002a054 UNCONDITIONAL_CALL FUN_1002a043"
+    ],
+    "direct_callee_addresses": [
+      "0x1001bc6b"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Dynel_t::GetDynel",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "?GetDynel@n3Dynel_t@@SAPAV1@ABVIdentity_t@@@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Dynel_t::GetDynel",
+    "rva": "0x00005494",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Finds the complete Identity_t in the dynel map; no entrance-component bit extraction.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x100059F7",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004cb90 DATA null",
+      "Entry Point EXTERNAL null",
+      "1003cc68 DATA null",
+      "1003d938 DATA null",
+      "1003e3e8 DATA null"
+    ],
+    "direct_callee_addresses": [
+      "0x10004d4f",
+      "0x100050cf",
+      "0x100052ad",
+      "0x100060d2"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Dynel_t::AddChildDynel",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [
+      "?SetParentVehicle@Vehicle_t@@QAEXPAV1@VVector3_t@@@Z"
+    ],
+    "module": "N3.dll",
+    "original_export_name": "?AddChildDynel@n3Dynel_t@@UAEXPAV1@ABVVector3_t@@ABVQuaternion_t@@@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Dynel_t::AddChildDynel",
+    "rva": "0x000059F7",
+    "source_evidence_path": "native-placement-transform.txt",
+    "source_evidence_sha256": "332fb68f69d746bff9b8cc48aea5db6703e4d21c1a3c5c77b77da9871206c3ad",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000CA9D",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004ce78 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Playfield_t::GetEntranceDoor",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "?GetEntranceDoor@n3Playfield_t@@QBEABVIdentity_t@@H@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Playfield_t::GetEntranceDoor",
+    "rva": "0x0000CA9D",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Linear exact signed-int key comparison, first duplicate wins; missing nonempty key falls back to first entry, empty/null returns zero Identity_t. No safe missing-key resolution by fallback.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000D415",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004cb94 DATA null",
+      "Entry Point EXTERNAL null",
+      "100079d5 UNCONDITIONAL_CALL n3EngineClient_t::CreateCamera",
+      "1000d4b5 UNCONDITIONAL_CALL n3Playfield_t::RelocateDynel"
+    ],
+    "direct_callee_addresses": [
+      "0x10003f7f",
+      "0x10003fce",
+      "0x10004036",
+      "0x10004196",
+      "0x10004d6a",
+      "0x100050cf",
+      "0x100052ad",
+      "0x100060d2",
+      "0x1000d494"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Playfield_t::AddChildDynel",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "?AddChildDynel@n3Playfield_t@@QAEXPAVn3Dynel_t@@ABVVector3_t@@ABVQuaternion_t@@@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Playfield_t::AddChildDynel",
+    "rva": "0x0000D415",
+    "source_evidence_path": "native-placement-transform.txt",
+    "source_evidence_sha256": "332fb68f69d746bff9b8cc48aea5db6703e4d21c1a3c5c77b77da9871206c3ad",
+    "structure_offsets_and_pseudocode": "Calls UpdateWhere(playfield instance, unchanged Vector3, unchanged Quaternion).",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000D98C",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004d390 DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x1000fa4f"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Playfield_t::RegisterEntranceDoor",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "?RegisterEntranceDoor@n3Playfield_t@@QAEXHABVIdentity_t@@H@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Playfield_t::RegisterEntranceDoor",
+    "rva": "0x0000D98C",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Owner+0x48 holds entries {int key, full Identity_t}; owner+0x4c counter=max(counter,key+1); key zero gets counter++. Append without duplicate rejection.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000DF4F",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004d17c DATA null",
+      "Entry Point EXTERNAL null",
+      "1000e086 UNCONDITIONAL_CALL n3Playfield_t::CreatePlayfieldFromResource"
+    ],
+    "direct_callee_addresses": [
+      "0x100163b0",
+      "0x1003875a"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Playfield_t::InitializeSpace",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "?InitializeSpace@n3Playfield_t@@QAEXXZ",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Playfield_t::InitializeSpace",
+    "rva": "0x0000DF4F",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000E09B",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004c94c DATA null",
+      "Entry Point EXTERNAL null"
+    ],
+    "direct_callee_addresses": [
+      "0x10007534",
+      "0x1000ea2e",
+      "0x1000eba4",
+      "0x100231e9",
+      "0x10037ca4",
+      "0x1003875a",
+      "0x10038774"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Playfield_t::n3Playfield_t",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "??0n3Playfield_t@@QAE@ABVPlayfieldProxy_t@@@Z",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Playfield_t::n3Playfield_t",
+    "rva": "0x0000E09B",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  },
+  {
+    "absolute_address": "0x1000E1FF",
+    "binary_sha256": "8c019efd72d547879a06585b69147ab1546b9617a2fce090e5863791aec8b0bb",
+    "callers_and_references": [
+      "1004ca10 DATA null",
+      "Entry Point EXTERNAL null",
+      "10010055 UNCONDITIONAL_CALL FUN_10010021",
+      "1001002e DATA FUN_10010021"
+    ],
+    "direct_callee_addresses": [
+      "0x10006272",
+      "0x10006957",
+      "0x1000bfe7",
+      "0x1000c917",
+      "0x1000cfeb",
+      "0x1000ef9c",
+      "0x1000ffe3",
+      "0x10017fb9",
+      "0x100182ed",
+      "0x10023425",
+      "0x10037cc6",
+      "0x1003860e",
+      "0x10038774",
+      "0x1003894a"
+    ],
+    "evidence_classification": "PROVEN_FROM_MODERN_CLIENT_CODE",
+    "ghidra_function_name": "n3Playfield_t::~n3Playfield_t",
+    "ghidra_project": "tools-temp/acgentrance-analysis/ghidra/AcgFreshN3dll.gpr",
+    "image_base": "0x10000000",
+    "imported_callees": [],
+    "module": "N3.dll",
+    "original_export_name": "??1n3Playfield_t@@UAE@XZ",
+    "program": "N3.dll",
+    "proposed_function_name": "n3Playfield_t::~n3Playfield_t",
+    "rva": "0x0000E1FF",
+    "source_evidence_path": "native-registry-n3.txt",
+    "source_evidence_sha256": "483c314e9392f54ddd606acef8b5af08843b7fd3e4bd37b57e46f70546b641b1",
+    "structure_offsets_and_pseudocode": "Targeted function retained as supporting evidence; no additional semantic claim.",
+    "tool": "Ghidra 12.1.3 PUBLIC; fresh matching binary import; private project"
+  }
+]
