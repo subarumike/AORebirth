@@ -59,6 +59,11 @@
     <Compile Include="ISummoner.cs" />
     <Compile Include="IUploadedNanos.cs" />
     <Compile Include="IVector3.cs" />
+    <Compile Include="Persistence\Accounts\IAccountDao.cs" />
+    <Compile Include="Persistence\Accounts\GameAccountData.cs" />
+    <Compile Include="Persistence\Accounts\GameAccountAuthenticationData.cs" />
+    <Compile Include="Persistence\Accounts\NewGameAccountData.cs" />
+    <Compile Include="Persistence\Accounts\GameAccountLookupResult.cs" />
     <Compile Include="Persistence\Missions\IMissionDao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

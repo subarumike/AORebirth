@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Actual production sources, including the unchanged legacy characterization path.
+         Only Connector/log/config hosting is isolated; no alternative DAO is modeled. -->
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Accounts/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/LoginDataDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/Dao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/IDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/TablenameAttribute.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/OrganizationDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/StatDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/ItemDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/InstancedItemDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/ReceivedMessagesDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBLoginData.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBCharacter.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/IDBEntity.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/ForeignKeyAttribute.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBOrganization.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBStats.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBItem.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBInstancedItem.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Entities/DBReceivedMessages.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlMapperUtil.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/Exceptions/DataBaseException.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs" />
+    <Compile Include="../../LinuxBuild/Compatibility/Database/SystemDataLinqBinary.Linux.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Core/Encryption/PasswordHash.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.79" />
+    <PackageReference Include="MySqlConnector" Version="2.6.1" />
+  </ItemGroup>
+</Project>
