@@ -9,8 +9,15 @@ namespace AORebirth.Database
 
     internal static class Connector
     {
+        internal static Func<IDbConnection> TestConnectionFactory;
+
         public static IDbConnection GetConnection()
         {
+            if (TestConnectionFactory != null)
+            {
+                return TestConnectionFactory();
+            }
+
             throw new InvalidOperationException("Isolated mission tests require an injected connection factory.");
         }
     }

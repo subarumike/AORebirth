@@ -47,7 +47,7 @@ namespace AORebirth.Database.Domain.Missions
         private readonly Func<IDbConnection> connectionFactory;
 
         public MySqlMissionDao()
-            : this(Connector.GetConnection)
+            : this(OpenConfiguredMySqlConnection)
         {
         }
 
@@ -59,6 +59,35 @@ namespace AORebirth.Database.Domain.Missions
             }
 
             this.connectionFactory = connectionFactory;
+        }
+
+        private static IDbConnection OpenConfiguredMySqlConnection()
+        {
+            IDbConnection connection = Connector.GetConnection();
+            if (connection is MySqlConnection)
+            {
+                return connection;
+            }
+
+            if (connection != null)
+            {
+                connection.Dispose();
+            }
+
+            throw new NotSupportedException("Mission persistence requires the configured MySQL provider.");
+        }
+
+        private static void RollbackAfterFailure(IDbTransaction transaction, Exception operationFailure)
+        {
+            try
+            {
+                transaction.Rollback();
+            }
+            catch (Exception rollbackFailure)
+            {
+                // Preserve the original exception and expose an uncertain rollback outcome.
+                operationFailure.Data["MissionDao.RollbackFailure"] = rollbackFailure;
+            }
         }
 
         private IDbConnection OpenConnection()
@@ -185,16 +214,7 @@ namespace AORebirth.Database.Domain.Missions
                 }
                 catch (Exception operationFailure)
                 {
-                    try
-                    {
-                        transaction.Rollback();
-                    }
-                    catch (Exception rollbackFailure)
-                    {
-                        // Keep the original exception/stack while exposing an unsuccessful rollback.
-                        // Callers must reload/reconcile state before retrying an uncertain outcome.
-                        operationFailure.Data["MissionDao.RollbackFailure"] = rollbackFailure;
-                    }
+                    RollbackAfterFailure(transaction, operationFailure);
 
                     if (scope != null)
                     {
@@ -338,16 +358,9 @@ namespace AORebirth.Database.Domain.Missions
                                Failure = string.Empty
                            };
                 }
-                catch
+                catch (Exception operationFailure)
                 {
-                    try
-                    {
-                        transaction.Rollback();
-                    }
-                    catch
-                    {
-                    }
-
+                    RollbackAfterFailure(transaction, operationFailure);
                     throw;
                 }
             }

@@ -40,6 +40,7 @@ namespace AORebirth.Tools.MissionDaoValidation
             run("mutation-cutpoints", () => ValidateMutationCutpoints(dao, connectionString));
             run("ledger-write-failure", () => ValidateLedgerWriteFailure(dao, connectionString));
             run("acceptance-failures", () => ValidateAcceptanceFailures(dao, connectionString));
+            run("parallel-contracts", () => ValidateParallelContracts(dao, connectionString));
             if (failures.Count != 0)
             {
                 throw new InvalidOperationException(string.Join(", ", failures));

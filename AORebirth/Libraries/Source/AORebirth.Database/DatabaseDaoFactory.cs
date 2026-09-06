@@ -8,6 +8,11 @@ namespace AORebirth.Database
     /// </summary>
     public static class DatabaseDaoFactory
     {
+        /// <summary>
+        /// Creates the configured MySQL mission DAO without opening a connection.
+        /// Each operation owns its connection; unsupported configured providers are
+        /// rejected before mission SQL is executed. No runtime initialization occurs here.
+        /// </summary>
         public static IMissionDao CreateMissionDao()
         {
             return new MySqlMissionDao();
