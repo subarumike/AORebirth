@@ -1,0 +1,164 @@
+{
+  "catalog_sha256": "da64734fd544d93c3ccfb2ae56ad4248c18a101b86fed7e0deadc8f315d6c1c8",
+  "terminal_object_commas_removed_for_parsing": 1,
+  "catalog_names": 370,
+  "catalog_ids": 2235,
+  "catalog_memberships": 2235,
+  "duplicate_ids": {},
+  "primary_level2": {
+    "cohorts": 54,
+    "cohorts_without_raw_response": 0,
+    "cohorts_with_five_offers": 54,
+    "cohorts_with_linked_outbound_and_inbound": 54,
+    "offers": 270,
+    "offers_with_chunk_catalog_hits": 38,
+    "offers_with_name_candidates": 106,
+    "offers_without_name_candidates": 164,
+    "offers_with_nonterminal_chunk_hits": 0,
+    "confirmed_selected_location_ids": 0,
+    "name_candidates": {
+      "a building": 43,
+      "a factory": 2,
+      "a factory building": 1,
+      "a house": 37,
+      "a livingmodule": 4,
+      "a ruined factory": 1,
+      "a waterwell": 2,
+      "building": 16
+    },
+    "packet_catalog_hits": [
+      {
+        "location_id": 3221226127,
+        "byte_order": "big",
+        "equals_roll_terminal_instance": true,
+        "count": 362,
+        "catalog_names": [
+          "Workers Flats"
+        ]
+      }
+    ],
+    "chunk_catalog_hits": [
+      {
+        "field": "UnkChunk4Base64",
+        "offset": 28,
+        "byte_order": "big",
+        "location_id": 3221226127,
+        "equals_roll_terminal_instance": true,
+        "count": 38
+      }
+    ],
+    "verified_slider_states": 27
+  },
+  "all_existing_harvester_offers": {
+    "cohorts": 18638,
+    "cohorts_without_raw_response": 71,
+    "cohorts_with_five_offers": 18637,
+    "cohorts_with_linked_outbound_and_inbound": 18567,
+    "offers": 93185,
+    "offers_with_chunk_catalog_hits": 16319,
+    "offers_with_name_candidates": 16981,
+    "offers_without_name_candidates": 76204,
+    "offers_with_nonterminal_chunk_hits": 0,
+    "confirmed_selected_location_ids": 0,
+    "name_candidates": {
+      "A building in Borealis": 1,
+      "Borrowed Hole": 1121,
+      "Cave Entrance": 1818,
+      "Desert Dungeon": 1,
+      "Dungeon Entrance": 131,
+      "Factory": 20,
+      "House": 1,
+      "Mountain Cave": 2,
+      "Mountain Caves": 29,
+      "Mutant Cave": 1,
+      "Omni Mine, property of Omni-Tek": 4,
+      "Omni-Med": 24,
+      "Outpost": 37,
+      "Ruin": 1,
+      "Tube": 40,
+      "a building": 7083,
+      "a factory": 752,
+      "a factory building": 790,
+      "a house": 1959,
+      "a house in Bliss": 1,
+      "a livingmodule": 1019,
+      "a mutant cave": 23,
+      "a ruined factory": 239,
+      "a ruined house": 17,
+      "a waterwell": 122,
+      "a woodshack": 21,
+      "a wrecked pipe": 19,
+      "a wrecked tank": 1,
+      "an Omni-Tek outpost": 37,
+      "an underground facility": 1,
+      "building": 1550,
+      "mine": 116,
+      "shack": 1,
+      "small house": 2,
+      "stub": 1,
+      "towerhouse": 1
+    },
+    "packet_catalog_hits": [
+      {
+        "location_id": 3221226127,
+        "byte_order": "big",
+        "equals_roll_terminal_instance": true,
+        "count": 108318,
+        "catalog_names": [
+          "Workers Flats"
+        ]
+      },
+      {
+        "location_id": 3221226272,
+        "byte_order": "big",
+        "equals_roll_terminal_instance": true,
+        "count": 19327,
+        "catalog_names": [
+          "A building in Borealis"
+        ]
+      },
+      {
+        "location_id": 3221228553,
+        "byte_order": "big",
+        "equals_roll_terminal_instance": true,
+        "count": 1,
+        "catalog_names": [
+          "Subway Entrance"
+        ]
+      }
+    ],
+    "chunk_catalog_hits": [
+      {
+        "field": "UnkChunk4Base64",
+        "offset": 28,
+        "byte_order": "big",
+        "location_id": 3221226127,
+        "equals_roll_terminal_instance": true,
+        "count": 13558
+      },
+      {
+        "field": "UnkChunk4Base64",
+        "offset": 28,
+        "byte_order": "big",
+        "location_id": 3221226272,
+        "equals_roll_terminal_instance": true,
+        "count": 2761
+      }
+    ]
+  },
+  "sessions": 77,
+  "source_role": "AUTHORITATIVE_EXTERNAL_GAME_CODE_EXTRACT",
+  "authoritative_for": [
+    "Complete mission-location ID catalog",
+    "Exact location ID values",
+    "Exact associated display names"
+  ],
+  "origin": "Supplied by another project; reportedly extracted directly from AO game code",
+  "AOREBIRTH_LOCAL_GHIDRA_EXTRACTION": "NO",
+  "AOREBIRTH_INDEPENDENT_REPRODUCTION": "NO",
+  "LIVE_MISSION_CAPTURE_PERFORMED": "NO",
+  "RUNTIME_MISSION_LOGIC_CHANGED": "NO",
+  "SOURCE_INDEPENDENTLY_REPRODUCED": "NO",
+  "scope_boundary": "All cohort_received offers in the enumerated retained and local MissionOfferHarvester sessions; zero-offer cohorts and legacy sessions retained in manifest. No claim to inventory unrelated capture products.",
+  "byte_scan_boundary": "Exact unsigned 32-bit values at every byte offset in both endian orders; not proof that an ID could not use a different encoding."
+}

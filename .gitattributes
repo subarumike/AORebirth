@@ -30,6 +30,7 @@ docs/reference/pf4582/PlayfieldDistrictInfo.json -text whitespace=cr-at-eol
 # External mission evidence and its hash-governed generated corpus are byte-exact.
 docs/reference/missions/** -text -diff
 docs/generated/missions/arpa3/** -text
+docs/generated/missions/location-reconciliation/** -text whitespace=cr-at-eol
 docs/generated/missions/arpa3/clicksaver-item-catalog.csv -diff
 
 # Windows launchers must remain directly executable by cmd.exe.
