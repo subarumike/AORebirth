@@ -367,6 +367,9 @@ namespace AORebirth.Interfaces.Persistence.Missions
     /// Database failures propagate, except the legacy start-area convenience methods
     /// which return false/null on failure. They must not be used to infer absence
     /// after a database outage. No method creates or migrates schema.
+    /// Collections are buffered and ordered by durable keys using database collation,
+    /// not a provider-independent ordinal comparison. Lifecycle transitions belong
+    /// to the caller; there is no automatic expiry or physical mission-delete API.
     /// </summary>
     public interface IMissionDao
     {
@@ -376,6 +379,12 @@ namespace AORebirth.Interfaces.Persistence.Missions
         string ResolveCharacterAccountKey(int characterId);
         MissionAccountFlagData GetAccountFlag(string accountKey, string flagKey);
         IList<MissionAccountFlagData> GetAccountFlags(string accountKey);
+        /// <summary>
+        /// Atomically records the supplied fee and debit; does not calculate gameplay costs.
+        /// Business conflicts return a status; provider failures propagate. A secondary
+        /// rollback failure is attached as Data["MissionDao.RollbackFailure"].
+        /// Reconcile an uncertain commit from durable state before retrying.
+        /// </summary>
         MissionRollFeeResult TryChargeRollFee(MissionRollFeeRequest request);
         bool MarkStartAreaSelectionPending(int characterId);
         string GetStartAreaSelectionState(int characterId);
@@ -386,6 +395,7 @@ namespace AORebirth.Interfaces.Persistence.Missions
         /// Do not return a Task or retain/share the transaction. Exceptions should
         /// escape the callback; failed writes prevent commit even if caught there.
         /// The DAO does not retry callbacks or perform nested transaction enlistment.
+        /// Character-only scoping is data isolation, not session authentication.
         /// If rollback also fails, the original exception is rethrown with that
         /// exception in Data["MissionDao.RollbackFailure"]. Reconcile before retrying.
         /// </summary>

@@ -19,6 +19,7 @@
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/NewCharacterStartAreaSelectionDao.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs" />
     <PackageReference Include="Dapper" Version="2.1.79" />
   </ItemGroup>

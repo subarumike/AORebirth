@@ -44,6 +44,14 @@ MISSION_FORBIDDEN_TOKENS = (
     "MySqlMissionRepository",
     "MissionRollFeeClaimRepository",
     "NewCharacterStartAreaSelectionDao",
+    "MySqlMissionDao",
+    "DatabaseDaoFactory",
+    "MySqlConnector",
+    "Npgsql",
+    "SqlClient",
+    "IDbTransaction",
+    "DbTransaction",
+    "IDataReader",
 )
 
 EXCLUDED_PARTS = {"bin", "obj", "packages", ".git"}
@@ -217,13 +225,17 @@ def direct_sql_sites(root: Path) -> list[str]:
 
 
 def mission_boundary_files(root: Path) -> list[Path]:
-    mission_root = root / "AORebirth" / "Server" / "ZoneEngine" / "Core" / "Missions"
-    result = sorted(mission_root.glob("*.cs")) if mission_root.exists() else []
+    result = []
+    for engine in ("ZoneEngine", "ZoneEngine_New"):
+        mission_root = root / "AORebirth" / "Server" / engine / "Core" / "Missions"
+        result.extend(sorted(path for path in mission_root.rglob("*.cs")
+                             if not set(path.relative_to(mission_root).parts) & EXCLUDED_PARTS))
     result.extend(
         path
         for path in (
             root / "AORebirth" / "Server" / "ZoneEngine" / "Core" / "NewCharacterStartAreaSelectionRuntime.cs",
             root / "AORebirth" / "Server" / "LoginEngine" / "Packets" / "CharacterName.cs",
+            root / "AORebirth" / "Server" / "ZoneEngine_New" / "Core" / "NewCharacterStartAreaSelectionRuntime.cs",
         )
         if path.exists()
     )
@@ -237,8 +249,19 @@ def mission_boundary_violations(root: Path) -> list[str]:
         relative = normalize(path.relative_to(root))
         if contains_sql(text):
             violations.append(relative + ":embedded-sql")
+        code = code_only(text)
         for token in MISSION_FORBIDDEN_TOKENS:
-            if token in text:
+            if re.search(r"(?<![\w])" + re.escape(token) + r"(?![\w])", code):
+                violations.append(relative + ":" + token)
+    # A retained public compatibility shim may forward calls, never own mission SQL.
+    shim = root / "AORebirth/Libraries/Source/AORebirth.Database/Dao/NewCharacterStartAreaSelectionDao.cs"
+    if shim.exists():
+        text = shim.read_text(encoding="utf-8-sig")
+        relative = normalize(shim.relative_to(root))
+        if contains_sql(text):
+            violations.append(relative + ":duplicate-mission-sql")
+        for token in ("Dapper", "Connector", "System.Data", "MySqlConnector"):
+            if re.search(r"(?<![\w])" + re.escape(token) + r"(?![\w])", code_only(text)):
                 violations.append(relative + ":" + token)
     return sorted(set(violations))
 
@@ -339,6 +362,29 @@ def self_test() -> None:
         )
         if not mission_boundary_violations(root):
             raise RuntimeError("mission provider fixture was not rejected")
+
+        (root / "AORebirth/Server/ZoneEngine/Core/Missions/BadMission.cs").unlink()
+        for engine in ("ZoneEngine", "ZoneEngine_New"):
+            nested = root / ("AORebirth/Server/" + engine + "/Core/Missions/Nested/Adapter.cs")
+            for bad_source in (
+                "using Provider = MySqlConnector; class Bad {}",
+                "class Bad { IDbTransaction transaction; }",
+                "class Bad { object Create() => DatabaseDaoFactory.CreateMissionDao(); }",
+                'class Bad { string Sql = "SELECT State FROM missionstates"; }',
+            ):
+                write(nested, bad_source)
+                if not mission_boundary_violations(root):
+                    raise RuntimeError("nested mission boundary fixture was not rejected")
+            write(nested, '// IDbConnection MySqlMissionDao\nclass Good { string Note = "Dapper"; }')
+            if mission_boundary_violations(root):
+                raise RuntimeError("mission comment/string fixture was rejected")
+        shim = root / "AORebirth/Libraries/Source/AORebirth.Database/Dao/NewCharacterStartAreaSelectionDao.cs"
+        write(shim, 'class Shim { string Sql = "SELECT Value FROM missionflags"; }')
+        if not mission_boundary_violations(root):
+            raise RuntimeError("duplicate mission SQL fixture was not rejected")
+        write(shim, "class Shim { object Create() => DatabaseDaoFactory.CreateMissionDao(); }")
+        if mission_boundary_violations(root):
+            raise RuntimeError("forwarding compatibility shim fixture was rejected")
 
         write(
             root / "AORebirth/Server/ZoneEngine/Unexpected.cs",
