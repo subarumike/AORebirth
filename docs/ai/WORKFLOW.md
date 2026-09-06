@@ -785,6 +785,21 @@ Run the movement decoder when movement, idle paths, chase, or range evidence is
 needed. It reconciles the packet log and `raw-packets.csv`, so Mike captures whose
 packet log uses the alternate line format still retain their movement evidence.
 
+Analyze the fixed, already-resolved mission-destination corpus without starting
+a client or capture through the repository wrapper:
+
+```cmd
+cmd /d /c Tools\mission_destination_eligibility_analysis.cmd generate
+cmd /d /c Tools\mission_destination_eligibility_analysis.cmd test
+cmd /d /c Tools\mission_destination_eligibility_analysis.cmd generate --check
+```
+
+The generator verifies every source-session hash, preserves the 355 offers with
+no raw destination as unresolved, and writes only evidence artifacts under
+`docs/generated/missions/destination-eligibility-analysis`. It does not infer
+eligibility from zero observations, infer server probabilities, or change
+mission runtime behavior.
+
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
 
