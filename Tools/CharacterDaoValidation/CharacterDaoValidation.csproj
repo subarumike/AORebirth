@@ -8,11 +8,18 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/**/*.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" />
+    <Compile Include="../../AORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs" />
+    <Compile Include="../../AORebirth/Server/LoginEngine/CoreClient/LoginHandoffLifecycle.cs" />
+    <Compile Include="../../LinuxBuild/Tools/Stage8OfflineSmokeTests/StaleOnlineRecoveryTests.cs" />
+    <Compile Include="../../LinuxBuild/Tools/Stage8OfflineSmokeTests/LoginHandoffLifecycleTests.cs" />
+    <Compile Include="../../LinuxBuild/Tools/Stage8OfflineSmokeTests/Stage8RepositoryRootResolver.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/LoginSessionHydrationSafetyContractTests.cs" />
     <!-- Actual production sources, including the unchanged legacy characterization path.
          Only Connector/log/config hosting is isolated; no alternative DAO is modeled. -->
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/**/*.cs" />
-    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/**/*.cs" />
-    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Accounts/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/**/*.cs" />

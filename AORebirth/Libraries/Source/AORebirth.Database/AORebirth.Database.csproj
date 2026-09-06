@@ -108,6 +108,7 @@
     <Compile Include="Connector.cs" />
     <Compile Include="DatabaseDaoFactory.cs" />
     <Compile Include="Domain\Accounts\MySqlAccountDao.cs" />
+    <Compile Include="Domain\Characters\MySqlCharacterDao.cs" />
     <Compile Include="Domain\Missions\MySqlMissionDao.cs" />
     <Compile Include="Dao\CharacterOnlineOwnershipGuard.cs" />
     <Compile Include="Dao\CharacterDao.cs" />
