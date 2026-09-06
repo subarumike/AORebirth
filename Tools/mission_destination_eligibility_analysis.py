@@ -20,11 +20,14 @@ SECONDARY_SLIDERS = ("good_bad", "order_chaos", "open_hidden", "physical_mystica
 
 
 def sha256(path):
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    raw = path.read_bytes()
+    try:
+        relative = path.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        relative = None
+    if relative is not None and path.suffix.lower() == ".cmd":
+        raw = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(raw).hexdigest()
 
 
 def stable_path(path):

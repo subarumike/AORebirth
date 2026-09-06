@@ -1,0 +1,51 @@
+{
+  "rows": [
+    {
+      "backend_classification": "ORDINARY_MISSION_TERMINAL_INSTANCE_PROVENANCE_ONLY",
+      "cross_playfield_distance_model": "UNAVAILABLE_UNPROVEN_COMMON_COORDINATE_SYSTEM",
+      "observed_terminal_local_xyz": [
+        {
+          "x": 3236.463,
+          "y": 35.11,
+          "z": 921.2086
+        }
+      ],
+      "offers": 79025,
+      "requests": 15805,
+      "same_playfield_offers": 2894,
+      "terminal_identity": {
+        "instance_uint32": 3221226127,
+        "type": 56001
+      },
+      "terminal_name": "Basic Individual Mission Terminal",
+      "terminal_playfield": 655,
+      "terminal_region": "Andromeda",
+      "unique_destination_playfields": 11,
+      "unique_destinations": 513
+    },
+    {
+      "backend_classification": "ORDINARY_MISSION_TERMINAL_INSTANCE_PROVENANCE_ONLY",
+      "cross_playfield_distance_model": "UNAVAILABLE_UNPROVEN_COMMON_COORDINATE_SYSTEM",
+      "observed_terminal_local_xyz": [
+        {
+          "x": 632.6141,
+          "y": 72.80022,
+          "z": 545.5198
+        }
+      ],
+      "offers": 13805,
+      "requests": 2761,
+      "same_playfield_offers": 1160,
+      "terminal_identity": {
+        "instance_uint32": 3221226272,
+        "type": 56001
+      },
+      "terminal_name": "Individual Mission Terminal",
+      "terminal_playfield": 800,
+      "terminal_region": "Borealis",
+      "unique_destination_playfields": 13,
+      "unique_destinations": 315
+    }
+  ],
+  "schema_version": 1
+}

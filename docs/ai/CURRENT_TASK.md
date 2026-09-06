@@ -2,42 +2,23 @@
 
 ## Active
 
-Mission-location reconciliation checkpoint: the supplied external catalog is
-preserved and every existing harvester offer has an offline reconciliation row.
-Exact destination IDs remain unresolved; the missing input is a source bridge
-from catalog IDs to captured destination coordinates or offer fields. No further
-rolling is requested for this issue. See
-`docs/evidence/MISSION_LOCATION_CATALOG_RECONCILIATION.md`.
+The next Rubi-Ka mission capture is the evidence-driven wave in
+`docs/evidence/MISSION_CAPTURE_WAVE_FROM_PROVEN_COVERAGE_GAPS.md`. Current exact
+expected-QL coverage is 45/250; 205 QLs are missing. The ready broad wave covers
+52 strategically selected missing QLs with 22 level-locked characters and 50
+requests per QL. The separate matched control wave reuses exact levels 25 and
+37 for QLs 25 and 44 at the recorded PF 655 Andromeda and PF 800 Borealis
+terminals. Mike owns all AO/client execution; Codex analyzes only completed
+session folders.
 
-Harvest one complete live Rubi-Ka mission-terminal offer cohort for every
-target QL 1-250. The generated plan assigns every target exactly once to an
-exact character-level/difficulty-slot pair and the AOSharp harvester now
-accepts that exact detent, reports its static expected QL, and fails closed when
-the state cannot be represented or verified,
-and reports completion plus output location. Mike owns AO client, plugin, and
-terminal interaction; Codex analyzes only completed session folders. Use
-`docs/mission-harvest/mission-ql-1-250-plan.md` as the literal runbook. Do not
-substitute a nearby QL, infer response-side mission QL from request metadata, or
-change AORebirth mission generation from static planning evidence. Harvester
-capture-contract version 3 must preserve the request-time terminal origin,
-mission destination, exact known icon type, reward-item descriptors, and every
-AOSharp-exposed offer field; a finite roll sample is never proof of pool
-exhaustion.
-
-Before any further level-2 harvest, run the one-request live acceptance in
-`docs/mission-harvest/LOW_LEVEL_SLIDER_CAPTURE_MATRIX.md`. Harvester 1.4.0 now
-owns all seven explicit controls and raw request/response evidence; Malis is not
-an operational dependency. Its resumable matrix command replaces manual
-per-state commands. Do not let the level-2 character level, and do not
-infer slider effects from historical descriptions or the discovery sample.
-The level-2 slider-discovery campaign is complete and accepted: 27 states,
-54 primary requests, 270 offers, two deterministic requests per state, and one
-explicitly retained surplus state-8 session excluded from the primary matrix.
-Offline analysis proves seven distinct transmitted request bytes, a definite
-Money/XP compensation effect, and a strong mission-QL candidate at decoded
-`UnkChunk3` offset 16. No additional level-2 slider capture is required; the
-character may advance and the next assigned capture character level is 7.
-Evidence: `docs/evidence/LEVEL2_MISSION_SLIDER_DISCOVERY_ANALYSIS.md`.
+Do not expand the wave to all missing QLs or all placement records. Keep all six
+secondary sliders fixed at `FIND_ITEM_PERSON_SUPPLEMENT`; treat Easy/Hard as the
+expected-QL detent; preserve complete five-offer cohorts and duplicates. The
+response-side `MissionInfo.UnkChunk3` value remains a strong candidate, not an
+authoritative live mission QL. Do not infer terminal-specific backends,
+cross-playfield distance, destination weights, or runtime mission behavior.
+Regenerate the 250-row matrix after the first wave and apply its marginal-yield
+stopping rules before any extension.
 
 ## Prior active checkpoint
 

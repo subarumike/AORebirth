@@ -1,0 +1,69 @@
+{
+  "generator": "Tools/mission_capture_wave_planner.py",
+  "inputs": [
+    {
+      "path": "docs/generated/missions/destination-eligibility-analysis/mission-offer-analysis-inventory.jsonl.gz",
+      "sha256": "a56a5a9f3d088b1663f8f637bd7fa0344f4477a47eeb6fe7ef420cb1312eaa4d"
+    },
+    {
+      "path": "docs/generated/missions/destination-eligibility-analysis/mission-destination-eligibility-summary.json",
+      "sha256": "0a3d6804c4b3eced4052c9d1dd91f08fe5402cf16d502e7d2f74f4a10c081e65"
+    },
+    {
+      "path": "docs/generated/missions/destination-eligibility-analysis/mission-destination-eligibility-manifest.json",
+      "sha256": "9c8b2f39b57b8796c95314734e13f824ac50733bae487817d3a925bba5390837"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv",
+      "sha256": "393308fe4ac80f7513743aaedabaaaf5c372d081f15f9afc489b3c4df8c03b6a"
+    },
+    {
+      "path": "docs/evidence/data/helpbot-mission-ql-levels-1-149.json",
+      "sha256": "8a8e3a38f0328c96d0a372645e38ad14f7c892929bcd64ff9e9069e9c017fc35"
+    },
+    {
+      "path": "docs/mission-harvest/mission-ql-1-250-plan.json",
+      "sha256": "a16583e742817e7da1d5da791430b78a139c5a9df547d644c68dd1155b8ccec0"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine/XML Data/Playfields.xml",
+      "sha256": "5edeaaa6242d6a63a66c8f1a2938e4e268bbf7feec32c535ee715355faed50ff"
+    },
+    {
+      "path": "Tools/AOSharpMissionOfferHarvester/Main.cs",
+      "sha256": "77c5b1d06fb31a56495d38c1609216e1d55dd6544a0ed57f8f5ea8ead67c5ac8"
+    },
+    {
+      "path": "Tools/AOSharpMissionOfferHarvester/MissionSliderState.cs",
+      "sha256": "6b00873dc253841b547356398a4b1bff76960a200e41458fe3d1c3a2ec603fff"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "docs/generated/missions/capture-wave-plan/capture-wave-plan.json",
+      "sha256": "1214adc91216e5740b1df08571c23163fa868ad11181338242b313638056e76b"
+    },
+    {
+      "path": "docs/generated/missions/capture-wave-plan/coherent-condition-coverage.jsonl",
+      "sha256": "39b53b6aca40b03ba4ab0ddf9e0a967557f1a0914f9144cf361cc8ac88569766"
+    },
+    {
+      "path": "docs/generated/missions/capture-wave-plan/expected-ql-capture-gap-matrix.csv",
+      "sha256": "02c6880592b52f573e7c23cd5cf536cc377f486c019020fb6e27df838f02c434"
+    },
+    {
+      "path": "docs/generated/missions/capture-wave-plan/expected-ql-capture-gap-matrix.json",
+      "sha256": "3fd5060de7b64754f7d769e35e597f449307f154d8ecb2ce89067bc7d1e2df33"
+    },
+    {
+      "path": "docs/generated/missions/capture-wave-plan/terminal-coverage-matrix.json",
+      "sha256": "c4227d4315aa576a8e05da72916c982d9640884fe3423350eb3207e1b50f9f72"
+    }
+  ],
+  "report": {
+    "path": "docs/evidence/MISSION_CAPTURE_WAVE_FROM_PROVEN_COVERAGE_GAPS.md",
+    "sha256": "24efdd2cfecf8e1bc38a15238ca0f3dc19cfce608dc80df5a8482331ef587929"
+  },
+  "runtime_mission_logic_changed": false,
+  "schema_version": 1
+}

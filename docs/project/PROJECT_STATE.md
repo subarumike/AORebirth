@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-09-01
+Updated: 2026-09-06
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,19 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- The next mission capture wave is now generated from the complete retained
+  destination-eligibility corpus. Exact expected-QL coverage is 45/250, leaving
+  205 gaps. The practical first wave uses an exact 22-character proven-edge set
+  to sample 52 missing QLs at 50 requests each, followed by matched level and
+  terminal-geography controls at QLs 25 and 44 using reusable levels 25 and 37.
+  The deterministic 250-row matrix retains per-QL last-100/500/1000 discovery,
+  marginal yield, neighboring-QL overlap, reachability, priority, and stopping
+  status. Only the captured PF 655 Andromeda and PF 800 Borealis terminal
+  identities are named; they remain instance provenance, not presumed backend
+  variants. No live capture, client control, probability inference, decoder
+  promotion, or runtime mission change occurred. Evidence:
+  `docs/evidence/MISSION_CAPTURE_WAVE_FROM_PROVEN_COVERAGE_GAPS.md`.
 
 - Mission-location catalog reconciliation (2026-09-05): externally supplied
   authoritative catalog preserved with 370 names and 2,235 IDs. All 270 primary
