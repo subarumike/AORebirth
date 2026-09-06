@@ -2,6 +2,13 @@
 
 ## Active
 
+Mission-location reconciliation checkpoint: the supplied external catalog is
+preserved and every existing harvester offer has an offline reconciliation row.
+Exact destination IDs remain unresolved; the missing input is a source bridge
+from catalog IDs to captured destination coordinates or offer fields. No further
+rolling is requested for this issue. See
+`docs/evidence/MISSION_LOCATION_CATALOG_RECONCILIATION.md`.
+
 Harvest one complete live Rubi-Ka mission-terminal offer cohort for every
 target QL 1-250. The generated plan assigns every target exactly once to an
 exact character-level/difficulty-slot pair and the AOSharp harvester now

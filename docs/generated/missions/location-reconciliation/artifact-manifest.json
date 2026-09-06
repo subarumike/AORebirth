@@ -1,0 +1,13 @@
+{
+  "catalog_sha256": "da64734fd544d93c3ccfb2ae56ad4248c18a101b86fed7e0deadc8f315d6c1c8",
+  "primary_request_index_sha256": "20deb50850a71e3bd0e32bad6fa33c6661daf1e1c2b5dca4a618f2546936d316",
+  "generator_sha256": "ebbc60b4cc7a0b9df56427e62783c20430110054928ec54e7a8c9d0276afeb59",
+  "files": {
+    "summary.json": "f5e6a0692935814548e53bb094a786a05c2b61710782a68e27fe1dae93c340c7",
+    "source-manifest.json": "90999e23cfd19e253eb0873a4c6e2c695f7905bc6a5abb87edb3e58e2335f21c",
+    "catalog-index.json": "43dca9a29c6982c6b9ee7124fa1e750549deb82ecf3bc171cd0579120de54351",
+    "observed-destinations.json": "31cd750c1541767779359d5ec0d38a82223ccecdb7e5ea99dd2fb7fed6464a2b",
+    "level2-offers.jsonl": "313469a6c334e11864ca5687853a0f1d8017e8f26191453e7ab2b32727f867f7",
+    "all-offers.jsonl.gz": "d70d43317b0b5c19c8004e634922e5559c3bea8c58c0ce488d9e2731e4eeb2df"
+  }
+}

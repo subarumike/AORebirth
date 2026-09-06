@@ -9,6 +9,14 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Mission-location catalog reconciliation (2026-09-05): externally supplied
+  authoritative catalog preserved with 370 names and 2,235 IDs. All 270 primary
+  level-2 offers and the 93,185-offer harvester corpus were audited offline.
+  Exact ID byte matches all refer to origin terminal instances; destination-ID
+  assignment remains unresolved without a coordinate or protocol bridge.
+  No live capture, runtime change or independent source reproduction occurred.
+  Evidence: `docs/evidence/MISSION_LOCATION_CATALOG_RECONCILIATION.md`.
+
 - Helpbot mission-terminal QL reconstruction now governs exact levels 1-149
   from pinned AOWiki revision `44808`. All 149 published rows and 1,639 derived
   detent cells pass exhaustive parity; 43 runtime cells across 41 levels were
