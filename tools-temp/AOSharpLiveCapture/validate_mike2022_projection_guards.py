@@ -63,6 +63,22 @@ def main():
         "queued inventory snapshot": 'this.WriteInventorySnapshot("deferred-inventory-refresh");',
         "capture-start inventory snapshot": 'this.WriteInventorySnapshot("capture-start");',
         "capture-end inventory snapshot": 'this.WriteInventorySnapshot("capture-end");',
+        "decoded inbound subscription": "Network.N3MessageReceived += this.OnN3MessageReceived;",
+        "decoded outbound subscription": "Network.N3MessageSent += this.OnN3MessageSent;",
+        "presence-aware NPC stat snapshots": '"enemy-stat-snapshots.csv"',
+        "transmitted NPC stat updates": '"enemy-stat-updates.csv"',
+        "decoded enemy combat": '"enemy-combat.csv"',
+        "enemy lifecycle state": '"enemy-state.csv"',
+        "runtime stat presence marker": 'Csv("runtime-entry")',
+        "unavailable stat presence marker": 'Csv("unavailable")',
+        "SCFU stat normalization": "private void WriteScfuStatSnapshot(",
+        "SCFU Health stat mapping": 'Stat = "Health", StatId = 27, Value = decoded.Health',
+        "SCFU MonsterData stat mapping": 'Stat = "MonsterData", StatId = 359, Value = decoded.MonsterData',
+        "SCFU NPCFamily stat mapping": 'Stat = "NPCFamily", StatId = 455, Value = decoded.Npc.Family',
+        "transmitted stat provenance": "presence=transmitted;provenance=DecodedN3Message",
+        "runtime stats validation coverage": "npcRuntimeStats",
+        "decoded combat validation coverage": "decodedEnemyCombat",
+        "enemy state validation coverage": "enemyState",
     }
     for description, value in requirements.items():
         require(source, value, description)
@@ -81,11 +97,34 @@ def main():
     )
     require(source, "TryFlush(this.inventorySnapshotLog);", "inventory writer flush")
     require(source, "TryFlush(this.itemUseObservationLog);", "item-use writer flush")
+    require(source, "TryFlush(this.enemyStatSnapshotLog);", "stat snapshot writer flush")
+    require(source, "TryFlush(this.enemyStatUpdateLog);", "stat update writer flush")
+    require(source, "TryFlush(this.enemyCombatLog);", "combat writer flush")
+    require(source, "TryFlush(this.enemyStateLog);", "enemy state writer flush")
+
+    for writer in (
+        "enemyStatSnapshotLog",
+        "enemyStatUpdateLog",
+        "enemyCombatLog",
+        "enemyStateLog",
+    ):
+        require_count(
+            source,
+            "this.{0} = CloseWriter(this.{0});".format(writer),
+            2,
+            "{0} startup-failure and finalization closes".format(writer),
+        )
 
     raw_guard_start = source.index("private bool RawRecaptureRequired()")
     raw_guard_end = source.index("private void WriteEvent(", raw_guard_start)
     raw_guard = source[raw_guard_start:raw_guard_end]
-    if "itemUse" in raw_guard or "inventorySnapshot" in raw_guard:
+    if (
+        "itemUse" in raw_guard
+        or "inventorySnapshot" in raw_guard
+        or "enemyStat" in raw_guard
+        or "enemyCombat" in raw_guard
+        or "enemyState" in raw_guard
+    ):
         raise AssertionError("projection gaps must not change raw recapture policy")
 
     print("MIKE_2022_PROJECTION_GUARDS=PASS")
