@@ -547,15 +547,34 @@ namespace ZoneEngine_New.Core.Entities
 
         public override InfoPacketMessage BuildInfoPacket()
         {
-            int profession = Stats.GetOrZero(CharacterStat.Profession);
-            int visualProfession = Stats.GetOrZero(CharacterStat.VisualProfession);
-            int alienLevel = Stats.GetOrZero(CharacterStat.AlienLevel);
-            if (alienLevel <= 0)
-                alienLevel = 1;
+            // Player inspect is Character (0x40), same as ZoneEngine CharacterInfoPacket.
+            // N3 Unknown=0. Unknown=1 is the monster path and stuck the official client
+            // on "Please wait". Reference Unknowns=1 is CharacterInfoPacket.Unknown1.
+            // Do not copy Name into FirstName — official 0x40 uses the DB first/last
+            // strings (often empty). Unique name already arrives in SCFU.Name.
+            int level = Stats.GetOrOne(CharacterStat.Level);
+            int profession = ClampProfession(Stats.GetOrZero(CharacterStat.Profession));
+            int visualProfession = ClampProfession(Stats.GetOrZero(CharacterStat.VisualProfession));
+            int health = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
+            int maxHealth = Math.Max(1, Stats.GetOrZero(CharacterStat.MaxHealth));
+            if (health > maxHealth)
+                health = maxHealth;
 
-            string firstName = FirstName;
-            if (string.IsNullOrEmpty(firstName))
-                firstName = Name ?? string.Empty;
+            string firstName = FirstName ?? string.Empty;
+            string lastName = LastName ?? string.Empty;
+
+            Logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "InfoPacket player={0} name={1} first='{2}' last='{3}' level={4} prof={5} hp={6}/{7}",
+                    Identity.Instance,
+                    Name ?? string.Empty,
+                    firstName,
+                    lastName,
+                    level,
+                    profession,
+                    health,
+                    maxHealth));
 
             return new InfoPacketMessage
             {
@@ -566,60 +585,44 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     Unknown1 = 0x01,
                     Profession = (Profession)profession,
-                    Level = ClampToByte(Stats.GetOrOne(CharacterStat.Level)),
+                    Level = ClampToByte(level),
                     TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
                     VisualProfession = (Profession)visualProfession,
                     SideXp = 0,
-                    Health = Stats.GetOrZero(CharacterStat.Health),
-                    MaxHealth = Stats.GetOrZero(CharacterStat.MaxHealth),
+                    Health = health,
+                    MaxHealth = maxHealth,
                     BreedHostility = 0,
                     OrganizationId = null,
                     FirstName = firstName,
-                    LastName = LastName ?? string.Empty,
-                    LegacyTitle = LegacyTitleFor(Stats.GetOrZero(CharacterStat.PvP_Rating)),
+                    LastName = lastName,
+                    LegacyTitle = string.Empty,
                     Unknown2 = 0,
                     OrganizationRank = null,
                     TowerFields = null,
                     CityPlayfieldId = 0,
                     Towers = null,
-                    InvadersKilled = Stats.GetOrZero(CharacterStat.InvadersKilled),
-                    KilledByInvaders = Stats.GetOrZero(CharacterStat.KilledByInvaders),
-                    AiLevel = alienLevel,
-                    PvpDuelWins = Stats.GetOrZero(CharacterStat.PVPDuelKills),
-                    PvpDuelLoses = Stats.GetOrZero(CharacterStat.PVPDuelDeaths),
-                    PvpProfessionDuelLoses = Stats.GetOrZero(CharacterStat.PVPProfessionDuelDeaths),
-                    PvpSoloKills = Stats.GetOrZero(CharacterStat.PVPRankedSoloKills),
-                    PvpTeamKills = Stats.GetOrZero(CharacterStat.PVPRankedTeamKills),
-                    PvpSoloScore = Stats.GetOrZero(CharacterStat.PVPSoloScore),
-                    PvpTeamScore = Stats.GetOrZero(CharacterStat.PVPTeamScore),
-                    PvpDuelScore = Stats.GetOrZero(CharacterStat.PVPDuelScore)
+                    InvadersKilled = 0,
+                    KilledByInvaders = 0,
+                    AiLevel = Stats.GetOrZero(CharacterStat.AlienLevel),
+                    PvpDuelWins = 0,
+                    PvpDuelLoses = 0,
+                    PvpProfessionDuelLoses = 0,
+                    PvpSoloKills = 0,
+                    PvpTeamKills = 0,
+                    PvpSoloScore = 0,
+                    PvpTeamScore = 0,
+                    PvpDuelScore = 0
                 }
             };
         }
 
-        static string LegacyTitleFor(int rating)
+        static int ClampProfession(int value)
         {
-            if (rating < 1400)
-                return string.Empty;
-            if (rating < 1500)
-                return "Freshman";
-            if (rating < 1600)
-                return "Rookie";
-            if (rating < 1700)
-                return "Apprentice";
-            if (rating < 1800)
-                return "Novice";
-            if (rating < 1900)
-                return "Neophyte";
-            if (rating < 2000)
-                return "Experienced";
-            if (rating < 2100)
-                return "Expert";
-            if (rating < 2300)
-                return "Master";
-            if (rating < 2500)
-                return "Champion";
-            return "Grand Master";
+            if (value < 0)
+                return 0;
+            if (value > (int)Profession.Shade)
+                return (int)Profession.Shade;
+            return value;
         }
 
         /// <summary>
@@ -743,12 +746,5 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        protected override byte[] CreateMovementStatus(int movementMode) =>
-        [
-            0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            (byte)movementMode, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
-            0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ];
     }
 }

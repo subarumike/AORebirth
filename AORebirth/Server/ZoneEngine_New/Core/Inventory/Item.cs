@@ -156,6 +156,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (page.Content.Count > 0)
             {
                 int handle = EnsureHandle(page, inventory, playfield, containerIdentity);
+                RegisterParentSlotHandle(inventory, slotIdentity, containerIdentity);
                 player.Session!.Send(
                     page.BuildChestItemFullUpdate(player.Identity, playfield.Identity.Instance, slotIdentity));
                 player.Session.Send(
@@ -170,6 +171,8 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 int introduceHandle = playfield.AllocateContainerInventoryHandle();
                 int openHandle = EnsureHandle(page, inventory, playfield, containerIdentity);
+                inventory.RegisterBackpackHandle(introduceHandle, containerIdentity);
+                RegisterParentSlotHandle(inventory, slotIdentity, containerIdentity);
                 player.Session!.Send(
                     page.BuildInventoryUpdateMessage(
                         player.Identity,
@@ -208,6 +211,15 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
 
             Identity = new Identity { Type = IdentityType.Container, Instance = instance };
+        }
+
+        static void RegisterParentSlotHandle(
+            PlayerInventory inventory,
+            Identity slotIdentity,
+            Identity containerIdentity)
+        {
+            if (slotIdentity.Type == IdentityType.Inventory && slotIdentity.Instance > 0)
+                inventory.RegisterBackpackHandle(slotIdentity.Instance, containerIdentity);
         }
 
         static int EnsureHandle(

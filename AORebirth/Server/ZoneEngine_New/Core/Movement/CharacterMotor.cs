@@ -50,6 +50,49 @@ namespace ZoneEngine_New.Core.Movement
 
         public MovementState State => _state;
 
+        public CharMovementStatus BuildMovementStatus()
+        {
+            bool onPath = HasPath;
+            bool forward = onPath || (_flags & MovementFlags.Forward) != 0;
+            bool backward = !onPath && (_flags & MovementFlags.Backward) != 0;
+            bool strafeLeft = (_flags & MovementFlags.StrafeLeft) != 0;
+            bool strafeRight = (_flags & MovementFlags.StrafeRight) != 0;
+            bool turnLeft = (_flags & MovementFlags.TurnLeft) != 0;
+            bool turnRight = (_flags & MovementFlags.TurnRight) != 0;
+            bool elevateUp = (_flags & MovementFlags.ElevateUp) != 0;
+            bool elevateDown = (_flags & MovementFlags.ElevateDown) != 0;
+            bool jumping = !_jumpArmed || (_flags & MovementFlags.Jump) != 0;
+
+            if (_state == MovementState.Sit)
+            {
+                forward = false;
+                backward = false;
+                strafeLeft = false;
+                strafeRight = false;
+                jumping = false;
+            }
+
+            MovementState lastSpeed = _state == MovementState.Walk || _state == MovementState.Run
+                ? _state
+                : _lastSpeedMode;
+
+            return new CharMovementStatus
+            {
+                Header = _character.IsPlayer ? (byte)0x80 : (byte)0,
+                ModeId = (byte)_state,
+                FwdState = (byte)(forward || backward ? 2 : 1),
+                FwdDir = (byte)(forward ? 1 : backward ? 2 : 0),
+                StrafeState = (byte)(strafeLeft || strafeRight ? 2 : 1),
+                StrafeDir = (byte)(strafeLeft && !strafeRight ? 3 : strafeRight && !strafeLeft ? 4 : 0),
+                ElevateState = (byte)(elevateUp || elevateDown ? 2 : 1),
+                ElevateDir = (byte)(elevateUp ? 5 : 0),
+                TurnState = (byte)(turnLeft || turnRight ? 4 : 1),
+                TurnDir = (byte)(turnLeft && !turnRight ? 3 : turnRight && !turnLeft ? 4 : 0),
+                JumpState = (byte)(jumping ? 3 : 1),
+                LastSpeedMode = (byte)lastSpeed
+            };
+        }
+
         public bool HasPath => _pathIndex >= 0 && _pathIndex < _path.Count;
 
         /// <summary>

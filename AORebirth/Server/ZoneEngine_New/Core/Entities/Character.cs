@@ -1161,7 +1161,6 @@ namespace ZoneEngine_New.Core.Entities
             int currentHealth = Stats.GetOrZero(CharacterStat.Health);
             int monsterData = Stats.Get(CharacterStat.MonsterData);
             int monsterScale = Stats.GetOrZero(CharacterStat.Scale);
-            int movementMode = (int)Motor.State;
 
             int petMasterInstance = Stats.Get(CharacterStat.PetMaster);
             int headMesh = Stats.Get(CharacterStat.HeadMesh);
@@ -1303,7 +1302,7 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             scfu.MonsterScale = (short)monsterScale;
-            scfu.Unknown1 = CreateMovementStatus(movementMode);
+            scfu.MovementStatus = Motor.BuildMovementStatus();
 
             if (!StatCollection.IsUnset(petMasterInstance) && petMasterInstance != 0)
             {
@@ -1421,8 +1420,5 @@ namespace ZoneEngine_New.Core.Entities
             new Texture { Place = 4, Id = 0, Unknown = 0 }
         ];
 
-        /// <summary>SCFU Unknown1 movement-status blob (player vs NPC layouts differ).</summary>
-        // TODO: Convert the arrays to a CharacterMovementStatus object.
-        protected abstract byte[] CreateMovementStatus(int movementMode);
     }
 }

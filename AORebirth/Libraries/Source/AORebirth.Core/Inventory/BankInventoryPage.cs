@@ -48,7 +48,7 @@ namespace AORebirth.Core.Inventory
         /// <param name="ownerInstance">
         /// </param>
         public BankInventoryPage(Identity ownerInstance)
-            : base((int)IdentityType.Bank, 50, 0, ownerInstance)
+            : base((int)IdentityType.BankByRef, 50, 0, ownerInstance)
         {
             this.NeedsItemCheck = false;
         }

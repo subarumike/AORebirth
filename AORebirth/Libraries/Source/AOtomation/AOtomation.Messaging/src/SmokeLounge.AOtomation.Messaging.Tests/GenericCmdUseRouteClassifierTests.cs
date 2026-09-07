@@ -575,12 +575,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "public void OpenBank(ICharacter character)");
             AssertContains(service, "BankMessageHandler.Default.Send(character);");
             AssertContains(service, "public BankSlot[] ResolveBankSlots(ICharacter character)");
-            AssertContains(service, "character.BaseInventory.Pages[(int)IdentityType.Bank].ToInventoryArray();");
+            AssertContains(service, "character.BaseInventory.Pages[(int)IdentityType.BankByRef].ToInventoryArray();");
 
             AssertContains(
                 bankHandler,
                 "x.BankSlots = InventoryContainerRuntimeService.Default.ResolveBankSlots(character);");
-            AssertDoesNotContain(bankHandler, "Pages[(int)IdentityType.Bank]");
+            AssertDoesNotContain(bankHandler, "Pages[(int)IdentityType.BankByRef]");
 
             AssertContains(
                 openBankFunction,
@@ -753,7 +753,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "toIdentity.Type = IdentityType.CanbeAffected;");
             AssertContains(service, "public IInventoryPage ResolveContainerAddItemReceivingPage");
             AssertContains(service, "target.Type == IdentityType.IncomingTradeWindow");
-            AssertContains(service, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
+            AssertContains(service, "itemReceiver.BaseInventory.Pages[(int)IdentityType.BankByRef]");
             AssertContains(service, "public int ResolveContainerAddItemTargetPlacement");
 
             AssertContains(service, "this.ResolveContainerAddItemTargetIdentity(toIdentity)");
@@ -763,7 +763,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemReceivingPage");
             AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemTargetPlacement");
             AssertDoesNotContain(containerAddItemHandler, "toIdentity.Type = IdentityType.CanbeAffected;");
-            AssertDoesNotContain(containerAddItemHandler, "itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank]");
+            AssertDoesNotContain(containerAddItemHandler, "itemReceiver.BaseInventory.Pages[(int)IdentityType.BankByRef]");
         }
 
         [TestMethod]
@@ -803,7 +803,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "private static bool IsInventoryToBankDeposit");
             AssertContains(service, "message.Target.Type == IdentityType.IncomingTradeWindow");
             AssertContains(service, "message.Target.Instance != character.Identity.Instance");
-            AssertContains(service, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank, out bankPage)");
+            AssertContains(service, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.BankByRef, out bankPage)");
             AssertContains(service, "private void TryRemoveBankRollback");
             AssertContains(service, "Persisted inventory after ClientContainerAddItem bank deposit");
 
@@ -811,7 +811,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertDoesNotContain(clientContainerAddItemHandler, "TryDepositInventoryItemToBank");
             AssertDoesNotContain(clientContainerAddItemHandler, "private bool IsInventoryToBankDeposit");
             AssertDoesNotContain(clientContainerAddItemHandler, "private void TryRemoveBankRollback");
-            AssertDoesNotContain(clientContainerAddItemHandler, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank");
+            AssertDoesNotContain(clientContainerAddItemHandler, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.BankByRef");
             AssertDoesNotContain(clientContainerAddItemHandler, "Persisted inventory after ClientContainerAddItem bank deposit");
         }
 

@@ -16,7 +16,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Playfield;
 
     /// <summary>
-    /// Authoritative ClientMoveItemToInventory + delayed equip/unequip.
+    /// Authoritative ClientMoveItemToInventory, ClientContainerAddItem, and delayed equip/unequip.
     /// </summary>
     public sealed class InventoryMoveService
     {
@@ -130,6 +130,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
             }
 
+            // TODO: Block multiple Uniques on ClientMoveItemToInventory
             bool sourceIsWear = sourcePage.Identity.Type.IsWearPage();
             if (!player.Inventory.TryResolveTargetSlot(
                     message.TargetPlacement,
@@ -157,58 +158,249 @@ namespace ZoneEngine_New.Core.Inventory
             bool touchesEquipment = sourceIsWear || destIsWear;
             if (touchesEquipment)
             {
-                if (HasPending(player.Identity.Instance))
-                    return;
-                if (destIsWear && !MeetsEquipRequirements(player, item, destPage, destSlot))
-                    return;
-
-                if (sourceIsWear
-                    && destOccupant != null
-                    && !MeetsEquipRequirements(player, destOccupant, sourcePage, sourceSlot))
-                    return;
-
-                if (!MeetsWeaponHandPairing(player, item, destPage, destSlot, sourcePage, sourceSlot))
-                    return;
-
-                double delaySeconds = ResolveEquipDelaySeconds(item, destPage.Identity.Type == IdentityType.SocialPage);
-                if (destOccupant != null)
-                    delaySeconds += ResolveEquipDelaySeconds(destOccupant, sourcePage.Identity.Type == IdentityType.SocialPage);
-
-                var pending = new PendingEquip(
+                TryBeginEquipmentMove(
                     player,
                     message.SourceContainer,
+                    player.Identity,
                     sourcePage,
                     sourceSlot,
                     destPage,
                     destSlot,
                     item,
                     destOccupant,
-                    lootSource,
-                    delaySeconds,
-                    ackTargetPlacement: destSlot);
-
-                if (delaySeconds <= 0)
-                {
-                    CompletePending(pending);
-                    return;
-                }
-
-                SetMoveLock(pending, true);
-                lock (_gate)
-                {
-                    if (!_pending.TryAdd(player.Identity.Instance, pending))
-                    {
-                        SetMoveLock(pending, false);
-                        return;
-                    }
-                }
+                    lootSource);
                 return;
             }
 
             if (!ApplyMove(player, sourcePage, sourceSlot, destPage, destSlot, item, lootSource))
                 return;
 
-            SendAck(player, message.SourceContainer, destSlot);
+            SendAck(player, message.SourceContainer, player.Identity, destSlot);
+        }
+
+        public void Handle(Player player, ClientContainerAddItemMessage message)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(message);
+
+            if (!player.Inventory.IsHydrated || player.Session == null || player.Playfield == null)
+                return;
+
+            if (!TryResolveAddSource(
+                    player,
+                    message.Source,
+                    out Container sourcePage,
+                    out int sourceSlot,
+                    out Item item))
+                return;
+
+            if (item.Locked)
+                return;
+
+            // TODO: Block temporary items on ClientContainerAddItem
+            if (IsBagItem(item))
+                return;
+
+            if (!TryResolveAddTarget(player, message.Target, out Container destPage))
+                return;
+
+            if (ReferenceEquals(sourcePage, destPage))
+                return;
+
+            if ((destPage.Flags & ContainerFlags.CanAdd) == 0)
+                return;
+
+            int destSlot = destPage.FindFreeSlot();
+            if (destSlot < 0)
+                return;
+
+            if (sourcePage.Identity.Type.IsWearPage())
+            {
+                TryBeginEquipmentMove(
+                    player,
+                    message.Source,
+                    message.Target,
+                    sourcePage,
+                    sourceSlot,
+                    destPage,
+                    destSlot,
+                    item,
+                    destOccupant: null,
+                    lootSource: null);
+                return;
+            }
+
+            if (!ApplyMove(player, sourcePage, sourceSlot, destPage, destSlot, item, lootSource: null))
+                return;
+
+            SendAck(player, message.Source, message.Target, destSlot);
+        }
+
+        void TryBeginEquipmentMove(
+            Player player,
+            Identity ackSource,
+            Identity ackTarget,
+            Container sourcePage,
+            int sourceSlot,
+            Container destPage,
+            int destSlot,
+            Item item,
+            Item? destOccupant,
+            LootableDynel? lootSource)
+        {
+            if (HasPending(player.Identity.Instance))
+                return;
+
+            bool destIsWear = destPage.Identity.Type.IsWearPage();
+            bool sourceIsWear = sourcePage.Identity.Type.IsWearPage();
+            if (destIsWear && !MeetsEquipRequirements(player, item, destPage, destSlot))
+                return;
+
+            if (sourceIsWear
+                && destOccupant != null
+                && !MeetsEquipRequirements(player, destOccupant, sourcePage, sourceSlot))
+                return;
+
+            if (!MeetsWeaponHandPairing(player, item, destPage, destSlot, sourcePage, sourceSlot))
+                return;
+
+            double delaySeconds = ResolveEquipDelaySeconds(item, destPage.Identity.Type == IdentityType.SocialPage);
+            if (destOccupant != null)
+                delaySeconds += ResolveEquipDelaySeconds(destOccupant, sourcePage.Identity.Type == IdentityType.SocialPage);
+
+            var pending = new PendingEquip(
+                player,
+                ackSource,
+                ackTarget,
+                sourcePage,
+                sourceSlot,
+                destPage,
+                destSlot,
+                item,
+                destOccupant,
+                lootSource,
+                delaySeconds,
+                destSlot);
+
+            if (delaySeconds <= 0)
+            {
+                CompletePending(pending);
+                return;
+            }
+
+            SetMoveLock(pending, true);
+            lock (_gate)
+            {
+                if (_pending.TryAdd(player.Identity.Instance, pending))
+                    return;
+            }
+
+            SetMoveLock(pending, false);
+        }
+
+        static bool TryResolveAddSource(
+            Player player,
+            Identity source,
+            out Container page,
+            out int slot,
+            out Item item)
+        {
+            page = null!;
+            slot = -1;
+            item = null!;
+
+            if (source.Type == IdentityType.Backpack || source.Type == IdentityType.Container)
+                return TryResolveOwnedBackpackSource(player, source, out page, out slot, out item);
+
+            if (!player.Inventory.TryGetItem(source.Type, source.Instance, out item))
+                return false;
+
+            if (item.Locked)
+                return false;
+
+            slot = source.Instance;
+            page = source.Type switch
+            {
+                IdentityType.Inventory => player.Inventory.Inventory,
+                IdentityType.WeaponPage => player.Inventory.Equipment,
+                IdentityType.ArmorPage => player.Inventory.Armor,
+                IdentityType.ImplantPage => player.Inventory.Implant,
+                IdentityType.SocialPage => player.Inventory.Social,
+                _ => null!
+            };
+
+            return page != null && (page.Flags & ContainerFlags.CanRemove) != 0;
+        }
+
+        static bool TryResolveOwnedBackpackSource(
+            Player player,
+            Identity source,
+            out Container page,
+            out int slot,
+            out Item item)
+        {
+            page = null!;
+            slot = DecodeBackpackSlot(source);
+            item = null!;
+
+            int handle = DecodeBackpackHandle(source);
+            if (handle != 0 && player.Inventory.TryGetOwnedBackpackPageByHandle(handle, out page))
+                return TryReadRemovableSlot(page, slot, out item);
+
+            if (handle == 0
+                && source.Instance > 0
+                && player.Inventory.TryGetOwnedBackpackPageByHandle(source.Instance, out page))
+            {
+                slot = 0;
+                return TryReadRemovableSlot(page, slot, out item);
+            }
+
+            if (handle == 0
+                && source.Type == IdentityType.Container
+                && player.Inventory.TryGetUniqueOwnedBackpackSlot(source.Instance, out page, out item))
+            {
+                slot = source.Instance;
+                return (page.Flags & ContainerFlags.CanRemove) != 0 && !item.Locked;
+            }
+
+            return false;
+        }
+
+        static bool TryReadRemovableSlot(Container page, int slot, out Item item)
+        {
+            item = null!;
+            if ((page.Flags & ContainerFlags.CanRemove) == 0)
+                return false;
+
+            return page.Content.TryGetValue(slot, out item!) && !item.Locked;
+        }
+
+        static bool TryResolveAddTarget(Player player, Identity target, out Container destPage)
+        {
+            destPage = null!;
+
+            if (target.Type == IdentityType.Container)
+                return player.Inventory.TryGetOwnedBackpackPage(target, out destPage);
+
+            if (target.Type != IdentityType.Bank && target.Type != IdentityType.BankByRef)
+                return false;
+
+            if (target.Instance != player.Identity.Instance)
+                return false;
+
+            if (!player.Inventory.Bank.IsHydrated)
+                return false;
+
+            destPage = player.Inventory.Bank;
+            return true;
+        }
+
+        static bool IsBagItem(Item item)
+        {
+            if (item.Identity.Type == IdentityType.Container)
+                return true;
+
+            return item.Definition != null && item.Definition.ItemType == (int)IdentityType.Backpack;
         }
 
         bool IsBlockedByPending(Player player, ClientMoveItemToInventoryMessage message)
@@ -218,7 +410,8 @@ namespace ZoneEngine_New.Core.Inventory
                 if (!_pending.TryGetValue(player.Identity.Instance, out PendingEquip? pending))
                     return false;
 
-                if (message.SourceContainer.Type == IdentityType.Backpack)
+                if (message.SourceContainer.Type == IdentityType.Backpack
+                    || message.SourceContainer.Type == IdentityType.Container)
                 {
                     int handle = DecodeBackpackHandle(message.SourceContainer);
                     int slot = DecodeBackpackSlot(message.SourceContainer);
@@ -277,18 +470,16 @@ namespace ZoneEngine_New.Core.Inventory
             item = null!;
             lootSource = null;
 
-            if (source.Type == IdentityType.Backpack)
+            if (source.Type == IdentityType.Backpack || source.Type == IdentityType.Container)
             {
+                if (TryResolveOwnedBackpackSource(player, source, out page, out slot, out item))
+                    return true;
+
+                if (source.Type != IdentityType.Backpack)
+                    return false;
+
                 int handle = DecodeBackpackHandle(source);
                 slot = DecodeBackpackSlot(source);
-
-                if (player.Inventory.TryGetBackpackPageByHandle(handle, out page))
-                {
-                    if ((page.Flags & ContainerFlags.CanRemove) == 0)
-                        return false;
-
-                    return page.Content.TryGetValue(slot, out item!) && !item.Locked;
-                }
 
                 Playfield? playfield = player.Playfield;
                 if (playfield == null)
@@ -327,7 +518,7 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.ArmorPage => player.Inventory.Armor,
                 IdentityType.ImplantPage => player.Inventory.Implant,
                 IdentityType.SocialPage => player.Inventory.Social,
-                IdentityType.Bank => player.Inventory.Bank,
+                IdentityType.BankByRef => player.Inventory.Bank,
                 _ => null!
             };
 
@@ -371,7 +562,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             SendUnequipActions(player, pending);
             player.Rebase();
-            SendAck(player, pending.AckSource, pending.AckTargetPlacement);
+            SendAck(player, pending.AckSource, pending.AckTarget, pending.AckTargetPlacement);
             NotifyEquipmentChanged(player, pending);
         }
 
@@ -467,14 +658,14 @@ namespace ZoneEngine_New.Core.Inventory
                 pending.SwappedItem.Locked = locked;
         }
 
-        static void SendAck(Player player, Identity sourceContainer, int targetPlacement)
+        static void SendAck(Player player, Identity sourceContainer, Identity target, int targetPlacement)
         {
             player.Session?.Send(
                 new ContainerAddItemMessage
                 {
                     Identity = player.Identity,
                     SourceContainer = sourceContainer,
-                    Target = player.Identity,
+                    Target = target,
                     TargetPlacement = targetPlacement,
                     Unknown = 0
                 });
@@ -641,6 +832,7 @@ namespace ZoneEngine_New.Core.Inventory
             public PendingEquip(
                 Player player,
                 Identity ackSource,
+                Identity ackTarget,
                 Container sourcePage,
                 int sourceSlot,
                 Container destPage,
@@ -653,6 +845,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 Player = player;
                 AckSource = ackSource;
+                AckTarget = ackTarget;
                 SourcePage = sourcePage;
                 SourceSlot = sourceSlot;
                 DestPage = destPage;
@@ -669,6 +862,8 @@ namespace ZoneEngine_New.Core.Inventory
             public Player Player { get; }
 
             public Identity AckSource { get; }
+
+            public Identity AckTarget { get; }
 
             public Container SourcePage { get; }
 

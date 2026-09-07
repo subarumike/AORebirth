@@ -71,6 +71,23 @@ namespace ZoneEngine_New.Core.Logging
             Line("VisualFlags", scfu.VisualFlags);
             Line("VisibleTitle", scfu.VisibleTitle);
             Line("Unknown1", FormatBytes(scfu.Unknown1));
+            CharMovementStatus move = scfu.MovementStatus;
+            Line(
+                "MovementStatus",
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "ModeId={0} Fwd={1}/{2} Strafe={3}/{4} Elevate={5}/{6} Turn={7}/{8} Jump={9} LastSpeed={10}",
+                    move.ModeId,
+                    move.FwdState,
+                    move.FwdDir,
+                    move.StrafeState,
+                    move.StrafeDir,
+                    move.ElevateState,
+                    move.ElevateDir,
+                    move.TurnState,
+                    move.TurnDir,
+                    move.JumpState,
+                    move.LastSpeedMode));
             Line("HeadMesh", scfu.HeadMesh);
             Line("RunSpeedBase", scfu.RunSpeedBase);
             Line("Flags2", scfu.Flags2);

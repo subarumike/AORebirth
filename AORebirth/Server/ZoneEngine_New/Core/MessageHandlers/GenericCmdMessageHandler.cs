@@ -300,7 +300,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 IdentityType.ArmorPage => player.Inventory.Armor,
                 IdentityType.ImplantPage => player.Inventory.Implant,
                 IdentityType.SocialPage => player.Inventory.Social,
-                IdentityType.Bank => player.Inventory.Bank,
+                IdentityType.BankByRef => player.Inventory.Bank,
                 _ => null
             };
 

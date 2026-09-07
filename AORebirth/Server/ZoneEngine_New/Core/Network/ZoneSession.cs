@@ -165,9 +165,32 @@ namespace ZoneEngine_New.Core.Network
                 return;
             }
 
-            LogNetworkMessage("Sent", body);
-            byte[] packet = _codec.Serialize(body, sender, receiver);
-            Send(packet);
+            try
+            {
+                byte[] packet = _codec.Serialize(body, sender, receiver);
+                LogNetworkMessage("Sent", body);
+                if (body is InfoPacketMessage)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Network,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "InfoPacket bytes={0} hex={1}",
+                            packet.Length,
+                            Convert.ToHexString(packet)));
+                }
+
+                Send(packet);
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to serialize {0}.",
+                        body.GetType().Name));
+            }
         }
 
         public void SendInitiateCompression()

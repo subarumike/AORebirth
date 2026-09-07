@@ -26,7 +26,8 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Inventory = 0x00000068, 
 
-        Bank = 0x00000069, 
+        /// <summary>Bank page / persistence identity (ContainerType 0x69).</summary>
+        BankByRef = 0x00000069, 
 
         Backpack = 0x0000006B, 
 
@@ -90,7 +91,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Organization = 0x0000DEAA, 
 
-        IncomingTradeWindow = 0x0000DEAD, 
+        /// <summary>Bank window on the wire (0xDEAD).</summary>
+        Bank = 0x0000DEAD,
+
+        IncomingTradeWindow = Bank, 
 
         Playfield3 = 0x000186A1,
     }

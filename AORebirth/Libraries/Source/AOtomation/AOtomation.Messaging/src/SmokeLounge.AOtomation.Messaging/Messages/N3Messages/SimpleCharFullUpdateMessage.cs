@@ -93,6 +93,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(19, SerializeSize = ArraySizeType.Int32)]
         public byte[] Unknown1 { get; set; }
 
+        public CharMovementStatus MovementStatus { get; set; }
+
         [AoMember(20)]
         public uint? HeadMesh { get; set; }
 
