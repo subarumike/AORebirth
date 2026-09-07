@@ -115,7 +115,7 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.ArmorPage => Armor,
                 IdentityType.ImplantPage => Implant,
                 IdentityType.SocialPage => Social,
-                IdentityType.Bank => Bank.IsHydrated ? Bank : null,
+                IdentityType.BankByRef => Bank.IsHydrated ? Bank : null,
                 _ => null
             };
 
@@ -213,6 +213,40 @@ namespace ZoneEngine_New.Core.Inventory
             return _backpackPages.TryGetValue(containerIdentity.Instance, out page!);
         }
 
+        public bool TryGetOwnedBackpackPage(Identity containerIdentity, out Container page)
+        {
+            page = null!;
+            if (!TryGetBackpackPage(containerIdentity, out page))
+                return false;
+
+            Item? bag = page.LinkedItem;
+            if (bag == null)
+                return false;
+
+            return ContainsCarriedItem(bag);
+        }
+
+        public bool ContainsCarriedItem(Item item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            return ContainsItem(Inventory, item)
+                || ContainsItem(Equipment, item)
+                || ContainsItem(Armor, item)
+                || ContainsItem(Implant, item)
+                || ContainsItem(Social, item);
+        }
+
+        static bool ContainsItem(Container page, Item item)
+        {
+            foreach (Item occupant in page.Content.Values)
+            {
+                if (ReferenceEquals(occupant, item))
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool TryGetLinkedItem(Identity containerIdentity, out Item item)
         {
             item = null!;
@@ -238,7 +272,8 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 Flags = ContainerFlags.Backpack | ContainerFlags.CanAdd | ContainerFlags.CanRemove,
                 LinkedItem = bagItem,
-                ParentSlot = parentSlot
+                ParentSlot = parentSlot,
+                IsHydrated = false
             };
 
             _backpackPages[containerIdentity.Instance] = page;
@@ -311,7 +346,7 @@ namespace ZoneEngine_New.Core.Inventory
                         Count = (short)Math.Clamp(Math.Max(1, item.StackCount), 1, short.MaxValue),
                         Identity = item.Identity.Instance != 0
                             ? item.Identity
-                            : new Identity { Type = IdentityType.Bank, Instance = pair.Key },
+                            : new Identity { Type = IdentityType.BankByRef, Instance = pair.Key },
                         ItemLowId = item.LowId,
                         ItemHighId = item.HighId,
                         Quality = item.Quality,
@@ -345,10 +380,65 @@ namespace ZoneEngine_New.Core.Inventory
         public bool TryGetBackpackPageByHandle(int handle, out Container page)
         {
             page = null!;
-            if (!TryGetContainerByHandle(handle, out Identity containerIdentity))
+            if (handle <= 0)
                 return false;
 
-            return TryGetBackpackPage(containerIdentity, out page);
+            if (TryGetContainerByHandle(handle, out Identity containerIdentity)
+                && TryGetBackpackPage(containerIdentity, out page))
+                return true;
+
+            foreach (Container candidate in _backpackPages.Values)
+            {
+                if (candidate.InventoryHandle != handle)
+                    continue;
+
+                page = candidate;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetOwnedBackpackPageByHandle(int handle, out Container page)
+        {
+            page = null!;
+            if (!TryGetBackpackPageByHandle(handle, out page))
+                return false;
+
+            Item? bag = page.LinkedItem;
+            if (bag == null)
+                return false;
+
+            return ContainsCarriedItem(bag);
+        }
+
+        public bool TryGetUniqueOwnedBackpackSlot(int slot, out Container page, out Item item)
+        {
+            page = null!;
+            item = null!;
+            Container? found = null;
+
+            foreach (Container candidate in _backpackPages.Values)
+            {
+                Item? bag = candidate.LinkedItem;
+                if (bag == null || !ContainsCarriedItem(bag))
+                    continue;
+
+                if (!candidate.Content.TryGetValue(slot, out Item? occupant))
+                    continue;
+
+                if (found != null)
+                    return false;
+
+                found = candidate;
+                item = occupant;
+            }
+
+            if (found == null)
+                return false;
+
+            page = found;
+            return true;
         }
 
         public void MarkDirty(Item item, Container page, int placement)
@@ -651,7 +741,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 Flags = ContainerFlags.CanAdd | ContainerFlags.CanRemove
             };
-            Bank = new Container(IdentityType.Bank, offset: 0, capacity: BankCapacity, instanceId: characterId)
+            Bank = new Container(IdentityType.BankByRef, offset: 0, capacity: BankCapacity, instanceId: characterId)
             {
                 Flags = ContainerFlags.Bank | ContainerFlags.CanAdd | ContainerFlags.CanRemove,
                 IsHydrated = false

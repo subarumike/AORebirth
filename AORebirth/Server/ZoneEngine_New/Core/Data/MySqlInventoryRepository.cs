@@ -29,7 +29,7 @@ namespace ZoneEngine_New.Core.Data
             "SELECT InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, "
             + "LowId, HighId, Quality, StackCount, Source "
             + "FROM item_instances WHERE ContainerType = "
-            + (int)IdentityType.Bank
+            + (int)IdentityType.BankByRef
             + " AND ContainerInstance = @CharacterId";
 
         private static readonly string SelectContainerSql =
@@ -256,15 +256,7 @@ namespace ZoneEngine_New.Core.Data
             ArgumentNullException.ThrowIfNull(connection);
             ArgumentNullException.ThrowIfNull(transaction);
 
-            for (int i = 0; i < inserts.Count; i++)
-            {
-                ItemInstanceRecord item = inserts[i];
-                if (item.InstanceId <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(inserts));
-                ExecuteInsert(item, connection, transaction);
-            }
-
-            // Park updates into unique negative placements first so swaps cannot collide.
+            // Park updates first so a new insert can reuse a slot another dirty item is leaving.
             for (int i = 0; i < updates.Count; i++)
             {
                 ItemLocationUpdate update = updates[i];
@@ -284,6 +276,14 @@ namespace ZoneEngine_New.Core.Data
                             "UpdateLocations park found no row for InstanceId={0}",
                             update.InstanceId));
                 }
+            }
+
+            for (int i = 0; i < inserts.Count; i++)
+            {
+                ItemInstanceRecord item = inserts[i];
+                if (item.InstanceId <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(inserts));
+                ExecuteInsert(item, connection, transaction);
             }
 
             foreach (ItemLocationUpdate update in updates)

@@ -55,7 +55,7 @@ namespace AORebirth.Core.Inventory
             this.Pages.Add((int)IdentityType.SocialPage, new SocialArmorInventoryPage(owner.Identity));
             this.Pages.Add((int)IdentityType.ImplantPage, new ImplantInventoryPage(owner.Identity));
             this.Pages.Add((int)IdentityType.WeaponPage, new WeaponInventoryPage(owner.Identity));
-            this.Pages.Add((int)IdentityType.Bank, new BankInventoryPage(owner.Identity));
+            this.Pages.Add((int)IdentityType.BankByRef, new BankInventoryPage(owner.Identity));
         }
 
         #endregion
