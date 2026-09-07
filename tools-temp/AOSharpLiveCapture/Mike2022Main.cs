@@ -11,6 +11,11 @@ using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
 using AORebirth.CaptureProtocol;
+using SmokeLounge.AOtomation.Messaging.Messages;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using N3AttackInfoMessage = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.AttackInfoMessage;
+using N3AttackMessage = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.AttackMessage;
+using N3MissedAttackInfoMessage = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.MissedAttackInfoMessage;
 using AOBackpack = AOSharp.Core.Inventory.Backpack;
 using AOContainer = AOSharp.Core.Inventory.Container;
 using AOInventory = AOSharp.Core.Inventory.Inventory;
@@ -145,6 +150,13 @@ namespace AOSharpLiveCapture.Mike2022
             internal ItemSnapshot Item;
         }
 
+        private sealed class RuntimeStatValue
+        {
+            internal object Stat;
+            internal int StatId;
+            internal object Value;
+        }
+
         private readonly object syncRoot = new object();
         private readonly Stopwatch captureClock = new Stopwatch();
         private string pluginDirectory = string.Empty;
@@ -159,6 +171,10 @@ namespace AOSharpLiveCapture.Mike2022
         private StreamWriter visibilityObservationLog;
         private StreamWriter inventorySnapshotLog;
         private StreamWriter itemUseObservationLog;
+        private StreamWriter enemyStatSnapshotLog;
+        private StreamWriter enemyStatUpdateLog;
+        private StreamWriter enemyCombatLog;
+        private StreamWriter enemyStateLog;
         private StreamWriter eventLog;
         private readonly Dictionary<string, EntitySnapshot> knownEntities =
             new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
@@ -246,6 +262,13 @@ namespace AOSharpLiveCapture.Mike2022
         private int correlatedDeleteItems;
         private int itemUseObservationRows;
         private int itemUseObservationErrors;
+        private int decodedInboundSequence;
+        private int decodedOutboundSequence;
+        private int enemyStatSnapshotRows;
+        private int enemyStatSnapshotErrors;
+        private int enemyStatUpdateRows;
+        private int enemyCombatRows;
+        private int enemyStateRows;
 
         public override void Run(string pluginDir)
         {
@@ -254,6 +277,8 @@ namespace AOSharpLiveCapture.Mike2022
             {
                 Network.PacketReceived += this.OnPacketReceived;
                 Network.PacketSent += this.OnPacketSent;
+                Network.N3MessageReceived += this.OnN3MessageReceived;
+                Network.N3MessageSent += this.OnN3MessageSent;
                 AOInventory.ContainerOpened += this.OnContainerOpened;
                 Game.OnUpdate += this.OnUpdate;
                 Chat.RegisterCommand("aocap", this.OnCommand);
@@ -456,6 +481,10 @@ namespace AOSharpLiveCapture.Mike2022
                 this.visibilityObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "visibility-observations.csv"));
                 this.inventorySnapshotLog = CreateWriter(Path.Combine(this.sessionDirectory, "inventory-snapshots.csv"));
                 this.itemUseObservationLog = CreateWriter(Path.Combine(this.sessionDirectory, "item-use-observations.csv"));
+                this.enemyStatSnapshotLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-snapshots.csv"));
+                this.enemyStatUpdateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-stat-updates.csv"));
+                this.enemyCombatLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-combat.csv"));
+                this.enemyStateLog = CreateWriter(Path.Combine(this.sessionDirectory, "enemy-state.csv"));
                 this.eventLog = CreateWriter(Path.Combine(this.sessionDirectory, "events.log"));
                 this.rawPacketLog.WriteLine(
                     "CapturedUtc,ElapsedMilliseconds,Direction,GlobalOrdinal,Sequence,PacketLength,N3TypeValue,N3TypeName,IdentityType,IdentityInstance,PreservationStatus,RawHex");
@@ -474,6 +503,14 @@ namespace AOSharpLiveCapture.Mike2022
                     "CapturedUtc,ElapsedMilliseconds,Phase,ContainerKind,ContainerIdentity,ContainerName,ContainerSlotIdentity,ContainerOpen,ItemSlotIdentity,ItemUniqueIdentity,LowId,HighId,QualityLevel,Name,Charges,ResolutionStatus,Error");
                 this.itemUseObservationLog.WriteLine(
                     "CapturedUtc,ElapsedMilliseconds,Phase,Direction,GlobalOrdinal,Sequence,SourceIdentity,Action,TargetSlotIdentity,ContainerKind,ContainerIdentity,ContainerName,ContainerSlotIdentity,ItemUniqueIdentity,LowId,HighId,QualityLevel,Name,Charges,ItemSnapshotUtc,ResolutionStatus,RelatedUseUtc,RelatedUseOrdinal,RelatedUseSequence,EvidenceSource,Error");
+                this.enemyStatSnapshotLog.WriteLine(
+                    "CapturedUtc,Phase,Identity,Name,PlayfieldId,Stat,StatId,Value,Presence,Provenance,PositionX,PositionY,PositionZ,StatsCount,Error");
+                this.enemyStatUpdateLog.WriteLine(
+                    "CapturedUtc,Direction,Sequence,MessageType,IdentityRole,Identity,Stat,StatId,Value,PositionX,PositionY,PositionZ,StatsCount,Detail");
+                this.enemyCombatLog.WriteLine(
+                    "CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail");
+                this.enemyStateLog.WriteLine(
+                    "timestamp,direction,sequence,messageType,evidenceSource,entityId,level,currentHealth,maxHealth,x,y,z,eventType");
             }
             catch
             {
@@ -487,6 +524,10 @@ namespace AOSharpLiveCapture.Mike2022
                 this.visibilityObservationLog = CloseWriter(this.visibilityObservationLog);
                 this.inventorySnapshotLog = CloseWriter(this.inventorySnapshotLog);
                 this.itemUseObservationLog = CloseWriter(this.itemUseObservationLog);
+                this.enemyStatSnapshotLog = CloseWriter(this.enemyStatSnapshotLog);
+                this.enemyStatUpdateLog = CloseWriter(this.enemyStatUpdateLog);
+                this.enemyCombatLog = CloseWriter(this.enemyCombatLog);
+                this.enemyStateLog = CloseWriter(this.enemyStateLog);
                 this.eventLog = CloseWriter(this.eventLog);
                 throw;
             }
@@ -543,6 +584,13 @@ namespace AOSharpLiveCapture.Mike2022
             this.correlatedDeleteItems = 0;
             this.itemUseObservationRows = 0;
             this.itemUseObservationErrors = 0;
+            this.decodedInboundSequence = 0;
+            this.decodedOutboundSequence = 0;
+            this.enemyStatSnapshotRows = 0;
+            this.enemyStatSnapshotErrors = 0;
+            this.enemyStatUpdateRows = 0;
+            this.enemyCombatRows = 0;
+            this.enemyStateRows = 0;
             this.knownEntities.Clear();
             this.knownCorpses.Clear();
             this.positions.Clear();
@@ -579,6 +627,196 @@ namespace AOSharpLiveCapture.Mike2022
         private void OnPacketSent(object sender, byte[] packet)
         {
             this.CapturePacket("OUT", packet, false);
+        }
+
+        private void OnN3MessageReceived(object sender, N3Message message)
+        {
+            this.CaptureDecodedMessage("IN-N3", message, true);
+        }
+
+        private void OnN3MessageSent(object sender, N3Message message)
+        {
+            this.CaptureDecodedMessage("OUT-N3", message, false);
+        }
+
+        private void CaptureDecodedMessage(string direction, N3Message message, bool inbound)
+        {
+            lock (this.syncRoot)
+            {
+                if (!this.enabled || message == null)
+                {
+                    return;
+                }
+
+                DateTime capturedUtc = DateTime.UtcNow;
+                this.lastPacketUtc = capturedUtc;
+                int sequence = inbound ? ++this.decodedInboundSequence : ++this.decodedOutboundSequence;
+
+                try
+                {
+                    StatMessage statMessage = message as StatMessage;
+                    if (statMessage != null)
+                    {
+                        this.CaptureDecodedStatMessage(capturedUtc, direction, sequence, statMessage);
+                    }
+
+                    if (message is N3AttackInfoMessage
+                        || message is N3MissedAttackInfoMessage
+                        || message is N3AttackMessage)
+                    {
+                        this.CaptureDecodedCombatMessage(capturedUtc, direction, sequence, message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.WriteFallbackError("DecodedMessage." + message.GetType().Name, ex);
+                }
+            }
+        }
+
+        private void CaptureDecodedStatMessage(
+            DateTime capturedUtc,
+            string direction,
+            int sequence,
+            StatMessage message)
+        {
+            if (this.enemyStatUpdateLog == null)
+            {
+                return;
+            }
+
+            string identity = NormalizeIdentity(MemberText(message, "Identity"));
+            var values = new List<RuntimeStatValue>();
+            IEnumerable stats = MemberValue(message, "Stats") as IEnumerable;
+            if (stats != null)
+            {
+                foreach (object entry in stats)
+                {
+                    object stat;
+                    object value;
+                    if (TryGetGameTupleValues(entry, out stat, out value))
+                    {
+                        values.Add(new RuntimeStatValue { Stat = stat, Value = value });
+                    }
+                }
+            }
+
+            EntitySnapshot entity;
+            this.knownEntities.TryGetValue(identity, out entity);
+            string messageType = MemberText(message, "N3MessageType");
+            if (messageType.Length == 0)
+            {
+                messageType = message.GetType().Name;
+            }
+
+            foreach (RuntimeStatValue entry in values)
+            {
+                this.enemyStatUpdateRows++;
+                this.enemyStatUpdateLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(direction),
+                        sequence.ToString(CultureInfo.InvariantCulture),
+                        Csv(messageType),
+                        Csv(this.ResolveIdentityRole(identity)),
+                        Csv(identity),
+                        Csv(ValueText(entry.Stat)),
+                        Csv(GetNumericValue(entry.Stat)),
+                        Csv(ValueText(entry.Value)),
+                        Csv(entity == null ? string.Empty : FormatFloat(entity.X)),
+                        Csv(entity == null ? string.Empty : FormatFloat(entity.Y)),
+                        Csv(entity == null ? string.Empty : FormatFloat(entity.Z)),
+                        values.Count.ToString(CultureInfo.InvariantCulture),
+                        Csv("presence=transmitted;provenance=DecodedN3Message;unknown=" + MemberText(message, "Unknown"))));
+            }
+        }
+
+        private void CaptureDecodedCombatMessage(
+            DateTime capturedUtc,
+            string direction,
+            int sequence,
+            N3Message message)
+        {
+            string sourceIdentity = NormalizeIdentity(MemberText(message, "Identity"));
+            string targetIdentity = string.Empty;
+            string auxIdentity1 = string.Empty;
+            string action = string.Empty;
+            string amount = string.Empty;
+            string unknown1 = string.Empty;
+            string unknown2 = string.Empty;
+            string unknown3 = string.Empty;
+            string unknown4 = string.Empty;
+            string unknown5 = string.Empty;
+            string unknown6 = string.Empty;
+            string detail;
+
+            N3AttackInfoMessage attackInfo = message as N3AttackInfoMessage;
+            N3MissedAttackInfoMessage missed = message as N3MissedAttackInfoMessage;
+            N3AttackMessage attack = message as N3AttackMessage;
+            if (attackInfo != null)
+            {
+                targetIdentity = NormalizeIdentity(MemberText(attackInfo, "Target"));
+                action = "hit";
+                amount = MemberText(attackInfo, "Amount");
+                unknown1 = MemberText(attackInfo, "Unk1");
+                unknown2 = MemberText(attackInfo, "AmmoCount");
+                unknown3 = MemberText(attackInfo, "WeaponSlot");
+                unknown4 = MemberText(attackInfo, "HitType");
+                unknown5 = MemberText(attackInfo, "WeaponInstance");
+                unknown6 = MemberText(attackInfo, "Unknown");
+                detail = "presence=transmitted;provenance=DecodedN3Message;damageType="
+                         + MemberText(attackInfo, "DamageType");
+            }
+            else if (missed != null)
+            {
+                targetIdentity = NormalizeIdentity(MemberText(missed, "Defender"));
+                auxIdentity1 = NormalizeIdentity(MemberText(missed, "Attacker"));
+                action = "miss";
+                unknown1 = MemberText(missed, "Unknown1");
+                unknown2 = MemberText(missed, "Unknown2");
+                unknown3 = MemberText(missed, "Unknown3");
+                unknown6 = MemberText(missed, "Unknown");
+                detail = "presence=transmitted;provenance=DecodedN3Message";
+            }
+            else if (attack != null)
+            {
+                targetIdentity = NormalizeIdentity(MemberText(attack, "Target"));
+                action = MemberText(attack, "Action");
+                unknown6 = MemberText(attack, "Unknown");
+                detail = "presence=transmitted;provenance=DecodedN3Message";
+            }
+            else
+            {
+                return;
+            }
+
+            this.enemyCombatRows++;
+            this.enemyCombatLog.WriteLine(
+                string.Join(
+                    ",",
+                    Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                    Csv(direction),
+                    sequence.ToString(CultureInfo.InvariantCulture),
+                    Csv(message.GetType().Name),
+                    Csv(this.ResolveIdentityRole(sourceIdentity)),
+                    Csv(sourceIdentity),
+                    Csv(this.ResolveIdentityRole(targetIdentity)),
+                    Csv(targetIdentity),
+                    Csv(this.ResolveIdentityRole(auxIdentity1)),
+                    Csv(auxIdentity1),
+                    Csv(string.Empty),
+                    Csv(string.Empty),
+                    Csv(action),
+                    Csv(amount),
+                    Csv(string.Empty),
+                    Csv(unknown1),
+                    Csv(unknown2),
+                    Csv(unknown3),
+                    Csv(unknown4),
+                    Csv(unknown5),
+                    Csv(unknown6),
+                    Csv(detail)));
         }
 
         private void OnContainerOpened(object sender, AOContainer container)
@@ -780,7 +1018,7 @@ namespace AOSharpLiveCapture.Mike2022
 
             if (messageType == CorpseFullUpdateMessage)
             {
-                this.CaptureCorpseFullUpdate(capturedUtc, packet);
+                this.CaptureCorpseFullUpdate(capturedUtc, direction, sequence, packet);
                 return;
             }
 
@@ -1604,6 +1842,18 @@ namespace AOSharpLiveCapture.Mike2022
                 decoded.Position.X,
                 decoded.Position.Y,
                 decoded.Position.Z);
+            if (entity.IsNpc)
+            {
+                this.WriteScfuStatSnapshot(capturedUtc, direction, sequence, decoded, entity);
+                this.WriteEnemyState(
+                    capturedUtc,
+                    direction,
+                    sequence,
+                    "SimpleCharFullUpdate",
+                    "RawSimpleCharFullUpdate",
+                    entity,
+                    "spawn");
+            }
         }
 
         private void CaptureDespawnObservation(
@@ -1716,7 +1966,11 @@ namespace AOSharpLiveCapture.Mike2022
             }
         }
 
-        private void CaptureCorpseFullUpdate(DateTime capturedUtc, byte[] packet)
+        private void CaptureCorpseFullUpdate(
+            DateTime capturedUtc,
+            string direction,
+            int sequence,
+            byte[] packet)
         {
             this.corpseFullUpdatePackets++;
             if (packet.Length < 231)
@@ -1761,6 +2015,35 @@ namespace AOSharpLiveCapture.Mike2022
             };
             this.knownCorpses[corpseIdentity] = corpse;
             this.observedCorpseIdentities.Add(corpseIdentity);
+            EntitySnapshot deadEntity;
+            this.knownEntities.TryGetValue(corpse.DeadNpcIdentity, out deadEntity);
+            if (deadEntity == null)
+            {
+                deadEntity = new EntitySnapshot
+                {
+                    CapturedUtc = capturedUtc,
+                    Identity = corpse.DeadNpcIdentity,
+                    Name = corpse.Name,
+                    PlayfieldId = corpse.PlayfieldId,
+                    X = corpse.X,
+                    Y = corpse.Y,
+                    Z = corpse.Z,
+                    MonsterData = corpse.MonsterData,
+                    HasPosition = true,
+                    IsNpc = true,
+                    Kind = "NPC"
+                };
+            }
+
+            deadEntity.HealthDamage = deadEntity.Health;
+            this.WriteEnemyState(
+                capturedUtc,
+                direction,
+                sequence,
+                "CorpseFullUpdate",
+                "RawCorpseFullUpdate",
+                deadEntity,
+                "death");
             this.WriteWorldSnapshot("corpse-observed");
         }
 
@@ -2628,6 +2911,10 @@ namespace AOSharpLiveCapture.Mike2022
                 && this.visibilityObservationLog == null
                 && this.inventorySnapshotLog == null
                 && this.itemUseObservationLog == null
+                && this.enemyStatSnapshotLog == null
+                && this.enemyStatUpdateLog == null
+                && this.enemyCombatLog == null
+                && this.enemyStateLog == null
                 && this.eventLog == null)
             {
                 return;
@@ -2664,6 +2951,10 @@ namespace AOSharpLiveCapture.Mike2022
             this.visibilityObservationLog = CloseWriter(this.visibilityObservationLog);
             this.inventorySnapshotLog = CloseWriter(this.inventorySnapshotLog);
             this.itemUseObservationLog = CloseWriter(this.itemUseObservationLog);
+            this.enemyStatSnapshotLog = CloseWriter(this.enemyStatSnapshotLog);
+            this.enemyStatUpdateLog = CloseWriter(this.enemyStatUpdateLog);
+            this.enemyCombatLog = CloseWriter(this.enemyCombatLog);
+            this.enemyStateLog = CloseWriter(this.enemyStateLog);
             this.eventLog = CloseWriter(this.eventLog);
         }
 
@@ -2693,6 +2984,8 @@ namespace AOSharpLiveCapture.Mike2022
             json.AppendLine("  \"rawPacketWriteErrors\": " + this.rawWriteErrors.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("  \"rawMissingPackets\": " + this.rawMissingPackets.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("  \"checkpointWriteErrors\": " + this.checkpointWriteErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("  \"decodedInbound\": " + this.decodedInboundSequence.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("  \"decodedOutbound\": " + this.decodedOutboundSequence.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("  \"movementProjection\": {");
             json.AppendLine("    \"rows\": " + this.movementPacketRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"followTargetPackets\": " + this.movementFollowTargetPackets.ToString(CultureInfo.InvariantCulture) + ",");
@@ -2707,6 +3000,11 @@ namespace AOSharpLiveCapture.Mike2022
             json.AppendLine("    \"scfuDecodeErrors\": " + this.scfuDecodeErrors.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"worldSnapshotRows\": " + this.worldSnapshotRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"worldSnapshotErrors\": " + this.worldSnapshotErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"enemyStatSnapshotRows\": " + this.enemyStatSnapshotRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"enemyStatSnapshotErrors\": " + this.enemyStatSnapshotErrors.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"enemyStatUpdateRows\": " + this.enemyStatUpdateRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"enemyCombatRows\": " + this.enemyCombatRows.ToString(CultureInfo.InvariantCulture) + ",");
+            json.AppendLine("    \"enemyStateRows\": " + this.enemyStateRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"playerCombatContextRows\": " + this.playerCombatContextRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"playerCombatContextCompleteRows\": " + this.playerCombatContextCompleteRows.ToString(CultureInfo.InvariantCulture) + ",");
             json.AppendLine("    \"playerCombatContextErrors\": " + this.playerCombatContextErrors.ToString(CultureInfo.InvariantCulture) + ",");
@@ -3006,6 +3304,20 @@ namespace AOSharpLiveCapture.Mike2022
                                     Csv(string.Empty),
                                     Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
                                     Csv(evidenceSource)));
+
+                            if (isNpc)
+                            {
+                                this.WriteRuntimeStatSnapshot(
+                                    capturedUtc,
+                                    phase,
+                                    identity,
+                                    name,
+                                    evidenceDynel,
+                                    positionX,
+                                    positionY,
+                                    positionZ,
+                                    evidenceSource);
+                            }
                         }
 
                         if (identity.Length == 0)
@@ -3076,6 +3388,17 @@ namespace AOSharpLiveCapture.Mike2022
                                 x,
                                 y,
                                 z);
+                            if (writeWorldRows && isNpc)
+                            {
+                                this.WriteEnemyState(
+                                    capturedUtc,
+                                    "LOCAL",
+                                    0,
+                                    "DynelSnapshot",
+                                    evidenceSource,
+                                    visible,
+                                    phase);
+                            }
                         }
                         else
                         {
@@ -3624,6 +3947,15 @@ namespace AOSharpLiveCapture.Mike2022
                 issues.Add("world snapshot errors=" + this.worldSnapshotErrors.ToString(CultureInfo.InvariantCulture));
             }
 
+            if (this.scfuPackets > 0 && this.enemyStatSnapshotRows == 0)
+            {
+                issues.Add("NPC observed without runtime stat snapshot entries");
+            }
+            else if (this.enemyStatSnapshotErrors > 0)
+            {
+                issues.Add("NPC runtime stat snapshot errors=" + this.enemyStatSnapshotErrors.ToString(CultureInfo.InvariantCulture));
+            }
+
             if (this.visibilitySamples < 2)
             {
                 issues.Add("insufficient periodic visibility samples=" + this.visibilitySamples.ToString(CultureInfo.InvariantCulture));
@@ -3681,9 +4013,19 @@ namespace AOSharpLiveCapture.Mike2022
                 issues.Add("unprovoked aggro observed without pre-aggro heading correlation");
             }
 
+            if (this.attackInfoPackets + this.missedAttackPackets > 0 && this.enemyCombatRows == 0)
+            {
+                issues.Add("combat packets observed without decoded enemy-combat rows");
+            }
+
             if (this.deathActions == 0 && this.corpseFullUpdatePackets == 0)
             {
                 issues.Add("no death/corpse evidence");
+            }
+
+            if (this.scfuPackets + this.corpseFullUpdatePackets > 0 && this.enemyStateRows == 0)
+            {
+                issues.Add("enemy identity evidence observed without enemy-state rows");
             }
 
             if (this.inventoryUpdatePackets == 0)
@@ -3746,6 +4088,10 @@ namespace AOSharpLiveCapture.Mike2022
                 json.AppendLine("    \"rawPacketStream\": " + (this.inboundSequence + this.outboundSequence > 0 && this.rawWriteErrors == 0 && this.rawMissingPackets == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"identityAndSpawn\": " + (this.scfuPackets > 0 && this.scfuDecodeErrors == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"worldSnapshot\": " + (this.worldSnapshotRows > 0 && this.worldSnapshotErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"npcRuntimeStats\": " + (this.enemyStatSnapshotRows > 0 && this.enemyStatSnapshotErrors == 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"decodedStatUpdates\": " + (this.enemyStatUpdateRows > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"decodedEnemyCombat\": " + (this.enemyCombatRows > 0 ? "true" : "false") + ",");
+                json.AppendLine("    \"enemyState\": " + (this.enemyStateRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"visibilitySampling\": " + (this.visibilitySamples >= 2 && this.visibilitySampleErrors == 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"visibilityTransitions\": " + (this.visibilityTransitionRows > 0 ? "true" : "false") + ",");
                 json.AppendLine("    \"lineOfSightState\": " + (this.lineOfSightStateObservations > 0 && this.lineOfSightReadErrors == 0 ? "true" : "false") + ",");
@@ -3813,6 +4159,10 @@ namespace AOSharpLiveCapture.Mike2022
             TryFlush(this.visibilityObservationLog);
             TryFlush(this.inventorySnapshotLog);
             TryFlush(this.itemUseObservationLog);
+            TryFlush(this.enemyStatSnapshotLog);
+            TryFlush(this.enemyStatUpdateLog);
+            TryFlush(this.enemyCombatLog);
+            TryFlush(this.enemyStateLog);
             TryFlush(this.eventLog);
         }
 
@@ -3820,6 +4170,8 @@ namespace AOSharpLiveCapture.Mike2022
         {
             try { Network.PacketReceived -= this.OnPacketReceived; } catch { }
             try { Network.PacketSent -= this.OnPacketSent; } catch { }
+            try { Network.N3MessageReceived -= this.OnN3MessageReceived; } catch { }
+            try { Network.N3MessageSent -= this.OnN3MessageSent; } catch { }
             try { AOInventory.ContainerOpened -= this.OnContainerOpened; } catch { }
             try { Game.OnUpdate -= this.OnUpdate; } catch { }
         }
@@ -4260,6 +4612,305 @@ namespace AOSharpLiveCapture.Mike2022
             return value.HasValue
                        ? value.Value.ToString("0.###", CultureInfo.InvariantCulture)
                        : string.Empty;
+        }
+
+        private void WriteRuntimeStatSnapshot(
+            DateTime capturedUtc,
+            string phase,
+            string identity,
+            string name,
+            object character,
+            string positionX,
+            string positionY,
+            string positionZ,
+            string evidenceSource)
+        {
+            if (this.enemyStatSnapshotLog == null)
+            {
+                return;
+            }
+
+            var values = new List<RuntimeStatValue>();
+            string error = string.Empty;
+            try
+            {
+                object statsObject = MemberValue(character, "Stats");
+                IDictionary dictionary = statsObject as IDictionary;
+                if (dictionary != null)
+                {
+                    foreach (DictionaryEntry entry in dictionary)
+                    {
+                        values.Add(new RuntimeStatValue { Stat = entry.Key, Value = entry.Value });
+                    }
+                }
+                else
+                {
+                    IEnumerable enumerable = statsObject as IEnumerable;
+                    if (enumerable == null)
+                    {
+                        error = "Stats collection unavailable";
+                    }
+                    else
+                    {
+                        foreach (object entry in enumerable)
+                        {
+                            object stat;
+                            object value;
+                            if (!TryGetGameTupleValues(entry, out stat, out value))
+                            {
+                                stat = MemberValue(entry, "Key") ?? MemberValue(entry, "Stat");
+                                value = MemberValue(entry, "Value");
+                            }
+
+                            if (stat != null)
+                            {
+                                values.Add(new RuntimeStatValue { Stat = stat, Value = value });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                error = ex.GetType().Name + ": " + OneLine(ex.Message);
+            }
+
+            if (values.Count == 0)
+            {
+                this.enemyStatSnapshotErrors++;
+                if (error.Length == 0)
+                {
+                    error = "Stats collection contained no enumerable entries";
+                }
+
+                this.enemyStatSnapshotLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(phase),
+                        Csv(identity),
+                        Csv(name),
+                        this.sessionPlayfieldId.ToString(CultureInfo.InvariantCulture),
+                        Csv(string.Empty),
+                        Csv(string.Empty),
+                        Csv(string.Empty),
+                        Csv("unavailable"),
+                        Csv(evidenceSource + ".Stats"),
+                        Csv(positionX),
+                        Csv(positionY),
+                        Csv(positionZ),
+                        "0",
+                        Csv(error)));
+                return;
+            }
+
+            foreach (RuntimeStatValue entry in values)
+            {
+                this.enemyStatSnapshotRows++;
+                this.enemyStatSnapshotLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv(phase),
+                        Csv(identity),
+                        Csv(name),
+                        this.sessionPlayfieldId.ToString(CultureInfo.InvariantCulture),
+                        Csv(ValueText(entry.Stat)),
+                        Csv(entry.StatId > 0
+                                ? entry.StatId.ToString(CultureInfo.InvariantCulture)
+                                : GetNumericValue(entry.Stat)),
+                        Csv(ValueText(entry.Value)),
+                        Csv("runtime-entry"),
+                        Csv(evidenceSource + ".Stats"),
+                        Csv(positionX),
+                        Csv(positionY),
+                        Csv(positionZ),
+                        values.Count.ToString(CultureInfo.InvariantCulture),
+                        Csv(string.Empty)));
+            }
+        }
+
+        private void WriteScfuStatSnapshot(
+            DateTime capturedUtc,
+            string direction,
+            int sequence,
+            RawSimpleCharFullUpdate decoded,
+            EntitySnapshot entity)
+        {
+            if (this.enemyStatSnapshotLog == null || decoded == null || decoded.Npc == null)
+            {
+                return;
+            }
+
+            var values = new[]
+            {
+                new RuntimeStatValue { Stat = "Life", StatId = 1, Value = decoded.HealthDamage },
+                new RuntimeStatValue { Stat = "Breed", StatId = 4, Value = decoded.AppearanceBreed },
+                new RuntimeStatValue { Stat = "Health", StatId = 27, Value = decoded.Health },
+                new RuntimeStatValue { Stat = "Side", StatId = 33, Value = decoded.AppearanceSide },
+                new RuntimeStatValue { Stat = "Fatness", StatId = 47, Value = decoded.AppearanceFatness },
+                new RuntimeStatValue { Stat = "Level", StatId = 54, Value = decoded.Level },
+                new RuntimeStatValue { Stat = "Gender", StatId = 59, Value = decoded.AppearanceGender },
+                new RuntimeStatValue { Stat = "Race", StatId = 89, Value = decoded.AppearanceRace },
+                new RuntimeStatValue { Stat = "RunSpeed", StatId = 156, Value = decoded.RunSpeedBase },
+                new RuntimeStatValue { Stat = "MonsterData", StatId = 359, Value = decoded.MonsterData },
+                new RuntimeStatValue { Stat = "MonsterScale", StatId = 360, Value = decoded.MonsterScale },
+                new RuntimeStatValue { Stat = "Expansions", StatId = 389, Value = decoded.Expansions },
+                new RuntimeStatValue { Stat = "NPCFamily", StatId = 455, Value = decoded.Npc.Family },
+                new RuntimeStatValue { Stat = "AccountFlags", StatId = 660, Value = decoded.AccountFlags }
+            };
+
+            foreach (RuntimeStatValue entry in values)
+            {
+                this.enemyStatSnapshotRows++;
+                this.enemyStatSnapshotLog.WriteLine(
+                    string.Join(
+                        ",",
+                        Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                        Csv("spawn"),
+                        Csv(entity.Identity),
+                        Csv(entity.Name),
+                        entity.PlayfieldId.ToString(CultureInfo.InvariantCulture),
+                        Csv(ValueText(entry.Stat)),
+                        entry.StatId.ToString(CultureInfo.InvariantCulture),
+                        Csv(ValueText(entry.Value)),
+                        Csv("transmitted"),
+                        Csv("RawSimpleCharFullUpdate:" + direction + ":" + sequence.ToString(CultureInfo.InvariantCulture)),
+                        Csv(FormatFloat(entity.X)),
+                        Csv(FormatFloat(entity.Y)),
+                        Csv(FormatFloat(entity.Z)),
+                        values.Length.ToString(CultureInfo.InvariantCulture),
+                        Csv(string.Empty)));
+            }
+        }
+
+        private void WriteEnemyState(
+            DateTime capturedUtc,
+            string direction,
+            int sequence,
+            string messageType,
+            string evidenceSource,
+            EntitySnapshot entity,
+            string eventType)
+        {
+            if (this.enemyStateLog == null || entity == null || string.IsNullOrWhiteSpace(entity.Identity))
+            {
+                return;
+            }
+
+            string currentHealth;
+            string maxHealth;
+            if (string.Equals(eventType, "death", StringComparison.OrdinalIgnoreCase))
+            {
+                currentHealth = "0";
+                maxHealth = entity.Health > 0
+                                ? entity.Health.ToString(CultureInfo.InvariantCulture)
+                                : string.Empty;
+            }
+            else if (string.Equals(evidenceSource, "RawSimpleCharFullUpdate", StringComparison.Ordinal))
+            {
+                currentHealth = Math.Max(0, entity.Health - entity.HealthDamage)
+                                    .ToString(CultureInfo.InvariantCulture);
+                maxHealth = entity.Health.ToString(CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                currentHealth = entity.Health.ToString(CultureInfo.InvariantCulture);
+                maxHealth = string.Empty;
+            }
+
+            this.enemyStateRows++;
+            this.enemyStateLog.WriteLine(
+                string.Join(
+                    ",",
+                    Csv(capturedUtc.ToString("o", CultureInfo.InvariantCulture)),
+                    Csv(direction),
+                    sequence.ToString(CultureInfo.InvariantCulture),
+                    Csv(messageType),
+                    Csv(evidenceSource),
+                    Csv(entity.Identity),
+                    entity.Level.ToString(CultureInfo.InvariantCulture),
+                    Csv(currentHealth),
+                    Csv(maxHealth),
+                    Csv(entity.HasPosition ? FormatFloat(entity.X) : string.Empty),
+                    Csv(entity.HasPosition ? FormatFloat(entity.Y) : string.Empty),
+                    Csv(entity.HasPosition ? FormatFloat(entity.Z) : string.Empty),
+                    Csv(eventType)));
+        }
+
+        private string ResolveIdentityRole(string identity)
+        {
+            string normalized = NormalizeIdentity(identity);
+            if (normalized.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            if (IdentityEquals(normalized, this.playerIdentity))
+            {
+                return "local-player";
+            }
+
+            EntitySnapshot entity;
+            if (this.knownEntities.TryGetValue(normalized, out entity))
+            {
+                if (entity.IsNpc)
+                {
+                    return "npc";
+                }
+
+                if (entity.IsPlayer)
+                {
+                    return "player";
+                }
+            }
+
+            return normalized.StartsWith("SimpleChar:", StringComparison.OrdinalIgnoreCase)
+                       ? "character"
+                       : "unknown";
+        }
+
+        private static bool TryGetGameTupleValues(object value, out object left, out object right)
+        {
+            left = null;
+            right = null;
+            if (value == null)
+            {
+                return false;
+            }
+
+            Type type = value.GetType();
+            if (!type.IsGenericType
+                || type.GetGenericTypeDefinition().FullName
+                   != "SmokeLounge.AOtomation.Messaging.GameData.GameTuple`2")
+            {
+                return false;
+            }
+
+            left = MemberValue(value, "Value1");
+            right = MemberValue(value, "Value2");
+            return left != null;
+        }
+
+        private static string GetNumericValue(object value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                IConvertible convertible = value as IConvertible;
+                return convertible == null
+                           ? string.Empty
+                           : convertible.ToInt32(CultureInfo.InvariantCulture)
+                               .ToString(CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         private static string NormalizeIdentity(string identity)

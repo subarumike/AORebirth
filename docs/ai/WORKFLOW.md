@@ -644,7 +644,17 @@ The plugin retains the complete inbound and outbound raw stream in
 `FollowTarget`, `SetPos`, `StopMovingCmd`, and `CharDCMove` packets into
 `movement-packets.csv`, raw `SimpleCharFullUpdate` packets into
 `scfu-appearance.csv`, current AOSharp dynels plus exact raw entity/corpse
-evidence into `world-snapshot.csv`, player position/stats/evades/armor/buffs/
+evidence into `world-snapshot.csv`, and decoded spawn/death plus live observations
+into `enemy-state.csv`. The fourteen stat fields carried by each NPC SCFU are
+normalized into `enemy-stat-snapshots.csv` with `transmitted` presence. Every
+additional actual entry exposed by an NPC's AOSharp `Stats` collection is written
+to the same file with `runtime-entry` presence
+and source provenance. A missing or non-enumerable collection is written as
+`unavailable`; an omitted stat is never converted to zero. Decoded network
+`StatMessage` tuples are kept separately in `enemy-stat-updates.csv` with
+`transmitted` presence, while decoded attack, hit, and miss messages are written
+to `enemy-combat.csv` with source/target roles and all exposed packet fields.
+The plugin also writes player position/stats/evades/armor/buffs/
 weapons into `player-combat-context.csv`, and attack-boundary distance evidence
 into `aggro-observations.csv`. Every live visibility sample also preserves the
 entity heading quaternion and derived horizontal forward vector. Before an
@@ -675,7 +685,8 @@ gamecode line-of-sight/in-play state, AOSharp dynel-set presence, and server
 removal packets. AOSharp does not expose a per-dynel renderer/frustum visibility
 property, so none of these rows alone proves that pixels were drawn.
 Stop-time validation reports coverage for raw,
-spawn identity, world/player context, periodic presence, LOS/in-play state,
+spawn identity, NPC runtime stats, decoded combat, enemy state, world/player
+context, periodic presence, LOS/in-play state,
 movement, combat start, NPC-to-player and unprovoked aggro, death/corpse, and
 identity-linked loot. A projection gap with an intact raw stream remains an
 offline-decode issue rather than an automatic recapture request. The packet log
