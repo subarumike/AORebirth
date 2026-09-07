@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Data
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.Enums;
+
     using MySqlConnector;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -14,7 +16,7 @@ namespace ZoneEngine_New.Core.Data
     {
         private static readonly string SelectCarriedSql =
             "SELECT InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, "
-            + "LowId, HighId, Quality, StackCount "
+            + "LowId, HighId, Quality, StackCount, Source "
             + "FROM item_instances WHERE ContainerInstance = @CharacterId "
             + "AND ContainerType IN ("
             + (int)IdentityType.Inventory + ", "
@@ -25,14 +27,14 @@ namespace ZoneEngine_New.Core.Data
 
         private static readonly string SelectBankSql =
             "SELECT InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, "
-            + "LowId, HighId, Quality, StackCount "
+            + "LowId, HighId, Quality, StackCount, Source "
             + "FROM item_instances WHERE ContainerType = "
             + (int)IdentityType.Bank
             + " AND ContainerInstance = @CharacterId";
 
         private static readonly string SelectContainerSql =
             "SELECT InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, "
-            + "LowId, HighId, Quality, StackCount "
+            + "LowId, HighId, Quality, StackCount, Source "
             + "FROM item_instances WHERE ContainerType = "
             + (int)IdentityType.Container
             + " AND ContainerInstance = @ContainerInstanceId";
@@ -46,8 +48,8 @@ namespace ZoneEngine_New.Core.Data
 
         private const string InsertSql =
             "INSERT INTO item_instances "
-            + "(InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, LowId, HighId, Quality, StackCount) "
-            + "VALUES (@InstanceId, @ContainerType, @ContainerInstance, @ContainerPlacement, @ItemType, @LowId, @HighId, @Quality, @StackCount)";
+            + "(InstanceId, ContainerType, ContainerInstance, ContainerPlacement, ItemType, LowId, HighId, Quality, StackCount, Source) "
+            + "VALUES (@InstanceId, @ContainerType, @ContainerInstance, @ContainerPlacement, @ItemType, @LowId, @HighId, @Quality, @StackCount, @Source)";
 
         private const string UpdateLocationSql =
             "UPDATE item_instances SET ContainerType = @ContainerType, "
@@ -307,6 +309,7 @@ namespace ZoneEngine_New.Core.Data
             command.Parameters.AddWithValue("@HighId", item.HighId);
             command.Parameters.AddWithValue("@Quality", item.Quality);
             command.Parameters.AddWithValue("@StackCount", item.StackCount);
+            command.Parameters.AddWithValue("@Source", (byte)item.Source);
             command.ExecuteNonQuery();
         }
 
@@ -356,7 +359,8 @@ namespace ZoneEngine_New.Core.Data
                 LowId = reader.GetInt32(reader.GetOrdinal("LowId")),
                 HighId = reader.GetInt32(reader.GetOrdinal("HighId")),
                 Quality = reader.GetInt32(reader.GetOrdinal("Quality")),
-                StackCount = reader.GetInt32(reader.GetOrdinal("StackCount"))
+                StackCount = reader.GetInt32(reader.GetOrdinal("StackCount")),
+                Source = (ItemSource)reader.GetInt32(reader.GetOrdinal("Source"))
             };
         }
     }

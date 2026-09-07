@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.WorldSimulation;
 
@@ -33,7 +34,8 @@ namespace ZoneEngine_New.Core.Playfield
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
             InventoryFlushService inventoryFlush,
-            CharacterSnapshotService characterSnapshot)
+            CharacterSnapshotService characterSnapshot,
+            IPlayfieldMetricsRegistry metricsRegistry)
             : base(
                 playfieldIdentity,
                 playfieldLogger,
@@ -46,7 +48,8 @@ namespace ZoneEngine_New.Core.Playfield
                 instanceIds,
                 inventoryMoves,
                 inventoryFlush,
-                characterSnapshot)
+                characterSnapshot,
+                metricsRegistry)
         {
         }
 
@@ -68,6 +71,7 @@ namespace ZoneEngine_New.Core.Playfield
                     Geometry,
                     MetaData,
                     DestinationsCatalog.Instance,
+                    GameData,
                     Logger);
 
                 statics = _world.HardStaticCount;
@@ -79,6 +83,7 @@ namespace ZoneEngine_New.Core.Playfield
                 int staticDynels = SpawnStaticDynels();
 
                 sw.Stop();
+                Metrics.RecordBuild(sw.Elapsed.TotalMilliseconds);
                 Logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
@@ -94,6 +99,7 @@ namespace ZoneEngine_New.Core.Playfield
             catch (Exception exception)
             {
                 sw.Stop();
+                Metrics.RecordBuild(sw.Elapsed.TotalMilliseconds);
                 Logger.Error(
                     exception,
                     string.Format(

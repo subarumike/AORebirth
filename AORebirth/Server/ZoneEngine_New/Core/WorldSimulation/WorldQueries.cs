@@ -51,28 +51,37 @@ namespace ZoneEngine_New.Core.WorldSimulation
             return !Raycast(from, dir, length, out _, out _);
         }
 
+        /// <summary>
+        /// Sweeps a capsule (center at <paramref name="start"/>) toward <paramref name="end"/>.
+        /// Reports the distance travelled before contact rather than the contact point itself; the
+        /// contact point lies on the geometry surface and is not a legal capsule center.
+        /// </summary>
         public bool CapsuleSweep(
             Vector3 start,
             Vector3 end,
             float radius,
             float halfLength,
-            out Vector3 hitPosition)
+            out float distance,
+            out Vector3 normal)
         {
-            hitPosition = end;
             Vector3 delta = end - start;
             float length = delta.Length();
+            distance = length;
+            normal = default;
             if (length < 1e-6f)
                 return false;
 
             var capsule = new Capsule(radius, halfLength * 2f);
             var pose = new RigidPose(start);
             var velocity = new BodyVelocity(delta / length, default);
-            var handler = new SweepHitHandler { Position = end };
+            var handler = new SweepHitHandler();
             _simulation.Sweep(ref capsule, ref pose, ref velocity, length, _pool, ref handler);
             if (!handler.Hit)
                 return false;
 
-            hitPosition = handler.Position;
+            // Velocity is unit length, so the sweep's t is a distance along the path.
+            distance = handler.T;
+            normal = handler.Normal;
             return true;
         }
 
@@ -111,7 +120,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         {
             public bool Hit;
             public float T;
-            public Vector3 Position;
+            public Vector3 Normal;
 
             public bool AllowTest(CollidableReference collidable) => true;
 
@@ -129,14 +138,16 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
                 maximumT = t;
                 T = t;
-                Position = hitLocation;
+                Normal = hitNormal;
                 Hit = true;
             }
 
             public void OnHitAtZeroT(ref float maximumT, CollidableReference collidable)
             {
+                // Already intersecting at the start pose: no distance is travellable.
                 maximumT = 0;
                 T = 0;
+                Normal = default;
                 Hit = true;
             }
         }

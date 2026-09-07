@@ -20,7 +20,6 @@ namespace ZoneEngine_New.Core.Inventory
     /// </summary>
     public sealed class InventoryMoveService
     {
-        const int MissingEquipDelay = 1234567890;
         const int DefaultEquipDelay = 20;
 
         private readonly object _gate = new();
@@ -38,8 +37,20 @@ namespace ZoneEngine_New.Core.Inventory
 
         public void CancelPending(int characterId)
         {
+            PendingEquip? pending;
             lock (_gate)
-                _pending.Remove(characterId);
+            {
+                if (!_pending.Remove(characterId, out pending))
+                    return;
+            }
+
+            SetMoveLock(pending, false);
+        }
+
+        public bool HasPending(int characterId)
+        {
+            lock (_gate)
+                return _pending.ContainsKey(characterId);
         }
 
         public void Tick(Playfield playfield, double deltaTime)
@@ -49,6 +60,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
 
             List<PendingEquip> due = [];
+            List<PendingEquip> stale = [];
             lock (_gate)
             {
                 if (_pending.Count == 0)
@@ -58,8 +70,15 @@ namespace ZoneEngine_New.Core.Inventory
                 foreach (KeyValuePair<int, PendingEquip> pair in _pending)
                 {
                     PendingEquip pending = pair.Value;
-                    if (!ReferenceEquals(pending.Player.Playfield, playfield))
+                    if (!ReferenceEquals(pending.OriginPlayfield, playfield))
                         continue;
+
+                    if (!ReferenceEquals(pending.Player.Playfield, playfield))
+                    {
+                        stale.Add(pending);
+                        remove.Add(pair.Key);
+                        continue;
+                    }
 
                     pending.RemainingSeconds -= deltaTime;
                     if (pending.RemainingSeconds > 0)
@@ -72,6 +91,9 @@ namespace ZoneEngine_New.Core.Inventory
                 foreach (int id in remove)
                     _pending.Remove(id);
             }
+
+            foreach (PendingEquip pending in stale)
+                SetMoveLock(pending, false);
 
             foreach (PendingEquip pending in due)
                 CompletePending(pending);
@@ -108,7 +130,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
             }
 
-            bool sourceIsWear = IsWearPage(sourcePage.Identity.Type);
+            bool sourceIsWear = sourcePage.Identity.Type.IsWearPage();
             if (!player.Inventory.TryResolveTargetSlot(
                     message.TargetPlacement,
                     out Container destPage,
@@ -131,22 +153,33 @@ namespace ZoneEngine_New.Core.Inventory
                     return;
             }
 
+            if (destPage.Content.TryGetValue(destSlot, out Item? destOccupant) && destOccupant.Locked)
+                return;
+
             bool touchesEquipment = sourceIsWear || destIsWear;
             if (touchesEquipment)
             {
-                if (destIsWear && !MeetsEquipRequirements(player, item, destPage.Identity.Type))
+                if (HasPending(player.Identity.Instance))
+                    return;
+                if (destIsWear && !MeetsEquipRequirements(player, item, destPage, destSlot))
                     return;
 
                 if (sourceIsWear
                     && destIsWear
                     && destPage.Content.TryGetValue(destSlot, out Item? swapped)
-                    && !MeetsEquipRequirements(player, swapped, sourcePage.Identity.Type))
+                    && !MeetsEquipRequirements(player, swapped, sourcePage, sourceSlot))
                 {
                     return;
                 }
 
+                if (!MeetsWeaponHandPairing(player, item, destPage, destSlot, sourcePage, sourceSlot))
+                    return;
+
                 double delaySeconds = ResolveEquipDelaySeconds(item, destPage.Identity.Type == IdentityType.SocialPage);
-                if (sourceIsWear && destIsWear && destPage.Content.TryGetValue(destSlot, out Item? other))
+                Item? other = null;
+                if (sourceIsWear && destIsWear)
+                    destPage.Content.TryGetValue(destSlot, out other);
+                if (other != null)
                     delaySeconds += ResolveEquipDelaySeconds(other, sourcePage.Identity.Type == IdentityType.SocialPage);
 
                 var pending = new PendingEquip(
@@ -157,19 +190,26 @@ namespace ZoneEngine_New.Core.Inventory
                     destPage,
                     destSlot,
                     item,
+                    other,
                     lootSource,
                     delaySeconds,
                     ackTargetPlacement: destSlot);
 
-                lock (_gate)
-                    _pending[player.Identity.Instance] = pending;
-
                 if (delaySeconds <= 0)
                 {
-                    CancelPending(player.Identity.Instance);
                     CompletePending(pending);
+                    return;
                 }
 
+                SetMoveLock(pending, true);
+                lock (_gate)
+                {
+                    if (!_pending.TryAdd(player.Identity.Instance, pending))
+                    {
+                        SetMoveLock(pending, false);
+                        return;
+                    }
+                }
                 return;
             }
 
@@ -218,7 +258,7 @@ namespace ZoneEngine_New.Core.Inventory
                         return true;
                 }
 
-                return true;
+                return false;
             }
         }
 
@@ -255,7 +295,7 @@ namespace ZoneEngine_New.Core.Inventory
                     if ((page.Flags & ContainerFlags.CanRemove) == 0)
                         return false;
 
-                    return page.Content.TryGetValue(slot, out item!);
+                    return page.Content.TryGetValue(slot, out item!) && !item.Locked;
                 }
 
                 Playfield? playfield = player.Playfield;
@@ -275,13 +315,16 @@ namespace ZoneEngine_New.Core.Inventory
 
                     page = lootable.Loot;
                     lootSource = lootable;
-                    return page.Content.TryGetValue(slot, out item!);
+                    return page.Content.TryGetValue(slot, out item!) && !item.Locked;
                 }
 
                 return false;
             }
 
             if (!player.Inventory.TryGetItem(source.Type, source.Instance, out item))
+                return false;
+
+            if (item.Locked)
                 return false;
 
             slot = source.Instance;
@@ -301,8 +344,13 @@ namespace ZoneEngine_New.Core.Inventory
 
         void CompletePending(PendingEquip pending)
         {
+            SetMoveLock(pending, false);
+
             Player player = pending.Player;
-            if (!player.Inventory.IsHydrated || player.IsDead)
+            if (!player.Inventory.IsHydrated
+                || player.IsDead
+                || player.Session == null
+                || !ReferenceEquals(player.Playfield, pending.OriginPlayfield))
                 return;
 
             if (!pending.SourcePage.Content.TryGetValue(pending.SourceSlot, out Item? current)
@@ -331,6 +379,18 @@ namespace ZoneEngine_New.Core.Inventory
 
             player.Rebase();
             SendAck(player, pending.AckSource, pending.AckTargetPlacement);
+            NotifyEquipmentChanged(player, pending);
+        }
+
+        static void NotifyEquipmentChanged(Player player, PendingEquip pending)
+        {
+            if (pending.SourcePage.Identity.Type.IsWearPage())
+                player.OnEquipmentChanged(new EquipSlot(pending.SourcePage.Identity.Type, pending.SourceSlot));
+
+            if (pending.DestPage.Identity.Type.IsWearPage()
+                && (pending.SourcePage.Identity.Type != pending.DestPage.Identity.Type
+                    || pending.SourceSlot != pending.DestSlot))
+                player.OnEquipmentChanged(new EquipSlot(pending.DestPage.Identity.Type, pending.DestSlot));
         }
 
         bool ApplyMove(
@@ -382,6 +442,13 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        static void SetMoveLock(PendingEquip pending, bool locked)
+        {
+            pending.Item.Locked = locked;
+            if (pending.SwappedItem != null)
+                pending.SwappedItem.Locked = locked;
+        }
+
         static void SendAck(Player player, Identity sourceContainer, int targetPlacement)
         {
             player.Session?.Send(
@@ -395,47 +462,128 @@ namespace ZoneEngine_New.Core.Inventory
                 });
         }
 
-        static bool MeetsEquipRequirements(Player player, Item item, IdentityType wearPage)
+        static bool MeetsEquipRequirements(Player player, Item item, Container wearPage, int destSlot)
         {
-            ActionType needed = wearPage == IdentityType.WeaponPage
+            if (!item.Can(CanFlags.Wear))
+                return false;
+
+            if (!FitsWearSlot(item, wearPage, destSlot))
+                return false;
+
+            ActionType needed = wearPage.Identity.Type == IdentityType.WeaponPage
                 ? ActionType.ToWield
                 : ActionType.ToWear;
 
-            ItemAction? action = null;
-            foreach (ItemAction candidate in item.Definition.Actions)
-            {
-                if (candidate.ActionType == (int)needed)
-                {
-                    action = candidate;
-                    break;
-                }
-            }
+            return item.Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), needed);
+        }
 
-            if (action == null)
+        static bool MeetsWeaponHandPairing(
+            Player player,
+            Item incoming,
+            Container destPage,
+            int destSlot,
+            Container sourcePage,
+            int sourceSlot)
+        {
+            if (!IsWeaponHand(destPage, destSlot) && !IsWeaponHand(sourcePage, sourceSlot))
                 return true;
 
-            foreach (ItemRequirement requirement in action.Requirements)
+            Item? right = ResolveHandAfterMove(
+                player,
+                (int)WeaponSlots.Righthand,
+                incoming,
+                destPage,
+                destSlot,
+                sourcePage,
+                sourceSlot);
+            Item? left = ResolveHandAfterMove(
+                player,
+                (int)WeaponSlots.LeftHand,
+                incoming,
+                destPage,
+                destSlot,
+                sourcePage,
+                sourceSlot);
+            return AreHandsCompatible(right, left);
+        }
+
+        static bool IsWeaponHand(Container page, int slot)
+            => page.Identity.Type == IdentityType.WeaponPage
+                && (slot == (int)WeaponSlots.Righthand || slot == (int)WeaponSlots.LeftHand);
+
+        static Item? ResolveHandAfterMove(
+            Player player,
+            int handSlot,
+            Item incoming,
+            Container destPage,
+            int destSlot,
+            Container sourcePage,
+            int sourceSlot)
+        {
+            if (destPage.Identity.Type == IdentityType.WeaponPage && destSlot == handSlot)
+                return incoming;
+
+            if (sourcePage.Identity.Type == IdentityType.WeaponPage && sourceSlot == handSlot)
             {
-                if (!EvaluateRequirement(player, requirement))
+                if (destPage.Identity.Type == IdentityType.WeaponPage
+                    && destPage.Content.TryGetValue(destSlot, out Item? swapped))
+                    return swapped;
+                return null;
+            }
+
+            return player.Inventory.Equipment.Content.GetValueOrDefault(handSlot);
+        }
+
+        static bool AreHandsCompatible(Item? right, Item? left)
+        {
+            if (right == null || left == null)
+                return true;
+
+            WeaponFlags rightFlags = right.GetWeaponFlags();
+            WeaponFlags leftFlags = left.GetWeaponFlags();
+            const WeaponFlags styleMask = WeaponFlags.Melee | WeaponFlags.Ranged | WeaponFlags.Unarmed;
+            if ((rightFlags & styleMask) == 0 || (leftFlags & styleMask) == 0)
+                return true;
+
+            bool rightTwoHanded = (rightFlags & WeaponFlags.TwoHanded) != 0;
+            bool leftTwoHanded = (leftFlags & WeaponFlags.TwoHanded) != 0;
+            bool rightOneHanded = (rightFlags & WeaponFlags.OneHanded) != 0;
+            bool leftOneHanded = (leftFlags & WeaponFlags.OneHanded) != 0;
+            if (rightTwoHanded || leftTwoHanded)
+            {
+                if (rightTwoHanded && leftTwoHanded)
+                    return false;
+                if (rightTwoHanded && leftOneHanded)
+                    return false;
+                if (leftTwoHanded && rightOneHanded)
                     return false;
             }
+
+            bool rightRanged = (rightFlags & WeaponFlags.Ranged) != 0;
+            bool leftRanged = (leftFlags & WeaponFlags.Ranged) != 0;
+            bool rightMelee = (rightFlags & (WeaponFlags.Melee | WeaponFlags.Unarmed)) != 0;
+            bool leftMelee = (leftFlags & (WeaponFlags.Melee | WeaponFlags.Unarmed)) != 0;
+            if ((rightRanged && leftMelee) || (leftRanged && rightMelee))
+                return false;
 
             return true;
         }
 
-        static bool EvaluateRequirement(Player player, ItemRequirement requirement)
+        /// <summary>
+        /// AO Placement/Slot (298) bitfield: allowed when (slotMask &amp; (1 &lt;&lt; relativeSlot)) != 0.
+        /// Relative slot is page-local (WeaponSlots / ArmorSlots / ImplantSlots), 1-based.
+        /// </summary>
+        static bool FitsWearSlot(Item item, Container wearPage, int destSlot)
         {
-            int statValue = player.Stats.Get((CharacterStat)requirement.StatNumber);
-            int required = requirement.Value;
-            return (Operator)requirement.Operator switch
-            {
-                Operator.EqualTo => statValue == required,
-                Operator.GreaterThan => statValue > required,
-                Operator.LessThan => statValue < required,
-                Operator.BitAnd => (statValue & required) != 0,
-                Operator.NotBitAnd => (statValue & required) == 0,
-                _ => true
-            };
+            int relativeSlot = destSlot - wearPage.Offset + 1;
+            if (relativeSlot < 1 || relativeSlot > wearPage.Capacity)
+                return false;
+
+            int slotMask = item.GetStat(CharacterStat.Slot);
+            if (slotMask <= 0)
+                return false;
+
+            return (slotMask & (1 << relativeSlot)) != 0;
         }
 
         static double ResolveEquipDelaySeconds(Item item, bool isSocial)
@@ -443,18 +591,12 @@ namespace ZoneEngine_New.Core.Inventory
             if (isSocial)
                 return DefaultEquipDelay * 0.01;
 
-            int delay = item.GetStat(CharacterStat.EquipDelay);
-            if (delay == MissingEquipDelay || delay <= 0)
+            int delay = StatCollection.Normalize(item.GetStat(CharacterStat.EquipDelay));
+            if (delay <= 0)
                 delay = DefaultEquipDelay;
 
             return delay * 0.01;
         }
-
-        static bool IsWearPage(IdentityType type)
-            => type is IdentityType.WeaponPage
-                or IdentityType.ArmorPage
-                or IdentityType.ImplantPage
-                or IdentityType.SocialPage;
 
         static int DecodeBackpackHandle(Identity sourceContainer)
             => (int)(((uint)sourceContainer.Instance >> 16) & 0xffff);
@@ -472,6 +614,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Container destPage,
                 int destSlot,
                 Item item,
+                Item? swappedItem,
                 LootableDynel? lootSource,
                 double remainingSeconds,
                 int ackTargetPlacement)
@@ -483,10 +626,12 @@ namespace ZoneEngine_New.Core.Inventory
                 DestPage = destPage;
                 DestSlot = destSlot;
                 Item = item;
+                SwappedItem = swappedItem;
                 LootSource = lootSource;
                 RemainingSeconds = remainingSeconds;
                 AckTargetPlacement = ackTargetPlacement;
                 LockedInstanceId = item.InstanceId;
+                OriginPlayfield = player.Playfield!;
             }
 
             public Player Player { get; }
@@ -503,6 +648,8 @@ namespace ZoneEngine_New.Core.Inventory
 
             public Item Item { get; }
 
+            public Item? SwappedItem { get; }
+
             public LootableDynel? LootSource { get; }
 
             public double RemainingSeconds { get; set; }
@@ -510,6 +657,8 @@ namespace ZoneEngine_New.Core.Inventory
             public int AckTargetPlacement { get; }
 
             public int LockedInstanceId { get; }
+
+            public Playfield OriginPlayfield { get; }
         }
     }
 }

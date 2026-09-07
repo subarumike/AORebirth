@@ -1,6 +1,7 @@
 namespace AORebirth.Tools.RDBDataExtractor
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using AORebirth.Core.GameData;
     using StbImageWriteSharp;
@@ -15,8 +16,44 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestDistrictAndSpawnContracts();
             TestPlayfieldDatFileNames();
             TestCollisionDatFraming();
+            TestSurfacesDatFraming();
             Console.WriteLine("RDBDataExtractor self-test PASS");
             return true;
+        }
+
+        private static void TestSurfacesDatFraming()
+        {
+            List<PlayfieldSurfaceEntry> entries = new List<PlayfieldSurfaceEntry>
+            {
+                new PlayfieldSurfaceEntry(1, new byte[] { 1, 2, 3 }),
+                new PlayfieldSurfaceEntry(4242, new byte[0]),
+                new PlayfieldSurfaceEntry(65535, new byte[] { 9 }),
+            };
+
+            List<PlayfieldSurfaceEntry> parsed = PlayfieldSurfacesDat.Parse(
+                PlayfieldSurfacesDat.Build(entries));
+            if (parsed.Count != entries.Count)
+            {
+                throw new InvalidOperationException(
+                    "Surfaces.dat round trip lost entries: " + parsed.Count);
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (parsed[i].CellId != entries[i].CellId
+                    || parsed[i].Payload.Length != entries[i].Payload.Length)
+                {
+                    throw new InvalidOperationException(
+                        "Surfaces.dat round trip corrupted entry " + i + ".");
+                }
+            }
+
+            if (PlayfieldSurfacesDat.Parse(
+                    PlayfieldSurfacesDat.Build(new List<PlayfieldSurfaceEntry>())).Count != 0)
+            {
+                throw new InvalidOperationException(
+                    "Surfaces.dat round trip of an empty list was not empty.");
+            }
         }
 
         private static void TestChgaPngWriter()
@@ -183,7 +220,9 @@ namespace AORebirth.Tools.RDBDataExtractor
         {
             if (GameDataPaths.WallsFileName != "Walls.dat"
                 || GameDataPaths.DynelsFileName != "Dynels.dat"
-                || GameDataPaths.CollisionFileName != "Collision.dat")
+                || GameDataPaths.DoorsFileName != "Doors.dat"
+                || GameDataPaths.CollisionFileName != "Collision.dat"
+                || GameDataPaths.DestinationsFileName != "Destinations.dat")
             {
                 throw new InvalidOperationException(
                     "Playfield dat file names were unexpected.");

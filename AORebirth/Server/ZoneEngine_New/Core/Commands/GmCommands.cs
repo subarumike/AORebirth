@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Commands
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Playfield;
 
     public sealed class GmCommandContext
     {
@@ -24,6 +25,24 @@ namespace ZoneEngine_New.Core.Commands
         public Player Player { get; }
 
         public string[] Args { get; }
+
+        /// <summary>Look-at player if selected, otherwise the command issuer.</summary>
+        public Player ResolveSubject()
+        {
+            Identity target = Player.Target;
+            if (target == Identity.None || target.Instance == 0)
+                return Player;
+
+            Playfield? playfield = Player.Playfield;
+            if (playfield == null)
+                return Player;
+
+            if (playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel)
+                && dynel is Player subject)
+                return subject;
+
+            return Player;
+        }
     }
 
     public interface IGmCommand
@@ -54,6 +73,30 @@ namespace ZoneEngine_New.Core.Commands
                     Unknown2 = 0,
                     Unknown3 = 0
                 });
+        }
+
+        public static void SendLines(
+            IZoneSession session,
+            Player player,
+            IEnumerable<string> lines,
+            int maxLines = 200)
+        {
+            ArgumentNullException.ThrowIfNull(session);
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(lines);
+
+            int count = 0;
+            foreach (string line in lines)
+            {
+                if (count >= maxLines)
+                {
+                    Send(session, player, "... truncated");
+                    return;
+                }
+
+                Send(session, player, line);
+                count++;
+            }
         }
     }
 

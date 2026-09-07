@@ -59,7 +59,8 @@ namespace ChatEngine
 
     using Utility;
 
-    using ZoneEngine.Core.Playfields;
+    // using ZoneEngine.Core.Playfields; // unused while CacheAllPlayfieldData is commented out
+    // #endif
 
     using Config = Utility.Config.ConfigReadWrite;
 
@@ -604,7 +605,9 @@ namespace ChatEngine
                     return false;
                 }
 
-                PlayfieldLoader.CacheAllPlayfieldData();
+                // Temporary: ChatEngine does not consume PFData; skip so startup
+                // does not require playfields.dat beside ChatEngine.exe.
+                // PlayfieldLoader.CacheAllPlayfieldData();
             }
             catch (Exception e)
             {

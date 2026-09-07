@@ -22,8 +22,32 @@ namespace ZoneEngine_New.Core.Movement
         public const float StatOffset = 1000f;
         public const float CapsuleRadius = 0.4f;
         public const float CapsuleHalfHeight = 0.9f;
-        public const float GroundCheckLift = 4f;
-        public const float GroundCheckDepth = 64f;
+
+        /// <summary>
+        /// Obstacles shorter than this are stepped over instead of blocking. Movement sweeps ignore
+        /// everything below it, which is also what keeps a character resting on a slope from
+        /// intersecting the terrain it is standing on and freezing in place.
+        /// </summary>
+        public const float StepHeight = 0.5f;
+
+        /// <summary>
+        /// Distance from the feet to the sweep capsule's center. Character positions are foot-level,
+        /// so the capsule has to be lifted clear of the floor or every sweep reports zero travel.
+        /// </summary>
+        public const float CapsuleCenterLift = CapsuleRadius + CapsuleHalfHeight + StepHeight;
+
+        /// <summary>Sweeps stop this far short of the contact so the capsule never rests inside geometry.</summary>
+        public const float SweepSkin = 0.02f;
+
+        /// <summary>Ground probes start a step above the feet so a small rise still reads as walkable floor.</summary>
+        public const float GroundProbeLift = StepHeight;
+
+        /// <summary>Ground found within this distance below the feet counts as support; past it the character is airborne.</summary>
+        public const float GroundSnapTolerance = 2.5f;
+
+        /// <summary>Probe used only to tell "standing above a drop" apart from "no geometry here at all".</summary>
+        public const float VoidProbeDepth = 4096f;
+
         public const float LineOfSightEyeHeight = 1.6f;
 
         public const float RunForwardSlope = 1f / 275f;

@@ -424,7 +424,8 @@ namespace ZoneEngine_New.Core.Inventory
                             LowId = item.LowId,
                             HighId = item.HighId,
                             Quality = item.Quality,
-                            StackCount = item.StackCount
+                            StackCount = item.StackCount,
+                            Source = item.Source
                         });
                     newlyPersisted.Add(item);
                 }

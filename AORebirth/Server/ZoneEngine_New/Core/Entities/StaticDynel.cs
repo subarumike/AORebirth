@@ -56,19 +56,13 @@ namespace ZoneEngine_New.Core.Entities
 
         protected virtual bool OnUse(Player player)
         {
-            if (player.Session == null)
+            if (Playfield == null || player.Session == null)
                 return false;
 
-            player.Session.Send(
-                new ChatTextMessage
-                {
-                    Identity = player.Identity,
-                    Text = "Not Implemented.",
-                    Unknown1 = 0,
-                    Unknown2 = 0,
-                    Unknown3 = 0
-                });
-            return true;
+            return Template.ExecuteOnUseSpells(
+                player,
+                Playfield.GetRequiredService<IInventoryRepository>(),
+                Playfield.GetRequiredService<IItemBuilder>());
         }
 
         public override MessageBody BuildSpawnMessage()
@@ -133,19 +127,6 @@ namespace ZoneEngine_New.Core.Entities
         public PlayfieldStaticDynel(Identity identity, ItemTemplate template)
             : base(identity, template)
         {
-        }
-
-        protected override bool OnUse(Player player)
-        {
-            if (Playfield != null
-                && Item.ExecuteOnUseSpells(
-                    Template,
-                    player,
-                    Playfield.GetRequiredService<IInventoryRepository>(),
-                    Playfield.GetRequiredService<IItemBuilder>()))
-                return true;
-
-            return base.OnUse(player);
         }
     }
 }

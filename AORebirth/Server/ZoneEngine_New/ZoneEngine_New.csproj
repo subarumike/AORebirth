@@ -90,8 +90,14 @@
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemClass.cs">
       <Link>Enums\ItemClass.cs</Link>
     </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemSource.cs">
+      <Link>Enums\ItemSource.cs</Link>
+    </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponSlots.cs">
       <Link>Enums\WeaponSlots.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponFlags.cs">
+      <Link>Enums\WeaponFlags.cs</Link>
     </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\MeshLayer.cs">
       <Link>Enums\MeshLayer.cs</Link>

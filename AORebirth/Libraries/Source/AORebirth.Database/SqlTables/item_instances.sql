@@ -8,6 +8,7 @@ CREATE TABLE `item_instances` (
 	`HighId` INT(32) NOT NULL,
 	`Quality` INT(32) NOT NULL,
 	`StackCount` INT(32) NOT NULL,
+	`Source` TINYINT UNSIGNED NOT NULL DEFAULT 1,
 	PRIMARY KEY (`InstanceId`),
 	UNIQUE INDEX `UX_item_instances_location` (`ContainerType`, `ContainerInstance`, `ContainerPlacement`),
 	INDEX `IX_item_instances_parent` (`ContainerType`, `ContainerInstance`)

@@ -18,6 +18,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.WorldSimulation;
@@ -38,6 +39,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly InventoryMoveService _inventoryMoves;
         private readonly InventoryFlushService _inventoryFlush;
         private readonly CharacterSnapshotService _characterSnapshot;
+        private readonly PlayfieldMetrics _metrics;
         private ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
@@ -59,7 +61,8 @@ namespace ZoneEngine_New.Core.Playfield
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
             InventoryFlushService inventoryFlush,
-            CharacterSnapshotService characterSnapshot)
+            CharacterSnapshotService characterSnapshot,
+            IPlayfieldMetricsRegistry metricsRegistry)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
                 playfieldIdentity.Instance,
@@ -75,6 +78,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(inventoryMoves);
             ArgumentNullException.ThrowIfNull(inventoryFlush);
             ArgumentNullException.ThrowIfNull(characterSnapshot);
+            ArgumentNullException.ThrowIfNull(metricsRegistry);
 
             Identity = playfieldIdentity;
             _logger = playfieldLogger;
@@ -88,6 +92,7 @@ namespace ZoneEngine_New.Core.Playfield
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
             _characterSnapshot = characterSnapshot;
+            _metrics = metricsRegistry.GetOrCreate(playfieldIdentity.Instance);
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
             Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
 
@@ -120,6 +125,7 @@ namespace ZoneEngine_New.Core.Playfield
             Stopwatch sw = Stopwatch.StartNew();
             int staticDynels = SpawnStaticDynels();
             sw.Stop();
+            _metrics.RecordBuild(sw.Elapsed.TotalMilliseconds);
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -129,6 +135,8 @@ namespace ZoneEngine_New.Core.Playfield
                     Geometry.Doors?.Doors?.Count ?? 0,
                     staticDynels));
         }
+
+        protected PlayfieldMetrics Metrics => _metrics;
 
         protected int SpawnStaticDynels()
             => GetRequiredService<SpawnService>().LoadStaticDynels();
@@ -151,6 +159,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>Parsed Walls.dat / Dynels.dat / Doors.dat / Collision.dat; members null when files are missing.</summary>
         public PlayfieldGeometryData Geometry { get; }
+
+        /// <summary>Zoning needs the destination playfield's geometry, not just this one's.</summary>
+        protected IGameData GameData => _gameData;
 
         /// <summary>Optional world simulation assigned by <see cref="ACGPlayfield.Build"/>.</summary>
         public WorldSimulationAccess WorldAccess =>
@@ -289,12 +300,11 @@ namespace ZoneEngine_New.Core.Playfield
 
         public void Tick(double deltaTime)
         {
+            long tickStart = Stopwatch.GetTimestamp();
             lock (_tickSync)
             {
                 if (_disposed)
-                {
                     return;
-                }
 
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
                 _inbound.Drain(_router, spawn);
@@ -302,10 +312,23 @@ namespace ZoneEngine_New.Core.Playfield
                 _inventoryMoves.Tick(this, deltaTime);
 
                 WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
-                world?.TickSoftTriggers(this, deltaTime);
+                if (world != null)
+                {
+                    long worldStart = Stopwatch.GetTimestamp();
+                    world.TickSoftTriggers(this, deltaTime);
+                    _metrics.WorldSimTick.Record(ElapsedMilliseconds(worldStart));
+                }
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
             }
+
+            _metrics.TickExecution.Record(ElapsedMilliseconds(tickStart));
+        }
+
+        private static double ElapsedMilliseconds(long startTimestamp)
+        {
+            long elapsed = Stopwatch.GetTimestamp() - startTimestamp;
+            return elapsed * 1000.0 / Stopwatch.Frequency;
         }
 
         private IServiceCollection BuildServices()

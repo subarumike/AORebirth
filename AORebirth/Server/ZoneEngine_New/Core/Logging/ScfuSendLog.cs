@@ -12,9 +12,11 @@ namespace ZoneEngine_New.Core.Logging
     /// <summary>Debug dump of SCFU fields (one field per log line) at send time.</summary>
     public static class ScfuSendLog
     {
+        public static bool Enabled { get; set; }
+
         public static void Write(SimpleCharFullUpdateMessage scfu)
         {
-            if (scfu == null)
+            if (!Enabled || scfu == null)
                 return;
 
             Line("Identity", FormatIdentity(scfu.Identity));

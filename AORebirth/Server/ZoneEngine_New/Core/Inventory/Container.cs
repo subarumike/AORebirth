@@ -68,6 +68,9 @@ namespace ZoneEngine_New.Core.Inventory
             if (!Content.TryGetValue(slot, out Item? item))
                 return null;
 
+            if (item.Locked)
+                return null;
+
             Content.Remove(slot);
             return item;
         }

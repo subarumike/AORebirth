@@ -18,7 +18,15 @@ namespace ZoneEngine_New.Core.Entities
     using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
-    //TODO: Nano casting should live here
+    /// <summary>
+    /// Why delayed character actions are being interrupted.
+    /// Jump cancels most (equip, nano cast). LeavePlayfield cancels every timed action.
+    /// </summary>
+    public enum TimedActionInterrupt
+    {
+        Jump,
+        LeavePlayfield,
+    }
 
     /// <summary>
     /// Character layer between Dynel and <see cref="Player"/> / <see cref="NpcCharacter"/> (shared fields).
@@ -29,12 +37,28 @@ namespace ZoneEngine_New.Core.Entities
             : base(identity)
         {
             Motor = new CharacterMotor(this);
+            Motor.Jumped += OnJumped;
             Stats.StatChanged += OnStatChanged;
-            Motor.RefreshFromStats();
         }
 
         //TODO: Put cooldowns here
         //TODO: Put buffs here
+        //TODO: Nano casting should live here
+
+        /// <summary>
+        /// Subscribe for delayed actions. Honor <see cref="TimedActionInterrupt.LeavePlayfield"/>
+        /// always; honor <see cref="TimedActionInterrupt.Jump"/> unless the action survives jump.
+        /// </summary>
+        public event Action<Character, TimedActionInterrupt>? TimedActionsInterrupted;
+
+        public void InterruptTimedActions(TimedActionInterrupt reason)
+        {
+            Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
+            TimedActionsInterrupted?.Invoke(this, reason);
+        }
+
+        void OnJumped()
+            => InterruptTimedActions(TimedActionInterrupt.Jump);
 
         public CharacterMotor Motor { get; }
 
@@ -71,6 +95,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             _deathNotified = true;
+            InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             SetFightingTarget(Identity.None);
 
             Cell?.Announce(
@@ -188,7 +213,10 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             foreach (CharacterWeapon weapon in Weapons.Values)
-                weapon?.Tick(deltaTime);
+            {
+                if (weapon != null && weapon.Tick(deltaTime))
+                    break;
+            }
         }
 
         void ProcessWeaponSwing(WeaponSlot slot)
@@ -201,11 +229,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             Item? weapon = characterWeapon.Item;
-            double attackRange = weapon != null
-                ? NormalizeCombatStat(weapon.GetStat(CharacterStat.AttackRange))
-                : 0.0;
-            if (attackRange <= 0.0)
-                attackRange = MaxMeleeCombatDistance;
+            double attackRange = characterWeapon.GetAttackRange();
 
             double distance = Distance3D(target);
             if (distance > attackRange * HardRangeMultiplier)
@@ -257,7 +281,7 @@ namespace ZoneEngine_New.Core.Entities
             if (_deathNotified || damage <= 0)
                 return false;
 
-            int previousHealth = NormalizeCombatStat(Stats.Get(CharacterStat.Health));
+            int previousHealth = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
             int newHealth = Math.Max(0, previousHealth - damage);
             Stats.Set(CharacterStat.Health, newHealth, StatDetail.Base, dirty: true);
 
@@ -268,7 +292,7 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
-        Character? TryResolveFightingTarget()
+        internal Character? TryResolveFightingTarget()
         {
             if (FightingTarget.Instance == 0 || Playfield == null)
                 return null;
@@ -299,10 +323,6 @@ namespace ZoneEngine_New.Core.Entities
             };
         }
 
-        static int NormalizeCombatStat(int value)
-            => value < 0 || StatCollection.IsUnset(value) ? 0 : value;
-
-        const double MaxMeleeCombatDistance = 4.0;
         const double SoftRangeGraceMeters = 1.5;
         const double HardRangeMultiplier = 3.0;
         const int NormalAttackInfoAmmoCount = 40;
@@ -353,13 +373,11 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(items);
 
-            Profession profession = (Profession)Stats.Get(CharacterStat.Profession);
-            int maSkill = Stats.Get(CharacterStat.MartialArts);
-            if (StatCollection.IsUnset(maSkill) || maSkill < 1)
-                maSkill = 1;
+            Profession profession = (Profession)Stats.GetOrZero(CharacterStat.Profession);
+            int maSkill = Stats.GetOrOne(CharacterStat.MartialArts);
 
             (int lowId, int highId, int quality) = MartialArtsFistResolver.Resolve(profession, maSkill);
-            Item fist = items.Create(lowId, highId, quality);
+            Item fist = items.Create(lowId, highId, quality, ItemSource.Other);
             ArmFromItem(slot, fist);
         }
 
@@ -456,6 +474,29 @@ namespace ZoneEngine_New.Core.Entities
             => new() { Value1 = stat, Value2 = value };
 
         /// <summary>
+        /// Builds an AppearanceUpdate from current textures, meshes, and visual flags.
+        /// </summary>
+        public AppearanceUpdateMessage BuildAppearanceUpdateMessage()
+        {
+            int visualFlags = Stats.Get(CharacterStat.VisualFlags);
+            int headMesh = Stats.Get(CharacterStat.HeadMesh);
+            bool isNpc = !IsPlayer;
+            short wireVisualFlags = StatCollection.IsUnset(visualFlags)
+                ? (isNpc ? (short)31 : (short)0)
+                : (short)visualFlags;
+
+            return new AppearanceUpdateMessage
+            {
+                Identity = Identity,
+                Unknown = 0,
+                Textures = BuildTextures(isNpc),
+                Meshes = BuildMeshes(headMesh),
+                VisualFlags = wireVisualFlags,
+                Unknown1 = 0
+            };
+        }
+
+        /// <summary>
         /// Builds a SimpleCharFullUpdate (SCFU) spawn packet from current character state.
         /// Structure follows ZoneEngine SimpleCharFullUpdate.ConstructMessage without capture/runtime special cases.
         /// </summary>
@@ -485,17 +526,17 @@ namespace ZoneEngine_New.Core.Entities
                 }
             }
 
-            int maxHealth = Stats.Get(CharacterStat.MaxHealth);
-            int currentHealth = Stats.Get(CharacterStat.Health);
+            int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
+            int currentHealth = Stats.GetOrZero(CharacterStat.Health);
             int monsterData = Stats.Get(CharacterStat.MonsterData);
-            int monsterScale = Stats.Get(CharacterStat.Scale);
+            int monsterScale = Stats.GetOrZero(CharacterStat.Scale);
             int movementMode = (int)Motor.State;
 
             int petMasterInstance = Stats.Get(CharacterStat.PetMaster);
             int headMesh = Stats.Get(CharacterStat.HeadMesh);
-            int runSpeedBase = Stats.Get(CharacterStat.RunSpeed, StatDetail.Base);
+            int runSpeedBase = Stats.GetOrZero(CharacterStat.RunSpeed, StatDetail.Base);
             int npcFamily = Stats.Get(CharacterStat.NPCFamily);
-            int losHeight = Stats.Get((CharacterStat)466);
+            int losHeight = Stats.GetOrZero((CharacterStat)466);
             bool isNpc = !IsPlayer
                 && !StatCollection.IsUnset(npcFamily)
                 && npcFamily != 0;
@@ -505,15 +546,8 @@ namespace ZoneEngine_New.Core.Entities
                 ? (isNpc ? (short)31 : (short)0)
                 : (short)visualFlags;
 
-            int side = Stats.Get(CharacterStat.Side, StatDetail.Base);
-            int fatness = Stats.Get(CharacterStat.Fatness, StatDetail.Base);
-            int breed = Stats.Get(CharacterStat.Breed, StatDetail.Base);
-            int gender = Stats.Get(CharacterStat.Sex, StatDetail.Base);
             int race = Stats.Get(CharacterStat.Race, StatDetail.Base);
-
-            int accountFlags = Stats.Get(CharacterStat.AccountFlags);
             int expansions = Stats.Get(CharacterStat.Expansion);
-            int level = Stats.Get(CharacterStat.Level);
 
             var scfu = new SimpleCharFullUpdateMessage
             {
@@ -524,22 +558,23 @@ namespace ZoneEngine_New.Core.Entities
                 Heading = heading,
                 Appearance = new Appearance
                 {
-                    Side = (Side)(StatCollection.IsUnset(side) ? 0 : side),
-                    Fatness = (Fatness)(StatCollection.IsUnset(fatness) ? 0 : fatness),
-                    Breed = (Breed)(StatCollection.IsUnset(breed) ? 0 : breed),
-                    Gender = (Gender)(StatCollection.IsUnset(gender) ? 0 : gender),
+                    Side = (Side)Stats.GetOrZero(CharacterStat.Side, StatDetail.Base),
+                    Fatness = (Fatness)Stats.GetOrZero(CharacterStat.Fatness, StatDetail.Base),
+                    Breed = (Breed)Stats.GetOrZero(CharacterStat.Breed, StatDetail.Base),
+                    Gender = (Gender)Stats.GetOrZero(CharacterStat.Sex, StatDetail.Base),
+                    // Unset race defaults to 1 (not 0) for a valid Appearance.
                     Race = (uint)(StatCollection.IsUnset(race) ? 1 : race)
                 },
                 Name = name,
                 CharacterFlags = (CharacterFlags)characterFlags,
-                AccountFlags = StatCollection.IsUnset(accountFlags) ? (short)0 : (short)accountFlags,
+                AccountFlags = (short)Stats.GetOrZero(CharacterStat.AccountFlags),
                 Expansions = StatCollection.IsUnset(expansions)
                     ? (isNpc ? (short)3 : (short)0)
                     : (short)expansions,
-                Level = StatCollection.IsUnset(level) ? (short)0 : (short)level,
+                Level = (short)Stats.GetOrZero(CharacterStat.Level),
                 VisualFlags = wireVisualFlags,
                 VisibleTitle = 0,
-                RunSpeedBase = StatCollection.IsUnset(runSpeedBase) ? (short)0 : (short)runSpeedBase,
+                RunSpeedBase = (short)runSpeedBase,
                 Flags2 = 0,
                 Unknown2 = 0,
                 ActiveNanos = [],
@@ -561,7 +596,7 @@ namespace ZoneEngine_New.Core.Entities
                 scfu.CharacterInfo = new SimpleNpcInfo
                 {
                     Family = (short)npcFamily,
-                    LosHeight = StatCollection.IsUnset(losHeight) ? (short)0 : (short)losHeight
+                    LosHeight = (short)losHeight
                 };
 
                 scfu.AdditionalFlags |= SimpleCharFullUpdateFlags.UnknownDataFlag;
@@ -571,15 +606,15 @@ namespace ZoneEngine_New.Core.Entities
             {
                 var pcInfo = new SimplePcInfo
                 {
-                    CurrentNano = (uint)Stats.Get(CharacterStat.CurrentNano),
+                    CurrentNano = (uint)Stats.GetOrZero(CharacterStat.CurrentNano),
                     Team = 0,
                     Swim = 5,
-                    StrengthBase = ClampToShort(Stats.Get(CharacterStat.Strength, StatDetail.Base)),
-                    AgilityBase = ClampToShort(Stats.Get(CharacterStat.Agility, StatDetail.Base)),
-                    StaminaBase = ClampToShort(Stats.Get(CharacterStat.Stamina, StatDetail.Base)),
-                    IntelligenceBase = ClampToShort(Stats.Get(CharacterStat.Intelligence, StatDetail.Base)),
-                    SenseBase = ClampToShort(Stats.Get(CharacterStat.Sense, StatDetail.Base)),
-                    PsychicBase = ClampToShort(Stats.Get(CharacterStat.Psychic, StatDetail.Base))
+                    StrengthBase = ClampToShort(Stats.GetOrZero(CharacterStat.Strength, StatDetail.Base)),
+                    AgilityBase = ClampToShort(Stats.GetOrZero(CharacterStat.Agility, StatDetail.Base)),
+                    StaminaBase = ClampToShort(Stats.GetOrZero(CharacterStat.Stamina, StatDetail.Base)),
+                    IntelligenceBase = ClampToShort(Stats.GetOrZero(CharacterStat.Intelligence, StatDetail.Base)),
+                    SenseBase = ClampToShort(Stats.GetOrZero(CharacterStat.Sense, StatDetail.Base)),
+                    PsychicBase = ClampToShort(Stats.GetOrZero(CharacterStat.Psychic, StatDetail.Base))
                 };
 
                 // FirstName / LastName / OrganizationName not on Character yet.
@@ -598,7 +633,7 @@ namespace ZoneEngine_New.Core.Entities
 
             int displayMaxHealth = maxHealth;
             int displayCurrentHealth = currentHealth;
-            if (!StatCollection.IsUnset(maxHealth) && maxHealth > ushort.MaxValue)
+            if (maxHealth > ushort.MaxValue)
             {
                 displayMaxHealth = ushort.MaxValue;
                 if (maxHealth > 0)
@@ -636,7 +671,7 @@ namespace ZoneEngine_New.Core.Entities
                 scfu.MonsterData = 0;
             }
 
-            scfu.MonsterScale = StatCollection.IsUnset(monsterScale) ? (short)0 : (short)monsterScale;
+            scfu.MonsterScale = (short)monsterScale;
             scfu.Unknown1 = CreateMovementStatus(movementMode);
 
             if (!StatCollection.IsUnset(petMasterInstance) && petMasterInstance != 0)
@@ -704,7 +739,7 @@ namespace ZoneEngine_New.Core.Entities
                 bool replaced = false;
                 for (int i = 0; i < meshes.Count; i++)
                 {
-                    if (meshes[i].Position != 0 || meshes[i].Layer != 4)
+                    if (meshes[i].Position != 0 || meshes[i].Layer != (byte)MeshLayer.Equipment)
                         continue;
 
                     meshes[i] = new Mesh
@@ -712,7 +747,7 @@ namespace ZoneEngine_New.Core.Entities
                         Position = 0,
                         Id = (uint)headMesh,
                         OverrideTextureId = 0,
-                        Layer = 4
+                        Layer = (byte)MeshLayer.Equipment
                     };
                     replaced = true;
                     break;
@@ -726,7 +761,7 @@ namespace ZoneEngine_New.Core.Entities
                             Position = 0,
                             Id = (uint)headMesh,
                             OverrideTextureId = 0,
-                            Layer = 4
+                            Layer = (byte)MeshLayer.Equipment
                         });
                 }
             }

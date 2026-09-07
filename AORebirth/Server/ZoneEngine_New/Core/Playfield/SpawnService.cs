@@ -36,7 +36,6 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
         private readonly IItemInstanceIdAllocator _ids;
-        private readonly InventoryMoveService _moves;
         private readonly InventoryFlushService _flush;
         private readonly CharacterSnapshotService _snapshot;
 
@@ -49,7 +48,6 @@ namespace ZoneEngine_New.Core.Playfield
             IGameData gameData,
             IItemBuilder items,
             IItemInstanceIdAllocator ids,
-            InventoryMoveService moves,
             InventoryFlushService flush,
             CharacterSnapshotService snapshot)
         {
@@ -61,7 +59,6 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
             ArgumentNullException.ThrowIfNull(ids);
-            ArgumentNullException.ThrowIfNull(moves);
             ArgumentNullException.ThrowIfNull(flush);
             ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -73,7 +70,6 @@ namespace ZoneEngine_New.Core.Playfield
             _gameData = gameData;
             _items = items;
             _ids = ids;
-            _moves = moves;
             _flush = flush;
             _snapshot = snapshot;
         }
@@ -422,6 +418,7 @@ namespace ZoneEngine_New.Core.Playfield
             player.SetFightingTarget(Identity.None);
             player.Target = Identity.None;
 
+            player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             _flush.HardFlush(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
@@ -466,6 +463,7 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentNullException.ThrowIfNull(npc);
 
+            npc.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             Identity identity = npc.Identity;
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(npc);
             _registry.Unregister(identity);
@@ -500,7 +498,7 @@ namespace ZoneEngine_New.Core.Playfield
         {
             int characterId = player.Identity.Instance;
 
-            _moves.CancelPending(characterId);
+            player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             if (player.Inventory.IsHydrated)
                 _flush.HardFlush(player);
 

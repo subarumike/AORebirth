@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Collections.Generic;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -15,7 +17,7 @@ namespace ZoneEngine_New.Core.Entities
     /// <summary>
     /// Dynel with a loot container that players can open (corpses, chests).
     /// </summary>
-    public abstract class LootableDynel : Dynel
+    public abstract class LootableDynel : Dynel, IUsableDynel
     {
         public const float OpenRange = 5f;
 
@@ -99,7 +101,7 @@ namespace ZoneEngine_New.Core.Entities
 
                     LootItemPair pair = pairs[LootRandom.Next(pairs.Count)];
                     int quality = RollQuality(LootLevel, entry.LevelMod);
-                    Item item = items.Create(pair.LowId, pair.HighId, quality);
+                    Item item = items.Create(pair.LowId, pair.HighId, quality, ItemSource.Loot);
                     AssignEphemeralInstanceId(item, ids);
                     if (!Loot.Add(nextSlot, item))
                         return;
@@ -132,7 +134,7 @@ namespace ZoneEngine_New.Core.Entities
             item.ApplyContainerIdentityIfBag();
         }
 
-        public bool TryOpen(Player player)
+        public bool TryUse(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
 
@@ -245,13 +247,6 @@ namespace ZoneEngine_New.Core.Entities
             int min = Math.Max(1, level * (100 - mod) / 100);
             int max = Math.Max(min, level * (100 + mod) / 100);
             return LootRandom.Next(min, max + 1);
-        }
-
-        protected static int NormalizeLevel(int level)
-        {
-            if (StatCollection.IsUnset(level) || level < 1)
-                return 1;
-            return level;
         }
     }
 }
