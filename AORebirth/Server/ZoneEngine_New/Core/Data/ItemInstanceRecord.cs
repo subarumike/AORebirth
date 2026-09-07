@@ -1,5 +1,7 @@
 namespace ZoneEngine_New.Core.Data
 {
+    using AORebirth.Enums;
+
     public sealed class ItemInstanceRecord
     {
         public int InstanceId { get; init; }
@@ -19,5 +21,7 @@ namespace ZoneEngine_New.Core.Data
         public int Quality { get; init; }
 
         public int StackCount { get; init; }
+
+        public ItemSource Source { get; init; } = ItemSource.Loot;
     }
 }

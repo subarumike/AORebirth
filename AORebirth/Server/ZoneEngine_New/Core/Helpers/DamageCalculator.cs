@@ -69,10 +69,10 @@ namespace ZoneEngine_New.Core.Helpers
             else
             {
                 weaponMin = Math.Max(
-                    NormalizeStat(attacker.Stats.Get(CharacterStat.MinDamage)),
-                    NormalizeStat(attacker.Stats.Get(CharacterStat.MaxDamage)));
+                    NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.MinDamage)),
+                    NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.MaxDamage)));
                 weaponMax = weaponMin;
-                weaponCritBonus = NormalizeStat(attacker.Stats.Get(CharacterStat.DamageBonus));
+                weaponCritBonus = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageBonus));
                 rawDamageType = 0;
                 amsCap = 0;
                 fullAutoClip = 0;
@@ -86,18 +86,18 @@ namespace ZoneEngine_New.Core.Helpers
             if (!ResolveHit(attackRating, defenseRating))
                 return new DamageResult(false, 0, HitType.Normal);
 
-            int overrideType = NormalizeStat(attacker.Stats.Get(CharacterStat.DamageOverrideType));
+            int overrideType = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageOverrideType));
             if (overrideType > 0)
                 rawDamageType = overrideType;
 
             ApplySpecialAttackWeaponScaling(specialAttackStat, fullAutoClip, ref weaponMin, ref weaponMax);
 
             int damageBonus = TryGetAddDamageStat(rawDamageType, out CharacterStat addDamageStat)
-                ? NormalizeStat(attacker.Stats.Get(addDamageStat))
+                ? NormalizeStat(attacker.Stats.GetOrZero(addDamageStat))
                 : 0;
 
             int targetArmorClass = TryGetArmorStat(rawDamageType, out CharacterStat armorStat)
-                ? NormalizeStat(target.Stats.Get(armorStat))
+                ? NormalizeStat(target.Stats.GetOrZero(armorStat))
                 : 0;
 
             if (specialAttackStat == CharacterStat.AimedShot)
@@ -126,7 +126,7 @@ namespace ZoneEngine_New.Core.Helpers
 
             HitType hitType = HitType.Normal;
             bool isBurst = specialAttackStat == CharacterStat.Burst;
-            int critIncrease = NormalizeStat(attacker.Stats.Get(CharacterStat.CriticalIncrease));
+            int critIncrease = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.CriticalIncrease));
             if (!isBurst && NextInt(0, 100) < critIncrease)
             {
                 hitType = HitType.Critical;
@@ -167,11 +167,11 @@ namespace ZoneEngine_New.Core.Helpers
                 foreach (System.Collections.Generic.KeyValuePair<CharacterStat, int> entry in template.Attack)
                 {
                     CharacterStat skill = specialAttackStat ?? entry.Key;
-                    attackRating += (entry.Value / 100) * NormalizeStat(attacker.Stats.Get(skill));
+                    attackRating += (entry.Value / 100) * NormalizeStat(attacker.Stats.GetOrZero(skill));
                 }
             }
 
-            return attackRating + NormalizeStat(attacker.Stats.Get(CharacterStat.AMSModifier));
+            return attackRating + NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.AMSModifier));
         }
 
         static int ResolveDefenseRating(Character target, ItemTemplate? template)
@@ -180,10 +180,10 @@ namespace ZoneEngine_New.Core.Helpers
             if (template?.Defend is { Count: > 0 })
             {
                 foreach (System.Collections.Generic.KeyValuePair<CharacterStat, int> entry in template.Defend)
-                    defenseRating += (entry.Value / 100) * NormalizeStat(target.Stats.Get(entry.Key));
+                    defenseRating += (entry.Value / 100) * NormalizeStat(target.Stats.GetOrZero(entry.Key));
             }
 
-            return defenseRating + NormalizeStat(target.Stats.Get(CharacterStat.DMSModifier));
+            return defenseRating + NormalizeStat(target.Stats.GetOrZero(CharacterStat.DMSModifier));
         }
 
         static bool ResolveHit(int attackRating, int defenseRating)
@@ -285,8 +285,9 @@ namespace ZoneEngine_New.Core.Helpers
             }
         }
 
+        // Floor negatives after Unset→0; combat math never wants either.
         static int NormalizeStat(int value)
-            => value < 0 || StatCollection.IsUnset(value) ? 0 : value;
+            => value < 0 ? 0 : StatCollection.Normalize(value);
 
         static double NextDouble()
         {

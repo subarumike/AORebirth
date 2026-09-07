@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Inventory
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Data;
@@ -26,6 +28,7 @@ namespace ZoneEngine_New.Core.Inventory
             int lowId,
             int highId,
             int quality,
+            ItemSource source,
             int stackCount = 1,
             int instanceId = 0,
             Identity? identity = null,
@@ -40,15 +43,45 @@ namespace ZoneEngine_New.Core.Inventory
             if (definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats) && stackFromStats > 0)
                 resolvedStack = stackFromStats;
 
-            return new Item
+            Item item = new()
             {
                 InstanceId = instanceId,
-                Identity = identity ?? Identity.None,
+                Identity = ResolveMintedIdentity(identity, definition.ItemType, instanceId),
                 LowId = lowId,
                 HighId = highId,
                 Quality = clampedQuality,
                 StackCount = Math.Max(1, resolvedStack),
+                Source = source,
                 Definition = definition
+            };
+            item.ApplyContainerIdentityIfBag();
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Item created name={0} low={1} high={2} ql={3} itemType={4} statItemType={5} identity={6}:{7}",
+                    item.Name,
+                    item.LowId,
+                    item.HighId,
+                    item.Quality,
+                    definition.ItemType,
+                    item.GetStat(CharacterStat.ItemType),
+                    item.Identity.Type,
+                    item.Identity.Instance));
+            return item;
+        }
+
+        static Identity ResolveMintedIdentity(Identity? identity, int itemType, int instanceId)
+        {
+            if (identity is Identity supplied && supplied.Type != IdentityType.None)
+                return supplied;
+
+            if (itemType == 0)
+                return identity ?? Identity.None;
+
+            return new Identity
+            {
+                Type = (IdentityType)itemType,
+                Instance = instanceId
             };
         }
 
@@ -76,6 +109,7 @@ namespace ZoneEngine_New.Core.Inventory
                     row.LowId,
                     row.HighId,
                     row.Quality,
+                    row.Source,
                     row.StackCount,
                     row.InstanceId,
                     identity);

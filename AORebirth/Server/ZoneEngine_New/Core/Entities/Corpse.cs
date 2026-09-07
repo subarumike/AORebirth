@@ -44,7 +44,7 @@ namespace ZoneEngine_New.Core.Entities
             Position = dead.Position;
             Rotation = dead.Rotation;
             Playfield = dead.Playfield;
-            LootLevel = NormalizeLevel(dead.Stats.Get(CharacterStat.Level));
+            LootLevel = dead.Stats.GetOrOne(CharacterStat.Level);
             ItemTable = dead is NpcCharacter npc ? npc.MobTemplate?.ItemTable : null;
             TimeExist = DefaultTimeExist;
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
@@ -68,9 +68,7 @@ namespace ZoneEngine_New.Core.Entities
 
             SourceStats[CharacterStat.Cash] = 0;
 
-            int current = player.Stats.Get(CharacterStat.Cash, StatDetail.Base);
-            if (StatCollection.IsUnset(current) || current < 0)
-                current = 0;
+            int current = Math.Max(0, player.Stats.GetOrZero(CharacterStat.Cash, StatDetail.Base));
 
             long sum = (long)current + cash;
             int newCash = sum > int.MaxValue ? int.MaxValue : (int)sum;

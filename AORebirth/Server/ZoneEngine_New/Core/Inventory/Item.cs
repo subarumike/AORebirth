@@ -2,14 +2,11 @@ namespace ZoneEngine_New.Core.Inventory
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
 
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-
-    using Utility;
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
@@ -46,6 +43,14 @@ namespace ZoneEngine_New.Core.Inventory
         public int Quality { get; init; }
 
         public int StackCount { get; set; } = 1;
+
+        public ItemSource Source { get; init; } = ItemSource.Other;
+
+        /// <summary>
+        /// True while this instance is mid-move (delayed equip/unequip). Locked items cannot be
+        /// removed or relocated by other packets (trade, delete, a second inventory move).
+        /// </summary>
+        public bool Locked { get; set; }
 
         public ItemTemplate Definition { get; init; } = null!;
 
@@ -86,6 +91,9 @@ namespace ZoneEngine_New.Core.Inventory
         public bool IsMaCombinedWeapon()
             => GetStat(CharacterStat.MartialArts) > 0;
 
+        public WeaponFlags GetWeaponFlags()
+            => Definition.GetWeaponFlags();
+
         /// <summary>
         /// Inventory/worn GenericCmd Use entry point. Bag open/reopen/close-toggle, then OnUse spells.
         /// </summary>
@@ -102,6 +110,9 @@ namespace ZoneEngine_New.Core.Inventory
             if (player.Session == null || player.Playfield == null || !player.Inventory.IsHydrated)
                 return false;
 
+            if (Locked)
+                return false;
+
             if (Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use))
             {
                 if (TryUseBackpack(player, slotIdentity, inventoryRepository, items))
@@ -111,7 +122,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (!Can(CanFlags.Use))
                 return false;
 
-            return ExecuteOnUse(player, inventoryRepository, items);
+            return Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
         }
 
         bool TryUseBackpack(
@@ -177,57 +188,6 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             page.IsOpen = true;
-            return true;
-        }
-
-        bool ExecuteOnUse(Player player, IInventoryRepository inventoryRepository, IItemBuilder items)
-        {
-            if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells) || spells.Count == 0)
-                return false;
-
-            bool any = false;
-            foreach (ItemSpell spell in spells)
-            {
-                if (ExecuteSpell(player, spell, inventoryRepository, items))
-                    any = true;
-            }
-
-            return any;
-        }
-
-        bool ExecuteSpell(
-            Player player,
-            ItemSpell spell,
-            IInventoryRepository inventoryRepository,
-            IItemBuilder items)
-        {
-            switch ((FunctionType)spell.FunctionType)
-            {
-                case FunctionType.OpenBank:
-                    return OpenBank(player, inventoryRepository, items);
-
-                default:
-                    LogUtil.Debug(
-                        DebugInfoDetail.Network,
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Unhandled OnUse FunctionType={0} item={1}/{2} character={3}",
-                            spell.FunctionType,
-                            LowId,
-                            HighId,
-                            player.Identity.Instance));
-                    return false;
-            }
-        }
-
-        static bool OpenBank(Player player, IInventoryRepository inventoryRepository, IItemBuilder items)
-        {
-            if (player.Session == null)
-                return false;
-
-            int characterId = player.Identity.Instance;
-            player.Inventory.EnsureBankHydrated(characterId, inventoryRepository, items);
-            player.Session.Send(player.Inventory.BuildBankMessage(player.Identity));
             return true;
         }
 

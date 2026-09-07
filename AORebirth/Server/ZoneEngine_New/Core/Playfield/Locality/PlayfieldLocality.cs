@@ -37,6 +37,18 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         internal LocalityPolicy Policy => _policy;
 
+        /// <summary>
+        /// Outdoor XZ must lie in the legacy playfield extent (<c>Width|Height * 4</c>).
+        /// Indoor layouts always accept.
+        /// </summary>
+        public bool ContainsWorldPosition(float x, float z) => _grid.ContainsWorldPosition(x, z);
+
+        /// <summary>Outdoor world width (X), or 0 for indoor.</summary>
+        public float WorldSizeX => _grid.WorldSizeX;
+
+        /// <summary>Outdoor world depth (Z), or 0 for indoor.</summary>
+        public float WorldSizeZ => _grid.WorldSizeZ;
+
         internal void AttachHashSpawns(
             IEnumerable<int> spawnCellIds,
             Action<int> onCellSleep,
@@ -114,15 +126,11 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             Cell? previous = dynel.Cell;
             dynel.Cell?.Remove(dynel);
 
-            if (_grid.TryResolveCell(dynel.Position, out Cell cell))
-            {
-                cell.Add(dynel);
-                dynel.Cell = cell;
-            }
-            else
-            {
-                dynel.Cell = null;
-            }
+            // Floor then clamp: a registered dynel always has a cell, including at the exclusive
+            // far edge where floor(worldSize/cellSize) would otherwise fall past the last index.
+            Cell cell = _grid.ResolveCell(dynel.Position);
+            cell.Add(dynel);
+            dynel.Cell = cell;
 
             if (logPlayerCellChange
                 && dynel is Player player
@@ -131,7 +139,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 LogPlayerCellChange(
                     player,
                     previous?.Id ?? CellGrid.NonLocalCellId,
-                    dynel.Cell?.Id ?? CellGrid.NonLocalCellId);
+                    cell.Id);
             }
         }
 

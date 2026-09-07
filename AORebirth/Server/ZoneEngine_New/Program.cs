@@ -20,6 +20,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.MessageHandlers;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -124,6 +125,7 @@ namespace ZoneEngine_New
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
             services.AddSingleton<CharacterSnapshotService>();
+            services.AddSingleton<IPlayfieldMetricsRegistry, PlayfieldMetricsRegistry>();
             services.AddSingleton<PlayfieldManager>();
             // Explicit Lazy so TeleportCommand can break the PlayfieldManager <-> command handler cycle.
             services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
@@ -139,6 +141,9 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, SpawnCommand>();
             services.AddSingleton<IGmCommand, TeleportCommand>();
             services.AddSingleton<IGmCommand, SetCommand>();
+            services.AddSingleton<IGmCommand, GiveItemCommand>();
+            services.AddSingleton<IGmCommand, NpcCommand>();
+            services.AddSingleton<IGmCommand, ServerStatsCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
 

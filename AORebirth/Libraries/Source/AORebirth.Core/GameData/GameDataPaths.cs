@@ -35,6 +35,8 @@ namespace AORebirth.Core.GameData
 
         public const string CollisionFileName = "Collision.dat";
 
+        public const string SurfacesFileName = "Surfaces.dat";
+
         public const string DestinationsFileName = "Destinations.dat";
 
         /// <summary>
@@ -107,6 +109,11 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldDestinationsRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DestinationsFileName);
+        }
+
+        public static string PlayfieldSurfacesRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SurfacesFileName);
         }
     }
 }

@@ -65,9 +65,9 @@ namespace ChatEngine
 
     using Utility;
 
-    #if !AOREBIRTH_LINUX
-    using ZoneEngine.Core.Playfields;
-    #endif
+    // #if !AOREBIRTH_LINUX
+    // using ZoneEngine.Core.Playfields; // unused while CacheAllPlayfieldData is commented out
+    // #endif
 
     using Config = Utility.Config.ConfigReadWrite;
 
@@ -691,7 +691,9 @@ namespace ChatEngine
                 }
 
                 #if !AOREBIRTH_LINUX
-                PlayfieldLoader.CacheAllPlayfieldData();
+                // Temporary: ChatEngine does not consume PFData; skip so startup
+                // does not require playfields.dat beside ChatEngine.exe.
+                // PlayfieldLoader.CacheAllPlayfieldData();
                 #endif
             }
             catch (Exception e)

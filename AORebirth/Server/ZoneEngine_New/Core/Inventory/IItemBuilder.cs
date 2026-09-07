@@ -1,5 +1,7 @@
 namespace ZoneEngine_New.Core.Inventory
 {
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Data;
@@ -11,6 +13,7 @@ namespace ZoneEngine_New.Core.Inventory
             int lowId,
             int highId,
             int quality,
+            ItemSource source,
             int stackCount = 1,
             int instanceId = 0,
             Identity? identity = null,

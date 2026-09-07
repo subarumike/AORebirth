@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
 
     public sealed class PlayfieldManager : IDisposable
@@ -35,6 +36,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly InventoryMoveService _inventoryMoves;
         private readonly InventoryFlushService _inventoryFlush;
         private readonly CharacterSnapshotService _characterSnapshot;
+        private readonly IPlayfieldMetricsRegistry _metricsRegistry;
         private bool _disposed;
 
         public PlayfieldManager(
@@ -47,7 +49,8 @@ namespace ZoneEngine_New.Core.Playfield
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
             InventoryFlushService inventoryFlush,
-            CharacterSnapshotService characterSnapshot)
+            CharacterSnapshotService characterSnapshot,
+            IPlayfieldMetricsRegistry metricsRegistry)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -59,6 +62,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(inventoryMoves);
             ArgumentNullException.ThrowIfNull(inventoryFlush);
             ArgumentNullException.ThrowIfNull(characterSnapshot);
+            ArgumentNullException.ThrowIfNull(metricsRegistry);
 
             _logger = logger;
             _router = router;
@@ -70,6 +74,7 @@ namespace ZoneEngine_New.Core.Playfield
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
             _characterSnapshot = characterSnapshot;
+            _metricsRegistry = metricsRegistry;
         }
 
         public static TimeSpan ResolveLinkDeadTimeout()
@@ -118,7 +123,8 @@ namespace ZoneEngine_New.Core.Playfield
                     _instanceIds,
                     _inventoryMoves,
                     _inventoryFlush,
-                    _characterSnapshot);
+                    _characterSnapshot,
+                    _metricsRegistry);
             }
             else
             {
@@ -134,7 +140,8 @@ namespace ZoneEngine_New.Core.Playfield
                     _instanceIds,
                     _inventoryMoves,
                     _inventoryFlush,
-                    _characterSnapshot);
+                    _characterSnapshot,
+                    _metricsRegistry);
             }
 
             created.Build();
@@ -231,6 +238,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             foreach (Playfield playfield in playfields)
                 playfield.Dispose();
+
+            _metricsRegistry.Clear();
         }
     }
 }

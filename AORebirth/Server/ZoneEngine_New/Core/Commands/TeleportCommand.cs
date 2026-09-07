@@ -10,12 +10,21 @@ namespace ZoneEngine_New.Core.Commands
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
 
+    using CharacterStat = SmokeLounge.AOtomation.Messaging.GameData.CharacterStat;
     using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     public sealed class TeleportCommand : IGmCommand
     {
+        private readonly Lazy<PlayfieldManager> _playfieldManager;
+
+        public TeleportCommand(Lazy<PlayfieldManager> playfieldManager)
+        {
+            ArgumentNullException.ThrowIfNull(playfieldManager);
+            _playfieldManager = playfieldManager;
+        }
+
         public string Name => "tp";
 
         public int RequiredGmLevel => 1;
@@ -35,61 +44,119 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            Player player = context.Player;
-            Playfield? playfield = player.Playfield;
+            Player subject = context.ResolveSubject();
+            Playfield? playfield = subject.Playfield;
             if (playfield == null)
             {
                 GmCommandFeedback.Send(context.Session, context.Player, "Not on a playfield.");
                 return;
             }
 
+            float y = subject.Position.yf;
+            Vector3 landing = new Vector3(x, y, z);
+            string who = ReferenceEquals(subject, context.Player)
+                ? "self"
+                : (string.IsNullOrEmpty(subject.Name)
+                    ? subject.Identity.Instance.ToString(CultureInfo.InvariantCulture)
+                    : subject.Name);
+
             if (playfieldId != playfield.Identity.Instance)
             {
+                if (subject.Session == null)
+                {
+                    GmCommandFeedback.Send(context.Session, context.Player, "Target has no session.");
+                    return;
+                }
+
+                // A GM jump is not a proxy entry, so it leaves no way back: exit proxies in the
+                // destination will decline until the player walks in through a real door.
+                subject.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+                subject.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+
+                Playfield destination = _playfieldManager.Value.GetOrCreate(playfieldId);
+
                 GmCommandFeedback.Send(
                     context.Session,
                     context.Player,
-                    "Cross-playfield teleport is not implemented.");
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Teleported {0} to ({1}, {2}, {3}) pf={4}",
+                        who,
+                        x,
+                        y,
+                        z,
+                        playfieldId));
+
+                if (!ReferenceEquals(subject, context.Player))
+                {
+                    GmCommandFeedback.Send(
+                        subject.Session,
+                        subject,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Teleported to ({0}, {1}, {2}) pf={3}",
+                            x,
+                            y,
+                            z,
+                            playfieldId));
+                }
+
+                subject.Session.TransferToPlayfield(destination, landing);
                 return;
             }
 
-            float y = player.Position.yf;
-            player.Position = new Vector3(x, y, z);
+            subject.Position = landing;
 
             CharDCMoveMessage move = new CharDCMoveMessage
             {
-                Identity = player.Identity,
+                Identity = subject.Identity,
                 Unknown = 0x00,
                 MoveType = (byte)MovementAction.FullStop,
                 Heading = new MsgQuaternion
                 {
-                    X = player.Rotation.xf,
-                    Y = player.Rotation.yf,
-                    Z = player.Rotation.zf,
-                    W = player.Rotation.wf
+                    X = subject.Rotation.xf,
+                    Y = subject.Rotation.yf,
+                    Z = subject.Rotation.zf,
+                    W = subject.Rotation.wf
                 },
                 Coordinates = new MsgVector3
                 {
-                    X = player.Position.xf,
-                    Y = player.Position.yf,
-                    Z = player.Position.zf
+                    X = subject.Position.xf,
+                    Y = subject.Position.yf,
+                    Z = subject.Position.zf
                 },
                 Unknown1 = 0,
                 AuxA = 0,
                 AuxB = 0
             };
 
-            playfield.GetRequiredService<PlayfieldLocality>().Announce(player, move, includeSelf: true);
+            playfield.GetRequiredService<PlayfieldLocality>().Announce(subject, move, includeSelf: true);
 
             GmCommandFeedback.Send(
                 context.Session,
                 context.Player,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Teleported to ({0}, {1}, {2}) pf={3}",
+                    "Teleported {0} to ({1}, {2}, {3}) pf={4}",
+                    who,
                     x,
                     y,
                     z,
                     playfieldId));
+
+            if (!ReferenceEquals(subject, context.Player) && subject.Session != null)
+            {
+                GmCommandFeedback.Send(
+                    subject.Session,
+                    subject,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Teleported to ({0}, {1}, {2}) pf={3}",
+                        x,
+                        y,
+                        z,
+                        playfieldId));
+            }
         }
     }
 }

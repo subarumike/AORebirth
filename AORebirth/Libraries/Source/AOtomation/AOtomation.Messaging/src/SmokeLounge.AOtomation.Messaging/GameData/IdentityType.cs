@@ -68,7 +68,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         
         Playfield1 = 0x0000C79C, 
 
-        Playfield = 0x0000C79D, 
+        Playfield = 0x0000C79D,
+
+        /// <summary>Playfield door / proxy destination identity (TeleportProxy dest type).</summary>
+        PlayfieldDoor = 0x0000C79E,
 
         NanoProgram = 0x0000CF1B, 
 

@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Collections.Generic;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -43,9 +45,7 @@ namespace ZoneEngine_New.Core.Entities
             List<List<int>>? weapons = MobTemplate?.Weapons;
             if (weapons != null && weapons.Count > 0)
             {
-                int quality = Stats.Get(CharacterStat.Level);
-                if (StatCollection.IsUnset(quality) || quality < 1)
-                    quality = 1;
+                int quality = Stats.GetOrOne(CharacterStat.Level);
 
                 for (int i = 0; i < weapons.Count && i < 2; i++)
                 {
@@ -58,7 +58,7 @@ namespace ZoneEngine_New.Core.Entities
                     if (lowId <= 0)
                         continue;
 
-                    Item item = _items.Create(lowId, highId, quality);
+                    Item item = _items.Create(lowId, highId, quality, ItemSource.Other);
                     if (!item.IsWieldableCombatWeapon())
                         continue;
 

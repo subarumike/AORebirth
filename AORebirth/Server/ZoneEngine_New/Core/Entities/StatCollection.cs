@@ -56,20 +56,24 @@ namespace ZoneEngine_New.Core.Entities
     /// </summary>
     public class StatCollection
     {
-        public const int Unset = 1234567890;
-
         readonly Dictionary<CharacterStat, StatValue> _values = new();
         readonly HashSet<CharacterStat> _dirty = new();
 
         public event Action<CharacterStat, int, int, bool>? StatChanged;
 
-        public static bool IsUnset(int value) => value == Unset;
+        public static bool IsUnset(int value) => value == (int)CharacterStat.Unset;
+
+        /// <summary>
+        /// Maps the Unset sentinel to 0; leaves all other values unchanged.
+        /// Use when a raw int may already hold Unset (e.g. item template stats).
+        /// </summary>
+        public static int Normalize(int value) => IsUnset(value) ? 0 : value;
 
         public bool TryGetValue(CharacterStat stat, out int value, StatDetail detail = StatDetail.Full)
         {
             if (!_values.TryGetValue(stat, out StatValue? statValue))
             {
-                value = Unset;
+                value = (int)CharacterStat.Unset;
                 return false;
             }
 
@@ -78,7 +82,26 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         public int Get(CharacterStat stat, StatDetail detail = StatDetail.Full)
-            => _values.TryGetValue(stat, out StatValue? statValue) ? GetDetail(statValue, detail) : Unset;
+            => _values.TryGetValue(stat, out StatValue? statValue) ? GetDetail(statValue, detail) : (int)CharacterStat.Unset;
+
+        /// <summary>
+        /// Returns the stat value, or 0 when absent / Unset.
+        /// Prefer this for quantities where Unset is not a meaningful value.
+        /// Keep <see cref="Get"/> + <see cref="IsUnset"/> when absence must be distinguished from zero
+        /// (identities, optional wire fields, special defaults).
+        /// </summary>
+        public int GetOrZero(CharacterStat stat, StatDetail detail = StatDetail.Full)
+            => Normalize(Get(stat, detail));
+
+        /// <summary>
+        /// Returns the stat value floored to at least 1 (absent / Unset / 0 / negative → 1).
+        /// Use for level/quality-style quantities that must never be below 1.
+        /// </summary>
+        public int GetOrOne(CharacterStat stat, StatDetail detail = StatDetail.Full)
+        {
+            int value = GetOrZero(stat, detail);
+            return value < 1 ? 1 : value;
+        }
 
         public IEnumerable<(CharacterStat Stat, int Base, int Bonus, int Full)> GetEntries()
         {
