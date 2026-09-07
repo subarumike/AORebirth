@@ -2,13 +2,10 @@ namespace ZoneEngine_New.Core.Inventory
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
 
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using Utility;
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
@@ -27,6 +24,8 @@ namespace ZoneEngine_New.Core.Inventory
         public int Flags { get; init; }
 
         public int ItemType { get; init; }
+
+        public int DynelType { get; init; }
 
         public int MultipleCount { get; init; }
 
@@ -108,7 +107,10 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
-        /// <summary>Runs every <see cref="EventType.OnUse"/> function on this template.</summary>
+        /// <summary>
+        /// Runs every <see cref="EventType.OnUse"/> function on this template.
+        /// Unimplemented functions are skipped and do not fail the use.
+        /// </summary>
         public bool ExecuteOnUseSpells(
             Player player,
             IInventoryRepository inventoryRepository,
@@ -121,14 +123,10 @@ namespace ZoneEngine_New.Core.Inventory
             if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells) || spells.Count == 0)
                 return false;
 
-            bool any = false;
             foreach (ItemSpell spell in spells)
-            {
-                if (ExecuteSpell(player, spell, inventoryRepository, items))
-                    any = true;
-            }
+                ExecuteSpell(player, spell, inventoryRepository, items);
 
-            return any;
+            return true;
         }
 
         bool ExecuteSpell(
@@ -136,35 +134,7 @@ namespace ZoneEngine_New.Core.Inventory
             ItemSpell spell,
             IInventoryRepository inventoryRepository,
             IItemBuilder items)
-        {
-            switch ((FunctionType)spell.FunctionType)
-            {
-                case FunctionType.OpenBank:
-                    return OpenBank(player, inventoryRepository, items);
-
-                default:
-                    LogUtil.Debug(
-                        DebugInfoDetail.Network,
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Unhandled OnUse FunctionType={0} template={1} character={2}",
-                            spell.FunctionType,
-                            Id,
-                            player.Identity.Instance));
-                    return false;
-            }
-        }
-
-        static bool OpenBank(Player player, IInventoryRepository inventoryRepository, IItemBuilder items)
-        {
-            if (player.Session == null)
-                return false;
-
-            int characterId = player.Identity.Instance;
-            player.Inventory.EnsureBankHydrated(characterId, inventoryRepository, items);
-            player.Session.Send(player.Inventory.BuildBankMessage(player.Identity));
-            return true;
-        }
+            => ItemUseFunctions.TryExecute(Id, player, spell, inventoryRepository, items);
 
         public static bool EvaluateRequirement(int statValue, ItemRequirement requirement)
         {

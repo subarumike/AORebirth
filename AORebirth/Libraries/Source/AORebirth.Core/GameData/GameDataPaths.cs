@@ -27,6 +27,10 @@ namespace AORebirth.Core.GameData
 
         public const string MonsterDataFileName = "MonsterData.json";
 
+        public const string XpFileName = "Xp.json";
+
+        public const string ItemsFileName = "items.dat";
+
         public const string WallsFileName = "Walls.dat";
 
         public const string DynelsFileName = "Dynels.dat";

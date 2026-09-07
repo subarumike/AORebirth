@@ -1,0 +1,1102 @@
+{
+    "1": {
+       "KillAward": 101,
+       "LevelDelta": 4,
+       "NextLevelXp": 1450
+    },
+    "2": {
+       "KillAward": 119,
+       "LevelDelta": 4,
+       "NextLevelXp": 2600
+    },
+    "3": {
+       "KillAward": 137,
+       "LevelDelta": 4,
+       "NextLevelXp": 3100
+    },
+    "4": {
+       "KillAward": 156,
+       "LevelDelta": 4,
+       "NextLevelXp": 4000
+    },
+    "5": {
+       "KillAward": 174,
+       "LevelDelta": 4,
+       "NextLevelXp": 4500
+    },
+    "6": {
+       "KillAward": 193,
+       "LevelDelta": 4,
+       "NextLevelXp": 5000
+    },
+    "7": {
+       "KillAward": 214,
+       "LevelDelta": 4,
+       "NextLevelXp": 5500
+    },
+    "8": {
+       "KillAward": 233,
+       "LevelDelta": 4,
+       "NextLevelXp": 6000
+    },
+    "9": {
+       "KillAward": 253,
+       "LevelDelta": 4,
+       "NextLevelXp": 6500
+    },
+    "10": {
+       "KillAward": 274,
+       "LevelDelta": 5,
+       "NextLevelXp": 7000
+    },
+    "11": {
+       "KillAward": 295,
+       "LevelDelta": 5,
+       "NextLevelXp": 7700
+    },
+    "12": {
+       "KillAward": 318,
+       "LevelDelta": 5,
+       "NextLevelXp": 8300
+    },
+    "13": {
+       "KillAward": 340,
+       "LevelDelta": 5,
+       "NextLevelXp": 8900
+    },
+    "14": {
+       "KillAward": 362,
+       "LevelDelta": 5,
+       "NextLevelXp": 9600
+    },
+    "15": {
+       "KillAward": 386,
+       "LevelDelta": 6,
+       "NextLevelXp": 10400
+    },
+    "16": {
+       "KillAward": 408,
+       "LevelDelta": 6,
+       "NextLevelXp": 11000
+    },
+    "17": {
+       "KillAward": 433,
+       "LevelDelta": 6,
+       "NextLevelXp": 11900
+    },
+    "18": {
+       "KillAward": 458,
+       "LevelDelta": 6,
+       "NextLevelXp": 12700
+    },
+    "19": {
+       "KillAward": 482,
+       "LevelDelta": 6,
+       "NextLevelXp": 13700
+    },
+    "20": {
+       "KillAward": 509,
+       "LevelDelta": 6,
+       "NextLevelXp": 15400
+    },
+    "21": {
+       "KillAward": 535,
+       "LevelDelta": 6,
+       "NextLevelXp": 16400
+    },
+    "22": {
+       "KillAward": 563,
+       "LevelDelta": 7,
+       "NextLevelXp": 17600
+    },
+    "23": {
+       "KillAward": 591,
+       "LevelDelta": 7,
+       "NextLevelXp": 18800
+    },
+    "24": {
+       "KillAward": 618,
+       "LevelDelta": 7,
+       "NextLevelXp": 20100
+    },
+    "25": {
+       "KillAward": 648,
+       "LevelDelta": 7,
+       "NextLevelXp": 21500
+    },
+    "26": {
+       "KillAward": 677,
+       "LevelDelta": 8,
+       "NextLevelXp": 22900
+    },
+    "27": {
+       "KillAward": 708,
+       "LevelDelta": 8,
+       "NextLevelXp": 24500
+    },
+    "28": {
+       "KillAward": 739,
+       "LevelDelta": 8,
+       "NextLevelXp": 26100
+    },
+    "29": {
+       "KillAward": 771,
+       "LevelDelta": 8,
+       "NextLevelXp": 27800
+    },
+    "30": {
+       "KillAward": 804,
+       "LevelDelta": 9,
+       "NextLevelXp": 30900
+    },
+    "31": {
+       "KillAward": 836,
+       "LevelDelta": 9,
+       "NextLevelXp": 33000
+    },
+    "32": {
+       "KillAward": 871,
+       "LevelDelta": 9,
+       "NextLevelXp": 35100
+    },
+    "33": {
+       "KillAward": 906,
+       "LevelDelta": 9,
+       "NextLevelXp": 37400
+    },
+    "34": {
+       "KillAward": 942,
+       "LevelDelta": 10,
+       "NextLevelXp": 39900
+    },
+    "35": {
+       "KillAward": 979,
+       "LevelDelta": 10,
+       "NextLevelXp": 42400
+    },
+    "36": {
+       "KillAward": 1017,
+       "LevelDelta": 10,
+       "NextLevelXp": 45100
+    },
+    "37": {
+       "KillAward": 1056,
+       "LevelDelta": 10,
+       "NextLevelXp": 47900
+    },
+    "38": {
+       "KillAward": 1095,
+       "LevelDelta": 11,
+       "NextLevelXp": 50900
+    },
+    "39": {
+       "KillAward": 1135,
+       "LevelDelta": 11,
+       "NextLevelXp": 54000
+    },
+    "40": {
+       "KillAward": 1178,
+       "LevelDelta": 11,
+       "NextLevelXp": 57400
+    },
+    "41": {
+       "KillAward": 1220,
+       "LevelDelta": 11,
+       "NextLevelXp": 60900
+    },
+    "42": {
+       "KillAward": 1263,
+       "LevelDelta": 12,
+       "NextLevelXp": 64500
+    },
+    "43": {
+       "KillAward": 1309,
+       "LevelDelta": 12,
+       "NextLevelXp": 68400
+    },
+    "44": {
+       "KillAward": 1354,
+       "LevelDelta": 12,
+       "NextLevelXp": 76400
+    },
+    "45": {
+       "KillAward": 1400,
+       "LevelDelta": 12,
+       "NextLevelXp": 81000
+    },
+    "46": {
+       "KillAward": 1448,
+       "LevelDelta": 13,
+       "NextLevelXp": 85900
+    },
+    "47": {
+       "KillAward": 1499,
+       "LevelDelta": 13,
+       "NextLevelXp": 91000
+    },
+    "48": {
+       "KillAward": 1548,
+       "LevelDelta": 13,
+       "NextLevelXp": 96400
+    },
+    "49": {
+       "KillAward": 1601,
+       "LevelDelta": 13,
+       "NextLevelXp": 101900
+    },
+    "50": {
+       "KillAward": 1653,
+       "LevelDelta": 14,
+       "NextLevelXp": 108000
+    },
+    "51": {
+       "KillAward": 1707,
+       "LevelDelta": 14,
+       "NextLevelXp": 114300
+    },
+    "52": {
+       "KillAward": 1764,
+       "LevelDelta": 14,
+       "NextLevelXp": 120800
+    },
+    "53": {
+       "KillAward": 1820,
+       "LevelDelta": 14,
+       "NextLevelXp": 127700
+    },
+    "54": {
+       "KillAward": 1880,
+       "LevelDelta": 15,
+       "NextLevelXp": 135000
+    },
+    "55": {
+       "KillAward": 1941,
+       "LevelDelta": 15,
+       "NextLevelXp": 142600
+    },
+    "56": {
+       "KillAward": 2001,
+       "LevelDelta": 15,
+       "NextLevelXp": 150700
+    },
+    "57": {
+       "KillAward": 2064,
+       "LevelDelta": 15,
+       "NextLevelXp": 159100
+    },
+    "58": {
+       "KillAward": 2129,
+       "LevelDelta": 16,
+       "NextLevelXp": 167800
+    },
+    "59": {
+       "KillAward": 2196,
+       "LevelDelta": 16,
+       "NextLevelXp": 177100
+    },
+    "60": {
+       "KillAward": 2262,
+       "LevelDelta": 16,
+       "NextLevelXp": 203500
+    },
+    "61": {
+       "KillAward": 2331,
+       "LevelDelta": 16,
+       "NextLevelXp": 214700
+    },
+    "62": {
+       "KillAward": 2403,
+       "LevelDelta": 17,
+       "NextLevelXp": 226700
+    },
+    "63": {
+       "KillAward": 2475,
+       "LevelDelta": 17,
+       "NextLevelXp": 239100
+    },
+    "64": {
+       "KillAward": 2551,
+       "LevelDelta": 17,
+       "NextLevelXp": 251900
+    },
+    "65": {
+       "KillAward": 2626,
+       "LevelDelta": 17,
+       "NextLevelXp": 265700
+    },
+    "66": {
+       "KillAward": 2704,
+       "LevelDelta": 18,
+       "NextLevelXp": 280000
+    },
+    "67": {
+       "KillAward": 2785,
+       "LevelDelta": 18,
+       "NextLevelXp": 294800
+    },
+    "68": {
+       "KillAward": 2867,
+       "LevelDelta": 18,
+       "NextLevelXp": 310600
+    },
+    "69": {
+       "KillAward": 2951,
+       "LevelDelta": 18,
+       "NextLevelXp": 327000
+    },
+    "70": {
+       "KillAward": 3036,
+       "LevelDelta": 19,
+       "NextLevelXp": 344400
+    },
+    "71": {
+       "KillAward": 3125,
+       "LevelDelta": 19,
+       "NextLevelXp": 362300
+    },
+    "72": {
+       "KillAward": 3215,
+       "LevelDelta": 19,
+       "NextLevelXp": 381100
+    },
+    "73": {
+       "KillAward": 3306,
+       "LevelDelta": 19,
+       "NextLevelXp": 401000
+    },
+    "74": {
+       "KillAward": 3402,
+       "LevelDelta": 20,
+       "NextLevelXp": 421600
+    },
+    "75": {
+       "KillAward": 3498,
+       "LevelDelta": 20,
+       "NextLevelXp": 443300
+    },
+    "76": {
+       "KillAward": 3596,
+       "LevelDelta": 20,
+       "NextLevelXp": 508100
+    },
+    "77": {
+       "KillAward": 3697,
+       "LevelDelta": 20,
+       "NextLevelXp": 534200
+    },
+    "78": {
+       "KillAward": 3802,
+       "LevelDelta": 21,
+       "NextLevelXp": 561600
+    },
+    "79": {
+       "KillAward": 3907,
+       "LevelDelta": 21,
+       "NextLevelXp": 590200
+    },
+    "80": {
+       "KillAward": 4014,
+       "LevelDelta": 21,
+       "NextLevelXp": 620000
+    },
+    "81": {
+       "KillAward": 4126,
+       "LevelDelta": 21,
+       "NextLevelXp": 651000
+    },
+    "82": {
+       "KillAward": 4238,
+       "LevelDelta": 22,
+       "NextLevelXp": 683700
+    },
+    "83": {
+       "KillAward": 4356,
+       "LevelDelta": 22,
+       "NextLevelXp": 717900
+    },
+    "84": {
+       "KillAward": 4474,
+       "LevelDelta": 22,
+       "NextLevelXp": 753500
+    },
+    "85": {
+       "KillAward": 4593,
+       "LevelDelta": 22,
+       "NextLevelXp": 790800
+    },
+    "86": {
+       "KillAward": 4718,
+       "LevelDelta": 23,
+       "NextLevelXp": 829400
+    },
+    "87": {
+       "KillAward": 4844,
+       "LevelDelta": 23,
+       "NextLevelXp": 870000
+    },
+    "88": {
+       "KillAward": 4973,
+       "LevelDelta": 23,
+       "NextLevelXp": 912600
+    },
+    "89": {
+       "KillAward": 5105,
+       "LevelDelta": 23,
+       "NextLevelXp": 956800
+    },
+    "90": {
+       "KillAward": 5242,
+       "LevelDelta": 24,
+       "NextLevelXp": 1003000
+    },
+    "91": {
+       "KillAward": 5378,
+       "LevelDelta": 24,
+       "NextLevelXp": 1051300
+    },
+    "92": {
+       "KillAward": 5521,
+       "LevelDelta": 24,
+       "NextLevelXp": 1101500
+    },
+    "93": {
+       "KillAward": 5665,
+       "LevelDelta": 24,
+       "NextLevelXp": 1153900
+    },
+    "94": {
+       "KillAward": 5812,
+       "LevelDelta": 25,
+       "NextLevelXp": 1208800
+    },
+    "95": {
+       "KillAward": 5963,
+       "LevelDelta": 25,
+       "NextLevelXp": 1266000
+    },
+    "96": {
+       "KillAward": 6116,
+       "LevelDelta": 25,
+       "NextLevelXp": 1325500
+    },
+    "97": {
+       "KillAward": 6274,
+       "LevelDelta": 25,
+       "NextLevelXp": 1387700
+    },
+    "98": {
+       "KillAward": 6433,
+       "LevelDelta": 26,
+       "NextLevelXp": 1452300
+    },
+    "99": {
+       "KillAward": 6599,
+       "LevelDelta": 26,
+       "NextLevelXp": 1519900
+    },
+    "100": {
+       "KillAward": 6765,
+       "LevelDelta": 26,
+       "NextLevelXp": 1590300
+    },
+    "101": {
+       "KillAward": 6936,
+       "LevelDelta": 26,
+       "NextLevelXp": 1663500
+    },
+    "102": {
+       "KillAward": 7110,
+       "LevelDelta": 27,
+       "NextLevelXp": 1739900
+    },
+    "103": {
+       "KillAward": 7288,
+       "LevelDelta": 27,
+       "NextLevelXp": 1819600
+    },
+    "104": {
+       "KillAward": 7469,
+       "LevelDelta": 27,
+       "NextLevelXp": 1902200
+    },
+    "105": {
+       "KillAward": 7653,
+       "LevelDelta": 27,
+       "NextLevelXp": 1988900
+    },
+    "106": {
+       "KillAward": 7844,
+       "LevelDelta": 28,
+       "NextLevelXp": 2078600
+    },
+    "107": {
+       "KillAward": 8037,
+       "LevelDelta": 28,
+       "NextLevelXp": 2172100
+    },
+    "108": {
+       "KillAward": 8234,
+       "LevelDelta": 28,
+       "NextLevelXp": 2269800
+    },
+    "109": {
+       "KillAward": 8435,
+       "LevelDelta": 28,
+       "NextLevelXp": 2371100
+    },
+    "110": {
+       "KillAward": 8641,
+       "LevelDelta": 29,
+       "NextLevelXp": 2476600
+    },
+    "111": {
+       "KillAward": 8850,
+       "LevelDelta": 29,
+       "NextLevelXp": 2586600
+    },
+    "112": {
+       "KillAward": 9063,
+       "LevelDelta": 29,
+       "NextLevelXp": 2701000
+    },
+    "113": {
+       "KillAward": 9280,
+       "LevelDelta": 29,
+       "NextLevelXp": 2819800
+    },
+    "114": {
+       "KillAward": 9504,
+       "LevelDelta": 30,
+       "NextLevelXp": 2943600
+    },
+    "115": {
+       "KillAward": 9731,
+       "LevelDelta": 30,
+       "NextLevelXp": 3072400
+    },
+    "116": {
+       "KillAward": 9961,
+       "LevelDelta": 30,
+       "NextLevelXp": 3205800
+    },
+    "117": {
+       "KillAward": 10196,
+       "LevelDelta": 30,
+       "NextLevelXp": 3345200
+    },
+    "118": {
+       "KillAward": 10438,
+       "LevelDelta": 31,
+       "NextLevelXp": 3489700
+    },
+    "119": {
+       "KillAward": 10683,
+       "LevelDelta": 31,
+       "NextLevelXp": 3640200
+    },
+    "120": {
+       "KillAward": 10933,
+       "LevelDelta": 31,
+       "NextLevelXp": 3796500
+    },
+    "121": {
+       "KillAward": 11185,
+       "LevelDelta": 31,
+       "NextLevelXp": 3958900
+    },
+    "122": {
+       "KillAward": 11446,
+       "LevelDelta": 32,
+       "NextLevelXp": 4128000
+    },
+    "123": {
+       "KillAward": 11710,
+       "LevelDelta": 32,
+       "NextLevelXp": 4303400
+    },
+    "124": {
+       "KillAward": 11979,
+       "LevelDelta": 32,
+       "NextLevelXp": 4485700
+    },
+    "125": {
+       "KillAward": 12252,
+       "LevelDelta": 32,
+       "NextLevelXp": 4674800
+    },
+    "126": {
+       "KillAward": 12534,
+       "LevelDelta": 33,
+       "NextLevelXp": 4871700
+    },
+    "127": {
+       "KillAward": 12820,
+       "LevelDelta": 33,
+       "NextLevelXp": 5075700
+    },
+    "128": {
+       "KillAward": 13109,
+       "LevelDelta": 33,
+       "NextLevelXp": 5288100
+    },
+    "129": {
+       "KillAward": 13403,
+       "LevelDelta": 33,
+       "NextLevelXp": 5508200
+    },
+    "130": {
+       "KillAward": 13705,
+       "LevelDelta": 34,
+       "NextLevelXp": 5736800
+    },
+    "131": {
+       "KillAward": 14013,
+       "LevelDelta": 34,
+       "NextLevelXp": 5974600
+    },
+    "132": {
+       "KillAward": 14326,
+       "LevelDelta": 34,
+       "NextLevelXp": 6220700
+    },
+    "133": {
+       "KillAward": 14644,
+       "LevelDelta": 34,
+       "NextLevelXp": 6476500
+    },
+    "134": {
+       "KillAward": 14969,
+       "LevelDelta": 35,
+       "NextLevelXp": 6742200
+    },
+    "135": {
+       "KillAward": 15299,
+       "LevelDelta": 35,
+       "NextLevelXp": 7017500
+    },
+    "136": {
+       "KillAward": 15633,
+       "LevelDelta": 35,
+       "NextLevelXp": 7303700
+    },
+    "137": {
+       "KillAward": 15974,
+       "LevelDelta": 35,
+       "NextLevelXp": 7600100
+    },
+    "138": {
+       "KillAward": 16324,
+       "LevelDelta": 36,
+       "NextLevelXp": 7907600
+    },
+    "139": {
+       "KillAward": 16677,
+       "LevelDelta": 36,
+       "NextLevelXp": 8227000
+    },
+    "140": {
+       "KillAward": 17038,
+       "LevelDelta": 36,
+       "NextLevelXp": 8557700
+    },
+    "141": {
+       "KillAward": 17406,
+       "LevelDelta": 36,
+       "NextLevelXp": 8901000
+    },
+    "142": {
+       "KillAward": 17779,
+       "LevelDelta": 37,
+       "NextLevelXp": 9256800
+    },
+    "143": {
+       "KillAward": 18158,
+       "LevelDelta": 37,
+       "NextLevelXp": 9625800
+    },
+    "144": {
+       "KillAward": 18547,
+       "LevelDelta": 37,
+       "NextLevelXp": 10008600
+    },
+    "145": {
+       "KillAward": 18939,
+       "LevelDelta": 37,
+       "NextLevelXp": 10405300
+    },
+    "146": {
+       "KillAward": 19341,
+       "LevelDelta": 38,
+       "NextLevelXp": 10816600
+    },
+    "147": {
+       "KillAward": 19747,
+       "LevelDelta": 38,
+       "NextLevelXp": 11242500
+    },
+    "148": {
+       "KillAward": 20163,
+       "LevelDelta": 38,
+       "NextLevelXp": 11684300
+    },
+    "149": {
+       "KillAward": 20585,
+       "LevelDelta": 38,
+       "NextLevelXp": 12141900
+    },
+    "150": {
+       "KillAward": 21012,
+       "LevelDelta": 39,
+       "NextLevelXp": 12616200
+    },
+    "151": {
+       "KillAward": 21449,
+       "LevelDelta": 39,
+       "NextLevelXp": 13107200
+    },
+    "152": {
+       "KillAward": 21893,
+       "LevelDelta": 39,
+       "NextLevelXp": 13616100
+    },
+    "153": {
+       "KillAward": 22343,
+       "LevelDelta": 39,
+       "NextLevelXp": 14143600
+    },
+    "154": {
+       "KillAward": 22804,
+       "LevelDelta": 40,
+       "NextLevelXp": 14689700
+    },
+    "155": {
+       "KillAward": 23269,
+       "LevelDelta": 40,
+       "NextLevelXp": 15255300
+    },
+    "156": {
+       "KillAward": 23742,
+       "LevelDelta": 40,
+       "NextLevelXp": 15841000
+    },
+    "157": {
+       "KillAward": 24224,
+       "LevelDelta": 40,
+       "NextLevelXp": 16447900
+    },
+    "158": {
+       "KillAward": 24714,
+       "LevelDelta": 41,
+       "NextLevelXp": 17075800
+    },
+    "159": {
+       "KillAward": 25212,
+       "LevelDelta": 41,
+       "NextLevelXp": 17725900
+    },
+    "160": {
+       "KillAward": 25720,
+       "LevelDelta": 41,
+       "NextLevelXp": 18399400
+    },
+    "161": {
+       "KillAward": 26234,
+       "LevelDelta": 41,
+       "NextLevelXp": 19096100
+    },
+    "162": {
+       "KillAward": 26757,
+       "LevelDelta": 42,
+       "NextLevelXp": 19817500
+    },
+    "163": {
+       "KillAward": 27287,
+       "LevelDelta": 42,
+       "NextLevelXp": 20564100
+    },
+    "164": {
+       "KillAward": 27827,
+       "LevelDelta": 42,
+       "NextLevelXp": 21336600
+    },
+    "165": {
+       "KillAward": 28375,
+       "LevelDelta": 42,
+       "NextLevelXp": 22136100
+    },
+    "166": {
+       "KillAward": 28933,
+       "LevelDelta": 43,
+       "NextLevelXp": 22963600
+    },
+    "167": {
+       "KillAward": 29502,
+       "LevelDelta": 43,
+       "NextLevelXp": 23819700
+    },
+    "168": {
+       "KillAward": 30076,
+       "LevelDelta": 43,
+       "NextLevelXp": 24705200
+    },
+    "169": {
+       "KillAward": 30660,
+       "LevelDelta": 43,
+       "NextLevelXp": 25621100
+    },
+    "170": {
+       "KillAward": 31253,
+       "LevelDelta": 44,
+       "NextLevelXp": 26569000
+    },
+    "171": {
+       "KillAward": 31856,
+       "LevelDelta": 44,
+       "NextLevelXp": 27548800
+    },
+    "172": {
+       "KillAward": 32468,
+       "LevelDelta": 44,
+       "NextLevelXp": 28562900
+    },
+    "173": {
+       "KillAward": 33092,
+       "LevelDelta": 44,
+       "NextLevelXp": 29611100
+    },
+    "174": {
+       "KillAward": 33724,
+       "LevelDelta": 45,
+       "NextLevelXp": 30695300
+    },
+    "175": {
+       "KillAward": 34366,
+       "LevelDelta": 45,
+       "NextLevelXp": 31816300
+    },
+    "176": {
+       "KillAward": 35017,
+       "LevelDelta": 45,
+       "NextLevelXp": 32975100
+    },
+    "177": {
+       "KillAward": 35680,
+       "LevelDelta": 45,
+       "NextLevelXp": 34173500
+    },
+    "178": {
+       "KillAward": 36349,
+       "LevelDelta": 46,
+       "NextLevelXp": 35412500
+    },
+    "179": {
+       "KillAward": 37032,
+       "LevelDelta": 46,
+       "NextLevelXp": 36692500
+    },
+    "180": {
+       "KillAward": 37726,
+       "LevelDelta": 46,
+       "NextLevelXp": 38016500
+    },
+    "181": {
+       "KillAward": 38427,
+       "LevelDelta": 46,
+       "NextLevelXp": 39384400
+    },
+    "182": {
+       "KillAward": 39141,
+       "LevelDelta": 47,
+       "NextLevelXp": 40797700
+    },
+    "183": {
+       "KillAward": 39862,
+       "LevelDelta": 47,
+       "NextLevelXp": 42258500
+    },
+    "184": {
+       "KillAward": 40601,
+       "LevelDelta": 47,
+       "NextLevelXp": 43768300
+    },
+    "185": {
+       "KillAward": 41343,
+       "LevelDelta": 47,
+       "NextLevelXp": 45328100
+    },
+    "186": {
+       "KillAward": 42103,
+       "LevelDelta": 48,
+       "NextLevelXp": 46939900
+    },
+    "187": {
+       "KillAward": 42871,
+       "LevelDelta": 48,
+       "NextLevelXp": 48604900
+    },
+    "188": {
+       "KillAward": 43652,
+       "LevelDelta": 48,
+       "NextLevelXp": 50324600
+    },
+    "189": {
+       "KillAward": 44441,
+       "LevelDelta": 48,
+       "NextLevelXp": 52101200
+    },
+    "190": {
+       "KillAward": 45245,
+       "LevelDelta": 49,
+       "NextLevelXp": 53936300
+    },
+    "191": {
+       "KillAward": 46060,
+       "LevelDelta": 49,
+       "NextLevelXp": 55831600
+    },
+    "192": {
+       "KillAward": 46884,
+       "LevelDelta": 49,
+       "NextLevelXp": 57788700
+    },
+    "193": {
+       "KillAward": 47725,
+       "LevelDelta": 49,
+       "NextLevelXp": 59810000
+    },
+    "194": {
+       "KillAward": 48575,
+       "LevelDelta": 50,
+       "NextLevelXp": 61897000
+    },
+    "195": {
+       "KillAward": 49436,
+       "LevelDelta": 50,
+       "NextLevelXp": 64052200
+    },
+    "196": {
+       "KillAward": 50311,
+       "LevelDelta": 50,
+       "NextLevelXp": 66277200
+    },
+    "197": {
+       "KillAward": 51199,
+       "LevelDelta": 50,
+       "NextLevelXp": 68574400
+    },
+    "198": {
+       "KillAward": 52098,
+       "LevelDelta": 51,
+       "NextLevelXp": 70945700
+    },
+    "199": {
+       "KillAward": 53011,
+       "LevelDelta": 51,
+       "NextLevelXp": 73393900
+    },
+    "200": {
+       "KillAward": 53940,
+       "LevelDelta": 51,
+       "NextLevelXp": 80000
+    },
+    "201": {
+       "KillAward": 60000,
+       "LevelDelta": 40,
+       "NextLevelXp": 96000
+    },
+    "202": {
+       "KillAward": 70000,
+       "LevelDelta": 35,
+       "NextLevelXp": 115200
+    },
+    "203": {
+       "KillAward": 80000,
+       "LevelDelta": 30,
+       "NextLevelXp": 138240
+    },
+    "204": {
+       "KillAward": 90000,
+       "LevelDelta": 25,
+       "NextLevelXp": 165888
+    },
+    "205": {
+       "KillAward": 100000,
+       "LevelDelta": 22,
+       "NextLevelXp": 199066
+    },
+    "206": {
+       "KillAward": 110000,
+       "LevelDelta": 20,
+       "NextLevelXp": 238879
+    },
+    "207": {
+       "KillAward": 120000,
+       "LevelDelta": 20,
+       "NextLevelXp": 286654
+    },
+    "208": {
+       "KillAward": 130000,
+       "LevelDelta": 20,
+       "NextLevelXp": 343985
+    },
+    "209": {
+       "KillAward": 140000,
+       "LevelDelta": 20,
+       "NextLevelXp": 412782
+    },
+    "210": {
+       "KillAward": 150000,
+       "LevelDelta": 20,
+       "NextLevelXp": 495339
+    },
+    "211": {
+       "KillAward": 162523,
+       "LevelDelta": 20,
+       "NextLevelXp": 594407
+    },
+    "212": {
+       "KillAward": 165253,
+       "LevelDelta": 20,
+       "NextLevelXp": 713288
+    },
+    "213": {
+       "KillAward": 168020,
+       "LevelDelta": 20,
+       "NextLevelXp": 855946
+    },
+    "214": {
+       "KillAward": 170825,
+       "LevelDelta": 20,
+       "NextLevelXp": 1027135
+    },
+    "215": {
+       "KillAward": 173668,
+       "LevelDelta": 20,
+       "NextLevelXp": 1232562
+    },
+    "216": {
+       "KillAward": 176540,
+       "LevelDelta": 21,
+       "NextLevelXp": 1479074
+    },
+    "217": {
+       "KillAward": 179463,
+       "LevelDelta": 22,
+       "NextLevelXp": 1774889
+    },
+    "218": {
+       "KillAward": 182413,
+       "LevelDelta": 23,
+       "NextLevelXp": 2129867
+    },
+    "219": {
+       "KillAward": 185410,
+       "LevelDelta": 24,
+       "NextLevelXp": 2555840
+    },
+    "220": {
+       "KillAward": 188440,
+       "LevelDelta": 25,
+       "NextLevelXp": 3067008
+    }
+ }

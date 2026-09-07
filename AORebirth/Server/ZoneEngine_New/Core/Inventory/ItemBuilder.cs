@@ -46,7 +46,10 @@ namespace ZoneEngine_New.Core.Inventory
             Item item = new()
             {
                 InstanceId = instanceId,
-                Identity = ResolveMintedIdentity(identity, definition.ItemType, instanceId),
+                Identity = ResolveMintedIdentity(
+                    identity,
+                    definition.DynelType != 0 ? definition.DynelType : definition.ItemType,
+                    instanceId),
                 LowId = lowId,
                 HighId = highId,
                 Quality = clampedQuality,
@@ -58,12 +61,13 @@ namespace ZoneEngine_New.Core.Inventory
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Item created name={0} low={1} high={2} ql={3} itemType={4} statItemType={5} identity={6}:{7}",
+                    "Item created name={0} low={1} high={2} ql={3} itemType={4} dynelType={5} statItemType={6} identity={7}:{8}",
                     item.Name,
                     item.LowId,
                     item.HighId,
                     item.Quality,
                     definition.ItemType,
+                    definition.DynelType,
                     item.GetStat(CharacterStat.ItemType),
                     item.Identity.Type,
                     item.Identity.Instance));
@@ -180,6 +184,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Quality = quality,
                 Flags = low.Flags,
                 ItemType = low.ItemType,
+                DynelType = low.DynelType,
                 MultipleCount = LerpInt(low.MultipleCount, high.MultipleCount, factor),
                 Stats = LerpIntMap(low.Stats, high.Stats, factor),
                 Attack = LerpIntMap(low.Attack, high.Attack, factor),
@@ -212,6 +217,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Quality = quality,
                 Flags = source.Flags,
                 ItemType = source.ItemType,
+                DynelType = source.DynelType,
                 MultipleCount = source.MultipleCount,
                 Stats = new Dictionary<CharacterStat, int>(source.Stats),
                 Attack = new Dictionary<CharacterStat, int>(source.Attack),

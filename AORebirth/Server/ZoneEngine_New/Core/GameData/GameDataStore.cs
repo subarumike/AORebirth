@@ -15,6 +15,7 @@ namespace ZoneEngine_New.Core.GameData
 
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
     /// Loads and caches the GameData tree from {BaseDirectory}\GameData.
@@ -46,9 +47,12 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<string, LootItemPair[]> _lootTables =
             new(StringComparer.Ordinal);
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
+        private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
         private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
+        private readonly Lock _exitProxySync = new();
+        private Dictionary<int, int[]>? _exitProxyDoorsByPlayfield;
 
         public GameDataStore(IZoneLogger logger)
         {
@@ -64,6 +68,7 @@ namespace ZoneEngine_New.Core.GameData
             LoadMobTemplates();
             LoadLootTables();
             LoadMonsterData();
+            LoadXpLevels();
         }
 
         public string RootPath { get; }
@@ -75,6 +80,19 @@ namespace ZoneEngine_New.Core.GameData
         public int LootTableCount => _lootTables.Count;
 
         public int MonsterDataCount => _catMeshByMonsterData.Count;
+
+        public int XpLevelCount => _xpLevels.Count;
+
+        public bool TryGetXpLevel(int level, out XpLevelEntry entry)
+        {
+            if (level <= 0)
+            {
+                entry = null!;
+                return false;
+            }
+
+            return _xpLevels.TryGetValue(level, out entry!);
+        }
 
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
@@ -164,6 +182,66 @@ namespace ZoneEngine_New.Core.GameData
                 PlayfieldGeometryData loaded = ReadPlayfieldGeometry(playfieldId);
                 _playfieldGeometry[playfieldId] = loaded;
                 return loaded;
+            }
+        }
+
+        public IReadOnlyList<int> GetExitProxyDoorInstances(int playfieldId)
+        {
+            if (playfieldId <= 0)
+                return [];
+
+            EnsureExitProxyIndex();
+            return _exitProxyDoorsByPlayfield!.TryGetValue(playfieldId, out int[]? doors)
+                ? doors
+                : [];
+        }
+
+        private void EnsureExitProxyIndex()
+        {
+            lock (_exitProxySync)
+            {
+                if (_exitProxyDoorsByPlayfield != null)
+                    return;
+
+                Dictionary<int, HashSet<int>> collected = new();
+                if (!Directory.Exists(PlayfieldsPath))
+                {
+                    _exitProxyDoorsByPlayfield = new Dictionary<int, int[]>();
+                    return;
+                }
+
+                foreach (string directory in Directory.EnumerateDirectories(PlayfieldsPath))
+                {
+                    string name = Path.GetFileName(directory);
+                    if (!int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out int sourcePlayfieldId)
+                        || sourcePlayfieldId <= 0)
+                        continue;
+
+                    string dynelsPath = Path.Combine(
+                        RootPath,
+                        GameDataPaths.PlayfieldDynelsRelativePath(sourcePlayfieldId));
+                    PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(dynelsPath);
+                    ExitProxyDoorCatalog.CollectFromDynels(dynels, collected);
+                }
+
+                Dictionary<int, int[]> index = new(collected.Count);
+                int doorTotal = 0;
+                foreach (KeyValuePair<int, HashSet<int>> pair in collected)
+                {
+                    int[] doors = new int[pair.Value.Count];
+                    pair.Value.CopyTo(doors);
+                    Array.Sort(doors);
+                    index[pair.Key] = doors;
+                    doorTotal += doors.Length;
+                }
+
+                _exitProxyDoorsByPlayfield = index;
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData exit-proxy destinations playfields={0} doors={1}",
+                        index.Count,
+                        doorTotal));
             }
         }
 
@@ -421,6 +499,100 @@ namespace ZoneEngine_New.Core.GameData
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Failed to load MonsterData.json from {0}; catalog empty",
+                        path));
+            }
+        }
+
+        private void LoadXpLevels()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.XpFileName);
+            if (!File.Exists(path))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Xp.json not found at {0}; catalog empty",
+                        path));
+                return;
+            }
+
+            try
+            {
+                Dictionary<string, XpLevelRow>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<string, XpLevelRow>>(
+                        File.ReadAllText(path),
+                        CatalogJsonOptions);
+                if (loaded == null)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Xp.json was empty: {0}",
+                            path));
+                    return;
+                }
+
+                var parsed = new List<(int Level, XpLevelRow Row)>();
+                int skipped = 0;
+                foreach (KeyValuePair<string, XpLevelRow> pair in loaded)
+                {
+                    if (!int.TryParse(pair.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int level)
+                        || level <= 0
+                        || pair.Value == null)
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    parsed.Add((level, pair.Value));
+                }
+
+                parsed.Sort((left, right) => left.Level.CompareTo(right.Level));
+                int floorXp = 0;
+                foreach ((int level, XpLevelRow row) in parsed)
+                {
+                    if (!_xpLevels.TryAdd(
+                            level,
+                            new XpLevelEntry
+                            {
+                                Level = level,
+                                KillAward = row.KillAward,
+                                LevelDelta = row.LevelDelta,
+                                NextLevelXp = row.NextLevelXp,
+                                FloorXp = floorXp
+                            }))
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    if (row.NextLevelXp > 0)
+                        floorXp += row.NextLevelXp;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData xp levels={0} from {1}",
+                        _xpLevels.Count,
+                        path));
+
+                if (skipped > 0)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "GameData skipped {0} xp level rows (invalid or duplicate)",
+                            skipped));
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load Xp.json from {0}; catalog empty",
                         path));
             }
         }
@@ -784,6 +956,15 @@ namespace ZoneEngine_New.Core.GameData
             public int MonsterData { get; set; }
 
             public int CatMesh { get; set; }
+        }
+
+        private sealed class XpLevelRow
+        {
+            public int KillAward { get; set; }
+
+            public int LevelDelta { get; set; }
+
+            public int NextLevelXp { get; set; }
         }
     }
 }

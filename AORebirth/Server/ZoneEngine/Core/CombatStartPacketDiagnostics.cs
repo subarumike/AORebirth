@@ -195,10 +195,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     IdentityText(Identity.None),
                     specialAttackWeapon.Unknown,
                     specialAttackWeapon.Specials == null ? 0 : specialAttackWeapon.Specials.Length,
-                    specialAttackWeapon.MeleeInit,
-                    specialAttackWeapon.RangedInit,
-                    specialAttackWeapon.PhysicalInit,
-                    specialAttackWeapon.NanoInit,
+                    specialAttackWeapon.CloseCombatInitiative,
+                    specialAttackWeapon.DistanceWeaponInitiative,
+                    specialAttackWeapon.PhysicalProwessInitiative,
+                    specialAttackWeapon.NanoProwessInitiative,
                     specialAttackWeapon.AggDef,
                     DescribeSpecials(specialAttackWeapon.Specials));
             }

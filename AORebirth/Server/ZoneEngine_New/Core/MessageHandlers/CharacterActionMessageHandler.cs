@@ -68,7 +68,25 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     AnnounceAction(player, CharacterActionType.StopSneaking);
                     break;
 
+                case CharacterActionType.InfoRequest:
+                {
+                    Playfield? playfield = player.Playfield;
+                    if (playfield == null)
+                        break;
+
+                    if (message.Target.Instance == 0)
+                        break;
+
+                    if (!playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel)
+                        || dynel is not Character target)
+                        break;
+
+                    session.Send(target.BuildInfoPacket());
+                    break;
+                }
+
                 case CharacterActionType.Logout:
+                {
                     //TODO: Combat guard this at least
                     session.Send(
                         new StartLogoutMessage
@@ -76,12 +94,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             Identity = player.Identity
                         });
 
-                    Playfield? playfield = player.Playfield;
-                    if (playfield != null)
-                        playfield.GetRequiredService<SpawnService>().LogoutPlayer(player);
+                    Playfield? logoutPlayfield = player.Playfield;
+                    if (logoutPlayfield != null)
+                        logoutPlayfield.GetRequiredService<SpawnService>().LogoutPlayer(player);
                     else
                         session.Close();
                     break;
+                }
 
                 default:
                     player.Logger.Warn(

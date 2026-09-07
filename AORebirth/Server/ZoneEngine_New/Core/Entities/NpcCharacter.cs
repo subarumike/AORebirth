@@ -32,6 +32,39 @@ namespace ZoneEngine_New.Core.Entities
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
             => new();
 
+        public override InfoPacketMessage BuildInfoPacket()
+        {
+            return new InfoPacketMessage
+            {
+                Identity = Identity,
+                Unknown = 1,
+                Type = InfoPacketType.Monster,
+                Info = new MonsterInfoPacket
+                {
+                    Unknown1 = 1,
+                    Profession = ClampToByte(Stats.GetOrZero(CharacterStat.Profession)),
+                    Level = ClampToByte(Stats.GetOrOne(CharacterStat.Level)),
+                    TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
+                    VisualProfession = ClampToByte(Stats.GetOrZero(CharacterStat.VisualProfession)),
+                    Unknown2 = 0,
+                    CurrentHealth = Stats.GetOrZero(CharacterStat.Health),
+                    MaxHealth = Stats.GetOrZero(CharacterStat.MaxHealth),
+                    Unknown3 = 0,
+                    OrganizationId = 0,
+                    Unknown8 = 1234567890,
+                    Unknown9 = 1234567890,
+                    Unknown10 = 1234567890
+                }
+            };
+        }
+
+        /// <summary>
+        /// Fight ended without a kill. Clears kill credit.
+        /// Later: restore HP, leash home, clear FightingTarget.
+        /// </summary>
+        public void OnReset()
+            => ClearKillRewards();
+
         public override void Rebase() => RebaseWeapons();
 
         public override void RebaseWeapons()
@@ -42,19 +75,22 @@ namespace ZoneEngine_New.Core.Entities
             bool armedOff = false;
             bool maCombined = false;
 
-            List<List<int>>? weapons = MobTemplate?.Weapons;
-            if (weapons != null && weapons.Count > 0)
+            List<List<int>>? equipment = MobTemplate?.Equipment;
+            if (equipment != null && equipment.Count > 0)
             {
                 int quality = Stats.GetOrOne(CharacterStat.Level);
 
-                for (int i = 0; i < weapons.Count && i < 2; i++)
+                for (int i = 0; i < equipment.Count; i++)
                 {
-                    List<int> pair = weapons[i];
-                    if (pair == null || pair.Count < 2)
+                    if (armedMain && armedOff)
+                        break;
+
+                    List<int> pair = equipment[i];
+                    if (pair == null || pair.Count < 1)
                         continue;
 
                     int lowId = pair[0];
-                    int highId = pair[1];
+                    int highId = pair.Count >= 2 ? pair[1] : lowId;
                     if (lowId <= 0)
                         continue;
 
@@ -62,7 +98,10 @@ namespace ZoneEngine_New.Core.Entities
                     if (!item.IsWieldableCombatWeapon())
                         continue;
 
-                    WeaponSlot slot = i == 0 ? WeaponSlot.MainHand : WeaponSlot.OffHand;
+                    WeaponSlot slot = ResolveHandSlot(i, equipment.Count, armedMain, armedOff);
+                    if (slot == WeaponSlot.None)
+                        continue;
+
                     ArmFromItem(slot, item);
                     if (slot == WeaponSlot.MainHand)
                         armedMain = true;
@@ -75,6 +114,21 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
+        }
+
+        static WeaponSlot ResolveHandSlot(int equipmentSlot, int equipmentCount, bool armedMain, bool armedOff)
+        {
+            if (equipmentSlot == (int)WeaponSlots.Righthand)
+                return armedMain ? WeaponSlot.None : WeaponSlot.MainHand;
+            if (equipmentSlot == (int)WeaponSlots.LeftHand)
+                return armedOff ? WeaponSlot.None : WeaponSlot.OffHand;
+            if (equipmentCount > (int)WeaponSlots.LeftHand)
+                return WeaponSlot.None;
+            if (!armedMain)
+                return WeaponSlot.MainHand;
+            if (!armedOff)
+                return WeaponSlot.OffHand;
+            return WeaponSlot.None;
         }
 
         protected override byte[] CreateMovementStatus(int movementMode) =>

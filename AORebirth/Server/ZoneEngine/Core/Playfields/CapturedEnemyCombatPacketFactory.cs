@@ -103,7 +103,7 @@ namespace AORebirth.Core.Playfields
         internal static SpecialAttackWeaponMessage CreateSpecialAttackWeapon(
             Identity attacker,
             CapturedEnemyCombatContract contract,
-            int specialAttackWeaponUnknown5)
+            int aggDef)
         {
             if (contract == null
                 || !contract.IsCombatReady
@@ -120,7 +120,7 @@ namespace AORebirth.Core.Playfields
                 contract.SpecialAttackWeaponUnknown2,
                 contract.SpecialAttackWeaponUnknown3,
                 contract.SpecialAttackWeaponUnknown4,
-                specialAttackWeaponUnknown5);
+                aggDef);
         }
 
         internal static AttackMessage CreateAttack(
@@ -215,11 +215,11 @@ namespace AORebirth.Core.Playfields
             Identity attacker,
             CapturedEnemySpecialAttackDefinition[] definitions,
             byte n3Unknown,
-            int unknown1,
-            int unknown2,
-            int unknown3,
-            int unknown4,
-            int unknown5)
+            int closeCombatInitiative,
+            int distanceWeaponInitiative,
+            int physicalProwessInitiative,
+            int nanoProwessInitiative,
+            int aggDef)
         {
             return new SpecialAttackWeaponMessage
             {
@@ -233,11 +233,11 @@ namespace AORebirth.Core.Playfields
                         Unknown3 = definition.Tag,
                         Unknown4 = definition.Name
                     }).ToArray(),
-                MeleeInit = unknown1,
-                RangedInit = unknown2,
-                PhysicalInit = unknown3,
-                NanoInit = unknown4,
-                AggDef = unknown5
+                CloseCombatInitiative = closeCombatInitiative,
+                DistanceWeaponInitiative = distanceWeaponInitiative,
+                PhysicalProwessInitiative = physicalProwessInitiative,
+                NanoProwessInitiative = nanoProwessInitiative,
+                AggDef = aggDef
             };
         }
 

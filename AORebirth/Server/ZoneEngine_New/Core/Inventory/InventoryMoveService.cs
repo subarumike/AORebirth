@@ -146,14 +146,12 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
             }
 
-            if (destPage.Content.ContainsKey(destSlot) && !(sourceIsWear && destIsWear))
-            {
-                // Equip-to-occupied wear slot is a swap; bag targets must be empty.
-                if (!destIsWear || !sourceIsWear)
-                    return;
-            }
+            destPage.Content.TryGetValue(destSlot, out Item? destOccupant);
+            if (destOccupant != null && destOccupant.Locked)
+                return;
 
-            if (destPage.Content.TryGetValue(destSlot, out Item? destOccupant) && destOccupant.Locked)
+            // Occupied wear or unequip-onto-occupied bag is a swap. Bag-to-bag stays empty-only.
+            if (destOccupant != null && !destIsWear && !sourceIsWear)
                 return;
 
             bool touchesEquipment = sourceIsWear || destIsWear;
@@ -165,22 +163,16 @@ namespace ZoneEngine_New.Core.Inventory
                     return;
 
                 if (sourceIsWear
-                    && destIsWear
-                    && destPage.Content.TryGetValue(destSlot, out Item? swapped)
-                    && !MeetsEquipRequirements(player, swapped, sourcePage, sourceSlot))
-                {
+                    && destOccupant != null
+                    && !MeetsEquipRequirements(player, destOccupant, sourcePage, sourceSlot))
                     return;
-                }
 
                 if (!MeetsWeaponHandPairing(player, item, destPage, destSlot, sourcePage, sourceSlot))
                     return;
 
                 double delaySeconds = ResolveEquipDelaySeconds(item, destPage.Identity.Type == IdentityType.SocialPage);
-                Item? other = null;
-                if (sourceIsWear && destIsWear)
-                    destPage.Content.TryGetValue(destSlot, out other);
-                if (other != null)
-                    delaySeconds += ResolveEquipDelaySeconds(other, sourcePage.Identity.Type == IdentityType.SocialPage);
+                if (destOccupant != null)
+                    delaySeconds += ResolveEquipDelaySeconds(destOccupant, sourcePage.Identity.Type == IdentityType.SocialPage);
 
                 var pending = new PendingEquip(
                     player,
@@ -190,7 +182,7 @@ namespace ZoneEngine_New.Core.Inventory
                     destPage,
                     destSlot,
                     item,
-                    other,
+                    destOccupant,
                     lootSource,
                     delaySeconds,
                     ackTargetPlacement: destSlot);
@@ -377,9 +369,35 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
             }
 
+            SendUnequipActions(player, pending);
             player.Rebase();
             SendAck(player, pending.AckSource, pending.AckTargetPlacement);
             NotifyEquipmentChanged(player, pending);
+        }
+
+        static void SendUnequipActions(Player player, PendingEquip pending)
+        {
+            if (pending.SourcePage.Identity.Type.IsWearPage())
+                SendUnequipAction(player, pending.SourceSlot);
+
+            if (pending.SwappedItem != null && pending.DestPage.Identity.Type.IsWearPage())
+                SendUnequipAction(player, pending.DestSlot);
+        }
+
+        static void SendUnequipAction(Player player, int slot)
+        {
+            player.Session?.Send(
+                new CharacterActionMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.Unknown3,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = 0,
+                    Parameter2 = slot,
+                    Unknown2 = 0
+                });
         }
 
         static void NotifyEquipmentChanged(Player player, PendingEquip pending)
@@ -464,9 +482,11 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool MeetsEquipRequirements(Player player, Item item, Container wearPage, int destSlot)
         {
-            if (!item.Can(CanFlags.Wear))
+            // Slot bits are page-local. ItemClass must match the wear page first so a crafted
+            // ClientMoveItemToInventory cannot land a weapon on armor/implant/social slots.
+            // Can.Wear is not required; some legal weapons (e.g. 121564) omit it.
+            if (!FitsWearPage(item, wearPage))
                 return false;
-
             if (!FitsWearSlot(item, wearPage, destSlot))
                 return false;
 
@@ -475,6 +495,19 @@ namespace ZoneEngine_New.Core.Inventory
                 : ActionType.ToWear;
 
             return item.Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), needed);
+        }
+
+        static bool FitsWearPage(Item item, Container wearPage)
+        {
+            var itemClass = (ItemClass)item.GetStat(CharacterStat.ItemClass);
+            return wearPage.Identity.Type switch
+            {
+                IdentityType.WeaponPage => itemClass is ItemClass.Weapon or ItemClass.Utility,
+                IdentityType.ArmorPage => itemClass == ItemClass.Armor,
+                IdentityType.ImplantPage => itemClass == ItemClass.Implant,
+                IdentityType.SocialPage => itemClass == ItemClass.Armor,
+                _ => false
+            };
         }
 
         static bool MeetsWeaponHandPairing(
@@ -525,8 +558,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (sourcePage.Identity.Type == IdentityType.WeaponPage && sourceSlot == handSlot)
             {
-                if (destPage.Identity.Type == IdentityType.WeaponPage
-                    && destPage.Content.TryGetValue(destSlot, out Item? swapped))
+                if (destPage.Content.TryGetValue(destSlot, out Item? swapped))
                     return swapped;
                 return null;
             }

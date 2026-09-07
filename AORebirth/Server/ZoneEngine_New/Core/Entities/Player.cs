@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
@@ -32,6 +33,10 @@ namespace ZoneEngine_New.Core.Entities
 
         public override bool IsPlayer => true;
 
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
         public IZoneSession? Session { get; set; }
 
         public PlayerConnectionPhase ConnectionPhase { get; set; } = PlayerConnectionPhase.Online;
@@ -49,7 +54,40 @@ namespace ZoneEngine_New.Core.Entities
 
         internal IZoneLogger Logger { get; set; }
 
-        public override void Rebase() => RebaseWeapons();
+        public override void Rebase()
+        {
+            RebaseMaxHealth();
+            RebaseMaxNano();
+            RebaseEquipBonuses();
+            RebaseWeapons();
+        }
+
+        void RebaseMaxHealth()
+        {
+            if (!MaxHealthCalculator.TryCompute(Stats, out int maxHealth))
+                return;
+
+            Stats.Set(CharacterStat.MaxHealth, maxHealth, StatDetail.Base, dirty: true);
+        }
+
+        void RebaseMaxNano()
+        {
+            if (!MaxNanoCalculator.TryCompute(Stats, out int maxNano))
+                return;
+
+            Stats.Set(CharacterStat.MaxNanoEnergy, maxNano, StatDetail.Base, dirty: true);
+        }
+
+        void RebaseEquipBonuses()
+        {
+            if (!Inventory.IsHydrated)
+            {
+                Stats.ClearBonuses(dirty: true);
+                return;
+            }
+
+            Inventory.ApplyWearBonuses(Stats);
+        }
 
         const CharacterStat WeaponMeshRightStat = (CharacterStat)1006;
         const CharacterStat WeaponMeshLeftStat = (CharacterStat)1007;
@@ -506,6 +544,83 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.MapFlags,
             CharacterStat.ChangeSideCount,
         ];
+
+        public override InfoPacketMessage BuildInfoPacket()
+        {
+            int profession = Stats.GetOrZero(CharacterStat.Profession);
+            int visualProfession = Stats.GetOrZero(CharacterStat.VisualProfession);
+            int alienLevel = Stats.GetOrZero(CharacterStat.AlienLevel);
+            if (alienLevel <= 0)
+                alienLevel = 1;
+
+            string firstName = FirstName;
+            if (string.IsNullOrEmpty(firstName))
+                firstName = Name ?? string.Empty;
+
+            return new InfoPacketMessage
+            {
+                Identity = Identity,
+                Unknown = 0,
+                Type = InfoPacketType.Character,
+                Info = new CharacterInfoPacket
+                {
+                    Unknown1 = 0x01,
+                    Profession = (Profession)profession,
+                    Level = ClampToByte(Stats.GetOrOne(CharacterStat.Level)),
+                    TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
+                    VisualProfession = (Profession)visualProfession,
+                    SideXp = 0,
+                    Health = Stats.GetOrZero(CharacterStat.Health),
+                    MaxHealth = Stats.GetOrZero(CharacterStat.MaxHealth),
+                    BreedHostility = 0,
+                    OrganizationId = null,
+                    FirstName = firstName,
+                    LastName = LastName ?? string.Empty,
+                    LegacyTitle = LegacyTitleFor(Stats.GetOrZero(CharacterStat.PvP_Rating)),
+                    Unknown2 = 0,
+                    OrganizationRank = null,
+                    TowerFields = null,
+                    CityPlayfieldId = 0,
+                    Towers = null,
+                    InvadersKilled = Stats.GetOrZero(CharacterStat.InvadersKilled),
+                    KilledByInvaders = Stats.GetOrZero(CharacterStat.KilledByInvaders),
+                    AiLevel = alienLevel,
+                    PvpDuelWins = Stats.GetOrZero(CharacterStat.PVPDuelKills),
+                    PvpDuelLoses = Stats.GetOrZero(CharacterStat.PVPDuelDeaths),
+                    PvpProfessionDuelLoses = Stats.GetOrZero(CharacterStat.PVPProfessionDuelDeaths),
+                    PvpSoloKills = Stats.GetOrZero(CharacterStat.PVPRankedSoloKills),
+                    PvpTeamKills = Stats.GetOrZero(CharacterStat.PVPRankedTeamKills),
+                    PvpSoloScore = Stats.GetOrZero(CharacterStat.PVPSoloScore),
+                    PvpTeamScore = Stats.GetOrZero(CharacterStat.PVPTeamScore),
+                    PvpDuelScore = Stats.GetOrZero(CharacterStat.PVPDuelScore)
+                }
+            };
+        }
+
+        static string LegacyTitleFor(int rating)
+        {
+            if (rating < 1400)
+                return string.Empty;
+            if (rating < 1500)
+                return "Freshman";
+            if (rating < 1600)
+                return "Rookie";
+            if (rating < 1700)
+                return "Apprentice";
+            if (rating < 1800)
+                return "Novice";
+            if (rating < 1900)
+                return "Neophyte";
+            if (rating < 2000)
+                return "Experienced";
+            if (rating < 2100)
+                return "Expert";
+            if (rating < 2300)
+                return "Master";
+            if (rating < 2500)
+                return "Champion";
+            return "Grand Master";
+        }
 
         /// <summary>
         /// Builds a FullCharacter login packet from current player state.

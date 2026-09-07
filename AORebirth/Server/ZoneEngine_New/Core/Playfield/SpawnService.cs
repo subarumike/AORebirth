@@ -136,6 +136,12 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnSource = SpawnSource.Corpse
             };
 
+            if (dead.TryGetLootWinner(out Identity lootWinner) && lootWinner.Instance != 0)
+            {
+                corpse.LootWinner = lootWinner;
+                corpse.ReservedUntilUtc = DateTime.UtcNow.AddSeconds(Corpse.LootReserveSeconds);
+            }
+
             corpse.ResolveLoot(_gameData, _items, _ids);
 
             _registry.Register(corpse);

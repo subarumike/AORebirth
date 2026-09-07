@@ -120,10 +120,12 @@ namespace ZoneEngine_New.Core.WorldSimulation
             world.HardStaticCount = surfaceStatics + tileStatics;
             world.BakeWallTriggers(geometry.Walls);
             world.BakePortalTriggers(geometry.Dynels, playfieldId);
+            world.BakeExitProxyTriggers(gameData.GetExitProxyDoorInstances(playfieldId));
 
             logger.Info(
                 $"World bake playfield={playfieldId} terrain[{tiles}] surfaceStatics={surfaceStatics}"
-                + $" wallTriggers={world.WallTriggerCount} portalTriggers={world.PortalTriggerCount}");
+                + $" wallTriggers={world.WallTriggerCount} portalTriggers={world.PortalTriggerCount}"
+                + $" exitTriggers={world.ExitTriggerCount}");
             if (geometry.Tilemap != null && !tiles.Complete)
             {
                 logger.Warn(
@@ -383,11 +385,13 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <summary>
         /// Turns the door a character just arrived through into a way back out. Legacy discovers
         /// these by scanning every playfield's proxies up front; geometry here loads lazily, so the
-        /// door is registered when someone actually walks in through it.
+        /// door is also registered when someone walks in through it (idempotent with bake).
         /// </summary>
         public void RegisterExitProxyDoor(int doorInstance)
         {
-            if (doorInstance == 0 || !_exitProxyDoors.Add(doorInstance))
+            if (doorInstance == 0
+                || !ExitProxyDoorCatalog.ShouldRegister(_playfieldId, doorInstance)
+                || !_exitProxyDoors.Add(doorInstance))
                 return;
 
             List<PlayfieldDynel>? dynels = _geometry.Dynels?.Dynels;
@@ -433,6 +437,13 @@ namespace ZoneEngine_New.Core.WorldSimulation
                     + doorInstance.ToString("X8", CultureInfo.InvariantCulture));
                 return;
             }
+        }
+
+        void BakeExitProxyTriggers(IReadOnlyList<int> doorInstances)
+        {
+            ArgumentNullException.ThrowIfNull(doorInstances);
+            for (int i = 0; i < doorInstances.Count; i++)
+                RegisterExitProxyDoor(doorInstances[i]);
         }
 
         bool TryResolvePortalLanding(ZoneTriggerVolume portal, out AoVector3 landing)

@@ -152,6 +152,9 @@ namespace ZoneEngine_New.Core.Entities
                 return false;
             }
 
+            if (!CanOpenLoot(player))
+                return false;
+
             if (_inventoryHandle == 0 && Playfield != null)
                 _inventoryHandle = Playfield.AllocateContainerInventoryHandle();
 
@@ -167,6 +170,9 @@ namespace ZoneEngine_New.Core.Entities
         protected virtual void OnOpened(Player player)
         {
         }
+
+        protected virtual bool CanOpenLoot(Player player)
+            => true;
 
         /// <summary>
         /// Call after loot contents change (item taken/deleted). Schedules despawn 1s after empty

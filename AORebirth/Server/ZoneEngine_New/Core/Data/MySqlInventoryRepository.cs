@@ -235,60 +235,72 @@ namespace ZoneEngine_New.Core.Data
                 using MySqlConnection connection = new MySqlConnection(_connectionString);
                 connection.Open();
                 using MySqlTransaction transaction = connection.BeginTransaction();
-
-                for (int i = 0; i < inserts.Count; i++)
-                {
-                    ItemInstanceRecord item = inserts[i];
-                    if (item.InstanceId <= 0)
-                        throw new ArgumentOutOfRangeException(nameof(inserts));
-                    ExecuteInsert(item, connection, transaction);
-                }
-
-                // Park updates into unique negative placements first so swaps cannot collide.
-                for (int i = 0; i < updates.Count; i++)
-                {
-                    ItemLocationUpdate update = updates[i];
-                    if (update.InstanceId <= 0)
-                        throw new ArgumentOutOfRangeException(nameof(updates));
-
-                    using MySqlCommand park = new MySqlCommand(UpdateLocationSql, connection, transaction);
-                    park.Parameters.AddWithValue("@InstanceId", update.InstanceId);
-                    park.Parameters.AddWithValue("@ContainerType", update.ContainerType);
-                    park.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
-                    park.Parameters.AddWithValue("@ContainerPlacement", -(i + 1));
-                    if (park.ExecuteNonQuery() == 0)
-                    {
-                        throw new InvalidOperationException(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "UpdateLocations park found no row for InstanceId={0}",
-                                update.InstanceId));
-                    }
-                }
-
-                foreach (ItemLocationUpdate update in updates)
-                {
-                    using MySqlCommand commit = new MySqlCommand(UpdateLocationSql, connection, transaction);
-                    commit.Parameters.AddWithValue("@InstanceId", update.InstanceId);
-                    commit.Parameters.AddWithValue("@ContainerType", update.ContainerType);
-                    commit.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
-                    commit.Parameters.AddWithValue("@ContainerPlacement", update.ContainerPlacement);
-                    if (commit.ExecuteNonQuery() == 0)
-                    {
-                        throw new InvalidOperationException(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "UpdateLocations commit found no row for InstanceId={0}",
-                                update.InstanceId));
-                    }
-                }
-
+                WritePersist(inserts, updates, connection, transaction);
                 transaction.Commit();
             }
             catch (Exception exception)
             {
                 _logger.Error(exception, "InventoryRepository.PersistNewAndUpdateLocations failed");
                 throw;
+            }
+        }
+
+        internal void WritePersist(
+            IReadOnlyList<ItemInstanceRecord> inserts,
+            IReadOnlyList<ItemLocationUpdate> updates,
+            MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            ArgumentNullException.ThrowIfNull(inserts);
+            ArgumentNullException.ThrowIfNull(updates);
+            ArgumentNullException.ThrowIfNull(connection);
+            ArgumentNullException.ThrowIfNull(transaction);
+
+            for (int i = 0; i < inserts.Count; i++)
+            {
+                ItemInstanceRecord item = inserts[i];
+                if (item.InstanceId <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(inserts));
+                ExecuteInsert(item, connection, transaction);
+            }
+
+            // Park updates into unique negative placements first so swaps cannot collide.
+            for (int i = 0; i < updates.Count; i++)
+            {
+                ItemLocationUpdate update = updates[i];
+                if (update.InstanceId <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(updates));
+
+                using MySqlCommand park = new MySqlCommand(UpdateLocationSql, connection, transaction);
+                park.Parameters.AddWithValue("@InstanceId", update.InstanceId);
+                park.Parameters.AddWithValue("@ContainerType", update.ContainerType);
+                park.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
+                park.Parameters.AddWithValue("@ContainerPlacement", -(i + 1));
+                if (park.ExecuteNonQuery() == 0)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "UpdateLocations park found no row for InstanceId={0}",
+                            update.InstanceId));
+                }
+            }
+
+            foreach (ItemLocationUpdate update in updates)
+            {
+                using MySqlCommand commit = new MySqlCommand(UpdateLocationSql, connection, transaction);
+                commit.Parameters.AddWithValue("@InstanceId", update.InstanceId);
+                commit.Parameters.AddWithValue("@ContainerType", update.ContainerType);
+                commit.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
+                commit.Parameters.AddWithValue("@ContainerPlacement", update.ContainerPlacement);
+                if (commit.ExecuteNonQuery() == 0)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "UpdateLocations commit found no row for InstanceId={0}",
+                            update.InstanceId));
+                }
             }
         }
 

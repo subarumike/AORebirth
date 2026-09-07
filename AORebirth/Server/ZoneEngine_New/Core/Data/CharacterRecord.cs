@@ -10,6 +10,10 @@ namespace ZoneEngine_New.Core.Data
 
         public string? Name { get; init; }
 
+        public string? FirstName { get; init; }
+
+        public string? LastName { get; init; }
+
         public int Playfield { get; init; }
 
         public float X { get; init; }

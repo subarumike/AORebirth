@@ -11,8 +11,9 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Playfield;
 
     /// <summary>
-    /// Per-character write-behind for dirty item locations.
+    /// Per-character write-behind for dirty item locations and uploaded nanos.
     /// Coalesces bursts, writes on a dedicated thread (off playfield tick), hard-flushes on authority boundaries.
+    /// Inventory and nano inserts commit in one transaction.
     /// </summary>
     public sealed class InventoryFlushService : IDisposable
     {
@@ -20,7 +21,7 @@ namespace ZoneEngine_New.Core.Inventory
         public const int CoalesceMilliseconds = 300;
 
         private readonly Lazy<PlayfieldManager> _playfieldManager;
-        private readonly IInventoryRepository _repository;
+        private readonly ICharacterCoalesceCommit _persist;
         private readonly IZoneLogger _logger;
         private readonly object _scheduleGate = new();
         private readonly Dictionary<int, long> _dueAtMs = new();
@@ -31,15 +32,15 @@ namespace ZoneEngine_New.Core.Inventory
 
         public InventoryFlushService(
             Lazy<PlayfieldManager> playfieldManager,
-            IInventoryRepository repository,
+            ICharacterCoalesceCommit persist,
             IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(playfieldManager);
-            ArgumentNullException.ThrowIfNull(repository);
+            ArgumentNullException.ThrowIfNull(persist);
             ArgumentNullException.ThrowIfNull(logger);
 
             _playfieldManager = playfieldManager;
-            _repository = repository;
+            _persist = persist;
             _logger = logger;
 
             _writer = new Thread(WriterLoop)
@@ -154,21 +155,37 @@ namespace ZoneEngine_New.Core.Inventory
 
         void FlushCharacter(Player player)
         {
-            if (!player.Inventory.IsHydrated || !player.Inventory.HasDirtyEntries)
+            if (!player.Inventory.IsHydrated)
+                return;
+
+            if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
                 return;
 
             object gate = GateFor(player.Identity.Instance);
             lock (gate)
             {
-                if (!player.Inventory.HasDirtyEntries)
+                if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
+                    return;
+
+                PlayerInventory.InventoryDirtyFlush? inventory = player.Inventory.TakeDirty();
+                int[] nanos = player.DrainDirtyUploadedNanos();
+                if (inventory == null && nanos.Length == 0)
                     return;
 
                 try
                 {
-                    player.Inventory.FlushDirty(_repository);
+                    _persist.Persist(
+                        inventory?.Inserts ?? [],
+                        inventory?.Updates ?? [],
+                        player.Identity.Instance,
+                        nanos);
+                    inventory?.MarkNewlyPersisted();
                 }
                 catch (Exception exception)
                 {
+                    if (inventory != null)
+                        player.Inventory.RestoreDirty(inventory);
+                    player.RestoreDirtyUploadedNanos(nanos);
                     _logger.Error(
                         exception,
                         string.Format(

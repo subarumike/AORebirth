@@ -116,7 +116,11 @@ namespace ZoneEngine_New
             services.AddSingleton<IZoneLogger, NLogZoneLogger>();
             services.AddSingleton<ICharacterRepository, MySqlCharacterRepository>();
             services.AddSingleton<IStatRepository, MySqlStatRepository>();
-            services.AddSingleton<IInventoryRepository, MySqlInventoryRepository>();
+            services.AddSingleton<MySqlInventoryRepository>();
+            services.AddSingleton<IInventoryRepository>(provider => provider.GetRequiredService<MySqlInventoryRepository>());
+            services.AddSingleton<MySqlUploadedNanoRepository>();
+            services.AddSingleton<IUploadedNanoRepository>(provider => provider.GetRequiredService<MySqlUploadedNanoRepository>());
+            services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
             services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();

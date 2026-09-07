@@ -51,6 +51,8 @@ namespace AORebirth.Tools.RDBDataExtractor
                 int playfieldDatSkipped = 0;
                 int monsterDataWritten = 0;
                 int monsterDataSkipped = 0;
+                int itemsDatWritten = 0;
+                int itemsDatSkipped = 0;
                 int failed = 0;
 
                 using (var controller = new RdbController(resolved.AoClientPath))
@@ -71,6 +73,28 @@ namespace AORebirth.Tools.RDBDataExtractor
                             failed++;
                             Console.Error.WriteLine(
                                 "FAIL MonsterData "
+                                + exception.GetType().Name
+                                + ": "
+                                + exception.Message);
+                        }
+                    }
+
+                    if (!resolved.SkipItemsDat)
+                    {
+                        try
+                        {
+                            var items = new ItemDatExporter(
+                                controller,
+                                resolved.GameDataDirectory);
+                            ExportFileCounts itemCounts = items.Export(resolved.Overwrite);
+                            itemsDatWritten += itemCounts.Written;
+                            itemsDatSkipped += itemCounts.Skipped;
+                        }
+                        catch (Exception exception)
+                        {
+                            failed++;
+                            Console.Error.WriteLine(
+                                "FAIL items.dat "
                                 + exception.GetType().Name
                                 + ": "
                                 + exception.Message);
@@ -241,6 +265,10 @@ namespace AORebirth.Tools.RDBDataExtractor
                     + monsterDataWritten
                     + " monsterDataSkipped="
                     + monsterDataSkipped
+                    + " itemsDatWritten="
+                    + itemsDatWritten
+                    + " itemsDatSkipped="
+                    + itemsDatSkipped
                     + " failed="
                     + failed);
                 return failed > 0 ? 1 : 0;
