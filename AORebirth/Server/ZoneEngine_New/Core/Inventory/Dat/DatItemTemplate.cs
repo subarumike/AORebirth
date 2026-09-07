@@ -37,6 +37,12 @@ namespace ZoneEngine_New.Core.Inventory.Dat
         public List<DatAction> Actions { get; set; } = new();
 
         public List<DatEvent> Events { get; set; } = new();
+
+        /// <summary>
+        /// RDB record DynelType (e.g. Container = 51017). Trailing so older
+        /// MessagePack array slices still unpack with this left at 0.
+        /// </summary>
+        public int DynelType;
     }
 
     [Serializable]

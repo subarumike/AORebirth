@@ -19,6 +19,10 @@ namespace ZoneEngine_New.Core.GameData
 
         int MonsterDataCount { get; }
 
+        int XpLevelCount { get; }
+
+        bool TryGetXpLevel(int level, out XpLevelEntry entry);
+
         bool TryGetMobTemplate(string hash, out MobTemplate template);
 
         MobTemplate RequireMobTemplate(string hash);
@@ -37,5 +41,11 @@ namespace ZoneEngine_New.Core.GameData
         /// Walls.dat / Dynels.dat / Doors.dat / Collision.dat. Missing files yield null members (no throw).
         /// </summary>
         PlayfieldGeometryData GetPlayfieldGeometry(int playfieldId);
+
+        /// <summary>
+        /// Door instances on <paramref name="playfieldId"/> that are TeleportProxy return exits
+        /// (static catalog, built once from all playfield Dynels.dat). Empty when none.
+        /// </summary>
+        IReadOnlyList<int> GetExitProxyDoorInstances(int playfieldId);
     }
 }

@@ -131,6 +131,30 @@ namespace ZoneEngine_New.Core.Entities
             StatChanged?.Invoke(stat, previousFull, existing.Full, isInitialSet);
         }
 
+        public void AddBonus(CharacterStat stat, int delta, bool dirty = false)
+        {
+            if (delta == 0)
+                return;
+
+            Set(stat, GetOrZero(stat, StatDetail.Bonus) + delta, StatDetail.Bonus, dirty);
+        }
+
+        public void ClearBonuses(bool dirty = false)
+        {
+            if (_values.Count == 0)
+                return;
+
+            var stats = new List<CharacterStat>(_values.Keys);
+            for (int i = 0; i < stats.Count; i++)
+            {
+                CharacterStat stat = stats[i];
+                if (GetOrZero(stat, StatDetail.Bonus) == 0)
+                    continue;
+
+                Set(stat, 0, StatDetail.Bonus, dirty);
+            }
+        }
+
         /// <summary>
         /// Takes ownership of all dirty stats (latest full values) and clears the dirty set.
         /// </summary>

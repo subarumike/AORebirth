@@ -15,7 +15,7 @@ namespace ZoneEngine_New.Core.Data
     public sealed class MySqlCharacterRepository : ICharacterRepository
     {
         private const string SelectSql =
-            "SELECT Id, Name, Playfield, X, Y, Z, HeadingW, HeadingX, HeadingY, HeadingZ "
+            "SELECT Id, Name, FirstName, LastName, Playfield, X, Y, Z, HeadingW, HeadingX, HeadingY, HeadingZ "
             + "FROM characters WHERE Id = @Id LIMIT 1";
 
         private const string UpdateLocationSql =
@@ -69,6 +69,12 @@ namespace ZoneEngine_New.Core.Data
                     Name = reader.IsDBNull(reader.GetOrdinal("Name"))
                         ? null
                         : reader.GetString(reader.GetOrdinal("Name")),
+                    FirstName = reader.IsDBNull(reader.GetOrdinal("FirstName"))
+                        ? null
+                        : reader.GetString(reader.GetOrdinal("FirstName")),
+                    LastName = reader.IsDBNull(reader.GetOrdinal("LastName"))
+                        ? null
+                        : reader.GetString(reader.GetOrdinal("LastName")),
                     Playfield = reader.GetInt32(reader.GetOrdinal("Playfield")),
                     X = reader.GetFloat(reader.GetOrdinal("X")),
                     Y = reader.GetFloat(reader.GetOrdinal("Y")),

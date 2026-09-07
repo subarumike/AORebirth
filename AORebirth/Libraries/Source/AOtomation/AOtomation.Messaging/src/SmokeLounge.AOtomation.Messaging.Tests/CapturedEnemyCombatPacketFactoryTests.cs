@@ -664,10 +664,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(144743, specialAttackWeapon.Specials[0].Unknown2);
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown1, specialAttackWeapon.MeleeInit);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown2, specialAttackWeapon.RangedInit);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown3, specialAttackWeapon.PhysicalInit);
-            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown4, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown1, specialAttackWeapon.CloseCombatInitiative);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown2, specialAttackWeapon.DistanceWeaponInitiative);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown3, specialAttackWeapon.PhysicalProwessInitiative);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown4, specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(baseline.SpecialAttackWeaponUnknown5, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -1769,16 +1769,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     out generatedSetup));
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown1,
-                specialAttackWeapon.MeleeInit);
+                specialAttackWeapon.CloseCombatInitiative);
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown2,
-                specialAttackWeapon.RangedInit);
+                specialAttackWeapon.DistanceWeaponInitiative);
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown3,
-                specialAttackWeapon.PhysicalInit);
+                specialAttackWeapon.PhysicalProwessInitiative);
             Assert.AreEqual(
                 generatedSetup.SpecialAttackWeaponUnknown4,
-                specialAttackWeapon.NanoInit);
+                specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(
                 NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
                 specialAttackWeapon.AggDef);
@@ -2149,10 +2149,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
             Assert.AreEqual(1, specialAttackWeapon.Specials.Length);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
-            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
-            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
-            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.DistanceWeaponInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalProwessInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -2230,7 +2230,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
             Assert.AreEqual(1, specialAttackWeapon.Specials.Length);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -2315,7 +2315,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -2400,10 +2400,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1145196631, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("DBPW", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
-            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
-            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
-            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.DistanceWeaponInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalProwessInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -2488,10 +2488,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1145919558, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("DMXF", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
-            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
-            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
-            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.DistanceWeaponInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalProwessInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -2576,10 +2576,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
-            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
-            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
-            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.DistanceWeaponInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalProwessInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);
@@ -2664,10 +2664,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
             Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
-            Assert.AreEqual(0, specialAttackWeapon.MeleeInit);
-            Assert.AreEqual(0, specialAttackWeapon.RangedInit);
-            Assert.AreEqual(0, specialAttackWeapon.PhysicalInit);
-            Assert.AreEqual(0, specialAttackWeapon.NanoInit);
+            Assert.AreEqual(0, specialAttackWeapon.CloseCombatInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.DistanceWeaponInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.PhysicalProwessInitiative);
+            Assert.AreEqual(0, specialAttackWeapon.NanoProwessInitiative);
             Assert.AreEqual(0, specialAttackWeapon.AggDef);
             Assert.AreEqual((byte)0, attack.Unknown);
             Assert.AreEqual((byte)0, attack.Action);

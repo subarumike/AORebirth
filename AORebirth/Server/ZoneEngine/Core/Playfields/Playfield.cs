@@ -3584,10 +3584,10 @@ namespace AORebirth.Core.Playfields
                 {
                     Identity = character.Identity,
                     Specials = CreateDefaultPlayerSpecialAttacks(),
-                    MeleeInit = 6,
-                    RangedInit = 6,
-                    PhysicalInit = 6,
-                    NanoInit = 6,
+                    CloseCombatInitiative = 6,
+                    DistanceWeaponInitiative = 6,
+                    PhysicalProwessInitiative = 6,
+                    NanoProwessInitiative = 6,
                     AggDef = 100
                 });
         }

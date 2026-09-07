@@ -45,6 +45,7 @@ namespace ZoneEngine_New.Core.Inventory.Dat
                 Quality = dat.Quality > 0 ? dat.Quality : 1,
                 Flags = dat.Flags,
                 ItemType = dat.ItemType,
+                DynelType = dat.DynelType,
                 MultipleCount = dat.MultipleCount,
                 Stats = ToCharacterStatMap(dat.Stats),
                 Attack = ToCharacterStatMap(dat.Attack),

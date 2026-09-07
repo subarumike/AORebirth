@@ -15,6 +15,8 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestPlayfieldMetaDataContract();
             TestDistrictAndSpawnContracts();
             TestPlayfieldDatFileNames();
+            TestItemsDatFileName();
+            TestItemsDatDynelTypeRoundTrip();
             TestCollisionDatFraming();
             TestSurfacesDatFraming();
             Console.WriteLine("RDBDataExtractor self-test PASS");
@@ -226,6 +228,58 @@ namespace AORebirth.Tools.RDBDataExtractor
             {
                 throw new InvalidOperationException(
                     "Playfield dat file names were unexpected.");
+            }
+        }
+
+        private static void TestItemsDatFileName()
+        {
+            if (GameDataPaths.ItemsFileName != "items.dat")
+            {
+                throw new InvalidOperationException(
+                    "items.dat file name was unexpected.");
+            }
+        }
+
+        private static void TestItemsDatDynelTypeRoundTrip()
+        {
+            string path = Path.Combine(Path.GetTempPath(), "rdbdataextractor-items-selftest.dat");
+            try
+            {
+                var templates = new List<ZoneEngine_New.Core.Inventory.Dat.DatItemTemplate>
+                {
+                    new ZoneEngine_New.Core.Inventory.Dat.DatItemTemplate
+                    {
+                        ID = 99228,
+                        DynelType = 51017,
+                        Quality = 1,
+                        ItemType = 0,
+                    },
+                    new ZoneEngine_New.Core.Inventory.Dat.DatItemTemplate
+                    {
+                        ID = 223372,
+                        DynelType = 53051,
+                        Quality = 1,
+                        ItemType = 0,
+                    },
+                };
+
+                ItemsDatWriter.Write(path, templates);
+                List<ZoneEngine_New.Core.Inventory.Dat.DatItemTemplate> loaded =
+                    ZoneEngine_New.Core.Inventory.Dat.ItemsDatReader.Read(path);
+                if (loaded.Count != 2
+                    || loaded[0].ID != 99228
+                    || loaded[0].DynelType != 51017
+                    || loaded[1].ID != 223372
+                    || loaded[1].DynelType != 53051)
+                {
+                    throw new InvalidOperationException(
+                        "items.dat item/nano DynelType round trip failed.");
+                }
+            }
+            finally
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
             }
         }
 

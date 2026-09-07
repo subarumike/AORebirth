@@ -122,7 +122,8 @@ namespace ZoneEngine_New.Core.Inventory
             if (!Can(CanFlags.Use))
                 return false;
 
-            return Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
+            Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
+            return true;
         }
 
         bool TryUseBackpack(

@@ -23,6 +23,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Lifetime in centiseconds (1/100 s). 18000 = 3 minutes.</summary>
         private const int DefaultTimeExist = 18000;
         private const int DefaultDeadTimer = 60;
+        public const int LootReserveSeconds = 120;
 
         /// <summary>Live Biofreak-style Flags when source Flags is missing/zero.</summary>
         private const int DefaultCorpseFlags = 1579013;
@@ -49,6 +50,18 @@ namespace ZoneEngine_New.Core.Entities
             TimeExist = DefaultTimeExist;
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
             CopySourceStats(dead);
+        }
+
+        public Identity LootWinner { get; set; } = Identity.None;
+
+        public DateTime ReservedUntilUtc { get; set; }
+
+        protected override bool CanOpenLoot(Player player)
+        {
+            if (LootWinner.Instance == 0 || DateTime.UtcNow >= ReservedUntilUtc)
+                return true;
+
+            return player.Identity.Instance == LootWinner.Instance;
         }
 
         /// <summary>

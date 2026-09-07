@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Inventory
     using System.Collections.Generic;
     using System.Linq;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -23,7 +25,7 @@ namespace ZoneEngine_New.Core.Inventory
         private readonly object _dirtyGate = new();
 
         /// <summary>Pending durable write for an item keyed by unique InstanceId.</summary>
-        private readonly struct DirtyEntry
+        internal readonly struct DirtyEntry
         {
             public DirtyEntry(Item item, int containerType, int containerInstance, int containerPlacement)
             {
@@ -385,11 +387,29 @@ namespace ZoneEngine_New.Core.Inventory
         {
             ArgumentNullException.ThrowIfNull(repository);
 
+            InventoryDirtyFlush? taken = TakeDirty();
+            if (taken == null)
+                return;
+
+            try
+            {
+                repository.PersistNewAndUpdateLocations(taken.Inserts, taken.Updates);
+                taken.MarkNewlyPersisted();
+            }
+            catch
+            {
+                RestoreDirty(taken);
+                throw;
+            }
+        }
+
+        public InventoryDirtyFlush? TakeDirty()
+        {
             DirtyEntry[] pending;
             lock (_dirtyGate)
             {
                 if (_dirty.Count == 0)
-                    return;
+                    return null;
 
                 pending = new DirtyEntry[_dirty.Count];
                 _dirty.Values.CopyTo(pending, 0);
@@ -440,24 +460,158 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
 
-            try
-            {
-                repository.PersistNewAndUpdateLocations(inserts, updates);
-                for (int i = 0; i < newlyPersisted.Count; i++)
-                    newlyPersisted[i].IsPersisted = true;
-            }
-            catch
-            {
-                lock (_dirtyGate)
-                {
-                    foreach (DirtyEntry entry in pending)
-                    {
-                        if (!_dirty.ContainsKey(entry.InstanceId))
-                            _dirty[entry.InstanceId] = entry;
-                    }
-                }
+            return new InventoryDirtyFlush(pending, inserts, updates, newlyPersisted);
+        }
 
-                throw;
+        public void RestoreDirty(InventoryDirtyFlush flush)
+        {
+            ArgumentNullException.ThrowIfNull(flush);
+
+            lock (_dirtyGate)
+            {
+                foreach (DirtyEntry entry in flush.Pending)
+                {
+                    if (!_dirty.ContainsKey(entry.InstanceId))
+                        _dirty[entry.InstanceId] = entry;
+                }
+            }
+        }
+
+        public sealed class InventoryDirtyFlush
+        {
+            internal InventoryDirtyFlush(
+                DirtyEntry[] pending,
+                List<ItemInstanceRecord> inserts,
+                List<ItemLocationUpdate> updates,
+                List<Item> newlyPersisted)
+            {
+                Pending = pending;
+                Inserts = inserts;
+                Updates = updates;
+                NewlyPersisted = newlyPersisted;
+            }
+
+            internal DirtyEntry[] Pending { get; }
+
+            public IReadOnlyList<ItemInstanceRecord> Inserts { get; }
+
+            public IReadOnlyList<ItemLocationUpdate> Updates { get; }
+
+            List<Item> NewlyPersisted { get; }
+
+            public void MarkNewlyPersisted()
+            {
+                for (int i = 0; i < NewlyPersisted.Count; i++)
+                    NewlyPersisted[i].IsPersisted = true;
+            }
+        }
+
+        /// <summary>
+        /// Clears character Bonus, then reapplies wear/wield <c>Modify</c> and <c>ScalingModify</c>
+        /// from equipped items. Weapons use OnWear+OnWield; armor/implants/social use OnWear.
+        /// </summary>
+        public void ApplyWearBonuses(StatCollection stats)
+        {
+            ArgumentNullException.ThrowIfNull(stats);
+            stats.ClearBonuses(dirty: true);
+            if (!IsHydrated)
+                return;
+
+            ApplyWearPage(Equipment, includeWield: true, stats);
+            ApplyWearPage(Armor, includeWield: false, stats);
+            ApplyWearPage(Implant, includeWield: false, stats);
+            ApplyWearPage(Social, includeWield: false, stats);
+        }
+
+        static void ApplyWearPage(Container page, bool includeWield, StatCollection stats)
+        {
+            int last = page.Offset + page.Capacity;
+            for (int slot = page.Offset; slot < last; slot++)
+            {
+                if (!page.Content.TryGetValue(slot, out Item? item) || item?.Definition == null)
+                    continue;
+
+                ApplyWearItem(item, includeWield, stats);
+            }
+        }
+
+        static void ApplyWearItem(Item item, bool includeWield, StatCollection stats)
+        {
+            Dictionary<EventType, List<ItemSpell>> spells = item.SpellList;
+            if (spells.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
+                ApplyWearSpells(wear, stats);
+
+            if (includeWield && spells.TryGetValue(EventType.OnWield, out List<ItemSpell>? wield))
+                ApplyWearSpells(wield, stats);
+        }
+
+        static void ApplyWearSpells(List<ItemSpell> spells, StatCollection stats)
+        {
+            for (int i = 0; i < spells.Count; i++)
+            {
+                ItemSpell spell = spells[i];
+                FunctionType function = (FunctionType)spell.FunctionType;
+                if (function != FunctionType.Modify && function != FunctionType.ScalingModify)
+                    continue;
+                if (!MeetsSpellRequirements(spell, stats))
+                    continue;
+                if (!TryReadModify(spell, out CharacterStat stat, out int delta))
+                    continue;
+                if (stat == CharacterStat.Cash)
+                    continue;
+
+                stats.AddBonus(stat, delta, dirty: true);
+            }
+        }
+
+        static bool MeetsSpellRequirements(ItemSpell spell, StatCollection stats)
+        {
+            for (int i = 0; i < spell.Requirements.Count; i++)
+            {
+                ItemRequirement requirement = spell.Requirements[i];
+                int value = stats.Get((CharacterStat)requirement.StatNumber);
+                if (!ItemTemplate.EvaluateRequirement(value, requirement))
+                    return false;
+            }
+
+            return true;
+        }
+
+        static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)
+        {
+            stat = default;
+            delta = 0;
+            if (spell.Arguments.Count < 2)
+                return false;
+            if (!TryGetInt(spell.Arguments[0], out int statId) || !TryGetInt(spell.Arguments[1], out delta))
+                return false;
+
+            stat = (CharacterStat)statId;
+            return true;
+        }
+
+        static bool TryGetInt(object? value, out int result)
+        {
+            switch (value)
+            {
+                case int i:
+                    result = i;
+                    return true;
+                case long l:
+                    result = (int)l;
+                    return true;
+                case uint u:
+                    result = (int)u;
+                    return true;
+                case short s:
+                    result = s;
+                    return true;
+                case byte b:
+                    result = b;
+                    return true;
+                default:
+                    result = 0;
+                    return false;
             }
         }
 

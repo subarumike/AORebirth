@@ -46,6 +46,8 @@ namespace ZoneEngine_New.Core.Playfield
         private PlayfieldHeartbeat? _heartBeat;
         private readonly Lock _tickSync = new();
         private int _nextContainerInventoryHandle = 1;
+        // TEMP: WIFU Identity.Instance until real weapon-instance identity allocation exists.
+        private int _nextWeaponInstanceId = 1;
         private bool _disposed;
         private bool _built;
 
@@ -230,6 +232,21 @@ namespace ZoneEngine_New.Core.Playfield
             return handle;
         }
 
+        /// <summary>
+        /// TEMP: Playfield-scoped unique id for WeaponItemFullUpdate Identity.Instance.
+        /// Increments on every WIFU build; not tied to inventory item.InstanceId.
+        /// </summary>
+        public int AllocateWeaponInstanceId()
+        {
+            int id = _nextWeaponInstanceId;
+            if (_nextWeaponInstanceId == int.MaxValue)
+                _nextWeaponInstanceId = 1;
+            else
+                _nextWeaponInstanceId++;
+
+            return id;
+        }
+
         /// <summary>Called from async I/O tasks. Handlers run on the playfield tick thread.</summary>
         public bool TryEnqueue(PlayfieldInboundItem item) => _inbound.TryEnqueue(item);
 
@@ -365,6 +382,7 @@ namespace ZoneEngine_New.Core.Playfield
             if (Geometry.Surface != null)
                 services.AddSingleton(Geometry.Surface);
 
+            services.AddSingleton<IUploadedNanoRepository, MySqlUploadedNanoRepository>();
             services.AddSingleton<DynelRegistry>();
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
             services.AddSingleton<SpawnService>();

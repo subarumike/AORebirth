@@ -63,11 +63,7 @@
       <Link>SqlTables\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="..\..\Datafiles\items.dat">
-      <Link>items.dat</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <!-- Full GameData tree (MobTemplates + Playfields metadata/spawns) for locality and hash spawns. -->
+    <!-- Full GameData tree (items.dat, MobTemplates, Playfields metadata/spawns). -->
     <Content Include="..\..\GameData\**\*">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

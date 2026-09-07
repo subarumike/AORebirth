@@ -26,10 +26,10 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public SpecialAttackWeaponMessage()
         {
             this.N3MessageType = N3MessageType.SpecialAttackWeapon;
-            this.MeleeInit = 0x00000007;
-            this.RangedInit = 0x00000007;
-            this.PhysicalInit = 0x00000007;
-            this.NanoInit = 0x0000000E;
+            this.CloseCombatInitiative = 0x00000007;
+            this.DistanceWeaponInitiative = 0x00000007;
+            this.PhysicalProwessInitiative = 0x00000007;
+            this.NanoProwessInitiative = 0x0000000E;
             this.AggDef = 0x00000064;
         }
 
@@ -41,16 +41,16 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public SpecialAttack[] Specials { get; set; }
 
         [AoMember(2)]
-        public int MeleeInit { get; set; }
+        public int CloseCombatInitiative { get; set; }
 
         [AoMember(3)]
-        public int RangedInit { get; set; }
+        public int DistanceWeaponInitiative { get; set; }
 
         [AoMember(4)]
-        public int PhysicalInit { get; set; }
+        public int PhysicalProwessInitiative { get; set; }
 
         [AoMember(5)]
-        public int NanoInit { get; set; }
+        public int NanoProwessInitiative { get; set; }
 
         [AoMember(6)]
         public int AggDef { get; set; }

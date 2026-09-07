@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Core.Characters
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
@@ -14,11 +15,14 @@ namespace ZoneEngine_New.Core.Characters
     public sealed class PlayerHydrator
     {
         private readonly IItemBuilder _items;
+        private readonly IGameData _gameData;
 
-        public PlayerHydrator(IItemBuilder items)
+        public PlayerHydrator(IItemBuilder items, IGameData gameData)
         {
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(gameData);
             _items = items;
+            _gameData = gameData;
         }
 
         public void Apply(Player player, CharacterHydrationResult hydration)
@@ -28,6 +32,8 @@ namespace ZoneEngine_New.Core.Characters
 
             CharacterRecord character = hydration.Character;
             player.Name = character.Name;
+            player.FirstName = character.FirstName ?? string.Empty;
+            player.LastName = character.LastName ?? string.Empty;
             player.Position = new Vector3(character.X, character.Y, character.Z);
             player.Rotation = new Quaternion(
                 character.HeadingX,
@@ -40,7 +46,28 @@ namespace ZoneEngine_New.Core.Characters
                 player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base);
             }
 
+            ApplyXpThresholds(player);
+
             player.Inventory.Apply(hydration, character.Id, _items);
+
+            player.UploadedNanoIds.Clear();
+            foreach (int nanoId in hydration.UploadedNanoIds)
+                player.TryAddUploadedNano(nanoId);
+        }
+
+        void ApplyXpThresholds(Player player)
+        {
+            int level = player.Stats.GetOrOne(CharacterStat.Level);
+            player.Stats.Set(CharacterStat.NextXP, GetNextXp(level), StatDetail.Base);
+            player.Stats.Set(CharacterStat.LastXP, level > 1 ? GetNextXp(level - 1) : 0, StatDetail.Base);
+        }
+
+        int GetNextXp(int level)
+        {
+            if (!_gameData.TryGetXpLevel(level, out XpLevelEntry entry) || entry.NextLevelXp <= 0)
+                return 0;
+
+            return entry.FloorXp + entry.NextLevelXp;
         }
     }
 }

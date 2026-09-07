@@ -6,13 +6,15 @@
     <AssemblyName>RDBDataExtractor</AssemblyName>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AODB" Version="1.0.6" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>
@@ -34,5 +36,17 @@
              Link="GameData\PlayfieldDistrictsData.cs" />
     <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldSpawnsData.cs"
              Link="GameData\PlayfieldSpawnsData.cs" />
+    <Compile Include="..\..\AORebirth\Server\ZoneEngine_New\Core\Inventory\Dat\DatItemTemplate.cs"
+             Link="Inventory\DatItemTemplate.cs" />
+    <Compile Include="..\..\AORebirth\Server\ZoneEngine_New\Core\Inventory\Dat\ItemsDatReader.cs"
+             Link="Inventory\ItemsDatReader.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Enums\EventType.cs"
+             Link="Enums\EventType.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Enums\ActionType.cs"
+             Link="Enums\ActionType.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Enums\Operator.cs"
+             Link="Enums\Operator.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Enums\ItemTarget.cs"
+             Link="Enums\ItemTarget.cs" />
   </ItemGroup>
 </Project>
