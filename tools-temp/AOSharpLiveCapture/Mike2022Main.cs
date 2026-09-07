@@ -187,6 +187,8 @@ namespace AOSharpLiveCapture.Mike2022
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> observedCorpseIdentities =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> runtimeStatSnapshotIdentities =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, EntitySnapshot> previousVisibleDynels =
             new Dictionary<string, EntitySnapshot>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, ItemSnapshot> latestItemsBySlot =
@@ -597,6 +599,7 @@ namespace AOSharpLiveCapture.Mike2022
             this.pendingAttacks.Clear();
             this.playerAttackTargets.Clear();
             this.observedCorpseIdentities.Clear();
+            this.runtimeStatSnapshotIdentities.Clear();
             this.previousVisibleDynels.Clear();
             this.latestItemsBySlot.Clear();
             this.pendingItemUses.Clear();
@@ -4630,8 +4633,16 @@ namespace AOSharpLiveCapture.Mike2022
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(identity)
+                || !this.runtimeStatSnapshotIdentities.Add(NormalizeIdentity(identity)))
+            {
+                return;
+            }
+
             var values = new List<RuntimeStatValue>();
             string error = string.Empty;
+            string presence = "runtime-entry";
+            string provenance = evidenceSource + ".Stats";
             try
             {
                 object statsObject = MemberValue(character, "Stats");
@@ -4646,11 +4657,7 @@ namespace AOSharpLiveCapture.Mike2022
                 else
                 {
                     IEnumerable enumerable = statsObject as IEnumerable;
-                    if (enumerable == null)
-                    {
-                        error = "Stats collection unavailable";
-                    }
-                    else
+                    if (enumerable != null)
                     {
                         foreach (object entry in enumerable)
                         {
@@ -4666,6 +4673,62 @@ namespace AOSharpLiveCapture.Mike2022
                             {
                                 values.Add(new RuntimeStatValue { Stat = stat, Value = value });
                             }
+                        }
+                    }
+                }
+
+                if (values.Count == 0)
+                {
+                    MethodInfo getStat = FindRuntimeGetStatMethod(character);
+                    if (getStat == null)
+                    {
+                        error = "Stats collection and GetStat API unavailable";
+                    }
+                    else
+                    {
+                        presence = "runtime-query";
+                        provenance = evidenceSource + ".GetStat";
+                        ParameterInfo[] parameters = getStat.GetParameters();
+                        var observedStatIds = new HashSet<int>();
+                        int queryFailures = 0;
+                        foreach (object stat in Enum.GetValues(parameters[0].ParameterType))
+                        {
+                            try
+                            {
+                                int statId = Convert.ToInt32(stat, CultureInfo.InvariantCulture);
+                                if (!observedStatIds.Add(statId))
+                                {
+                                    continue;
+                                }
+
+                                object[] arguments = parameters.Length == 1
+                                                         ? new[] { stat }
+                                                         : new[]
+                                                           {
+                                                               stat,
+                                                               parameters[1].IsOptional
+                                                                   ? parameters[1].DefaultValue
+                                                                   : (object)2
+                                                           };
+                                values.Add(
+                                    new RuntimeStatValue
+                                    {
+                                        Stat = stat,
+                                        StatId = statId,
+                                        Value = getStat.Invoke(character, arguments)
+                                    });
+                            }
+                            catch
+                            {
+                                queryFailures++;
+                            }
+                        }
+
+                        if (queryFailures > 0)
+                        {
+                            error = "GetStat query failures="
+                                    + queryFailures.ToString(CultureInfo.InvariantCulture);
+                            this.enemyStatSnapshotErrors++;
                         }
                     }
                 }
@@ -4695,7 +4758,7 @@ namespace AOSharpLiveCapture.Mike2022
                         Csv(string.Empty),
                         Csv(string.Empty),
                         Csv("unavailable"),
-                        Csv(evidenceSource + ".Stats"),
+                        Csv(provenance),
                         Csv(positionX),
                         Csv(positionY),
                         Csv(positionZ),
@@ -4720,14 +4783,42 @@ namespace AOSharpLiveCapture.Mike2022
                                 ? entry.StatId.ToString(CultureInfo.InvariantCulture)
                                 : GetNumericValue(entry.Stat)),
                         Csv(ValueText(entry.Value)),
-                        Csv("runtime-entry"),
-                        Csv(evidenceSource + ".Stats"),
+                        Csv(presence),
+                        Csv(provenance),
                         Csv(positionX),
                         Csv(positionY),
                         Csv(positionZ),
                         values.Count.ToString(CultureInfo.InvariantCulture),
-                        Csv(string.Empty)));
+                        Csv(error)));
             }
+        }
+
+        private static MethodInfo FindRuntimeGetStatMethod(object character)
+        {
+            if (character == null)
+            {
+                return null;
+            }
+
+            MethodInfo[] methods = character.GetType().GetMethods(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (MethodInfo method in methods)
+            {
+                if (!string.Equals(method.Name, "GetStat", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                ParameterInfo[] parameters = method.GetParameters();
+                if ((parameters.Length == 1 || parameters.Length == 2)
+                    && parameters[0].ParameterType.IsEnum
+                    && (parameters.Length == 1 || parameters[1].ParameterType == typeof(int)))
+                {
+                    return method;
+                }
+            }
+
+            return null;
         }
 
         private void WriteScfuStatSnapshot(
@@ -4853,6 +4944,19 @@ namespace AOSharpLiveCapture.Mike2022
 
             EntitySnapshot entity;
             if (this.knownEntities.TryGetValue(normalized, out entity))
+            {
+                if (entity.IsNpc)
+                {
+                    return "npc";
+                }
+
+                if (entity.IsPlayer)
+                {
+                    return "player";
+                }
+            }
+
+            if (this.previousVisibleDynels.TryGetValue(normalized, out entity))
             {
                 if (entity.IsNpc)
                 {
