@@ -69,7 +69,10 @@ def main():
         "transmitted NPC stat updates": '"enemy-stat-updates.csv"',
         "decoded enemy combat": '"enemy-combat.csv"',
         "enemy lifecycle state": '"enemy-state.csv"',
-        "runtime stat presence marker": 'Csv("runtime-entry")',
+        "runtime stat presence marker": 'string presence = "runtime-entry";',
+        "runtime GetStat presence marker": 'presence = "runtime-query"',
+        "runtime GetStat enumeration": "Enum.GetValues(parameters[0].ParameterType)",
+        "once-per-NPC runtime snapshot": "runtimeStatSnapshotIdentities.Add",
         "unavailable stat presence marker": 'Csv("unavailable")',
         "SCFU stat normalization": "private void WriteScfuStatSnapshot(",
         "SCFU Health stat mapping": 'Stat = "Health", StatId = 27, Value = decoded.Health',
@@ -79,6 +82,7 @@ def main():
         "runtime stats validation coverage": "npcRuntimeStats",
         "decoded combat validation coverage": "decodedEnemyCombat",
         "enemy state validation coverage": "enemyState",
+        "live NPC role resolution": "this.previousVisibleDynels.TryGetValue(normalized, out entity)",
     }
     for description, value in requirements.items():
         require(source, value, description)

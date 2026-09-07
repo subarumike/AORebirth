@@ -649,8 +649,11 @@ into `enemy-state.csv`. The fourteen stat fields carried by each NPC SCFU are
 normalized into `enemy-stat-snapshots.csv` with `transmitted` presence. Every
 additional actual entry exposed by an NPC's AOSharp `Stats` collection is written
 to the same file with `runtime-entry` presence
-and source provenance. A missing or non-enumerable collection is written as
-`unavailable`; an omitted stat is never converted to zero. Decoded network
+and source provenance. When that legacy collection is unavailable, the plugin
+enumerates the installed runtime's `GetStat` enum once per NPC and records every
+result as `runtime-query`. A zero in such a row is an AOSharp API result, not proof
+that the server transmitted the stat. `unavailable` is used only when neither
+read path exists; an omitted stat is never silently converted to zero. Decoded network
 `StatMessage` tuples are kept separately in `enemy-stat-updates.csv` with
 `transmitted` presence, while decoded attack, hit, and miss messages are written
 to `enemy-combat.csv` with source/target roles and all exposed packet fields.
