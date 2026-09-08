@@ -1,11 +1,13 @@
-# NPC Inspect Probe 1.2.1 (Mike's AOSharp runtime)
+# NPC Inspect Probe 1.2.2 (Mike's AOSharp runtime)
 
 Version 1.1.0 fixes outbound recognition at AOSharp's pre-framing hook. The
 original version incorrectly required the outgoing transport length field to
 already be populated. Version 1.2.0 adds bounded full game-packet diagnostics
 and rejection-feedback logging. Version 1.2.1 ports the entry point to
 `AOPluginEntry`, which supplies the installed runtime's `Init(string)` contract.
-The startup banner now says `v1.2.1 Mike2022 ready`.
+Version 1.2.2 supports Mike's explicitly supplied Gamecode.dll after static
+verification of its native Inspect export. The startup banner now says
+`v1.2.2 Mike2022 ready`.
 Replace only this plugin DLL with the client closed, then restart and load it.
 
 Standalone .NET Framework 4.8, x86 AOSharp plugin. No ZamTools dependency,
@@ -109,13 +111,28 @@ Uses the named Gamecode.dll export
 with the existing `N3Engine_t.GetInstance()` and an 8-byte target identity.
 No guessed request serializer is used.
 
-Analyzed Gamecode.dll SHA256:
-`654969A6B65946CB161F0E60AED8589260FC5ECA1795488F66BB56F8FFF73726`.
+Supported Gamecode.dll: `C:\Users\Mike\Desktop\win\client\Gamecode.dll`.
+SHA256: `0948301922D0DF738879C2C375962A0A5B0248C48D430C296B46480B97930BBE`.
 The plugin checks the loaded module's on-disk hash and refuses a mismatch.
 Do not bypass that guard; analyze a different build before supporting it.
 This is an ABI compatibility guard, not a check of in-memory integrity.
 
-Local decompiler-derived evidence (not original source):
+Current-build static evidence (no native execution):
+
+- PE32 x86, image base `0x10000000`; the named Inspect export is RVA `0x1DC58`.
+- `0x1DC6A` preserves ECX as `this`; `0x1DC9A` passes the one identity-reference
+  argument from `[ebp+8]`; `0x1DCF6` returns with `ret 4` (x86 thiscall).
+- `0x1DC94` supplies action `0x105` (261); `0x1DCAD` calls constructor RVA
+  `0x7253F`. At `0x725A1` it copies both identity words into target fields.
+- `0x1DCCB` calls IAT RVA `0x153F6C`, resolved to
+  `N3.dll!n3Dynel_t::SendIIRToObservers`. This proves use of the client's native
+  dispatch routine, not network delivery or server support.
+- `verify_native.ps1` independently verifies the exact hash, export, instruction
+  bytes and import target directly from the PE file without loading it.
+
+Historical decompiler-derived evidence for the original build (not original
+source, not current-build offsets; hash
+`654969A6B65946CB161F0E60AED8589260FC5ECA1795488F66BB56F8FFF73726`):
 
 - Gamecode.dll+0x0001DDD4: Inspect constructs CharacterAction action `0x105`
   with the requested target, then sends through the existing client routine.
@@ -142,7 +159,8 @@ Local decompiler-derived evidence (not original source):
 The original source was copied from AO stripdown with Mike's explicit approval;
 the original files were left untouched. All porting and builds happen in AORebirth.
 The historical reverse-engineering references above describe the original
-implementation; this port does not change packet parsing or the native hash guard.
+implementation. This port preserves packet parsing and the fail-closed native
+hash guard, replacing its accepted hash only after current-build verification.
 
 Built against Mike's `D:\AOTools\ReadyToUse` AOSharp.Core/Common pair. The package
 includes their build-time SHA256 hashes in `build-runtime.json`, not copies
@@ -157,6 +175,7 @@ From the repository root:
 powershell -NoProfile -File Tools/aosharp_npc_inspect/build.ps1 -AOSharpPath 'D:\AOTools\ReadyToUse'
 powershell -NoProfile -File Tools/aosharp_npc_inspect/test_packet_view.ps1
 powershell -NoProfile -File Tools/aosharp_npc_inspect/test_capture.ps1
+powershell -NoProfile -File Tools/aosharp_npc_inspect/verify_native.ps1 -GamecodePath 'C:\Users\Mike\Desktop\win\client\Gamecode.dll'
 & "$env:WINDIR/SysWOW64/WindowsPowerShell/v1.0/powershell.exe" -NoProfile -File Tools/aosharp_npc_inspect/verify_runtime.ps1 -AOSharpPath 'D:\AOTools\ReadyToUse' -PluginPath '.local/npc-inspect-probe/package/NpcInspectProbe.dll'
 ```
 

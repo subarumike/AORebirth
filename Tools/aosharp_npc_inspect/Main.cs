@@ -13,7 +13,7 @@ namespace NpcInspectProbe
 {
     public sealed class Main : AOPluginEntry
     {
-        private const string SupportedGamecode = "654969A6B65946CB161F0E60AED8589260FC5ECA1795488F66BB56F8FFF73726";
+        private const string SupportedGamecode = "0948301922D0DF738879C2C375962A0A5B0248C48D430C296B46480B97930BBE";
         private const string InspectExport = "?N3Msg_Inspect@n3EngineClientAnarchy_t@@QAEXABVIdentity_t@@@Z";
         private const double WindowSeconds = 15;
         private static Main current;
@@ -82,7 +82,7 @@ namespace NpcInspectProbe
                     DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8));
                 Directory.CreateDirectory(directory);
                 log = new StreamWriter(Path.Combine(directory, "session.log"), false, new UTF8Encoding(false)) { AutoFlush = true };
-                Record("PLUGIN_START version=1.2.1 runtime=Mike2022 outboundObserver=pre-connection-framing Core=" + typeof(Game).Assembly.FullName
+                Record("PLUGIN_START version=1.2.2 runtime=Mike2022 outboundObserver=pre-connection-framing Core=" + typeof(Game).Assembly.FullName
                     + " Common=" + typeof(Identity).Assembly.FullName);
                 if (IntPtr.Size != 4) throw new NotSupportedException("Requires the 32-bit AO client.");
                 IntPtr module = GetModuleHandleW("Gamecode.dll");
@@ -106,7 +106,7 @@ namespace NpcInspectProbe
                 Network.PacketSent += OnSent;
                 enabled = true;
                 status = "Ready";
-                Say("v1.2.1 Mike2022 ready. Select an NPC and type /npcinspect. /npcinspect help for options.");
+                Say("v1.2.2 Mike2022 ready. Select an NPC and type /npcinspect. /npcinspect help for options.");
                 Say("Each probe saves all game-network callbacks for 15 seconds, up to 16 MiB / 20,000 packets. Keep logs private.");
                 Say("Logs: " + directory);
             }

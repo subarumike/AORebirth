@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <PlatformTarget>x86</PlatformTarget>
     <Deterministic>true</Deterministic>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
