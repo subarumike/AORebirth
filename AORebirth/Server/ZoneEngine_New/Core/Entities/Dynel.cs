@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Entities
 {
     using System;
+    using System.Collections.Generic;
 
     using AORebirth.Core.Vector;
 
@@ -106,6 +107,13 @@ namespace ZoneEngine_New.Core.Entities
             throw new NotSupportedException(
                 GetType().Name + " does not implement BuildSpawnMessage.");
         }
+
+        /// <summary>
+        /// Additional packets sent right after <see cref="BuildSpawnMessage"/> when this dynel enters
+        /// a client's visibility. Used for objects that are rendered as part of another dynel, such as
+        /// the shop pane attached to a vendor NPC.
+        /// </summary>
+        public virtual IEnumerable<MessageBody> BuildSpawnCompanionMessages() => [];
 
         public virtual void Tick(double deltaTime)
         {

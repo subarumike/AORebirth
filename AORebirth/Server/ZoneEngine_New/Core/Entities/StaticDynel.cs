@@ -104,7 +104,7 @@ namespace ZoneEngine_New.Core.Entities
             Stats.Set(CharacterStat.StaticInstance, Template.Id);
         }
 
-        GameTuple<CharacterStat, uint>[] BuildStats()
+        protected GameTuple<CharacterStat, uint>[] BuildStats()
         {
             var stats = new List<GameTuple<CharacterStat, uint>>();
             foreach ((CharacterStat stat, int _, int _, int full) in Stats.GetEntries())

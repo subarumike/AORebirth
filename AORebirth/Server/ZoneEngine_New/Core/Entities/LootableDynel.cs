@@ -9,7 +9,6 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Data;
-    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Playfield;
@@ -73,10 +72,9 @@ namespace ZoneEngine_New.Core.Entities
         /// Each rolled item gets a unique in-memory <see cref="Item.InstanceId"/> (no DB write).
         /// Persistence happens on loot via MarkDirty / flush.
         /// </summary>
-        public void ResolveLoot(IGameData gameData, IItemBuilder items, IItemInstanceIdAllocator ids)
+        public void ResolveLoot(HashItemMinter minter, IItemInstanceIdAllocator ids)
         {
-            ArgumentNullException.ThrowIfNull(gameData);
-            ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(ids);
 
             if (ItemTable == null || ItemTable.Count == 0)
@@ -96,12 +94,10 @@ namespace ZoneEngine_New.Core.Entities
                     if (!RollChance(entry.Chance))
                         continue;
 
-                    if (!gameData.TryGetLootTable(entry.Hash, out IReadOnlyList<LootItemPair> pairs) || pairs.Count == 0)
+                    int quality = RollQuality(LootLevel, entry.LevelMod);
+                    if (!minter.TryMint(entry.Hash, quality, ItemSource.Loot, out Item item))
                         continue;
 
-                    LootItemPair pair = pairs[LootRandom.Next(pairs.Count)];
-                    int quality = RollQuality(LootLevel, entry.LevelMod);
-                    Item item = items.Create(pair.LowId, pair.HighId, quality, ItemSource.Loot);
                     AssignEphemeralInstanceId(item, ids);
                     if (!Loot.Add(nextSlot, item))
                         return;

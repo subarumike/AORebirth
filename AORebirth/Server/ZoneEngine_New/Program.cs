@@ -24,6 +24,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Trade;
 
     using ConfigReadWrite = Utility.Config.ConfigReadWrite;
 
@@ -79,10 +80,11 @@ namespace ZoneEngine_New
                 logger.Info(
                     string.Format(
                         System.Globalization.CultureInfo.InvariantCulture,
-                        "GameData ready root={0} mobs={1} loot={2} monsterData={3}",
+                        "GameData ready root={0} mobs={1} hashTemplates={2} hashInstances={3} monsterData={4}",
                         gameData.RootPath,
                         gameData.MobTemplateCount,
-                        gameData.LootTableCount,
+                        gameData.HashTemplateCount,
+                        gameData.HashInstanceCount,
                         gameData.MonsterDataCount));
                 chatEngineLink = rootServices.GetRequiredService<IChatEngineLink>();
                 chatEngineLink.Start();
@@ -126,6 +128,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
             services.AddSingleton<IItemBuilder, ItemBuilder>();
             services.AddSingleton<IGameData, GameDataStore>();
+            services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
             services.AddSingleton<CharacterSnapshotService>();
@@ -135,6 +138,7 @@ namespace ZoneEngine_New
             services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
             services.AddSingleton<InventoryFlushService>();
             services.AddSingleton<InventoryMoveService>();
+            services.AddSingleton<TradeService>();
             services.AddSingleton<ZoneMessageCodec>();
 
             //Chat
@@ -161,6 +165,7 @@ namespace ZoneEngine_New
             AddMessageHandler<GenericCmdMessageHandler>(services);
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);
+            AddMessageHandler<TradeMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();

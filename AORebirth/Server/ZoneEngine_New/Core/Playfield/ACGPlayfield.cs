@@ -13,6 +13,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
@@ -30,10 +31,12 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerHydrator playerHydrator,
             IGameData gameData,
             IItemBuilder items,
+            HashItemMinter hashItems,
             IInventoryRepository inventoryRepository,
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
             InventoryFlushService inventoryFlush,
+            TradeService trades,
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry)
             : base(
@@ -44,10 +47,12 @@ namespace ZoneEngine_New.Core.Playfield
                 playerHydrator,
                 gameData,
                 items,
+                hashItems,
                 inventoryRepository,
                 instanceIds,
                 inventoryMoves,
                 inventoryFlush,
+                trades,
                 characterSnapshot,
                 metricsRegistry)
         {

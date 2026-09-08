@@ -44,8 +44,10 @@ namespace ZoneEngine_New.Core.GameData
         private readonly IZoneLogger _logger;
         private readonly Dictionary<string, MobTemplate> _mobTemplates =
             new(StringComparer.Ordinal);
-        private readonly Dictionary<string, LootItemPair[]> _lootTables =
-            new(StringComparer.Ordinal);
+        private HashItemCatalog _hashItems = new(
+            new Dictionary<string, string[]>(StringComparer.Ordinal),
+            new Dictionary<string, HashInstance>(StringComparer.Ordinal));
+        private readonly Dictionary<int, VendingMachineDefinition> _vendingMachines = new();
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
         private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
@@ -66,7 +68,8 @@ namespace ZoneEngine_New.Core.GameData
 
             EnsureRootExists();
             LoadMobTemplates();
-            LoadLootTables();
+            LoadHashItems();
+            LoadVendingMachines();
             LoadMonsterData();
             LoadXpLevels();
         }
@@ -77,7 +80,11 @@ namespace ZoneEngine_New.Core.GameData
 
         public int MobTemplateCount => _mobTemplates.Count;
 
-        public int LootTableCount => _lootTables.Count;
+        public int HashTemplateCount => _hashItems.CategoryCount;
+
+        public int HashInstanceCount => _hashItems.InstanceCount;
+
+        public int VendingMachineCount => _vendingMachines.Count;
 
         public int MonsterDataCount => _catMeshByMonsterData.Count;
 
@@ -117,16 +124,27 @@ namespace ZoneEngine_New.Core.GameData
                     hash));
         }
 
-        public bool TryGetLootTable(string hash, out IReadOnlyList<LootItemPair> pairs)
+        public bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes)
+            => _hashItems.TryGetCategory(hash, out childHashes);
+
+        public bool TryGetHashInstance(string hash, out HashInstance instance)
+            => _hashItems.TryGetInstance(hash, out instance);
+
+        public bool TryResolveHashInstance(string hash, out HashInstance instance)
+            => _hashItems.TryResolveInstance(hash, out instance);
+
+        public void CollectHashLeafInstances(string hash, List<HashInstance> into)
+            => _hashItems.CollectLeafInstances(hash, into);
+
+        public bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition)
         {
-            if (string.IsNullOrEmpty(hash) || !_lootTables.TryGetValue(hash, out LootItemPair[]? entries))
+            if (templateId <= 0)
             {
-                pairs = Array.Empty<LootItemPair>();
+                definition = null!;
                 return false;
             }
 
-            pairs = entries;
-            return true;
+            return _vendingMachines.TryGetValue(templateId, out definition!);
         }
 
         public bool TryGetCatMesh(int monsterData, out int catMesh)
@@ -333,23 +351,66 @@ namespace ZoneEngine_New.Core.GameData
             }
         }
 
-        private void LoadLootTables()
+        private void LoadHashItems()
         {
-            string path = Path.Combine(RootPath, GameDataPaths.LootTableFileName);
+            string templatesPath = Path.Combine(RootPath, GameDataPaths.ItemTemplatesFileName);
+            string instancesPath = Path.Combine(RootPath, GameDataPaths.HashInstancesFileName);
+
+            if (!File.Exists(templatesPath))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "ItemTemplates.json not found at {0}; hash categories empty",
+                        templatesPath));
+            }
+
+            if (!File.Exists(instancesPath))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "HashInstances.json not found at {0}; hash instances empty",
+                        instancesPath));
+            }
+
+            try
+            {
+                string? templatesJson = File.Exists(templatesPath) ? File.ReadAllText(templatesPath) : null;
+                string? instancesJson = File.Exists(instancesPath) ? File.ReadAllText(instancesPath) : null;
+                _hashItems = HashItemCatalog.Parse(templatesJson, instancesJson);
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData hash templates={0} hash instances={1}",
+                        _hashItems.CategoryCount,
+                        _hashItems.InstanceCount));
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    "Failed to load ItemTemplates.json / HashInstances.json; hash catalogs empty");
+            }
+        }
+
+        private void LoadVendingMachines()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.VendingMachinesFileName);
             if (!File.Exists(path))
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "LootTable.json not found at {0}; catalog empty",
+                        "VendingMachines.json not found at {0}; shops will stock nothing",
                         path));
                 return;
             }
 
             try
             {
-                Dictionary<string, List<List<int>>>? loaded =
-                    JsonSerializer.Deserialize<Dictionary<string, List<List<int>>>>(
+                Dictionary<string, VendingMachineDefinition>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<string, VendingMachineDefinition>>(
                         File.ReadAllText(path),
                         CatalogJsonOptions);
                 if (loaded == null)
@@ -357,64 +418,36 @@ namespace ZoneEngine_New.Core.GameData
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "LootTable.json was empty: {0}",
+                            "VendingMachines.json was empty: {0}",
                             path));
                     return;
                 }
 
                 int skipped = 0;
-                foreach (KeyValuePair<string, List<List<int>>> entry in loaded)
+                foreach (KeyValuePair<string, VendingMachineDefinition> pair in loaded)
                 {
-                    if (string.IsNullOrEmpty(entry.Key) || entry.Value == null)
+                    if (!int.TryParse(
+                            pair.Key,
+                            NumberStyles.Integer,
+                            CultureInfo.InvariantCulture,
+                            out int templateId)
+                        || templateId <= 0
+                        || pair.Value == null)
                     {
                         skipped++;
                         continue;
                     }
 
-                    List<LootItemPair> pairs = new();
-                    foreach (List<int> pair in entry.Value)
-                    {
-                        if (pair == null || pair.Count < 2 || pair[0] <= 0)
-                        {
-                            skipped++;
-                            continue;
-                        }
-
-                        pairs.Add(new LootItemPair(pair[0], pair[1]));
-                    }
-
-                    if (pairs.Count == 0)
-                    {
+                    if (!_vendingMachines.TryAdd(templateId, pair.Value))
                         skipped++;
-                        continue;
-                    }
-
-                    if (!_lootTables.TryAdd(entry.Key, pairs.ToArray()))
-                    {
-                        _logger.Warn(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "Duplicate loot table hash '{0}' skipped",
-                                entry.Key));
-                        skipped++;
-                    }
                 }
 
                 _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "GameData loot tables={0} from {1}",
-                        _lootTables.Count,
-                        path));
-
-                if (skipped > 0)
-                {
-                    _logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "GameData skipped {0} loot entries (empty, invalid, or duplicate)",
-                            skipped));
-                }
+                        "GameData vending machines={0} skipped={1}",
+                        _vendingMachines.Count,
+                        skipped));
             }
             catch (Exception exception)
             {
@@ -422,7 +455,7 @@ namespace ZoneEngine_New.Core.GameData
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Failed to load LootTable.json from {0}; catalog empty",
+                        "Failed to load VendingMachines.json from {0}; shops will stock nothing",
                         path));
             }
         }

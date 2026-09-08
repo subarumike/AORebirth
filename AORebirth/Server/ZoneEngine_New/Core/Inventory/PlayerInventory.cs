@@ -19,6 +19,9 @@ namespace ZoneEngine_New.Core.Inventory
 
         public const int BankCapacity = 104;
 
+        /// <summary>Matches the legacy OverflowInventoryPage geometry (64 slots starting at 0).</summary>
+        public const int OverflowCapacity = 0x40;
+
         private readonly Dictionary<int, Container> _backpackPages = new();
         private readonly Dictionary<int, Identity> _handleToContainer = new();
         private readonly Dictionary<int, DirtyEntry> _dirty = new();
@@ -58,13 +61,22 @@ namespace ZoneEngine_New.Core.Inventory
 
         public Container Bank { get; private set; } = null!;
 
+        /// <summary>
+        /// Landing page for grants that do not fit in <see cref="Inventory"/>. Remove-only and never
+        /// persisted: <see cref="MarkDirty"/> ignores it and <see cref="TryPlace"/> refuses to move an
+        /// already-durable item here, so a crash can never leave a DB row pointing at overflow.
+        /// Contents are lost on logout, which is the intended in-memory-only behaviour.
+        /// </summary>
+        public Container Overflow { get; private set; } = null!;
+
         public bool IsHydrated =>
             Inventory != null
             && Equipment != null
             && Armor != null
             && Implant != null
             && Social != null
-            && Bank != null;
+            && Bank != null
+            && Overflow != null;
 
         public void Apply(CharacterHydrationResult hydration, int characterId, IItemBuilder items)
         {
@@ -115,6 +127,7 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.ArmorPage => Armor,
                 IdentityType.ImplantPage => Implant,
                 IdentityType.SocialPage => Social,
+                IdentityType.OverflowWindow => Overflow,
                 IdentityType.BankByRef => Bank.IsHydrated ? Bank : null,
                 _ => null
             };
@@ -173,6 +186,56 @@ namespace ZoneEngine_New.Core.Inventory
             return false;
         }
 
+        /// <summary>
+        /// Single funnel for handing an item to a player: main inventory first, overflow when it is full.
+        /// Returns false when the item cannot be placed anywhere, which callers must treat as
+        /// "the grant did not happen" — no packet, no state change.
+        /// </summary>
+        /// <remarks>
+        /// A persisted item is never allowed into overflow. Overflow is not written to the database,
+        /// so parking a durable row there would leave the row at its previous location and duplicate
+        /// the item on the next restart. Callers moving durable items (player-to-player trades) must
+        /// check <see cref="HasFreeInventorySlots"/> up front and fail the whole operation instead.
+        /// </remarks>
+        public bool TryPlace(Item item, out Container page, out int slot)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            page = null!;
+            slot = -1;
+            if (!IsHydrated)
+                return false;
+
+            slot = Inventory.FindFreeSlot();
+            if (slot >= 0)
+            {
+                page = Inventory;
+                return Inventory.Add(slot, item);
+            }
+
+            if (item.IsPersisted)
+                return false;
+
+            slot = Overflow.FindFreeSlot();
+            if (slot < 0)
+                return false;
+
+            page = Overflow;
+            return Overflow.Add(slot, item);
+        }
+
+        /// <summary>True when main inventory has at least <paramref name="count"/> empty slots.</summary>
+        public bool HasFreeInventorySlots(int count)
+        {
+            if (count <= 0)
+                return true;
+
+            if (!IsHydrated)
+                return false;
+
+            return Inventory.Capacity - Inventory.Content.Count >= count;
+        }
+
         public bool IsBagMarkerTarget(int targetPlacement)
         {
             return targetPlacement == (int)IdentityType.TradeWindow
@@ -224,6 +287,33 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             return ContainsCarriedItem(bag);
+        }
+
+        /// <summary>
+        /// Every item the character is holding: carried pages, overflow, and the interior of any bag
+        /// whose page has been hydrated. Bank is excluded — unique rules only cover carried items.
+        /// </summary>
+        public IEnumerable<Item> EnumerateHeldItems()
+        {
+            if (!IsHydrated)
+                yield break;
+
+            Container[] pages = [Inventory, Equipment, Armor, Implant, Social, Overflow];
+            foreach (Container page in pages)
+            {
+                foreach (Item item in page.Content.Values)
+                    yield return item;
+            }
+
+            foreach (Container page in _backpackPages.Values)
+            {
+                Item? bag = page.LinkedItem;
+                if (bag == null || !ContainsCarriedItem(bag))
+                    continue;
+
+                foreach (Item item in page.Content.Values)
+                    yield return item;
+            }
         }
 
         public bool ContainsCarriedItem(Item item)
@@ -450,11 +540,38 @@ namespace ZoneEngine_New.Core.Inventory
             if (item.InstanceId <= 0)
                 return;
 
+            // Overflow is in-memory only; writing a row for it would resurrect the item on restart.
+            if (page.Identity.Type == IdentityType.OverflowWindow)
+                return;
+
             var entry = new DirtyEntry(
                 item,
                 (int)page.Identity.Type,
                 page.Identity.Instance,
                 placement);
+
+            lock (_dirtyGate)
+                _dirty[item.InstanceId] = entry;
+        }
+
+        /// <summary>
+        /// Retires a durable item by re-homing its row under <paramref name="graveyard"/>. The item
+        /// instance repository has no delete, and simply forgetting the item in memory would let the
+        /// row resurrect it at next login. Placement is the instance id so the location unique index
+        /// can never collide.
+        /// </summary>
+        public void MarkOrphaned(Item item, Identity graveyard)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (item.InstanceId <= 0 || !item.IsPersisted)
+                return;
+
+            var entry = new DirtyEntry(
+                item,
+                (int)graveyard.Type,
+                graveyard.Instance,
+                item.InstanceId);
 
             lock (_dirtyGate)
                 _dirty[item.InstanceId] = entry;
@@ -745,6 +862,15 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 Flags = ContainerFlags.Bank | ContainerFlags.CanAdd | ContainerFlags.CanRemove,
                 IsHydrated = false
+            };
+            // No CanAdd: the client may only drag items out of overflow, never into it.
+            Overflow = new Container(
+                IdentityType.OverflowWindow,
+                offset: 0,
+                capacity: OverflowCapacity,
+                instanceId: characterId)
+            {
+                Flags = ContainerFlags.CanRemove
             };
         }
 

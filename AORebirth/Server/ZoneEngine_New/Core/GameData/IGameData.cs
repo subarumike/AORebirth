@@ -15,7 +15,9 @@ namespace ZoneEngine_New.Core.GameData
 
         int MobTemplateCount { get; }
 
-        int LootTableCount { get; }
+        int HashTemplateCount { get; }
+
+        int HashInstanceCount { get; }
 
         int MonsterDataCount { get; }
 
@@ -27,7 +29,17 @@ namespace ZoneEngine_New.Core.GameData
 
         MobTemplate RequireMobTemplate(string hash);
 
-        bool TryGetLootTable(string hash, out IReadOnlyList<LootItemPair> pairs);
+        bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes);
+
+        bool TryGetHashInstance(string hash, out HashInstance instance);
+
+        bool TryResolveHashInstance(string hash, out HashInstance instance);
+
+        /// <summary>Appends every leaf item family reachable from <paramref name="hash"/>.</summary>
+        void CollectHashLeafInstances(string hash, List<HashInstance> into);
+
+        /// <summary>Shop stock table for a vending machine template id.</summary>
+        bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition);
 
         bool TryGetCatMesh(int monsterData, out int catMesh);
 

@@ -33,10 +33,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         /// <summary>
         /// Bit 21. Present on live knubot vendors (Lorelei/Barry SCFU 279450113).
-        /// Client uses this with HasBlueName to enable the dialogue Shop cart.
-        /// Capture 20260721-loralei.
+        /// Marks the character as a shop: the client shows the vendor cursor/cart and,
+        /// with HasBlueName, enables the dialogue Shop cart. Capture 20260721-loralei.
         /// </summary>
-        HasShopCart = 0x00200000,
+        HasItemsForSale = 0x00200000,
 
         /// <summary>
         /// Bit 23. On player SCFU this paints a blue nametag (Mike 2026-07-19).
