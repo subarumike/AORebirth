@@ -4835,9 +4835,9 @@ namespace AOSharpLiveCapture.Mike2022
 
             var values = new[]
             {
-                new RuntimeStatValue { Stat = "Life", StatId = 1, Value = decoded.HealthDamage },
+                new RuntimeStatValue { Stat = "Life", StatId = 1, Value = decoded.Health },
                 new RuntimeStatValue { Stat = "Breed", StatId = 4, Value = decoded.AppearanceBreed },
-                new RuntimeStatValue { Stat = "Health", StatId = 27, Value = decoded.Health },
+                new RuntimeStatValue { Stat = "Health", StatId = 27, Value = Math.Max(0, decoded.Health - decoded.HealthDamage) },
                 new RuntimeStatValue { Stat = "Side", StatId = 33, Value = decoded.AppearanceSide },
                 new RuntimeStatValue { Stat = "Fatness", StatId = 47, Value = decoded.AppearanceFatness },
                 new RuntimeStatValue { Stat = "Level", StatId = 54, Value = decoded.Level },
