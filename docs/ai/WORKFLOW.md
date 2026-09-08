@@ -627,6 +627,12 @@ set MIKE_AOSHARP_RUNTIME=<exact legacy AOSharp runtime directory>
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Mike2022.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
 ```
 
+For the separate manual NPC Inspect plugin, use the build and offline test
+commands in [NPC Inspect Probe](../../Tools/aosharp_npc_inspect/README.md#rebuild-and-checks-no-client-execution).
+Its package is `.local/npc-inspect-probe/package/NpcInspectProbe.dll`.
+It targets the same installed runtime without replacing AOSharp assemblies;
+native Inspect and in-game behavior still require Mike's manual validation.
+
 For Mike2022 spawn-stat health changes, keep the same `MIKE_AOSHARP_RUNTIME`
 setting and run the offline CSV export regression:
 
