@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>NpcInspectProbe</AssemblyName>
+    <RootNamespace>NpcInspectProbe</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>x86</PlatformTarget>
+    <Deterministic>true</Deterministic>
+    <Version>1.2.1</Version>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="PacketView.cs" />
+    <Compile Include="ProbeCapture.cs" />
+    <Reference Include="AOSharp.Core">
+      <HintPath>$(AOSharpPath)\AOSharp.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="AOSharp.Common">
+      <HintPath>$(AOSharpPath)\AOSharp.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckAOSharpPath" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(AOSharpPath)\AOSharp.Core.dll') Or !Exists('$(AOSharpPath)\AOSharp.Common.dll')"
+           Text="Supply /p:AOSharpPath=path to the installed AOSharp runtime directory." />
+  </Target>
+</Project>
