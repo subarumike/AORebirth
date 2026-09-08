@@ -23,7 +23,11 @@ namespace AORebirth.Core.GameData
 
         public const string MobTemplatesFileName = "MobTemplates.json";
 
-        public const string LootTableFileName = "LootTable.json";
+        public const string ItemTemplatesFileName = "ItemTemplates.json";
+
+        public const string HashInstancesFileName = "HashInstances.json";
+
+        public const string VendingMachinesFileName = "VendingMachines.json";
 
         public const string MonsterDataFileName = "MonsterData.json";
 

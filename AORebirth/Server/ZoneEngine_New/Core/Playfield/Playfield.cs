@@ -21,6 +21,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
@@ -34,10 +35,12 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayerHydrator _playerHydrator;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
+        private readonly HashItemMinter _hashItems;
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IItemInstanceIdAllocator _instanceIds;
         private readonly InventoryMoveService _inventoryMoves;
         private readonly InventoryFlushService _inventoryFlush;
+        private readonly TradeService _trades;
         private readonly CharacterSnapshotService _characterSnapshot;
         private readonly PlayfieldMetrics _metrics;
         private ServiceProvider _serviceProvider;
@@ -59,10 +62,12 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerHydrator playerHydrator,
             IGameData gameData,
             IItemBuilder items,
+            HashItemMinter hashItems,
             IInventoryRepository inventoryRepository,
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
             InventoryFlushService inventoryFlush,
+            TradeService trades,
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry)
         {
@@ -75,10 +80,12 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(playerHydrator);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(hashItems);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(instanceIds);
             ArgumentNullException.ThrowIfNull(inventoryMoves);
             ArgumentNullException.ThrowIfNull(inventoryFlush);
+            ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(characterSnapshot);
             ArgumentNullException.ThrowIfNull(metricsRegistry);
 
@@ -89,10 +96,12 @@ namespace ZoneEngine_New.Core.Playfield
             _playerHydrator = playerHydrator;
             _gameData = gameData;
             _items = items;
+            _hashItems = hashItems;
             _inventoryRepository = inventoryRepository;
             _instanceIds = instanceIds;
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
+            _trades = trades;
             _characterSnapshot = characterSnapshot;
             _metrics = metricsRegistry.GetOrCreate(playfieldIdentity.Instance);
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
@@ -327,6 +336,7 @@ namespace ZoneEngine_New.Core.Playfield
                 _inbound.Drain(_router, spawn);
                 spawn.Tick();
                 _inventoryMoves.Tick(this, deltaTime);
+                _trades.Tick(this, deltaTime);
 
                 WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
                 if (world != null)
@@ -358,10 +368,12 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
             services.AddSingleton(_items);
+            services.AddSingleton(_hashItems);
             services.AddSingleton(_inventoryRepository);
             services.AddSingleton(_instanceIds);
             services.AddSingleton(_inventoryMoves);
             services.AddSingleton(_inventoryFlush);
+            services.AddSingleton(_trades);
             services.AddSingleton(_characterSnapshot);
             services.AddSingleton(new WorldSimulationAccess());
             services.Add(new ServiceDescriptor(typeof(Identity), Identity));

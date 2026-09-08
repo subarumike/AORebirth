@@ -1,0 +1,32 @@
+{
+    "99643": {
+        "Inventory": [
+            {
+                "Hash": "WEAP",
+                "MinLevel": 1,
+                "MaxLevel": 400,
+                "Repeats": 1,
+                "Chance": 100,
+                "Flags": 0
+            },
+            {
+                "Hash": "MOPA",
+                "MinLevel": 1,
+                "MaxLevel": 400,
+                "Repeats": 1,
+                "Chance": 50
+            }
+        ]
+    },
+    "248368": {
+        "Inventory": [
+            {
+                "Hash": "MOPA",
+                "MinLevel": 1,
+                "MaxLevel": 10,
+                "Repeats": 10,
+                "Chance": 100
+            }
+        ]
+    }
+}

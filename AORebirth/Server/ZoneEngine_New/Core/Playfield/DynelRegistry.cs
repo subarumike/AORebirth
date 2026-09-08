@@ -12,11 +12,15 @@ namespace ZoneEngine_New.Core.Playfield
     {
         private const int FirstNpcInstance = 1_000_000;
         private const int FirstCorpseInstance = 2_000_000;
+        private const int FirstVendingMachineInstance = 3_000_000;
+        private const int FirstTempBagInstance = 4_000_000;
 
         private readonly Lock _sync = new();
         private readonly Dictionary<ulong, Dynel> _dynels = new();
         private int _nextNpcInstance = FirstNpcInstance - 1;
         private int _nextCorpseInstance = FirstCorpseInstance - 1;
+        private int _nextVendingMachineInstance = FirstVendingMachineInstance - 1;
+        private int _nextTempBagInstance = FirstTempBagInstance - 1;
 
         public Identity AllocateNpcIdentity()
         {
@@ -34,6 +38,28 @@ namespace ZoneEngine_New.Core.Playfield
             return new Identity
             {
                 Type = IdentityType.Corpse,
+                Instance = instance
+            };
+        }
+
+        /// <summary>Identity for a shop attached to an NPC vendor rather than placed by Dynels.dat.</summary>
+        public Identity AllocateVendingMachineIdentity()
+        {
+            int instance = Interlocked.Increment(ref _nextVendingMachineInstance);
+            return new Identity
+            {
+                Type = IdentityType.VendingMachine,
+                Instance = instance
+            };
+        }
+
+        /// <summary>Identity for a trade window's temporary bag. Not a registered dynel.</summary>
+        public Identity AllocateTempBagIdentity()
+        {
+            int instance = Interlocked.Increment(ref _nextTempBagInstance);
+            return new Identity
+            {
+                Type = IdentityType.TempBag,
                 Instance = instance
             };
         }

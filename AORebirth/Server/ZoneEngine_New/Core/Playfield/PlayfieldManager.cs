@@ -18,6 +18,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Trade;
 
     public sealed class PlayfieldManager : IDisposable
     {
@@ -31,10 +32,12 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayerHydrator _playerHydrator;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
+        private readonly HashItemMinter _hashItems;
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IItemInstanceIdAllocator _instanceIds;
         private readonly InventoryMoveService _inventoryMoves;
         private readonly InventoryFlushService _inventoryFlush;
+        private readonly TradeService _trades;
         private readonly CharacterSnapshotService _characterSnapshot;
         private readonly IPlayfieldMetricsRegistry _metricsRegistry;
         private bool _disposed;
@@ -45,10 +48,12 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerHydrator playerHydrator,
             IGameData gameData,
             IItemBuilder items,
+            HashItemMinter hashItems,
             IInventoryRepository inventoryRepository,
             IItemInstanceIdAllocator instanceIds,
             InventoryMoveService inventoryMoves,
             InventoryFlushService inventoryFlush,
+            TradeService trades,
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry)
         {
@@ -57,10 +62,12 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(playerHydrator);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(hashItems);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(instanceIds);
             ArgumentNullException.ThrowIfNull(inventoryMoves);
             ArgumentNullException.ThrowIfNull(inventoryFlush);
+            ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(characterSnapshot);
             ArgumentNullException.ThrowIfNull(metricsRegistry);
 
@@ -69,10 +76,12 @@ namespace ZoneEngine_New.Core.Playfield
             _playerHydrator = playerHydrator;
             _gameData = gameData;
             _items = items;
+            _hashItems = hashItems;
             _inventoryRepository = inventoryRepository;
             _instanceIds = instanceIds;
             _inventoryMoves = inventoryMoves;
             _inventoryFlush = inventoryFlush;
+            _trades = trades;
             _characterSnapshot = characterSnapshot;
             _metricsRegistry = metricsRegistry;
         }
@@ -119,10 +128,12 @@ namespace ZoneEngine_New.Core.Playfield
                     _playerHydrator,
                     _gameData,
                     _items,
+                    _hashItems,
                     _inventoryRepository,
                     _instanceIds,
                     _inventoryMoves,
                     _inventoryFlush,
+                    _trades,
                     _characterSnapshot,
                     _metricsRegistry);
             }
@@ -136,10 +147,12 @@ namespace ZoneEngine_New.Core.Playfield
                     _playerHydrator,
                     _gameData,
                     _items,
+                    _hashItems,
                     _inventoryRepository,
                     _instanceIds,
                     _inventoryMoves,
                     _inventoryFlush,
+                    _trades,
                     _characterSnapshot,
                     _metricsRegistry);
             }

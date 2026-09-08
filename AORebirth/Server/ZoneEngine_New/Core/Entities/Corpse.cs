@@ -23,7 +23,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Lifetime in centiseconds (1/100 s). 18000 = 3 minutes.</summary>
         private const int DefaultTimeExist = 18000;
         private const int DefaultDeadTimer = 60;
-        public const int LootReserveSeconds = 120;
+        public const int LootReserveSeconds = 60;
 
         /// <summary>Live Biofreak-style Flags when source Flags is missing/zero.</summary>
         private const int DefaultCorpseFlags = 1579013;

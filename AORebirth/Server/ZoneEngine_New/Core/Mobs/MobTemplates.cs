@@ -51,18 +51,4 @@ namespace ZoneEngine_New.Core.Mobs
 
         public JsonElement? BinaryList { get; set; }
     }
-
-    /// <summary>One [lowId, highId] loot pair under a loot-table hash.</summary>
-    public readonly struct LootItemPair
-    {
-        public LootItemPair(int lowId, int highId)
-        {
-            LowId = lowId;
-            HighId = highId;
-        }
-
-        public int LowId { get; }
-
-        public int HighId { get; }
-    }
 }

@@ -327,17 +327,26 @@ namespace ZoneEngine_New.Core.Commands
                         entry.Chance,
                         entry.LevelMod));
 
-                if (!_gameData.TryGetLootTable(entry.Hash, out IReadOnlyList<LootItemPair> pairs) || pairs.Count == 0)
+                bool isCategory = _gameData.TryGetHashTemplate(entry.Hash, out IReadOnlyList<string> children)
+                    && children.Count > 0;
+                if (isCategory)
+                    lines.Add("    category " + string.Join(", ", children));
+
+                if (_gameData.TryGetHashInstance(entry.Hash, out HashInstance instance))
                 {
                     lines.Add(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "    (not found)"));
+                            "    instance ql={0}-{1}",
+                            instance.MinLevel,
+                            instance.MaxLevel));
+                    for (int i = 0; i < instance.TemplateIds.Length; i++)
+                        lines.Add("    " + FormatItemId(instance.TemplateIds[i]));
                     continue;
                 }
 
-                for (int i = 0; i < pairs.Count; i++)
-                    lines.Add("    " + FormatItemPair(pairs[i].LowId, pairs[i].HighId));
+                if (!isCategory)
+                    lines.Add("    (not found)");
             }
 
             return lines;

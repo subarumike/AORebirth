@@ -326,6 +326,7 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.ArmorPage => player.Inventory.Armor,
                 IdentityType.ImplantPage => player.Inventory.Implant,
                 IdentityType.SocialPage => player.Inventory.Social,
+                IdentityType.OverflowWindow => player.Inventory.Overflow,
                 _ => null!
             };
 
@@ -395,8 +396,9 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
-        static bool IsBagItem(Item item)
+        public static bool IsBagItem(Item item)
         {
+            ArgumentNullException.ThrowIfNull(item);
             if (item.Identity.Type == IdentityType.Container)
                 return true;
 
@@ -518,6 +520,7 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.ArmorPage => player.Inventory.Armor,
                 IdentityType.ImplantPage => player.Inventory.Implant,
                 IdentityType.SocialPage => player.Inventory.Social,
+                IdentityType.OverflowWindow => player.Inventory.Overflow,
                 IdentityType.BankByRef => player.Inventory.Bank,
                 _ => null!
             };
@@ -545,6 +548,21 @@ namespace ZoneEngine_New.Core.Inventory
                         "Pending equip aborted; source changed char={0} slot={1}",
                         player.Identity.Instance,
                         pending.SourceSlot));
+                return;
+            }
+
+            // The occupant of the destination was requirement-checked when the move began, and an
+            // empty destination carries no lock. Anything that arrived since (trade return, trade
+            // delivery, shop purchase, loot) would otherwise be swapped onto a wear page unchecked.
+            Item? occupant = pending.DestPage.Content.GetValueOrDefault(pending.DestSlot);
+            if (!ReferenceEquals(occupant, pending.SwappedItem))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Pending equip aborted; destination changed char={0} slot={1}",
+                        player.Identity.Instance,
+                        pending.DestSlot));
                 return;
             }
 
