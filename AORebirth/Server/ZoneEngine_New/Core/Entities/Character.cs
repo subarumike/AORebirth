@@ -102,9 +102,12 @@ namespace ZoneEngine_New.Core.Entities
         public event Action<Character>? Died;
 
         public const int CorpseSwapDelayMilliseconds = 2500;
+        protected virtual int CorpseSpawnDelayMilliseconds => CorpseSwapDelayMilliseconds;
 
         const int DefaultNpcDeathAnimationKey = 0x1F7;
         const int DefaultPlayerDeathAnimationKey = 500;
+        protected virtual int DeathAnimationKey => IsPlayer ? DefaultPlayerDeathAnimationKey : DefaultNpcDeathAnimationKey;
+        protected virtual bool UsesPassiveRegen => true;
 
         bool _deathNotified;
         bool _corpseSwapPending;
@@ -134,11 +137,11 @@ namespace ZoneEngine_New.Core.Entities
                     Action = CharacterActionType.Death,
                     Target = Identity.None,
                     Parameter1 = 0,
-                    Parameter2 = IsPlayer ? DefaultPlayerDeathAnimationKey : DefaultNpcDeathAnimationKey
+                    Parameter2 = DeathAnimationKey
                 });
 
             _corpseSwapPending = true;
-            _corpseSwapRemainingSeconds = CorpseSwapDelayMilliseconds / 1000.0;
+            _corpseSwapRemainingSeconds = CorpseSpawnDelayMilliseconds / 1000.0;
 
             AwardKillRewards();
         }
@@ -243,7 +246,7 @@ namespace ZoneEngine_New.Core.Entities
             };
         }
 
-        static int TitleLevelFor(int level)
+        internal static int TitleLevelFor(int level)
         {
             if (level >= 205)
                 return 7;
@@ -261,7 +264,7 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>Lifetime IP earned at <paramref name="level"/> (legacy <c>StatIp</c> brackets).</summary>
-        static int TotalIpEarnedAtLevel(int level)
+        internal static int TotalIpEarnedAtLevel(int level)
         {
             if (level < 1)
                 return 0;
@@ -410,7 +413,7 @@ namespace ZoneEngine_New.Core.Entities
 
             _corpseSwapPending = false;
 
-            Playfield?.GetRequiredService<SpawnService>().SpawnCorpse(this);
+            SpawnDeathCorpse();
             ClearKillRewards();
             Died?.Invoke(this);
         }
@@ -422,11 +425,17 @@ namespace ZoneEngine_New.Core.Entities
                 ResetAllWeaponAttacks();
         }
 
+        protected virtual void SpawnDeathCorpse()
+            => Playfield?.GetRequiredService<SpawnService>().SpawnCorpse(this);
+
         /// <summary>
         /// Engage auto-attack: SpecialAttackWeapon first so observers have specials, then Attack.
         /// </summary>
-        public void StartFighting(Identity target, byte action)
+        public virtual void StartFighting(Identity target, byte action)
         {
+            if (this is Player player && (player.IsPersistenceQuarantined
+                || player.NanoRuntime?.IsFightingRestricted(player) == true))
+                return;
             SetFightingTarget(target);
             ResetAllWeaponAttacks();
             Cell?.Announce(BuildSpecialAttackWeaponMessage());
@@ -439,7 +448,7 @@ namespace ZoneEngine_New.Core.Entities
                 });
         }
 
-        public SpecialAttackWeaponMessage BuildSpecialAttackWeaponMessage()
+        public virtual SpecialAttackWeaponMessage BuildSpecialAttackWeaponMessage()
         {
             SpecialAttack[] specials = BuildSpecialAttacks();
             var message = new SpecialAttackWeaponMessage
@@ -674,8 +683,8 @@ namespace ZoneEngine_New.Core.Entities
 
             Motor.Tick(deltaTime);
             if (FightingTarget.Instance != 0 && TryResolveFightingTarget() != null)
-                TickWeapons(deltaTime);
-            if (!IsDead)
+                TickCombat(deltaTime);
+            if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
             base.Tick(deltaTime);
         }
@@ -743,6 +752,8 @@ namespace ZoneEngine_New.Core.Entities
 
             Stats.Set(currentStat, next, StatDetail.Base, dirty: true);
         }
+
+        protected virtual void TickCombat(double deltaTime) => TickWeapons(deltaTime);
 
         void TickWeapons(double deltaTime)
         {
@@ -827,7 +838,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>
         /// Applies hit-point damage. Returns true when this hit killed the character.
         /// </summary>
-        public bool ApplyDamage(Character attacker, int damage, HitType hitType)
+        public virtual bool ApplyDamage(Character attacker, int damage, HitType hitType)
         {
             if (_deathNotified || damage <= 0)
                 return false;

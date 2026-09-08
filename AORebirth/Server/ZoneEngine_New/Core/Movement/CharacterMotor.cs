@@ -215,6 +215,11 @@ namespace ZoneEngine_New.Core.Movement
             float z = message.Coordinates.Z;
 
             Playfield? playfield = _character.Playfield;
+            if (playfield is MissionPlayfield mission
+                && !mission.World.AcceptsMovement(_character, new Vector3(x, y, z))) return;
+            if (playfield is MissionPlayfield && _character is Player missionPlayer
+                && !playfield.GetRequiredService<ZoneEngine_New.Core.Missions.GeneratedMissionAcgService>()
+                    .TryPersistPlayerPosition(missionPlayer, new Vector3(x, y, z))) return;
             if (playfield != null)
             {
                 PlayfieldLocality locality = playfield.GetRequiredService<PlayfieldLocality>();
@@ -268,6 +273,7 @@ namespace ZoneEngine_New.Core.Movement
 
         public void Tick(double deltaTime)
         {
+            RefreshFlightAuthority();
             float dt = (float)deltaTime;
             if (dt <= 0f)
                 return;
@@ -330,6 +336,14 @@ namespace ZoneEngine_New.Core.Movement
                 start.x + (planar.x * dt),
                 start.y + (_verticalVelocity * dt),
                 start.z + (planar.z * dt));
+
+            // Governed generated interiors retain the existing no-world altitude behavior;
+            // their captured envelope is an ownership bound, never a fabricated floor/mesh.
+            if (_character.Playfield is MissionPlayfield mission && !mission.World.AcceptsMovement(_character, end))
+            {
+                Halt(); _verticalVelocity = 0;
+                return;
+            }
 
             WorldSimulation.PlayfieldWorldSimulation? world = _character.Playfield?.WorldAccess.Instance;
             if (world != null
@@ -399,6 +413,7 @@ namespace ZoneEngine_New.Core.Movement
 
         public void ApplyAction(MovementAction action)
         {
+            RefreshFlightAuthority();
             switch (action)
             {
                 case MovementAction.ForwardStart:
@@ -485,7 +500,7 @@ namespace ZoneEngine_New.Core.Movement
                     EnterMovementState(MovementState.Sneak);
                     break;
                 case MovementAction.SwitchToFly:
-                    EnterMovementState(MovementState.Fly);
+                    if (HasFlightAuthority()) EnterMovementState(MovementState.Fly);
                     break;
                 case MovementAction.SwitchToSit:
                     EnterMovementState(MovementState.Sit);
@@ -507,6 +522,21 @@ namespace ZoneEngine_New.Core.Movement
                     LeaveMovementState();
                     break;
             }
+        }
+
+        // The accepted CanFly effect explicitly grants IsVehicle=1 outside Shadowlands. A
+        // client mode request cannot grant this authority. Check after whole owner operations,
+        // not each transient Bonus clear during equipment/nano rebasing.
+        bool HasFlightAuthority() => _character.Stats.GetOrZero(CharacterStat.IsVehicle) == 1
+            && (_character.Playfield != null
+                ? _character.Playfield.Identity.Instance is < 4000 or > 4999
+                : _character.Stats.GetOrZero((CharacterStat)531) == 0);
+
+        public void RefreshFlightAuthority()
+        {
+            if (_state != MovementState.Fly || HasFlightAuthority()) return;
+            _flags &= ~(MovementFlags.ElevateUp | MovementFlags.ElevateDown);
+            LeaveMovementState();
         }
 
         void SetFlags(MovementFlags flags)

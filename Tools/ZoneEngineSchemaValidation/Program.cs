@@ -22,6 +22,7 @@ try
     fixture.Start();
     using var connection = fixture.Open();
     FixtureSql.CreateBaseline(connection);
+    AuthoredMissionSmoke.CreateBaseline(connection);
     FixtureSql.Execute(connection, "INSERT INTO instanceditems (Id,ContainerType,ContainerInstance,ContainerPlacement,Itemtype,LowId,HighId,Quality,MultipleCount) VALUES (42,1001,104,1,0,10,10,1,2); INSERT INTO items (ContainerType,ContainerInstance,ContainerPlacement,LowId,HighId,Quality,MultipleCount) VALUES (1001,104,2,11,11,1,1)");
     string before = FixtureSql.Fingerprint(connection);
     Require(DatabaseSchemaReadiness.Check(fixture.ConnectionString).State == SchemaState.SCHEMA_MIGRATION_REQUIRED, "negative-readiness");
@@ -77,6 +78,10 @@ try
     Console.WriteLine("CHARACTER_SNAPSHOT_ATOMIC_COMMIT=PASS CHARACTER_SNAPSHOT_FAILURE_ROLLBACK=PASS");
     TradeSmoke.Validate(fixture, connection);
     Console.WriteLine("TWO_PARTY_TRADE_ATOMIC_COMMIT=PASS TWO_PARTY_TRADE_LATE_FAILURE_ROLLBACK=PASS");
+    GeneratedMissionSmoke.Validate(fixture, connection);
+    InventoryMutationSmoke.Validate(fixture, connection);
+    ActiveNanoSmoke.Validate(fixture, connection);
+    AuthoredMissionSmoke.Validate(fixture, connection);
 
     // A missing real world package is a lifecycle failure, not a reason to lose the
     // independent schema and transactional-import proofs completed above.
@@ -92,6 +97,8 @@ try
 catch (Exception exception)
 {
     Console.Error.WriteLine("SCHEMA_VALIDATION=FAIL " + (exception is FixtureFailure ? exception.Message : exception.GetType().Name));
+    if (exception is MySqlException sqlException)
+        Console.Error.WriteLine("DISPOSABLE_SQL_ERROR_NUMBER=" + sqlException.Number);
     return 1;
 }
 
@@ -107,6 +114,8 @@ static class FixtureSql
     public static void CreateBaseline(MySqlConnection connection)
     {
         // Minimal exact DAO contract fixture; no unrelated SqlTables bootstrap or seed data.
+        Execute(connection, "CREATE TABLE charactersactivenanos (Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,CharacterId INT NOT NULL,NanoId INT UNSIGNED NOT NULL,Strain INT UNSIGNED NOT NULL,NanoInstance INT NOT NULL DEFAULT 0,DurationCentiseconds INT NOT NULL DEFAULT 0,ExpiresAtUtcTicks BIGINT NOT NULL DEFAULT 0) ENGINE=InnoDB");
+        Execute(connection, "CREATE TABLE missionrewardledger (Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,CharacterId INT NOT NULL,QuestId VARCHAR(128) NOT NULL,RewardKey VARCHAR(191) NOT NULL,RewardType VARCHAR(64) NOT NULL,Status INT NOT NULL,Attempts INT NOT NULL DEFAULT 0,EffectReference VARCHAR(255) NULL,LastError VARCHAR(1024) NULL,ClaimToken VARCHAR(64) NULL,ClaimedAtUtcTicks BIGINT NOT NULL DEFAULT 0,ClaimExpiresAtUtcTicks BIGINT NOT NULL DEFAULT 0,AppliedAtUtcTicks BIGINT NOT NULL DEFAULT 0,CreatedAtUtcTicks BIGINT NOT NULL,UpdatedAtUtcTicks BIGINT NOT NULL,Version BIGINT NOT NULL DEFAULT 1,UNIQUE KEY character_quest_reward(CharacterId,QuestId,RewardKey),KEY character_quest(CharacterId,QuestId)) ENGINE=InnoDB");
         Execute(connection, "CREATE TABLE characters (Id INT PRIMARY KEY,Name VARCHAR(32),FirstName VARCHAR(32),LastName VARCHAR(32),Playfield INT,X FLOAT,Y FLOAT,Z FLOAT,HeadingW FLOAT,HeadingX FLOAT,HeadingY FLOAT,HeadingZ FLOAT,Online SMALLINT) ENGINE=InnoDB; CREATE TABLE stats (Type INT,Instance INT,StatId INT,StatValue INT,UNIQUE KEY main(Type,Instance,StatId)) ENGINE=InnoDB; CREATE TABLE charactersuploadednanos (Id INT AUTO_INCREMENT PRIMARY KEY,CharacterId INT,NanoId INT,INDEX Nanos(CharacterId,NanoId)) ENGINE=InnoDB; CREATE TABLE itemnames (Id INT PRIMARY KEY,Name VARCHAR(250)) ENGINE=InnoDB; CREATE TABLE instanceditems (Id INT PRIMARY KEY,ContainerType INT,ContainerInstance INT,ContainerPlacement INT,Itemtype INT,LowId INT,HighId INT,Quality INT,MultipleCount INT) ENGINE=InnoDB; CREATE TABLE items (Id INT AUTO_INCREMENT PRIMARY KEY,ContainerType INT,ContainerInstance INT,ContainerPlacement INT,LowId INT,HighId INT,Quality INT,MultipleCount INT) ENGINE=InnoDB");
     }
     public static string Fingerprint(MySqlConnection connection, bool includeAutoIncrementCounters = true)

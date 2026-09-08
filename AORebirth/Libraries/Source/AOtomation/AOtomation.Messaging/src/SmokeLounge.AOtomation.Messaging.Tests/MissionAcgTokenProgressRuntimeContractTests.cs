@@ -523,7 +523,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadMissionSource("MissionAcgTokenProgressState.cs");
             string store =
                 ReadMissionSource("MissionAcgTokenProgressStore.cs");
-            string generated = runtime + state + store;
+            string policy =
+                ReadMissionSource("MissionAcgTokenRewardPolicy.cs");
+            string generated = runtime + state + store + policy;
 
             Assert.IsFalse(generated.Contains("QuestFullUpdate"));
             Assert.IsFalse(generated.Contains("GrantMissionToken"));
@@ -534,7 +536,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "MissionAcgTokenClaimDisposition.Eligible");
             StringAssert.Contains(
                 state,
-                "progress.Percent < 100");
+                "MissionAcgTokenRewardPolicy.TryResolve(progress.Percent,");
+            StringAssert.Contains(
+                policy,
+                "if (percent < 100) { result = new MissionAcgTokenRewardData(0, 0, 0, 0, string.Empty); return true; }");
+            StringAssert.Contains(state, "UnresolvedBelowFullProgress = 0");
             Assert.IsFalse(generated.Contains("ALTER TABLE"));
             Assert.IsFalse(generated.Contains("CREATE TABLE"));
             StringAssert.Contains(runtime, "TeamIdentity != null");

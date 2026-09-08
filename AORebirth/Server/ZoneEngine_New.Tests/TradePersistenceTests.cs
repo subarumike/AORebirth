@@ -219,6 +219,29 @@ namespace ZoneEngine_New.Tests
             AssertNoGrantsOrComplete(world.FirstSession);
         }
 
+        [TestMethod]
+        public void PopulatedBagCannotEnterVendorSaleOfferOrOrphanChildren()
+        {
+            using var world = new Fixture();
+            TradeSession shop = world.CreateShop();
+            Item bag = TestWorld.CreateItem(instanceId: 73);
+            bag.Identity = new Identity { Type = IdentityType.Container, Instance = 73 };
+            world.First.Inventory.Inventory.Add(64, bag);
+            Container contents = world.First.Inventory.GetOrCreateBackpackPage(bag, bag.Identity,
+                new Identity { Type = IdentityType.Inventory, Instance = 64 });
+            Item child = TestWorld.CreateItem(instanceId: 74);
+            contents.Add(0, child);
+            world.OfferShopItem(shop, 64);
+            Assert.AreSame(bag, world.First.Inventory.Inventory.Content[64]);
+            Assert.AreSame(child, contents.Content[0]);
+            Assert.IsFalse(bag.Locked);
+            Assert.AreEqual(0, shop.InitiatorOffer.Count);
+            Assert.AreEqual(100, world.First.Stats.GetOrZero(CharacterStat.Cash));
+            Assert.AreEqual(0, world.Persistence.Calls);
+            Assert.AreEqual(0, world.FirstSession.Messages.OfType<TradeMessage>().Count());
+            AssertNoGrantsOrComplete(world.FirstSession);
+        }
+
         static void AssertNoGrantsOrComplete(params RecordingSession[] sessions)
         {
             Assert.IsFalse(sessions.SelectMany(s => s.Messages).OfType<AddTemplateMessage>().Any());
@@ -271,6 +294,12 @@ namespace ZoneEngine_New.Tests
                 return new TradeSession(new Identity { Type = IdentityType.TradeWindow, Instance = 92 }, TradeKind.Shop, First, null, machine);
             }
             public void CommitShop(TradeSession session) => typeof(TradeService).GetMethod("CommitShop", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(_service, new object[] { First, session });
+            public void OfferShopItem(TradeSession session, int slot) => typeof(TradeService).GetMethod("HandleAddItem", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(_service, new object[] { First, session, new TradeMessage
+                {
+                    Identity = First.Identity, Action = TradeAction.AddItem, Target = First.Identity,
+                    Container = new Identity { Type = IdentityType.Inventory, Instance = slot }
+                } });
             public void Dispose() => Flush.Dispose();
         }
 

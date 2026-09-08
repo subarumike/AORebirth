@@ -1813,7 +1813,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
         private static string ReadPlayfieldSource(string root, string file)
         {
-            return File.ReadAllText(
+            return LegacyGameplaySource.ReadAllText(
                     Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file))
                 .Replace("\r\n", "\n");
         }

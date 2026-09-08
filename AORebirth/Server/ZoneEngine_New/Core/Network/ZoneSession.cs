@@ -28,8 +28,10 @@ namespace ZoneEngine_New.Core.Network
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
-    public sealed class ZoneSession : IZoneSession, IAsyncDisposable
+    public sealed class ZoneSession : IZoneSession, IGameTimeSession, IAsyncDisposable
     {
+        public DateTime? GameTimeSynchronizedAtUtc { get; private set; }
+        public void RecordGameTimeSynchronization(DateTime utcNow) => GameTimeSynchronizedAtUtc = utcNow;
         private const int HeaderLength = 16;
         private const int ReceiveChunkSize = 4096;
         private const int MaxPacketSize = 8192;
@@ -396,6 +398,9 @@ namespace ZoneEngine_New.Core.Network
                 Player owned = Player;
                 if (ReferenceEquals(owned.Session, this))
                 {
+                    owned.Playfield?.GetRequiredService<ZoneEngine_New.Core.Teams.TeamService>()
+                        .OnTransportDisconnected(owned, this);
+                    owned.NanoRuntime?.Cancel(owned, this);
                     owned.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
                     _logger.Info(
                         string.Format(

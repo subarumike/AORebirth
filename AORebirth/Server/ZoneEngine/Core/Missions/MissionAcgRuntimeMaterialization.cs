@@ -649,12 +649,12 @@ namespace ZoneEngine.Core.Missions
             }
 
             allocatedLivePlayfield2 =
-                MissionAcgAllocationService.MinimumLivePlayfield2
+                MissionAcgIdentityRanges.MinimumLivePlayfield2
                 + playfieldOffset;
             return allocatedLivePlayfield2
-                       >= MissionAcgAllocationService.MinimumLivePlayfield2
+                       >= MissionAcgIdentityRanges.MinimumLivePlayfield2
                    && allocatedLivePlayfield2
-                       <= MissionAcgAllocationService.MaximumLivePlayfield2;
+                       <= MissionAcgIdentityRanges.MaximumLivePlayfield2;
         }
 
         private static bool ValidateAtomicRelationship(
@@ -682,7 +682,7 @@ namespace ZoneEngine.Core.Missions
                     StringComparison.OrdinalIgnoreCase)
                 || !binding.AcgBuildingIdentity.Equals(bundle.BuildingIdentity)
                 || binding.AllocatedLivePlayfield2
-                   == MissionAcgAllocationService.LegacySharedPlayfield2
+                   == MissionAcgIdentityRanges.LegacySharedPlayfield2
                 || binding.AllocatedLivePlayfield2 == bundle.SourcePlayfield2)
             {
                 failure = "Binding and immutable layout bundle do not form one valid atomic instance.";
@@ -794,7 +794,7 @@ namespace ZoneEngine.Core.Missions
         {
             int playfieldOffset =
                 binding.AllocatedLivePlayfield2
-                - MissionAcgAllocationService.MinimumLivePlayfield2;
+                - MissionAcgIdentityRanges.MinimumLivePlayfield2;
             var entries = new List<MissionAcgRuntimeIdentityEntry>(seeds.Count);
             for (int i = 0; i < seeds.Count; i++)
             {

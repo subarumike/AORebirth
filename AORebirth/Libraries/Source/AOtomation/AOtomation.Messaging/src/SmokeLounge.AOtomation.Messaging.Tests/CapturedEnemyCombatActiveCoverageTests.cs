@@ -229,7 +229,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEquivalent(
                 new[] { "subway.supported.17720", "subway.supported.203734" },
                 StringArrayMember(resolverAudit, "exactSupportedProfileSelectors"));
-            Assert.AreEqual(5, ArrayMember(resolverAudit, "owners").Length);
+            var expectedResolverSources = new[]
+                {
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs",
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
+                };
+            CollectionAssert.AreEquivalent(
+                expectedResolverSources,
+                ArrayMember(resolverAudit, "owners")
+                    .Select(value => StringMember(JsonObject(value, "resolver owner"), "path"))
+                    .ToArray());
 
             var profiles = ArrayMember(document, "profiles")
                 .Select(value => JsonObject(value, "coverage profile"))
@@ -299,9 +312,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             level,
                             "allConcreteRuntimeVariantsMustResolveFinalCombatReady"),
                         bindingKey);
-                    Assert.AreEqual(
-                        5,
-                        ArrayMember(level, "runtimeResolverSources").Length,
+                    CollectionAssert.AreEquivalent(
+                        expectedResolverSources,
+                        StringArrayMember(level, "runtimeResolverSources"),
                         bindingKey);
                     Assert.AreEqual(
                         expectedRetaliationEligibilityPromotion,

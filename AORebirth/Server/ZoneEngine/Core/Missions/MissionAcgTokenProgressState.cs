@@ -181,75 +181,10 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            if (progress.Percent < 100)
-            {
-                resolution =
-                    new MissionAcgTokenClaimResolution(
-                        progress,
-                        MissionAcgTokenClaimDisposition
-                            .UnresolvedBelowFullProgress,
-                        0,
-                        0,
-                        0,
-                        0,
-                        string.Empty);
-                return true;
-            }
-
-            if (side == Side.Neutral)
-            {
-                resolution =
-                    new MissionAcgTokenClaimResolution(
-                        progress,
-                        MissionAcgTokenClaimDisposition.ExplicitNone,
-                        0,
-                        0,
-                        0,
-                        0,
-                        string.Empty);
-                return true;
-            }
-
-            int lowId;
-            int highId;
-            string name;
-            if (side == Side.Clan)
-            {
-                lowId = ClanTokenLowId;
-                highId = ClanTokenHighId;
-                name = "Clan Token";
-            }
-            else if (side == Side.Omni)
-            {
-                lowId = OmniTokenLowId;
-                highId = OmniTokenHighId;
-                name = "Omni Token";
-            }
-            else
-            {
-                failure =
-                    "Generated token claim side is not a supported player faction.";
-                return false;
-            }
-
-            int count;
-            if (!MissionLevelTable.TryGetTokenReward(
-                    characterLevelAtClaimFreeze,
-                    out count,
-                    out failure))
-            {
-                return false;
-            }
-
-            resolution =
-                new MissionAcgTokenClaimResolution(
-                    progress,
-                    MissionAcgTokenClaimDisposition.Eligible,
-                    lowId,
-                    highId,
-                    TokenQuality,
-                    count,
-                    name);
+            MissionAcgTokenRewardData data;
+            if (!MissionAcgTokenRewardPolicy.TryResolve(progress.Percent, characterLevelAtClaimFreeze, side, out data, out failure)) return false;
+            resolution = new MissionAcgTokenClaimResolution(progress, (MissionAcgTokenClaimDisposition)data.Disposition,
+                data.LowId, data.HighId, data.Disposition == 2 ? TokenQuality : 0, data.Count, data.Name);
             return true;
         }
     }
@@ -816,21 +751,7 @@ namespace ZoneEngine.Core.Missions
             int appliedCount,
             int totalCountableAmbientSlots)
         {
-            if (appliedCount < 0
-                || totalCountableAmbientSlots < 0
-                || appliedCount > totalCountableAmbientSlots)
-            {
-                throw new ArgumentOutOfRangeException("appliedCount");
-            }
-
-            if (totalCountableAmbientSlots == 0)
-            {
-                return 100;
-            }
-
-            return (int)Math.Min(
-                100L,
-                ((long)appliedCount * 100L) / totalCountableAmbientSlots);
+            return MissionAcgTokenRewardPolicy.CalculatePercent(appliedCount, totalCountableAmbientSlots);
         }
 
         internal static string BuildEventId(

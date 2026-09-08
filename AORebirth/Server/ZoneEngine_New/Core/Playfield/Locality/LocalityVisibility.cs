@@ -256,10 +256,23 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 return false;
             }
 
-            MessageBody spawn = source.BuildSpawnMessage();
-            if (spawn is SimpleCharFullUpdateMessage scfu)
-                ScfuSendLog.Write(scfu);
-            recipient.Session!.Send(spawn);
+            try
+            {
+                if (source.BuildSpawnPacket(recipient.Identity) is { } packet)
+                    recipient.Session!.Send(packet);
+                else
+                {
+                    MessageBody spawn = source.BuildSpawnMessage();
+                    if (spawn is SimpleCharFullUpdateMessage scfu)
+                        ScfuSendLog.Write(scfu);
+                    recipient.Session!.Send(spawn);
+                }
+            }
+            catch
+            {
+                RemoveVisibleEntry(recipient.Identity.Long(), source.Identity.Long());
+                throw;
+            }
 
             if (source is Character character)
             {

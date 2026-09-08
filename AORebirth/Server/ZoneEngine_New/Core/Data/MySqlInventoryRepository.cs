@@ -304,6 +304,42 @@ namespace ZoneEngine_New.Core.Data
             }
         }
 
+        internal void WriteStackCounts(IReadOnlyList<ItemStackUpdate> updates,
+            MySqlConnection connection, MySqlTransaction transaction)
+        {
+            foreach (ItemStackUpdate update in updates)
+            {
+                if (update.InstanceId <= 0 || update.ExpectedCount <= 0 || update.FinalCount <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(updates));
+                using var command = new MySqlCommand(
+                    "UPDATE item_instances SET StackCount=@Final WHERE InstanceId=@Id AND StackCount=@Expected",
+                    connection, transaction);
+                command.Parameters.AddWithValue("@Final", update.FinalCount);
+                command.Parameters.AddWithValue("@Id", update.InstanceId);
+                command.Parameters.AddWithValue("@Expected", update.ExpectedCount);
+                if (command.ExecuteNonQuery() != 1)
+                    throw new InvalidOperationException("Inventory stack changed before the operation could commit.");
+            }
+        }
+
+        internal void AssertContainersEmpty(IReadOnlyList<int> containerInstances,
+            MySqlConnection connection, MySqlTransaction transaction)
+        {
+            foreach (int instanceId in containerInstances)
+            {
+                if (instanceId <= 0) throw new InvalidOperationException("Invalid container retirement identity.");
+                // Lock the exact child range in the existing container-location index. A
+                // stale/unhydrated in-memory bag cannot authorize orphaning durable children.
+                using var command = new MySqlCommand(
+                    "SELECT InstanceId FROM item_instances WHERE ContainerType = @Type "
+                    + "AND ContainerInstance = @Instance LIMIT 1 FOR UPDATE", connection, transaction);
+                command.Parameters.AddWithValue("@Type", (int)IdentityType.Container);
+                command.Parameters.AddWithValue("@Instance", instanceId);
+                if (command.ExecuteScalar() != null)
+                    throw new InvalidOperationException("Cannot retire a nonempty item container.");
+            }
+        }
+
         private static void ExecuteInsert(
             ItemInstanceRecord item,
             MySqlConnection connection,

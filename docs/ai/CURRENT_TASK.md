@@ -2,189 +2,74 @@
 
 ## Active
 
-Integrate `ZoneEngine_New` as the governed Windows/Linux default on
-`codex/zoneengine-new-full-integration`, based on integration commit
-`307e87670f9d26b50b1ed26e019684726600c52c`. Runtime startup is schema-read-only;
-the separate operator migration tool owns explicit, acknowledged schema changes.
-Legacy is an explicit rollback selection in this candidate branch.
+Reconcile missions, teams, nano casting, supported inventory actions and accepted
+NPC/combat mappings on `codex/zoneengine-new-gameplay-reconciliation`, beginning
+at validated checkpoint `6dab287bd52590d7b9c0e7054bef95160a1594ba`.
+Use the existing isolated integration worktree; preserve the primary master
+worktree and the prior integration branch. Starting origin/master and merge base:
+`6e90dda030774726aa2060acb9edb756ea1f635c`.
 
-The clean-checkout playfield package is pinned and validated; see
-`docs/project/PLAYFIELD_PACKAGE_SUPPLY.md`. Master promotion remains blocked until
-external gameplay contract gaps are resolved and the complete Windows then
-same-SHA Linux acceptance gates pass. Missing content must not be replaced with
-empty fixtures or made optional to obtain acceptance. No production deployment,
-production schema mutation, public-network change, or live client use is authorized.
-See `docs/evidence/ZONEENGINE_NEW_FULL_INTEGRATION_20260908.md` and
-`docs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md` for evidence and remaining gates.
+Preserve the proven schema/startup/persistence/packaging boundaries. Classify
+actual legacy/New/test/evidence discrepancies before implementing only supported
+contracts. No guessed behavior, fallback identities, unapproved schema changes,
+or runtime capture dependency. Each domain needs deterministic tests and explicit remaining
+gaps. Master may switch only when genuine supported-runtime regressions are
+resolved and Windows then same-SHA Linux acceptance passes.
 
-## Prior active checkpoint
+No production database/migration/deployment/service/network change or live client
+use is authorized. The existing integration and transition evidence remains at
+`docs/evidence/ZONEENGINE_NEW_FULL_INTEGRATION_20260908.md` and
+`docs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md`.
 
-Crash-reconnect zombie-session fix is production accepted. Windows-authoritative
-source commit `fe6617b3bcd1d3806eddd4dbbb91e9c6680ef499` deployed to Linux
-ZoneEngine release `reconnect-fe6617b3` and passed live official-client
-acceptance: first fast reconnect under 30 seconds was immediately playable,
-old timer deadline had no effect, reconnect after timeout passed, fast reconnect
-repeat was 3/3, no ZoneEngine restart occurred, and final `ONLINE_COUNT=0`.
-Later Windows `master` commit `5d0a84960df961e504f8761da46521d9968b8cd8`
-contains client-patch-only work and does not require a ZoneEngine redeploy.
-Evidence: `docs/evidence/CRASH_RECONNECT_LIVE_ACCEPTANCE_20260818.md`.
+### Approved additive mission schema scope
 
-Linux login/inventory follow-up after `login-hydration-b1c61405` is now source
-validated. DailyLogin no longer uses Windows XAMPP claim/reward paths
-unconditionally on Linux; claim roots resolve through
-`AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS`, then
-`AO_REBIRTH_ZONE_STATE_DIR/daily-login/claims`, with legacy XAMPP roots retained
-only for Windows runtime compatibility. Live read-only SQL for `Nanotechnica`
-proved visible startup inventory persists under `ContainerType=39` and normal
-inventory page `ContainerInstance=104`; the earlier
-`ContainerInstance=39` query was looking at the wrong column. Validation:
-focused DailyLogin contract PASS, Windows debug build PASS, AOtomation
-messaging PASS 1018/1018, Linux ZoneEngine publish/offline smoke PASS,
-production ZoneEngine release `dailylogin-path-360b3002` active with
-startup/database preflight PASS and port `7501` listening.
-Evidence: `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`.
+The current SQL mission contract stores authored mission lifecycle/objectives/
+rewards, but generated terminal offers and accepted ACG/destination bindings are
+still file-backed. SQL-only preservation of that accepted behavior requires an
+additive migration for frozen offers/batches, exact accepted quest/key/ACG/PF2
+bindings, and objective/expiry/completion checkpoints. Mike explicitly approved
+these additive mission schema/DAO changes with "yes make the changes" after the
+scope was stated. Test migration execution only against disposable databases;
+production remains separately prohibited. Preserve existing rows and explicit
+operator-only migration ownership; no JSON/opaque-flag parallel mission store.
 
-## Prior carried state
+Team packet/chat/raid and exact-session ownership lifecycle routes are wired.
+Inventory mutation, crystal upload, supported item actions and bag-retirement
+transactions are connected. Real packaged nano catalog decoding, active effect
+persistence, map/aura and supported vehicle morph paths are implemented.
 
-Public unified account/forum infrastructure remains frozen and accepted.
-Forum community-launch preparation has been applied on production: restrained
-AORebirth forum CSS, AORebirth header navigation, guest login/register links
-pointing back to AORebirth account routes, final board descriptions, seed
-threads, rules/support/bug-report guidance, official/archive read-only
-permissions for normal users, conservative PM/avatar/signature/attachment
-settings, backup coverage, and registered-user SSO/posting acceptance.
-Source-side email verification plumbing is prepared but not production-enabled:
-the Account Broker owns hashed one-time verification tokens, SMTP-backed send
-configuration, resend, and verify endpoints; the website has accurate resend
-and fragment-based verify pages. Evidence:
-`docs/project/EMAIL_DELIVERY_PRODUCTION_EVIDENCE_20260815.md`.
-Production email provider selection and fail-closed deployment are now recorded:
-self-hosted VPS mail is selected, the production token-table migration is
-applied after a backup, Account Broker release `email-foundation-20260816-002`
-is deployed and healthy without SMTP/account-mail app configuration, and the
-VPS Postfix/Dovecot/OpenDKIM stack is configured for `ao-rebirth.com`. Email
-now sends through the self-hosted VPS mail stack: Hostinger MX/SPF/DKIM/DMARC
-records resolve, Account Broker verification resend to an external mailbox
-passed, and MyBB SMTP notification to an external mailbox passed. Production
-email is accepted for launch: `SubaruMike` received the verification email,
-clicked the link, and production now shows the account email as verified.
-Evidence:
-`docs/project/EMAIL_PRODUCTION_CONFIGURATION_EVIDENCE_20260816.md`.
-Unified account character display is now integrated on production through the
-Account Broker. Release `account-characters-20260816-001` is deployed and
-healthy on `172.18.0.1:7510`; `/account` renders a read-only My Characters
-section from the authenticated unified `AOR_IDENTITY` session, and the broker
-queries the live Stage6 `characters` table with
-`characters.Username = CanonicalUsername`. `SubaruMike` route acceptance shows
-one live character, a controlled zero-character identity renders the empty
-state, unauthenticated `/account` redirects, posted username tampering is
-ignored, and `/member-index.php` remains blocked at the Apache boundary.
+Approved normalized mission tables/DAO own SQL offer identities, frozen offers,
+fees, acceptance/key/object state, objective observations and completion. The
+five selectable accepted ACG bundles now have concrete New NPC/world consumers,
+reconnect restoration, exact frozen exits, lifecycle cleanup and mission-only
+combat. Durable corpse currency, accepted raw corpse projection, progression
+and token reconciliation are in the current validation batch.
 
-Launch status is currently BLOCKED only on final live moderator acceptance,
-authorized Admin CP acceptance, and production-grade email transport/DNS
-(`SPF`/`DKIM`/`DMARC` plus authenticated SMTP) if email notifications are
-required for launch. Evidence:
-`docs/project/MYBB_FORUM_LAUNCH_READINESS_20260815.md`.
+Authored Stan/package and DOJA transaction services are present and their focused
+tests pass, but trusted New NPC dialogue/trade activation remains missing. Generic
+native NPC activation still lacks the accepted profile bridge; the implemented
+mission NPC adapter is not general NPC/combat parity. Remaining supported nano
+specialties are recorded explicitly in the nano matrix.
 
-## Current checkpoint
+The final focused checkpoint passed 308/308 tests and startup validation.
+This includes real-catalog eligibility, exact corpse wire/visibility, frozen token
+progress, authored/DOJA transactions, and prospective equipment/nano contribution
+planning for level-up refills. The fresh approved disposable run passed schema,
+migration/rerun, mission/corpse/token/authored/inventory/nano rollback and restart
+cases, runtime start/stop/restart and cleanup with no owned Docker residue or
+production contact. DAO architecture guard PASS with no new violations. The final
+completed-DOJA journal guard passes its regression; the full Windows Debug build
+also passes. Source-level mandatory integration passes all 12 stages. Only final
+EOF normalization and accepted provenance refresh follow that source-level gate;
+post-commit exact-SHA acceptance covers the final committed bytes separately.
 
-- Unified password management is production-accepted. Account Broker release
-  `password-management-8fd1300f` and website revision `c79468e6` provide
-  `/forgot-password`, `/reset-password`, and `/account/password`; the additive
-  token migration, real email delivery, website session invalidation, token
-  lifecycle, MyBB regression, and final LoginEngine credential path all pass.
-  Evidence: `docs/project/PASSWORD_MANAGEMENT_PRODUCTION_EVIDENCE_20260831.md`.
-- Password authentication is restored and proven in Debug and Release.
-- The proposed identity schema now validates against the local Windows
-  development MySQL target.
-- The first internal Account Broker foundation is implemented and validated.
-- The loopback Account Broker HTTP service now exposes local registration,
-  login, current-session, logout, and health endpoints.
-- Windows-local unified account flow validation passes in Debug and Release.
-- Production Account Broker release `mybb-sso-20260815-001` is deployed and
-  healthy on `172.18.0.1:7510`.
-- Production Account Broker release `email-foundation-20260816-002` is deployed
-  and healthy on `172.18.0.1:7510`; SMTP/account-mail secrets are intentionally
-  absent, so mail remains fail-closed.
-- Public `/register`, `/login`, `/account`, and `/logout` are enabled on
-  `ao-rebirth.com`.
-- Public `/account` now includes read-only My Characters display backed by the
-  Account Broker and live Stage6 character data. No character schema, character
-  rows, LoginEngine behavior, or game authentication was changed.
-- Public registration created a controlled production account through the
-  broker only; database proof shows one identity row, one linked `login` row,
-  one linked game mapping, and normal non-GM account flags.
-- Website wrong-password, correct-password, account, logout, duplicate,
-  validation, rate-limit, and broker-unavailable failure paths passed.
-- Production LoginEngine protocol acceptance passed for the controlled
-  website-created account: correct password reached `CHARACTER_LIST`, wrong
-  password reached `LOGIN_ERROR`.
-- Exposed MySQL root and `aorebirth_stage6` credentials were rotated, old values
-  were rejected, and ChatEngine/LoginEngine/ZoneEngine/AccountBroker remained
-  healthy after deployment.
-- LoginEngine and ZoneEngine Linux database preflights now allow only the six
-  governed Account Broker extension tables in addition to the 34 governed game
-  tables.
-- Legacy PHP account routes remain blocked.
-- MyBB 1.8.40 is installed under `/opt/ao-rebirth/forum`, native MyBB
-  registration is disabled, the AORebirth Identity Bridge plugin is active, and
-  controlled SSO E2E passed with Account Broker external mapping.
-- Final cutover-safe production work completed while public DNS remains
-  blocked:
-  - website Forum SSO handoff now posts the one-time code instead of placing it
-    in the callback URL query string;
-  - approved 40-row traditional forum board structure is live;
-  - MyBB cookie domain was narrowed by clearing `cookiedomain`;
-  - controlled acceptance accounts were disabled and game login hashes rotated
-    after zero-character/zero-post proof;
-  - MyBB credential isolation, sensitive path checks, forum-container failure
-    isolation, runtime log scan, and cutover backup passed.
-- Final public production forum acceptance passed:
-  - Hostinger DNS `forum.ao-rebirth.com A 2.24.96.30` TTL `300`;
-  - Let's Encrypt production certificate issued for `forum.ao-rebirth.com`;
-  - public HTTP redirects to HTTPS and public forum homepage returns `200`;
-  - public SSO creates exactly one MyBB UID and one external mapping;
-  - second SSO reuses the same UID/mapping;
-  - replay, expired, malformed, and unknown codes are rejected;
-  - SSO codes do not appear in request URLs or current URL logs;
-  - cookies are Secure/SameSite and session cookies are HttpOnly;
-  - final controlled test accounts were disabled and their game passwords
-    rotated;
-  - final backup exists at
-    `/opt/ao-rebirth/database/backups/mybb-public-acceptance-20260815T094721Z`.
+Domain records: `docs/evidence/ZONEENGINE_NEW_TEAMS_RECONCILIATION.md`,
+`docs/evidence/ZONEENGINE_NEW_INVENTORY_RECONCILIATION.md`, and
+`docs/evidence/ZONEENGINE_NEW_NPC_COMBAT_RECONCILIATION.md`,
+`docs/evidence/ZONEENGINE_NEW_MISSIONS_RECONCILIATION.md`, and
+`docs/evidence/ZONEENGINE_NEW_NANOS_RECONCILIATION.md`.
+Post-commit Windows/Linux attestation is recorded in the acceptance artifacts for
+the actual committed SHA. This checkpoint does not claim master-switch readiness.
 
-## Remaining gates
-
-- No remaining MyBB/forum infrastructure architecture gate is open.
-- Email provider selection is complete with self-hosted VPS mail, and the
-  production broker/schema/mail-server/app configuration is in place. Broker
-  verification email and MyBB notification email were accepted by an external
-  mailbox provider. `SubaruMike` verification-link acceptance passed and the
-  production account email is verified. Production email is accepted for launch.
-- Forum presentation/content launch prep is applied, but community launch is
-  blocked until:
-  - live moderator sticky/close-open/move/report acceptance passes with a
-    controlled moderator account;
-  - Admin CP user/group/board/plugin/theme management acceptance passes with
-    authorized admin credentials and without exposing secrets;
-  - forum email is either intentionally launched without notifications or
-    reliable SMTP plus SPF/DKIM/DMARC is configured and proven.
-- Repository baseline freeze is in progress under explicit approval. Runtime
-  baseline commits are:
-  - AORebirth:
-    `76258f8fc55a8220d63ef11f9aa039139e2870f6`;
-  - website:
-    `1ecd84fc44457a0ced44b5f0399ead0eeb654ae3`.
-- After the baseline commits are pushed, future account/forum work should stay
-  limited to presentation, content, moderation, email/notification
-  configuration, and launch preparation unless a proven production defect is
-  found.
-
-## Constraints
-
-- Do not redesign the AO login protocol.
-- Do not replace the existing password-hash format.
-- Do not change character ownership in this stage.
-- Do not perform destructive database operations.
-- Do not enable legacy website registration/login pages.
-- Do not launch the AO client without explicit current authorization.
+Historical completed work remains in its existing evidence records and Git history;
+this file tracks only the active ZoneEngine_New reconciliation.

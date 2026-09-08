@@ -56,7 +56,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
             }
 
-            string subwayCombat = File.ReadAllText(
+            string subwayCombat = LegacyGameplaySource.ReadAllText(
                 Path.Combine(
                     FindRepositoryRoot(),
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));

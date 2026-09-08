@@ -7,11 +7,14 @@ namespace ZoneEngine_New
     using System.Runtime.InteropServices;
 
     using AORebirth.Database.Schema;
+    using AORebirth.Database.Domain.Missions;
+    using AORebirth.Interfaces.Persistence.Missions;
     using AORebirth.Core.Playfields.OfficialPlacements;
 
     using Microsoft.Extensions.DependencyInjection;
 
     using NLog;
+    using MySqlConnector;
 
     using Utility;
 
@@ -25,10 +28,14 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.MessageHandlers;
     using ZoneEngine_New.Core.Metrics;
+    using ZoneEngine_New.Core.Missions;
+    using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.Teams;
 
     using ConfigReadWrite = Utility.Config.ConfigReadWrite;
 
@@ -177,6 +184,29 @@ namespace ZoneEngine_New
             // Explicit Lazy so TeleportCommand can break the PlayfieldManager <-> command handler cycle.
             services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
             services.AddSingleton<InventoryFlushService>();
+            services.AddSingleton<IInventoryMutationPersistence, MySqlInventoryMutationPersistence>();
+            services.AddSingleton<InventoryActionService>();
+            services.AddSingleton(_ => new MySqlMissionDao(() =>
+            {
+                var connection = new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString());
+                try { connection.Open(); return connection; }
+                catch { connection.Dispose(); throw; }
+            }));
+            services.AddSingleton<IMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
+            services.AddSingleton<IGeneratedMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
+            services.AddSingleton<GeneratedMissionService>();
+            services.AddSingleton(provider => new Lazy<GeneratedMissionAcgService>(provider.GetRequiredService<GeneratedMissionAcgService>));
+            services.AddSingleton<IGeneratedMissionNpcFactory, GeneratedMissionNpcFactory>();
+            services.AddSingleton<GeneratedMissionAcgService>();
+            services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
+            services.AddSingleton<AuthoredQuestService>();
+            services.AddSingleton<INanoCatalog>(provider => NanoCatalog.Load(
+                Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "nanos.dat")));
+            services.AddSingleton<IActiveNanoRepository, MySqlActiveNanoRepository>();
+            services.AddSingleton<INanoSpecialization, AmbientRestorationNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, OverviewMapNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
+            services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();
@@ -184,6 +214,9 @@ namespace ZoneEngine_New
 
             //Chat
             services.AddSingleton<IChatEngineLink, IsComChatEngineLink>();
+            services.AddSingleton(provider => new TeamService(
+                provider.GetRequiredService<IChatEngineLink>(), dispatchOnOwner: (player, action) =>
+                    player.Playfield?.DispatchPlayerProjection(player, action)));
             services.AddSingleton<VicinityChatRelay>();
 
             //Commands
@@ -207,6 +240,11 @@ namespace ZoneEngine_New
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);
             AddMessageHandler<TradeMessageHandler>(services);
+            AddMessageHandler<RaidCmdMessageHandler>(services);
+            AddMessageHandler<TeamChatMessageHandler>(services);
+            AddMessageHandler<QuestAlternativeMessageHandler>(services);
+            AddMessageHandler<CreateQuestMessageHandler>(services);
+            AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();
@@ -247,6 +285,7 @@ namespace ZoneEngine_New
             networkHost = null;
             Cleanup(() => playfieldManager?.Dispose());
             playfieldManager = null;
+            Cleanup(() => rootServices?.GetRequiredService<TeamService>().Shutdown());
             Cleanup(() => chatEngineLink?.Dispose());
             chatEngineLink = null;
             Cleanup(() => rootServices?.DisposeAsync().AsTask().GetAwaiter().GetResult());

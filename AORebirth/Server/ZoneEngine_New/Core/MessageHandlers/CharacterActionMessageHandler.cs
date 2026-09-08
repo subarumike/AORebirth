@@ -10,6 +10,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using Utility;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Teams;
+    using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
@@ -20,6 +24,20 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
     public sealed class CharacterActionMessageHandler : IMessageHandler<CharacterActionMessage>
     {
+        private readonly InventoryActionService _inventoryActions;
+        private readonly TeamService _teams;
+        private readonly NanoService _nanos;
+        private readonly GeneratedMissionAcgService _missions;
+
+        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams, NanoService nanos,
+            GeneratedMissionAcgService missions)
+        {
+            _inventoryActions = inventoryActions;
+            _teams = teams;
+            _nanos = nanos;
+            _missions = missions;
+        }
+
         public Type MessageBodyType => typeof(CharacterActionMessage);
 
         public void Handle(MessageBody body, IZoneSession session)
@@ -36,7 +54,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
 
             Player? player = session.Player;
-            if (player == null)
+            if (player == null || !ReferenceEquals(player.Session, session) || player.IsPersistenceQuarantined)
                 return;
 
             LogUtil.Debug(
@@ -51,8 +69,24 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     message.Parameter2,
                     player.Identity.Instance));
 
+            if (_teams.TryHandle(player, message))
+                return;
+
             switch (message.Action)
             {
+                case CharacterActionType.CastNano:
+                    _nanos.TryCast(player, message.Parameter2, message.Target);
+                    break;
+
+                case CharacterActionType.RemoveFriendlyNano:
+                    _nanos.TryRemove(player, message);
+                    break;
+
+                case CharacterActionType.DeleteItem:
+                case CharacterActionType.Split:
+                    _inventoryActions.Handle(player, message);
+                    break;
+
                 case CharacterActionType.StandUp:
                     // Sit posture arrives via CharDCMove (MoveType SwitchToSit), not CharacterAction.
                     ApplyStand(player);
@@ -82,6 +116,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         break;
 
                     session.Send(target.BuildInfoPacket());
+                    _missions.TryInfoRequest(player, target.Identity);
                     break;
                 }
 

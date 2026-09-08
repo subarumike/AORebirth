@@ -109,7 +109,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// Runs every <see cref="EventType.OnUse"/> function on this template.
-        /// Unimplemented functions are skipped and do not fail the use.
+        /// Reject unsupported functions before applying any part of a compound use.
         /// </summary>
         public bool ExecuteOnUseSpells(
             Player player,
@@ -124,7 +124,9 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             foreach (ItemSpell spell in spells)
-                ExecuteSpell(player, spell, inventoryRepository, items);
+                if (!ItemUseFunctions.CanExecute(player, spell)) return false;
+            foreach (ItemSpell spell in spells)
+                if (!ExecuteSpell(player, spell, inventoryRepository, items)) return false;
 
             return true;
         }
@@ -148,7 +150,10 @@ namespace ZoneEngine_New.Core.Inventory
                 Operator.LessThan => statValue < required,
                 Operator.BitAnd => (statValue & required) != 0,
                 Operator.NotBitAnd => (statValue & required) == 0,
-                _ => true
+                Operator.Unequal => statValue != required,
+                Operator.True => true,
+                Operator.False => false,
+                _ => false
             };
         }
     }

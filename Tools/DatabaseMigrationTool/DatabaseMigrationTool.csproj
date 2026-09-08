@@ -10,5 +10,7 @@
     <ProjectReference Include="../../AORebirth/Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj" />
     <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/202609*_item_*.sql" Link="Migrations/%(Filename)%(Extension)" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/202609*_item_*.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql" Link="Migrations/%(Filename)%(Extension)" />
+    <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

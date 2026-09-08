@@ -93,7 +93,7 @@ public static class MigrationCommand
         SchemaCheckResult status = DatabaseSchemaReadiness.Evaluate(snapshot);
         if (status.IsCurrent) return;
         if (status.State != SchemaState.SCHEMA_MIGRATION_REQUIRED) throw new MigrationRefusedException(status.Message);
-        var baseline = SchemaContract.Columns.Where(c => c.Table is not "item_instances" and not "item_instance_id_sequence" and not "schema_migrations");
+        var baseline = SchemaContract.Columns.Where(c => !SchemaContract.MigrationOwnedTables.Contains(c.Table, StringComparer.Ordinal));
         if (baseline.Any(required => !snapshot.Columns.Any(actual => Equal(actual.Table, required.Table) && Equal(actual.Column, required.Column))))
             throw new MigrationRefusedException("Governed baseline tables/columns are absent. Provision or restore the baseline separately; this tool never bootstraps unrelated SQL tables.");
         if (!snapshot.Indexes.Any(index => Equal(index.Table, "stats") && index.Unique && Equal(index.Columns, "Type,Instance,StatId")))

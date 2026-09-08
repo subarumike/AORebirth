@@ -9,6 +9,14 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- The approved gameplay reconciliation branch now has normalized generated
+  mission persistence and five-bundle runtime connections, transactional supported
+  inventory/authored rewards, team lifecycle and accepted nano paths. The coherent
+  final focused checkpoint passes 308 tests and startup validation. Remaining trusted
+  authored/NPC activation, nano specialties and occupied-state migration still
+  prevent a full-parity/master-switch claim. Fresh disposable and full exact-SHA
+  acceptance are tracked in `docs/evidence/ZONEENGINE_NEW_GAMEPLAY_CHECKPOINT_20260908.md`.
+  No production change or client launch occurred.
 - The full-integration candidate builds on Delmus reconciliation
   `307e87670f9d26b50b1ed26e019684726600c52c`. Its normal Windows/Linux wrappers
   select `ZoneEngine_New`; Legacy requires explicit rollback selection.

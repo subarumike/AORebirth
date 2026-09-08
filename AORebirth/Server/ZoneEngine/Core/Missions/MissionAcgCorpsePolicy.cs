@@ -23,31 +23,7 @@ namespace ZoneEngine.Core.Missions
             int allocatedLivePlayfield2,
             out int credits)
         {
-            credits = 0;
-            int salt;
-            int encodedPlayfield2;
-            int ordinal;
-            if (runtimeNpcInstance <= 0
-                || !MissionAcgAllocationService.IsAllocatableRange(
-                    allocatedLivePlayfield2)
-                || !MissionAcgRuntimeMaterializer.TryReverseRuntimeInstance(
-                    runtimeNpcInstance,
-                    out encodedPlayfield2,
-                    out ordinal)
-                || encodedPlayfield2 != allocatedLivePlayfield2
-                || ordinal <= 0
-                || !TryResolveLegacySignedSalt(
-                    runtimeNpcInstance,
-                    allocatedLivePlayfield2,
-                    131u,
-                    out salt))
-            {
-                return false;
-            }
-
-            credits = MinimumCapturedCorpseCredits
-                      + (int)(Magnitude(salt) % CapturedCorpseCreditValueCount);
-            return true;
+            return MissionAcgCorpseCreditPolicy.TryResolve(runtimeNpcInstance, allocatedLivePlayfield2, out credits);
         }
 
         internal static bool IsCapturedCorpseCreditAmount(int credits)
@@ -62,19 +38,7 @@ namespace ZoneEngine.Core.Missions
             uint multiplier,
             out int salt)
         {
-            salt = 0;
-            if (left <= 0 || right < 0 || multiplier == 0)
-            {
-                return false;
-            }
-
-            // Preserve the established low-32-bit identity mix without ever
-            // performing signed overflow. The historical int.MinValue result is
-            // rejected because taking its signed absolute value was the crash.
-            ulong product = (ulong)(uint)left * multiplier;
-            uint lowBits = (uint)(product & uint.MaxValue);
-            salt = unchecked((int)(lowBits ^ (uint)right));
-            return salt != int.MinValue;
+            return MissionAcgCorpseCreditPolicy.TryResolveSignedSalt(left, right, multiplier, out salt);
         }
 
         internal static int StableBucket(int salt, int bucketCount)

@@ -20,6 +20,88 @@ from Tools import generated_artifact_transaction as transaction
 
 
 class GeneratedCombatPipelineTests(unittest.TestCase):
+    def test_item_projector_stages_identical_verified_bytes_and_short_output(self):
+        with tempfile.TemporaryDirectory(prefix="projector-snapshot-") as temporary:
+            root = Path(temporary)
+            frozen = root / "frozen"; frozen.mkdir()
+            analyzer = root / "analyzer.exe"; analyzer.write_bytes(b"fixture")
+            item = frozen / ("nested-" * 20) / ("snapshot-" * 10) / "items.dat"
+            item.parent.mkdir(parents=True); item.write_bytes(b"exact immutable items")
+            observed = []
+
+            def project(command, **kwargs):
+                staged = Path(command[2]); output = Path(command[6])
+                self.assertEqual(staged.read_bytes(), item.read_bytes())
+                self.assertEqual(command[3], pipeline.sha256_file(item))
+                self.assertEqual(command[4], str(item.stat().st_size))
+                self.assertEqual(staged.parent, output.parent)
+                self.assertLess(len(str(staged)), len(str(item)))
+                output.write_text('{"templates":{"1":{}}}', encoding="utf-8")
+                observed.append(staged)
+                return subprocess.CompletedProcess(command, 0, "", "")
+
+            with mock.patch.object(pipeline, "_stage_short_scfu_analyzer", return_value=analyzer), mock.patch.object(pipeline, "run_checked", side_effect=project):
+                payload, output = pipeline._build_item_template_projection(
+                    repo_root=root, frozen_repo_root=frozen, analyzer=analyzer, template_ids=[1],
+                    projection_name="fixture", item_database_path=item,
+                    item_database_sha256=pipeline.sha256_file(item), item_database_byte_length=item.stat().st_size,
+                    lease=object(),
+                )
+                self.assertEqual(json.loads(payload), {"templates": {"1": {}}})
+                self.assertEqual(output.read_bytes(), payload)
+                self.assertFalse(observed[0].exists())
+                with self.assertRaises(pipeline.PipelineError):
+                    pipeline._build_item_template_projection(
+                        repo_root=root, frozen_repo_root=frozen, analyzer=analyzer, template_ids=[1],
+                        projection_name="bad-descriptor", item_database_path=item,
+                        item_database_sha256="0" * 64, item_database_byte_length=item.stat().st_size,
+                        lease=object(),
+                    )
+                self.assertEqual(len(observed), 1)
+
+    def test_linked_worktree_candidate_requires_same_live_writer_staging(self):
+        lease_module = pipeline._load_transaction_module()
+        with tempfile.TemporaryDirectory(prefix="combat-candidate-scope-") as temporary:
+            base = Path(temporary).resolve()
+            root, other, control = base / "checkout", base / "other", base / "git-control"
+            root.mkdir(); other.mkdir()
+            with mock.patch.object(lease_module, "_control_root", return_value=control):
+                with lease_module.GeneratedArtifactLease(root, pipeline.PIPELINE_NAME, mode="write") as lease:
+                    candidate = lease.new_staging_directory("candidate")
+                    pipeline._require_candidate_root(root, candidate.resolve(), lease)
+                    with self.assertRaises(pipeline.PipelineError):
+                        pipeline._require_candidate_root(other, candidate.resolve(), lease)
+                    with self.assertRaises(pipeline.PipelineError):
+                        pipeline._require_candidate_root(root, other, lease)
+                    with self.assertRaises(pipeline.PipelineError):
+                        pipeline._require_candidate_root(root, lease.staging_root.resolve(), lease)
+                    foreign_candidate = other / "candidate"
+                    foreign_candidate.mkdir()
+                    with mock.patch.object(lease, "staging_root", other):
+                        with self.assertRaises(pipeline.PipelineError):
+                            pipeline._require_candidate_root(root, foreign_candidate, lease)
+                    # Model both POSIX symlink and Windows junction lstat results
+                    # without requiring elevation or host symlink privileges.
+                    real_lstat = os.lstat
+                    for escaped_anchor in (control, lease.staging_root.parent, lease.staging_root):
+                        for link_status in (
+                            type("SymlinkStatus", (), {"st_mode": 0o120777})(),
+                            type("JunctionStatus", (), {"st_mode": 0o040777, "st_file_attributes": 0x400})(),
+                        ):
+                            def escaped_lstat(path, *args, **kwargs):
+                                if Path(path) == escaped_anchor:
+                                    return link_status
+                                return real_lstat(path, *args, **kwargs)
+
+                            with self.subTest(anchor=escaped_anchor, status=type(link_status).__name__):
+                                with mock.patch.object(lease_module.os, "lstat", side_effect=escaped_lstat):
+                                    with self.assertRaises(pipeline.PipelineError):
+                                        pipeline._require_candidate_root(root, candidate, lease)
+                with lease_module.GeneratedArtifactLease(root, pipeline.PIPELINE_NAME, mode="read") as lease:
+                    candidate = lease.new_staging_directory("candidate")
+                    with self.assertRaises(pipeline.PipelineError):
+                        pipeline._require_candidate_root(root, candidate.resolve(), lease)
+
     @staticmethod
     def _load_module_from_path(name: str, path: Path):
         specification = importlib.util.spec_from_file_location(name, path)

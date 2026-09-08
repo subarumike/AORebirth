@@ -96,6 +96,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(position);
 
             MobTemplate template = _gameData.RequireMobTemplate(hash);
+            NpcTemplateLevelPolicy.RequireExactLevel(template, level);
             Identity identity = _registry.AllocateNpcIdentity();
             NpcCharacter npc = new NpcCharacter(identity, _items)
             {
@@ -109,9 +110,6 @@ namespace ZoneEngine_New.Core.Playfield
 
             foreach (var entry in template.Stats)
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
-
-            if (level.HasValue)
-                npc.Stats.Set(CharacterStat.Level, level.Value);
 
             npc.Rebase();
             TryAttachShop(npc, template);
@@ -361,11 +359,16 @@ namespace ZoneEngine_New.Core.Playfield
                 registered = true;
                 _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
                 player.EnterOnline(session);
+                player.NanoRuntime = _playfieldManager.Nanos;
+                if (!_playfieldManager.Nanos.AttachPlayer(player))
+                    throw new InvalidOperationException("Active nano hydration failed; durable state was not replaced.");
                 player.AttachOnlineOwnership(ownership);
                 ownership = null;
             }
             catch
             {
+                _playfieldManager.Nanos.DetachPlayer(player);
+                player.NanoRuntime = null;
                 if (registered)
                 {
                     _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
@@ -430,6 +433,7 @@ namespace ZoneEngine_New.Core.Playfield
             session.State = SessionState.SpawnReady;
             // InitiateCompression + ChatServerInfo + PlayfieldAnarchyF + GameTime are sent from ZoneLoginHandler.
 
+            _playfieldManager.Teams.AttachPlayer(player);
             SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
             ScfuSendLog.Write(spawn);
             session.Send(spawn);
@@ -437,6 +441,13 @@ namespace ZoneEngine_New.Core.Playfield
                 session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
             session.State = SessionState.InPlay;
+
+            _playfieldManager.Teams.AttachPlayer(player);
+            _playfieldManager.Teams.RefreshPlayer(player);
+
+            _playfieldManager.Nanos.RefreshPlayer(player);
+            _playfieldManager.Missions.ReplayJournal(player);
+            _playfieldManager.AuthoredQuests.Restore(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
 
@@ -500,6 +511,13 @@ namespace ZoneEngine_New.Core.Playfield
                 session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
             session.State = SessionState.InPlay;
+
+            _playfieldManager.Teams.AttachPlayer(player);
+            _playfieldManager.Teams.RefreshPlayer(player);
+
+            _playfieldManager.Nanos.RefreshPlayer(player);
+            _playfieldManager.Missions.ReplayJournal(player);
+            _playfieldManager.AuthoredQuests.Restore(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
 
@@ -628,6 +646,9 @@ namespace ZoneEngine_New.Core.Playfield
         private void DespawnPlayer(Player player)
         {
             int characterId = player.Identity.Instance;
+            _playfieldManager.Teams.DetachPlayer(player);
+            _playfieldManager.Nanos.DetachPlayer(player);
+            player.NanoRuntime = null;
 
             if (!player.IsPersistenceQuarantined)
             {
