@@ -24,6 +24,8 @@ for ($i = 0; $i -lt $mapping.InterfaceMethods.Length; $i++) {
     }
 }
 if (!$initVerified) { throw 'Installed runtime Init contract was not verified.' }
-if ($plugin.GetName().Version.ToString() -ne '1.2.1.0') { throw 'Expected the Mike2022 port version 1.2.1.0.' }
+if ($plugin.GetName().Version.ToString() -ne '1.2.2.0') { throw 'Expected the Mike2022 port version 1.2.2.0.' }
+$nativeHash = $entries[0].GetField('SupportedGamecode', [Reflection.BindingFlags]'NonPublic,Static').GetRawConstantValue()
+if ($nativeHash -ne '0948301922D0DF738879C2C375962A0A5B0248C48D430C296B46480B97930BBE') { throw 'Wrong native build guard.' }
 Write-Host "PLUGIN_TYPE_LOAD=PASS entry=$($entries[0].FullName)"
 Write-Host 'Metadata/type load only: no instance created, Run not called, no client or native invocation.'
