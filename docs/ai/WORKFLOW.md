@@ -627,6 +627,19 @@ set MIKE_AOSHARP_RUNTIME=<exact legacy AOSharp runtime directory>
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Mike2022.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
 ```
 
+For Mike2022 spawn-stat health changes, keep the same `MIKE_AOSHARP_RUNTIME`
+setting and run the offline CSV export regression:
+
+```cmd
+cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\Tests\Mike2022HealthExportTests.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
+cmd /d /c tools-temp\AOSharpLiveCapture\Tests\bin\Release\Mike2022HealthExportTests.exe
+cmd /d /c python tools-temp\AOSharpLiveCapture\validate_mike2022_projection_guards.py
+```
+
+The test invokes the compiled CSV writer without starting the plugin or client.
+Stat 1 (`Life`) is the full health pool; stat 27 (`Health`) is the pool minus
+health damage, clamped to zero.
+
 Load `AOSharpLiveCapture.Mike2022.dll` in the same assembly selection as the
 other plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
 plugin registers `/aocap start|stop|status|flush|mark|snapshot` plus

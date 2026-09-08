@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Mike2022HealthExportTests</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="AOSharp.Common">
+      <HintPath>$(MIKE_AOSHARP_RUNTIME)\AOSharp.Common.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="AOSharp.Core">
+      <HintPath>$(MIKE_AOSHARP_RUNTIME)\AOSharp.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <ProjectReference Include="..\AOSharpLiveCapture.Mike2022.csproj">
+      <Project>{D2419B94-170D-461E-B726-C8CC74A81103}</Project>
+      <Name>AOSharpLiveCapture.Mike2022</Name>
+    </ProjectReference>
+    <Compile Include="Mike2022HealthExportTests.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
