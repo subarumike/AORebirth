@@ -49,8 +49,12 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Credits the machine charges per unit of item value when selling to a player.</summary>
         public int SellModifier => Stats.GetOrZero(CharacterStat.SellModifier);
 
-        /// <summary>The identity the client addresses this shop by: the NPC when one owns it.</summary>
-        public Identity ShopIdentity => OwnerNpc != null ? OwnerNpc.Identity : Identity;
+        /// <summary>
+        /// The client binds a shop pane to the machine dynel it was told about in
+        /// <see cref="VendingMachineFullUpdateMessage"/>, so shop and trade frames are always keyed to
+        /// this machine even when an NPC owns it. The NPC is only the Use entry point.
+        /// </summary>
+        public Identity ShopIdentity => Identity;
 
         /// <summary>
         /// An NPC-owned machine is opened through the NPC, never by targeting the machine directly.
