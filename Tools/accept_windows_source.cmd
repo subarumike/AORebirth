@@ -83,7 +83,7 @@ if "%RUN_BUILD%"=="1" (
 )
 echo BUILD=%BUILD_RESULT%
 
-set "PLACEMENT_OUTPUT=AORebirth\Built\Debug\Content\Official\PlayfieldPlacements"
+set "PLACEMENT_OUTPUT=AORebirth\Built\Debug\ZoneEngine_New\Content\Official\PlayfieldPlacements"
 set "PLACEMENT_MANIFEST=%PLACEMENT_OUTPUT%\official-placement-build-manifest.json"
 set "PLACEMENT_PROVENANCE=%PLACEMENT_OUTPUT%\PLACEMENT_PROVENANCE.env"
 if not exist "%PLACEMENT_MANIFEST%" goto :placement_failed
@@ -120,6 +120,15 @@ echo PLACEMENT_CORPUS=PASS
 echo PLACEMENT_BUILD_MANIFEST_SHA256=%PLACEMENT_BUILD_MANIFEST_SHA256%
 
 set "TEST_RESULT=NOT_RUN"
+if "%RUN_MANDATORY_GATE%"=="0" (
+    call tools\run_zoneengine_new_tests.cmd
+    if errorlevel 1 (
+        echo ZONEENGINE_NEW_ACCEPTANCE=FAIL
+        echo WINDOWS_ACCEPTANCE=FAIL
+        popd
+        exit /b 30
+    )
+)
 if "%RUN_MANDATORY_GATE%"=="1" (
     call tools\run_mandatory_integration_gate.cmd
     if errorlevel 1 (
@@ -131,6 +140,8 @@ if "%RUN_MANDATORY_GATE%"=="1" (
     set "TEST_RESULT=PASS"
 )
 echo TESTS=%TEST_RESULT%
+echo DEFAULT_ZONEENGINE=ZoneEngine_New
+echo ZONEENGINE_NEW_ACCEPTANCE=PASS
 
 if not exist build-verify mkdir build-verify
 set "SHORT_SHA=%ACTUAL_SHA:~0,8%"
@@ -145,6 +156,8 @@ set "EVIDENCE=build-verify\windows-acceptance-%SHORT_SHA%.env"
 >> "%EVIDENCE%" echo PLACEMENT_CORPUS=PASS
 >> "%EVIDENCE%" echo PLACEMENT_BUILD_MANIFEST_SHA256=%PLACEMENT_BUILD_MANIFEST_SHA256%
 >> "%EVIDENCE%" echo TESTS=%TEST_RESULT%
+>> "%EVIDENCE%" echo DEFAULT_ZONEENGINE=ZoneEngine_New
+>> "%EVIDENCE%" echo ZONEENGINE_NEW_ACCEPTANCE=PASS
 >> "%EVIDENCE%" echo BUILD_PLATFORM=windows
 >> "%EVIDENCE%" echo CONFIGURATION=Debug
 >> "%EVIDENCE%" echo BUILD_TIMESTAMP_LOCAL=%DATE% %TIME%

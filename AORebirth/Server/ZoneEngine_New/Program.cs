@@ -4,6 +4,10 @@ namespace ZoneEngine_New
     using System.IO;
     using System.Text;
     using System.Threading;
+    using System.Runtime.InteropServices;
+
+    using AORebirth.Database.Schema;
+    using AORebirth.Core.Playfields.OfficialPlacements;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -36,43 +40,54 @@ namespace ZoneEngine_New
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
         private static int shutdownStarted;
+        private static bool shutdownFailed;
 
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             // AODB playfield RDB parsers read strings with Windows-1252.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
+            using PosixSignalRegistration? termination = OperatingSystem.IsWindows() ? null :
+                PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+                {
+                    context.Cancel = true;
+                    exited = true;
+                });
             Console.CancelKeyPress += ConsoleCancelKeyPress;
-
-            OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
-            Console.WriteLine();
-
-            // Match legacy ZoneEngine: keep console foreground green for the session.
-            Colouring.Push(ConsoleColor.Green);
-            Console.WriteLine("ZoneEngine_New (root DI + PlayfieldManager + ZoneLogin)");
-
-            if (!InitializeLogging())
-            {
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Failed to initialize logging.");
-                Colouring.Pop();
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
-                return;
-            }
-
-            if (!DatabaseMigrationRunner.TryApplyPendingMigrations())
-            {
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Startup aborted due to database migration failure.");
-                Colouring.Pop();
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
-                return;
-            }
-
             try
             {
+                RuntimeStartup.ValidateArguments(args);
+                RedirectConsoleLog(args, "/stdout-log", "--stdout-log", false);
+                RedirectConsoleLog(args, "/stderr-log", "--stderr-log", true);
+                if (HasArgument(args, "--validate-official-placements"))
+                {
+                    var catalog = new OfficialPlayfieldPlacementCatalog(
+                        OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(AppContext.BaseDirectory));
+                    catalog.WriteValidationArtifacts(
+                        GetArgumentValue(args, "--source-sha")!,
+                        GetArgumentValue(args, "--build-platform")!,
+                        GetArgumentValue(args, "--placement-manifest-output")!,
+                        GetArgumentValue(args, "--placement-provenance-output")!);
+                    Console.WriteLine("OFFICIAL_PLACEMENT_VALIDATION_OK");
+                    return 0;
+                }
+
+                RuntimeStartup.ValidateConfiguration();
+                if (HasArgument(args, "--validate-database"))
+                    return CheckDatabase();
+
+                if (HasArgument(args, "--validate-startup"))
+                {
+                    RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+                    Console.WriteLine("ZONEENGINE_NEW_STARTUP_VALIDATION_OK");
+                    return 0;
+                }
+                if (CheckDatabase() != 0)
+                    return 2;
+                RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+
+                if (!InitializeLogging())
+                    return 1;
+                OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
                 rootServices = BuildRootServices();
                 IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
                 IGameData gameData = rootServices.GetRequiredService<IGameData>();
@@ -93,23 +108,47 @@ namespace ZoneEngine_New
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
+                RuntimeStartup.NotifyService("READY=1\nSTATUS=ZoneEngine_New ready");
+                Console.WriteLine("ZONEENGINE_NEW_READY");
                 logger.Info("ZoneEngine_New root container started.");
+                StartShutdownFileWatcher(args);
+                CommandLoop(args);
+                return Shutdown() ? 0 : 3;
             }
             catch (Exception exception)
             {
-                LogUtil.ErrorException(exception);
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Startup failed: " + exception.Message);
-                Colouring.Pop();
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
-                Shutdown();
-                return;
+                // Configuration and connector exception messages can contain credentials.
+                Console.Error.WriteLine("ZONEENGINE_NEW_STARTUP_FAILED type=" + exception.GetType().Name);
+                if (exception is StartupValidationException)
+                    Console.Error.WriteLine("CONFIGURATION_VALIDATION_FAILED " + exception.Message);
+                if (exception is InvalidDataException || exception is FileNotFoundException || exception is DirectoryNotFoundException)
+                    Console.Error.WriteLine("PACKAGE_VALIDATION_FAILED " + exception.Message);
+                return 1;
             }
+            finally
+            {
+                exited = true;
+                Shutdown();
+                Console.CancelKeyPress -= ConsoleCancelKeyPress;
+            }
+        }
 
-            StartShutdownFileWatcher(args);
-            CommandLoop(args);
-            Shutdown();
+        private static int CheckDatabase()
+        {
+            SchemaCheckResult result = DatabaseSchemaReadiness.Check(MySqlConnectionSettings.GetRequiredConnectionString(),
+                Environment.GetEnvironmentVariable("AO_REBIRTH_EXPECTED_DATABASE"));
+            Console.WriteLine(result.State.ToString());
+            Console.WriteLine(result.Message);
+            return result.IsCurrent ? 0 : 2;
+        }
+
+        private static void RedirectConsoleLog(string[] args, string first, string second, bool error)
+        {
+            string? path = GetEitherArgumentValue(args, first, second);
+            if (string.IsNullOrWhiteSpace(path)) return;
+            var stream = new StreamWriter(new FileStream(Path.GetFullPath(path), FileMode.Append,
+                FileAccess.Write, FileShare.ReadWrite), new UTF8Encoding(false)) { AutoFlush = true };
+            if (error) Console.SetError(stream); else Console.SetOut(stream);
         }
 
         private static ServiceProvider BuildRootServices()
@@ -139,6 +178,7 @@ namespace ZoneEngine_New
             services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
             services.AddSingleton<InventoryFlushService>();
             services.AddSingleton<InventoryMoveService>();
+            services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();
             services.AddSingleton<ZoneMessageCodec>();
 
@@ -181,34 +221,38 @@ namespace ZoneEngine_New
             services.AddSingleton<IMessageHandler, THandler>();
         }
 
-        private static void Shutdown()
+        private static bool Shutdown()
         {
             if (Interlocked.Exchange(ref shutdownStarted, 1) != 0)
             {
-                return;
+                return !shutdownFailed;
             }
-
-            if (networkHost != null)
-            {
-                networkHost.DisposeAsync().AsTask().GetAwaiter().GetResult();
-            }
-
-            networkHost = null;
-
-            playfieldManager?.Dispose();
-            playfieldManager = null;
-
-            chatEngineLink?.Dispose();
-            chatEngineLink = null;
-
+            // Read-only validators must never send a service stop notification.
             if (rootServices != null)
             {
-                rootServices.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                try { RuntimeStartup.NotifyService("STOPPING=1"); }
+                catch (Exception) { Console.Error.WriteLine("ZONEENGINE_NEW_STOP_NOTIFICATION_FAILED"); }
             }
 
+            void Cleanup(Action action)
+            {
+                try { action(); }
+                catch (Exception exception)
+                {
+                    shutdownFailed = true;
+                    Console.Error.WriteLine("ZONEENGINE_NEW_SHUTDOWN_FAILED type=" + exception.GetType().Name);
+                }
+            }
+            Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());
+            networkHost = null;
+            Cleanup(() => playfieldManager?.Dispose());
+            playfieldManager = null;
+            Cleanup(() => chatEngineLink?.Dispose());
+            chatEngineLink = null;
+            Cleanup(() => rootServices?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             rootServices = null;
-
-            LogManager.Configuration = null;
+            Cleanup(LogManager.Shutdown);
+            return !shutdownFailed;
         }
 
         private static bool InitializeLogging()
@@ -221,13 +265,9 @@ namespace ZoneEngine_New
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngine_NewLog.txt", LogLevel.Trace);
                 LogActiveConfiguration();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                LogUtil.ErrorException(e);
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Error initializing NLog");
-                Console.WriteLine(e.Message);
-                Colouring.Pop();
+                Console.Error.WriteLine("Error initializing NLog.");
                 return false;
             }
 
@@ -315,8 +355,7 @@ namespace ZoneEngine_New
                             {
                                 Console.WriteLine("Shutdown file requested.");
                                 exited = true;
-                                Shutdown();
-                                Environment.Exit(0);
+                                return;
                             }
 
                             Thread.Sleep(1000);

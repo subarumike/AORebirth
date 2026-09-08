@@ -5,7 +5,7 @@ namespace AORebirth.Tools.RDBDataExtractor
     using System.IO;
     using System.Text;
 
-    using Ionic.Zlib;
+    using System.IO.Compression;
 
     using MsgPack.Serialization;
 
@@ -59,7 +59,7 @@ namespace AORebirth.Tools.RDBDataExtractor
                         unpacked.Position = 0;
                         using (var compressed = new MemoryStream())
                         {
-                            using (var zlib = new ZlibStream(compressed, CompressionMode.Compress, true))
+                            using (var zlib = new ZLibStream(compressed, CompressionMode.Compress, true))
                                 unpacked.CopyTo(zlib);
 
                             byte[] buffer = compressed.ToArray();

@@ -350,14 +350,38 @@ namespace ZoneEngine_New.Core.Playfield
             Player player = ActivatorUtilities.CreateInstance<Player>(_services, identity);
             player.Playfield = _playfield;
             player.SpawnSource = SpawnSource.Player;
-            player.EnterOnline(session);
-
-            _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
-            player.Rebase();
-
-            _registry.Register(player);
-            _playfieldManager.RegisterPlayer(player);
-            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+            IDisposable? ownership = _snapshot.AcquireOnlineOwnership(characterId);
+            bool registered = false;
+            try
+            {
+                _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
+                player.Rebase();
+                _playfieldManager.RegisterPlayer(player);
+                _registry.Register(player);
+                registered = true;
+                _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+                player.EnterOnline(session);
+                player.AttachOnlineOwnership(ownership);
+                ownership = null;
+            }
+            catch
+            {
+                if (registered)
+                {
+                    _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+                    _registry.Unregister(identity);
+                }
+                _playfieldManager.UnregisterPlayer(player);
+                if (ReferenceEquals(session.Player, player)) session.UnbindPlayer();
+                player.Session = null;
+                player.Playfield = null;
+                throw;
+            }
+            finally
+            {
+                if (ownership != null)
+                    _snapshot.AbandonOnlineOwnership(characterId, ownership);
+            }
 
             _logger.Info(
                 string.Format(
@@ -378,12 +402,29 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(command);
 
-            if (session.State is SessionState.InPlay or SessionState.SpawnReady)
+            lock (session)
+            {
+                CompletePendingSpawnCore(session, command);
+            }
+        }
+
+        private void CompletePendingSpawnCore(IZoneSession session, PendingSpawnInboundItem command)
+        {
+            if (session.State != SessionState.Loading)
             {
                 return;
             }
 
             int characterId = command.Hydration.Character.Id;
+            if (_playfieldManager.FindPlayer(characterId, out _))
+            {
+                CompletePendingReconnect(session, new PendingReconnectInboundItem
+                {
+                    Session = session,
+                    CharacterId = characterId
+                });
+                return;
+            }
             Player player = SpawnPlayer(session, command.Hydration);
 
             session.State = SessionState.SpawnReady;
@@ -413,7 +454,15 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(command);
 
-            if (session.State is SessionState.InPlay or SessionState.SpawnReady)
+            lock (session)
+            {
+                CompletePendingReconnectCore(session, command);
+            }
+        }
+
+        private void CompletePendingReconnectCore(IZoneSession session, PendingReconnectInboundItem command)
+        {
+            if (session.State != SessionState.Loading)
                 return;
 
             int characterId = command.CharacterId;
@@ -426,6 +475,15 @@ namespace ZoneEngine_New.Core.Playfield
                         "Reconnect failed character={0}: not present on playfield {1}",
                         characterId,
                         _playfield.Identity.Instance));
+                session.Close();
+                return;
+            }
+
+            if (player.IsPersistenceQuarantined)
+            {
+                // An uncertain durable transaction invalidates this in-memory aggregate.
+                // Remove it without writing it back; the next login must hydrate storage.
+                DespawnPlayer(player);
                 session.Close();
                 return;
             }
@@ -552,9 +610,13 @@ namespace ZoneEngine_New.Core.Playfield
             if (oldSession == null || ReferenceEquals(oldSession, newSession))
                 return;
 
-            player.Session = null;
-            oldSession.UnbindPlayer();
-            oldSession.Close();
+            lock (oldSession)
+            {
+                // Closing the old socket cannot race the accepted reconnect's ownership.
+                if (ReferenceEquals(player.Session, oldSession)) player.Session = null;
+                oldSession.UnbindPlayer();
+                oldSession.Close();
+            }
 
             _logger.Info(
                 string.Format(
@@ -567,13 +629,16 @@ namespace ZoneEngine_New.Core.Playfield
         {
             int characterId = player.Identity.Instance;
 
-            player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
-            // Return offered items before the snapshot so a logout mid-trade cannot eat them.
-            _trades.Cancel(player, "logged out");
-            if (player.Inventory.IsHydrated)
-                _flush.HardFlush(player);
+            if (!player.IsPersistenceQuarantined)
+            {
+                player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
+                // Return offered items before the snapshot so a logout mid-trade cannot eat them.
+                _trades.Cancel(player, "logged out");
+                if (player.Inventory.IsHydrated)
+                    _flush.HardFlush(player);
 
-            _snapshot.Commit(player);
+                _snapshot.Commit(player);
+            }
 
             IZoneSession? session = player.Session;
             if (session != null)
@@ -589,6 +654,9 @@ namespace ZoneEngine_New.Core.Playfield
             player.Playfield = null;
             player.ConnectionPhase = PlayerConnectionPhase.LinkDead;
             player.LinkDeadUntilUtc = null;
+            player.ReleaseOnlineOwnership();
+            if (player.IsPersistenceQuarantined)
+                _snapshot.ClearOnlineIfUnowned(characterId);
 
             _logger.Info(
                 string.Format(

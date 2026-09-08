@@ -38,7 +38,6 @@ namespace AORebirth.Database
     using System.Data;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     using Dapper;
@@ -53,12 +52,6 @@ namespace AORebirth.Database
     /// </summary>
     public static class Misc
     {
-        private const int MaxSqlBatchLength = 256 * 1024;
-
-        private const string InsertIntoKeyword = "insert into";
-
-        private const string ValuesKeyword = "values";
-
         #region Public Methods and Operators
 
         /// <summary>
@@ -68,6 +61,11 @@ namespace AORebirth.Database
         public static bool CheckDatabase()
         {
             string applicationFolder = Path.Combine(Directory.GetCurrentDirectory(), "SqlTables");
+            if (!Directory.Exists(applicationFolder))
+            {
+                Console.WriteLine("SCHEMA_INCOMPATIBLE: governed SqlTables inventory is missing. Restore the approved package before startup.");
+                return false;
+            }
             string[] files = Directory.GetFiles(applicationFolder, "*.sql", SearchOption.TopDirectoryOnly);
 
             string errorMessage = string.Empty;
@@ -77,9 +75,9 @@ namespace AORebirth.Database
                 {
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                errorMessage = ex.Message;
+                errorMessage = "DATABASE_UNREACHABLE: verify database configuration and access; no schema writes were attempted.";
             }
 
             if (errorMessage != string.Empty)
@@ -119,9 +117,9 @@ namespace AORebirth.Database
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                errorMessage = ex.Message;
+                errorMessage = "SCHEMA_INCOMPATIBLE: required schema could not be read; review the governed baseline and account read permissions.";
             }
 
             if (errorMessage != string.Empty)
@@ -133,324 +131,15 @@ namespace AORebirth.Database
                 return false;
             }
 
-            try
+            if (tablesNotFound.Count > 0)
             {
-                using (IDbConnection conn = Connector.GetConnection())
-                {
-                    if (tablesNotFound.Count > 0)
-                    {
-                        Colouring.Push(ConsoleColor.Red);
-                        Console.Write("SQL Tables are not complete. Should they be created? (Y/N) ");
-                        Colouring.Pop();
-
-                        string answer = Console.ReadLine();
-                        string sqlQuery;
-                        if (answer.ToLower() == "y")
-                        {
-                            foreach (string sqlFile in tablesNotFound)
-                            {
-                                fName = Path.GetFileNameWithoutExtension(sqlFile);
-                                long fileSize = new FileInfo(sqlFile).Length;
-                                Colouring.Push(ConsoleColor.Green);
-                                Console.Write("Table " + fName.PadRight(67) + "[  0%]");
-                                Colouring.Pop();
-                                if (fileSize > 10000)
-                                {
-                                    string[] queries = File.ReadAllLines(sqlFile);
-                                    int counter = 0;
-                                    string lastpercent = "0";
-                                    ExecuteSqlStatementsUntilFirstInsert(conn, queries, ref counter);
-                                    while (counter < queries.Length)
-                                    {
-                                        if (queries[counter].TrimStart().StartsWith(
-                                            InsertIntoKeyword,
-                                            StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            break;
-                                        }
-
-                                        counter++;
-                                    }
-
-                                    if (counter < queries.Length)
-                                    {
-                                        ExecuteLargeSqlInserts(conn, queries, counter, fName, lastpercent);
-                                    }
-                                    else
-                                    {
-                                        Colouring.Push(ConsoleColor.Green);
-                                        Console.Write("\rTable " + fName.PadRight(67) + "[100%]");
-                                        Colouring.Pop();
-                                    }
-                                }
-                                else
-                                {
-                                    sqlQuery = File.ReadAllText(sqlFile);
-                                    conn.Execute(sqlQuery);
-                                    Colouring.Push(ConsoleColor.Green);
-                                    Console.Write("\rTable " + fName.PadRight(67) + "[100%]");
-                                    Colouring.Pop();
-                                }
-
-                                Console.WriteLine();
-                            }
-                        }
-
-                        return true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                LogUtil.ErrorException(e);
+                Console.WriteLine("SCHEMA_MIGRATION_REQUIRED: runtime startup cannot create tables or apply SQL. Review the governed baseline and use the explicit operator migration plan before restarting.");
+                foreach (string file in tablesNotFound)
+                    Console.WriteLine("Missing schema asset: " + Path.GetFileName(file));
                 return false;
             }
 
             return true;
-        }
-
-        private static void ExecuteLargeSqlInserts(
-            IDbConnection conn,
-            string[] queries,
-            int startIndex,
-            string tableName,
-            string lastPercent)
-        {
-            StringBuilder buffer = new StringBuilder(MaxSqlBatchLength);
-            string batchPrefix = string.Empty;
-            int counter = startIndex;
-            while (counter < queries.Length)
-            {
-                string statement = ReadSqlStatement(queries, ref counter);
-                if (statement.Trim().Length == 0)
-                {
-                    continue;
-                }
-
-                string insertPrefix;
-                string valuesPart;
-                if (!TrySplitInsertStatement(statement, out insertPrefix, out valuesPart))
-                {
-                    FlushSqlBatch(conn, buffer);
-                    batchPrefix = string.Empty;
-                    conn.Execute(statement);
-                    WriteTableProgress(tableName, counter, queries.Length, ref lastPercent);
-                    continue;
-                }
-
-                if (batchPrefix != insertPrefix)
-                {
-                    FlushSqlBatch(conn, buffer);
-                    batchPrefix = insertPrefix;
-                }
-
-                foreach (string valuesRow in SplitSqlValuesRows(valuesPart))
-                {
-                    if (buffer.Length == 0)
-                    {
-                        buffer.Append(batchPrefix);
-                    }
-
-                    if (buffer.Length > batchPrefix.Length
-                        && buffer.Length + valuesRow.Length + 2 > MaxSqlBatchLength)
-                    {
-                        FlushSqlBatch(conn, buffer);
-                        buffer.Append(batchPrefix);
-                    }
-
-                    if (buffer.Length > batchPrefix.Length)
-                    {
-                        buffer.Append(", ");
-                    }
-
-                    buffer.Append(valuesRow);
-                }
-                WriteTableProgress(tableName, counter, queries.Length, ref lastPercent);
-            }
-
-            FlushSqlBatch(conn, buffer);
-        }
-
-        private static void ExecuteSqlStatementsUntilFirstInsert(IDbConnection conn, string[] queries, ref int counter)
-        {
-            while (counter < queries.Length)
-            {
-                int statementStart = counter;
-                string statement = ReadSqlStatement(queries, ref counter);
-                if (statement.Trim().Length == 0)
-                {
-                    continue;
-                }
-
-                if (statement.TrimStart().StartsWith(InsertIntoKeyword, StringComparison.OrdinalIgnoreCase))
-                {
-                    counter = statementStart;
-                    return;
-                }
-
-                conn.Execute(statement);
-            }
-        }
-
-        private static string ReadSqlStatement(string[] queries, ref int counter)
-        {
-            StringBuilder statement = new StringBuilder();
-            while (counter < queries.Length)
-            {
-                string line = queries[counter];
-                counter++;
-                if (line.Trim().Length == 0)
-                {
-                    continue;
-                }
-
-                if (statement.Length > 0)
-                {
-                    statement.Append('\n');
-                }
-
-                statement.Append(line);
-                if (line.TrimEnd().EndsWith(";", StringComparison.Ordinal))
-                {
-                    break;
-                }
-            }
-
-            return statement.ToString();
-        }
-
-        private static bool TrySplitInsertStatement(string statement, out string insertPrefix, out string valuesPart)
-        {
-            insertPrefix = string.Empty;
-            valuesPart = string.Empty;
-
-            string trimmed = statement.Trim();
-            if (!trimmed.StartsWith(InsertIntoKeyword, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            int valuesIndex = trimmed.IndexOf(ValuesKeyword, StringComparison.OrdinalIgnoreCase);
-            if (valuesIndex < 0)
-            {
-                return false;
-            }
-
-            valuesPart = trimmed.Substring(valuesIndex + ValuesKeyword.Length).Trim();
-            if (valuesPart.EndsWith(";", StringComparison.Ordinal))
-            {
-                valuesPart = valuesPart.Substring(0, valuesPart.Length - 1).Trim();
-            }
-
-            if (!valuesPart.StartsWith("(", StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            insertPrefix = trimmed.Substring(0, valuesIndex).TrimEnd() + " VALUES ";
-            return true;
-        }
-
-        private static IEnumerable<string> SplitSqlValuesRows(string valuesPart)
-        {
-            List<string> rows = new List<string>();
-            int rowStart = -1;
-            int depth = 0;
-            bool inString = false;
-            char stringDelimiter = '\0';
-            for (int i = 0; i < valuesPart.Length; i++)
-            {
-                char current = valuesPart[i];
-                if (inString)
-                {
-                    if (current == '\\')
-                    {
-                        i++;
-                        continue;
-                    }
-
-                    if (current == stringDelimiter)
-                    {
-                        if (i + 1 < valuesPart.Length && valuesPart[i + 1] == stringDelimiter)
-                        {
-                            i++;
-                            continue;
-                        }
-
-                        inString = false;
-                    }
-
-                    continue;
-                }
-
-                if (current == '\'' || current == '"')
-                {
-                    inString = true;
-                    stringDelimiter = current;
-                    continue;
-                }
-
-                if (current == '(')
-                {
-                    if (depth == 0)
-                    {
-                        rowStart = i;
-                    }
-
-                    depth++;
-                    continue;
-                }
-
-                if (current == ')' && depth > 0)
-                {
-                    depth--;
-                    if (depth == 0 && rowStart >= 0)
-                    {
-                        rows.Add(valuesPart.Substring(rowStart, i - rowStart + 1).Trim());
-                        rowStart = -1;
-                    }
-                }
-            }
-
-            if (rows.Count == 0 && valuesPart.Trim().Length > 0)
-            {
-                rows.Add(valuesPart.Trim());
-            }
-
-            return rows;
-        }
-
-        private static void FlushSqlBatch(IDbConnection conn, StringBuilder buffer)
-        {
-            if (buffer.Length == 0)
-            {
-                return;
-            }
-
-            buffer.Append(";");
-            try
-            {
-                conn.Execute(buffer.ToString());
-            }
-            catch (Exception)
-            {
-                Console.WriteLine(buffer.ToString().Substring(0, Math.Min(300, buffer.Length)));
-                throw;
-            }
-
-            buffer.Clear();
-        }
-
-        private static void WriteTableProgress(string tableName, int counter, int total, ref string lastPercent)
-        {
-            string percent = Convert.ToInt32(Math.Floor((double)counter / total * 100)).ToString();
-            if (percent == lastPercent)
-            {
-                return;
-            }
-
-            Console.Write("\rTable " + tableName.PadRight(67) + "[" + percent.PadLeft(3) + "%]");
-            lastPercent = percent;
         }
 
         /// <summary>

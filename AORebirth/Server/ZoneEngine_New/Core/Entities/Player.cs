@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Threading;
 
     using AORebirth.Enums;
 
@@ -21,6 +22,30 @@ namespace ZoneEngine_New.Core.Entities
     public class Player : Character
     {
         readonly IItemBuilder _items;
+        private IDisposable? _onlineOwnership;
+        private volatile bool _persistenceQuarantined;
+
+        /// <summary>Serializes durable snapshots, write-behind, and economic transactions.</summary>
+        public object PersistenceGate { get; } = new();
+
+        public bool IsPersistenceQuarantined => _persistenceQuarantined;
+
+        /// <summary>An indeterminate commit must be reloaded from storage, never overwritten from memory.</summary>
+        public void QuarantinePersistence()
+        {
+            lock (PersistenceGate)
+                _persistenceQuarantined = true;
+        }
+
+        public void AttachOnlineOwnership(IDisposable ownership)
+        {
+            ArgumentNullException.ThrowIfNull(ownership);
+            if (Interlocked.CompareExchange(ref _onlineOwnership, ownership, null) != null)
+                throw new InvalidOperationException("Player already has online ownership.");
+        }
+
+        public void ReleaseOnlineOwnership()
+            => Interlocked.Exchange(ref _onlineOwnership, null)?.Dispose();
 
         public Player(Identity identity, IZoneLogger logger, IItemBuilder items)
             : base(identity)
@@ -288,10 +313,14 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(session);
 
-            ConnectionPhase = PlayerConnectionPhase.Online;
-            LinkDeadUntilUtc = null;
-            Session = session;
-            session.BindPlayer(this);
+            lock (session)
+            {
+                // Bind first: a transport closed during hydration must not alter the player.
+                session.BindPlayer(this);
+                ConnectionPhase = PlayerConnectionPhase.Online;
+                LinkDeadUntilUtc = null;
+                Session = session;
+            }
         }
 
         static readonly CharacterStat[] FullCharacterStats1 =

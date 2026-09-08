@@ -87,16 +87,7 @@ namespace ZoneEngine_New.Core.Data
                 connection.Open();
                 using MySqlTransaction transaction = connection.BeginTransaction();
 
-                for (int i = 0; i < stats.Count; i++)
-                {
-                    StatRecord stat = stats[i];
-                    using MySqlCommand command = new MySqlCommand(UpsertSql, connection, transaction);
-                    command.Parameters.AddWithValue("@Type", CharacterStatOwnerType);
-                    command.Parameters.AddWithValue("@Instance", characterId);
-                    command.Parameters.AddWithValue("@StatId", stat.StatId);
-                    command.Parameters.AddWithValue("@StatValue", stat.StatValue);
-                    command.ExecuteNonQuery();
-                }
+                UpsertForCharacter(connection, transaction, characterId, stats);
 
                 transaction.Commit();
             }
@@ -109,6 +100,20 @@ namespace ZoneEngine_New.Core.Data
                         "StatRepository.UpsertForCharacter failed for {0}",
                         characterId));
                 throw;
+            }
+        }
+
+        internal static void UpsertForCharacter(MySqlConnection connection, MySqlTransaction transaction,
+            int characterId, IReadOnlyList<StatRecord> stats)
+        {
+            foreach (StatRecord stat in stats)
+            {
+                using var command = new MySqlCommand(UpsertSql, connection, transaction);
+                command.Parameters.AddWithValue("@Type", CharacterStatOwnerType);
+                command.Parameters.AddWithValue("@Instance", characterId);
+                command.Parameters.AddWithValue("@StatId", stat.StatId);
+                command.Parameters.AddWithValue("@StatValue", stat.StatValue);
+                command.ExecuteNonQuery();
             }
         }
     }

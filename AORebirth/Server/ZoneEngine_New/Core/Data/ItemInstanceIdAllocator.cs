@@ -24,7 +24,7 @@ namespace ZoneEngine_New.Core.Data
             ArgumentNullException.ThrowIfNull(logger);
             _inventory = inventory;
             _logger = logger;
-            LeaseBlock();
+            // Construction/readiness must not advance persistent state. Lease on first use.
         }
 
         public int Allocate()

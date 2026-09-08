@@ -22,16 +22,24 @@ namespace AORebirth.Database.Dao
         private static readonly Dictionary<int, HeldZoneLease> ZoneLeases =
             new Dictionary<int, HeldZoneLease>();
 
+#if !AOREBIRTH_WIN_NET10
         public static IDisposable AcquireZoneOwnership(int characterId)
         {
+            return AcquireZoneOwnership(characterId, CharacterDao.Instance.SetOnline);
+        }
+#endif
+
+        public static IDisposable AcquireZoneOwnership(int characterId, Action<int> setOnline)
+        {
             ValidateCharacterId(characterId);
+            if (setOnline == null) throw new ArgumentNullException("setOnline");
             lock (Sync)
             {
                 HeldZoneLease existing;
                 if (ZoneLeases.TryGetValue(characterId, out existing))
                 {
+                    setOnline(characterId);
                     existing.ReferenceCount++;
-                    CharacterDao.Instance.SetOnline(characterId);
                     return new ZoneLeaseReference(characterId);
                 }
 
@@ -57,7 +65,7 @@ namespace AORebirth.Database.Dao
 
                 try
                 {
-                    CharacterDao.Instance.SetOnline(characterId);
+                    setOnline(characterId);
                     ZoneLeases.Add(characterId, new HeldZoneLease(ownershipStream));
                     return new ZoneLeaseReference(characterId);
                 }
@@ -69,23 +77,37 @@ namespace AORebirth.Database.Dao
             }
         }
 
+#if !AOREBIRTH_WIN_NET10
         public static LoginOwnedOnlineCleanupResult TryClearLoginOwnership(int characterId)
         {
-            ValidateCharacterId(characterId);
-            FileStream ownershipStream = TryAcquire(characterId);
-            if (ownershipStream == null)
-            {
-                return LoginOwnedOnlineCleanupResult.ZoneOwned;
-            }
+            return TryClearLoginOwnership(characterId, CharacterDao.Instance.SetOffline);
+        }
+#endif
 
-            try
+        public static LoginOwnedOnlineCleanupResult TryClearLoginOwnership(int characterId, Action<int> setOffline)
+        {
+            ValidateCharacterId(characterId);
+            if (setOffline == null) throw new ArgumentNullException("setOffline");
+            lock (Sync)
             {
-                CharacterDao.Instance.SetOffline(characterId);
-                return LoginOwnedOnlineCleanupResult.Cleared;
-            }
-            finally
-            {
-                ReleaseStream(ownershipStream);
+                // Unix byte-range locks are process-scoped. Opening and closing another
+                // descriptor for an already-held file could release the zone's lock.
+                if (ZoneLeases.ContainsKey(characterId)) return LoginOwnedOnlineCleanupResult.ZoneOwned;
+                FileStream ownershipStream = TryAcquire(characterId);
+                if (ownershipStream == null)
+                {
+                    return LoginOwnedOnlineCleanupResult.ZoneOwned;
+                }
+
+                try
+                {
+                    setOffline(characterId);
+                    return LoginOwnedOnlineCleanupResult.Cleared;
+                }
+                finally
+                {
+                    ReleaseStream(ownershipStream);
+                }
             }
         }
 
@@ -113,6 +135,11 @@ namespace AORebirth.Database.Dao
             {
                 stream.Dispose();
                 return null;
+            }
+            catch
+            {
+                stream.Dispose();
+                throw;
             }
         }
 
@@ -176,7 +203,7 @@ namespace AORebirth.Database.Dao
         private sealed class ZoneLeaseReference : IDisposable
         {
             private readonly int characterId;
-            private bool disposed;
+            private int disposed;
 
             public ZoneLeaseReference(int characterId)
             {
@@ -185,12 +212,11 @@ namespace AORebirth.Database.Dao
 
             public void Dispose()
             {
-                if (this.disposed)
+                if (Interlocked.Exchange(ref this.disposed, 1) != 0)
                 {
                     return;
                 }
 
-                this.disposed = true;
                 ReleaseZoneOwnership(this.characterId);
             }
         }

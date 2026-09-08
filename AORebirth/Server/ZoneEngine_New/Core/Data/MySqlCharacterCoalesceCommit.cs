@@ -52,7 +52,8 @@ namespace ZoneEngine_New.Core.Data
                 _inventory.WritePersist(inserts, updates, connection, transaction);
                 _nanos.WriteInsertMissing(characterId, uploadedNanoIds, connection, transaction);
 
-                transaction.Commit();
+                try { transaction.Commit(); }
+                catch (Exception exception) { throw new DatabaseCommitOutcomeUnknownException(exception); }
             }
             catch (Exception exception)
             {

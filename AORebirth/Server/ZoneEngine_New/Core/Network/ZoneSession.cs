@@ -65,6 +65,7 @@ namespace ZoneEngine_New.Core.Network
         private short _packetNumber;
         private bool _outboundCompressed;
         private volatile bool _closed;
+        private int _state;
 
         public ZoneSession(
             Guid id,
@@ -87,18 +88,37 @@ namespace ZoneEngine_New.Core.Network
 
         public Guid Id { get; }
 
-        public SessionState State { get; set; } = SessionState.Connected;
+        public SessionState State
+        {
+            get => (SessionState)Volatile.Read(ref _state);
+            set
+            {
+                lock (this)
+                {
+                    if (_closed && value != SessionState.Closed)
+                        throw new InvalidOperationException("A closed session cannot resume gameplay.");
+                    Volatile.Write(ref _state, (int)value);
+                }
+            }
+        }
 
         public Player? Player { get; private set; }
 
         public void BindPlayer(Player player)
         {
-            Player = player;
+            lock (this)
+            {
+                if (_closed) throw new InvalidOperationException("A closed session cannot own a player.");
+                if (Player != null && !ReferenceEquals(Player, player))
+                    throw new InvalidOperationException("A session cannot own multiple characters.");
+                Player = player;
+            }
         }
 
         public void UnbindPlayer()
         {
-            Player = null;
+            lock (this)
+                Player = null;
         }
 
         public void Send(byte[] packet)
@@ -328,12 +348,21 @@ namespace ZoneEngine_New.Core.Network
 
         public void Close()
         {
+            lock (this)
+            {
+                CloseCore();
+            }
+        }
+
+        private void CloseCore()
+        {
             if (_closed)
             {
                 return;
             }
 
             _closed = true;
+            State = SessionState.Closed;
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -342,7 +371,7 @@ namespace ZoneEngine_New.Core.Network
                     Player?.Identity.Instance ?? 0,
                     State));
             _sendQueue.Writer.TryComplete();
-            _receiveBuffer.Clear();
+            // The receive loop owns this buffer; do not mutate its List from a closing thread.
 
             DisposeCompressionStreams();
 
@@ -444,7 +473,7 @@ namespace ZoneEngine_New.Core.Network
                     for (int i = 0; i < read; i++)
                         _receiveBuffer.Add(chunk[i]);
 
-                    while (TryPopPacket(out byte[] packet, out bool invalidPacket))
+                    while (!_closed && TryPopPacket(out byte[] packet, out bool invalidPacket))
                     {
                         if (invalidPacket)
                         {

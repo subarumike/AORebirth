@@ -45,7 +45,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string wrapper = ReadRepositoryFile(@"tools\build_aorebirth_debug.cmd");
 
             StringAssert.Contains(wrapper, "git rev-parse HEAD");
-            StringAssert.Contains(wrapper, @"%ZONE_OUTPUT%\ZoneEngine.exe");
+            StringAssert.Contains(wrapper, @"%ZONE_OUTPUT%\ZoneEngine_New.exe");
+            StringAssert.Contains(wrapper, @"AORebirth\Built\Debug\ZoneEngine_New");
             StringAssert.Contains(wrapper, "--validate-official-placements");
             StringAssert.Contains(wrapper, "--source-sha \"%SOURCE_SHA%\"");
             StringAssert.Contains(wrapper, "--placement-manifest-output \"%PLACEMENT_MANIFEST%\"");

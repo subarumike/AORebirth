@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
 
     using MySqlConnector;
@@ -32,14 +33,7 @@ namespace ZoneEngine_New.Core.Data
 
             _logger = logger;
 
-            Config config = ConfigReadWrite.Instance.CurrentConfig;
-            string? connectionString = config?.MysqlConnection;
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new InvalidOperationException("MysqlConnection is not configured.");
-            }
-
-            _connectionString = connectionString;
+            _connectionString = MySqlConnectionSettings.GetRequiredConnectionString();
         }
 
         public CharacterRecord? GetById(int characterId)
@@ -108,27 +102,7 @@ namespace ZoneEngine_New.Core.Data
                 using MySqlConnection connection = new MySqlConnection(_connectionString);
                 connection.Open();
 
-                using MySqlCommand command = new MySqlCommand(UpdateLocationSql, connection);
-                command.Parameters.AddWithValue("@Id", character.Id);
-                command.Parameters.AddWithValue("@Playfield", character.Playfield);
-                command.Parameters.AddWithValue("@X", character.X);
-                command.Parameters.AddWithValue("@Y", character.Y);
-                command.Parameters.AddWithValue("@Z", character.Z);
-                command.Parameters.AddWithValue("@HeadingW", character.HeadingW);
-                command.Parameters.AddWithValue("@HeadingX", character.HeadingX);
-                command.Parameters.AddWithValue("@HeadingY", character.HeadingY);
-                command.Parameters.AddWithValue("@HeadingZ", character.HeadingZ);
-                command.Parameters.AddWithValue("@Online", online);
-
-                int updated = command.ExecuteNonQuery();
-                if (updated == 0)
-                {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "CharacterRepository.SaveLocation found no row for {0}",
-                            character.Id));
-                }
+                SaveLocation(connection, null, character, online);
             }
             catch (Exception exception)
             {
@@ -140,6 +114,73 @@ namespace ZoneEngine_New.Core.Data
                         character.Id));
                 throw;
             }
+        }
+
+        public void SetOnline(int characterId)
+            => SetOnlineState(characterId, 1);
+
+        internal static void LockForTransaction(MySqlConnection connection, MySqlTransaction transaction, int characterId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(characterId);
+            using var row = new MySqlCommand("SELECT Id FROM characters WHERE Id=@Id FOR UPDATE", connection, transaction);
+            row.Parameters.AddWithValue("@Id", characterId);
+            if (row.ExecuteScalar() == null)
+                throw new InvalidOperationException("Transaction participant no longer exists.");
+        }
+
+        public void SetOffline(int characterId)
+            => SetOnlineState(characterId, 0);
+
+        private void SetOnlineState(int characterId, int online)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(characterId);
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            using var command = new MySqlCommand("UPDATE characters SET Online = @Online WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Id", characterId);
+            command.Parameters.AddWithValue("@Online", online);
+            if (command.ExecuteNonQuery() != 1)
+                throw new InvalidOperationException("Character row is missing during online ownership acquisition.");
+        }
+
+        public void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats)
+        {
+            ArgumentNullException.ThrowIfNull(character);
+            ArgumentNullException.ThrowIfNull(stats);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(character.Id);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(character.Playfield);
+
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            using MySqlTransaction transaction = connection.BeginTransaction();
+            SaveLocation(connection, transaction, character, online);
+            MySqlStatRepository.UpsertForCharacter(connection, transaction, character.Id, stats);
+            try
+            {
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                throw new DatabaseCommitOutcomeUnknownException(exception);
+            }
+        }
+
+        private static void SaveLocation(MySqlConnection connection, MySqlTransaction? transaction,
+            CharacterRecord character, int online)
+        {
+            using var command = new MySqlCommand(UpdateLocationSql, connection, transaction);
+            command.Parameters.AddWithValue("@Id", character.Id);
+            command.Parameters.AddWithValue("@Playfield", character.Playfield);
+            command.Parameters.AddWithValue("@X", character.X);
+            command.Parameters.AddWithValue("@Y", character.Y);
+            command.Parameters.AddWithValue("@Z", character.Z);
+            command.Parameters.AddWithValue("@HeadingW", character.HeadingW);
+            command.Parameters.AddWithValue("@HeadingX", character.HeadingX);
+            command.Parameters.AddWithValue("@HeadingY", character.HeadingY);
+            command.Parameters.AddWithValue("@HeadingZ", character.HeadingZ);
+            command.Parameters.AddWithValue("@Online", online);
+            if (command.ExecuteNonQuery() != 1)
+                throw new InvalidOperationException("Character row is missing during snapshot persistence.");
         }
     }
 }

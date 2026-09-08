@@ -216,6 +216,9 @@ namespace ZoneEngine_New.Core.Playfield
             lock (_sync)
             {
                 ObjectDisposedException.ThrowIf(_disposed, this);
+                if (_playersByCharacterId.TryGetValue(characterId, out Player? existing)
+                    && !ReferenceEquals(existing, player))
+                    throw new InvalidOperationException("A character already has an authoritative player instance.");
                 _playersByCharacterId[characterId] = player;
             }
         }

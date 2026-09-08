@@ -8,7 +8,10 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $logDir = Join-Path $root "logs\engines"
 $engineDir = Join-Path $root "AORebirth\Built\Debug"
-$configPath = Join-Path $root "AORebirth\Config\Config.xml"
+$configPath = $env:AO_REBIRTH_CONFIG_PATH
+if ([string]::IsNullOrWhiteSpace($configPath)) {
+    $configPath = Join-Path $root "AORebirth\Config\Config.xml"
+}
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
 $failed = $false
@@ -144,6 +147,7 @@ foreach ($engine in $engines) {
                 if ([string]$metadata.Engine -ieq $engine.Name -and
                     $actualPath -ieq $expectedPath -and
                     $recordedPath -ieq $expectedPath -and
+                    [System.IO.Path]::GetFullPath($shutdownFile) -ieq [System.IO.Path]::GetFullPath($defaultShutdownFile) -and
                     $startDifferenceSeconds -le 5) {
                     $metadataIsTrusted = $true
                 }
@@ -184,9 +188,14 @@ foreach ($engine in $engines) {
     if ($metadataIsTrusted -and $managedStopVerified -and (Test-Path $shutdownFile)) {
         Remove-Item -LiteralPath $shutdownFile -Force
     }
+}
 
+# Both zone implementations share one port. Stop every selected managed process
+# before checking released listeners, including explicit Legacy rollback sessions.
+foreach ($engine in $engines) {
+    $expectedPath = [System.IO.Path]::GetFullPath((Join-Path $engineDir $engine.File))
     if ($engine.Name -eq "ZoneEngine_New") {
-        # net10 skeleton host is not registered in engine_status_probe (shared zone port / path).
+        # Both implementations share a zone port; always verify this exact backend path.
         $stillRunning = @(Get-ProcessesByExecutablePath -ExpectedPath $expectedPath)
         if ($stillRunning) {
             Write-Warning "ZoneEngine_New is still running after stop (pid=$($stillRunning.Id -join ','))."
@@ -194,6 +203,11 @@ foreach ($engine in $engines) {
         }
         else {
             Write-Host "ZoneEngine_New process is not running."
+        }
+        & $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart ZoneEngine_New
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "ZoneEngine_New zone port is not fully released; no unmanaged process was killed."
+            $failed = $true
         }
     }
     else {

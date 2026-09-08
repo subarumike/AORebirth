@@ -45,6 +45,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (body is not ZoneLoginMessage message)
                 return;
 
+            lock (session)
+            {
+                if (session.State != SessionState.Connected)
+                {
+                    session.Close();
+                    return;
+                }
+                session.State = SessionState.Loading;
+            }
             _ = HandleAsyncCore(message, session);
         }
 
@@ -74,8 +83,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            session.State = SessionState.Loading;
-
             if (_playfieldManager.FindPlayer(characterId, out Player existing))
             {
                 BeginReconnect(session, existing, characterId);
@@ -83,7 +90,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             CharacterHydrationResult? hydration = await LoadHydrationAsync(session, characterId).ConfigureAwait(false);
-            if (hydration == null)
+            if (hydration == null || session.State != SessionState.Loading)
                 return;
 
             Playfield playfield = _playfieldManager.GetOrCreate(hydration.Character.Playfield);
@@ -128,12 +135,16 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 characterId);
             SendGameTime(session, playfield, characterId);
 
-            playfield.TryEnqueue(
+            if (!playfield.TryEnqueue(
                 new PendingReconnectInboundItem
                 {
                     Session = session,
                     CharacterId = characterId
-                });
+                }))
+            {
+                session.Close();
+                return;
+            }
 
             _logger.Info(
                 string.Format(
@@ -221,12 +232,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
             Playfield playfield,
             CharacterHydrationResult hydration)
         {
-            playfield.TryEnqueue(
+            if (!playfield.TryEnqueue(
                 new PendingSpawnInboundItem
                 {
                     Session = session,
                     Hydration = hydration
-                });
+                })) session.Close();
         }
 
         private void FailLogin(IZoneSession session, int characterId, string error)

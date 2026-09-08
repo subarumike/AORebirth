@@ -44,11 +44,7 @@ echo [NewZoneEngineBuild] Using MSBuild: %MSBUILD%
 echo [NewZoneEngineBuild] Repo: %CD%
 echo.
 
-echo [1/4] Cleaning stale build processes...
-taskkill /F /T /IM MSBuild.exe >nul 2>&1
-taskkill /F /T /IM dotnet.exe >nul 2>&1
-taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
-taskkill /F /T /IM NuGet.exe >nul 2>&1
+echo [1/4] Building the authoritative ZoneEngine_New backend with isolated MSBuild nodes...
 
 echo.
 echo [2/4] Restoring NuGet packages...
