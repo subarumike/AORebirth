@@ -14,12 +14,15 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/ImplantSlots.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/InventoryError.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/ItemFlags.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/ItemSource.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/ItemTarget.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/ItemType.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/ItemClass.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/MeshLayer.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/MoveModes.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/Operator.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/Properties/AssemblyInfo.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/WeaponFlags.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Enums/WeaponSlots.cs" />
   </ItemGroup>
 </Project>
